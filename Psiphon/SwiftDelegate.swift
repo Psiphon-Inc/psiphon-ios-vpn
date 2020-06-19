@@ -367,58 +367,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func applicationWillTerminate(_ application: UIApplication) {
         self.environmentCleanup?()
     }
-
-    @objc func application(_ application: UIApplication,
-                           continue userActivity: NSUserActivity,
-                           restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
-
-        guard
-            userActivity.activityType == NSUserActivityTypeBrowsingWeb,
-            let incomingURL = userActivity.webpageURL else {
-
-           return false
-        }
-
-        if  incomingURL.scheme == .some("https") &&
-            incomingURL.host == .some("mobile.psi.cash") &&
-            incomingURL.path == "/ios" {
-
-            let topMostViewController = AppDelegate.getTopMostViewController()
-
-            /// Walk up the presenting stack and return the first `PsiCashViewController` found.
-            func findPsiCashViewController(vc: UIViewController) -> PsiCashViewController? {
-                if let psiCashViewController = vc as? PsiCashViewController {
-                    return .some(psiCashViewController)
-                }
-                if let parent = vc.presentingViewController {
-                    return findPsiCashViewController(vc: parent)
-                }
-                return .none
-            }
-
-            // Ensure the PsiCash view controller is the top most view controller and
-            // that it is displaying the buy PsiCash tab.
-            if let psiCashViewController = findPsiCashViewController(vc: topMostViewController) {
-                if psiCashViewController == topMostViewController {
-                    psiCashViewController.activeTab = .addPsiCash
-                } else if let presented = psiCashViewController.presentedViewController {
-                    // Dismiss any presented view controllers so the top most view controller is
-                    // the PsiCash view controller.
-                    presented.dismiss(animated: true) {
-                        psiCashViewController.activeTab = .addPsiCash
-                    }
-                }
-            } else if let psiCashViewController = makePsiCashViewController(.addPsiCash) {
-                AppDelegate.getTopMostViewController().present(psiCashViewController,
-                                                               animated: true,
-                                                               completion: .none)
-            }
-
-            return true
-        }
-
-        return false
-    }
     
     @objc func makeSubscriptionBarView() -> SubscriptionBarView {
         SubscriptionBarView { [unowned objcBridge, store] state in
