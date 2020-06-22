@@ -111,6 +111,7 @@ func makeEnvironment(
     sharedDB: PsiphonDataSharedDB,
     psiCashLib: PsiCash,
     supportedAppStoreProducts: SupportedAppStoreProducts,
+    userDefaultsConfig: UserDefaultsConfig,
     objcBridgeDelegate: ObjCBridgeDelegate,
     rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
     calendar: Calendar
@@ -142,7 +143,7 @@ func makeEnvironment(
         psiCashEffects: PsiCashEffects.default(psiCash: psiCashLib, feedbackLogger: feedbackLogger),
         clientMetaData: ClientMetaData(AppInfoObjC()),
         sharedDB: sharedDB,
-        userConfigs: UserDefaultsConfig(),
+        userConfigs: userDefaultsConfig,
         notifier: NotifierObjC(notifier:Notifier.sharedInstance()),
         tunnelStatusSignal: store.$value.signalProducer
             .map(\.vpnState.value.providerVPNStatus),

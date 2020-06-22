@@ -109,6 +109,12 @@ import PsiCashClient
     @objc func reinstallVPNConfig()
     @objc func installVPNConfigWithPromise()
         -> Promise<VPNConfigInstallResultWrapper>.ObjCPromise<VPNConfigInstallResultWrapper>
+    
+    // User defaults
+    
+    // Returns Locale for currently selected app language.
+    // Note that this can be different from device Locale value `Locale.current`.
+    @objc func getLocaleForCurrentAppLanguage() -> NSLocale
 }
 
 // MARK: Bridged Types

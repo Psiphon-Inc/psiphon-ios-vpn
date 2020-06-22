@@ -84,6 +84,7 @@ func appDelegateReducer(
     private let feedbackLogger = FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler())
     private let supportedProducts =
         SupportedAppStoreProducts.fromPlists(types: [.subscription, .psiCash])
+    private let userDefaultsConfig = UserDefaultsConfig()
     
     private var (lifetime, token) = Lifetime.make()
     private var objcBridge: ObjCBridgeDelegate!
@@ -154,6 +155,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     sharedDB: self.sharedDB,
                     psiCashLib: self.psiCashLib,
                     supportedAppStoreProducts: self.supportedProducts,
+                    userDefaultsConfig: self.userDefaultsConfig,
                     objcBridgeDelegate: objcBridge,
                     rewardedVideoAdBridgeDelegate: self,
                     calendar: Calendar.current
@@ -623,5 +625,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         }
         
         return promise.asObjCPromise()
+    }
+    
+    @objc func getLocaleForCurrentAppLanguage() -> NSLocale {
+        return self.userDefaultsConfig.localeForAppLanguage as NSLocale
     }
 }

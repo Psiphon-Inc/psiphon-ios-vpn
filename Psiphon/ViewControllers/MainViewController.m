@@ -854,12 +854,13 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 
     // Add constraints
     regionSelectionButton.translatesAutoresizingMaskIntoConstraints = NO;
-    NSLayoutConstraint *idealBottomSpacing = [regionSelectionButton.bottomAnchor constraintEqualToAnchor:bottomBarBackground.topAnchor constant:-31.f];
+    NSLayoutConstraint *idealBottomSpacing = [regionSelectionButton.bottomAnchor constraintEqualToAnchor:bottomBarBackground.topAnchor constant:-25.f];
     [idealBottomSpacing setPriority:999];
 
     [NSLayoutConstraint activateConstraints:@[
         idealBottomSpacing,
-        [regionSelectionButton.heightAnchor constraintEqualToConstant:58.0],
+        [regionSelectionButton.topAnchor constraintGreaterThanOrEqualToAnchor:statusLabel.bottomAnchor
+                                                                     constant:15.0],
         [regionSelectionButton.leadingAnchor constraintEqualToAnchor:viewWidthGuide.leadingAnchor],
         [regionSelectionButton.trailingAnchor constraintEqualToAnchor:settingsButton.leadingAnchor
                                                              constant:-10.f]
