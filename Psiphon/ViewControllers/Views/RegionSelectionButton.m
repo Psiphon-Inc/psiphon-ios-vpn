@@ -70,16 +70,17 @@
 
 - (void)setupAutoLayoutConstraints {
     flagImageView.translatesAutoresizingMaskIntoConstraints = NO;
-    [flagImageView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:22.f].active = YES;
-    [flagImageView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor constant:1].active = YES;
+    [flagImageView.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:14.f].active = YES;
+    [flagImageView.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
     [flagImageView.widthAnchor constraintEqualToConstant:41.f].active = YES;
     [flagImageView.heightAnchor constraintEqualToConstant:29.f].active = YES;
+    [flagImageView.topAnchor constraintEqualToAnchor:self.topAnchor constant:14.0].active = YES;
+    [flagImageView.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-14.0].active = YES;
 
     regionNameLabel.translatesAutoresizingMaskIntoConstraints = NO;
     [regionNameLabel.leadingAnchor constraintEqualToAnchor:flagImageView.trailingAnchor constant:14.f].active = YES;
-    [regionNameLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor constant:1].active = YES;
-    [regionNameLabel.heightAnchor constraintEqualToAnchor:self.heightAnchor multiplier:.5].active = YES;
-    [regionNameLabel.trailingAnchor constraintEqualToAnchor:rightArrow.leadingAnchor constant:-14.f].active = YES;
+    [regionNameLabel.centerYAnchor constraintEqualToAnchor:self.centerYAnchor].active = YES;
+    [regionNameLabel.trailingAnchor constraintEqualToAnchor:rightArrow.leadingAnchor constant:-5.f].active = YES;
 
     UIImage *rightArrowImage = [UIImage imageNamed:@"ChevronWhite"];
     rightArrow.image = rightArrowImage;
