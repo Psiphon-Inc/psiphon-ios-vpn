@@ -81,6 +81,9 @@ import PsiCashClient
     @objc func applicationDidEnterBackground(_ application: UIApplication)
     @objc func applicationDidBecomeActive(_ application: UIApplication)
     @objc func applicationWillTerminate(_ application: UIApplication)
+    @objc func application(_ app: UIApplication,
+                           open url: URL,
+                           options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool
     
     // -
     
