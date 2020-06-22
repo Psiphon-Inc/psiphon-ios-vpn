@@ -22,17 +22,7 @@ CustomStringConvertible where RawValue == String {
 }
 
 extension TypedIdentifier {
-    
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        try container.encode(self.rawValue)
-    }
-    
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-        self.init(rawValue: try container.decode(String.self))!
-    }
-    
+     
     public var description: String {
         self.rawValue
     }
