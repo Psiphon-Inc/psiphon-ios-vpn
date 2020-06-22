@@ -348,7 +348,7 @@ public struct UserDefault<T: UserDefaultsPropertyListType> {
     let defaultValue: T
     let store: UserDefaults
 
-    init(_ store: UserDefaults, _ key: String, defaultValue: T) {
+    public init(_ store: UserDefaults, _ key: String, defaultValue: T) {
         self.key = key
         self.defaultValue = defaultValue
         self.store = store
