@@ -71,7 +71,7 @@ extension PsiCashViewControllerState {
     
 }
 
-final class PsiCashViewController: UIViewController {
+final class PsiCashViewController: ReactiveViewController {
     typealias AddPsiCashViewType =
         EitherView<PsiCashCoinPurchaseTable,
         EitherView<Spinner,
@@ -111,7 +111,10 @@ final class PsiCashViewController: UIViewController {
     private let productRequestStore: Store<Utilities.Unit, ProductRequestAction>
 
     // VC-specific UI state
-    @State private var activeTab: Tabs
+
+    /// Active view in the view controller.
+    /// - Warning: Must only be set from the main thread.
+    @State var activeTab: Tabs
     private var navigation: Screen = .mainScreen
 
     /// Set of presented error alerts.
@@ -467,6 +470,8 @@ final class PsiCashViewController: UIViewController {
 
     // Setup and add all the views here
     override func viewDidLoad() {
+        super.viewDidLoad()
+
         setBackgroundGradient(for: view)
 
         tabControl.setTabHandler { [unowned self] tab in
@@ -522,6 +527,7 @@ final class PsiCashViewController: UIViewController {
     }
 
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         productRequestStore.send(.getProductList)
     }
 
@@ -561,7 +567,7 @@ extension PsiCashViewController {
         }
         
         let alertController = makeAlertController()
-        self.present(alertController, animated: true, completion: nil)
+        self.presentOnViewDidAppear(alertController, animated: true, completion: nil)
     }
 
     private func display(screen: Screen) {
@@ -578,12 +584,12 @@ extension PsiCashViewController {
             let purchasingViewController = AlertViewController(viewBuilder:
                 PsiCashPurchasingViewBuilder())
 
-            self.present(purchasingViewController, animated: false,
+            self.presentOnViewDidAppear(purchasingViewController, animated: false,
                                              completion: nil)
 
         case .speedBoostPurchaseDialog:
             let vc = AlertViewController(viewBuilder: PurchasingSpeedBoostAlertViewBuilder())
-            self.present(vc, animated: false, completion: nil)
+            self.presentOnViewDidAppear(vc, animated: false, completion: nil)
         }
     }
 

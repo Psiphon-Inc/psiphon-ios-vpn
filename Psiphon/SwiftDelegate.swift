@@ -369,6 +369,47 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func applicationWillTerminate(_ application: UIApplication) {
         self.environmentCleanup?()
     }
+
+    @objc func application(_ app: UIApplication,
+                           open url: URL,
+                           options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+
+        // Open add PsiCash screen when the user navigates to "psiphon://psicash".
+        if let scheme = url.scheme,
+            scheme == "psiphon",
+            let host = url.host,
+            host == "psicash" {
+
+            let topMostViewController = AppDelegate.getTopMostViewController()
+
+            /// Walk up the presenting stack and return the first `PsiCashViewController` found.
+            func findPsiCashViewController(vc: UIViewController) -> PsiCashViewController? {
+                if let psiCashViewController = vc as? PsiCashViewController {
+                    return .some(psiCashViewController)
+                }
+                if let parent = vc.presentingViewController {
+                    return findPsiCashViewController(vc: parent)
+                }
+                return .none
+            }
+
+            // Ensure the PsiCash view controller is either the top most view controller
+            // or in the presented view hierarchy.
+            if let psiCashViewController = findPsiCashViewController(vc: topMostViewController) {
+                if psiCashViewController == topMostViewController {
+                    psiCashViewController.activeTab = .addPsiCash
+                }
+            } else if let psiCashViewController = makePsiCashViewController(.addPsiCash) {
+                AppDelegate.getTopMostViewController().present(psiCashViewController,
+                                                               animated: true,
+                                                               completion: .none)
+            }
+
+            return true
+        }
+
+        return false
+    }
     
     @objc func makeSubscriptionBarView() -> SubscriptionBarView {
         SubscriptionBarView { [unowned objcBridge, store] state in
