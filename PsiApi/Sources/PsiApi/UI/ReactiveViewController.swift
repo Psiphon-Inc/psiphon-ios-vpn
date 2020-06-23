@@ -113,7 +113,7 @@ open class ReactiveViewController: UIViewController {
                                               completion: (() -> Void)? = nil) {
 
         self.$lifeCycle.signalProducer
-            .filter{ $0.viewDidAppear }.take(last: 1).startWithValues { [weak self] _ in
+            .filter{ $0.viewDidAppear }.take(first: 1).startWithValues { [weak self] _ in
                 self?.present(viewControllerToPresent, animated: flag, completion: completion)
         }
     }
