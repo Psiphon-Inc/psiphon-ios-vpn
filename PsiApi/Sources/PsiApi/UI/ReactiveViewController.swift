@@ -83,7 +83,7 @@ open class ReactiveViewController: UIViewController {
     /// Value of the last UIViewController lifecycle call. The property wrapper provides
     /// an interface to obtain a stream of UIViewController lifecycle call values, which starts
     /// with the current value of this variable.
-    @State public var lifeCycle: ViewControllerLifeCycle = .initing
+    @State public private(set) var lifeCycle: ViewControllerLifeCycle = .initing
 
     open override func viewDidLoad() {
         super.viewDidLoad()
@@ -113,7 +113,7 @@ open class ReactiveViewController: UIViewController {
                                               completion: (() -> Void)? = nil) {
 
         self.$lifeCycle.signalProducer
-            .filter{ $0.viewDidAppear}.take(last: 1).startWithValues { [unowned self] _ in
+            .filter{ $0.viewDidAppear }.take(last: 1).startWithValues { [unowned self] _ in
                 self.present(viewControllerToPresent, animated: flag, completion: completion)
         }
     }
