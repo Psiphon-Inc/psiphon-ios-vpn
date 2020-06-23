@@ -81,9 +81,9 @@ import PsiCashClient
     @objc func applicationDidEnterBackground(_ application: UIApplication)
     @objc func applicationDidBecomeActive(_ application: UIApplication)
     @objc func applicationWillTerminate(_ application: UIApplication)
-    @objc func application(_ application: UIApplication,
-                           continue userActivity: NSUserActivity,
-                           restorationHandler: @escaping ([Any]?) -> Void) -> Bool
+    @objc func application(_ app: UIApplication,
+                           open url: URL,
+                           options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool
     
     // -
     
@@ -112,6 +112,12 @@ import PsiCashClient
     @objc func reinstallVPNConfig()
     @objc func installVPNConfigWithPromise()
         -> Promise<VPNConfigInstallResultWrapper>.ObjCPromise<VPNConfigInstallResultWrapper>
+    
+    // User defaults
+    
+    // Returns Locale for currently selected app language.
+    // Note that this can be different from device Locale value `Locale.current`.
+    @objc func getLocaleForCurrentAppLanguage() -> NSLocale
 }
 
 // MARK: Bridged Types

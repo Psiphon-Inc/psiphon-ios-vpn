@@ -23,7 +23,9 @@
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "Strings.h"
 #import "DispatchUtils.h"
+#import "Psiphon-Swift.h"
 
+#define FastestCountryCode @""
 
 @implementation SkyRegionSelectionViewController {
     NSArray<Region *> *regions;
@@ -43,13 +45,37 @@
 }
 
 - (void)populateRegionsArray {
+    
+    // Locale for currently selected app language.
+    NSLocale *appLangLocale = [SwiftDelegate.bridge getLocaleForCurrentAppLanguage];
+    
     NSString *currentRegionCode = [[RegionAdapter sharedInstance] getSelectedRegion].code;
 
-    regions = [[[RegionAdapter sharedInstance] getRegions]
+    regions = [[[[RegionAdapter sharedInstance] getRegions]
         filteredArrayUsingPredicate:[NSPredicate predicateWithBlock:^BOOL(Region *evaluatedObject,
           NSDictionary<NSString *, id> *bindings) {
             return evaluatedObject.serverExists;
-        }]];
+    }]] sortedArrayUsingComparator:^NSComparisonResult(Region*  _Nonnull obj1, Region* _Nonnull obj2) {
+        // Sorts the array alphabetically using current locale.
+        NSString *region1Name;
+        if ([obj1.code isEqualToString:FastestCountryCode]) {
+            region1Name = @"";
+        } else {
+            region1Name = [[RegionAdapter sharedInstance] getLocalizedRegionTitle:obj1.code];
+        }
+        
+        NSString *region2Name;
+        if ([obj2.code isEqualToString:FastestCountryCode]) {
+            region2Name = @"";
+        } else {
+            region2Name = [[RegionAdapter sharedInstance] getLocalizedRegionTitle:obj2.code];
+        }
+        
+        return [region1Name compare:region2Name
+                            options:kNilOptions
+                              range:NSMakeRange(0, region1Name.length)
+                             locale:appLangLocale];
+    }];
 
     [regions enumerateObjectsUsingBlock:^(Region *r, NSUInteger idx, BOOL *stop) {
         if ([r.code isEqualToString:currentRegionCode]) {

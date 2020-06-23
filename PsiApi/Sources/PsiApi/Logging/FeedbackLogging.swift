@@ -182,8 +182,12 @@ func makeFeedbackEntry<T: CustomFieldFeedbackDescription>(_ value: T) -> String 
 
 fileprivate func normalizeFeedbackDescriptionTypes(_ value: String) -> String {
     value.replacingOccurrences(of: "\"", with: "\\\"")
+        // Removes module prefixes.
         .replacingOccurrences(of: "Psiphon.", with: "")
         .replacingOccurrences(of: "Swift.", with: "")
+        .replacingOccurrences(of: "PsiApi.", with: "")
+        .replacingOccurrences(of: "AppStoreIAP.", with: "")
+        .replacingOccurrences(of: "Utilities.", with: "")
 }
 
 extension String {

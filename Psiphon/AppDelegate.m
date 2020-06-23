@@ -93,13 +93,6 @@ PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 
 # pragma mark - Lifecycle methods
 
--  (BOOL)application:(UIApplication *)application
-continueUserActivity:(NSUserActivity *)userActivity
-  restorationHandler:(void (^)(NSArray<id<UIUserActivityRestoring>> * _Nullable))restorationHandler {
-
-    return [SwiftDelegate.bridge application:application continue:userActivity restorationHandler:restorationHandler];
-}
-
 - (BOOL)application:(UIApplication *)application
 willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
@@ -173,6 +166,13 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     LOG_DEBUG();
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     [SwiftDelegate.bridge applicationWillTerminate:application];
+}
+
+- (BOOL)application:(UIApplication *)app
+            openURL:(NSURL *)url
+            options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
+
+    return [SwiftDelegate.bridge application:app open:url options:options];
 }
 
 #pragma mark - VPN start stop

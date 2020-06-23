@@ -84,6 +84,7 @@ func appDelegateReducer(
     private let feedbackLogger = FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler())
     private let supportedProducts =
         SupportedAppStoreProducts.fromPlists(types: [.subscription, .psiCash])
+    private let userDefaultsConfig = UserDefaultsConfig()
     
     private var (lifetime, token) = Lifetime.make()
     private var objcBridge: ObjCBridgeDelegate!
@@ -154,6 +155,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     sharedDB: self.sharedDB,
                     psiCashLib: self.psiCashLib,
                     supportedAppStoreProducts: self.supportedProducts,
+                    userDefaultsConfig: self.userDefaultsConfig,
                     objcBridgeDelegate: objcBridge,
                     rewardedVideoAdBridgeDelegate: self,
                     calendar: Calendar.current
@@ -368,20 +370,15 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.environmentCleanup?()
     }
 
-    @objc func application(_ application: UIApplication,
-                           continue userActivity: NSUserActivity,
-                           restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
+    @objc func application(_ app: UIApplication,
+                           open url: URL,
+                           options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
 
-        guard
-            userActivity.activityType == NSUserActivityTypeBrowsingWeb,
-            let incomingURL = userActivity.webpageURL else {
-
-           return false
-        }
-
-        if  incomingURL.scheme == .some("https") &&
-            incomingURL.host == .some("mobile.psi.cash") &&
-            incomingURL.path == "/ios" {
+        // Open add PsiCash screen when the user navigates to "psiphon://psicash".
+        if let scheme = url.scheme,
+            scheme == "psiphon",
+            let host = url.host,
+            host == "psicash" {
 
             let topMostViewController = AppDelegate.getTopMostViewController()
 
@@ -396,17 +393,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 return .none
             }
 
-            // Ensure the PsiCash view controller is the top most view controller and
-            // that it is displaying the buy PsiCash tab.
+            // Ensure the PsiCash view controller is either the top most view controller
+            // or in the presented view hierarchy.
             if let psiCashViewController = findPsiCashViewController(vc: topMostViewController) {
                 if psiCashViewController == topMostViewController {
                     psiCashViewController.activeTab = .addPsiCash
-                } else if let presented = psiCashViewController.presentedViewController {
-                    // Dismiss any presented view controllers so the top most view controller is
-                    // the PsiCash view controller.
-                    presented.dismiss(animated: true) {
-                        psiCashViewController.activeTab = .addPsiCash
-                    }
                 }
             } else if let psiCashViewController = makePsiCashViewController(.addPsiCash) {
                 AppDelegate.getTopMostViewController().present(psiCashViewController,
@@ -675,5 +666,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         }
         
         return promise.asObjCPromise()
+    }
+    
+    @objc func getLocaleForCurrentAppLanguage() -> NSLocale {
+        return self.userDefaultsConfig.localeForAppLanguage as NSLocale
     }
 }

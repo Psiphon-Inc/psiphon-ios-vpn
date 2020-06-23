@@ -18,8 +18,25 @@
 	<string>1.0.43</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLName</key>
+			<string>ca.psiphon.Psiphon</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>psiphon</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>163</string>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-1072041961750291~2085686375</string>
+	<key>GADDelayAppMeasurementInit</key>
+	<true/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
@@ -57,9 +74,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-1072041961750291~2085686375</string>
-    <key>GADDelayAppMeasurementInit</key>
-    <true/>
 </dict>
 </plist>
