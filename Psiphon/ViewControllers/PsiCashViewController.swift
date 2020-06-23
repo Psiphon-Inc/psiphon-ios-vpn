@@ -470,6 +470,8 @@ final class PsiCashViewController: ReactiveViewController {
 
     // Setup and add all the views here
     override func viewDidLoad() {
+        super.viewDidLoad()
+
         setBackgroundGradient(for: view)
 
         tabControl.setTabHandler { [unowned self] tab in
@@ -525,6 +527,7 @@ final class PsiCashViewController: ReactiveViewController {
     }
 
     override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         productRequestStore.send(.getProductList)
     }
 
