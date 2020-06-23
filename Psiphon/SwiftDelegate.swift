@@ -393,17 +393,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 return .none
             }
 
-            // Ensure the PsiCash view controller is the top most view controller and
-            // that it is displaying the buy PsiCash tab.
+            // Ensure the PsiCash view controller is either the top most view controller
+            // or in the presented view hierarchy.
             if let psiCashViewController = findPsiCashViewController(vc: topMostViewController) {
                 if psiCashViewController == topMostViewController {
                     psiCashViewController.activeTab = .addPsiCash
-                } else if let presented = psiCashViewController.presentedViewController {
-                    // Dismiss any presented view controllers so the top most view controller is
-                    // the PsiCash view controller.
-                    presented.dismiss(animated: true) {
-                        psiCashViewController.activeTab = .addPsiCash
-                    }
                 }
             } else if let psiCashViewController = makePsiCashViewController(.addPsiCash) {
                 AppDelegate.getTopMostViewController().present(psiCashViewController,
