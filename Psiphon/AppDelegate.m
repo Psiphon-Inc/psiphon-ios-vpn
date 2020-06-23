@@ -168,6 +168,13 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [SwiftDelegate.bridge applicationWillTerminate:application];
 }
 
+- (BOOL)application:(UIApplication *)app
+            openURL:(NSURL *)url
+            options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
+
+    return [SwiftDelegate.bridge application:app open:url options:options];
+}
+
 #pragma mark - VPN start stop
 
 // Emitted NSNumber is of type VPNIntent.
