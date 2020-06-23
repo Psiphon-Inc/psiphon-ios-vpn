@@ -326,7 +326,9 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
         // Banner Title
         UILabel *title = [[UILabel alloc] initWithFrame:CGRectZero];
-        title.numberOfLines = 0;
+        title.numberOfLines = 1;
+        title.adjustsFontSizeToFitWidth = TRUE;
+        title.minimumScaleFactor = 0.6;
         title.lineBreakMode = NSLineBreakByWordWrapping;
         title.textColor = UIColor.whiteColor;
         title.textAlignment = NSTextAlignmentCenter;
@@ -358,10 +360,14 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
         [NSLayoutConstraint activateConstraints:@[
             [title.topAnchor constraintEqualToAnchor:cellView.topAnchor constant:35.0],
             [title.centerXAnchor constraintEqualToAnchor:cellView.centerXAnchor],
+            [title.leadingAnchor constraintEqualToAnchor:cellView.leadingAnchor constant:20.0],
+            [title.trailingAnchor constraintEqualToAnchor:cellView.trailingAnchor constant:-20.0],
 
             [subtitle.topAnchor constraintEqualToAnchor:title.bottomAnchor constant:18.0],
             [subtitle.centerXAnchor constraintEqualToAnchor:cellView.centerXAnchor],
-            [subtitle.bottomAnchor constraintEqualToAnchor:cellView.bottomAnchor constant:-20.0]
+            [subtitle.bottomAnchor constraintEqualToAnchor:cellView.bottomAnchor constant:-20.0],
+            [subtitle.leadingAnchor constraintEqualToAnchor:title.leadingAnchor],
+            [subtitle.trailingAnchor constraintEqualToAnchor:title.trailingAnchor]
         ]];
 
         return cellView;

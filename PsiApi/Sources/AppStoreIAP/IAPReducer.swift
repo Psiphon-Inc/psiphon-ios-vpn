@@ -185,19 +185,19 @@ public func iapReducer(
         return [ environment.paymentQueue.addPayment(product).mapNever() ]
         
     case .receiptUpdated(let maybeReceiptData):
-        guard let unverifiedPsiCashTx = state.iap.unfinishedPsiCashTx else {
+        guard let unfinishedPsiCashTx = state.iap.unfinishedPsiCashTx else {
             return []
         }
         
         // Requests verification only if one has not been made, or it failed.
-        if case .pendingResponse = unverifiedPsiCashTx.verification {
+        if case .pendingResponse = unfinishedPsiCashTx.verification {
             // A verification request has already been made.
             return []
         }
         
         guard let receiptData = maybeReceiptData else {
             state.iap.unfinishedPsiCashTx = UnfinishedConsumableTransaction(
-                transaction: unverifiedPsiCashTx.transaction,
+                transaction: unfinishedPsiCashTx.transaction,
                 verificationState: .requestError(
                     ErrorEvent(ErrorRepr(repr: "nil receipt"), date: environment.getCurrentTime())
                 )
@@ -207,7 +207,7 @@ public func iapReducer(
                 environment.feedbackLogger.log(.error, """
                     nil receipt data: \
                     failed to send verification request for transaction: \
-                    '\(unverifiedPsiCashTx)'
+                    '\(unfinishedPsiCashTx)'
                     """)
                     .mapNever()
             ]
@@ -215,7 +215,7 @@ public func iapReducer(
         
         guard let customData = environment.psiCashEffects.rewardedVideoCustomData() else {
             state.iap.unfinishedPsiCashTx = UnfinishedConsumableTransaction(
-                transaction: unverifiedPsiCashTx.transaction,
+                transaction: unfinishedPsiCashTx.transaction,
                 verificationState: .requestError(
                     ErrorEvent(
                         ErrorRepr(repr: "nil custom data"),
@@ -227,14 +227,14 @@ public func iapReducer(
                 environment.feedbackLogger.log(.error, """
                     nil customData: \
                     failed to send verification request for transaction: \
-                    '\(unverifiedPsiCashTx)'
+                    '\(unfinishedPsiCashTx)'
                     """)
                     .mapNever()
             ]
         }
         
         state.iap.unfinishedPsiCashTx = UnfinishedConsumableTransaction(
-            transaction: unverifiedPsiCashTx.transaction,
+            transaction: unfinishedPsiCashTx.transaction,
             verificationState: .pendingResponse
         )
         
@@ -242,7 +242,7 @@ public func iapReducer(
         
         let req = PurchaseVerifierServer.psiCash(
             requestBody: PsiCashValidationRequest(
-                transaction: unverifiedPsiCashTx.transaction,
+                transaction: unfinishedPsiCashTx.transaction,
                 receipt: receiptData,
                 customData: customData
             ),
@@ -270,7 +270,7 @@ public func iapReducer(
             ).map {
                 ._psiCashConsumableVerificationRequestResult(
                     result: $0,
-                    forTransaction: unverifiedPsiCashTx.transaction
+                    forTransaction: unfinishedPsiCashTx.transaction
                 )
             },
             
@@ -280,7 +280,7 @@ public func iapReducer(
             
             environment.feedbackLogger.log(.info, """
                 verifying PsiCash consumable IAP with transaction ID: \
-                '\(unverifiedPsiCashTx.transaction)'
+                '\(unfinishedPsiCashTx.transaction)'
                 """).mapNever()
         ]
         
@@ -420,13 +420,19 @@ public func iapReducer(
                         reason: .purchasedPsiCash,
                         persisted: environment.psiCashPersistedValues
                     )
+                    
+                    effects.append(
+                        environment.feedbackLogger.log(.info, """
+                            new IAP transaction: transaction ID: '\(tx.transactionID().rawValue)': \
+                            product ID: '\(tx.productID().rawValue)'
+                            """).mapNever()
+                    )
                 }
                 
             case .success(.nonUnique):
-                // Transaction has the same identifier as the current
-                // unverified psicash IAP transaction.
+                // There is already an existing unfinished consumable transaction.
                 effects.append(
-                    environment.feedbackLogger.log(.warn,"""
+                    environment.feedbackLogger.log(.warn, """
                         unexpected duplicate transaction with id '\(tx.transactionID())'
                         """).mapNever()
                 )
