@@ -35,6 +35,7 @@ struct Styling {
     var largeButtonHeight: CGFloat = 60.0
     var statusBarStyle = UIStatusBarStyle.lightContent
     var buttonContentEdgeInsets = UIEdgeInsets(top: 10.0, left: 15.0, bottom: 10.0, right: 15.0)
+    var buttonMinimumContentEdgeInsets = UIEdgeInsets(top: 5.0, left: 5.0, bottom: 5.0, right: 5.0)
 }
 
 enum Gradients: Int {
@@ -88,23 +89,38 @@ extension UILabel {
         numberOfLines: Int = 1,
         alignment: NSTextAlignment = .natural) -> Label {
 
-        let v = Label(frame: .zero)
-        v.backgroundColor = .clear
-        v.adjustsFontSizeToFitWidth = true
-        v.minimumScaleFactor = 0.6
-        v.font = typeface.font(fontSize)
-        v.textAlignment = alignment
-        v.textColor = color
-        v.isUserInteractionEnabled = false
-        v.clipsToBounds = false
-        v.text = text
-
-        v.numberOfLines = numberOfLines
+        let label = Label(frame: .zero)
+        label.apply(text: text,
+                    fontSize: fontSize,
+                    typeface: typeface,
+                    color: color,
+                    numberOfLines: numberOfLines,
+                    alignment: alignment)
+        return label
+    }
+    
+    func apply(
+        text: String = "",
+        fontSize: FontSize = .normal,
+        typeface: AvenirFont = .demiBold,
+        color: UIColor = .white,
+        numberOfLines: Int = 1,
+        alignment: NSTextAlignment = .natural
+    ) {
+        backgroundColor = .clear
+        adjustsFontSizeToFitWidth = true
+        minimumScaleFactor = 0.6
+        font = typeface.font(fontSize)
+        textAlignment = alignment
+        textColor = color
+        isUserInteractionEnabled = false
+        clipsToBounds = false
+        self.text = text
+        
+        self.numberOfLines = numberOfLines
         if numberOfLines == 0 {
-            v.lineBreakMode = .byWordWrapping
+            lineBreakMode = .byWordWrapping
         }
-
-        return v
     }
 
 }
