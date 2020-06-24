@@ -106,6 +106,8 @@ final class PsiCashViewController: ReactiveViewController {
         }
     }
 
+    private let viewControllerInitTime = Date()
+    
     private let (lifetime, token) = Lifetime.make()
     private let store: Store<PsiCashViewControllerState, PsiCashAction>
     private let productRequestStore: Store<Utilities.Unit, ProductRequestAction>
@@ -552,10 +554,18 @@ extension PsiCashViewController {
         }
     }
     
-    /// Display error alert if `errorDesc` is a unique alert not in `self.errorAlerts`.
+    /// Display error alert if `errorDesc` is a unique alert not in `self.errorAlerts`, and
+    /// the error event `errorDesc.event` date is not before the init date of
+    /// the view controller `viewControllerInitTime`.
     /// Only if the error is unique `makeAlertController` is called for creating the alert controller.
     private func display(errorDesc: ErrorEventDescription<ErrorRepr>,
                          makeAlertController: () -> UIAlertController) {
+        
+        // Displays errors that have been emitted before the init date of the view controller.
+        guard errorDesc.event.date > viewControllerInitTime else {
+            return
+        }
+        
         // Inserts `errorDesc` into `errorAlerts` set.
         // If a member of `errorAlerts` is equal to `errorDesc.event.error`, then
         // that member is removed and `errorDesc` is inserted.
