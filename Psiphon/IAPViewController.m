@@ -479,10 +479,11 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
                 case SKProductDiscountPaymentModeFreeTrial: {
 
                     // Example: "1 Week", "6 Months", "2 Years"
-                    NSString *discPeriodFull = [StringUtils
-                                            stringForSubscriptionPeriod:discount.subscriptionPeriod
-                                            dropNumOfUnitsIfOne:FALSE
-                                            andAbbreviate:FALSE];
+                    NSString *discPeriodFull = [[StringUtils
+                                                 stringForSubscriptionPeriod:discount.subscriptionPeriod
+                                                 dropNumOfUnitsIfOne:FALSE
+                                                 andAbbreviate:FALSE]
+                                                localizedLowercaseString];
 
                     subtitleString = [NSString
                                       stringWithFormat:@"%@ of free trial, %@/%@ after",
@@ -490,9 +491,6 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
                     break;
                 }
             }
-
-            subtitleString = subtitleString.localizedLowercaseString;
-
         }
     } else {
         // Fallback for older devices.
