@@ -194,8 +194,13 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
         layer.cornerRadius = Style.default.cornerRadius
         backgroundColor = .white(withAlpha: 0.42)
         button.setTitleColor(.darkBlue(), for: .normal)
-        button.titleLabel!.font = AvenirFont.bold.font(.h3)
-
+        
+        button.titleLabel!.apply(fontSize: .h3,
+                                 typeface: .bold,
+                                 color: .darkBlue())
+        
+        button.contentEdgeInsets = Style.default.buttonMinimumContentEdgeInsets
+        
         spinner.isHidden = true
 
         // Setup subviews
