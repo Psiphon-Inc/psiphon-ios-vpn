@@ -196,8 +196,8 @@
 /* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
 "PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item1" = "የወደፊት ወጪዎችን ለመተመን፦ በየወሩ የምናስተላልፈው የተጠቃሚ ውሂብ ከምናወጣው ወጪ ትልቅ አካል ነው። የጥቅም መዋዠቅን ማየት አና መረዳት ለእኛ በጣም ወሳኝ ነው።";
 
-/*[UNTRANSLATED] Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item2" = "Optimize for traffic types: Video streaming has different network requirements than web browsing does, which is different than chat, which is different than voice, and so on. Statistics about the number of bytes transferred for some major media providers helps us to understand how to provide the best experience to our users.";
+/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item2" = "ለእትራፊክ አየነቶች አትባ፦ የቪድዮ ዥረት መጠቀም ከድር ማሰስ የተለየ የአውታረ መረብ ፍላጎቶች አሉት። ድር ማሰስ ደግሞ በጽሁፍ መልዕክት ከመላላክ የተለየ የአውታረ መረብ ፍላጎቶች አሉት። የጽሁፍ መልዕክት መላላክ ደግሞ ከድምጽ መልዕክት የተለየ የአውታረ መረብ ፍላጎቶች አሉት ፤ የድምጽ መልዕክት ደግሞ ከሌላው እንዲዚህ የተለየ አውታረ መረብ ፍላጎቶች አሉት እያለ ይቀጥላል። ከአንዳንድ ትላልቅ ሚዲያ አቅራቢዎች የሚተላለፈው የባይት መጠን ስታቲስቲክስ ለተጠቃሚዎች የተሻለ ተሞክሮ እንዴት ማቅረብ እንዳለብን እንድረዳድ ያግዘናል።";
 
 /* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. If available in your language, the blog post URLs should be updated to the localized post. */
 "PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item3" = "የአንዳንድ ታላላቅ ሳንሱር ኩነቶችን ተፈጥሮ ለመረዳት፦ ጣቢያችን እና አገልጎቶች ብዙ ግዜ በድንገት እና ያለ ማስጠንቀቂያ ይታገዳሉ። ይህም የPsiphon ቀጠናዊ አጠቃቀም ላይ ትልቅ ውዥቀትን ሊያስከትል ይችላል። ለምሳሌ፦ በጥቅም ላይ እስከ 20 እጥፍ ንረት ተከስቶ ነበር <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">ብራዚል WhatsAppን ያገደች ወቅት</a> እና <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">ቱርክ ማህበረሰባዊ ሚድያን ያገደች ወቅት</a>።";

@@ -561,7 +561,7 @@ extension PsiCashViewController {
     private func display(errorDesc: ErrorEventDescription<ErrorRepr>,
                          makeAlertController: () -> UIAlertController) {
         
-        // Displays errors that have been emitted before the init date of the view controller.
+        // Displays errors that have been emitted after the init date of the view controller.
         guard errorDesc.event.date > viewControllerInitTime else {
             return
         }
