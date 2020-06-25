@@ -38,6 +38,18 @@
     return [NSError errorWithDomain:domain code:code userInfo:errorDict];
 }
 
++ (instancetype)errorWithDomain:(NSErrorDomain)domain
+                           code:(NSInteger)code
+        andLocalizedDescription:(NSString*)localizedDescription
+            withUnderlyingError:(NSError *)error {
+    NSDictionary *errorDict = nil;
+    if (error) {
+        errorDict = @{NSLocalizedDescriptionKey: localizedDescription,
+                      NSUnderlyingErrorKey: error};
+    }
+    return [NSError errorWithDomain:domain code:code userInfo:errorDict];
+}
+
 - (NSDictionary<NSString *, id> *)jsonSerializableDictionaryRepresentation {
     NSMutableDictionary *d = [[NSMutableDictionary alloc] init];
 

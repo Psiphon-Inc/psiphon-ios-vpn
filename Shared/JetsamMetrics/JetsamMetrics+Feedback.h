@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2020, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,19 +18,23 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "JetsamMetrics.h"
 
-@interface AppInfo : NSObject
+NS_ASSUME_NONNULL_BEGIN
 
-+ (NSString*_Nonnull)appVersion;
+FOUNDATION_EXPORT NSErrorDomain const JetsamMetrics_FeedbackErrorDomain;
 
-+ (NSString*_Nullable)clientRegion;
+typedef NS_ERROR_ENUM(JetsamMetrics_FeedbackErrorDomain, JetsamMetrics_FeedbackErrorCode) {
+    JetsamMetrics_FeedbackErrorInvalidDictForJSON = 1,
+    JetsamMetrics_FeedbackErrorNestedDictNil = 2,
+    JetsamMetrics_FeedbackErrorFailedToSerializeJSON = 3,
+};
 
-+ (NSString*_Nullable)propagationChannelId;
+/// Adds methods which structure the underlying data for submission with feedback.
+@interface JetsamMetrics (Feedback)
 
-+ (NSString*_Nullable)sponsorId;
-
-+ (NSString *_Nonnull)clientPlatform;
-
-+ (BOOL)runningUITest;
+- (nullable NSString *)logForFeedback:(NSError * _Nullable *)outError;
 
 @end
+
+NS_ASSUME_NONNULL_END
