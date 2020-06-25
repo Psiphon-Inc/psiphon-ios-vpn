@@ -24,9 +24,18 @@ import ReactiveSwift
 public final class State<Value> {
     private let passthroughSubject = Signal<Value, Never>.pipe()
 
-    public var wrappedValue: Value {
+    private var value: Value {
         didSet {
             self.passthroughSubject.input.send(value: wrappedValue)
+        }
+    }
+
+    public var wrappedValue: Value {
+        get {
+            value
+        }
+        set {
+            value = newValue
         }
     }
 
@@ -44,7 +53,7 @@ public final class State<Value> {
     }
 
     public init(wrappedValue: Value) {
-        self.wrappedValue = wrappedValue
+        self.value = wrappedValue
     }
 
     deinit {
