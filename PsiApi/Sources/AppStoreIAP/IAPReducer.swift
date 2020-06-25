@@ -30,9 +30,8 @@ public enum IAPAction: Equatable {
     case purchase(product: AppStoreProduct, resultPromise: Promise<ObjCIAPResult>? = nil)
     case receiptUpdated(ReceiptData?)
     case _psiCashConsumableVerificationRequestResult(
-        result: RetriableTunneledHttpRequest<PsiCashValidationResponse>.RequestResult,
-        forTransaction: PaymentTransaction
-    )
+            result: RetriableTunneledHttpRequest<PsiCashValidationResponse>.RequestResult,
+            forTransaction: PaymentTransaction)
     case transactionUpdate(TransactionUpdate)
 }
 
@@ -209,7 +208,7 @@ public func iapReducer(
                     failed to send verification request for transaction: \
                     '\(unfinishedPsiCashTx)'
                     """)
-                    .mapNever()
+                .mapNever()
             ]
         }
         
@@ -229,7 +228,7 @@ public func iapReducer(
                     failed to send verification request for transaction: \
                     '\(unfinishedPsiCashTx)'
                     """)
-                    .mapNever()
+                .mapNever()
             ]
         }
         
@@ -308,7 +307,7 @@ public func iapReducer(
         }
         
         switch requestResult {
-            
+        
         case .willRetry(when: let retryCondition):
             // Authorization request will be retried whenever retryCondition becomes true.
             switch retryCondition {
@@ -349,7 +348,7 @@ public func iapReducer(
                     environment.paymentQueue.finishTransaction(requestTransaction).mapNever(),
                     environment.psiCashStore(.refreshPsiCashState).mapNever(),
                     environment.feedbackLogger.log(.info, "verified consumable transaction: '\(requestTransaction)'")
-                        .mapNever()
+                    .mapNever()
                 ]
                 
             case .failure(let errorEvent):
@@ -379,7 +378,7 @@ public func iapReducer(
         } else {
             return [
                 environment.appReceiptStore(._remoteReceiptRefreshResult(.success(.unit)))
-                    .mapNever()
+                .mapNever()
             ]
         }
         
@@ -404,13 +403,14 @@ public func iapReducer(
                 transaction: tx,
                 existingConsumableTransaction: { paymentTx -> Bool? in
                     state.iap.unfinishedPsiCashTx?.transaction.isEqualTransactionID(to: paymentTx)
-            },
+                },
                 getCurrentTime: environment.getCurrentTime
             )
             
             // Updates purchasing state based on result of IAPPurchasing.makeGiven.
             switch iapPurchasingResult {
             case let .success(.unique(iapPurchasing, maybeUnfinishedConsumableTx)):
+                
                 state.iap.purchasing[productType] = iapPurchasing
                 
                 if let unfinishedTx = maybeUnfinishedConsumableTx {
@@ -460,7 +460,8 @@ public func iapReducer(
             }
             
             // Adds effect to finish current transaction `tx`.
-            switch tx.transactionState().shouldFinishTransactionImmediately(productType: productType) {
+            switch
+                tx.transactionState().shouldFinishTransactionImmediately(productType: productType) {
             case .nop, .afterDeliverablesDelivered:
                 break
             case .immediately:
