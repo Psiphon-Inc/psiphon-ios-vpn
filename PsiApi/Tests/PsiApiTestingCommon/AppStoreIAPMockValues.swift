@@ -118,6 +118,7 @@ extension IAPEnvironment {
             psiCashEffects: psiCashEffects ?? PsiCashEffects.mock(),
             clientMetaData: (clientMetaData ?? { ClientMetaData(MockAppInfoProvider()) })(),
             paymentQueue: paymentQueue ?? PaymentQueue.mock(),
+            psiCashPersistedValues: MockPsiCashPersistedValues(),
             isSupportedProduct: isSupportedProduct ?? { _ in XCTFatal() },
             psiCashStore: psiCashStore ?? { _ in XCTFatal() },
             appReceiptStore: appReceiptStore ?? { _ in XCTFatal() },
