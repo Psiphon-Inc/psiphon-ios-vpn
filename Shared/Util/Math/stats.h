@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2020, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,20 +17,14 @@
  *
  */
 
-#import <Foundation/Foundation.h>
+#ifndef stats_h
+#define stats_h
 
-@interface AppInfo : NSObject
+#include <stdio.h>
 
-+ (NSString*_Nonnull)appVersion;
+double double_mean(double *vals, int length);
 
-+ (NSString*_Nullable)clientRegion;
+double double_stdev(double *vals, int length);
 
-+ (NSString*_Nullable)propagationChannelId;
+#endif /* stats_h */
 
-+ (NSString*_Nullable)sponsorId;
-
-+ (NSString *_Nonnull)clientPlatform;
-
-+ (BOOL)runningUITest;
-
-@end

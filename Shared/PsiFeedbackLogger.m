@@ -18,15 +18,16 @@
  */
 
 #import "PsiFeedbackLogger.h"
+#import "RotatingFile.h"
 #import "SharedConstants.h"
 #import "NSDate+PSIDateExtension.h"
 #import "Nullity.h"
 #import "Asserts.h"
 
 #if DEBUG
-#define MAX_NOTICE_FILE_SIZE_BYTES 164000
+unsigned long long MAX_NOTICE_FILE_SIZE_BYTES = 164000;
 #else
-#define MAX_NOTICE_FILE_SIZE_BYTES 64000
+unsigned long long MAX_NOTICE_FILE_SIZE_BYTES = 64000;
 #endif
 
 #define NOTICE_FILENAME_EXTENSION "extension_notices"
@@ -91,9 +92,7 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
  */
 @implementation PsiFeedbackLogger {
     NSLock *writeLock;
-    NSString *rotatingFilepath;
-    NSString *rotatingOlderFilepath;
-    unsigned long long rotatingCurrentFileSize;
+    RotatingFile *rotatedFile;
 }
 
 #pragma mark - Class properties
@@ -322,29 +321,15 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
     self = [super init];
     if (self) {
         writeLock = [[NSLock alloc] init];
-
-        rotatingFilepath = noticesFilepath;
-        rotatingOlderFilepath = olderFilepath;
-
-        NSFileManager *fileManager = [NSFileManager defaultManager];
-
-        // Checks if rotatingFilepath exists, creates the the file if it doesn't exist.
-        if ([fileManager fileExistsAtPath:rotatingFilepath]) {
-            NSError *err;
-            rotatingCurrentFileSize = [[fileManager attributesOfItemAtPath:rotatingFilepath error:&err] fileSize];
-            if (err) {
-                LOG_ERROR_NO_NOTICE(@"Failed to get log file bytes count");
-                // This is fatal, return nil.
-                return nil;
-            }
-        } else {
-            if ([fileManager createFileAtPath:rotatingFilepath contents:nil attributes:nil]) {
-                // Set the current file size to 0.
-                rotatingCurrentFileSize = 0;
-            } else {
-                // If failed to create log file, return nil;
-                return nil;
-            }
+        NSError *err;
+        self->rotatedFile = [[RotatingFile alloc]
+                             initWithFilepath:noticesFilepath
+                             olderFilepath:olderFilepath
+                             maxFilesizeBytes:MAX_NOTICE_FILE_SIZE_BYTES
+                             error:&err];
+        if (err != nil) {
+            LOG_ERROR_NO_NOTICE(@"Failed to init rotating notices file: %@", err);
+            return nil;
         }
 
     }
@@ -415,93 +400,21 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 
     [writeLock lock];
 
-    BOOL success = FALSE;
-    for (int i = 0; i < MAX_RETRIES && !success; i++) {
-        success = [self writeData:output toPath:rotatingFilepath];
-    }
+    for (int i = 0; i < MAX_RETRIES; i++) {
+        // Add newline delimiter
+        NSMutableData *data = [NSMutableData dataWithData:output];
+        [data appendData:[@"\n" dataUsingEncoding:NSUTF8StringEncoding]];
 
-    if (rotatingCurrentFileSize > MAX_NOTICE_FILE_SIZE_BYTES) {
-        [self rotateFile:rotatingFilepath toFile:rotatingOlderFilepath];
+        NSError *err;
+        [self->rotatedFile writeData:data error:&err];
+        if (err != nil) {
+            LOG_ERROR_NO_NOTICE(@"Failed to write data: %@", err);
+            continue;
+        }
+        break;
     }
 
     [writeLock unlock];
-}
-
-- (NSFileHandle * _Nullable)fileHandleForPath:(NSString * _Nonnull)path {
-    NSError *err;
-    NSFileHandle *fh = [NSFileHandle fileHandleForWritingToURL:[NSURL fileURLWithPath:path] error:&err];
-    if (err) {
-        if (err.code == NSFileReadNoSuchFileError || err.code == NSFileNoSuchFileError) {
-            if ([[NSFileManager defaultManager] createFileAtPath:path contents:nil attributes:nil]) {
-                rotatingCurrentFileSize = 0;
-                return [NSFileHandle fileHandleForWritingAtPath:path];
-            }
-        }
-
-        LOG_ERROR_NO_NOTICE(@"Error opening file handle for file (%@): %@", [path lastPathComponent], err);
-        return nil;
-    }
-    return fh;
-}
-
-- (BOOL)writeData:(NSData *)data toPath:(NSString *)filePath {
-
-    NSFileHandle *fh;
-
-    @try {
-        fh = [self fileHandleForPath:filePath];
-
-        if (!fh) {
-            return FALSE;
-        }
-
-        // Appends data to the file, and syncs.
-        [fh seekToEndOfFile];
-        [fh writeData:data];
-        [fh writeData:[@"\n" dataUsingEncoding:NSUTF8StringEncoding]];
-
-        [fh synchronizeFile];
-
-        rotatingCurrentFileSize += [data length] + 1;
-        return TRUE;
-    }
-    @catch (NSException *exception) {
-        LOG_ERROR_NO_NOTICE(@"Failed to write log: %@", exception);
-    }
-    @finally {
-        [fh closeFile];
-    }
-
-    return FALSE;
-}
-
-- (BOOL)rotateFile:(NSString *)filePath toFile:(NSString *)olderFilePath {
-
-    // Check file size, and rotate if necessary.
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-    NSError *err;
-
-    // Remove old log file if it exists.
-    [fileManager removeItemAtPath:olderFilePath error:&err];
-    if (err && [err code] != NSFileNoSuchFileError) {
-        LOG_ERROR_NO_NOTICE(@"Failed to remove file at path (%@). Error: %@", olderFilePath, err);
-        return FALSE;
-    }
-
-    err = nil;
-
-    [fileManager copyItemAtPath:filePath toPath:olderFilePath error:&err];
-    if (err) {
-        LOG_ERROR_NO_NOTICE(@"Failed to move file at path (%@). Error: %@", filePath, err);
-        return FALSE;
-    }
-
-    if ([fileManager createFileAtPath:filePath contents:nil attributes:nil]) {
-        rotatingCurrentFileSize = 0;
-        return TRUE;
-    }
-
-    return FALSE;
 }
 
 #pragma mark - Log generating methods
