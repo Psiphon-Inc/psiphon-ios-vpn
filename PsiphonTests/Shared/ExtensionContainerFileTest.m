@@ -29,16 +29,10 @@
 /// Test writing/reading the rotated files and persisting/restoring the registry state.
 - (void)testWriteThenReadBack {
 
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-
-    NSError *err;
-    NSURL *dir = [fileManager URLForDirectory:NSDocumentDirectory
-                                     inDomain:NSUserDomainMask
-                            appropriateForURL:nil
-                                       create:NO
-                                        error:&err];
-    if (err != nil) {
-        XCTFail(@"Failed to get dir: %@", err);
+    NSBundle *testBundle = [NSBundle bundleForClass:[self class]];
+    NSURL *dir = [testBundle resourceURL];
+    if (dir == nil) {
+        XCTFail(@"Failed test bundle resource URL");
         return;
     }
 
@@ -47,10 +41,12 @@
     NSString *registryFilePath = [dir URLByAppendingPathComponent:@"registry"].path;
 
     // cleanup previous run
+    NSFileManager *fileManager = [NSFileManager defaultManager];
     [fileManager removeItemAtPath:filePath error:nil];
     [fileManager removeItemAtPath:olderFilePath error:nil];
     [fileManager removeItemAtPath:registryFilePath error:nil];
 
+    NSError *err;
     ExtensionWriterRotatedFile *ext =
       [[ExtensionWriterRotatedFile alloc] initWithFilepath:filePath
                                              olderFilepath:olderFilePath
@@ -272,17 +268,11 @@
 /// file handle. Otherwise reads may erroneously start mid-line when the registry is restored.
 - (void)testPartialReadBack {
 
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-
-    NSError *err;
-    NSURL *dir = [fileManager URLForDirectory:NSDocumentDirectory
-                                    inDomain:NSUserDomainMask
-                           appropriateForURL:nil
-                                      create:NO
-                                       error:&err];
-    if (err != nil) {
-       XCTFail(@"Failed to get dir: %@", err);
-       return;
+    NSBundle *testBundle = [NSBundle bundleForClass:[self class]];
+    NSURL *dir = [testBundle resourceURL];
+    if (dir == nil) {
+        XCTFail(@"Failed test bundle resource URL");
+        return;
     }
 
     NSString *filePath = [dir URLByAppendingPathComponent:@"file"].path;
@@ -290,10 +280,12 @@
     NSString *registryFilePath = [dir URLByAppendingPathComponent:@"registry"].path;
 
     // cleanup previous run
+    NSFileManager *fileManager = [NSFileManager defaultManager];
     [fileManager removeItemAtPath:filePath error:nil];
     [fileManager removeItemAtPath:olderFilePath error:nil];
     [fileManager removeItemAtPath:registryFilePath error:nil];
 
+    NSError *err;
     ExtensionWriterRotatedFile *ext =
      [[ExtensionWriterRotatedFile alloc] initWithFilepath:filePath
                                             olderFilepath:olderFilePath

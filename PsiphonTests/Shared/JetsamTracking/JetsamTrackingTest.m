@@ -32,16 +32,10 @@
 /// and reading back the aggregate metrics from the container's perspective.
 - (void)testWritingAndReading {
 
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-
-    NSError *err;
-    NSURL *dir = [fileManager URLForDirectory:NSDocumentDirectory
-                                     inDomain:NSUserDomainMask
-                            appropriateForURL:nil
-                                       create:NO
-                                        error:&err];
-    if (err != nil) {
-        XCTFail(@"Failed to get dir: %@", err);
+    NSBundle *testBundle = [NSBundle bundleForClass:[self class]];
+    NSURL *dir = [testBundle resourceURL];
+    if (dir == nil) {
+        XCTFail(@"Failed test bundle resource URL");
         return;
     }
 
@@ -50,6 +44,7 @@
     NSString *registryFilePath = [dir URLByAppendingPathComponent:@"registry"].path;
 
     // cleanup previous run
+    NSFileManager *fileManager = [NSFileManager defaultManager];
     [fileManager removeItemAtPath:filePath error:nil];
     [fileManager removeItemAtPath:olderFilePath error:nil];
     [fileManager removeItemAtPath:registryFilePath error:nil];
@@ -73,6 +68,7 @@
     JetsamEvent *prevJetsam = nil;
 
     for (JetsamEvent *jetsam in jetsams) {
+        NSError *err;
         [ExtensionJetsamTracking logJetsamEvent:jetsam
                                      toFilepath:filePath
                             withRotatedFilepath:olderFilePath
@@ -112,6 +108,7 @@
         prevJetsam = jetsam;
     }
 
+    NSError *err;
     JetsamMetrics *metrics = [ContainerJetsamTracking getMetricsFromFilePath:filePath
                                                          withRotatedFilepath:olderFilePath
                                                             registryFilepath:registryFilePath
@@ -157,16 +154,10 @@
 /// Test corrupting the jetsam log file. The container reader should return an error.
 - (void)testFileCorruption {
 
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-
-    NSError *err;
-    NSURL *dir = [fileManager URLForDirectory:NSDocumentDirectory
-                                     inDomain:NSUserDomainMask
-                            appropriateForURL:nil
-                                       create:NO
-                                        error:&err];
-    if (err != nil) {
-        XCTFail(@"Failed to get dir: %@", err);
+    NSBundle *testBundle = [NSBundle bundleForClass:[self class]];
+    NSURL *dir = [testBundle resourceURL];
+    if (dir == nil) {
+        XCTFail(@"Failed test bundle resource URL");
         return;
     }
 
@@ -175,6 +166,7 @@
     NSString *registryFilePath = [dir URLByAppendingPathComponent:@"registry"].path;
 
     // cleanup previous run
+    NSFileManager *fileManager = [NSFileManager defaultManager];
     [fileManager removeItemAtPath:filePath error:nil];
     [fileManager removeItemAtPath:olderFilePath error:nil];
     [fileManager removeItemAtPath:registryFilePath error:nil];
@@ -184,6 +176,7 @@
     ];
 
     for (JetsamEvent *jetsam in jetsams) {
+        NSError *err;
         [ExtensionJetsamTracking logJetsamEvent:jetsam
                                      toFilepath:filePath
                             withRotatedFilepath:olderFilePath
@@ -200,6 +193,7 @@
     [fh writeData:[NSData dataWithBytes:garbage_bytes length:1024]];
     free(garbage_bytes);
 
+    NSError *err;
     JetsamMetrics *metrics = [ContainerJetsamTracking getMetricsFromFilePath:filePath
                                                          withRotatedFilepath:olderFilePath
                                                             registryFilepath:registryFilePath

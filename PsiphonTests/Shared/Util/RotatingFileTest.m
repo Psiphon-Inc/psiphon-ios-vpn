@@ -29,16 +29,10 @@
 /// Test writing the file until it rotates. Verify data.
 - (void)testFileRotation {
 
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-
-    NSError *err;
-    NSURL *dir = [fileManager URLForDirectory:NSDocumentDirectory
-                                     inDomain:NSUserDomainMask
-                            appropriateForURL:nil
-                                       create:NO
-                                        error:&err];
-    if (err != nil) {
-        XCTFail(@"%@", err);
+    NSBundle *testBundle = [NSBundle bundleForClass:[self class]];
+    NSURL *dir = [testBundle resourceURL];
+    if (dir == nil) {
+        XCTFail(@"Failed test bundle resource URL");
         return;
     }
 
@@ -46,9 +40,11 @@
     NSString *olderFilePath = [dir URLByAppendingPathComponent:@"rotating_file.old"].path;
 
     // Clean up files from previous run
+    NSFileManager *fileManager = [NSFileManager defaultManager];
     [fileManager removeItemAtPath:filePath error:nil];
     [fileManager removeItemAtPath:olderFilePath error:nil];
 
+    NSError *err;
     RotatingFile *rotatingFile = [[RotatingFile alloc] initWithFilepath:filePath
                                                           olderFilepath:olderFilePath
                                                        maxFilesizeBytes:256
