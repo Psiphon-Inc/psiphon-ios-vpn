@@ -30,18 +30,14 @@
 // Read different chunk sizes appropriate for UTF-8 encoding.
 - (void)testDifferentChunkSizes {
 
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-
-    NSError *err;
-    NSURL *dir = [fileManager URLForDirectory:NSDocumentDirectory
-                                     inDomain:NSUserDomainMask
-                            appropriateForURL:nil
-                                       create:NO
-                                        error:&err];
-    if (err != nil) {
-        XCTFail(@"Failed to get dir: %@", err);
+    NSBundle *testBundle = [NSBundle bundleForClass:[self class]];
+    NSURL *dir = [testBundle resourceURL];
+    if (dir == nil) {
+        XCTFail(@"Failed test bundle resource URL");
         return;
     }
+
+    NSFileManager *fileManager = [NSFileManager defaultManager];
 
     NSString *filePath = [dir URLByAppendingPathComponent:@"file"].path;
     [fileManager removeItemAtPath:filePath error:nil]; // cleanup previous run
@@ -57,6 +53,7 @@
 
     for (NSNumber *chunkSize in chunkSizes) {
 
+        NSError *err;
         DelimitedFile *f = [[DelimitedFile alloc] initWithFilepath:filePath
                                                          chunkSize:[chunkSize unsignedIntValue]
                                                              error:&err];
@@ -85,18 +82,14 @@
 // Test which closes the file handle between reads.
 - (void)testReadError {
 
-    NSFileManager *fileManager = [NSFileManager defaultManager];
-
-    NSError *err;
-    NSURL *dir = [fileManager URLForDirectory:NSDocumentDirectory
-                                     inDomain:NSUserDomainMask
-                            appropriateForURL:nil
-                                       create:NO
-                                        error:&err];
-    if (err != nil) {
-        XCTFail(@"Failed to get dir: %@", err);
+    NSBundle *testBundle = [NSBundle bundleForClass:[self class]];
+    NSURL *dir = [testBundle resourceURL];
+    if (dir == nil) {
+        XCTFail(@"Failed test bundle resource URL");
         return;
     }
+
+    NSFileManager *fileManager = [NSFileManager defaultManager];
 
     NSString *filePath = [dir URLByAppendingPathComponent:@"file"].path;
     [fileManager removeItemAtPath:filePath error:nil]; // cleanup previous run
@@ -106,6 +99,7 @@
                          contents:[s dataUsingEncoding:NSASCIIStringEncoding]
                        attributes:nil];
 
+    NSError *err;
     DelimitedFile *f = [[DelimitedFile alloc] initWithFilepath:filePath
                                                      chunkSize:4
                                                          error:&err];
