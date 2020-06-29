@@ -17,6 +17,8 @@
  *
  */
 
+#if !os(macOS)
+
 import Foundation
 import UIKit
 import ReactiveSwift
@@ -119,3 +121,5 @@ open class ReactiveViewController: UIViewController {
     }
 
 }
+
+#endif
