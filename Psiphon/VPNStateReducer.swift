@@ -997,18 +997,22 @@ extension TunnelProviderSyncedState {
             let responseValues = (zombie: response.isZombie,
                                   connected: response.isPsiphonTunnelConnected,
                                   reachable: response.isNetworkReachable)
+            
             switch responseValues {
             case (zombie: true, connected: false, reachable: _):
                 return .zombie
-            case (zombie: false, connected: false, reachable: false):
+            case (zombie: false, connected: _, reachable: false):
+                // After first connection, 'connected' and 'reachable'
+                // values may not be the same at any specific points in time,
+                // but will eventually sync.
                 return .active(.networkNotReachable)
             case (zombie: false, connected: false, reachable: true):
                 return .active(.connecting)
             case (zombie: false, connected: true, reachable: true):
                 return .active(.connected)
-            default:
+            case (zombie: true, connected: true, reachable: _):
                 feedbackLogger.fatalError(
-                    "unexpected tunnel provider response '\(response)'")
+                    "unexpected tunnel provider state '\(response)'")
                 return nil
             }
             
