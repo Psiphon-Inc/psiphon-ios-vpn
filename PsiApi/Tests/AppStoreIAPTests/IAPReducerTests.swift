@@ -600,12 +600,8 @@ final class IAPReducerTests: XCTestCase {
                                     )
                                     return (earlyExit: false, finishTx: false)
                                     
-                                case .some(false):
+                                case .some(_):
                                     return (earlyExit: false, finishTx: false)
-                                    
-                                case .some(true):
-                                    // Two completed consumable purchases
-                                    return (earlyExit: true, finishTx: nil)
                                 }
                             }
                         }
@@ -656,11 +652,8 @@ final class IAPReducerTests: XCTestCase {
                                 )
                                 return prv
                                 
-                            case .some(false):
+                            case .some(_):
                                 return prv
-                                
-                            case .some(true):
-                                return true
                             }
                         default:
                             return prv
@@ -722,18 +715,20 @@ final class IAPReducerTests: XCTestCase {
                             
                             switch expectedState.iap.unfinishedPsiCashTx?.transaction
                                 .isEqualTransactionID(to: tx) {
-                                
+                            
                             case .none:
                                 expectedState.iap.unfinishedPsiCashTx = UnfinishedConsumableTransaction(
                                     transaction: tx,
                                     verificationState: .notRequested
                                 )
+                                expectedState.psiCashBalance.waitingForExpectedIncrease(
+                                    withAddedReward: .zero,
+                                    reason: .purchasedPsiCash,
+                                    persisted: MockPsiCashPersistedValues() // dummy value
+                                )
                                 
-                            case .some(false):
+                            case .some(_):
                                 continue expectedStateLoop
-                                
-                            case .some(true):
-                                break expectedStateLoop
                             }
                         }
                     }
