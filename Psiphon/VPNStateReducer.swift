@@ -486,31 +486,40 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
             ]
             
         case .active(.connected):
-            guard case .start(transition: .none) = state.tunnelIntent else {
-                environment.feedbackLogger.fatalError(
-                    "Unexpected state '\(String(describing: state.tunnelIntent))'"
-                )
-                return []
-            }
-            guard tpm.verifyConfig(forExpectedType: .startVPN) else {
-                // Failed to verify VPN config values.
-                // To update the config, tunnel is restarted.
+            
+            // Verifies that tunnel intent matches expected tunnel provider state.
+            if case .start(transition: .none) = state.tunnelIntent {
+                
+                guard tpm.verifyConfig(forExpectedType: .startVPN) else {
+                    // Failed to verify VPN config values.
+                    // To update the config, tunnel is restarted.
+                    return firstEffects + [
+                        Effect(value: .public(
+                                .tunnelStateIntent(
+                                    intent: .start(transition: .restart), reason: .vpnConfigValidationFailed
+                                ))
+                        )
+                    ]
+                }
+                
+                // Sends start vpn notification to the tunnel provider
+                // if vpnStartCondition passes.
+                guard state.loadState.connectionStatus == .connecting,
+                      environment.vpnStartCondition() else {
+                    return firstEffects
+                }
+                return firstEffects + [ notifyStartVPN().mapNever() ]
+                
+            } else {
+                // Tunnel intent does not reflect tunnel provider state.
+                // Logs for debugging purposes.
                 return firstEffects + [
-                    Effect(value: .public(
-                        .tunnelStateIntent(
-                            intent: .start(transition: .restart), reason: .vpnConfigValidationFailed
-                        ))
-                    )
+                    environment.feedbackLogger.log(.info, """
+                        tunnel provider state does not match intent: \
+                        '\(makeFeedbackEntry( state.tunnelIntent))'
+                        """).mapNever()
                 ]
             }
-            
-            // Sends start vpn notification to the tunnel provider
-            // if vpnStartCondition passes.
-            guard state.loadState.connectionStatus == .connecting,
-                environment.vpnStartCondition() else {
-                    return firstEffects
-            }
-            return firstEffects + [ notifyStartVPN().mapNever() ]
             
         case .unknown(_):
             return firstEffects + [
