@@ -35,7 +35,10 @@
                                               fileSystemFileNumber:1
                                                             offset:0]];
     [reg setEntry:[FileRegistryEntry fileRegistryEntryWithFilepath:@"/file.1"
-                                              fileSystemFileNumber:2
+                                              fileSystemFileNumber:ULLONG_MAX/2
+                                                            offset:0]];
+    [reg setEntry:[FileRegistryEntry fileRegistryEntryWithFilepath:@"/file.2"
+                                              fileSystemFileNumber:ULLONG_MAX
                                                             offset:0]];
 
     // Encode
