@@ -206,7 +206,7 @@ extension PaymentTransaction.TransactionState: Arbitrary {
             PendingTransactionState.arbitrary
                 .map(PaymentTransaction.TransactionState.pending),
             
-            Result<Pair<Date, CompletedTransactionState>, Either<SystemError, SKError>>.arbitrary
+            Result<Pair<Date?, CompletedTransactionState>, Either<SystemError, SKError>>.arbitrary
                 .map(PaymentTransaction.TransactionState.completed)
         ])
     }

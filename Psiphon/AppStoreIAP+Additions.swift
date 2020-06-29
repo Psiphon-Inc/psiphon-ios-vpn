@@ -163,10 +163,10 @@ extension PaymentTransaction {
                     return .pending(.deferred)
                 case .purchased:
                     return .completed(.success(
-                        Pair(skPaymentTransaction.transactionDate!, .purchased)))
+                        Pair(skPaymentTransaction.transactionDate, .purchased)))
                 case .restored:
                     return .completed(.success(
-                        Pair(skPaymentTransaction.transactionDate!, .restored)))
+                        Pair(skPaymentTransaction.transactionDate, .restored)))
                 case .failed:
                     // Error is non-null when state is failed.
                     let someError = skPaymentTransaction.error!
