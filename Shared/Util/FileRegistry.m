@@ -27,7 +27,7 @@ NSUInteger const FileRegistryEntryArchiveVersion1 = 1;
 // NSCoder keys (must be unique)
 NSString *_Nonnull const FileRegistryEntryArchiveVersionIntegerCoderKey = @"version.integer";
 NSString *_Nonnull const FileRegistryEntryFilePathStringCoderKey = @"filepath.string";
-NSString *_Nonnull const FileRegistryEntryFileSystemFileNoIntCoderKey = @"file_system_file_no.int";
+NSString *_Nonnull const FileRegistryEntryFileSystemFileNoNSNumberCoderKey = @"file_system_file_no.nsnumber";
 NSString *_Nonnull const FileRegistryEntryOffsetIntCoderKey = @"offset.int";
 
 @interface FileRegistryEntry ()
@@ -81,8 +81,8 @@ NSString *_Nonnull const FileRegistryEntryOffsetIntCoderKey = @"offset.int";
                   forKey:FileRegistryEntryArchiveVersionIntegerCoderKey];
     [coder encodeObject:self.filepath
                  forKey:FileRegistryEntryFilePathStringCoderKey];
-    [coder encodeInt:(int)self.fileSystemFileNumber
-              forKey:FileRegistryEntryFileSystemFileNoIntCoderKey];
+    [coder encodeObject:[NSNumber numberWithUnsignedLongLong:self.fileSystemFileNumber]
+                 forKey:FileRegistryEntryFileSystemFileNoNSNumberCoderKey];
     [coder encodeInt:(int)self.offset
               forKey:FileRegistryEntryOffsetIntCoderKey];
 }
@@ -92,7 +92,11 @@ NSString *_Nonnull const FileRegistryEntryOffsetIntCoderKey = @"offset.int";
     if (self) {
         self.filepath = [coder decodeObjectOfClass:[NSString class]
                                             forKey:FileRegistryEntryFilePathStringCoderKey];
-        self.fileSystemFileNumber = [coder decodeIntForKey:FileRegistryEntryFileSystemFileNoIntCoderKey];
+        NSNumber *fileSystemFileNumber = [coder decodeObjectOfClass:[NSNumber class]
+                                                             forKey:FileRegistryEntryFileSystemFileNoNSNumberCoderKey];
+        if (fileSystemFileNumber != nil) {
+            self.fileSystemFileNumber = fileSystemFileNumber.unsignedLongLongValue;
+        }
         self.offset = [coder decodeIntForKey:FileRegistryEntryOffsetIntCoderKey];
     }
     return self;
