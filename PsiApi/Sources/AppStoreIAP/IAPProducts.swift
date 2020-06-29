@@ -206,7 +206,10 @@ public struct PaymentTransaction: Equatable {
         case pending(PendingTransactionState)
         
         /// Success case `Date` is the transaction date.
-        case completed(Result<Pair<Date, CompletedTransactionState>, Either<SystemError, SKError>>)
+        // FIXME: If state is one of `CompletedTransactionState` then
+        // `SKPaymentTransaction.transactionDate` is non-nil.
+        // We keep this as an optional for now due to crashes seen so far.
+        case completed(Result<Pair<Date?, CompletedTransactionState>, Either<SystemError, SKError>>)
     }
     
     public let transactionID: () -> TransactionID
