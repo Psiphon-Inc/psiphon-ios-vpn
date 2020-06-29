@@ -119,15 +119,9 @@ public struct IAPPurchasing: Hashable {
                     
                     return .success(.unique(nil, unfinishedTx))
 
-                case .some(false):
+                case .some(_):
                     // Unexpected duplicate transaction.
                     return .success(.nonUnique)
-                    
-                case .some(true):
-                    return .failure(FatalError("""
-                        found two completed but unverified consumable purchases: \
-                        new transaction id: '\(tx.transactionID())'
-                        """))
                 }
             }
         }
