@@ -43,6 +43,77 @@ NSInteger const ReceiptASN1TypeIsInIntroOfferPeriod = 1719;
 NSInteger const ReceiptASN1TypeWebOrderLineItemID = 1711;
 NSInteger const ReceiptASN1TypeCancellationDate = 1712;
 
+static intmax_t
+asn__integer_convert(const uint8_t *b, const uint8_t *end) {
+    uintmax_t value;
+
+    /* Perform the sign initialization */
+    /* Actually value = -(*b >> 7); gains nothing, yet unreadable! */
+    if((*b >> 7)) {
+        value = (uintmax_t)(-1);
+    } else {
+        value = 0;
+    }
+
+    /* Conversion engine */
+    for(; b < end; b++) {
+        value = (value << 8) | *b;
+    }
+
+    return value;
+}
+
+int
+asn_INTEGER2imax(const INTEGER_t *iptr, intmax_t *lptr) {
+    uint8_t *b, *end;
+    size_t size;
+
+    /* Sanity checking */
+    if(!iptr || !iptr->buf || !lptr) {
+        errno = EINVAL;
+        return -1;
+    }
+
+    /* Cache the begin/end of the buffer */
+    b = iptr->buf;    /* Start of the INTEGER buffer */
+    size = iptr->size;
+    end = b + size;    /* Where to stop */
+
+    if(size > sizeof(intmax_t)) {
+        uint8_t *end1 = end - 1;
+        /*
+         * Slightly more advanced processing,
+         * able to process INTEGERs with >sizeof(intmax_t) bytes
+         * when the actual value is small, e.g. for intmax_t == int32_t
+         * (0x0000000000abcdef INTEGER would yield a fine 0x00abcdef int32_t)
+         */
+        /* Skip out the insignificant leading bytes */
+        for(; b < end1; b++) {
+            switch(*b) {
+                case 0x00: if((b[1] & 0x80) == 0) continue; break;
+                case 0xff: if((b[1] & 0x80) != 0) continue; break;
+            }
+            break;
+        }
+
+        size = end - b;
+        if(size > sizeof(intmax_t)) {
+            /* Still cannot fit the sizeof(intmax_t) */
+            errno = ERANGE;
+            return -1;
+        }
+    }
+
+    /* Shortcut processing of a corner case */
+    if(end == b) {
+        *lptr = 0;
+        return 0;
+    }
+
+    *lptr = asn__integer_convert(b, end);
+    return 0;
+}
+
 static NSString* ASN1ReadUTF8String(const uint8_t *bytes, long length) {
     UTF8String_t *utf8String = NULL;
     NSString *retString;
@@ -77,13 +148,13 @@ static NSString* ASN1ReadIA5SString(const uint8_t *bytes, long length) {
     return retString;
 }
 
-static long ASN1ReadInteger(const uint8_t *bytes, long length) {
-    long parsed = 0;
+static intmax_t ASN1ReadInteger(const uint8_t *bytes, long length) {
+    intmax_t parsed = 0;
     INTEGER_t *asn1Integer = NULL;
 
     asn_dec_rval_t rval = ber_decode(0, &asn_DEF_INTEGER, (void **)&asn1Integer, bytes, length);
 
-    int result = asn_INTEGER2long(asn1Integer, &parsed);
+    int result = asn_INTEGER2imax(asn1Integer, &parsed);
 
     if (result != 0) {
         [NSException raise:NSGenericException format:@"Failed to parse ASN1 Integer"];
@@ -97,6 +168,14 @@ static long ASN1ReadInteger(const uint8_t *bytes, long length) {
     return parsed;
 }
 
+static BOOL ASN1ReadIntegerAsBool(const uint8_t *bytes, long length) {
+    intmax_t parsed = ASN1ReadInteger(bytes, length);
+    if (parsed == 0) {
+        return FALSE;
+    } else {
+        return TRUE;
+    }
+}
 
 // TODO: Local receipt does not contains `is_trial_period` field, it is only accessible by
 // sending the receipt to Apple.
@@ -224,15 +303,13 @@ static long ASN1ReadInteger(const uint8_t *bytes, long length) {
                     break;
                 }
                 case ReceiptASN1TypeWebOrderLineItemID: {
-                    long webOrderLineItemID = ASN1ReadInteger(p, length);
-                    self->_webOrderLineItemID = [NSString stringWithFormat:@"%ld",
+                    intmax_t webOrderLineItemID = ASN1ReadInteger(p, length);
+                    self->_webOrderLineItemID = [NSString stringWithFormat:@"%jd",
                                                  webOrderLineItemID];
                     break;
                 }
                 case ReceiptASN1TypeIsInIntroOfferPeriod: {
-                    long is_in_intro_period = ASN1ReadInteger(p, length);
-                    self->_isInIntroPeriod = [[NSNumber numberWithLong: is_in_intro_period]
-                                              boolValue];
+                    self->_isInIntroPeriod = ASN1ReadIntegerAsBool(p, length);
                     break;
                 }
             }
