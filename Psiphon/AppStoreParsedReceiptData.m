@@ -168,6 +168,14 @@ static intmax_t ASN1ReadInteger(const uint8_t *bytes, long length) {
     return parsed;
 }
 
+static BOOL ASN1ReadIntegerAsBool(const uint8_t *bytes, long length) {
+    intmax_t parsed = ASN1ReadInteger(bytes, length);
+    if (parsed == 0) {
+        return FALSE;
+    } else {
+        return TRUE;
+    }
+}
 
 // TODO: Local receipt does not contains `is_trial_period` field, it is only accessible by
 // sending the receipt to Apple.
@@ -301,9 +309,7 @@ static intmax_t ASN1ReadInteger(const uint8_t *bytes, long length) {
                     break;
                 }
                 case ReceiptASN1TypeIsInIntroOfferPeriod: {
-                    intmax_t is_in_intro_period = ASN1ReadInteger(p, length);
-                    self->_isInIntroPeriod = [[NSNumber numberWithLongLong: is_in_intro_period]
-                                              boolValue];
+                    self->_isInIntroPeriod = ASN1ReadIntegerAsBool(p, length);
                     break;
                 }
             }
