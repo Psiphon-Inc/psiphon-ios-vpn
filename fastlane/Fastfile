@@ -13,15 +13,24 @@
 # Uncomment the line if you want fastlane to automatically update itself
 # update_fastlane
 
+# To run use: `fastlane ios screenshots`.
+
 default_platform(:ios)
 
 platform :ios do
   desc "Generate new localized screenshots"
   lane :screenshots do
     capture_ios_screenshots(workspace: "Psiphon.xcworkspace",
-                            scheme: "Psiphon",
+                            scheme: "PsiphonUITests",
                             stop_after_first_error: true,
+                            derived_data_path: "~/Library/Developer/Xcode/DerivedData/",
+                            # Do not rebuild for every device/language combination.
+                            test_without_building: true,
+                            concurrent_simulators: true,
                             dark_mode: true)
-    upload_to_app_store(skip_binary_upload: true, skip_metadata: true, screenshots_path: 'StoreAssets/screenshots')
+    upload_to_app_store(skip_binary_upload: true,
+                        skip_metadata: true, 
+                        overwrite_screenshots: true,
+                        screenshots_path: 'StoreAssets/screenshots')
   end
 end
