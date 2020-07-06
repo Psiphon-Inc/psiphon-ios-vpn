@@ -128,7 +128,7 @@
 "NO_INTERNET_CONNECTION_TITLE" = "Aucune connexion à Internet";
 
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
-"NO_PRODUCTS_TEXT_2" = "Impossible de récupérer les abonnements du magasin d’applications App Store. Veuillez ressayer ultérieurement.";
+"NO_PRODUCTS_TEXT_2" = "Impossible de récupérer les abonnements du magasin d’applications App Store. Veuillez ressayer plus tard.";
 
 /*[UNTRANSLATED] Alert OK Button */
 "OK_BUTTON" = "OK";
@@ -155,7 +155,7 @@
 "PERMISSION_REQUIRED_ALERT__TITLE" = "Une autorisation est requise";
 
 /* Subtitle shown when the current operation failed, asking the user to try again at a later time. */
-"PLEASE_TRY_AGAIN_LATER" = "Veuillez ressayer ultérieurement.";
+"PLEASE_TRY_AGAIN_LATER" = "Veuillez ressayer plus tard.";
 
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
 "PRIVACY_POLICY_DECLINED_ALERT_BODY" = "Vous devez accepter notre politique de confidentialité avant de poursuivre l’utilisation de Psiphon.";
@@ -278,7 +278,7 @@
 "RETRY_BUTTON_TITLE" = "Ressayer";
 
 /* Shown in a pop-up alert if user's rewarded video ad failed to load. */
-"REWARDED_VIDEO_LOAD_FAILED" = "Échec de chargement de la vidéo récompensée. Veuillez ressayer ultérieurement.";
+"REWARDED_VIDEO_LOAD_FAILED" = "Échec de chargement de la vidéo récompensée. Veuillez ressayer plus tard.";
 
 /* Title for screen that allows user to select language. Use all capital letters in the translation only if it makes sense. */
 "SELECT_LANG" = "SÉLECTIONNER UNE LANGUE";
