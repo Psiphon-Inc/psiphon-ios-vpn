@@ -19,6 +19,9 @@
 
 #import <Foundation/Foundation.h>
 #import "BasePacketTunnelProvider.h"
+#import "AppInfo.h"
+#import "ExtensionDataStore.h"
+#import "JetsamTracking.h"
 #import "SharedConstants.h"
 #import "PsiFeedbackLogger.h"
 #import "FileUtils.h"
@@ -26,10 +29,14 @@
 #import "Asserts.h"
 #import "PsiphonDataSharedDB.h"
 #import "Logging.h"
+#import "NSDate+PSIDateExtension.h"
+#import "NSUserDefaults+KeyedDataStore.h"
 
 NSErrorDomain _Nonnull const BasePsiphonTunnelErrorDomain = @"BasePsiphonTunnelErrorDomain";
 
 PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelProvider";
+
+PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
 
 @interface BasePacketTunnelProvider ()
 
@@ -45,6 +52,8 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
     // Pointer to startTunnelWithOptions completion handler.
     // NOTE: value is expected to be nil after completion handler has been called.
     void (^vpnStartCompletionHandler)(NSError *__nullable error);
+
+    dispatch_source_t tickerDispatch;
 }
 
 - (instancetype)init {
@@ -60,6 +69,12 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
     return self;
 }
 
+- (void)dealloc {
+    if (self->tickerDispatch != NULL) {
+        dispatch_source_cancel(tickerDispatch);
+    }
+}
+
 /**
  * Subclasses should not override this function.
  */
@@ -68,15 +83,76 @@ PsiFeedbackLogType const BasePacketTunnelProviderLogType = @"BasePacketTunnelPro
     @synchronized (self) {
 
         // Determine if the extension jetsammed previously to this start.
+        // NOTE: in some scenarios this will be a false positive, e.g. the extension is killed by
+        // the system when the device is restarted or powered down.
         BOOL previouslyJetsammed = [self.sharedDB getExtensionJetsammedBeforeStopFlag];
 
          // Sets the crash flag. This flag is reset when `stopTunnelWithReason:completionHandler:` is called.
         [self.sharedDB setExtensionJetsammedBeforeStopFlag:TRUE];
 
         if (previouslyJetsammed) {
-            [self.sharedDB incrementJetsamCounter];
-            [PsiFeedbackLogger errorWithType:BasePacketTunnelProviderLogType
-                                        json:@{@"JetsamCount": @([self.sharedDB getJetsamCounter])}];
+            ExtensionDataStore *dataStore = [[ExtensionDataStore alloc]
+                                             initWithDataStore:[NSUserDefaults standardUserDefaults]];
+
+            NSDate *previousStartTime = [dataStore extensionStartTime];
+            if (previousStartTime != nil) {
+
+                NSDate *lastTickerTime = [dataStore tickerTime];
+                if (lastTickerTime == nil) {
+                    // No previous ticker time. Set to now.
+                    lastTickerTime = NSDate.date;
+                    [PsiFeedbackLogger errorWithType:JetsamMetricsLogType
+                                             message:@"No previous ticker time."];
+                }
+
+                NSTimeInterval previousUptime = [lastTickerTime timeIntervalSinceDate:previousStartTime];
+                if (previousUptime >= 0) {
+
+                    JetsamEvent *jetsam = [JetsamEvent jetsamEventWithAppVersion:AppInfo.appVersion
+                                                                     runningTime:previousUptime
+                                                                      jetsamDate:[NSDate.date timeIntervalSince1970]];
+
+                    NSError *err;
+                    [ExtensionJetsamTracking logJetsamEvent:jetsam
+                                                 toFilepath:[self.sharedDB extensionJetsamMetricsFilePath]
+                                        withRotatedFilepath:[self.sharedDB extensionJetsamMetricsRotatedFilePath]
+                                           maxFilesizeBytes:1e6
+                                                      error:&err];
+                    if (err != nil) {
+                        [PsiFeedbackLogger errorWithType:JetsamMetricsLogType
+                                                 message:@"Error logging jetsam"
+                                                  object:err];
+                    }
+                } else {
+                    [PsiFeedbackLogger errorWithType:JetsamMetricsLogType
+                                             message:[NSString stringWithFormat:@"Negative uptime value: %f", previousUptime]];
+                }
+            } else {
+                // Do not log Jetsam event since the previous start time cannot be determined.
+            }
+        }
+
+        ExtensionDataStore *dataStore = [[ExtensionDataStore alloc]
+                                         initWithDataStore:[NSUserDefaults standardUserDefaults]];
+        [dataStore setExtensionStartTimeToNow];
+
+        // Start timer which tracks extension uptime.
+
+        self->tickerDispatch = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0,
+                                                      dispatch_get_main_queue());
+
+        if (self->tickerDispatch != NULL) {
+            // Start timer which fires every 5s with a leeway of 5s.
+            dispatch_source_set_timer(self->tickerDispatch,
+                                      dispatch_time(DISPATCH_TIME_NOW, 0),
+                                      5 * NSEC_PER_SEC,
+                                      5 * NSEC_PER_SEC);
+
+            dispatch_source_set_event_handler(self->tickerDispatch, ^{
+                [dataStore setTickerTimeToNow];
+            });
+
+            dispatch_resume(self->tickerDispatch);
         }
 
         // Creates boot test file used for testing if device is unlocked since boot.

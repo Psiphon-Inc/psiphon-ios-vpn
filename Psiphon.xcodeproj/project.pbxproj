@@ -208,6 +208,65 @@
 		CEA1B78B249AB959006D9853 /* embedded_server_entries in Resources */ = {isa = PBXBuildFile; fileRef = EF6C1F501F59E46500709554 /* embedded_server_entries */; };
 		CEBA9C112481A5C80097D700 /* Notifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBA9C102481A5C80097D700 /* Notifier.swift */; };
 		CEBA9C132481AA9F0097D700 /* SharedDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBA9C122481AA9F0097D700 /* SharedDB.swift */; };
+		CED6790E24A4F82400C4CA81 /* JetsamTracking.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6790424A4F82300C4CA81 /* JetsamTracking.m */; };
+		CED6790F24A4F82400C4CA81 /* JetsamTracking.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6790424A4F82300C4CA81 /* JetsamTracking.m */; };
+		CED6791024A4F82400C4CA81 /* JetsamEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6790624A4F82400C4CA81 /* JetsamEvent.m */; };
+		CED6791124A4F82400C4CA81 /* JetsamEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6790624A4F82400C4CA81 /* JetsamEvent.m */; };
+		CED6791224A4F82400C4CA81 /* JetsamMetrics.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6790824A4F82400C4CA81 /* JetsamMetrics.m */; };
+		CED6791324A4F82400C4CA81 /* JetsamMetrics.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6790824A4F82400C4CA81 /* JetsamMetrics.m */; };
+		CED6791424A4F82400C4CA81 /* JetsamPerAppVersionStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6790B24A4F82400C4CA81 /* JetsamPerAppVersionStat.m */; };
+		CED6791524A4F82400C4CA81 /* JetsamPerAppVersionStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6790B24A4F82400C4CA81 /* JetsamPerAppVersionStat.m */; };
+		CED6791624A4F82400C4CA81 /* JetsamMetrics+Feedback.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6790D24A4F82400C4CA81 /* JetsamMetrics+Feedback.m */; };
+		CED6791B24A4F88D00C4CA81 /* JSONCodable.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6791A24A4F88D00C4CA81 /* JSONCodable.m */; };
+		CED6791C24A4F88D00C4CA81 /* JSONCodable.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6791A24A4F88D00C4CA81 /* JSONCodable.m */; };
+		CED6794224A4F95D00C4CA81 /* RunningStdev.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6793B24A4F95D00C4CA81 /* RunningStdev.m */; };
+		CED6794324A4F95D00C4CA81 /* RunningStdev.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6793B24A4F95D00C4CA81 /* RunningStdev.m */; };
+		CED6794424A4F95D00C4CA81 /* RunningStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6793C24A4F95D00C4CA81 /* RunningStat.m */; };
+		CED6794524A4F95D00C4CA81 /* RunningStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6793C24A4F95D00C4CA81 /* RunningStat.m */; };
+		CED6794624A4F95D00C4CA81 /* RunningMinMax.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6793D24A4F95D00C4CA81 /* RunningMinMax.m */; };
+		CED6794724A4F95D00C4CA81 /* RunningMinMax.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6793D24A4F95D00C4CA81 /* RunningMinMax.m */; };
+		CED6794824A4F95D00C4CA81 /* RunningBins.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6793E24A4F95D00C4CA81 /* RunningBins.m */; };
+		CED6794924A4F95D00C4CA81 /* RunningBins.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6793E24A4F95D00C4CA81 /* RunningBins.m */; };
+		CED6794A24A4F98200C4CA81 /* stats.c in Sources */ = {isa = PBXBuildFile; fileRef = CED6793A24A4F95D00C4CA81 /* stats.c */; };
+		CED6794F24A4F9D400C4CA81 /* DelimitedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6794B24A4F9D400C4CA81 /* DelimitedFile.m */; };
+		CED6795024A4F9D400C4CA81 /* DelimitedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6794B24A4F9D400C4CA81 /* DelimitedFile.m */; };
+		CED6795124A4F9D400C4CA81 /* DiskBackedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6794E24A4F9D400C4CA81 /* DiskBackedFile.m */; };
+		CED6795224A4F9D400C4CA81 /* DiskBackedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6794E24A4F9D400C4CA81 /* DiskBackedFile.m */; };
+		CED6795524A4F9F100C4CA81 /* Archiver.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6795424A4F9F100C4CA81 /* Archiver.m */; };
+		CED6795624A4F9F100C4CA81 /* Archiver.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6795424A4F9F100C4CA81 /* Archiver.m */; };
+		CED6795924A4FA1200C4CA81 /* FileRegistry.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6795824A4FA1200C4CA81 /* FileRegistry.m */; };
+		CED6795A24A4FA1200C4CA81 /* FileRegistry.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6795824A4FA1200C4CA81 /* FileRegistry.m */; };
+		CED6795D24A4FA3200C4CA81 /* RotatingFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6795B24A4FA3200C4CA81 /* RotatingFile.m */; };
+		CED6795E24A4FA3200C4CA81 /* RotatingFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6795B24A4FA3200C4CA81 /* RotatingFile.m */; };
+		CED6796124A4FA6D00C4CA81 /* ExtensionContainerFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6796024A4FA6C00C4CA81 /* ExtensionContainerFile.m */; };
+		CED6796224A4FA6D00C4CA81 /* ExtensionContainerFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6796024A4FA6C00C4CA81 /* ExtensionContainerFile.m */; };
+		CED6796924A4FAA700C4CA81 /* ExtensionDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6796424A4FAA700C4CA81 /* ExtensionDataStore.m */; };
+		CED6796B24A4FAA700C4CA81 /* ExtensionDataStoreKeys.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6796524A4FAA700C4CA81 /* ExtensionDataStoreKeys.m */; };
+		CED6797024A4FAF400C4CA81 /* NSUserDefaults+KeyedDataStore.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6796D24A4FAF400C4CA81 /* NSUserDefaults+KeyedDataStore.m */; };
+		CED6797E24A4FF2800C4CA81 /* RotatingFileTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6797324A4FF2800C4CA81 /* RotatingFileTest.m */; };
+		CED6797F24A4FF2800C4CA81 /* RunningStatsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6797524A4FF2800C4CA81 /* RunningStatsTest.m */; };
+		CED6798024A4FF2800C4CA81 /* RunningBinsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6797624A4FF2800C4CA81 /* RunningBinsTest.m */; };
+		CED6798124A4FF2800C4CA81 /* DelimitedFileTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6797724A4FF2800C4CA81 /* DelimitedFileTest.m */; };
+		CED6798224A4FF2800C4CA81 /* FileRegistryTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6797824A4FF2800C4CA81 /* FileRegistryTest.m */; };
+		CED6798324A4FF2800C4CA81 /* ExtensionContainerFileTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6797924A4FF2800C4CA81 /* ExtensionContainerFileTest.m */; };
+		CED6798424A4FF2800C4CA81 /* JetsamTrackingTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6797B24A4FF2800C4CA81 /* JetsamTrackingTest.m */; };
+		CED6798524A4FF2800C4CA81 /* JetsamEventTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6797C24A4FF2800C4CA81 /* JetsamEventTest.m */; };
+		CED6798624A4FF2800C4CA81 /* JetsamMetricsTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6797D24A4FF2800C4CA81 /* JetsamMetricsTest.m */; };
+		CED6798724A4FFC000C4CA81 /* RunningStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6793C24A4F95D00C4CA81 /* RunningStat.m */; };
+		CED6798824A4FFC300C4CA81 /* RunningStdev.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6793B24A4F95D00C4CA81 /* RunningStdev.m */; };
+		CED6798924A4FFC500C4CA81 /* RunningMinMax.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6793D24A4F95D00C4CA81 /* RunningMinMax.m */; };
+		CED6798A24A4FFC700C4CA81 /* RunningBins.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6793E24A4F95D00C4CA81 /* RunningBins.m */; };
+		CED6798B24A501FA00C4CA81 /* JetsamTracking.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6790424A4F82300C4CA81 /* JetsamTracking.m */; };
+		CED6798C24A5252000C4CA81 /* JetsamPerAppVersionStat.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6790B24A4F82400C4CA81 /* JetsamPerAppVersionStat.m */; };
+		CED6798D24A5252500C4CA81 /* JetsamMetrics.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6790824A4F82400C4CA81 /* JetsamMetrics.m */; };
+		CED6798E24A5252900C4CA81 /* JetsamEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6790624A4F82400C4CA81 /* JetsamEvent.m */; };
+		CED6798F24A5254500C4CA81 /* ExtensionContainerFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6796024A4FA6C00C4CA81 /* ExtensionContainerFile.m */; };
+		CED6799024A525D200C4CA81 /* FileRegistry.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6795824A4FA1200C4CA81 /* FileRegistry.m */; };
+		CED6799124A525FD00C4CA81 /* DelimitedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6794B24A4F9D400C4CA81 /* DelimitedFile.m */; };
+		CED6799224A5260100C4CA81 /* DiskBackedFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6794E24A4F9D400C4CA81 /* DiskBackedFile.m */; };
+		CED6799324A5260500C4CA81 /* JSONCodable.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6791A24A4F88D00C4CA81 /* JSONCodable.m */; };
+		CED6799424A5261000C4CA81 /* Archiver.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6795424A4F9F100C4CA81 /* Archiver.m */; };
+		CED6799524A5264C00C4CA81 /* RotatingFile.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6795B24A4FA3200C4CA81 /* RotatingFile.m */; };
 		CEED7835247703DD002D9D55 /* AppReceiptReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEED7834247703DD002D9D55 /* AppReceiptReducer.swift */; };
 		EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79F204F22C900228A63 /* RACSignal+Operations2.m */; };
 		EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */; };
@@ -686,6 +745,56 @@
 		CEA1B786249AAA13006D9853 /* EmbeddedServerEntriesTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EmbeddedServerEntriesTest.m; sourceTree = "<group>"; };
 		CEBA9C102481A5C80097D700 /* Notifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifier.swift; sourceTree = "<group>"; };
 		CEBA9C122481AA9F0097D700 /* SharedDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedDB.swift; sourceTree = "<group>"; };
+		CED6790424A4F82300C4CA81 /* JetsamTracking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JetsamTracking.m; sourceTree = "<group>"; };
+		CED6790524A4F82300C4CA81 /* JetsamMetrics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JetsamMetrics.h; sourceTree = "<group>"; };
+		CED6790624A4F82400C4CA81 /* JetsamEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JetsamEvent.m; sourceTree = "<group>"; };
+		CED6790724A4F82400C4CA81 /* JetsamTracking.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JetsamTracking.h; sourceTree = "<group>"; };
+		CED6790824A4F82400C4CA81 /* JetsamMetrics.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JetsamMetrics.m; sourceTree = "<group>"; };
+		CED6790924A4F82400C4CA81 /* JetsamEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JetsamEvent.h; sourceTree = "<group>"; };
+		CED6790A24A4F82400C4CA81 /* JetsamPerAppVersionStat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JetsamPerAppVersionStat.h; sourceTree = "<group>"; };
+		CED6790B24A4F82400C4CA81 /* JetsamPerAppVersionStat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JetsamPerAppVersionStat.m; sourceTree = "<group>"; };
+		CED6790C24A4F82400C4CA81 /* JetsamMetrics+Feedback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "JetsamMetrics+Feedback.h"; sourceTree = "<group>"; };
+		CED6790D24A4F82400C4CA81 /* JetsamMetrics+Feedback.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "JetsamMetrics+Feedback.m"; sourceTree = "<group>"; };
+		CED6791924A4F88D00C4CA81 /* JSONCodable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONCodable.h; sourceTree = "<group>"; };
+		CED6791A24A4F88D00C4CA81 /* JSONCodable.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONCodable.m; sourceTree = "<group>"; };
+		CED6793624A4F95D00C4CA81 /* RunningMinMax.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RunningMinMax.h; sourceTree = "<group>"; };
+		CED6793724A4F95D00C4CA81 /* RunningStat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RunningStat.h; sourceTree = "<group>"; };
+		CED6793824A4F95D00C4CA81 /* RunningStdev.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RunningStdev.h; sourceTree = "<group>"; };
+		CED6793924A4F95D00C4CA81 /* RunningBins.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RunningBins.h; sourceTree = "<group>"; };
+		CED6793A24A4F95D00C4CA81 /* stats.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stats.c; sourceTree = "<group>"; };
+		CED6793B24A4F95D00C4CA81 /* RunningStdev.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunningStdev.m; sourceTree = "<group>"; };
+		CED6793C24A4F95D00C4CA81 /* RunningStat.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunningStat.m; sourceTree = "<group>"; };
+		CED6793D24A4F95D00C4CA81 /* RunningMinMax.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunningMinMax.m; sourceTree = "<group>"; };
+		CED6793E24A4F95D00C4CA81 /* RunningBins.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunningBins.m; sourceTree = "<group>"; };
+		CED6793F24A4F95D00C4CA81 /* stats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stats.h; sourceTree = "<group>"; };
+		CED6794B24A4F9D400C4CA81 /* DelimitedFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DelimitedFile.m; sourceTree = "<group>"; };
+		CED6794C24A4F9D400C4CA81 /* DelimitedFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DelimitedFile.h; sourceTree = "<group>"; };
+		CED6794D24A4F9D400C4CA81 /* DiskBackedFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DiskBackedFile.h; sourceTree = "<group>"; };
+		CED6794E24A4F9D400C4CA81 /* DiskBackedFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DiskBackedFile.m; sourceTree = "<group>"; };
+		CED6795324A4F9F100C4CA81 /* Archiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Archiver.h; sourceTree = "<group>"; };
+		CED6795424A4F9F100C4CA81 /* Archiver.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Archiver.m; sourceTree = "<group>"; };
+		CED6795724A4FA1200C4CA81 /* FileRegistry.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileRegistry.h; sourceTree = "<group>"; };
+		CED6795824A4FA1200C4CA81 /* FileRegistry.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileRegistry.m; sourceTree = "<group>"; };
+		CED6795B24A4FA3200C4CA81 /* RotatingFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RotatingFile.m; sourceTree = "<group>"; };
+		CED6795C24A4FA3200C4CA81 /* RotatingFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RotatingFile.h; sourceTree = "<group>"; };
+		CED6795F24A4FA6C00C4CA81 /* ExtensionContainerFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtensionContainerFile.h; sourceTree = "<group>"; };
+		CED6796024A4FA6C00C4CA81 /* ExtensionContainerFile.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtensionContainerFile.m; sourceTree = "<group>"; };
+		CED6796424A4FAA700C4CA81 /* ExtensionDataStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtensionDataStore.m; sourceTree = "<group>"; };
+		CED6796524A4FAA700C4CA81 /* ExtensionDataStoreKeys.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtensionDataStoreKeys.m; sourceTree = "<group>"; };
+		CED6796624A4FAA700C4CA81 /* ExtensionDataStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtensionDataStore.h; sourceTree = "<group>"; };
+		CED6796724A4FAA700C4CA81 /* ExtensionDataStoreKeys.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtensionDataStoreKeys.h; sourceTree = "<group>"; };
+		CED6796D24A4FAF400C4CA81 /* NSUserDefaults+KeyedDataStore.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSUserDefaults+KeyedDataStore.m"; sourceTree = "<group>"; };
+		CED6796E24A4FAF400C4CA81 /* KeyedDataStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyedDataStore.h; sourceTree = "<group>"; };
+		CED6796F24A4FAF400C4CA81 /* NSUserDefaults+KeyedDataStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSUserDefaults+KeyedDataStore.h"; sourceTree = "<group>"; };
+		CED6797324A4FF2800C4CA81 /* RotatingFileTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RotatingFileTest.m; sourceTree = "<group>"; };
+		CED6797524A4FF2800C4CA81 /* RunningStatsTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunningStatsTest.m; sourceTree = "<group>"; };
+		CED6797624A4FF2800C4CA81 /* RunningBinsTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RunningBinsTest.m; sourceTree = "<group>"; };
+		CED6797724A4FF2800C4CA81 /* DelimitedFileTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DelimitedFileTest.m; sourceTree = "<group>"; };
+		CED6797824A4FF2800C4CA81 /* FileRegistryTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileRegistryTest.m; sourceTree = "<group>"; };
+		CED6797924A4FF2800C4CA81 /* ExtensionContainerFileTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ExtensionContainerFileTest.m; sourceTree = "<group>"; };
+		CED6797B24A4FF2800C4CA81 /* JetsamTrackingTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JetsamTrackingTest.m; sourceTree = "<group>"; };
+		CED6797C24A4FF2800C4CA81 /* JetsamEventTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JetsamEventTest.m; sourceTree = "<group>"; };
+		CED6797D24A4FF2800C4CA81 /* JetsamMetricsTest.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JetsamMetricsTest.m; sourceTree = "<group>"; };
 		CEE5765E249AA01D00744C38 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CEED7834247703DD002D9D55 /* AppReceiptReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppReceiptReducer.swift; sourceTree = "<group>"; };
 		CF62E51A6A76190276A6FF94 /* Pods-PsiApi-Utilities.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Utilities.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Utilities/Pods-PsiApi-Utilities.debug.xcconfig"; sourceTree = "<group>"; };
@@ -889,6 +998,7 @@
 		4E0DCB101F28458100495781 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				CED6791824A4F82A00C4CA81 /* JetsamMetrics */,
 				521FD102219E0E8400F748EC /* Annotations.h */,
 				521FD101219E0E6300F748EC /* NotificationCenter.h */,
 				521FD0F4219E0DC300F748EC /* Profiling */,
@@ -898,6 +1008,8 @@
 				669A10B61F58A74E00EE831F /* Strings */,
 				EF90D793204F22C900228A63 /* Util */,
 				9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */,
+				CED6795F24A4FA6C00C4CA81 /* ExtensionContainerFile.h */,
+				CED6796024A4FA6C00C4CA81 /* ExtensionContainerFile.m */,
 				EFB3E62D1F66F23F004AAE8C /* Logging.h */,
 				9BFEC3165745A5D14C8C3C08 /* Notifier.h */,
 				9BFEC91ED4A1C511520E9948 /* Notifier.m */,
@@ -1253,6 +1365,8 @@
 				CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */,
 				CE26FCA91BBDC85900B83375 /* Info.plist */,
 				EF743FC11F99546B00AC89A2 /* IAP */,
+				CED6796324A4FAA700C4CA81 /* LocalDatastore */,
+				CED6796C24A4FAF400C4CA81 /* Utils */,
 				9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */,
 				9BFEC8783D4222F2272E50E7 /* BasePacketTunnelProvider.h */,
 				EF652CD81F352271002AFB48 /* PacketTunnelProvider.h */,
@@ -1264,11 +1378,107 @@
 			path = PsiphonVPN;
 			sourceTree = "<group>";
 		};
+		CED6791824A4F82A00C4CA81 /* JetsamMetrics */ = {
+			isa = PBXGroup;
+			children = (
+				CED6790924A4F82400C4CA81 /* JetsamEvent.h */,
+				CED6790624A4F82400C4CA81 /* JetsamEvent.m */,
+				CED6790524A4F82300C4CA81 /* JetsamMetrics.h */,
+				CED6790824A4F82400C4CA81 /* JetsamMetrics.m */,
+				CED6790C24A4F82400C4CA81 /* JetsamMetrics+Feedback.h */,
+				CED6790D24A4F82400C4CA81 /* JetsamMetrics+Feedback.m */,
+				CED6790A24A4F82400C4CA81 /* JetsamPerAppVersionStat.h */,
+				CED6790B24A4F82400C4CA81 /* JetsamPerAppVersionStat.m */,
+				CED6790724A4F82400C4CA81 /* JetsamTracking.h */,
+				CED6790424A4F82300C4CA81 /* JetsamTracking.m */,
+			);
+			path = JetsamMetrics;
+			sourceTree = "<group>";
+		};
+		CED6793524A4F95D00C4CA81 /* Math */ = {
+			isa = PBXGroup;
+			children = (
+				CED6793924A4F95D00C4CA81 /* RunningBins.h */,
+				CED6793E24A4F95D00C4CA81 /* RunningBins.m */,
+				CED6793624A4F95D00C4CA81 /* RunningMinMax.h */,
+				CED6793D24A4F95D00C4CA81 /* RunningMinMax.m */,
+				CED6793724A4F95D00C4CA81 /* RunningStat.h */,
+				CED6793C24A4F95D00C4CA81 /* RunningStat.m */,
+				CED6793824A4F95D00C4CA81 /* RunningStdev.h */,
+				CED6793B24A4F95D00C4CA81 /* RunningStdev.m */,
+				CED6793F24A4F95D00C4CA81 /* stats.h */,
+				CED6793A24A4F95D00C4CA81 /* stats.c */,
+			);
+			path = Math;
+			sourceTree = "<group>";
+		};
+		CED6796324A4FAA700C4CA81 /* LocalDatastore */ = {
+			isa = PBXGroup;
+			children = (
+				CED6796624A4FAA700C4CA81 /* ExtensionDataStore.h */,
+				CED6796424A4FAA700C4CA81 /* ExtensionDataStore.m */,
+				CED6796724A4FAA700C4CA81 /* ExtensionDataStoreKeys.h */,
+				CED6796524A4FAA700C4CA81 /* ExtensionDataStoreKeys.m */,
+			);
+			path = LocalDatastore;
+			sourceTree = "<group>";
+		};
+		CED6796C24A4FAF400C4CA81 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				CED6796D24A4FAF400C4CA81 /* NSUserDefaults+KeyedDataStore.m */,
+				CED6796E24A4FAF400C4CA81 /* KeyedDataStore.h */,
+				CED6796F24A4FAF400C4CA81 /* NSUserDefaults+KeyedDataStore.h */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		CED6797124A4FF2800C4CA81 /* Shared */ = {
+			isa = PBXGroup;
+			children = (
+				CED6797924A4FF2800C4CA81 /* ExtensionContainerFileTest.m */,
+				CED6797A24A4FF2800C4CA81 /* JetsamTracking */,
+				CED6797224A4FF2800C4CA81 /* Util */,
+			);
+			path = Shared;
+			sourceTree = "<group>";
+		};
+		CED6797224A4FF2800C4CA81 /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				CED6797324A4FF2800C4CA81 /* RotatingFileTest.m */,
+				CED6797424A4FF2800C4CA81 /* Math */,
+				CED6797724A4FF2800C4CA81 /* DelimitedFileTest.m */,
+				CED6797824A4FF2800C4CA81 /* FileRegistryTest.m */,
+			);
+			path = Util;
+			sourceTree = "<group>";
+		};
+		CED6797424A4FF2800C4CA81 /* Math */ = {
+			isa = PBXGroup;
+			children = (
+				CED6797524A4FF2800C4CA81 /* RunningStatsTest.m */,
+				CED6797624A4FF2800C4CA81 /* RunningBinsTest.m */,
+			);
+			path = Math;
+			sourceTree = "<group>";
+		};
+		CED6797A24A4FF2800C4CA81 /* JetsamTracking */ = {
+			isa = PBXGroup;
+			children = (
+				CED6797B24A4FF2800C4CA81 /* JetsamTrackingTest.m */,
+				CED6797C24A4FF2800C4CA81 /* JetsamEventTest.m */,
+				CED6797D24A4FF2800C4CA81 /* JetsamMetricsTest.m */,
+			);
+			path = JetsamTracking;
+			sourceTree = "<group>";
+		};
 		CEE5765B249AA01D00744C38 /* PsiphonTests */ = {
 			isa = PBXGroup;
 			children = (
 				CEE5765E249AA01D00744C38 /* Info.plist */,
 				CEA1B786249AAA13006D9853 /* EmbeddedServerEntriesTest.m */,
+				CED6797124A4FF2800C4CA81 /* Shared */,
 			);
 			path = PsiphonTests;
 			sourceTree = "<group>";
@@ -1326,22 +1536,35 @@
 		EF90D793204F22C900228A63 /* Util */ = {
 			isa = PBXGroup;
 			children = (
+				CED6793524A4F95D00C4CA81 /* Math */,
+				CED6795324A4F9F100C4CA81 /* Archiver.h */,
+				CED6795424A4F9F100C4CA81 /* Archiver.m */,
 				CE6C3F6824366AE1007A17F0 /* ClientMetadata.h */,
 				CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */,
 				521FD0FC219E0E0E00F748EC /* DebugUtils.h */,
 				521FD0FB219E0E0E00F748EC /* DebugUtils.m */,
+				CED6794C24A4F9D400C4CA81 /* DelimitedFile.h */,
+				CED6794B24A4F9D400C4CA81 /* DelimitedFile.m */,
+				CED6794D24A4F9D400C4CA81 /* DiskBackedFile.h */,
+				CED6794E24A4F9D400C4CA81 /* DiskBackedFile.m */,
+				EF90D79B204F22C900228A63 /* DispatchUtils.h */,
+				EF90D798204F22C900228A63 /* DispatchUtils.m */,
+				CED6795724A4FA1200C4CA81 /* FileRegistry.h */,
+				CED6795824A4FA1200C4CA81 /* FileRegistry.m */,
 				EF90D794204F22C900228A63 /* FileUtils.h */,
 				EF90D799204F22C900228A63 /* FileUtils.m */,
+				CED6791924A4F88D00C4CA81 /* JSONCodable.h */,
+				CED6791A24A4F88D00C4CA81 /* JSONCodable.m */,
 				EF90D795204F22C900228A63 /* NSError+Convenience.h */,
 				EF90D79A204F22C900228A63 /* NSError+Convenience.m */,
 				EF90D79D204F22C900228A63 /* NSDate+Comparator.h */,
 				EF90D796204F22C900228A63 /* NSDate+Comparator.m */,
 				EF90D79C204F22C900228A63 /* NSDate+PSIDateExtension.h */,
 				EF90D797204F22C900228A63 /* NSDate+PSIDateExtension.m */,
-				EF90D79B204F22C900228A63 /* DispatchUtils.h */,
-				EF90D798204F22C900228A63 /* DispatchUtils.m */,
 				9BFECCCF429898FD903B69A6 /* Nullity.m */,
 				9BFECEEB971749A4E9705B15 /* Nullity.h */,
+				CED6795C24A4FA3200C4CA81 /* RotatingFile.h */,
+				CED6795B24A4FA3200C4CA81 /* RotatingFile.m */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -1772,6 +1995,7 @@
 				52A2465E239081C100A01FF1 /* AppState.swift in Sources */,
 				8D255E2D24620E2900FD5D1C /* NoConnectionBannerView.swift in Sources */,
 				EF90D7A6204F22C900228A63 /* NSDate+Comparator.m in Sources */,
+				CED6791424A4F82400C4CA81 /* JetsamPerAppVersionStat.m in Sources */,
 				4EB846422151830600687344 /* AvailableServerRegions.m in Sources */,
 				8D7789CA247499110038BFDA /* Reachability+Additions.swift in Sources */,
 				5246800922D51CE4009AEC6E /* PsiCashBalanceView.swift in Sources */,
@@ -1791,6 +2015,7 @@
 				EF4F1F3D206055F7006A40A1 /* RACSignal+Operations2.m in Sources */,
 				445F24F020E1A5BA00D004E9 /* xer_encoder.c in Sources */,
 				445F24D520E1A5BA00D004E9 /* constr_TYPE.c in Sources */,
+				CED6791224A4F82400C4CA81 /* JetsamMetrics.m in Sources */,
 				445F24E220E1A5BA00D004E9 /* der_encoder.c in Sources */,
 				445F24DC20E1A5BA00D004E9 /* NativeInteger.c in Sources */,
 				521FD0F3219E0D5600F748EC /* DebugTextViewController.m in Sources */,
@@ -1807,6 +2032,7 @@
 				EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */,
 				EF90D7A7204F22C900228A63 /* NSDate+PSIDateExtension.m in Sources */,
 				8DCA6864247C7CF8001D026E /* Bindable.swift in Sources */,
+				CED6795D24A4FA3200C4CA81 /* RotatingFile.m in Sources */,
 				445F239620E1817C00D004E9 /* AppStoreParsedReceiptData.m in Sources */,
 				445F24E420E1A5BA00D004E9 /* constr_SEQUENCE.c in Sources */,
 				CEBA9C132481AA9F0097D700 /* SharedDB.swift in Sources */,
@@ -1850,6 +2076,7 @@
 				8DB6C638242A4D06005E2F4C /* DuskButton.swift in Sources */,
 				4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */,
 				52DF5E9223C675EC00A1B067 /* ViewController+Additions.swift in Sources */,
+				CED6796124A4FA6D00C4CA81 /* ExtensionContainerFile.m in Sources */,
 				52C8F0AB237CA26200E5F9C0 /* ImageViewBuilder.swift in Sources */,
 				445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */,
 				521FD0F0219E0D5600F748EC /* DebugLogViewController.m in Sources */,
@@ -1860,6 +2087,7 @@
 				4E10920820F3DA190033114B /* AppInfo.m in Sources */,
 				445F24EE20E1A5BA00D004E9 /* asn_codecs_prim.c in Sources */,
 				521FD0FA219E0DDF00F748EC /* AppProfiler.m in Sources */,
+				CED6794624A4F95D00C4CA81 /* RunningMinMax.m in Sources */,
 				445F24E620E1A5BA00D004E9 /* per_opentype.c in Sources */,
 				445F24EC20E1A5BA00D004E9 /* SignedData.c in Sources */,
 				9BFEC2458D1346F537E9089E /* Nullity.m in Sources */,
@@ -1868,6 +2096,8 @@
 				445F24EA20E1A5BA00D004E9 /* per_decoder.c in Sources */,
 				445F24F520E1A85D00D004E9 /* IA5String.c in Sources */,
 				520201212360F5B800D00C8E /* IndexedViewSwitcher.swift in Sources */,
+				CED6794824A4F95D00C4CA81 /* RunningBins.m in Sources */,
+				CED6795924A4FA1200C4CA81 /* FileRegistry.m in Sources */,
 				52DF5E9E23D0D01F00A1B067 /* BridgingTypes.swift in Sources */,
 				9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */,
 				521FD0F9219E0DDF00F748EC /* AppStats.m in Sources */,
@@ -1879,14 +2109,18 @@
 				521FD0F2219E0D5600F748EC /* DebugViewController.m in Sources */,
 				52CAC4312385D06600A92842 /* Spinner.swift in Sources */,
 				445F24EF20E1A5BA00D004E9 /* constraints.c in Sources */,
+				CED6794224A4F95D00C4CA81 /* RunningStdev.m in Sources */,
 				5248B4CE23203781008C00D4 /* SwiftObjCBridges.swift in Sources */,
 				52D363CB230DEBED002C2221 /* CloseButton.swift in Sources */,
 				445F24DB20E1A5BA00D004E9 /* ber_decoder.c in Sources */,
+				CED6790E24A4F82400C4CA81 /* JetsamTracking.m in Sources */,
 				52D2581122BADE1900CA956A /* SwiftDelegate.swift in Sources */,
 				5202011D2360D34000D00C8E /* EitherView.swift in Sources */,
 				9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */,
 				9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */,
 				52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */,
+				CED6791624A4F82400C4CA81 /* JetsamMetrics+Feedback.m in Sources */,
+				CED6795124A4F9D400C4CA81 /* DiskBackedFile.m in Sources */,
 				8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */,
 				52C8F0AD237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift in Sources */,
 				8DE4E6D2244E97D000275362 /* Result+Codable.swift in Sources */,
@@ -1895,6 +2129,7 @@
 				9BFECF61970F215F32E76280 /* AdMobInterstitialAdControllerWrapper.m in Sources */,
 				52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */,
 				9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */,
+				CED6791024A4F82400C4CA81 /* JetsamEvent.m in Sources */,
 				521FD0FD219E0E0F00F748EC /* DebugUtils.m in Sources */,
 				524B4E6B2316F0E3004E9891 /* BorderedSubtitleButton.m in Sources */,
 				9BFEC8A2F99380655E853F81 /* AdControllerWrapper.m in Sources */,
@@ -1905,10 +2140,12 @@
 				A8408AACE30F860F2C961A04 /* WhiteSkyButton.m in Sources */,
 				A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */,
 				8D9E603524366D71003A46D8 /* FeedbackDescriptions.swift in Sources */,
+				CED6791B24A4F88D00C4CA81 /* JSONCodable.m in Sources */,
 				A8408FA13890CD67154033C6 /* RegionSelectionButton.m in Sources */,
 				A8408E611665FC60D5DFF339 /* SubscriptionStatusView.m in Sources */,
 				A8408EB13777DDCBEF7DE3C0 /* SwoopView.m in Sources */,
 				8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */,
+				CED6794424A4F95D00C4CA81 /* RunningStat.m in Sources */,
 				8D1F62C0247DC3350028AFAF /* Authorization+Additions.swift in Sources */,
 				A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */,
 				8D417ED9241844FA00FEE587 /* FloatingPoint+Additions.swift in Sources */,
@@ -1941,6 +2178,8 @@
 				A84081194DA12328ABB5A43E /* UIImageView+Additions.m in Sources */,
 				A840849074861D633B3EB4D1 /* AppEvent.m in Sources */,
 				A84080E9FC63E29F71A79A63 /* RelaySubject.m in Sources */,
+				CED6794F24A4F9D400C4CA81 /* DelimitedFile.m in Sources */,
+				CED6795524A4F9F100C4CA81 /* Archiver.m in Sources */,
 				8D9D9BD0247C6B910093220E /* HardCodedValues.swift in Sources */,
 				A840803A0733D9FCA5410796 /* ActivityIndicatorRoyalSkyButton.m in Sources */,
 			);
@@ -1951,31 +2190,49 @@
 			buildActionMask = 2147483647;
 			files = (
 				EFC2F5CC20226835007B52F9 /* PsiphonConfigReader.m in Sources */,
+				CED6794524A4F95D00C4CA81 /* RunningStat.m in Sources */,
+				CED6795224A4F9D400C4CA81 /* DiskBackedFile.m in Sources */,
+				CED6791324A4F82400C4CA81 /* JetsamMetrics.m in Sources */,
+				CED6791524A4F82400C4CA81 /* JetsamPerAppVersionStat.m in Sources */,
 				CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */,
 				EF90D7B1204F231E00228A63 /* timestamp_tm.c in Sources */,
 				8DD6E7E524591E270041DAC5 /* SubscriptionAuthCheck.m in Sources */,
 				8DD6E7E82459C83B0041DAC5 /* StoredAuthorizations.m in Sources */,
 				EF90D7B3204F232300228A63 /* timestamp_parse.c in Sources */,
+				CED6795024A4F9D400C4CA81 /* DelimitedFile.m in Sources */,
+				CED6796924A4FAA700C4CA81 /* ExtensionDataStore.m in Sources */,
+				CED6797024A4FAF400C4CA81 /* NSUserDefaults+KeyedDataStore.m in Sources */,
 				EF90D7B8204F236400228A63 /* NSError+Convenience.m in Sources */,
 				EF90D7B5204F234700228A63 /* NSDate+PSIDateExtension.m in Sources */,
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,
 				521FD0FF219E0E2600F748EC /* AppStats.m in Sources */,
 				4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */,
 				4E10920920F3DC670033114B /* AppInfo.m in Sources */,
+				CED6795E24A4FA3200C4CA81 /* RotatingFile.m in Sources */,
 				9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */,
 				EF90D7AF204F231900228A63 /* timestamp_valid.c in Sources */,
 				EF639C301F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
 				EF90D7B6204F235100228A63 /* DispatchUtils.m in Sources */,
 				EF90D7B2204F232100228A63 /* timestamp_format.c in Sources */,
+				CED6794724A4F95D00C4CA81 /* RunningMinMax.m in Sources */,
+				CED6794924A4F95D00C4CA81 /* RunningBins.m in Sources */,
+				CED6795A24A4FA1200C4CA81 /* FileRegistry.m in Sources */,
 				9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */,
+				CED6795624A4F9F100C4CA81 /* Archiver.m in Sources */,
+				CED6791C24A4F88D00C4CA81 /* JSONCodable.m in Sources */,
 				EF90D7B7204F235800228A63 /* FileUtils.m in Sources */,
 				EFC2F5B620226758007B52F9 /* PacketTunnelUtils.m in Sources */,
 				EF90D7B0204F231B00228A63 /* timestamp_compare.c in Sources */,
 				9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */,
+				CED6796224A4FA6D00C4CA81 /* ExtensionContainerFile.m in Sources */,
 				521FD0FE219E0E1900F748EC /* AppProfiler.m in Sources */,
 				EF90D7B4204F234100228A63 /* NSDate+Comparator.m in Sources */,
 				9BFECEA225F023F895CC8DA1 /* Authorization.m in Sources */,
 				9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */,
+				CED6796B24A4FAA700C4CA81 /* ExtensionDataStoreKeys.m in Sources */,
+				CED6794324A4F95D00C4CA81 /* RunningStdev.m in Sources */,
+				CED6791124A4F82400C4CA81 /* JetsamEvent.m in Sources */,
+				CED6790F24A4F82400C4CA81 /* JetsamTracking.m in Sources */,
 				521FD100219E0E3800F748EC /* DebugUtils.m in Sources */,
 				A8408F5F45CDBDF42701063E /* Strings.m in Sources */,
 			);
@@ -1985,9 +2242,34 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CED6798924A4FFC500C4CA81 /* RunningMinMax.m in Sources */,
+				CED6798824A4FFC300C4CA81 /* RunningStdev.m in Sources */,
+				CED6799224A5260100C4CA81 /* DiskBackedFile.m in Sources */,
+				CED6799024A525D200C4CA81 /* FileRegistry.m in Sources */,
 				CEA1B787249AAA13006D9853 /* EmbeddedServerEntriesTest.m in Sources */,
+				CED6798024A4FF2800C4CA81 /* RunningBinsTest.m in Sources */,
+				CED6798424A4FF2800C4CA81 /* JetsamTrackingTest.m in Sources */,
+				CED6798624A4FF2800C4CA81 /* JetsamMetricsTest.m in Sources */,
+				CED6798724A4FFC000C4CA81 /* RunningStat.m in Sources */,
+				CED6798A24A4FFC700C4CA81 /* RunningBins.m in Sources */,
+				CED6798D24A5252500C4CA81 /* JetsamMetrics.m in Sources */,
+				CED6798524A4FF2800C4CA81 /* JetsamEventTest.m in Sources */,
+				CED6798224A4FF2800C4CA81 /* FileRegistryTest.m in Sources */,
+				CED6798324A4FF2800C4CA81 /* ExtensionContainerFileTest.m in Sources */,
+				CED6798124A4FF2800C4CA81 /* DelimitedFileTest.m in Sources */,
+				CED6797E24A4FF2800C4CA81 /* RotatingFileTest.m in Sources */,
+				CED6799524A5264C00C4CA81 /* RotatingFile.m in Sources */,
+				CED6798B24A501FA00C4CA81 /* JetsamTracking.m in Sources */,
+				CED6798C24A5252000C4CA81 /* JetsamPerAppVersionStat.m in Sources */,
+				CED6799124A525FD00C4CA81 /* DelimitedFile.m in Sources */,
+				CED6797F24A4FF2800C4CA81 /* RunningStatsTest.m in Sources */,
+				CED6799324A5260500C4CA81 /* JSONCodable.m in Sources */,
+				CED6799424A5261000C4CA81 /* Archiver.m in Sources */,
+				CED6798F24A5254500C4CA81 /* ExtensionContainerFile.m in Sources */,
 				CEA1B789249AB229006D9853 /* EmbeddedServerEntriesHelpers.c in Sources */,
+				CED6794A24A4F98200C4CA81 /* stats.c in Sources */,
 				CEA1B788249AB144006D9853 /* EmbeddedServerEntries.m in Sources */,
+				CED6798E24A5252900C4CA81 /* JetsamEvent.m in Sources */,
 				CEA1B78A249AB3EF006D9853 /* NSError+Convenience.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2251,6 +2533,11 @@
 				DEVELOPMENT_TEAM = Q6HLNEX92A;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"COCOAPODS=1",
+					"TARGET_IS_CONTAINER=1",
+				);
 				INFOPLIST_FILE = Psiphon/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2289,6 +2576,11 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"COCOAPODS=1",
+					"TARGET_IS_CONTAINER=1",
+				);
 				INFOPLIST_FILE = Psiphon/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2393,6 +2685,10 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"TARGET_IS_TEST=1",
+				);
 				INFOPLIST_FILE = PsiphonTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -2425,6 +2721,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
 				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_PREPROCESSOR_DEFINITIONS = "TARGET_IS_TEST=1";
 				INFOPLIST_FILE = PsiphonTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
 				LD_RUNPATH_SEARCH_PATHS = (
