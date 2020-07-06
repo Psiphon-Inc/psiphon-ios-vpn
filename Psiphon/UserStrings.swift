@@ -469,7 +469,7 @@ extension UserStrings {
     static func Activating_subscription_title() -> String {
         return NSLocalizedString(
         "ACTIVATE_SUBSCRIPTION_BUTTON_TITILE", tableName: nil, bundle: .main,
-        value: "Activating...",
+        value: "Activating…",
         comment: "After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language.")
     }
     

@@ -1,7 +1,7 @@
 /* Accept button title */
 "ACCEPT_BUTTON_TITLE" = "Terima";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
+/* After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
 "ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Activating...";
 
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
