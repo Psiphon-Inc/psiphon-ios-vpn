@@ -882,11 +882,16 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     versionLabel.userInteractionEnabled = FALSE;
     versionLabel.contentEdgeInsets = UIEdgeInsetsMake(padding, padding, padding, padding);
 
-# if DEBUG
+#if DEBUG
     versionLabel.userInteractionEnabled = TRUE;
     [versionLabel addTarget:self
                      action:@selector(onVersionLabelTap:)
            forControlEvents:UIControlEventTouchUpInside];
+    
+    if (AppInfo.runningUITest == TRUE) {
+        // Hide the version label when generating screenshots.
+        versionLabel.hidden = YES;
+    }
 #endif
     // Setup autolayout
     [NSLayoutConstraint activateConstraints:@[
