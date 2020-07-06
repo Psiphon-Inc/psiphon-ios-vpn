@@ -75,7 +75,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// Deprecated:
 /// PsiphonTunnel now stores all of its files under the configured data root directory.
 /// This directory can be obtained with `homepageNoticesPath`.
-/// PsiphonTunnel must be given a config with the `MigrateHompageNoticesFilename`
+/// PsiphonTunnel must be given a config with the `MigrateHomepageNoticesFilename`
 /// field set to this path to ensure that the homepage file at the old path is migrated to
 /// the new location used by PsiphonTunnel.
 - (NSString *)oldHomepageNoticesPath;
@@ -270,21 +270,23 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 
 #pragma mark - Jetsam counter
 
-#if TARGET_IS_EXTENSION
+- (NSString*)extensionJetsamMetricsFilePath;
 
-- (void)incrementJetsamCounter;
+- (NSString*)extensionJetsamMetricsRotatedFilePath;
 
-- (void)setExtensionJetsammedBeforeStopFlag:(BOOL)crashed;
+#if TARGET_IS_CONTAINER
 
-#else
-
-- (void)resetJetsamCounter;
+- (NSString *)containerJetsamMetricsRegistryFilePath;
 
 #endif
 
-- (NSInteger)getJetsamCounter;
+#if TARGET_IS_EXTENSION
+
+- (void)setExtensionJetsammedBeforeStopFlag:(BOOL)crashed;
 
 - (BOOL)getExtensionJetsammedBeforeStopFlag;
+
+#endif
 
 #pragma mark - Debug Preferences
 

@@ -98,9 +98,6 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
     if ([AppUpgrade firstRunOfAppVersion]) {
         [self updateAvailableEgressRegionsOnFirstRunOfAppVersion];
-
-        // Reset Jetsam counter.
-        [self.sharedDB resetJetsamCounter];
     }
 
     // Immediately register to receive notifications from the Network Extension process.
