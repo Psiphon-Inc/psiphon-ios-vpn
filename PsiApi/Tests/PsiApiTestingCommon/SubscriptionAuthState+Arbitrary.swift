@@ -47,7 +47,7 @@ extension SubscriptionAuthStateReducerEnvironment: Arbitrary {
                 sharedDB: TestSharedDBContainer(state:c.generate()),
                 tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>(value: c.generate()),
                 tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>(value: c.generate()),
-                clientMetaData: ClientMetaData(MockAppInfoProvider()),
+                clientMetaData: { ClientMetaData(MockAppInfoProvider()) },
                 getCurrentTime: {
                     return Date()
                 },
@@ -76,7 +76,7 @@ extension SubscriptionAuthStateReducerEnvironment: Arbitrary {
                 sharedDB: TestSharedDBContainer(state:c.generate()),
                 tunnelStatusSignal: tunnelStatusSignal,
                 tunnelConnectionRefSignal: tunnelConnectionRefSignal,
-                clientMetaData: ClientMetaData(MockAppInfoProvider()),
+                clientMetaData: { ClientMetaData(MockAppInfoProvider()) },
                 getCurrentTime: {
                     return Date()
                 },
