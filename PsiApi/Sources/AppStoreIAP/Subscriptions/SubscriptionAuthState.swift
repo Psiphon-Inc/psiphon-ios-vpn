@@ -99,7 +99,7 @@ public struct SubscriptionAuthStateReducerEnvironment {
     public let sharedDB: SharedDBContainer
     public let tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
     public let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
-    public let clientMetaData: ClientMetaData
+    public let clientMetaData: () -> ClientMetaData
     public let getCurrentTime: () -> Date
     public let compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
 
@@ -109,7 +109,7 @@ public struct SubscriptionAuthStateReducerEnvironment {
                sharedDB: SharedDBContainer,
                tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
                tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
-               clientMetaData: ClientMetaData,
+               clientMetaData: @escaping () -> ClientMetaData,
                getCurrentTime: @escaping () -> Date,
                compareDates: @escaping (Date, Date, Calendar.Component) -> ComparisonResult) {
 
@@ -339,7 +339,7 @@ public func subscriptionAuthStateReducer(
                 productID: purchaseWithLatestExpiry.purchase.productID,
                 receipt: receiptData
             ),
-         clientMetaData: environment.clientMetaData
+         clientMetaData: environment.clientMetaData()
         )
 
         let authRequest = RetriableTunneledHttpRequest(
