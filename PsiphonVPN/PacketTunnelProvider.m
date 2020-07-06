@@ -709,7 +709,7 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
 
     NSString *oldHomepageNoticesPath = [self.sharedDB oldHomepageNoticesPath];
     if (oldHomepageNoticesPath) {
-        mutableConfigCopy[@"MigrateHompageNoticesFilename"] = oldHomepageNoticesPath;
+        mutableConfigCopy[@"MigrateHomepageNoticesFilename"] = oldHomepageNoticesPath;
     } else {
         [PsiFeedbackLogger infoWithType:PsiphonTunnelDelegateLogType
                                 format:@"Failed to get old homepage notices path"];
