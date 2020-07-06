@@ -93,7 +93,7 @@ func generateRetriableTunneledHttpRequestTest(
     }
     
     // Arrange
-    var connectionSeqGenerator = Generator(sequence: connectionStatusBeforeRequestSeq)
+    let connectionSeqGenerator = Generator(sequence: connectionStatusBeforeRequestSeq)
     
     let request = RetriableTunneledHttpRequest(
         request: HTTPRequest.mockJsonRequest(
