@@ -116,7 +116,7 @@ extension IAPEnvironment {
             tunnelStatusSignal: _tunnelStatusSignal,
             tunnelConnectionRefSignal: _tunnelConnectionRefSignal,
             psiCashEffects: psiCashEffects ?? PsiCashEffects.mock(),
-            clientMetaData: (clientMetaData ?? { ClientMetaData(MockAppInfoProvider()) })(),
+            clientMetaData: clientMetaData ?? { ClientMetaData(MockAppInfoProvider()) },
             paymentQueue: paymentQueue ?? PaymentQueue.mock(),
             psiCashPersistedValues: MockPsiCashPersistedValues(),
             isSupportedProduct: isSupportedProduct ?? { _ in XCTFatal() },
