@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2020, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,18 +19,27 @@
 
 #import <Foundation/Foundation.h>
 
-@interface AppInfo : NSObject
+typedef NSString *_Nonnull KeyedDataStoreKey;
 
-+ (NSString*_Nonnull)appVersion;
+NS_ASSUME_NONNULL_BEGIN
 
-+ (NSString*_Nullable)clientRegion;
 
-+ (NSString*_Nullable)propagationChannelId;
+/// Generic datastore protocol.
+@protocol KeyedDataStore
 
-+ (NSString*_Nullable)sponsorId;
+@required
 
-+ (NSString *_Nonnull)clientPlatform;
+/// Lookup any data stored under the provided key from the datastore.
+/// @param key Key with which to query the datastore.
+- (nullable id)lookup:(KeyedDataStoreKey)key;
 
-+ (BOOL)runningUITest;
+/// Insert data under the provided key in the datastore.
+/// @param object Data to be stored.
+/// @param key Key underwhich to store the data.
+/// @note should be changed to return an error when a datastore
+/// implements this protocol that can return an error from a store operation.
+- (void)insert:(id)object key:(KeyedDataStoreKey)key;
 
 @end
+
+NS_ASSUME_NONNULL_END

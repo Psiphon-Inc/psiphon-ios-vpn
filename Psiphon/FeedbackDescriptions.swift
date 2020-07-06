@@ -149,11 +149,7 @@ extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
             ContainerForegroundStateBoolKey: self.getAppForegroundState(),
             
             ContainerTunnelIntentStatusIntKey: TunnelStartStopIntent.description(integerCode:
-                self.getContainerTunnelIntentStatus()),
-            
-            SharedDataExtensionCrashedBeforeStopBoolKey: self.getExtensionJetsammedBeforeStopFlag(),
-            
-            SharedDataExtensionJetsamCounterIntegerKey: self.getJetsamCounter()
+                self.getContainerTunnelIntentStatus())
         ]
         
         #if DEBUG

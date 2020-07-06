@@ -34,7 +34,11 @@ UserDefaultsKey const AppInfoFastLaneSnapShotBoolKey = @"FASTLANE_SNAPSHOT";
 @implementation AppInfo
 
 + (NSString*)appVersion {
-    return [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+    NSString *appVersion = [[[NSBundle mainBundle] infoDictionary] objectForKey:@"CFBundleVersion"];
+    if (appVersion == NULL) {
+        return @"unknown";
+    }
+    return appVersion;
 }
 
 + (NSString*)clientRegion {

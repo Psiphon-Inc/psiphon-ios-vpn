@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2020, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,20 +17,16 @@
  *
  */
 
-#import <Foundation/Foundation.h>
+#import "NSUserDefaults+KeyedDataStore.h"
 
-@interface AppInfo : NSObject
+@implementation NSUserDefaults (KeyedDataStore)
 
-+ (NSString*_Nonnull)appVersion;
+- (nullable id)lookup:(KeyedDataStoreKey)key {
+    return [self objectForKey:key];
+}
 
-+ (NSString*_Nullable)clientRegion;
-
-+ (NSString*_Nullable)propagationChannelId;
-
-+ (NSString*_Nullable)sponsorId;
-
-+ (NSString *_Nonnull)clientPlatform;
-
-+ (BOOL)runningUITest;
+- (void)insert:(id)object key:(KeyedDataStoreKey)key {
+    [self setObject:object forKey:key];
+}
 
 @end

@@ -81,11 +81,16 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CEE57659249AA01D00744C38"
+               BlueprintIdentifier = "CEA1B777249AA9A0006D9853"
                BuildableName = "PsiphonTests.xctest"
                BlueprintName = "PsiphonTests"
                ReferencedContainer = "container:Psiphon.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "RunningStatsTest/testIntegerOverflow">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
    </TestAction>
