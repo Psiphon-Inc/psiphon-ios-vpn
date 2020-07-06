@@ -83,6 +83,8 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
     @synchronized (self) {
 
         // Determine if the extension jetsammed previously to this start.
+        // NOTE: in some scenarios this will be a false positive, e.g. the extension is killed by
+        // the system when the device is restarted or powered down.
         BOOL previouslyJetsammed = [self.sharedDB getExtensionJetsammedBeforeStopFlag];
 
          // Sets the crash flag. This flag is reset when `stopTunnelWithReason:completionHandler:` is called.
@@ -93,7 +95,7 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
                                              initWithDataStore:[NSUserDefaults standardUserDefaults]];
 
             NSDate *previousStartTime = [dataStore extensionStartTime];
-            if (previousStartTime) {
+            if (previousStartTime != nil) {
 
                 NSDate *lastTickerTime = [dataStore tickerTime];
                 if (lastTickerTime == nil) {
