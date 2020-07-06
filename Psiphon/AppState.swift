@@ -71,7 +71,7 @@ typealias AppEnvironment = (
     feedbackLogger: FeedbackLogger,
     httpClient: HTTPClient,
     psiCashEffects: PsiCashEffects,
-    clientMetaData: ClientMetaData,
+    clientMetaData: () -> ClientMetaData,
     sharedDB: PsiphonDataSharedDB,
     userConfigs: UserDefaultsConfig,
     notifier: PsiApi.Notifier,
@@ -141,7 +141,7 @@ func makeEnvironment(
         feedbackLogger: feedbackLogger,
         httpClient: HTTPClient.default(urlSession: urlSession),
         psiCashEffects: PsiCashEffects.default(psiCash: psiCashLib, feedbackLogger: feedbackLogger),
-        clientMetaData: ClientMetaData(AppInfoObjC()),
+        clientMetaData: { ClientMetaData(AppInfoObjC()) },
         sharedDB: sharedDB,
         userConfigs: userDefaultsConfig,
         notifier: NotifierObjC(notifier:Notifier.sharedInstance()),
@@ -416,9 +416,19 @@ extension Store where Value == AppState, Action == AppAction {
 // MARK: AppInfoProvider
 
 struct AppInfoObjC: AppInfoProvider {
-    let clientPlatform: String = AppInfo.clientPlatform()
-    let clientRegion: String = AppInfo.clientRegion() ?? ""
-    let clientVersion: String = AppInfo.appVersion()
-    let propagationChannelId: String = AppInfo.propagationChannelId() ?? ""
-    let sponsorId: String = AppInfo.sponsorId() ?? ""
+    var clientPlatform: String {
+        AppInfo.clientPlatform()
+    }
+    var clientRegion: String {
+        AppInfo.clientRegion() ?? ""
+    }
+    var clientVersion: String {
+        AppInfo.appVersion()
+    }
+    var propagationChannelId: String {
+        AppInfo.propagationChannelId() ?? ""
+    }
+    var sponsorId: String {
+        AppInfo.sponsorId() ?? ""
+    }
 }
