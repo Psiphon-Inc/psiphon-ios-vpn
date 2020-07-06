@@ -416,9 +416,19 @@ extension Store where Value == AppState, Action == AppAction {
 // MARK: AppInfoProvider
 
 struct AppInfoObjC: AppInfoProvider {
-    let clientPlatform: String = AppInfo.clientPlatform()
-    let clientRegion: String = AppInfo.clientRegion() ?? ""
-    let clientVersion: String = AppInfo.appVersion()
-    let propagationChannelId: String = AppInfo.propagationChannelId() ?? ""
-    let sponsorId: String = AppInfo.sponsorId() ?? ""
+    var clientPlatform: String {
+        AppInfo.clientPlatform()
+    }
+    var clientRegion: String {
+        AppInfo.clientRegion() ?? ""
+    }
+    var clientVersion: String {
+        AppInfo.appVersion()
+    }
+    var propagationChannelId: String {
+        AppInfo.propagationChannelId() ?? ""
+    }
+    var sponsorId: String {
+        AppInfo.sponsorId() ?? ""
+    }
 }
