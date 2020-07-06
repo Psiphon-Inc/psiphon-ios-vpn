@@ -1,8 +1,8 @@
 /* Accept button title */
 "ACCEPT_BUTTON_TITLE" = "接受";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
-"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Activating...";
+/* After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
+"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "激活中......";
 
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "您已订阅！";
@@ -76,14 +76,14 @@
 /* Error alert title */
 "ERROR_TITLE" = "错误";
 
-/*[UNTRANSLATED] No comment provided by engineer. */
-"EXTENSION_EXPIRED_SUBSCRIPTION_ALERT" = "Your Psiphon subscription has expired.\n\n Please open Psiphon app to renew your subscription.";
+/* No comment provided by engineer. */
+"EXTENSION_EXPIRED_SUBSCRIPTION_ALERT" = "您的赛风订阅已经过期。\n\n请打开赛风程序从而更新您的订阅。";
 
 /* Message shown when something fails to load */
 "FAILED_TO_LOAD" = "加载失败";
 
-/*[UNTRANSLATED] Message shown when verification of a product already purchased fails. */
-"FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Failed to verify purchase";
+/* Message shown when verification of a product already purchased fails. */
+"FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "无法验证购买";
 
 /* Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
 "FEEDBACK_UPLOAD_FAILED_MESSAGE" = "上传您的反馈时发生错误。请再试一次。您的反馈有助于我们改进 Psiphon 网络。";
@@ -124,8 +124,8 @@
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "无互联网连接";
 
-/*[UNTRANSLATED] Message shown to the user when there is no internet connect. */
-"NO_INTERNET_CONNECTION_TITLE" = "No internet connection";
+/* Message shown to the user when there is no internet connect. */
+"NO_INTERNET_CONNECTION_TITLE" = "无网络连接";
 
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
 "NO_PRODUCTS_TEXT_2" = "无法从 App Store 获取订阅资料。请稍后再试。";
@@ -313,8 +313,8 @@
 /* Footer text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. Please keep this text concise as the width of the text box is restricted in size. */
 "SUBSCRIPTION_BAR_FOOTER_TEXT_NOT_SUBSCRIBED_2" = "移除广告•极速";
 
-/*[UNTRANSLATED] Footer text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
-"SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED_V2" = "Premium • Max Speed";
+/* Footer text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
+"SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED_V2" = "高级版 * 最高速度";
 
 /* Header text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
 "SUBSCRIPTION_BAR_HEADER_TEXT_NOT_SUBSCRIBED" = "升级到高级版";
@@ -322,17 +322,17 @@
 /* Header text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. Please keep this text concise as the width of the text box is restricted in size. */
 "SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIBED" = "订阅";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. This title is displayed on the main screen indicating that the subscription is pending activation. */
-"SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIPTION_PENDING" = "SUBSCRIPTION PENDING";
+/* After a user successfully purchases a subscription, it needs to be activated. This title is displayed on the main screen indicating that the subscription is pending activation. */
+"SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIPTION_PENDING" = "订阅待定";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. Label with this text displayed on the main screen, indicating that the user needs to connect to Psiphon in order to activate the subscription. */
-"SUBSCRIPTION_CONNECT_TO_ACTIVATE" = "Connect to activate";
+/* After a user successfully purchases a subscription, it needs to be activated. Label with this text displayed on the main screen, indicating that the user needs to connect to Psiphon in order to activate the subscription. */
+"SUBSCRIPTION_CONNECT_TO_ACTIVATE" = "连接从而激活";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating that activation of user's subscription failed. */
-"SUBSCRIPTION_FAILED_TO_ACTIVATE" = "Failed to activate";
+/* After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating that activation of user's subscription failed. */
+"SUBSCRIPTION_FAILED_TO_ACTIVATE" = "激活失败";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating to the user that the subscription is in the process of getting activated */
-"SUBSCRIPTION_PLEASE_WAIT_WHILE_ACTIVATING" = "Please wait while activating";
+/* After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating to the user that the subscription is in the process of getting activated */
+"SUBSCRIPTION_PLEASE_WAIT_WHILE_ACTIVATING" = "激活中，请等待";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "订阅";
@@ -364,11 +364,11 @@
 /* Button title shown when something fails to load. Asks the user to tap the button to retry the operation */
 "TAP_TO_RETRY" = "轻按重试";
 
-/*[UNTRANSLATED] Alert message informing user to turn on their cellular data or wifi to connect to the internet */
-"TURN_ON_DATE" = "Please turn on cellular data or use Wi-Fi.";
+/* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
+"TURN_ON_DATE" = "请打开蜂窝网络或者连接至Wi-Fi";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
-"VPN_START_FAIL_MESSAGE" = "启动 Psiphon 时发生错误。请再试一次。如果问题仍然存在，请尝试重新安装 Psiphon 应用。";
+"VPN_START_FAIL_MESSAGE" = "连接赛风时一个错误出现。\n请再次尝试连接。";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to to 'Fastest Country', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
 "VPN_START_FAIL_REGION_INVALID_MESSAGE_2" = "你所选择的区域不再有效。已经自动将你转到“最快的国家”。\n\n你也可以从 Psiphon 应用中选取一个新的区域。";
