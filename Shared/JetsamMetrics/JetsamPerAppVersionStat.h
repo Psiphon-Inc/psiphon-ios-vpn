@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2020, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,19 +18,21 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "RunningStat.h"
 
-@interface AppInfo : NSObject
+NS_ASSUME_NONNULL_BEGIN
 
-+ (NSString*_Nonnull)appVersion;
+/// Jetsam stat calculated per app version.
+@interface JetsamPerAppVersionStat : NSObject <NSCopying, NSCoding, NSSecureCoding>
 
-+ (NSString*_Nullable)clientRegion;
+/// Stat for the amount of time the extension ran before each jetsam.
+@property (nonatomic, strong) RunningStat *runningTime;
 
-+ (NSString*_Nullable)propagationChannelId;
+/// Stat for the amount of time between jetsam events.
+@property (nonatomic, strong) RunningStat *timeBetweenJetsams;
 
-+ (NSString*_Nullable)sponsorId;
-
-+ (NSString *_Nonnull)clientPlatform;
-
-+ (BOOL)runningUITest;
+- (BOOL)isEqualToJetsamPerAppVersionStat:(JetsamPerAppVersionStat*)stat;
 
 @end
+
+NS_ASSUME_NONNULL_END

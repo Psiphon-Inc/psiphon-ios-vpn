@@ -270,21 +270,23 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 
 #pragma mark - Jetsam counter
 
-#if TARGET_IS_EXTENSION
+- (NSString*)extensionJetsamMetricsFilePath;
 
-- (void)incrementJetsamCounter;
+- (NSString*)extensionJetsamMetricsRotatedFilePath;
 
-- (void)setExtensionJetsammedBeforeStopFlag:(BOOL)crashed;
+#if TARGET_IS_CONTAINER
 
-#else
-
-- (void)resetJetsamCounter;
+- (NSString *)containerJetsamMetricsRegistryFilePath;
 
 #endif
 
-- (NSInteger)getJetsamCounter;
+#if TARGET_IS_EXTENSION
+
+- (void)setExtensionJetsammedBeforeStopFlag:(BOOL)crashed;
 
 - (BOOL)getExtensionJetsammedBeforeStopFlag;
+
+#endif
 
 #pragma mark - Debug Preferences
 

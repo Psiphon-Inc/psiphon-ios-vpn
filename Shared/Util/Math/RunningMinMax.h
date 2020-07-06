@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2020, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,18 +19,22 @@
 
 #import <Foundation/Foundation.h>
 
-@interface AppInfo : NSObject
+NS_ASSUME_NONNULL_BEGIN
 
-+ (NSString*_Nonnull)appVersion;
+@interface RunningMinMax : NSObject <NSCopying, NSCoding, NSSecureCoding>
 
-+ (NSString*_Nullable)clientRegion;
+@property (readonly, nonatomic, assign) double min;
+@property (readonly, nonatomic, assign) double max;
 
-+ (NSString*_Nullable)propagationChannelId;
+- (instancetype)init NS_UNAVAILABLE;
 
-+ (NSString*_Nullable)sponsorId;
+- (instancetype)initWithValue:(double)x;
+- (instancetype)initWithMin:(double)min andMax:(double)max;
 
-+ (NSString *_Nonnull)clientPlatform;
+- (void)addValue:(double)x;
 
-+ (BOOL)runningUITest;
+- (BOOL)isEqualToRunningMinMax:(RunningMinMax*)runningMinMax;
 
 @end
+
+NS_ASSUME_NONNULL_END

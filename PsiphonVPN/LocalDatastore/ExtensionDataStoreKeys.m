@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2020, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,20 +17,9 @@
  *
  */
 
-#import <Foundation/Foundation.h>
+#import "ExtensionDataStoreKeys.h"
 
-@interface AppInfo : NSObject
+// See comments in header.
 
-+ (NSString*_Nonnull)appVersion;
-
-+ (NSString*_Nullable)clientRegion;
-
-+ (NSString*_Nullable)propagationChannelId;
-
-+ (NSString*_Nullable)sponsorId;
-
-+ (NSString *_Nonnull)clientPlatform;
-
-+ (BOOL)runningUITest;
-
-@end
+KeyedDataStoreKey const ExtensionStartTimeKey = @"PersistentJetsamData.ExtensionStartTimeNSDateKey";
+KeyedDataStoreKey const TickerTimeKey = @"PersistentJetsamData.TickerTimeNSDateKey";

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2020, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,19 +18,23 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "KeyedDataStore.h"
 
-@interface AppInfo : NSObject
+/**
+* LocalDataStoreKeys
+*
+* Keys to access the local datastore.
+*
+* Each key must be unique and ideally composed in this way:
+* [Full name of associated class] . [UniquePartOfName] + [Type] + Key
+*
+* e.g. In SettingsViewController you might have:
+* UserDefaultsKey const SettingsConnectOnDemandBoolKey = @"SettingsViewController.ConnectOnDemandBoolKey"
+*
+*/
 
-+ (NSString*_Nonnull)appVersion;
+/// Key for the time when the extension was last started. Type: NSDate.
+FOUNDATION_EXTERN KeyedDataStoreKey const ExtensionStartTimeKey;
 
-+ (NSString*_Nullable)clientRegion;
-
-+ (NSString*_Nullable)propagationChannelId;
-
-+ (NSString*_Nullable)sponsorId;
-
-+ (NSString *_Nonnull)clientPlatform;
-
-+ (BOOL)runningUITest;
-
-@end
+/// Key for the time when the ticker last fired in the extension. Type: NSDate.
+FOUNDATION_EXTERN KeyedDataStoreKey const TickerTimeKey;

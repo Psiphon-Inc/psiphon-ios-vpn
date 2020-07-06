@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2020, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,19 +18,23 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "JSONCodable.h"
 
-@interface AppInfo : NSObject
+NS_ASSUME_NONNULL_BEGIN
 
-+ (NSString*_Nonnull)appVersion;
+/// Represents a jetsam event in the extension.
+@interface JetsamEvent : NSObject <NSCoding, NSSecureCoding, JSONCodable> 
 
-+ (NSString*_Nullable)clientRegion;
+@property (readonly, nonatomic, strong) NSString *appVersion;
+@property (readonly, nonatomic, assign) NSTimeInterval runningTime; // epoch time
+@property (readonly, nonatomic, assign) NSTimeInterval jetsamDate; // epoch time
 
-+ (NSString*_Nullable)propagationChannelId;
++ (instancetype)jetsamEventWithAppVersion:(NSString*)appVersion
+                              runningTime:(NSTimeInterval)runningTime
+                               jetsamDate:(NSTimeInterval)jetsamDate;
 
-+ (NSString*_Nullable)sponsorId;
-
-+ (NSString *_Nonnull)clientPlatform;
-
-+ (BOOL)runningUITest;
+- (BOOL)isEqualToJetsamEvent:(JetsamEvent*)jetsamEvent;
 
 @end
+
+NS_ASSUME_NONNULL_END
