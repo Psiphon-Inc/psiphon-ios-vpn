@@ -187,7 +187,7 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     // Adds "Done" button (dismiss action) to the navigation bar if it is not opened from Setting menu.
     if (!self.openedFromSettings) {
         UIBarButtonItem *doneButton = [[UIBarButtonItem alloc]
-          initWithTitle:NSLocalizedStringWithDefaultValue(@"DONE_ACTION", nil, [NSBundle mainBundle], @"Done", @"Title of the button that dismisses the subscriptions menu")
+          initWithTitle:[UserStrings Done_button_title]
                   style:UIBarButtonItemStyleDone
                  target:self
                  action:@selector(dismissViewController)];
