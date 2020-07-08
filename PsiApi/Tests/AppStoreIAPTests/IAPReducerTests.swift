@@ -280,7 +280,7 @@ final class IAPReducerTests: XCTestCase {
                             
                             var expectedNext = initState
                             expectedNext.iap.unfinishedPsiCashTx = UnfinishedConsumableTransaction(
-                                transaction: initState.iap.unfinishedPsiCashTx!.transaction,
+                                completedTransaction: initState.iap.unfinishedPsiCashTx!.transaction,
                                 verificationState: .requestError(
                                     ErrorEvent(ErrorRepr(repr: "nil receipt"), date: fixedDate)
                                 )
@@ -307,7 +307,7 @@ final class IAPReducerTests: XCTestCase {
                             // to be in a pending state.
                             var expectedNext = initState
                             expectedNext.iap.unfinishedPsiCashTx = UnfinishedConsumableTransaction(
-                                transaction: initState.iap.unfinishedPsiCashTx!.transaction,
+                                completedTransaction: initState.iap.unfinishedPsiCashTx!.transaction,
                                 verificationState: .pendingResponse
                             )
                             
@@ -450,7 +450,7 @@ final class IAPReducerTests: XCTestCase {
                                 // errorEvent should be reflected in the state.
                                 var expectedState = initState
                                 expectedState.iap.unfinishedPsiCashTx = UnfinishedConsumableTransaction(
-                                    transaction: paymentTransaction,
+                                    completedTransaction: paymentTransaction,
                                     verificationState: .requestError(errorEvent.eraseToRepr())
                                 )
 
@@ -480,7 +480,7 @@ final class IAPReducerTests: XCTestCase {
 
                                     expectedState.iap.unfinishedPsiCashTx =
                                         UnfinishedConsumableTransaction(
-                                            transaction: paymentTransaction,
+                                            completedTransaction: paymentTransaction,
                                             verificationState: .requestError(errorEvent.eraseToRepr()))
 
                                     return (nextState ==== expectedState)
@@ -582,20 +582,18 @@ final class IAPReducerTests: XCTestCase {
                     case .completed(.failure(_)):
                         return (earlyExit: false, finishTx: true)
                         
-                    case .completed(.success(let txStatePair)):
-                        switch txStatePair.second {
+                    case .completed(.success(let completedTx)):
+                        switch completedTx.completedState {
                         case .purchased, .restored:
                             switch productType {
                             case .subscription:
                                 return (earlyExit: false, finishTx: true)
                                 
                             case .psiCash:
-                                switch  copy.iap.unfinishedPsiCashTx?.transaction
-                                    .isEqualTransactionID(to: tx)
-                                {
+                                switch copy.iap.unfinishedPsiCashTx?.transaction.isEqual(tx) {
                                 case .none:
                                     copy.iap.unfinishedPsiCashTx = UnfinishedConsumableTransaction(
-                                        transaction: tx,
+                                        completedTransaction: tx,
                                         verificationState: .notRequested
                                     )
                                     return (earlyExit: false, finishTx: false)
@@ -637,17 +635,15 @@ final class IAPReducerTests: XCTestCase {
                     return prv
                 }
                 switch tx.transactionState() {
-                case .completed(.success(let pair)):
-                    switch pair.second {
+                case .completed(.success(let completedTx)):
+                    switch completedTx.completedState {
                     case .purchased, .restored:
                         switch productType {
                         case .psiCash:
-                            switch copy.iap.unfinishedPsiCashTx?.transaction
-                                .isEqualTransactionID(to: tx)
-                            {
+                            switch copy.iap.unfinishedPsiCashTx?.transaction.isEqual(tx) {
                             case .none:
                                 copy.iap.unfinishedPsiCashTx = UnfinishedConsumableTransaction(
-                                    transaction: tx,
+                                    completedTransaction: tx,
                                     verificationState: .notRequested
                                 )
                                 return prv
@@ -703,8 +699,8 @@ final class IAPReducerTests: XCTestCase {
                                                                date: initValues.fixedDate))
                     )
                     
-                case .completed(.success(let txStatePair)):
-                    switch txStatePair.second {
+                case .completed(.success(let completedTx)):
+                    switch completedTx.completedState {
                     case .purchased, .restored:
                         switch productType {
                         case .subscription:
@@ -713,12 +709,11 @@ final class IAPReducerTests: XCTestCase {
                         case .psiCash:
                             updatedState = nil
                             
-                            switch expectedState.iap.unfinishedPsiCashTx?.transaction
-                                .isEqualTransactionID(to: tx) {
+                            switch expectedState.iap.unfinishedPsiCashTx?.transaction.isEqual(tx) {
                             
                             case .none:
                                 expectedState.iap.unfinishedPsiCashTx = UnfinishedConsumableTransaction(
-                                    transaction: tx,
+                                    completedTransaction: tx,
                                     verificationState: .notRequested
                                 )
                                 expectedState.psiCashBalance.waitingForExpectedIncrease(

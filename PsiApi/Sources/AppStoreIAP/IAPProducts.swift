@@ -198,35 +198,53 @@ public struct PaymentTransaction: Equatable {
             case deferred
         }
         
-        public enum CompletedTransactionState: Equatable {
+        public enum TransactionErrorState: HashableError {
+            /// A `SKPaymentTransaction` is invalid if its state does not match Apple's documentation.
+            /// This might indicate that the device is jailbroken.
+            case invalidTransaction
+            /// Represents an error emitted by `StoreKit` processing an in-app purchase.
+            case error(Either<SystemError, SKError>)
+        }
+        
+        case pending(PendingTransactionState)
+
+        case completed(Result<CompletedTransaction, TransactionErrorState>)
+    }
+    
+    /// Represents a `SKPaymentTransaction` with state `.purchased` or `.completed`.
+    public struct CompletedTransaction: Equatable {
+        
+        public enum State: Equatable {
             case purchased
             case restored
         }
         
-        case pending(PendingTransactionState)
+        public let completedState: State
+        public let paymentTransactionID: PaymentTransactionID
+        public let transactionDate: Date
         
-        /// Success case `Date` is the transaction date.
-        // FIXME: If state is one of `CompletedTransactionState` then
-        // `SKPaymentTransaction.transactionDate` is non-nil.
-        // We keep this as an optional for now due to crashes seen so far.
-        case completed(Result<Pair<Date?, CompletedTransactionState>, Either<SystemError, SKError>>)
+        public init(completedState: PaymentTransaction.CompletedTransaction.State,
+                    paymentTransactionID: PaymentTransactionID,
+                    transactionDate: Date) {
+            self.completedState = completedState
+            self.paymentTransactionID = paymentTransactionID
+            self.transactionDate = transactionDate
+        }
+        
     }
     
-    public let transactionID: () -> TransactionID
     public let productID: () -> ProductID
     public let transactionState: () -> TransactionState
     public let payment: () -> Payment
-    private let isEqual: (PaymentTransaction) -> Bool
+    public let isEqual: (PaymentTransaction) -> Bool
     
     public let skPaymentTransaction: () -> SKPaymentTransaction?
     
-    public init(transactionID: @escaping () -> TransactionID,
-                productID: @escaping () -> ProductID,
+    public init(productID: @escaping () -> ProductID,
                 transactionState: @escaping () -> PaymentTransaction.TransactionState,
                 payment: @escaping () -> Payment,
                 isEqual: @escaping (PaymentTransaction) -> Bool,
                 skPaymentTransaction: @escaping () -> SKPaymentTransaction?) {
-        self.transactionID = transactionID
         self.productID = productID
         self.transactionState = transactionState
         self.payment = payment
@@ -234,23 +252,8 @@ public struct PaymentTransaction: Equatable {
         self.skPaymentTransaction = skPaymentTransaction
     }
     
-    public func isEqualTransactionID(to other: PaymentTransaction) -> Bool {
-        self.transactionID() == other.transactionID()
-    }
-    
     public static func == (lhs: Self, rhs: Self) -> Bool {
-        switch (lhs.skPaymentTransaction(), rhs.skPaymentTransaction()) {
-        case (nil, nil):
-            return lhs.transactionID() == rhs.transactionID()
-        case let (.some(lobj), .some(robj)):
-            return lobj.isEqual(robj)
-        default:
-            fatalError("""
-                expected lhs and rhs to have same underlying type: \
-                lhs: '\(String(describing: lhs))' \
-                rhs: '\(String(describing: rhs))'
-                """)
-        }
+        lhs.isEqual(rhs)
     }
 }
 
@@ -312,6 +315,17 @@ extension PaymentTransaction.TransactionState {
                 return .immediately
             }
         }
+    }
+    
+}
+
+extension PaymentTransaction.TransactionState: FeedbackDescription {}
+
+extension PaymentTransaction: CustomFieldFeedbackDescription {
+    
+    public var feedbackFields: [String: CustomStringConvertible] {
+        ["productID": self.productID(),
+         "transactionState": makeFeedbackEntry(self.transactionState())]
     }
     
 }

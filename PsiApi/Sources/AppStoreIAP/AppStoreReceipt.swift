@@ -20,6 +20,24 @@
 import Foundation
 import Utilities
 
+/// Typed wrapper for `SKPaymentTransaction.transactionIdentifier`.
+///
+/// This value has the same format as the transaction’s `transaction_id` in the receipt;
+/// however, the values may not be the same.
+/// Hence, these values are given a separate type to distinguish them from the
+/// receipt `TransactionID` type.
+///
+/// - See Also: [Apple Documentation SKPaymentTransaction.transactionIdentifier]( https://developer.apple.com/documentation/storekit/skpaymenttransaction/1411288-transactionidentifier)
+public struct PaymentTransactionID: TypedIdentifier {
+    public var rawValue: String { value }
+    
+    private let value: String
+    
+    public init?(rawValue: String) {
+        self.value = rawValue
+    }
+}
+
 /// Represents an in-app purchase transaction identifier present in the app receipt.
 /// Apple Ref: https://developer.apple.com/documentation/appstorereceipts/transaction_id
 public struct TransactionID: TypedIdentifier {

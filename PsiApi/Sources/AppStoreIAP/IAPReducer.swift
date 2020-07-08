@@ -195,11 +195,9 @@ public func iapReducer(
         }
         
         guard let receiptData = maybeReceiptData else {
-            state.iap.unfinishedPsiCashTx = UnfinishedConsumableTransaction(
-                transaction: unfinishedPsiCashTx.transaction,
-                verificationState: .requestError(
-                    ErrorEvent(ErrorRepr(repr: "nil receipt"), date: environment.getCurrentTime())
-                )
+            
+            state.iap.unfinishedPsiCashTx?.verification = .requestError(
+                ErrorEvent(ErrorRepr(repr: "nil receipt"), date: environment.getCurrentTime())
             )
             
             return [
@@ -213,15 +211,14 @@ public func iapReducer(
         }
         
         guard let customData = environment.psiCashEffects.rewardedVideoCustomData() else {
-            state.iap.unfinishedPsiCashTx = UnfinishedConsumableTransaction(
-                transaction: unfinishedPsiCashTx.transaction,
-                verificationState: .requestError(
-                    ErrorEvent(
-                        ErrorRepr(repr: "nil custom data"),
-                        date: environment.getCurrentTime()
-                    )
+            
+            state.iap.unfinishedPsiCashTx?.verification = .requestError(
+                ErrorEvent(
+                    ErrorRepr(repr: "nil custom data"),
+                    date: environment.getCurrentTime()
                 )
             )
+            
             return [
                 environment.feedbackLogger.log(.error, """
                     nil customData: \
@@ -232,16 +229,13 @@ public func iapReducer(
             ]
         }
         
-        state.iap.unfinishedPsiCashTx = UnfinishedConsumableTransaction(
-            transaction: unfinishedPsiCashTx.transaction,
-            verificationState: .pendingResponse
-        )
+        state.iap.unfinishedPsiCashTx?.verification = .pendingResponse
         
         // Creates request to verify PsiCash AppStore IAP purchase.
         
         let req = PurchaseVerifierServer.psiCash(
             requestBody: PsiCashValidationRequest(
-                transaction: unfinishedPsiCashTx.transaction,
+                productID: unfinishedPsiCashTx.transaction.productID(),
                 receipt: receiptData,
                 customData: customData
             ),
@@ -278,18 +272,17 @@ public func iapReducer(
                 """).mapNever(),
             
             environment.feedbackLogger.log(.info, """
-                verifying PsiCash consumable IAP with transaction ID: \
-                '\(unfinishedPsiCashTx.transaction)'
+                verifying PsiCash consumable IAP with transaction: '\(unfinishedPsiCashTx)'
                 """).mapNever()
         ]
         
     case let ._psiCashConsumableVerificationRequestResult(requestResult, requestTransaction):
-        guard let unverifiedPsiCashTx = state.iap.unfinishedPsiCashTx else {
+        guard let unfinishedPsiCashTx = state.iap.unfinishedPsiCashTx else {
             environment.feedbackLogger.fatalError("expected non-nil 'unverifiedPsiCashTx'")
             return []
         }
         
-        guard case .pendingResponse = unverifiedPsiCashTx.verification else {
+        guard case .pendingResponse = unfinishedPsiCashTx.verification else {
             environment.feedbackLogger.fatalError("""
                 unexpected state for unverified PsiCash IAP transaction \
                 '\(String(describing: state.iap.unfinishedPsiCashTx))'
@@ -297,11 +290,11 @@ public func iapReducer(
             return []
         }
         
-        guard unverifiedPsiCashTx.transaction == requestTransaction else {
+        guard unfinishedPsiCashTx.transaction == requestTransaction else {
             environment.feedbackLogger.fatalError("""
                 expected transactions to be equal: \
-                '\(String(describing: requestTransaction.transactionID()))' != \
-                '\(String(describing: unverifiedPsiCashTx.transaction.transactionID()))'
+                '\(makeFeedbackEntry(requestTransaction))' != \
+                '\(makeFeedbackEntry(unfinishedPsiCashTx.transaction))'
                 """)
             return []
         }
@@ -325,15 +318,12 @@ public func iapReducer(
         case .failed(let errorEvent):
             // Authorization request finished in failure, and will not be retried automatically.
             
-            state.iap.unfinishedPsiCashTx = UnfinishedConsumableTransaction(
-                transaction: requestTransaction,
-                verificationState: .requestError(errorEvent.eraseToRepr())
-            )
+            state.iap.unfinishedPsiCashTx?.verification = .requestError(errorEvent.eraseToRepr())
             
             return [
                 environment.feedbackLogger.log(.error, """
                     verification request failed: '\(errorEvent)'\
-                    transaction: '\(requestTransaction)'
+                    transaction: '\(makeFeedbackEntry(requestTransaction))'
                     """).mapNever()
             ]
             
@@ -354,11 +344,8 @@ public func iapReducer(
             case .failure(let errorEvent):
                 // Non-200 OK response.
                 
-                // This is a fatal error and should not happen in production.
-                state.iap.unfinishedPsiCashTx = UnfinishedConsumableTransaction(
-                    transaction: requestTransaction,
-                    verificationState: .requestError(errorEvent.eraseToRepr())
-                )
+                state.iap.unfinishedPsiCashTx?.verification = .requestError(
+                    errorEvent.eraseToRepr())
                 
                 return [
                     environment.feedbackLogger.log(.error, """
@@ -402,7 +389,18 @@ public func iapReducer(
                 productType: productType,
                 transaction: tx,
                 existingConsumableTransaction: { paymentTx -> Bool? in
-                    state.iap.unfinishedPsiCashTx?.transaction.isEqualTransactionID(to: paymentTx)
+                    guard let existingTransaction = state.iap.unfinishedPsiCashTx else {
+                        return nil
+                    }
+                    
+                    guard
+                        case .completed(.success(let completedTx)) = paymentTx.transactionState()
+                    else {
+                        return false
+                    }
+                    
+                    return existingTransaction.completedTransaction.paymentTransactionID ==
+                        completedTx.paymentTransactionID
                 },
                 getCurrentTime: environment.getCurrentTime
             )
@@ -423,17 +421,16 @@ public func iapReducer(
                     
                     effects.append(
                         environment.feedbackLogger.log(.info, """
-                            new IAP transaction: transaction ID: '\(tx.transactionID().rawValue)': \
-                            product ID: '\(tx.productID().rawValue)'
+                            new IAP transaction: '\(makeFeedbackEntry(tx))'
                             """).mapNever()
                     )
                 }
                 
-            case .success(.nonUnique):
+            case .success(.duplicate):
                 // There is already an existing unfinished consumable transaction.
                 effects.append(
                     environment.feedbackLogger.log(.warn, """
-                        unexpected duplicate transaction with id '\(tx.transactionID())'
+                        Transaction is a duplicate: '\(makeFeedbackEntry(tx))'
                         """).mapNever()
                 )
                 

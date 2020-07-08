@@ -70,18 +70,6 @@ extension PaymentQueue {
     
 }
 
-extension PaymentTransaction.TransactionState: FeedbackDescription {}
-
-extension PaymentTransaction: CustomFieldFeedbackDescription {
-    
-    public var feedbackFields: [String: CustomStringConvertible] {
-        ["transactionID": self.transactionID(),
-         "productID": self.productID(),
-         "transactionState": makeFeedbackEntry(self.transactionState())]
-    }
-    
-}
-
 extension ReceiptData: FeedbackDescription {}
 
 extension SKProduct {
@@ -149,9 +137,6 @@ extension PaymentTransaction {
     /// Created PaymentTransaction holds a strong reference to the `skPaymentTransaction` object.
     static func make(from skPaymentTransaction: SKPaymentTransaction) -> Self {
         PaymentTransaction(
-            transactionID: { () -> TransactionID in
-                TransactionID(rawValue: skPaymentTransaction.transactionIdentifier!)!
-            },
             productID: { () -> ProductID in
                 ProductID(rawValue: skPaymentTransaction.payment.productIdentifier)!
             },
@@ -159,22 +144,64 @@ extension PaymentTransaction {
                 switch skPaymentTransaction.transactionState {
                 case .purchasing:
                     return .pending(.purchasing)
+                    
                 case .deferred:
                     return .pending(.deferred)
+                    
                 case .purchased:
+                    
+                    // https://developer.apple.com/documentation/storekit/skpaymenttransaction/1411288-transactionidentifier
+                    // The contents of `transactionIdentifier` and `transactionDate` properties are
+                    // undefined except when transactionState is set to `.purchased` or `.restored`.
+                    
+                    guard let paymentTxID = skPaymentTransaction.transactionIdentifier else {
+                        // The transaction is invalid probably due to a jailbroken device.
+                        return .completed(.failure(.invalidTransaction))
+                    }
+                    
+                    guard let transactionDate = skPaymentTransaction.transactionDate else {
+                        // The transaction is invalid probably due to a jailbroken device.
+                        return .completed(.failure(.invalidTransaction))
+                    }
+                    
                     return .completed(.success(
-                        Pair(skPaymentTransaction.transactionDate, .purchased)))
+                        PaymentTransaction.CompletedTransaction(
+                            completedState: .purchased,
+                            paymentTransactionID: PaymentTransactionID(rawValue: paymentTxID)!,
+                            transactionDate: transactionDate)))
+                    
                 case .restored:
+                    
+                    // https://developer.apple.com/documentation/storekit/skpaymenttransaction/1411288-transactionidentifier
+                    // The contents of `transactionIdentifier` and `transactionDate` properties are
+                    // undefined except when transactionState is set to `.purchased` or `.restored`.
+                    
+                    
+                    guard let paymentTxID = skPaymentTransaction.transactionIdentifier else {
+                        // The transaction is invalid probably due to a jailbroken device.
+                        return .completed(.failure(.invalidTransaction))
+                    }
+                    
+                    guard let transactionDate = skPaymentTransaction.transactionDate else {
+                        // The transaction is invalid probably due to a jailbroken device.
+                        return .completed(.failure(.invalidTransaction))
+                    }
+                    
                     return .completed(.success(
-                        Pair(skPaymentTransaction.transactionDate, .restored)))
+                        PaymentTransaction.CompletedTransaction(
+                            completedState: .restored,
+                            paymentTransactionID: PaymentTransactionID(rawValue: paymentTxID)!,
+                            transactionDate: transactionDate)))
+                    
                 case .failed:
                     // Error is non-null when state is failed.
                     let someError = skPaymentTransaction.error!
                     if let skError = someError as? SKError {
-                        return .completed(.failure(.right(skError)))
+                        return .completed(.failure(.error(.right(skError))))
                     } else {
-                        return .completed(.failure(.left(SystemError(someError))))
+                        return .completed(.failure(.error(.left(SystemError(someError)))))
                     }
+                    
                 @unknown default:
                     fatalError("""
                         unknown transaction state \(skPaymentTransaction.transactionState)
