@@ -246,7 +246,8 @@ extension AppState {
             psiCash: self.psiCash,
             iap: self.iapState,
             subscription: self.subscription,
-            appStorePsiCashProducts: self.products.psiCashProducts
+            appStorePsiCashProducts: self.products.psiCashProducts,
+            isRefreshingAppStoreReceipt: self.appReceipt.isRefreshingReceipt
         )
     }
     

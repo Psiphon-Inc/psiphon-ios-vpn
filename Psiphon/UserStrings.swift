@@ -203,6 +203,24 @@ import Foundation
                                  value: "Tap to Retry",
                                  comment: "Button title shown when something fails to load. Asks the user to tap the button to retry the operation")
     }
+    
+    static func Purchase_not_recorded_by_AppStore() -> String {
+        return NSLocalizedString("PURCHASE_NOT_RECORDED_BY_APPSTORE", tableName: nil, bundle: Bundle.main,
+                                 value: "Purchase not recorded by App Store.",
+                                 comment: "'App Store' refers to Apple's App Store, do not translate or transliterate 'App Store'. This alert message informs the user that the purchase they made has not been recorded by App Store.")
+    }
+    
+    static func Refresh_app_receipt_to_try_again() -> String {
+        return NSLocalizedString("REFRESH_APP_RECEIPT_TO_TRY_AGAIN", tableName: nil, bundle: Bundle.main,
+                                 value: "Refresh the app receipt to try again.",
+                                 comment: "This alert message informs the user that the purchase they made has not been recorded and that they can tap the button 'Refresh Receipt' to try again.")
+    }
+    
+    static func Refresh_receipt_button_title() -> String {
+        return NSLocalizedString("RECEIPT_REFRESH_BUTTON", tableName: nil, bundle: Bundle.main,
+                                 value: "Refresh Receipt",
+                                 comment: "Button title on an error alert that indicates it refreshes the user's purchase receipt on device.")
+    }
 }
 
 // MARK: Internet reachability

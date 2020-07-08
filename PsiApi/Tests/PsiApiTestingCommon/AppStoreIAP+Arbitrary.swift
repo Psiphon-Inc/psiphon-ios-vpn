@@ -315,6 +315,7 @@ extension UnfinishedConsumableTransaction.VerificationRequestState: Arbitrary {
             Gen.pure(.pendingResponse),
             ErrorEvent<ErrorRepr>.arbitrary
                 .map(UnfinishedConsumableTransaction.VerificationRequestState.requestError),
+            Gen.pure(.purchaseNotRecordedByAppStore),
         ])
     }
 }
@@ -695,7 +696,11 @@ extension SubscriptionIAPPurchase: Arbitrary {
 extension ConsumableIAPPurchase: Arbitrary {
     public static var arbitrary: Gen<ConsumableIAPPurchase> {
         Gen.compose { c in
-            ConsumableIAPPurchase(productID: c.generate(), transactionID: c.generate())
+            ConsumableIAPPurchase(
+                productID: c.generate(),
+                transactionID: c.generate(),
+                purchaseDate: c.generate()
+            )
         }
     }
 }

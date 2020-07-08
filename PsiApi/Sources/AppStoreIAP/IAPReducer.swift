@@ -210,6 +210,19 @@ public func iapReducer(
             ]
         }
         
+        let purchaseIsInReceipt = receiptData.consumableInAppPurchases.contains { purchase in
+            purchase.matches(paymentTransaction: unfinishedPsiCashTx.transaction)
+        }
+        
+        guard purchaseIsInReceipt else {
+            state.iap.unfinishedPsiCashTx?.verification = .purchaseNotRecordedByAppStore
+            
+            return [
+                environment.feedbackLogger.log(.error, "Transaction is not recorded by AppStore")
+                .mapNever()
+            ]
+        }
+        
         guard let customData = environment.psiCashEffects.rewardedVideoCustomData() else {
             
             state.iap.unfinishedPsiCashTx?.verification = .requestError(
