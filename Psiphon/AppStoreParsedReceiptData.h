@@ -39,6 +39,11 @@
 @property (nonatomic, strong, readonly) NSDate *_Nonnull purchaseDate;
 
 /**
+ Raw purchase date string interpreted as a RFC 3339 date.
+ */
+@property (nonatomic, strong, readonly) NSString *_Nonnull rawPurchaseDate;
+
+/**
  The Web Order Line Item ID for subscription.
  
  This value is a unique ID that identifies purchase events across devices, including subscription renewal purchase events.

@@ -288,8 +288,8 @@ static BOOL ASN1ReadIntegerAsBool(const uint8_t *bytes, long length) {
                     self->_originalTransactionID = ASN1ReadUTF8String(p, length);
                     break;
                 case ReceiptASN1TypePurchaseDate: {
-                    NSString *string = ASN1ReadIA5SString(p, length);
-                    self->_purchaseDate = [NSDate fromRFC3339String:string];
+                    self->_rawPurchaseDate = ASN1ReadIA5SString(p, length);
+                    self->_purchaseDate = [NSDate fromRFC3339String:self->_rawPurchaseDate];
                     break;
                 }
                 case ReceiptASN1TypeSubscriptionExpirationDate: {
