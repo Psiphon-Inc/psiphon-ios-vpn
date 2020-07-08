@@ -18,6 +18,7 @@
 */
 
 import Foundation
+import PsiApi
 import Utilities
 
 /// Typed wrapper for `SKPaymentTransaction.transactionIdentifier`.
@@ -116,21 +117,81 @@ public struct ReceiptData: Hashable {
     
 }
 
+/// Represents an in-app purchase that is recorded in the receipt.
+public protocol RecordedIAPPurchase: Hashable {
+ 
+    /// Product ID string as create on Apple App Store.
+    /// - ASN.1 Field Type: 1702
+    /// - JSON Field Name: `product_id`
+    var productID: ProductID { get }
+    
+    /// For a transaction that restores a previous transaction, this value is different from the
+    /// transaction identifier of the original purchase transaction.
+    /// In an auto-renewable subscription receipt, a new value for the transaction identifier is
+    /// generated every time the subscription automatically renews or is restored.
+    /// - ASN.1 Field Type: 1703
+    /// - JSON Field Name: `transaction_id`
+    var transactionID: TransactionID { get }
+    
+    /// In an auto-renewable subscription receipt, the purchase date is the
+    /// date when the subscription was either purchased or renewed (with or without a lapse).
+    /// For an automatic renewal that occurs on the expiration date of the current period,
+    /// the purchase date is the start date of the next period, which is identical to the
+    /// end date of the current period.
+    /// - ASN.1 Field Type: 1704
+    /// - JSON Field Name: `purchase_date`
+    var purchaseDate: Date { get }
+    
+}
+
+extension RecordedIAPPurchase {
+    
+    public static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.transactionID == rhs.transactionID
+    }
+    
+    public func hash(into hasher: inout Hasher) {
+        // Transaction ID is unique.
+        hasher.combine(self.transactionID)
+    }
+    
+    /// Determines whether or not `paymentTransaction` matches this in-app purchase recorded
+    /// in the App Store receipt.
+    /// - Returns: `false` if `paymentTransaction` is not completed,
+    /// otherwise matches transaction date and product ID.
+    public func matches(paymentTransaction: PaymentTransaction) -> Bool {
+        guard
+            case .completed(.success(let completedTx)) = paymentTransaction.transactionState()
+        else {
+            return false
+        }
+        
+        return (completedTx.transactionDate == self.purchaseDate &&
+                    paymentTransaction.productID() == self.productID)
+    }
+    
+}
+
 /// Represents a consumable in-app purchase contained in the app receipt.
-public struct ConsumableIAPPurchase: Hashable {
+public struct ConsumableIAPPurchase: RecordedIAPPurchase {
+    
     public let productID: ProductID
     public let transactionID: TransactionID
+    public let purchaseDate: Date
     
-    public init(productID: ProductID, transactionID: TransactionID) {
+    public init(productID: ProductID,
+                transactionID: TransactionID,
+                purchaseDate: Date) {
         self.productID = productID
         self.transactionID = transactionID
+        self.purchaseDate = purchaseDate
     }
     
 }
 
 /// Represents a renewable-subscription in-app purchase contained in the app receipt.
 /// - Note: `SubscriptionIAPPurchase` values are compared and hashed only by `transactionID`.
-public struct SubscriptionIAPPurchase: Hashable, Codable {
+public struct SubscriptionIAPPurchase: RecordedIAPPurchase, Codable {
     
     /// Product ID string as create on Apple App Store.
     /// - ASN.1 Field Type: 1702
@@ -211,14 +272,6 @@ public struct SubscriptionIAPPurchase: Hashable, Codable {
         }
     }
     
-    public static func == (lhs: Self, rhs: Self) -> Bool {
-        lhs.transactionID == rhs.transactionID
-    }
-    
-    public func hash(into hasher: inout Hasher) {
-        // Transaction ID is unique.
-        hasher.combine(self.transactionID)
-    }
 }
 
 extension Set where Element == SubscriptionIAPPurchase {

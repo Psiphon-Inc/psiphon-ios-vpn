@@ -212,7 +212,7 @@ extension PaymentTransaction {
                 Payment.from(skPayment: skPaymentTransaction.payment)
             },
             isEqual: { other -> Bool in
-                skPaymentTransaction.isEqual(other)
+                skPaymentTransaction.isEqual(other.skPaymentTransaction())
             },
             skPaymentTransaction: { () -> SKPaymentTransaction? in
                 skPaymentTransaction

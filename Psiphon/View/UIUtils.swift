@@ -594,3 +594,48 @@ final class MutableBindableViewable<BindingType: Equatable, WrappedView: ViewWra
     }
 
 }
+
+extension UIAlertController {
+    
+    /// Creates a `UIAlertController` with a single "OK" button that dismisses the alert.
+    static func makeSimpleAlertWithOKButton(message: String) -> UIAlertController {
+        let alert = UIAlertController(title: UserStrings.Error_title(),
+                                      message: message,
+                                      preferredStyle: .alert)
+        
+        alert.addAction(
+            UIAlertAction(title: UserStrings.OK_button_title(), style: .default)
+        )
+        
+        return alert
+    }
+    
+    /// Creates a `UIAlertController` with a "cancel"-style dismiss button, and a
+    /// "default"-style button with provided title.
+    static func makeSimpleAlertWithDismissButton(
+        actionButtonTitle: String,
+        message: String,
+        addPsiCashHandler: @escaping () -> Void
+    ) -> UIAlertController {
+        let alertController = UIAlertController(
+            title: UserStrings.Error_title(),
+            message: message,
+            preferredStyle: .alert
+        )
+
+        alertController.addAction(
+            UIAlertAction(
+                title: actionButtonTitle,
+                style: .default,
+                handler: { _ in
+                    addPsiCashHandler()
+            })
+        )
+        
+        alertController.addAction(
+            UIAlertAction(title: UserStrings.Dismiss_button_title(),
+                          style: .cancel)
+        )
+        return alertController
+    }
+}

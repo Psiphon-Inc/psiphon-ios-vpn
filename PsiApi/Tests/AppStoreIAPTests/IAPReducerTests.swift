@@ -248,7 +248,7 @@ final class IAPReducerTests: XCTestCase {
             for which a request has not been sent yet
             """, arguments: args)
             <-
-            forAll { (initState: IAPReducerState, receipt: ReceiptData?) in
+            forAll { (initState: IAPReducerState, receiptContainsPurchase: Bool?, generatedReceipt: ReceiptData) in
                 
                 // Resets feedbackHandler logs before each test.
                 self.feedbackHandler.logs = []
@@ -258,6 +258,44 @@ final class IAPReducerTests: XCTestCase {
                 ]))
                 
                 env.httpClient = mockHttp.client
+                
+                let receipt: ReceiptData?
+                
+                // Sets receipt `consumableInAppPurchases` field based on `receiptContainsPurchase`
+                // property.
+                // receiptContainsPurchase determines whether or not the unfinished consumable
+                // purchase in `initState` has a matching purchase in the receipt or not.
+                switch receiptContainsPurchase {
+                case .none:
+                    receipt = .none
+                case .some(false):
+                    receipt = generatedReceipt
+                    
+                case .some(true):
+                    if let unfinishedPsiCashTx = initState.iap.unfinishedPsiCashTx {
+                        
+                        let matchingConsumableIAP = ConsumableIAPPurchase(
+                            productID: unfinishedPsiCashTx.transaction.productID(),
+                            transactionID:
+                                TransactionID(rawValue: unfinishedPsiCashTx.completedTransaction
+                                                .paymentTransactionID.rawValue)!,
+                            purchaseDate: unfinishedPsiCashTx.completedTransaction.transactionDate)
+                                                
+                        receipt = ReceiptData(
+                            subscriptionInAppPurchases: generatedReceipt.subscriptionInAppPurchases,
+                            consumableInAppPurchases: generatedReceipt.consumableInAppPurchases.union([matchingConsumableIAP]),
+                            data: Data(),
+                            readDate: generatedReceipt.readDate)
+                        
+                    } else {
+                        receipt = ReceiptData(
+                            subscriptionInAppPurchases: generatedReceipt.subscriptionInAppPurchases,
+                            consumableInAppPurchases: Set(),
+                            data: Data(),
+                            readDate: generatedReceipt.readDate)
+                    }
+
+                }
                 
                 // Act
                 let (nextState, effectsResults) = testReducer(initState,
@@ -301,7 +339,8 @@ final class IAPReducerTests: XCTestCase {
                     // consumable purchase if all conditions set below are met.
                     (initState.iap.unfinishedPsiCashTx != nil &&
                         initState.iap.unfinishedPsiCashTx?.verification != .pendingResponse &&
-                        receipt != nil) ==> {
+                        receipt != nil &&
+                        receiptContainsPurchase == .some(true)) ==> {
                             
                             // Before the request is submitted, verificationState is expected
                             // to be in a pending state.
