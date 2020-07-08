@@ -259,7 +259,7 @@ final class PsiCashViewController: ReactiveViewController {
                     
                 case (.completed(let iapErrorEvent), _, _):
                     self.display(screen: .mainScreen)
-                    if let errorDesc = errorEventDescription(iapErrorEvent: iapErrorEvent) {
+                    if let errorDesc = iapErrorEvent.localizedErrorEventDescription {
                         self.displayBasicAlert(errorDesc: errorDesc)
                     }
                     
@@ -642,31 +642,42 @@ extension RewardedVideoState {
     }
 }
 
-fileprivate func errorEventDescription(
-    iapErrorEvent: ErrorEvent<IAPError>
-) -> ErrorEventDescription<ErrorRepr>? {
+extension ErrorEvent where E == IAPError {
     
-    let optionalDescription: String?
-    switch iapErrorEvent.error {
+    /// Returns an `ErrorEventDescription` if the error represents a user-facing error, otherwise returns `nil`.
+    fileprivate var localizedErrorEventDescription: ErrorEventDescription<ErrorRepr>? {
+        let optionalDescription: String?
         
-    case let .failedToCreatePurchase(reason: reason):
-        optionalDescription = reason
+        switch self.error {
         
-    case let .storeKitError(error: iapError):
-        // Payment cancelled errors are ignored.
-        if iapError.paymentCancelled {
-            optionalDescription = .none
-        } else {
-            optionalDescription = """
-            \(UserStrings.Purchase_failed())
-            (\(iapError.localizedDescription))
-            """
-        };
+        case let .failedToCreatePurchase(reason: reason):
+            optionalDescription = reason
+            
+        case let .storeKitError(error: transactionError):
+            
+            switch transactionError {
+            case .invalidTransaction:
+                optionalDescription = "App Store failed to record the purchase"
+                
+            case let .error(skEmittedError):
+                // Payment cancelled errors are ignored.
+                if case let .right(skError) = skEmittedError,
+                   case .paymentCancelled = skError.code {
+                    optionalDescription = .none
+                } else {
+                    optionalDescription = """
+                        \(UserStrings.Purchase_failed())
+                        (\(skEmittedError.localizedDescription))
+                        """
+                }
+            }
+        }
+        
+        guard let description = optionalDescription else {
+            return nil
+        }
+        return ErrorEventDescription(event: self.eraseToRepr(),
+                                     localizedUserDescription: description)
     }
     
-    guard let description = optionalDescription else {
-        return nil
-    }
-    return ErrorEventDescription(event: iapErrorEvent.eraseToRepr(),
-                                 localizedUserDescription: description)
 }

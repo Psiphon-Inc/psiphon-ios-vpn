@@ -25,24 +25,21 @@ import PsiCashClient
 
 public struct PsiCashValidationRequest: Encodable {
     let productID: ProductID
-    let transactionID: TransactionID
     let receiptData: String
     let customData: String
     
     public init(
-        transaction: PaymentTransaction,
+        productID: ProductID,
         receipt: ReceiptData,
         customData: CustomData
     ) {
-        self.productID = transaction.productID()
-        self.transactionID = transaction.transactionID()
+        self.productID = productID
         self.receiptData = receipt.data.base64EncodedString()
         self.customData = customData
     }
 
     private enum CodingKeys: String, CodingKey {
         case productID = "product_id"
-        case transactionID = "transaction_id"
         case receiptData = "receipt-data"
         case customData = "custom_data"
     }

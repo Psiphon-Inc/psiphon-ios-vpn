@@ -176,7 +176,7 @@ public func makeFeedbackEntry<T: FeedbackDescription>(_ value: T) -> String {
 
 /// Creates a string representation of `value` fit for sending in feedback.
 /// - Note: Escapes double-quotes `"`, and removes "Psiphon" and "Swift" module names.
-func makeFeedbackEntry<T: CustomFieldFeedbackDescription>(_ value: T) -> String {
+public func makeFeedbackEntry<T: CustomFieldFeedbackDescription>(_ value: T) -> String {
     normalizeFeedbackDescriptionTypes(value.description)
 }
 

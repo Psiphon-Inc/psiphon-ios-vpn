@@ -189,12 +189,43 @@ extension PaymentTransaction.TransactionState.PendingTransactionState: Arbitrary
     }
 }
 
-extension PaymentTransaction.TransactionState.CompletedTransactionState: Arbitrary {
-    public static var arbitrary: Gen<PaymentTransaction.TransactionState.CompletedTransactionState> {
+extension PaymentTransaction.CompletedTransaction.State: Arbitrary {
+    public static var arbitrary: Gen<PaymentTransaction.CompletedTransaction.State> {
         Gen.fromElements(of: [
             // Should cover all cases
             .purchased,
             .restored,
+        ])
+    }
+}
+
+extension PaymentTransactionID: Arbitrary {
+    public static var arbitrary: Gen<PaymentTransactionID> {
+        Int.arbitrary.resize(999_999_999).map {
+            PaymentTransactionID.init(rawValue: String(abs($0)))!
+        }
+    }
+}
+
+extension PaymentTransaction.CompletedTransaction: Arbitrary {
+    public static var arbitrary: Gen<PaymentTransaction.CompletedTransaction> {
+        Gen.compose { c in
+            PaymentTransaction.CompletedTransaction(
+                completedState: c.generate(),
+                paymentTransactionID: c.generate(),
+                transactionDate: c.generate()
+            )
+        }
+    }
+}
+
+extension PaymentTransaction.TransactionState.TransactionErrorState: Arbitrary {
+    public static var arbitrary: Gen<PaymentTransaction.TransactionState.TransactionErrorState> {
+        Gen.frequency([
+            (1, Gen.pure(PaymentTransaction.TransactionState.TransactionErrorState.invalidTransaction)),
+            (3,
+             Either<SystemError, SKError>.arbitrary
+                .map(PaymentTransaction.TransactionState.TransactionErrorState.error))
         ])
     }
 }
@@ -206,7 +237,7 @@ extension PaymentTransaction.TransactionState: Arbitrary {
             PendingTransactionState.arbitrary
                 .map(PaymentTransaction.TransactionState.pending),
             
-            Result<Pair<Date?, CompletedTransactionState>, Either<SystemError, SKError>>.arbitrary
+            Result<PaymentTransaction.CompletedTransaction, TransactionErrorState>.arbitrary
                 .map(PaymentTransaction.TransactionState.completed)
         ])
     }
@@ -248,7 +279,6 @@ extension Payment: Arbitrary {
 extension PaymentTransaction: Arbitrary {
     public static var arbitrary: Gen<PaymentTransaction> {
         Gen.compose { c in
-            let transactionID: TransactionID = c.generate()
             let productID: ProductID = c.generate()
             let transactionState: TransactionState = c.generate()
             let payment: Payment = c.generate(using:
@@ -256,11 +286,21 @@ extension PaymentTransaction: Arbitrary {
             )
             
             return PaymentTransaction(
-                transactionID: { transactionID },
                 productID: { productID },
                 transactionState: { transactionState },
                 payment: { payment },
-                isEqual: { $0.transactionID() == transactionID },
+                isEqual: {
+                    guard case .completed(.success(let selfCompletedTx)) = transactionState else {
+                        return false
+                    }
+                    guard
+                        case .completed(.success(let otherCompletedTx)) = $0.transactionState()
+                    else {
+                        return false
+                    }
+                    return selfCompletedTx.paymentTransactionID ==
+                        otherCompletedTx.paymentTransactionID
+                },
                 skPaymentTransaction: { nil }
             )
         }
@@ -288,8 +328,10 @@ extension UnfinishedConsumableTransaction: Arbitrary {
                 }
                 return false
             }).map {
-                guard let value =
-                    UnfinishedConsumableTransaction(transaction: $0, verificationState: $1) else {
+                guard
+                    let value = UnfinishedConsumableTransaction(completedTransaction: $0,
+                                                                verificationState: $1)
+                else {
                         XCTFatal()
                 }
                 return value
@@ -346,7 +388,8 @@ extension IAPError: Arbitrary {
         Gen.one(of: [
             // Should cover all cases
             String.arbitrary.map(IAPError.failedToCreatePurchase(reason:)),
-            IAPError.StoreKitError.arbitrary.map(IAPError.storeKitError)
+            PaymentTransaction.TransactionState.TransactionErrorState.arbitrary
+            .map(IAPError.storeKitError)
         ])
     }
 }
