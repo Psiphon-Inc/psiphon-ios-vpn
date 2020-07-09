@@ -183,6 +183,10 @@ final class PsiCashViewController: ReactiveViewController {
             .skipRepeats()
             .startWithValues { [unowned self] observed in
                 
+                guard !self.lifeCycle.viewWillOrDidDisappear else {
+                    return
+                }
+                
                 if case let .failure(errorEvent) = observed.state.psiCash.rewardedVideo.loading {
                     switch errorEvent.error {
                     case .adSDKError(_), .requestedAdFailedToLoad:
