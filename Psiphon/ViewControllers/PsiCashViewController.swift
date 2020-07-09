@@ -87,6 +87,7 @@ final class PsiCashViewController: ReactiveViewController {
         let state: PsiCashViewControllerState
         let activeTab: PsiCashViewController.Tabs
         let tunneled: TunnelConnectedStatus
+        let lifeCycle: ViewControllerLifeCycle
     }
 
     enum Screen: Equatable {
@@ -178,11 +179,21 @@ final class PsiCashViewController: ReactiveViewController {
         self.lifetime += SignalProducer.combineLatest(
             store.$value.signalProducer,
             self.$activeTab.signalProducer,
-            tunnelConnectedSignal)
+            tunnelConnectedSignal,
+            self.$lifeCycle.signalProducer)
             .map(ObservedState.init)
             .skipRepeats()
+            .filter { observed in
+                !observed.lifeCycle.viewWillOrDidDisappear
+            }
             .startWithValues { [unowned self] observed in
                 
+                // Even though the reactive signal has a filter on
+                // `!observed.lifeCycle.viewWillOrDidDisappear`, due to async nature
+                // of the signal it is ambiguous if this closure is called when
+                // `self.lifeCycle.viewWillOrDidDisappear` is true.
+                // Due to this race-condition, the source-of-truth (`self.lifeCycle`),
+                // is checked for whether view will or did disappear.
                 guard !self.lifeCycle.viewWillOrDidDisappear else {
                     return
                 }

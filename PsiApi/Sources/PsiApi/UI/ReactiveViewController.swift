@@ -23,7 +23,7 @@ import Foundation
 import UIKit
 import ReactiveSwift
 
-public enum ViewControllerLifeCycle {
+public enum ViewControllerLifeCycle: Equatable {
     case initing
     case viewDidLoad
     case viewWillAppear(animated: Bool)
