@@ -75,6 +75,10 @@ extension ViewControllerLifeCycle {
         }
         return true
     }
+    
+    public var viewWillOrDidDisappear: Bool {
+        viewWillDisappear || viewDidDisappear
+    }
 
 }
 
@@ -116,10 +120,16 @@ open class ReactiveViewController: UIViewController {
 
         self.$lifeCycle.signalProducer
             .filter{ $0.viewDidAppear }.take(first: 1).startWithValues { [weak self] _ in
-                self?.present(viewControllerToPresent, animated: flag, completion: completion)
+                guard let self = self else {
+                    return
+                }
+                guard !self.lifeCycle.viewWillOrDidDisappear else {
+                    return
+                }
+                self.present(viewControllerToPresent, animated: flag, completion: completion)
         }
     }
-
+    
 }
 
 #endif
