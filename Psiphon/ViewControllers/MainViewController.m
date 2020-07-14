@@ -418,8 +418,19 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
         if (s == VPNStatusDisconnected || s == VPNStatusInvalid) {
             
             
-            return [[[[AdManager.sharedInstance.adSDKStarted
-                       flattenMap:^__kindof RACSignal * _Nullable(RACUnit * _Nullable value) {
+            return [[[[[AdManager.sharedInstance.adSDKStarted
+                        catch:^RACSignal * _Nonnull(NSError * _Nonnull error) {
+                
+                // Ad SDK failed to initialize.
+                // Returns unit value to indicate that we're done with ad initialization.
+                
+                [PsiFeedbackLogger errorWithType:MainViewControllerLogType
+                                         message:@"Ad SDK failed to initialize"
+                                          object:error];
+                
+                return [RACSignal return:RACUnit.defaultUnit];
+                
+            }] flattenMap:^__kindof RACSignal * _Nullable(RACUnit * _Nullable value) {
                 
                 // Ad SDK has loaded and consent collected.
                 return [AdManager.sharedInstance.untunneledInterstitialLoadStatus
