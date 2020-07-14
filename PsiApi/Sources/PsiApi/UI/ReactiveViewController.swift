@@ -23,7 +23,7 @@ import Foundation
 import UIKit
 import ReactiveSwift
 
-public enum ViewControllerLifeCycle {
+public enum ViewControllerLifeCycle: Equatable {
     case initing
     case viewDidLoad
     case viewWillAppear(animated: Bool)
@@ -33,93 +33,107 @@ public enum ViewControllerLifeCycle {
 }
 
 extension ViewControllerLifeCycle {
-
+    
     public var initing: Bool {
         guard case .initing = self else {
             return false
         }
         return true
     }
-
+    
     public var viewDidLoad: Bool {
         guard case .viewDidLoad = self else {
             return false
         }
         return true
     }
-
+    
     public var viewWillAppear: Bool {
         guard case .viewWillAppear = self else {
             return false
         }
         return true
     }
-
+    
     public var viewDidAppear: Bool {
         guard case .viewDidAppear(_) = self else {
             return false
         }
         return true
     }
-
+    
     public var viewWillDisappear: Bool {
         guard case .viewWillDisappear(_) = self else {
             return false
         }
         return true
     }
-
+    
     public var viewDidDisappear: Bool {
         guard case .viewDidDisappear(_) = self else {
             return false
         }
         return true
     }
-
+    
+    public var viewWillOrDidDisappear: Bool {
+        viewWillDisappear || viewDidDisappear
+    }
+    
 }
 
 /// ReactiveViewController makes the values of UIViewController lifecycle calls available in a stream
 /// and also buffers the last value.
 open class ReactiveViewController: UIViewController {
-
+    
     /// Value of the last UIViewController lifecycle call. The property wrapper provides
     /// an interface to obtain a stream of UIViewController lifecycle call values, which starts
     /// with the current value of this variable.
     @State public private(set) var lifeCycle: ViewControllerLifeCycle = .initing
-
+    
     open override func viewDidLoad() {
         super.viewDidLoad()
         lifeCycle = .viewDidLoad
     }
+    
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         lifeCycle = .viewWillAppear(animated: animated)
     }
+    
     open override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         lifeCycle = .viewDidAppear(animated: animated)
     }
-
+    
     open override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         lifeCycle = .viewWillDisappear(animated: animated)
     }
-
+    
     open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         lifeCycle = .viewDidDisappear(animated: animated)
     }
-
-    public func presentOnViewDidAppear(_ viewControllerToPresent: UIViewController,
-                                              animated flag: Bool,
-                                              completion: (() -> Void)? = nil) {
-
+    
+    public func presentOnViewDidAppear(
+        _ viewControllerToPresent: UIViewController,
+        animated flag: Bool,
+        completion: (() -> Void)? = nil
+    ) {
+        
         self.$lifeCycle.signalProducer
             .filter{ $0.viewDidAppear }.take(first: 1).startWithValues { [weak self] _ in
-                self?.present(viewControllerToPresent, animated: flag, completion: completion)
-        }
+                guard let self = self else {
+                    return
+                }
+                guard !self.lifeCycle.viewWillOrDidDisappear else {
+                    return
+                }
+                self.present(viewControllerToPresent, animated: flag, completion: completion)
+            }
     }
-
+    
 }
 
 #endif

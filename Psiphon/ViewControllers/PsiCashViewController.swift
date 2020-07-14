@@ -34,6 +34,7 @@ struct PsiCashViewControllerState: Equatable {
     let subscription: SubscriptionState
     let appStorePsiCashProducts:
         PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent>
+    let isRefreshingAppStoreReceipt: Bool
 }
 
 extension PsiCashViewControllerState {
@@ -54,7 +55,7 @@ extension PsiCashViewControllerState {
                 psiCash.rewardedVideoProduct(
                     clearedForSale: rewardedVideoClearedForSale, subtitle: rewardedVideoSubtitle
                 )
-                ] + viewModels
+            ] + viewModels
             }
         }, completed: { result in
             result.map { parsedList -> [PsiCashPurchasableViewModel] in
@@ -64,7 +65,7 @@ extension PsiCashViewControllerState {
                         clearedForSale: rewardedVideoClearedForSale, subtitle: rewardedVideoSubtitle
                     ) ] + parsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
                         parsed.viewModel
-                }
+                    }
             }
         })
     }
@@ -74,30 +75,33 @@ extension PsiCashViewControllerState {
 final class PsiCashViewController: ReactiveViewController {
     typealias AddPsiCashViewType =
         EitherView<PsiCashCoinPurchaseTable,
-        EitherView<Spinner,
-        EitherView<PsiCashMessageViewUntunneled,
-        EitherView<PsiCashMessageWithRetryView, PsiCashMessageView>>>>
-
+                   EitherView<Spinner,
+                              EitherView<PsiCashMessageViewUntunneled,
+                                         EitherView<PsiCashMessageWithRetryView,
+                                                    PsiCashMessageView>>>>
+    
     typealias SpeedBoostViewType = EitherView<SpeedBoostPurchaseTable,
-        EitherView<Spinner,
-        EitherView<PsiCashMessageViewUntunneled, PsiCashMessageView>>>
-
+                                              EitherView<Spinner,
+                                                         EitherView<PsiCashMessageViewUntunneled,
+                                                                    PsiCashMessageView>>>
+    
     struct ObservedState: Equatable {
         let state: PsiCashViewControllerState
         let activeTab: PsiCashViewController.Tabs
         let tunneled: TunnelConnectedStatus
+        let lifeCycle: ViewControllerLifeCycle
     }
-
+    
     enum Screen: Equatable {
         case mainScreen
         case psiCashPurchaseDialog
         case speedBoostPurchaseDialog
     }
-
+    
     @objc enum Tabs: Int, UICases {
         case addPsiCash
         case speedBoost
-
+        
         var description: String {
             switch self {
             case .addPsiCash: return UserStrings.Add_psiCash()
@@ -105,41 +109,42 @@ final class PsiCashViewController: ReactiveViewController {
             }
         }
     }
-
+    
     private let viewControllerInitTime = Date()
     
     private let (lifetime, token) = Lifetime.make()
     private let store: Store<PsiCashViewControllerState, PsiCashAction>
     private let productRequestStore: Store<Utilities.Unit, ProductRequestAction>
-
+    
     // VC-specific UI state
-
+    
     /// Active view in the view controller.
     /// - Warning: Must only be set from the main thread.
     @State var activeTab: Tabs
     private var navigation: Screen = .mainScreen
-
+    
     /// Set of presented error alerts.
     /// Note: Once an error alert has been dismissed by the user, it will be removed from the set.
     private var errorAlerts = Set<ErrorEventDescription<ErrorRepr>>()
-
+    
     // Views
     private let balanceView = PsiCashBalanceView(frame: .zero)
     private let closeButton = CloseButton(frame: .zero)
     private let tabControl = TabControlView<Tabs>()
-
+    
     private let container: EitherView<AddPsiCashViewType, SpeedBoostViewType>
     private let containerView = UIView(frame: .zero)
     private let containerBindable: EitherView<AddPsiCashViewType, SpeedBoostViewType>.BuildType
-
+    
     init(initialTab: Tabs,
          store: Store<PsiCashViewControllerState, PsiCashAction>,
          iapStore: Store<Utilities.Unit, IAPAction>,
          productRequestStore: Store<Utilities.Unit, ProductRequestAction>,
+         appStoreReceiptStore: Store<Utilities.Unit, ReceiptStateAction>,
          tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>,
          feedbackLogger: FeedbackLogger
     ) {
-
+        
         self.activeTab = initialTab
         self.store = store
         self.productRequestStore = productRequestStore
@@ -167,19 +172,33 @@ final class PsiCashViewController: ReactiveViewController {
                       .init(PsiCashMessageViewUntunneled(action: { [unowned store] in
                         store.send(.connectToPsiphonTapped)
                       }), PsiCashMessageView()))))
-
+        
         containerBindable = self.container.build(self.containerView)
-
+        
         super.init(nibName: nil, bundle: nil)
-
+        
         // Updates UI by merging all necessary signals.
         self.lifetime += SignalProducer.combineLatest(
             store.$value.signalProducer,
             self.$activeTab.signalProducer,
-            tunnelConnectedSignal)
+            tunnelConnectedSignal,
+            self.$lifeCycle.signalProducer)
             .map(ObservedState.init)
             .skipRepeats()
+            .filter { observed in
+                !observed.lifeCycle.viewWillOrDidDisappear
+            }
             .startWithValues { [unowned self] observed in
+                
+                // Even though the reactive signal has a filter on
+                // `!observed.lifeCycle.viewWillOrDidDisappear`, due to async nature
+                // of the signal it is ambiguous if this closure is called when
+                // `self.lifeCycle.viewWillOrDidDisappear` is true.
+                // Due to this race-condition, the source-of-truth (`self.lifeCycle`),
+                // is checked for whether view will or did disappear.
+                guard !self.lifeCycle.viewWillOrDidDisappear else {
+                    return
+                }
                 
                 if case let .failure(errorEvent) = observed.state.psiCash.rewardedVideo.loading {
                     switch errorEvent.error {
@@ -187,7 +206,7 @@ final class PsiCashViewController: ReactiveViewController {
                         let errorDesc = ErrorEventDescription(
                             event: errorEvent.eraseToRepr(),
                             localizedUserDescription: UserStrings.Rewarded_video_load_failed())
-
+                        
                         self.displayBasicAlert(errorDesc: errorDesc)
                         
                     case .noTunneledRewardedVideoAd:
@@ -229,37 +248,25 @@ final class PsiCashViewController: ReactiveViewController {
                     self.display(screen: .mainScreen)
                     
                     if case let .serverError(psiCashStatus, _, nil) = psiCashErrorEvent.error,
-                        PsiCashStatus(rawValue: psiCashStatus)! == .insufficientBalance {
+                       PsiCashStatus(rawValue: psiCashStatus)! == .insufficientBalance {
                         
-                        self.display(errorDesc: errorDesc) { () -> UIAlertController in
-                            let alertController = UIAlertController(
-                                title: UserStrings.Error_title(),
-                                message: errorDesc.localizedUserDescription,
-                                preferredStyle: .alert
-                            )
-
-                            alertController.addAction(
-                                UIAlertAction(
-                                    title: "Add PsiCash",
-                                    style: .default,
-                                    handler: { [unowned self] _ in
-                                        self.activeTab = .addPsiCash
-                                })
-                            )
-                            
-                            alertController.addAction(
-                                UIAlertAction(title: UserStrings.Dismiss_button_title(),
-                                              style: .cancel)
-                            )
-                            return alertController
-                        }
+                        self.display(errorDesc: errorDesc,
+                                     makeAlertController:
+                                        UIAlertController.makeSimpleAlertWithDismissButton(
+                                            actionButtonTitle: UserStrings.Add_psiCash(),
+                                            message: errorDesc.localizedUserDescription,
+                                            addPsiCashHandler: { [unowned self] in
+                                                self.activeTab = .addPsiCash
+                                            }
+                                        ))
+                        
                     } else {
                         self.displayBasicAlert(errorDesc: errorDesc)
                     }
                     
                 case (.completed(let iapErrorEvent), _, _):
                     self.display(screen: .mainScreen)
-                    if let errorDesc = errorEventDescription(iapErrorEvent: iapErrorEvent) {
+                    if let errorDesc = iapErrorEvent.localizedErrorEventDescription {
                         self.displayBasicAlert(errorDesc: errorDesc)
                     }
                     
@@ -279,7 +286,7 @@ final class PsiCashViewController: ReactiveViewController {
                     )
                     return
                 }
-
+                
                 switch observed.state.subscription.status {
                 case .unknown:
                     // There is not PsiCash state or subscription state is unknown.
@@ -288,7 +295,7 @@ final class PsiCashViewController: ReactiveViewController {
                     self.containerBindable.bind(
                         .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
                     )
-
+                    
                 case .subscribed(_):
                     // User is subscribed. Only shows the PsiCash balance.
                     self.balanceView.isHidden = false
@@ -297,12 +304,12 @@ final class PsiCashViewController: ReactiveViewController {
                     self.containerBindable.bind(
                         .left(.right(.right(.right(.right(.userSubscribed)))))
                     )
-
+                    
                 case .notSubscribed:
                     self.balanceView.isHidden = false
                     self.tabControl.isHidden = false
                     self.balanceView.bind(observed.state.psiCashBalanceViewModel)
-
+                    
                     // Updates active tab UI
                     switch observed.activeTab {
                     case .addPsiCash:
@@ -310,7 +317,7 @@ final class PsiCashViewController: ReactiveViewController {
                     case .speedBoost:
                         self.tabControl.bind(.speedBoost)
                     }
-
+                    
                     switch (observed.tunneled, observed.activeTab) {
                     case (.notConnected, .addPsiCash),
                          (.connected, .addPsiCash):
@@ -325,7 +332,7 @@ final class PsiCashViewController: ReactiveViewController {
                                 case .notRequested, .pendingResponse:
                                     self.containerBindable.bind(
                                         .left(.right(.right(.right(.right(
-                                            .pendingPsiCashVerification)))))
+                                                                    .pendingPsiCashVerification)))))
                                     )
                                     
                                 case .requestError(_):
@@ -333,9 +340,18 @@ final class PsiCashViewController: ReactiveViewController {
                                     // tap to retry button.
                                     self.containerBindable.bind(
                                         .left(.right(.right(.right(.left(
-                                            .failedToVerifyPsiCashIAPPurchase(retryAction: {
-                                                iapStore.send(.checkUnverifiedTransaction)
-                                            })))))))
+                                                                    .failedToVerifyPsiCashIAPPurchase(retryAction: {
+                                                                        iapStore.send(.checkUnverifiedTransaction)
+                                                                    })))))))
+                                    
+                                case .purchaseNotRecordedByAppStore:
+                                    self.containerBindable.bind(.left(.right(.right(.right(.left(.transactionNotRecordedByAppStore(
+                                        isRefreshingReceipt: observed.state.isRefreshingAppStoreReceipt,
+                                        retryAction: {
+                                            appStoreReceiptStore.send(
+                                                .remoteReceiptRefresh(optionalPromise: nil))
+                                        }
+                                    )))))))
                                 }
                                 
                             case .notConnected:
@@ -345,10 +361,11 @@ final class PsiCashViewController: ReactiveViewController {
                                     .left(.right(.right(.left(.pendingPsiCashPurchase))))
                                 )
                             case .connecting, .disconnecting:
-                                feedbackLogger.fatalError("tunnelState at this point should not be 'connecting'")
+                                feedbackLogger.fatalError(
+                                    "tunnelState at this point should not be 'connecting'")
                                 return
                             }
-
+                            
                         } else {
                             
                             
@@ -391,67 +408,66 @@ final class PsiCashViewController: ReactiveViewController {
                                     // Shows failed to load message with tap to retry button.
                                     self.containerBindable.bind(
                                         .left(.right(.right(.right(.left(
-                                            .failedToLoadProductList(retryAction: {
-                                                productRequestStore.send(.getProductList)
-                                            })))))))
+                                                                    .failedToLoadProductList(retryAction: {
+                                                                        productRequestStore.send(.getProductList)
+                                                                    })))))))
                                 }
                             }
                         }
-
+                        
                     case (.connecting, _):
                         self.tabControl.isHidden = true
                         self.containerBindable.bind(
                             .left(.right(.right(.right(.right(.unavailableWhileConnecting))))))
-                    
+                        
                     case (.disconnecting, _):
                         self.tabControl.isHidden = true
                         self.containerBindable.bind(
-                        .left(.right(.right(.right(.right(.unavailableWhileDisconnecting))))))
-
+                            .left(.right(.right(.right(.right(.unavailableWhileDisconnecting))))))
+                        
                     case (let tunnelState, .speedBoost):
-
+                        
                         let activeSpeedBoost = observed.state.psiCash.activeSpeedBoost
                         
                         switch tunnelState {
                         case .notConnected, .connecting, .disconnecting:
-
+                            
                             switch activeSpeedBoost {
                             case .none:
                                 // There is no active speed boost.
-                            let connectToPsiphonMessage =
-                                PsiCashMessageViewUntunneled.Message
+                                let connectToPsiphonMessage =
+                                    PsiCashMessageViewUntunneled.Message
                                     .speedBoostUnavailable(subtitle: .connectToPsiphon)
-
-                            self.containerBindable.bind(
-                                .right(.right(.right(.left(connectToPsiphonMessage)))))
-
+                                
+                                self.containerBindable.bind(
+                                    .right(.right(.right(.left(connectToPsiphonMessage)))))
+                                
                             case .some(_):
                                 // There is an active speed boost.
                                 self.containerBindable.bind(
                                     .right(.right(.right(.left(.speedBoostAlreadyActive)))))
                             }
-
-
+                            
+                            
                         case .connected:
                             switch activeSpeedBoost {
                             case .none:
                                 // There is no active speed boost.
-                                let viewModel = NonEmpty(array:
-                                    observed.state.psiCash.libData.availableProducts
-                                .items.compactMap { $0.speedBoost }
-                                .map { SpeedBoostPurchasableViewModel(purchasable: $0) })
-
+                                let viewModel = NonEmpty(
+                                    array:observed.state.psiCash.libData.availableProducts
+                                        .items.compactMap { $0.speedBoost }
+                                        .map { SpeedBoostPurchasableViewModel(purchasable: $0) })
+                                
                                 if let viewModel = viewModel {
-                                self.containerBindable.bind(.right(.left(viewModel)))
+                                    self.containerBindable.bind(.right(.left(viewModel)))
                                 } else {
-                                let tryAgainLater = PsiCashMessageViewUntunneled.Message
-                                .speedBoostUnavailable(subtitle: .tryAgainLater)
-                                self.containerBindable.bind(
-                                .right(.right(.right(.left(tryAgainLater)))))
+                                    let tryAgainLater = PsiCashMessageViewUntunneled.Message
+                                        .speedBoostUnavailable(subtitle: .tryAgainLater)
+                                    self.containerBindable.bind(
+                                        .right(.right(.right(.left(tryAgainLater)))))
                                 }
-
+                                
                             case .some(_):
-                                // There is an active speed boost.
                                 // There is an active speed boost.
                                 self.containerBindable.bind(
                                     .right(.right(.right(.right(.speedBoostAlreadyActive)))))
@@ -459,99 +475,90 @@ final class PsiCashViewController: ReactiveViewController {
                         }
                     }
                 }
-        }
+            }
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
+    
     override var preferredStatusBarStyle: UIStatusBarStyle {
         Style.default.statusBarStyle
     }
-
+    
     // Setup and add all the views here
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         setBackgroundGradient(for: view)
-
+        
         tabControl.setTabHandler { [unowned self] tab in
             self.activeTab = tab
         }
-
+        
         closeButton.setEventHandler { [unowned self] in
             self.dismiss(animated: true, completion: nil)
         }
-
+        
         // Add subviews
         view.addSubview(balanceView)
         view.addSubview(closeButton)
         view.addSubview(tabControl)
         view.addSubview(containerView)
-
+        
         // Setup layout guide
         let rootViewLayoutGuide = addSafeAreaLayoutGuide(to: view)
-
+        
         let paddedLayoutGuide = UILayoutGuide()
         view.addLayoutGuide(paddedLayoutGuide)
-
+        
         paddedLayoutGuide.activateConstraints {
             $0.constraint(to: rootViewLayoutGuide, .top(), .bottom(), .centerX()) +
                 [ $0.widthAnchor.constraint(equalTo: rootViewLayoutGuide.widthAnchor,
                                             multiplier: 0.91) ]
         }
-
+        
         // Setup subview constraints
         setChildrenAutoresizingMaskIntoConstraintsFlagToFalse(forView: view)
-
+        
         balanceView.activateConstraints {
             $0.constraint(to: paddedLayoutGuide, .centerX(), .top(30))
         }
-
+        
         closeButton.activateConstraints {[
             $0.centerYAnchor.constraint(equalTo: balanceView.centerYAnchor),
             $0.trailingAnchor.constraint(equalTo: paddedLayoutGuide.trailingAnchor),
-            ]}
-
+        ]}
+        
         tabControl.activateConstraints {[
             $0.topAnchor.constraint(equalTo: balanceView.topAnchor, constant: 50.0),
             $0.centerXAnchor.constraint(equalTo: paddedLayoutGuide.centerXAnchor),
             $0.widthAnchor.constraint(equalTo: paddedLayoutGuide.widthAnchor),
             $0.heightAnchor.constraint(equalToConstant: 44.0)
-            ]}
-
+        ]}
+        
         containerView.activateConstraints {
             $0.constraint(to: paddedLayoutGuide, .bottom(), .leading(), .trailing()) +
                 [ $0.topAnchor.constraint(equalTo: tabControl.bottomAnchor, constant: 15.0) ]
         }
-
+        
     }
-
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         productRequestStore.send(.getProductList)
     }
-
+    
 }
 
 // Navigations
 extension PsiCashViewController {
-
+    
     /// Display an error alert with a single "OK" button.
     private func displayBasicAlert(errorDesc: ErrorEventDescription<ErrorRepr>) {
-
-        self.display(errorDesc: errorDesc) { () -> UIAlertController in
-            let alert = UIAlertController(title: UserStrings.Error_title(),
-                                          message: errorDesc.localizedUserDescription,
-                                          preferredStyle: .alert)
-
-            alert.addAction(
-                UIAlertAction(title: UserStrings.OK_button_title(), style: .default)
-            )
-            
-            return alert
-        }
+        self.display(errorDesc: errorDesc,
+                     makeAlertController:
+                        .makeSimpleAlertWithOKButton(message: errorDesc.localizedUserDescription))
     }
     
     /// Display error alert if `errorDesc` is a unique alert not in `self.errorAlerts`, and
@@ -559,7 +566,7 @@ extension PsiCashViewController {
     /// the view controller `viewControllerInitTime`.
     /// Only if the error is unique `makeAlertController` is called for creating the alert controller.
     private func display(errorDesc: ErrorEventDescription<ErrorRepr>,
-                         makeAlertController: () -> UIAlertController) {
+                         makeAlertController: @autoclosure () -> UIAlertController) {
         
         // Displays errors that have been emitted after the init date of the view controller.
         guard errorDesc.event.date > viewControllerInitTime else {
@@ -570,7 +577,7 @@ extension PsiCashViewController {
         // If a member of `errorAlerts` is equal to `errorDesc.event.error`, then
         // that member is removed and `errorDesc` is inserted.
         let inserted = self.errorAlerts.insert(orReplaceIfEqual: \.event.error, errorDesc)
-
+        
         // Prevent display of the same error event.
         guard inserted else {
             return
@@ -579,30 +586,30 @@ extension PsiCashViewController {
         let alertController = makeAlertController()
         self.presentOnViewDidAppear(alertController, animated: true, completion: nil)
     }
-
+    
     private func display(screen: Screen) {
         guard self.navigation != screen else {
             return
         }
         self.navigation = screen
-
+        
         switch screen {
         case .mainScreen:
             self.presentedViewController?.dismiss(animated: false, completion: nil)
-
+            
         case .psiCashPurchaseDialog:
             let purchasingViewController = AlertViewController(viewBuilder:
-                PsiCashPurchasingViewBuilder())
-
+                                                                PsiCashPurchasingViewBuilder())
+            
             self.presentOnViewDidAppear(purchasingViewController, animated: false,
-                                             completion: nil)
-
+                                        completion: nil)
+            
         case .speedBoostPurchaseDialog:
             let vc = AlertViewController(viewBuilder: PurchasingSpeedBoostAlertViewBuilder())
             self.presentOnViewDidAppear(vc, animated: false, completion: nil)
         }
     }
-
+    
 }
 
 // MARK: Extensions
@@ -614,11 +621,11 @@ extension RewardedVideoState {
         }
         self.loading = .success(.none)
     }
-
+    
     mutating func combine(loading: RewardedVideoLoad) {
         self.loading = loading
     }
-
+    
     mutating func combine(presentation: RewardedVideoPresentation) {
         self.presentation = presentation
         switch presentation {
@@ -642,31 +649,42 @@ extension RewardedVideoState {
     }
 }
 
-fileprivate func errorEventDescription(
-    iapErrorEvent: ErrorEvent<IAPError>
-) -> ErrorEventDescription<ErrorRepr>? {
+extension ErrorEvent where E == IAPError {
     
-    let optionalDescription: String?
-    switch iapErrorEvent.error {
+    /// Returns an `ErrorEventDescription` if the error represents a user-facing error, otherwise returns `nil`.
+    fileprivate var localizedErrorEventDescription: ErrorEventDescription<ErrorRepr>? {
+        let optionalDescription: String?
         
-    case let .failedToCreatePurchase(reason: reason):
-        optionalDescription = reason
+        switch self.error {
         
-    case let .storeKitError(error: iapError):
-        // Payment cancelled errors are ignored.
-        if iapError.paymentCancelled {
-            optionalDescription = .none
-        } else {
-            optionalDescription = """
-            \(UserStrings.Purchase_failed())
-            (\(iapError.localizedDescription))
-            """
-        };
+        case let .failedToCreatePurchase(reason: reason):
+            optionalDescription = reason
+            
+        case let .storeKitError(error: transactionError):
+            
+            switch transactionError {
+            case .invalidTransaction:
+                optionalDescription = "App Store failed to record the purchase"
+                
+            case let .error(skEmittedError):
+                // Payment cancelled errors are ignored.
+                if case let .right(skError) = skEmittedError,
+                   case .paymentCancelled = skError.code {
+                    optionalDescription = .none
+                } else {
+                    optionalDescription = """
+                        \(UserStrings.Purchase_failed())
+                        (\(skEmittedError.localizedDescription))
+                        """
+                }
+            }
+        }
+        
+        guard let description = optionalDescription else {
+            return nil
+        }
+        return ErrorEventDescription(event: self.eraseToRepr(),
+                                     localizedUserDescription: description)
     }
     
-    guard let description = optionalDescription else {
-        return nil
-    }
-    return ErrorEventDescription(event: iapErrorEvent.eraseToRepr(),
-                                 localizedUserDescription: description)
 }
