@@ -23,26 +23,15 @@ import Utilities
 import StoreKit
 import PsiApi
 
+/// Represents possible failed states when making an in-app purchase.
 public enum IAPError: HashableError {
-    // Fully specified StoreKit error type.
-    // Not all errors emitted by StoreKit are of type `SKError`.
-    public typealias StoreKitError = Either<SystemError, SKError>
     
+    /// Represents an error state where the in-app purchase purchase could not be created,
+    /// usually due to missing data (e.g. PsiCash tokens).
     case failedToCreatePurchase(reason: String)
-    case storeKitError(StoreKitError)
-}
-
-extension IAPError.StoreKitError {
-    /// True if payment is cancelled by the user
-    public var paymentCancelled: Bool {
-        guard case let .right(skError) = self else {
-            return false
-        }
-        guard case .paymentCancelled = skError.code else {
-            return false
-        }
-        return true
-    }
+    
+    /// Represents a StoreKit error.
+    case storeKitError(PaymentTransaction.TransactionState.TransactionErrorState)
 }
 
 public struct IAPPurchasing: Hashable {
@@ -50,7 +39,7 @@ public struct IAPPurchasing: Hashable {
     
     public enum TransactionUniqueness: Equatable {
         case unique(IAPPurchasing?, UnfinishedConsumableTransaction?)
-        case nonUnique
+        case duplicate
         
         var iapPurchasing: IAPPurchasing? {
             guard case let .unique(a, _) = self else { return nil }
@@ -113,15 +102,15 @@ public struct IAPPurchasing: Hashable {
                 switch existingConsumableTransaction(tx) {
                 case .none:
                     let unfinishedTx = UnfinishedConsumableTransaction(
-                        transaction: tx,
+                        completedTransaction: tx,
                         verificationState: .notRequested
                     )
                     
                     return .success(.unique(nil, unfinishedTx))
 
                 case .some(_):
-                    // Unexpected duplicate transaction.
-                    return .success(.nonUnique)
+                    // Transaction is a duplicate.
+                    return .success(.duplicate)
                 }
             }
         }
@@ -129,25 +118,41 @@ public struct IAPPurchasing: Hashable {
     
 }
 
-/// Represents  a consumable transaction has not been finished pending verification by the purchase-verifier server.
+/// Represents  a consumable transaction has not been finished, pending verification by the purchase-verifier server.
 public struct UnfinishedConsumableTransaction: Equatable {
     
     public enum VerificationRequestState: Equatable {
+        /// No verification request for this purchase has been made.
         case notRequested
+        
         /// Request is submitted, and is pending response from the verifier server.
         case pendingResponse
+        
+        /// Request to verify purchase failed.
         case requestError(ErrorEvent<ErrorRepr>)
+        
+        /// Purchase has been made, however App Store has not recorded the
+        ///
+        /// To resolve the error user can be prompted to refresh the App Store receipt,
+        /// however this may not always resolve the issue if for example device is jailbroken.
+        case purchaseNotRecordedByAppStore
     }
     
     public let transaction: PaymentTransaction
-    public let verification: VerificationRequestState
+    public let completedTransaction: PaymentTransaction.CompletedTransaction
+    public var verification: VerificationRequestState
     
-    public init?(transaction: PaymentTransaction, verificationState: VerificationRequestState) {
+    public init?(completedTransaction: PaymentTransaction,
+                 verificationState: VerificationRequestState) {
         // An uncompleted transaction is not verifiable.
-        guard case .completed(.success(_)) = transaction.transactionState() else {
+        guard
+            case .completed(.success(let completedTx)) = completedTransaction.transactionState()
+        else {
             return nil
         }
-        self.transaction = transaction
+        
+        self.transaction = completedTransaction
+        self.completedTransaction = completedTx
         self.verification = verificationState
     }
 }

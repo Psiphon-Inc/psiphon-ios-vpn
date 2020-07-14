@@ -31,13 +31,28 @@ public enum ReceiptReadReason: Equatable, CaseIterable {
 
 public struct ReceiptState: Equatable {
     
+    public typealias ReceiptRefreshState = PendingValue<SKReceiptRefreshRequest,
+                                                        Result<Utilities.Unit, SystemErrorEvent>>
+    
     public var receiptData: ReceiptData?
     
     // remoteReceiptRefreshState holds a strong reference to the `SKReceiptRefreshRequest`
     // object while the request is in progress.
-    public var remoteReceiptRefreshState: PendingValue<SKReceiptRefreshRequest, Result<Utilities.Unit, SystemErrorEvent>>
+    public var remoteReceiptRefreshState: ReceiptRefreshState
     
     public var remoteRefreshAppReceiptPromises: [Promise<Result<Utilities.Unit, SystemErrorEvent>>]
+}
+
+// Convenience properties.
+extension ReceiptState {
+    
+    public var isRefreshingReceipt: Bool {
+        switch self.remoteReceiptRefreshState {
+        case .pending(_): return true
+        case .completed(_): return false
+        }
+    }
+    
 }
 
 extension ReceiptState {

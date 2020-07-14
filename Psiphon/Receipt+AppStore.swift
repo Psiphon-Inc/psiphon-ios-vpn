@@ -108,7 +108,8 @@ extension ReceiptData {
                 }
                 return ConsumableIAPPurchase(
                     productID: productID,
-                    transactionID: TransactionID(rawValue: parsedIAP.transactionID)!
+                    transactionID: TransactionID(rawValue: parsedIAP.transactionID)!,
+                    purchaseDate: parsedIAP.purchaseDate
                 )
         })
         

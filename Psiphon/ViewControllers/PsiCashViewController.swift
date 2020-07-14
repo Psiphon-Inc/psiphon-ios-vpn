@@ -34,6 +34,7 @@ struct PsiCashViewControllerState: Equatable {
     let subscription: SubscriptionState
     let appStorePsiCashProducts:
         PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent>
+    let isRefreshingAppStoreReceipt: Bool
 }
 
 extension PsiCashViewControllerState {
@@ -136,6 +137,7 @@ final class PsiCashViewController: ReactiveViewController {
          store: Store<PsiCashViewControllerState, PsiCashAction>,
          iapStore: Store<Utilities.Unit, IAPAction>,
          productRequestStore: Store<Utilities.Unit, ProductRequestAction>,
+         appStoreReceiptStore: Store<Utilities.Unit, ReceiptStateAction>,
          tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>,
          feedbackLogger: FeedbackLogger
     ) {
@@ -231,35 +233,23 @@ final class PsiCashViewController: ReactiveViewController {
                     if case let .serverError(psiCashStatus, _, nil) = psiCashErrorEvent.error,
                         PsiCashStatus(rawValue: psiCashStatus)! == .insufficientBalance {
                         
-                        self.display(errorDesc: errorDesc) { () -> UIAlertController in
-                            let alertController = UIAlertController(
-                                title: UserStrings.Error_title(),
-                                message: errorDesc.localizedUserDescription,
-                                preferredStyle: .alert
-                            )
-
-                            alertController.addAction(
-                                UIAlertAction(
-                                    title: "Add PsiCash",
-                                    style: .default,
-                                    handler: { [unowned self] _ in
-                                        self.activeTab = .addPsiCash
-                                })
-                            )
-                            
-                            alertController.addAction(
-                                UIAlertAction(title: UserStrings.Dismiss_button_title(),
-                                              style: .cancel)
-                            )
-                            return alertController
-                        }
+                        self.display(errorDesc: errorDesc,
+                                     makeAlertController:
+                                        UIAlertController.makeSimpleAlertWithDismissButton(
+                                            actionButtonTitle: UserStrings.Add_psiCash(),
+                                            message: errorDesc.localizedUserDescription,
+                                            addPsiCashHandler: { [unowned self] in
+                                                self.activeTab = .addPsiCash
+                                            }
+                                        ))
+                        
                     } else {
                         self.displayBasicAlert(errorDesc: errorDesc)
                     }
                     
                 case (.completed(let iapErrorEvent), _, _):
                     self.display(screen: .mainScreen)
-                    if let errorDesc = errorEventDescription(iapErrorEvent: iapErrorEvent) {
+                    if let errorDesc = iapErrorEvent.localizedErrorEventDescription {
                         self.displayBasicAlert(errorDesc: errorDesc)
                     }
                     
@@ -336,6 +326,15 @@ final class PsiCashViewController: ReactiveViewController {
                                             .failedToVerifyPsiCashIAPPurchase(retryAction: {
                                                 iapStore.send(.checkUnverifiedTransaction)
                                             })))))))
+                                    
+                                case .purchaseNotRecordedByAppStore:
+                                    self.containerBindable.bind(.left(.right(.right(.right(.left(.transactionNotRecordedByAppStore(
+                                        isRefreshingReceipt: observed.state.isRefreshingAppStoreReceipt,
+                                        retryAction: {
+                                            appStoreReceiptStore.send(
+                                                .remoteReceiptRefresh(optionalPromise: nil))
+                                        }
+                                    )))))))
                                 }
                                 
                             case .notConnected:
@@ -540,18 +539,9 @@ extension PsiCashViewController {
 
     /// Display an error alert with a single "OK" button.
     private func displayBasicAlert(errorDesc: ErrorEventDescription<ErrorRepr>) {
-
-        self.display(errorDesc: errorDesc) { () -> UIAlertController in
-            let alert = UIAlertController(title: UserStrings.Error_title(),
-                                          message: errorDesc.localizedUserDescription,
-                                          preferredStyle: .alert)
-
-            alert.addAction(
-                UIAlertAction(title: UserStrings.OK_button_title(), style: .default)
-            )
-            
-            return alert
-        }
+        self.display(errorDesc: errorDesc,
+                     makeAlertController:
+                        .makeSimpleAlertWithOKButton(message: errorDesc.localizedUserDescription))
     }
     
     /// Display error alert if `errorDesc` is a unique alert not in `self.errorAlerts`, and
@@ -559,7 +549,7 @@ extension PsiCashViewController {
     /// the view controller `viewControllerInitTime`.
     /// Only if the error is unique `makeAlertController` is called for creating the alert controller.
     private func display(errorDesc: ErrorEventDescription<ErrorRepr>,
-                         makeAlertController: () -> UIAlertController) {
+                         makeAlertController: @autoclosure () -> UIAlertController) {
         
         // Displays errors that have been emitted after the init date of the view controller.
         guard errorDesc.event.date > viewControllerInitTime else {
@@ -642,31 +632,42 @@ extension RewardedVideoState {
     }
 }
 
-fileprivate func errorEventDescription(
-    iapErrorEvent: ErrorEvent<IAPError>
-) -> ErrorEventDescription<ErrorRepr>? {
+extension ErrorEvent where E == IAPError {
     
-    let optionalDescription: String?
-    switch iapErrorEvent.error {
+    /// Returns an `ErrorEventDescription` if the error represents a user-facing error, otherwise returns `nil`.
+    fileprivate var localizedErrorEventDescription: ErrorEventDescription<ErrorRepr>? {
+        let optionalDescription: String?
         
-    case let .failedToCreatePurchase(reason: reason):
-        optionalDescription = reason
+        switch self.error {
         
-    case let .storeKitError(error: iapError):
-        // Payment cancelled errors are ignored.
-        if iapError.paymentCancelled {
-            optionalDescription = .none
-        } else {
-            optionalDescription = """
-            \(UserStrings.Purchase_failed())
-            (\(iapError.localizedDescription))
-            """
-        };
+        case let .failedToCreatePurchase(reason: reason):
+            optionalDescription = reason
+            
+        case let .storeKitError(error: transactionError):
+            
+            switch transactionError {
+            case .invalidTransaction:
+                optionalDescription = "App Store failed to record the purchase"
+                
+            case let .error(skEmittedError):
+                // Payment cancelled errors are ignored.
+                if case let .right(skError) = skEmittedError,
+                   case .paymentCancelled = skError.code {
+                    optionalDescription = .none
+                } else {
+                    optionalDescription = """
+                        \(UserStrings.Purchase_failed())
+                        (\(skEmittedError.localizedDescription))
+                        """
+                }
+            }
+        }
+        
+        guard let description = optionalDescription else {
+            return nil
+        }
+        return ErrorEventDescription(event: self.eraseToRepr(),
+                                     localizedUserDescription: description)
     }
     
-    guard let description = optionalDescription else {
-        return nil
-    }
-    return ErrorEventDescription(event: iapErrorEvent.eraseToRepr(),
-                                 localizedUserDescription: description)
 }
