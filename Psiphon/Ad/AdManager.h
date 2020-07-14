@@ -35,6 +35,7 @@ FOUNDATION_EXPORT AdControllerTag const AdControllerTagAdMobUntunneledRewardedVi
 @interface AdManager : NSObject
 
 /** Terminating signal, that emits unit value when ad SDK is loaded.
+ * - Note: This signal re-emits error emitted by the ad SDK that failed to initialize.
  */
 @property (nonatomic, readonly) RACSubject<RACUnit *> *adSDKStarted;
 
