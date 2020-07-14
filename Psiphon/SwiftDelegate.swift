@@ -442,6 +442,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             productRequestStore: self.store.projection(
                 value: erase,
                 action: { .productRequest($0) } ),
+            appStoreReceiptStore: self.store.projection(
+                value: erase,
+                action: { .appReceipt($0) } ),
             tunnelConnectedSignal: self.store.$value.signalProducer
                 .map(\.vpnState.value.providerVPNStatus.tunneled),
             feedbackLogger: self.feedbackLogger
