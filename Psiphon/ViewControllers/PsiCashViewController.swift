@@ -469,7 +469,6 @@ final class PsiCashViewController: ReactiveViewController {
                                 
                             case .some(_):
                                 // There is an active speed boost.
-                                // There is an active speed boost.
                                 self.containerBindable.bind(
                                     .right(.right(.right(.right(.speedBoostAlreadyActive)))))
                             }
