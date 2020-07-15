@@ -181,7 +181,11 @@ public func iapReducer(
             purchasingState: .pending(nil)
         )
         
-        return [ environment.paymentQueue.addPayment(product).mapNever() ]
+        return [
+            environment.paymentQueue.addPayment(product).mapNever(),
+            environment.feedbackLogger.log(
+                .info, "request to purchase: '\(makeFeedbackEntry(product))'").mapNever()
+        ]
         
     case .receiptUpdated(let maybeReceiptData):
         guard let unfinishedPsiCashTx = state.iap.unfinishedPsiCashTx else {
@@ -397,6 +401,11 @@ public func iapReducer(
                 
                 continue
             }
+            
+            effects.append(
+                environment.feedbackLogger.log(
+                    .info, "transactionUpdate: '\(makeFeedbackEntry(tx))'").mapNever()
+            )
             
             let iapPurchasingResult = IAPPurchasing.makeGiven(
                 productType: productType,
