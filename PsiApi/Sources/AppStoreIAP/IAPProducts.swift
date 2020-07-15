@@ -104,7 +104,7 @@ public struct Payment: Hashable {
 }
 
 /// Wraps SKProduct.
-public struct AppStoreProduct: Hashable {
+public struct AppStoreProduct: Hashable, FeedbackDescription {
     
     public let type: AppStoreProductType
     public let productID: ProductID
