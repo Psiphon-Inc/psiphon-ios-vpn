@@ -115,6 +115,7 @@
     // once the loading is done.
     __block RACDisposable *disposable = [mainViewController.activeStateLoadingSignal
       subscribeNext:^(RACUnit *x) {
+          [PsiFeedbackLogger info:@"dismiss loading screen"];
           [weakSelf removeLaunchScreen];
       } error:^(NSError *error) {
           [weakSelf.compoundDisposable removeDisposable:disposable];

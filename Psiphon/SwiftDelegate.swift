@@ -140,6 +140,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func applicationDidFinishLaunching(
         _ application: UIApplication, objcBridge: ObjCBridgeDelegate
     ) {
+        self.feedbackLogger.immediate(.info, "applicationDidFinishLaunching")
+        
         self.objcBridge = objcBridge
         
         self.psiCashLib = PsiCash.make(flags: Debugging)
