@@ -154,7 +154,7 @@ extension PsiCashEffects {
                         }
                         fulfilled(.completed(result))
                     }
-                }.prefix(value: .pending)
+                }
             },
             purchaseProduct: { [psiCash, feedbackLogger] (purchasable, tunnelConnection) -> Effect<PsiCashPurchaseResult> in
                 Effect.deferred { fulfilled in

@@ -66,7 +66,12 @@ NSString * const StateCellIdentifier = @"StateCell";
     [actionsTableView registerClass:UITableViewCell.class forCellReuseIdentifier:ActionCellIdentifier];
     [actionsTableView registerClass:UITableViewCell.class forCellReuseIdentifier:SwitchCellIdentifier];
     [actionsTableView registerClass:UITableViewCell.class forCellReuseIdentifier:StateCellIdentifier];
-    actionsTableView.backgroundColor = [UIColor whiteColor];
+    if (@available(iOS 13.0, *)) {
+        actionsTableView.backgroundColor = UIColor.systemBackgroundColor;
+    } else {
+        // Fallback on earlier versions
+        actionsTableView.backgroundColor = [UIColor whiteColor];
+    }
     [self.view addSubview:actionsTableView];
 
     // Layout constraints
