@@ -123,6 +123,7 @@ func psiCashReducer(
         state.psiCash.pendingPsiCashRefresh = .pending
         
         return [
+            environment.feedbackLogger.log(.info, "PsiCash: refresh state started").mapNever(),
             environment.psiCashEffects
                 .refreshState(PsiCashTransactionClass.allCases, tunnelConnection)
                 .map(PsiCashAction.refreshPsiCashStateResult)
@@ -130,12 +131,25 @@ func psiCashReducer(
         
     case .refreshPsiCashStateResult(let result):
         state.psiCash.pendingPsiCashRefresh = result.map { $0.map { _ in .unit } }
-        if case .completed(.success(let refreshedLibData)) = result {
+
+        switch result {
+        case .completed(.success(let refreshedLibData)):
             state.psiCash.libData = refreshedLibData
             state.psiCashBalance = .refreshed(refreshedData: refreshedLibData,
                                               persisted: environment.psiCashPersistedValues)
+            return [
+                environment.feedbackLogger.log(.info, "PsiCash: refresh state success").mapNever()
+            ]
+        case .completed(.failure(let error)):
+            return [
+                environment.feedbackLogger.log(
+                    .warn,
+                    LogMessage(stringLiteral:"PsiCash: refresh state error: " + String(describing: error))
+                ).mapNever()
+            ]
+        case .pending:
+            return []
         }
-        return []
         
     case .showRewardedVideoAd:
         guard case .notSubscribed = state.subscription.status else {
