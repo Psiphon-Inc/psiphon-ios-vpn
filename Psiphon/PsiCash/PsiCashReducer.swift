@@ -119,6 +119,9 @@ func psiCashReducer(
         guard case .completed(_) = state.psiCash.pendingPsiCashRefresh else {
             return []
         }
+        
+        state.psiCash.pendingPsiCashRefresh = .pending
+        
         return [
             environment.psiCashEffects
                 .refreshState(PsiCashTransactionClass.allCases, tunnelConnection)
