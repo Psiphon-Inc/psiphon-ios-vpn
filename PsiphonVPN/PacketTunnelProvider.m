@@ -51,7 +51,7 @@
 #import "FileUtils.h"
 #import "Strings.h"
 #import "SubscriptionAuthCheck.h"
-#import "StoredAuthorizations.h"
+#import "SessionConfigValues.h"
 #import "FeedbackUtils.h"
 
 NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
@@ -91,21 +91,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 @property (nonatomic, nonnull) PsiphonTunnel *psiphonTunnel;
 
-// Authorization IDs supplied to tunnel-core from the container.
-// NOTE: Does not include subscription authorization ID.
-@property (atomic, nonnull) NSSet<NSString *> *nonSubscriptionAuthIdSnapshot;
-
-@property (nonatomic) PsiphonConfigSponsorIds *cachedSponsorIDs;
-
-// Subscription authorization ID.
-@property (atomic, nullable) NSString *subscriptionAuthID;
-
 // Notifier message state management.
 @property (atomic) BOOL postedNetworkConnectivityFailed;
 
 @property (atomic) BOOL startWithSubscriptionCheckSponsorID;
-
-@property (atomic, nullable) StoredAuthorizations *storedAuthorizations;
 
 @end
 
@@ -117,6 +106,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     dispatch_queue_t workQueue;
 
     AppProfiler *_Nullable appProfiler;
+    
+    // sessionConfigValues is not thread-safe.
+    SessionConfigValues *_Nonnull sessionConfigValues;
 }
 
 - (id)init {
@@ -132,14 +124,11 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
         _tunnelProviderState = TunnelProviderStateInit;
         _waitForContainerStartVPNCommand = FALSE;
-        _nonSubscriptionAuthIdSnapshot = [NSSet set];
-        
-        _subscriptionAuthID = nil;
 
         _postedNetworkConnectivityFailed = FALSE;
         _startWithSubscriptionCheckSponsorID = FALSE;
         
-        _storedAuthorizations = nil;
+        sessionConfigValues = [[SessionConfigValues alloc] initWithSharedDB:self.sharedDB];
     }
     return self;
 }
@@ -165,102 +154,30 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
 }
 
-- (NSArray<NSString *> *_Nonnull)
-getAllEncodedAuthsWithUpdated:(StoredAuthorizations *_Nullable)updatedStoredAuths
-withSponsorID:(NSString *_Nonnull *)sponsorID {
-    
-    if (updatedStoredAuths == nil) {
-        self.storedAuthorizations = [[StoredAuthorizations alloc] initWithPersistedValues];
-    } else {
-        self.storedAuthorizations = updatedStoredAuths;
-    }
-    
-    if (self.storedAuthorizations.subscriptionAuth == nil) {
-        (*sponsorID) = self.cachedSponsorIDs.defaultSponsorId;
-    } else {
-        (*sponsorID) = self.cachedSponsorIDs.subscriptionSponsorId;
-    }
-    
-    if (self.storedAuthorizations.subscriptionAuth != nil) {
-        
-        [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
-                                 format:@"using subscription authorization ID:%@",
-         self.storedAuthorizations.subscriptionAuth.ID];
-    }
-    
-    // Updates copy authorization IDs supplied to tunnel-core.
-    self.subscriptionAuthID = self.storedAuthorizations.subscriptionAuth.ID;
-    self.nonSubscriptionAuthIdSnapshot = self.storedAuthorizations.nonSubscriptionAuthIDs;
-    
-    return [self.storedAuthorizations encoded];
-}
-
-// If tunnel is already connected, and there are updated authorizations,
-// reconnects Psiphon tunnel with `-reconnectWithConfig::`.
-- (void)updateStoredAuthorizationAndReconnectIfNeeded {
-    
-    // Guards that Psiphon tunnel is connected.
-    if (PsiphonConnectionStateConnected != self.psiphonTunnel.getConnectionState) {
-        return;
-    }
-    
-    StoredAuthorizations *updatedStoredAuths = [[StoredAuthorizations alloc]
-                                                initWithPersistedValues];
-    
-    NSString *_Nullable currentSubscriptionAuthID = self.subscriptionAuthID;
-    NSSet<NSString *> *_Nonnull currentNonSubsAuths =  self.nonSubscriptionAuthIdSnapshot;
-    
-    // If current connection uses an authorization that no longer exists,
-    // reconnects with no subscription authorizations.
-    if (updatedStoredAuths.subscriptionAuth == nil && currentSubscriptionAuthID != nil) {
-        
-        [PsiFeedbackLogger
-         infoWithType:AuthCheckLogType
-         format:@"reconnect since stored subscription auth is 'nil' but tunnel connected with \
-         auth id '%@'", self.subscriptionAuthID];
-        
-        [self reconnectWithUpdatedAuthorizations: updatedStoredAuths];
-        return;
-    }
-    
-    // Reconnects if non-subscription authorization IDs are different from previous
-    // value passed to tunnel-core.
-    if (![updatedStoredAuths.nonSubscriptionAuthIDs isEqualToSet:currentNonSubsAuths]) {
-        
-        [PsiFeedbackLogger
-         infoWithType:AuthCheckLogType
-         message:@"reconnect since supplied non-sub auth ids don't match persisted value"];
-        
-        [self reconnectWithUpdatedAuthorizations: updatedStoredAuths];
-        return;
-    }
-    
-    if (updatedStoredAuths.subscriptionAuth != nil) {
-        if (currentSubscriptionAuthID != nil &&
-            [updatedStoredAuths.subscriptionAuth.ID isEqualToString:currentSubscriptionAuthID]) {
-            // Authorization used by tunnel-core has not changed.
-            return;
-            
-        } else {
-            // Reconnects with the new subscription authorization.
-            [PsiFeedbackLogger infoWithType:AuthCheckLogType
-                                    message:@"reconnect with new subscription authorization"];
-            [self reconnectWithUpdatedAuthorizations: updatedStoredAuths];
-        }
-    }
-
-}
-
-- (void)reconnectWithUpdatedAuthorizations:(StoredAuthorizations *_Nullable)updatedAuths {
+- (void)checkAuthorizationsChangeAndReconnectIfNeeded {
     dispatch_async(self->workQueue, ^{
+        
+        // Guards that Psiphon tunnel is connected.
+        if (PsiphonConnectionStateConnected != self.psiphonTunnel.getConnectionState) {
+            return;
+        }
+        
+        // If authorizations stored by the container have been updated,
+        // reconnects with the updated values.
+        
+        if (![self->sessionConfigValues updateStoredAuthorizations]) {
+            return;
+        }
+        
         NSString *sponsorID = nil;
-        NSArray<NSString *> *_Nonnull auths = [self getAllEncodedAuthsWithUpdated:updatedAuths
-                                                                    withSponsorID:&sponsorID];
+        NSArray<NSString *> *_Nonnull auths = [self->sessionConfigValues
+                                               getEncodedAuthsWithSponsorID:&sponsorID];
         
         [AppProfiler logMemoryReportWithTag:@"reconnectWithConfig"];
         [self.psiphonTunnel reconnectWithConfig:sponsorID :auths];
     });
 }
+
 
 - (NSError *_Nullable)startPsiphonTunnel {
 
@@ -289,9 +206,6 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
 
     [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
 
-    self.storedAuthorizations = [[StoredAuthorizations alloc] initWithPersistedValues];
-    self.cachedSponsorIDs = [PsiphonConfigReader fromConfigFile].sponsorIds;
-
     [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
                                json:@{
                                    @"Event":@"Start",
@@ -309,11 +223,11 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
 
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
         self.extensionStartMethod == ExtensionStartMethodFromCrash ||
-        self.storedAuthorizations.subscriptionAuth != nil) {
+        [sessionConfigValues hasSubscriptionAuth]) {
 
         [self.sharedDB setExtensionIsZombie:FALSE];
 
-        if (self.storedAuthorizations.subscriptionAuth == nil &&
+        if (![sessionConfigValues hasSubscriptionAuth] &&
             self.extensionStartMethod == ExtensionStartMethodFromContainer) {
             self.waitForContainerStartVPNCommand = TRUE;
         }
@@ -448,13 +362,13 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
 
         // Restarts the tunnel only if the persisted authorizations have changed from the
         // last set of authorizations supplied to tunnel-core.
-        [self updateStoredAuthorizationAndReconnectIfNeeded];
+        [self checkAuthorizationsChangeAndReconnectIfNeeded];
 
     } else if ([NotifierUpdatedSubscriptionAuths isEqualToString:message]) {
         // Checks for updated subscription authorizations.
         // Reconnects the tunnel if there is a new authorization to be used,
         // or if the currently used authorization is no longer available.
-        [self updateStoredAuthorizationAndReconnectIfNeeded];
+        [self checkAuthorizationsChangeAndReconnectIfNeeded];
     }
 
 #if DEBUG
@@ -726,17 +640,16 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
     [noticeFiles setObject:@0 forKey:@"RotatingSyncFrequency"];
 
     mutableConfigCopy[@"UseNoticeFiles"] = noticeFiles;
-
+    
     // Provide auth tokens
     NSString *sponsorID;
-    NSArray *authorizations = [self getAllEncodedAuthsWithUpdated:nil
-                                                    withSponsorID:&sponsorID];
+    NSArray *authorizations = [self->sessionConfigValues getEncodedAuthsWithSponsorID:&sponsorID];
     if ([authorizations count] > 0) {
         mutableConfigCopy[@"Authorizations"] = [authorizations copy];
     }
     
     if (self.startWithSubscriptionCheckSponsorID) {
-        mutableConfigCopy[@"SponsorId"] = self.cachedSponsorIDs.checkSubscriptionSponsorId;
+        mutableConfigCopy[@"SponsorId"] = self->sessionConfigValues.cachedSponsorIDs.checkSubscriptionSponsorId;
         self.startWithSubscriptionCheckSponsorID = FALSE;
     } else {
         mutableConfigCopy[@"SponsorId"] = sponsorID;
@@ -776,53 +689,25 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
         if (!strongSelf) {
             return;
         }
-
-        // If subscription authorization was rejected, adds to the list of
-        // rejected subscription authorization IDs.
-        if (self.subscriptionAuthID != nil) {
-            
-            // Sanity-check
-            if (![self.storedAuthorizations.subscriptionAuth.ID
-                  isEqualToString:self.subscriptionAuthID]) {
+        
+        ActiveAuthorizationResult result = [self->sessionConfigValues
+                                            setActiveAuthorizationIDs:authorizationIds];
+        
+        switch (result) {
+            case ActiveAuthorizationResultNone:
+                return;
                 
-                [NSException raise:@"StateInconsistency"
-                            format:@"Expected 'storedAuthorizations': '%@' to match \
-                 'subscriptionAuthID': '%@'", self.storedAuthorizations.subscriptionAuth.ID,
-                 self.subscriptionAuthID];
-                
-            }
-            
-            if (![authorizationIds containsObject:self.storedAuthorizations.subscriptionAuth.ID]) {
-                
-                [PsiFeedbackLogger infoWithType:AuthCheckLogType
-                                         format:@"Subscription auth with ID '%@' rejected",
-                 self.storedAuthorizations.subscriptionAuth.ID];
-                
-                [SubscriptionAuthCheck
-                 addRejectedSubscriptionAuthID:self.storedAuthorizations.subscriptionAuth.ID];
-                
+            case ActiveAuthorizationResultInactiveSubscription: {
                 // Displays an alert to the user for the expired subscription.
                 // This only happens if the container has not been up for 24 hours before expiry.
                 if ([self.sharedDB getAppForegroundState] == FALSE) {
                     [self displayMessage: NSLocalizedStringWithDefaultValue(@"EXTENSION_EXPIRED_SUBSCRIPTION_ALERT", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired.\n\n Please open Psiphon app to renew your subscription.", @"")];
                 }
+                break;
             }
-        }
-
-        // Marks container authorizations found to be invalid.
-        if ([self.nonSubscriptionAuthIdSnapshot count] > 0) {
-
-            // Subtracts provided active authorizations from the the set of authorizations
-            // supplied in Psiphon config, to get the set of rejected authorizations.
-            NSMutableSet<NSString *> *rejectedNonSubscriptionAuthIDs =
-              [NSMutableSet setWithSet:self.nonSubscriptionAuthIdSnapshot];
             
-            [rejectedNonSubscriptionAuthIDs minusSet:[NSSet setWithArray:authorizationIds]];
-            
-            // Immediately delete authorization ids not accepted.
-            [self.sharedDB
-             removeNonSubscriptionAuthorizationsNotAccepted:rejectedNonSubscriptionAuthIDs];
-
+            default:
+                [NSException raise:@"Unknown value" format:@"unknown value %ld", (long)result];
         }
     });
 }
@@ -840,8 +725,8 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
         [[Notifier sharedInstance] post:NotifierTunnelConnected];
         [self tryStartVPN];
         
-        // Reconnect if subscription authorizations has been updated.
-        [self updateStoredAuthorizationAndReconnectIfNeeded];
+        // Reconnect if authorizations have changed.
+        [self checkAuthorizationsChangeAndReconnectIfNeeded];
     });
 }
 

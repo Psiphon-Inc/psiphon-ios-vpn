@@ -23,6 +23,16 @@
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 
+@interface StoredAuthorizations ()
+
+@property (nonatomic, nullable, readwrite) Authorization *subscriptionAuth;
+
+@property (nonatomic, nonnull, readwrite) NSSet<Authorization *> *nonSubscriptionAuths;
+
+@property (nonatomic, readwrite) BOOL speedBoostedOrActiveSubscription;
+
+@end
+
 @implementation StoredAuthorizations
 
 - (instancetype)initWithPersistedValues {
@@ -53,6 +63,31 @@
     [auths addObjectsFromArray:[Authorization encodeAuthorizations:self.nonSubscriptionAuths]];
     
     return auths;
+}
+
+- (BOOL)isEqual:(id)object {
+    if (self == object) {
+        return TRUE;
+    }
+    
+    if (![object isKindOfClass:[StoredAuthorizations class]]) {
+        return FALSE;
+    }
+    
+    return [self isEqualToStoredAuthorizations:(StoredAuthorizations *)object];
+}
+
+- (BOOL)isEqualToStoredAuthorizations:(StoredAuthorizations *_Nonnull)other {
+    if (self.subscriptionAuth != other.subscriptionAuth &&
+        ![self.subscriptionAuth isEqual:other.subscriptionAuth]) {
+        return FALSE;
+    }
+    
+    if (![self.nonSubscriptionAuths isEqualToSet:other.nonSubscriptionAuths]) {
+        return FALSE;
+    }
+    
+    return TRUE;
 }
 
 @end

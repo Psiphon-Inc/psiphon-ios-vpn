@@ -125,6 +125,7 @@
 		8D497A2C247CEF50009CEBA8 /* GoogleUtilities.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */; };
 		8D497A2E247CEF50009CEBA8 /* nanopb.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A27247CEF4F009CEBA8 /* nanopb.xcframework */; };
 		8D4ACD32247E3626008E404C /* AppStoreIAP+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */; };
+		8D53C6A824C5EED8001E4E2D /* SessionConfigValues.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D53C6A724C5EED8001E4E2D /* SessionConfigValues.m */; };
 		8D778978247469FE0038BFDA /* AppInfo.h in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920620F3DA190033114B /* AppInfo.h */; };
 		8D7789B9247491CA0038BFDA /* PsiphonBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */; };
 		8D7789BD247493300038BFDA /* VPNState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789BC247493300038BFDA /* VPNState.swift */; };
@@ -596,6 +597,8 @@
 		8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = GoogleUtilities.xcframework; sourceTree = "<group>"; };
 		8D497A27247CEF4F009CEBA8 /* nanopb.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = nanopb.xcframework; sourceTree = "<group>"; };
 		8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppStoreIAP+Additions.swift"; sourceTree = "<group>"; };
+		8D53C6A624C5EED8001E4E2D /* SessionConfigValues.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SessionConfigValues.h; sourceTree = "<group>"; };
+		8D53C6A724C5EED8001E4E2D /* SessionConfigValues.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SessionConfigValues.m; sourceTree = "<group>"; };
 		8D5D8494247CE6420018A35B /* libPromisesObjC.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libPromisesObjC.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5F08A5247DB21700F51A42 /* Testing */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Testing; sourceTree = SOURCE_ROOT; };
 		8D5F08A6247DB23A00F51A42 /* Utilities */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Utilities; sourceTree = SOURCE_ROOT; };
@@ -1377,6 +1380,8 @@
 				EFC2F5B520226758007B52F9 /* PacketTunnelUtils.h */,
 				EFC2F5B420226757007B52F9 /* PacketTunnelUtils.m */,
 				9BFEC1C9F506CE1DF07306D2 /* NEBridge.h */,
+				8D53C6A624C5EED8001E4E2D /* SessionConfigValues.h */,
+				8D53C6A724C5EED8001E4E2D /* SessionConfigValues.m */,
 			);
 			path = PsiphonVPN;
 			sourceTree = "<group>";
@@ -2237,6 +2242,7 @@
 				9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */,
 				CED6796B24A4FAA700C4CA81 /* ExtensionDataStoreKeys.m in Sources */,
 				CED6794324A4F95D00C4CA81 /* RunningStdev.m in Sources */,
+				8D53C6A824C5EED8001E4E2D /* SessionConfigValues.m in Sources */,
 				CED6791124A4F82400C4CA81 /* JetsamEvent.m in Sources */,
 				CED6790F24A4F82400C4CA81 /* JetsamTracking.m in Sources */,
 				521FD100219E0E3800F748EC /* DebugUtils.m in Sources */,
