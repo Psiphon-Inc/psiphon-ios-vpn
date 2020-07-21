@@ -71,7 +71,7 @@ typedef NS_ENUM(NSInteger, ExtensionStartMethodEnum) {
 @protocol BasePacketTunnelProviderProtocol
 
 @required
-- (void)startTunnelWithOptions:(NSDictionary<NSString *, NSObject *> *)options
+- (void)startTunnelWithOptions:(NSDictionary<NSString *, NSObject *> *_Nullable)options
                   errorHandler:(void (^)(NSError *error))errorHandler;
 
 - (void)stopTunnelWithReason:(NEProviderStopReason)reason;
