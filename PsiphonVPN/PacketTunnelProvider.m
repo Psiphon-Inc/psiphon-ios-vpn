@@ -293,8 +293,7 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
 
     [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
                                json:@{@"Event":@"Start",
-                                      @"StartMethod": [self extensionStartMethodTextDescription],
-                                      @"StartOptions": options}];
+                                      @"StartMethod": [self extensionStartMethodTextDescription]}];
     
     if ([((NSString*)options[EXTENSION_OPTION_SUBSCRIPTION_CHECK_SPONSOR_ID])
          isEqualToString:EXTENSION_OPTION_TRUE]) {
