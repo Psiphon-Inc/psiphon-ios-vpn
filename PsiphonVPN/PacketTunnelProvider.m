@@ -52,6 +52,7 @@
 #import "Strings.h"
 #import "SubscriptionAuthCheck.h"
 #import "StoredAuthorizations.h"
+#import "FeedbackUtils.h"
 
 NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
 
@@ -292,8 +293,12 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
     self.cachedSponsorIDs = [PsiphonConfigReader fromConfigFile].sponsorIds;
 
     [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
-                               json:@{@"Event":@"Start",
-                                      @"StartMethod": [self extensionStartMethodTextDescription]}];
+                               json:@{
+                                   @"Event":@"Start",
+                                   @"StartOptions": [FeedbackUtils
+                                                     startTunnelOptionsFeedbackLog:options],
+                                   @"StartMethod": [self extensionStartMethodTextDescription]
+                               }];
     
     if ([((NSString*)options[EXTENSION_OPTION_SUBSCRIPTION_CHECK_SPONSOR_ID])
          isEqualToString:EXTENSION_OPTION_TRUE]) {
