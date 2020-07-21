@@ -24,11 +24,14 @@
 @implementation FeedbackUtils
 
 + (NSDictionary<NSString *, NSString *> *)
-startTunnelOptionsFeedbackLog:(NSDictionary<NSString *, NSObject *> *)options {
+startTunnelOptionsFeedbackLog:(NSDictionary<NSString *, NSObject *> *_Nullable)options {
+    
+    if (options == nil) {
+        return [NSDictionary dictionary];
+    }
     
     NSArray<NSString *> *nonSensitiveFields = @[EXTENSION_OPTION_START_FROM_CONTAINER,
-                                                EXTENSION_OPTION_SUBSCRIPTION_CHECK_SPONSOR_ID,
-                                                @"is-on-demand"];
+                                                EXTENSION_OPTION_SUBSCRIPTION_CHECK_SPONSOR_ID];
     
     return [FeedbackUtils keepFields:nonSensitiveFields
                             fromDict:options];
@@ -36,7 +39,7 @@ startTunnelOptionsFeedbackLog:(NSDictionary<NSString *, NSObject *> *)options {
 }
 
 + (NSDictionary<NSString *, NSString *> *)keepFields:(NSArray<NSString *> *)fieldsToLog
-                                             fromDict:(NSDictionary<NSString *, NSObject *> *)dict {
+                                            fromDict:(NSDictionary<NSString *, NSObject *> *)dict {
         
     NSMutableDictionary<NSString *, NSString *> *nonSensitive = [NSMutableDictionary dictionary];
     

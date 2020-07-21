@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Returns startTunnel options dictionary with non-sensitive data.
 + (NSDictionary<NSString *, NSString *> *)
-startTunnelOptionsFeedbackLog:(NSDictionary<NSString *, NSObject *> *)options;
+startTunnelOptionsFeedbackLog:(NSDictionary<NSString *, NSObject *> *_Nullable)options;
 
 // Returns a projection of `dict` with keys from `fieldsToLog` only.
 + (NSDictionary<NSString *, NSString *> *)keepFields:(NSArray<NSString *> *)fieldsToLog

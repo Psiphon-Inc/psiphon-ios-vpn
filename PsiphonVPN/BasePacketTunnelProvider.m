@@ -198,7 +198,8 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
             self.extensionStartMethod = ExtensionStartMethodFromBoot;
 
         } else if (tunnelStartedFromContainerRecently ||
-                 [((NSString *)options[EXTENSION_OPTION_START_FROM_CONTAINER]) isEqualToString:EXTENSION_OPTION_TRUE]) {
+                   ((options != nil) &&
+                    [((NSString *)options[EXTENSION_OPTION_START_FROM_CONTAINER]) isEqualToString:EXTENSION_OPTION_TRUE])) {
             self.extensionStartMethod = ExtensionStartMethodFromContainer;
 
         } else if (previouslyJetsammed) {
