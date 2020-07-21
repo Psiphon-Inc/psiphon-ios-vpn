@@ -52,6 +52,7 @@
 #import "Strings.h"
 #import "SubscriptionAuthCheck.h"
 #import "StoredAuthorizations.h"
+#import "FeedbackUtils.h"
 
 NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
 
@@ -278,7 +279,7 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
 // VPN should only start if it is started from the container app directly,
 // OR if the user possibly has a valid subscription
 // OR if the extension is started after boot but before being unlocked.
-- (void)startTunnelWithOptions:(NSDictionary<NSString *, NSObject *> *)options
+- (void)startTunnelWithOptions:(NSDictionary<NSString *, NSObject *> *_Nullable)options
                   errorHandler:(void (^)(NSError *error))errorHandler {
 
     __weak PacketTunnelProvider *weakSelf = self;
@@ -292,10 +293,14 @@ withSponsorID:(NSString *_Nonnull *)sponsorID {
     self.cachedSponsorIDs = [PsiphonConfigReader fromConfigFile].sponsorIds;
 
     [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
-                               json:@{@"Event":@"Start",
-                                      @"StartMethod": [self extensionStartMethodTextDescription]}];
+                               json:@{
+                                   @"Event":@"Start",
+                                   @"StartOptions": [FeedbackUtils
+                                                     startTunnelOptionsFeedbackLog:options],
+                                   @"StartMethod": [self extensionStartMethodTextDescription]
+                               }];
     
-    if ([((NSString*)options[EXTENSION_OPTION_SUBSCRIPTION_CHECK_SPONSOR_ID])
+    if (options != nil && [((NSString*)options[EXTENSION_OPTION_SUBSCRIPTION_CHECK_SPONSOR_ID])
          isEqualToString:EXTENSION_OPTION_TRUE]) {
         self.startWithSubscriptionCheckSponsorID = TRUE;
     } else {
