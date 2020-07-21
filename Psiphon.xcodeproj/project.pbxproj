@@ -132,6 +132,7 @@
 		8D7789CA247499110038BFDA /* Reachability+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C9247499110038BFDA /* Reachability+Additions.swift */; };
 		8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */; };
 		8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9E2425E053006F3A2F /* Animations.swift */; };
+		8D90FD5724C748E000E11C66 /* FeedbackUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D90FD5624C748E000E11C66 /* FeedbackUtils.m */; };
 		8D92A33124928E4900F75254 /* SubscriptionBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D92A33024928E4900F75254 /* SubscriptionBarView.swift */; };
 		8D9D9BCC247C6A9D0093220E /* PsiphonRotatingFileFeedbackLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789CF2474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift */; };
 		8D9D9BD0247C6B910093220E /* HardCodedValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9D9BCF247C6B910093220E /* HardCodedValues.swift */; };
@@ -606,6 +607,8 @@
 		8D7789CF2474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonRotatingFileFeedbackLogger.swift; sourceTree = "<group>"; };
 		8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedUIView.swift; sourceTree = "<group>"; };
 		8D7E9B9E2425E053006F3A2F /* Animations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animations.swift; sourceTree = "<group>"; };
+		8D90FD5524C748E000E11C66 /* FeedbackUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FeedbackUtils.h; sourceTree = "<group>"; };
+		8D90FD5624C748E000E11C66 /* FeedbackUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FeedbackUtils.m; sourceTree = "<group>"; };
 		8D92A33024928E4900F75254 /* SubscriptionBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionBarView.swift; sourceTree = "<group>"; };
 		8D9D9BCF247C6B910093220E /* HardCodedValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardCodedValues.swift; sourceTree = "<group>"; };
 		8D9D9C29247C77AB0093220E /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -1429,6 +1432,8 @@
 				CED6796D24A4FAF400C4CA81 /* NSUserDefaults+KeyedDataStore.m */,
 				CED6796E24A4FAF400C4CA81 /* KeyedDataStore.h */,
 				CED6796F24A4FAF400C4CA81 /* NSUserDefaults+KeyedDataStore.h */,
+				8D90FD5524C748E000E11C66 /* FeedbackUtils.h */,
+				8D90FD5624C748E000E11C66 /* FeedbackUtils.m */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -2196,6 +2201,7 @@
 				CED6791524A4F82400C4CA81 /* JetsamPerAppVersionStat.m in Sources */,
 				CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */,
 				EF90D7B1204F231E00228A63 /* timestamp_tm.c in Sources */,
+				8D90FD5724C748E000E11C66 /* FeedbackUtils.m in Sources */,
 				8DD6E7E524591E270041DAC5 /* SubscriptionAuthCheck.m in Sources */,
 				8DD6E7E82459C83B0041DAC5 /* StoredAuthorizations.m in Sources */,
 				EF90D7B3204F232300228A63 /* timestamp_parse.c in Sources */,
