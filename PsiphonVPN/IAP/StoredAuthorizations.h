@@ -24,9 +24,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface StoredAuthorizations : NSObject
 
-@property (nonatomic, nullable) Authorization *subscriptionAuth;
+@property (nonatomic, nullable, readonly) Authorization *subscriptionAuth;
 
-@property (nonatomic, nonnull) NSSet<Authorization *> *nonSubscriptionAuths;
+@property (nonatomic, nonnull, readonly) NSSet<Authorization *> *nonSubscriptionAuths;
 
 - (instancetype _Nonnull)init NS_UNAVAILABLE;
 
@@ -37,6 +37,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 // Returns encoded representation of all auths.
 - (NSArray<NSString *> *)encoded;
+
+- (BOOL)isEqualToStoredAuthorizations:(StoredAuthorizations *_Nonnull)other;
 
 @end
 
