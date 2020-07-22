@@ -165,16 +165,24 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         // If authorizations stored by the container have been updated,
         // reconnects with the updated values.
         
-        if (![self->sessionConfigValues updateStoredAuthorizations]) {
-            return;
+        AuthorizationUpdateResult result = [self->sessionConfigValues updateStoredAuthorizations];
+        switch (result) {
+            case AuthorizationUpdateResultNoChange:
+                return;
+                
+            case AuthorizationUpdateResultNoNewAuths:
+                return;
+                
+            case AuthorizationUpdateResultNewAuthsAvailable: {
+                NSString *sponsorID = nil;
+                NSArray<NSString *> *_Nonnull auths = [self->sessionConfigValues
+                                                       getEncodedAuthsWithSponsorID:&sponsorID];
+                
+                [AppProfiler logMemoryReportWithTag:@"reconnectWithConfig"];
+                [self.psiphonTunnel reconnectWithConfig:sponsorID :auths];
+                break;
+            }
         }
-        
-        NSString *sponsorID = nil;
-        NSArray<NSString *> *_Nonnull auths = [self->sessionConfigValues
-                                               getEncodedAuthsWithSponsorID:&sponsorID];
-        
-        [AppProfiler logMemoryReportWithTag:@"reconnectWithConfig"];
-        [self.psiphonTunnel reconnectWithConfig:sponsorID :auths];
     });
 }
 
@@ -223,11 +231,11 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
         self.extensionStartMethod == ExtensionStartMethodFromCrash ||
-        [sessionConfigValues hasSubscriptionAuth]) {
+        [sessionConfigValues hasSubscriptionAuth] == TRUE) {
 
         [self.sharedDB setExtensionIsZombie:FALSE];
 
-        if (![sessionConfigValues hasSubscriptionAuth] &&
+        if ([sessionConfigValues hasSubscriptionAuth] == FALSE &&
             self.extensionStartMethod == ExtensionStartMethodFromContainer) {
             self.waitForContainerStartVPNCommand = TRUE;
         }
@@ -705,9 +713,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 }
                 break;
             }
-            
-            default:
-                [NSException raise:@"Unknown value" format:@"unknown value %ld", (long)result];
         }
     });
 }

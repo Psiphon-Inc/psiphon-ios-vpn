@@ -27,7 +27,14 @@ PsiFeedbackLogType const SessionConfigValuesLogType = @"SessionConfigValues";
 
 @implementation SessionConfigValues {
     PsiphonDataSharedDB *_Nonnull sharedDB;
-    StoredAuthorizations *_Nonnull storedAuths;
+    
+    // latestAuths contains latest stored authorization,
+    // following any event that changes authorizations.
+    // These events include auth change notifications from the container,
+    // or after the processing of `-onActiveAuthorizationIDs:` callback from tunnel-core.
+    StoredAuthorizations *_Nonnull latestAuths;
+    
+    StoredAuthorizations *_Nullable lastSessionAuths;
     
     // hasRetrievedLatestEncodedAuths flag keeps track of whether
     // latest auths have been retrieved (by calling `getEncodedAuthsWithSponsorID:`) or not.
@@ -40,73 +47,93 @@ PsiFeedbackLogType const SessionConfigValuesLogType = @"SessionConfigValues";
     self = [super init];
     if (self) {
         self->sharedDB = sharedDB;
-        self->storedAuths = [[StoredAuthorizations alloc] initWithPersistedValues];
+        self->latestAuths = [[StoredAuthorizations alloc] initWithPersistedValues];
         self->hasRetrievedLatestEncodedAuths = FALSE;
+        self->lastSessionAuths = nil;
         
         self->_cachedSponsorIDs = [PsiphonConfigReader fromConfigFile].sponsorIds;
-
+        
     }
     return self;
 }
 
-- (BOOL)updateStoredAuthorizations {
+- (AuthorizationUpdateResult)updateStoredAuthorizations {
     
-    StoredAuthorizations *_Nonnull updatedStoredAuths = [[StoredAuthorizations alloc]
-                                                         initWithPersistedValues];
+    if (lastSessionAuths == nil) {
+        @throw [NSException exceptionWithName:@"StateInconsistency"
+                                       reason:@"undefined state"
+                                     userInfo:nil];
+    }
     
-    if ([updatedStoredAuths isEqualToStoredAuthorizations:storedAuths]) {
-        return FALSE;
+    latestAuths = [[StoredAuthorizations alloc] initWithPersistedValues];
+    
+    if ([lastSessionAuths isEqualToStoredAuthorizations:latestAuths]) {
+        // Authorizations have not changed since "last session".
+        return AuthorizationUpdateResultNoChange;
+        
+    } else if ([lastSessionAuths containsAllAuthsFrom:latestAuths]) {
+        // lastSessionAuths is not equal to latestAuths,
+        // but contains all authorization that are in latestAuths.
+        // This implies at least one authorization has been marked
+        // as invalid since "last session".
+        return AuthorizationUpdateResultNoNewAuths;
+        
     } else {
+        // At this point, latestAuths contains authorizations not contained
+        // in lastSessionsAuths.
+        
         [PsiFeedbackLogger infoWithType:SessionConfigValuesLogType
                                 message:@"Updated stored authorizations"];
         
-        storedAuths = updatedStoredAuths;
         hasRetrievedLatestEncodedAuths = FALSE;
-        return TRUE;
+        
+        return AuthorizationUpdateResultNewAuthsAvailable;
     }
     
 }
 
 - (NSArray<NSString *> *)getEncodedAuthsWithSponsorID:(NSString *_Nonnull *_Nullable)sponsorID {
     
-    if (hasRetrievedLatestEncodedAuths) {
+    if (hasRetrievedLatestEncodedAuths == TRUE) {
         @throw [NSException exceptionWithName:@"StateInconsistency"
                                        reason:@"undefined state"
                                      userInfo:nil];
     }
     
+    lastSessionAuths = latestAuths;
     hasRetrievedLatestEncodedAuths = TRUE;
     
-    if (storedAuths.subscriptionAuth == nil) {
+    if (latestAuths.subscriptionAuth == nil) {
         (*sponsorID) = self.cachedSponsorIDs.defaultSponsorId;
     } else {
         (*sponsorID) = self.cachedSponsorIDs.subscriptionSponsorId;
     }
     
-    if (storedAuths.subscriptionAuth != nil) {
+    if (latestAuths.subscriptionAuth != nil) {
         [PsiFeedbackLogger infoWithType:SessionConfigValuesLogType
                                  format:@"provided subscription authorization ID:%@",
-         storedAuths.subscriptionAuth.ID];
+         latestAuths.subscriptionAuth.ID];
     }
     
-    NSSet<NSString *> *_Nonnull nonSubscriptionAuthIDs = storedAuths.nonSubscriptionAuthIDs;
+    NSSet<NSString *> *_Nonnull nonSubscriptionAuthIDs = latestAuths.nonSubscriptionAuthIDs;
     if ([nonSubscriptionAuthIDs count] > 0) {
         [PsiFeedbackLogger infoWithType:SessionConfigValuesLogType
                                  format:@"provided non-subscription authorization IDs:%@",
          nonSubscriptionAuthIDs];
     }
     
-    return [storedAuths encoded];
+    return [latestAuths encoded];
 }
 
 - (ActiveAuthorizationResult)
-setActiveAuthorizationIDs:(NSArray<NSString *> *_Nonnull)authorizationIds; {
+setActiveAuthorizationIDs:(NSArray<NSString *> *_Nonnull)authorizationIds {
     
+    BOOL anyAuthRejected = FALSE;
     ActiveAuthorizationResult result = ActiveAuthorizationResultNone;
     
     // If `hasRetrievedEncodedAuths` is FALSE, then there is no guarantee that the authorizations
     // passed to tunnel-core are the same as the authorizations in `storedAuths`.
-    if (!hasRetrievedLatestEncodedAuths) {
+    if (hasRetrievedLatestEncodedAuths == FALSE) {
         @throw [NSException exceptionWithName:@"StateInconsistency"
                                        reason:@"undefined state"
                                      userInfo:nil];
@@ -114,21 +141,24 @@ setActiveAuthorizationIDs:(NSArray<NSString *> *_Nonnull)authorizationIds; {
     
     // First, identifies if subscription authorization has been marked as invalid
     
-    if (storedAuths.subscriptionAuth != nil) {
-        if (![authorizationIds containsObject:storedAuths.subscriptionAuth.ID]) {
+    if (lastSessionAuths.subscriptionAuth != nil) {
+        if (![authorizationIds containsObject:lastSessionAuths.subscriptionAuth.ID]) {
             
             [PsiFeedbackLogger infoWithType:SessionConfigValuesLogType
                                      format:@"Rejected subscription auth ID '%@'",
-             storedAuths.subscriptionAuth.ID];
+             lastSessionAuths.subscriptionAuth.ID];
             
             // Marks the subscription auth ID as rejected.
-            [SubscriptionAuthCheck addRejectedSubscriptionAuthID:storedAuths.subscriptionAuth.ID];
+            [SubscriptionAuthCheck
+             addRejectedSubscriptionAuthID:lastSessionAuths.subscriptionAuth.ID];
             
             result = ActiveAuthorizationResultInactiveSubscription;
+            
+            anyAuthRejected = TRUE;
         }
     }
     
-    NSSet<NSString *> *_Nonnull nonSubAuthIDs = storedAuths.nonSubscriptionAuthIDs;
+    NSSet<NSString *> *_Nonnull nonSubAuthIDs = lastSessionAuths.nonSubscriptionAuthIDs;
     if ([nonSubAuthIDs count] > 0) {
         
         // Subtracts provided active authorizations `authorizationIds`
@@ -138,20 +168,27 @@ setActiveAuthorizationIDs:(NSArray<NSString *> *_Nonnull)authorizationIds; {
         [rejectedNonSubAuthIDs minusSet:[NSSet setWithArray:authorizationIds]];
         
         if ([rejectedNonSubAuthIDs count] > 0) {
-            // Immediately removes authorization ids that are not accepted.
-            [sharedDB removeNonSubscriptionAuthorizationsNotAccepted:rejectedNonSubAuthIDs];
             
             [PsiFeedbackLogger infoWithType:SessionConfigValuesLogType
                                      format:@"Rejected non-subscription auth IDs: %@",
              rejectedNonSubAuthIDs];
+            
+            // Immediately removes authorization ids that are not accepted.
+            [sharedDB removeNonSubscriptionAuthorizationsNotAccepted:rejectedNonSubAuthIDs];
+            
+            anyAuthRejected = TRUE;
         }
+    }
+    
+    if (anyAuthRejected) {
+        latestAuths = [[StoredAuthorizations alloc] initWithPersistedValues];
     }
     
     return result;
 }
 
 - (BOOL)hasSubscriptionAuth {
-    return (storedAuths.subscriptionAuth != nil);
+    return (latestAuths.subscriptionAuth != nil);
 }
 
 @end
