@@ -639,3 +639,53 @@ extension UIAlertController {
         return alertController
     }
 }
+
+extension UIViewController {
+    
+    /// Represents result of traversing presenting stack search for view controller with type `ViewController`.
+    enum ViewControllerPresent<ViewController: UIViewController> : Equatable {
+        /// Indicates that the view controller is not present in the presenting stack.
+        case notPresent
+        /// Indicates that the view controller is present in the presenting stack, but is not top of the stack.
+        case presentInStack(ViewController)
+        /// Indicates that the view controller is present in presenting stack, and is top of the stack.
+        case presentTopOfStack(ViewController)
+    }
+    
+    func traversePresentingStackFor<ViewController: UIViewController>(
+        type: ViewController.Type
+    ) -> ViewControllerPresent<ViewController> {
+        
+        if let viewController = UIViewController.traversePresentingStackFor(
+            viewControllerType: type, startingFrom: self
+        ) {
+            if viewController == self && viewController.presentedViewController == nil {
+                return .presentTopOfStack(viewController)
+            } else {
+                return .presentInStack(viewController)
+            }
+        } else {
+            return .notPresent
+        }
+    }
+    
+    /// Traverses the presenting stack starting from `topViewController`, searching for view controller
+    /// with type `viewControllerType`.
+    static func traversePresentingStackFor<ViewController: UIViewController>(
+        viewControllerType: ViewController.Type,
+        startingFrom topViewController: UIViewController
+    ) -> ViewController? {
+        
+        if let viewController = topViewController as? ViewController {
+            return .some(viewController)
+        }
+        
+        if let parent = topViewController.presentingViewController {
+            return traversePresentingStackFor(viewControllerType: viewControllerType,
+                                              startingFrom: parent)
+        }
+        
+        return .none
+    }
+    
+}

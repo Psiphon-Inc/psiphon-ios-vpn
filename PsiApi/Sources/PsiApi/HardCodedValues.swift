@@ -67,3 +67,13 @@ public struct UrlRequestParameters {
     public static let timeoutInterval: TimeInterval = 60.0
     
 }
+
+public struct PsiphonDeepLinking {
+    
+    public static let scheme = "psiphon"
+    
+    public static let psiCashHost = "psicash"
+    
+    public static let psiCashDeepLink = URL(string: "\(scheme)://\(psiCashHost)")!
+    
+}
