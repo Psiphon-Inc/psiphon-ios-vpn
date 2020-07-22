@@ -91,7 +91,7 @@ import PsiCashClient
     
     @objc func makePsiCashViewController(
         _ initialTab: PsiCashViewController.Tabs
-    ) -> UIViewController?
+    ) -> UIViewController
     @objc func getCustomRewardData(_ callback: @escaping (String?) -> Void)
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError>
     @objc func buyAppStoreSubscriptionProduct(
