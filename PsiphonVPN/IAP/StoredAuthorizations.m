@@ -65,6 +65,31 @@
     return auths;
 }
 
+- (BOOL)containsAllAuthsFrom:(StoredAuthorizations *_Nonnull)other {
+    
+    // Checks if `other` has subscription auth not contained in self.
+    if (other.subscriptionAuth != nil) {
+        if (self.subscriptionAuth.ID != other.subscriptionAuth.ID) {
+            // `other` contains subscription auth not contained in self.
+            return FALSE;
+        }
+    }
+    
+    // Checks if `other` has non-subscription auths not contained in self.
+    
+    NSSet<NSString *> *selfNonSubAuthIDs = [self nonSubscriptionAuthIDs];
+    
+    for (NSString *_Nonnull otherAuthID in other.nonSubscriptionAuthIDs) {
+        if (![selfNonSubAuthIDs containsObject:otherAuthID]) {
+            // `other` contains a non-subscription auth not contained in self.
+            return FALSE;
+        }
+    }
+    
+    // All auths contained in `other` are also contained in `self`.
+    return TRUE;
+}
+
 - (BOOL)isEqual:(id)object {
     if (self == object) {
         return TRUE;

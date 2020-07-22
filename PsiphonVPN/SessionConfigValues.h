@@ -33,6 +33,18 @@ typedef NS_ENUM(NSInteger, ActiveAuthorizationResult) {
     ActiveAuthorizationResultInactiveSubscription = 1
 };
 
+typedef NS_ENUM(NSInteger, AuthorizationUpdateResult) {
+    
+    // There has been no changes to authorizations
+    AuthorizationUpdateResultNoChange = 0,
+    
+    // There are new authorizations available, needs to reconnect
+    AuthorizationUpdateResultNewAuthsAvailable = 1,
+    
+    // Stored authorizations have been updated, but there are no new auths
+    AuthorizationUpdateResultNoNewAuths = 2
+};
+
 // SessionConfigValues represents some of the values supplied to tunnel-core in a session.
 // A session is defined by when a new set of parameters are passed to tunnel-core,
 // through calls to either `-getPsiphonConfig` or `-reconnectWithConfig::`.
@@ -47,16 +59,25 @@ typedef NS_ENUM(NSInteger, ActiveAuthorizationResult) {
 
 - (instancetype)initWithSharedDB:(PsiphonDataSharedDB *)sharedDB NS_DESIGNATED_INITIALIZER;
 
-// Returns TRUE if authorizations have been updated.
-// Can call `getEncodedAuthsWithSponsorID:` to get the new authorizations.
-- (BOOL)updateStoredAuthorizations;
+// Checks for updated in stored authorizations relative to last time
+// since `-getEncodedAuthsWithSponsorID:` was called.
+//
+// -Note: Can call `getEncodedAuthsWithSponsorID:` to get the new authorizations.
+//
+// - Important: Throws an exception if this function is called before a call
+// to `-getEncodedAuthsWithSponsorID:` for the first time.
+- (AuthorizationUpdateResult)updateStoredAuthorizations;
 
 // Returns array of authorizations to be passed to tunnel-core, and populates `sponsorID`
 // with the appropriate value depending on the authorizations present.
+//
 // - Important: Throws an exception if this function is called more than once, unless
-// call to `updateStoredAuthorizations` returns TRUE.
+// call to `updateStoredAuthorizations` returns AuthorizationUpdateResultNewAuthsAvailable.
 - (NSArray<NSString *> *)getEncodedAuthsWithSponsorID:(NSString *_Nonnull *_Nullable)sponsorID;
 
+// Sets which of the authorizations returned from previous call to `-getEncodedAuthsWithSponsorID:`
+// are active.
+// 
 // - Important: Throws an exception if `getEncodedAuthsWithSponsorID:` has not
 // already been called.
 - (ActiveAuthorizationResult)

@@ -38,6 +38,9 @@ NS_ASSUME_NONNULL_BEGIN
 // Returns encoded representation of all auths.
 - (NSArray<NSString *> *)encoded;
 
+// Returns TRUE if all authorizations contained in `other` are also contained in `self`.
+- (BOOL)containsAllAuthsFrom:(StoredAuthorizations *_Nonnull)other;
+
 - (BOOL)isEqualToStoredAuthorizations:(StoredAuthorizations *_Nonnull)other;
 
 @end
