@@ -378,36 +378,42 @@ extension SwiftDelegate: SwiftBridgeDelegate {
 
         // Open add PsiCash screen when the user navigates to "psiphon://psicash".
         if let scheme = url.scheme,
-            scheme == "psiphon",
-            let host = url.host,
-            host == "psicash" {
+           scheme == "psiphon",
+           let host = url.host {
 
-            let topMostViewController = AppDelegate.getTopMostViewController()
+            let psiCashDeepLinks =
+                ["psicash": PsiCashViewController.Tabs.addPsiCash,
+                 "speedboost": PsiCashViewController.Tabs.speedBoost]
 
-            /// Walk up the presenting stack and return the first `PsiCashViewController` found.
-            func findPsiCashViewController(vc: UIViewController) -> PsiCashViewController? {
-                if let psiCashViewController = vc as? PsiCashViewController {
-                    return .some(psiCashViewController)
+            if let psiCashTab = psiCashDeepLinks[host] {
+
+                let topMostViewController = AppDelegate.getTopMostViewController()
+
+                /// Walk up the presenting stack and return the first `PsiCashViewController` found.
+                func findPsiCashViewController(vc: UIViewController) -> PsiCashViewController? {
+                    if let psiCashViewController = vc as? PsiCashViewController {
+                        return .some(psiCashViewController)
+                    }
+                    if let parent = vc.presentingViewController {
+                        return findPsiCashViewController(vc: parent)
+                    }
+                    return .none
                 }
-                if let parent = vc.presentingViewController {
-                    return findPsiCashViewController(vc: parent)
+
+                // Ensure the PsiCash view controller is either the top most view controller
+                // or in the presented view hierarchy.
+                if let psiCashViewController = findPsiCashViewController(vc: topMostViewController) {
+                    if psiCashViewController == topMostViewController {
+                        psiCashViewController.activeTab = psiCashTab
+                    }
+                } else if let psiCashViewController = makePsiCashViewController(psiCashTab) {
+                    AppDelegate.getTopMostViewController().present(psiCashViewController,
+                                                                   animated: true,
+                                                                   completion: .none)
                 }
-                return .none
+
+                return true
             }
-
-            // Ensure the PsiCash view controller is either the top most view controller
-            // or in the presented view hierarchy.
-            if let psiCashViewController = findPsiCashViewController(vc: topMostViewController) {
-                if psiCashViewController == topMostViewController {
-                    psiCashViewController.activeTab = .addPsiCash
-                }
-            } else if let psiCashViewController = makePsiCashViewController(.addPsiCash) {
-                AppDelegate.getTopMostViewController().present(psiCashViewController,
-                                                               animated: true,
-                                                               completion: .none)
-            }
-
-            return true
         }
 
         return false
