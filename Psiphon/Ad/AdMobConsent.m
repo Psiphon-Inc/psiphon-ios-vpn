@@ -78,7 +78,7 @@ PsiFeedbackLogType const AdMobConsentLogType = @"AdMobConsent";
                   }
 
                   // Present the Google-rendered consent form.
-                  [form presentFromViewController:[AppDelegate getTopMostViewController]
+                  [form presentFromViewController:[AppDelegate getTopPresentedViewController]
                     dismissCompletion:^(NSError *error, BOOL userPrefersAdFree) {
 
                         if (error) {

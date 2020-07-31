@@ -379,7 +379,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // Opens "Add PsiCash" screen when the user navigates to "psiphon://psicash".
         if PsiphonDeepLinking.psiCashDeepLink.isEqualInSchemeAndHost(to: url) {
             
-            let topMostViewController = AppDelegate.getTopMostViewController()
+            let topMostViewController = AppDelegate.getTopPresentedViewController()
             
             let found = topMostViewController
                 .traversePresentingStackFor(type: PsiCashViewController.self)

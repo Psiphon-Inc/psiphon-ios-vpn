@@ -204,7 +204,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
             // We always want to start the tunnel after the presentation signal
             // is completed, no matter if it presented an ad or it failed.
             return [[AdManager.sharedInstance
-                     presentInterstitialOnViewController:[AppDelegate getTopMostViewController]]
+                     presentInterstitialOnViewController:[AppDelegate getTopPresentedViewController]]
                     then:^RACSignal * {
                 return [RACSignal return:value];
             }];
@@ -309,7 +309,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
 #pragma mark -
 
-+ (UIViewController *)getTopMostViewController {
++ (UIViewController *)getTopPresentedViewController {
     UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
     while(topController.presentedViewController) {
         topController = topController.presentedViewController;
@@ -431,7 +431,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // function call is still present by the time the ad is loaded and ready to be presented.
     // Note that the guarantee is strong only if `weakTopMostVC.beingDismissed` flag is checked
     // immediately before presenting.
-    UIViewController *__weak weakTopMostVC = [AppDelegate getTopMostViewController];
+    UIViewController *__weak weakTopMostVC = [AppDelegate getTopPresentedViewController];
 
     LOG_DEBUG(@"rewarded video started");
 
@@ -556,7 +556,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     UINavigationController* navCtrl = [[UINavigationController alloc]
                                        initWithRootViewController:iapViewController];
     
-    [[AppDelegate getTopMostViewController] presentViewController:navCtrl
+    [[AppDelegate getTopPresentedViewController] presentViewController:navCtrl
                                                          animated:TRUE
                                                        completion:nil];
 }
