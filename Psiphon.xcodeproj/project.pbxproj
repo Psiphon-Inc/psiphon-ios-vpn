@@ -115,6 +115,7 @@
 		8D1F62C0247DC3350028AFAF /* Authorization+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */; };
 		8D1F62C2247DC4840028AFAF /* PsiCashClient+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */; };
 		8D255E2D24620E2900FD5D1C /* NoConnectionBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */; };
+		8D26455F24D4842E000F46C0 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D26455E24D4842E000F46C0 /* Navigator.swift */; };
 		8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E982411954A00FEE587 /* PsiCashReducer.swift */; };
 		8D417EB124147C6D00FEE587 /* LandingPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB024147C6D00FEE587 /* LandingPage.swift */; };
 		8D417EB324148C1E00FEE587 /* URLHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB224148C1E00FEE587 /* URLHandler.swift */; };
@@ -586,6 +587,7 @@
 		8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Authorization+Additions.swift"; sourceTree = "<group>"; };
 		8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PsiCashClient+Additions.swift"; sourceTree = "<group>"; };
 		8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoConnectionBannerView.swift; sourceTree = "<group>"; };
+		8D26455E24D4842E000F46C0 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		8D417E982411954A00FEE587 /* PsiCashReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashReducer.swift; sourceTree = "<group>"; };
 		8D417EB024147C6D00FEE587 /* LandingPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingPage.swift; sourceTree = "<group>"; };
 		8D417EB224148C1E00FEE587 /* URLHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLHandler.swift; sourceTree = "<group>"; };
@@ -1358,6 +1360,7 @@
 				8DCA6863247C7CF8001D026E /* Bindable.swift */,
 				8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */,
 				8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */,
+				8D26455E24D4842E000F46C0 /* Navigator.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -2145,6 +2148,7 @@
 				A8408AACE30F860F2C961A04 /* WhiteSkyButton.m in Sources */,
 				A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */,
 				8D9E603524366D71003A46D8 /* FeedbackDescriptions.swift in Sources */,
+				8D26455F24D4842E000F46C0 /* Navigator.swift in Sources */,
 				CED6791B24A4F88D00C4CA81 /* JSONCodable.m in Sources */,
 				A8408FA13890CD67154033C6 /* RegionSelectionButton.m in Sources */,
 				A8408E611665FC60D5DFF339 /* SubscriptionStatusView.m in Sources */,

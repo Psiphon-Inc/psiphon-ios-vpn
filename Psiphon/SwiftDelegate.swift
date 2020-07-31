@@ -80,6 +80,7 @@ func appDelegateReducer(
     
     static let instance = SwiftDelegate()
     
+    private var navigator = Navigator()
     private let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER)
     private let feedbackLogger = FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler())
     private let supportedProducts =
@@ -141,6 +142,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         _ application: UIApplication, objcBridge: ObjCBridgeDelegate
     ) {
         self.feedbackLogger.immediate(.info, "applicationDidFinishLaunching")
+        
+        navigator.register(url: PsiphonDeepLinking.psiCashDeepLink) { [unowned self] in
+            self.tryPresentPsiCashViewController(.addPsiCash)
+            return true
+        }
         
         self.objcBridge = objcBridge
         
@@ -375,32 +381,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func application(_ app: UIApplication,
                            open url: URL,
                            options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-
-        // Opens "Add PsiCash" screen when the user navigates to "psiphon://psicash".
-        if PsiphonDeepLinking.psiCashDeepLink.isEqualInSchemeAndHost(to: url) {
-            
-            let topMostViewController = AppDelegate.getTopPresentedViewController()
-            
-            let found = topMostViewController
-                .traversePresentingStackFor(type: PsiCashViewController.self)
-            
-            switch found {
-            case .presentInStack(_):
-                // NO-OP if
-                break
-                
-            case .presentTopOfStack(let psiCashViewController):
-                psiCashViewController.activeTab = .addPsiCash
-                
-            case .notPresent:
-                let psiCashViewController = makePsiCashViewController(.addPsiCash)
-                topMostViewController.present(psiCashViewController, animated: true)
-            }
-
-           return true
-        }
         
-        return false
+        return navigator.handle(url: url)
     }
     
     @objc func makeSubscriptionBarView() -> SubscriptionBarView {
@@ -666,4 +648,28 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func getLocaleForCurrentAppLanguage() -> NSLocale {
         return self.userDefaultsConfig.localeForAppLanguage as NSLocale
     }
+}
+
+fileprivate extension SwiftDelegate {
+    
+    func tryPresentPsiCashViewController(_ tab: PsiCashViewController.Tabs) {
+        let topMostViewController = AppDelegate.getTopPresentedViewController()
+        
+        let found = topMostViewController
+            .traversePresentingStackFor(type: PsiCashViewController.self)
+        
+        switch found {
+        case .presentInStack(_):
+            // NO-OP if
+            break
+            
+        case .presentTopOfStack(let psiCashViewController):
+            psiCashViewController.activeTab = tab
+            
+        case .notPresent:
+            let psiCashViewController = makePsiCashViewController(tab)
+            topMostViewController.present(psiCashViewController, animated: true)
+        }
+    }
+    
 }
