@@ -148,6 +148,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             return true
         }
         
+        navigator.register(url: PsiphonDeepLinking.speedBoostDeepLink) { [unowned self] in
+            self.tryPresentPsiCashViewController(.speedBoost)
+            return true
+        }
+        
         self.objcBridge = objcBridge
         
         self.psiCashLib = PsiCash.make(flags: Debugging)

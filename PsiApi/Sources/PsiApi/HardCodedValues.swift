@@ -74,6 +74,8 @@ public struct PsiphonDeepLinking {
     
     public static let psiCashHost = "psicash"
     
-    public static let psiCashDeepLink = URL(string: "\(scheme)://\(psiCashHost)")!
+    public static let speedBoostHost = "speedboost"
     
+    public static let psiCashDeepLink = URL(string: "\(scheme)://\(psiCashHost)")!
+    public static let speedBoostDeepLink = URL(string: "\(scheme)://\(speedBoostHost)")!
 }
