@@ -240,7 +240,8 @@ PsiFeedbackLogType const FeedbackUploadLogType = @"FeedbackUpload";
 #pragma mark - Helpers
 
 - (void)showUploadInProgressView {
-    uploadProgressAlert = [MBProgressHUD showHUDAddedTo:AppDelegate.getTopMostViewController.view animated:YES];
+    uploadProgressAlert = [MBProgressHUD showHUDAddedTo:
+                           [AppDelegate getTopPresentedViewController].view animated:YES];
     uploadProgressAlert.mode = MBProgressHUDModeIndeterminate;
     uploadProgressAlert.label.text = NSLocalizedStringWithDefaultValue(@"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE", nil, [NSBundle mainBundle], @"Sending feedback…", @"Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers.");
     uploadProgressAlert.label.adjustsFontSizeToFitWidth = YES;
