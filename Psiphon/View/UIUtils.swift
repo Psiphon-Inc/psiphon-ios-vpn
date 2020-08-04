@@ -688,4 +688,20 @@ extension UIViewController {
         return .none
     }
     
+    /// Presents a view controller modally, and returns `true` if operation succeeded, returns `false` otherwise.
+    func safePresent(
+        _ viewControllerToPresent: UIViewController,
+        animated flag: Bool,
+        completion: (() -> Void)? = nil
+    ) -> Bool {
+        self.present(viewControllerToPresent, animated: flag, completion: completion)
+        
+        // `isBeingPresented` value here is interpreted as meaning that
+        // the view controller will be presented soon and that the operation
+        // has not failed (e.g. if `self` is already presenting another view controller).
+        // Documentation is sparse on this, and this interpretation might need to be
+        // re-evaluated at some point in the future.
+        return viewControllerToPresent.isBeingPresented
+    }
+    
 }

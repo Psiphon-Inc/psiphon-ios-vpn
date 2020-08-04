@@ -83,7 +83,11 @@ typedef NS_ENUM(NSInteger, AuthorizationUpdateResult) {
 - (ActiveAuthorizationResult)
 setActiveAuthorizationIDs:(NSArray<NSString *> *_Nonnull)authorizationIds;
 
+// Returns TRUE if latest stored auths contain a subscription auth.
 - (BOOL)hasSubscriptionAuth;
+
+// Returns TRUE if the latest stored auths contain a speed-boost or subscription auth.
+- (BOOL)hasActiveSpeedBoostOrSubscription;
 
 @end
 

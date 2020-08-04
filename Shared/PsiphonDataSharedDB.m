@@ -64,6 +64,12 @@ UserDefaultsKey const ContainerForegroundStateBoolKey =
 
 UserDefaultsKey const ContainerTunnelIntentStatusIntKey = @"container_tunnel_intent_status_key";
 
+UserDefaultsKey const ExtensionDisallowedTrafficAlertWriteSeqIntKey =
+@"extension_disallowed_traffic_alert_write_seq_int";
+
+UserDefaultsKey const ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey =
+@"container_disallowed_traffic_alert_read_at_least_up_to_seq_int";
+
 /**
  * Key for boolean value that when TRUE indicates that the extension crashed before stop was called.
  * This value is only valid if the extension is not currently running.
@@ -352,6 +358,16 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
     [sharedDefaults setObject:rfc3339Date forKey:TunnelStartTimeStringKey];
 }
 
+#if !(TARGET_IS_EXTENSION)
+- (void)setContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum:(NSInteger)seq {
+    [sharedDefaults setInteger:seq forKey:ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey];
+}
+
+- (NSInteger)getContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum {
+    return [sharedDefaults integerForKey:ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey];
+}
+#endif
+
 #pragma mark - Extension Data (Data originating in the extension)
 
 // TODO: is timestamp needed? Maybe we can use this to detect staleness later
@@ -381,6 +397,16 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 
 - (BOOL)getExtensionIsZombie {
     return [sharedDefaults boolForKey:ExtensionIsZombieBoolKey];
+}
+
+- (void)incrementDisallowedTrafficAlertWriteSequenceNum {
+    NSInteger lastSeq = [self getDisallowedTrafficAlertWriteSequenceNum];
+    [sharedDefaults setInteger:(lastSeq + 1)
+                        forKey:ExtensionDisallowedTrafficAlertWriteSeqIntKey];
+}
+
+- (NSInteger)getDisallowedTrafficAlertWriteSequenceNum {
+    return [sharedDefaults integerForKey:ExtensionDisallowedTrafficAlertWriteSeqIntKey];
 }
 
 - (NSArray<Homepage *> *_Nullable)getHomepages {

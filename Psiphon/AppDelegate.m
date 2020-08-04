@@ -143,6 +143,10 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
 }
 
+- (void)applicationWillResignActive:(UIApplication *)application {
+    [SwiftDelegate.bridge applicationWillResignActive:application];
+}
+
 - (void)applicationDidEnterBackground:(UIApplication *)application {
     LOG_DEBUG();
     // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
@@ -288,13 +292,13 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 #pragma mark - Notifier callback
 
 - (void)onMessageReceived:(NotifierMessage)message {
+    LOG_DEBUG(@"Received notification: '%@'", message);
+    
     if ([NotifierTunnelConnected isEqualToString:message]) {
-        LOG_DEBUG(@"Received notification NE.tunnelConnected");
         [SwiftDelegate.bridge syncWithTunnelProviderWithReason:
          TunnelProviderSyncReasonProviderNotificationPsiphonTunnelConnected];
 
     } else if ([NotifierAvailableEgressRegions isEqualToString:message]) {
-        LOG_DEBUG(@"Received notification NE.onAvailableEgressRegions");
         // Update available regions
         __weak AppDelegate *weakSelf = self;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -304,6 +308,9 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
     } else if ([NotifierNetworkConnectivityFailed isEqualToString:message]) {
         // TODO: fix
+        
+    } else if ([NotifierDisallowedTrafficAlert isEqualToString:message]) {
+        [SwiftDelegate.bridge disallowedTrafficAlertNotification];
     }
 }
 
@@ -311,7 +318,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
 + (UIViewController *)getTopPresentedViewController {
     UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    while(topController.presentedViewController) {
+    while(topController.presentedViewController != nil) {
         topController = topController.presentedViewController;
     }
     return topController;
