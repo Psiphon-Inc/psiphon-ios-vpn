@@ -41,7 +41,7 @@
 }
 
 - (void)presentFromTopController {
-    [[AppDelegate getTopMostViewController]
+    [[AppDelegate getTopPresentedViewController]
       presentViewController:self animated:TRUE completion:nil];
 }
 

@@ -72,7 +72,7 @@ struct PsiCashBalanceViewModel: Equatable {
                                 preferredStyle: .alert)
                             alert.addAction(.init(title: UserStrings.Done_button_title(),
                                                   style: .default, handler: nil))
-                            AppDelegate.getTopMostViewController().present(alert,
+                            AppDelegate.getTopPresentedViewController().present(alert,
                                                                            animated: true,
                                                                            completion: nil)
                            })))
