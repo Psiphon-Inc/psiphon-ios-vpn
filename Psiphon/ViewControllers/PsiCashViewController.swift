@@ -87,7 +87,7 @@ final class PsiCashViewController: ReactiveViewController {
     
     struct ObservedState: Equatable {
         let state: PsiCashViewControllerState
-        let activeTab: PsiCashViewController.Tabs
+        let activeTab: PsiCashViewController.PsiCashViewControllerTabs
         let tunneled: TunnelConnectedStatus
         let lifeCycle: ViewControllerLifeCycle
     }
@@ -98,7 +98,7 @@ final class PsiCashViewController: ReactiveViewController {
         case speedBoostPurchaseDialog
     }
     
-    @objc enum Tabs: Int, UICases {
+    @objc enum PsiCashViewControllerTabs: Int, UICases {
         case addPsiCash
         case speedBoost
         
@@ -120,7 +120,7 @@ final class PsiCashViewController: ReactiveViewController {
     
     /// Active view in the view controller.
     /// - Warning: Must only be set from the main thread.
-    @State var activeTab: Tabs
+    @State var activeTab: PsiCashViewControllerTabs
     private var navigation: Screen = .mainScreen
     
     /// Set of presented error alerts.
@@ -130,13 +130,13 @@ final class PsiCashViewController: ReactiveViewController {
     // Views
     private let balanceView = PsiCashBalanceView(frame: .zero)
     private let closeButton = CloseButton(frame: .zero)
-    private let tabControl = TabControlView<Tabs>()
+    private let tabControl = TabControlView<PsiCashViewControllerTabs>()
     
     private let container: EitherView<AddPsiCashViewType, SpeedBoostViewType>
     private let containerView = UIView(frame: .zero)
     private let containerBindable: EitherView<AddPsiCashViewType, SpeedBoostViewType>.BuildType
     
-    init(initialTab: Tabs,
+    init(initialTab: PsiCashViewControllerTabs,
          store: Store<PsiCashViewControllerState, PsiCashAction>,
          iapStore: Store<Utilities.Unit, IAPAction>,
          productRequestStore: Store<Utilities.Unit, ProductRequestAction>,

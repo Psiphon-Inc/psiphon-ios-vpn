@@ -42,7 +42,8 @@
 #import "Strings.h"
 #import "WhiteSkyButton.h"
 #import "SubscriptionStatusView.h"
-
+#import "RootContainerController.h"
+#import "IAPViewController.h"
 
 // Ads
 #import "AdControllerWrapper.h"

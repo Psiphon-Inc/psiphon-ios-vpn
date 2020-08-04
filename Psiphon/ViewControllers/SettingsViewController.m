@@ -140,7 +140,7 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
     }
 }
 
-#pragma mark - Table constuctor methods
+#pragma mark - Table constructor methods
 
 - (void)settingsViewController:(IASKAppSettingsViewController*)sender
                      tableView:(UITableView *)tableView
@@ -220,7 +220,7 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 
 - (void)openPsiCashViewController {
     UIViewController *psiCashViewController = [SwiftDelegate.bridge
-                                               makePsiCashViewController:TabsAddPsiCash];
+                                               makePsiCashViewController:PsiCashViewControllerTabsAddPsiCash];
     [self presentViewController:psiCashViewController animated:YES completion:nil];
 }
 

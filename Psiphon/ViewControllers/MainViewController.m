@@ -54,6 +54,7 @@
 #import "UIView+Additions.h"
 #import "AppObservables.h"
 #import <PersonalizedAdConsent/PersonalizedAdConsent.h>
+#import "Psiphon-Swift.h"
 
 PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 
@@ -1050,30 +1051,22 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self presentViewController:navController animated:YES completion:nil];
 }
 
-#pragma mark - Subscription
-
-- (void)openIAPViewController {
-    IAPViewController *iapViewController = [[IAPViewController alloc] init];
-    iapViewController.openedFromSettings = NO;
-    UINavigationController *navController = [[UINavigationController alloc]
-      initWithRootViewController:iapViewController];
-    [self presentViewController:navController animated:YES completion:nil];
-}
-
 #pragma mark - PsiCash
 
 #pragma mark - PsiCash UI
 
-- (void)addPsiCashButtonTapped {
+- (void)presentPsiCashViewController:(PsiCashViewControllerTabs)tab {
     UIViewController *psiCashViewController = [SwiftDelegate.bridge
-                                               makePsiCashViewController:TabsAddPsiCash];
+                                               makePsiCashViewController:tab];
     [self presentViewController:psiCashViewController animated:YES completion:nil];
 }
 
+- (void)addPsiCashButtonTapped {
+    [self presentPsiCashViewController:PsiCashViewControllerTabsAddPsiCash];
+}
+
 - (void)speedBoostButtonTapped {
-    UIViewController *psiCashViewController = [SwiftDelegate.bridge
-                                               makePsiCashViewController:TabsSpeedBoost];
-    [self presentViewController:psiCashViewController animated:YES completion:nil];
+    [self presentPsiCashViewController:PsiCashViewControllerTabsSpeedBoost];
 }
 
 - (void)setupPsiphonLogoView {

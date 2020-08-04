@@ -506,3 +506,19 @@ extension UserStrings {
     }
     
 }
+
+// MARK: Disallowed traffic
+extension UserStrings {
+    
+    static func Upgrade_psiphon() -> String {
+        return NSLocalizedString("UPGRADE_PSIPHON", tableName: nil, bundle: Bundle.main,
+                                 value: "Upgrade Psiphon",
+                                 comment: "Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request.")
+    }
+    
+    static func Disallowed_traffic_alert_message() -> String {
+        return NSLocalizedString("DISALLOWED_TRAFFIC_ALERT_MESSAGE", tableName: nil, bundle: Bundle.main,
+                                 value: "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.",
+                                 comment: "Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request.")
+    }
+}

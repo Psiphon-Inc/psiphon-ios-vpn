@@ -60,6 +60,12 @@
 /* Decline button title */
 "DECLINE_BUTTON_TITLE" = "Decline";
 
+/* Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
+"DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
+
+/* Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
+"DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
+
 /* Text next to the button indicating to the user that the rewarded video advertisement is only available when they are not connected to Psiphon. Do not translate or transliterate 'PsiCash'. Do not translate or transliterate 'Psiphon'. */
 "DISCONNECT_TO_WATCH_AND_EARN_PSICASH" = "You must disconnect from Psiphon to watch a video to earn PsiCash";
 
@@ -374,6 +380,9 @@
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Please turn on cellular data or use Wi-Fi.";
+
+/* Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
+"UPGRADE_PSIPHON" = "Upgrade Psiphon";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "An error occurred while starting Psiphon. Please try again.";

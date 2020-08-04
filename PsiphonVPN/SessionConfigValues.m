@@ -191,4 +191,20 @@ setActiveAuthorizationIDs:(NSArray<NSString *> *_Nonnull)authorizationIds {
     return (latestAuths.subscriptionAuth != nil);
 }
 
+- (BOOL)hasActiveSpeedBoostOrSubscription {
+    
+    if (latestAuths.subscriptionAuth != nil) {
+        return TRUE;
+    }
+    
+    for (Authorization *nonSubAuth in latestAuths.nonSubscriptionAuths) {
+        if (nonSubAuth.accessTypeValue == AuthorizationAccessTypeSpeedBoost ||
+            nonSubAuth.accessTypeValue == AuthorizationAccessTypeSpeedBoostTest) {
+            return TRUE;
+        }
+    }
+    
+    return FALSE;
+}
+
 @end

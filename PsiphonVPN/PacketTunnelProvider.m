@@ -741,6 +741,23 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     });
 }
 
+- (void)onServerAlert:(NSString *)reason :(NSString *)subject {
+    dispatch_async(self->workQueue, ^{
+        if ([reason isEqualToString:@"disallowed-traffic"] && [subject isEqualToString:@""]) {
+            
+            // Determines if the user is subscribed or speed-boosted.
+            if ([self->sessionConfigValues hasActiveSpeedBoostOrSubscription] == FALSE) {
+                
+                // Notifies the extension of the server alert.
+                [self.sharedDB incrementDisallowedTrafficAlertWriteSequenceNum];
+                [[Notifier sharedInstance] post:NotifierDisallowedTrafficAlert];
+                
+                [self displayMessage:NSLocalizedStringWithDefaultValue(@"DISALLOWED_TRAFFIC_EXTENSION_ALERT", nil, [NSBundle mainBundle], @"Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.", @"Alert dialog which is shown to the user when if unsupported Internet traffic has been requested")];
+            }
+        }
+    });
+}
+
 - (void)onAvailableEgressRegions:(NSArray *)regions {
     [self.sharedDB setEmittedEgressRegions:regions];
 

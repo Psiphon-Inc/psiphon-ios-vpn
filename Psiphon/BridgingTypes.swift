@@ -80,6 +80,7 @@ import PsiCashClient
     @objc func applicationWillEnterForeground(_ application: UIApplication)
     @objc func applicationDidEnterBackground(_ application: UIApplication)
     @objc func applicationDidBecomeActive(_ application: UIApplication)
+    @objc func applicationWillResignActive(_ application: UIApplication)
     @objc func applicationWillTerminate(_ application: UIApplication)
     @objc func application(_ app: UIApplication,
                            open url: URL,
@@ -90,7 +91,7 @@ import PsiCashClient
     @objc func makeSubscriptionBarView() -> SubscriptionBarView
     
     @objc func makePsiCashViewController(
-        _ initialTab: PsiCashViewController.Tabs
+        _ initialTab: PsiCashViewController.PsiCashViewControllerTabs
     ) -> UIViewController
     @objc func getCustomRewardData(_ callback: @escaping (String?) -> Void)
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError>
@@ -101,6 +102,7 @@ import PsiCashClient
     @objc func getAppStoreSubscriptionProductIDs() -> Set<String>
     @objc func getAppStateFeedbackEntry(completionHandler: @escaping (String) -> Void)
     @objc func isCurrentlySpeedBoosted(completionHandler: @escaping (Bool) -> Void)
+    @objc func disallowedTrafficAlertNotification()
     
     // VPN
     
