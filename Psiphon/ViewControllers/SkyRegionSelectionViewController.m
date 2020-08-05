@@ -34,7 +34,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.title = [Strings connectViaTitle];
+    self.title = [Strings selectServerRegionTitle];
     [self populateRegionsArray];
 
     // Listen to notification from client common library for when regions are updated.

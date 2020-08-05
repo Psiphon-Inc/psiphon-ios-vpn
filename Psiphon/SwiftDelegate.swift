@@ -80,6 +80,7 @@ func appDelegateReducer(
     
     static let instance = SwiftDelegate()
     
+    private var navigator = Navigator()
     private let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER)
     private let feedbackLogger = FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler())
     private let supportedProducts =
@@ -141,6 +142,16 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         _ application: UIApplication, objcBridge: ObjCBridgeDelegate
     ) {
         self.feedbackLogger.immediate(.info, "applicationDidFinishLaunching")
+        
+        navigator.register(url: PsiphonDeepLinking.psiCashDeepLink) { [unowned self] in
+            self.tryPresentPsiCashViewController(.addPsiCash)
+            return true
+        }
+        
+        navigator.register(url: PsiphonDeepLinking.speedBoostDeepLink) { [unowned self] in
+            self.tryPresentPsiCashViewController(.speedBoost)
+            return true
+        }
         
         self.objcBridge = objcBridge
         
@@ -375,42 +386,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func application(_ app: UIApplication,
                            open url: URL,
                            options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
-
-        // Open add PsiCash screen when the user navigates to "psiphon://psicash".
-        if let scheme = url.scheme,
-            scheme == "psiphon",
-            let host = url.host,
-            host == "psicash" {
-
-            let topMostViewController = AppDelegate.getTopMostViewController()
-
-            /// Walk up the presenting stack and return the first `PsiCashViewController` found.
-            func findPsiCashViewController(vc: UIViewController) -> PsiCashViewController? {
-                if let psiCashViewController = vc as? PsiCashViewController {
-                    return .some(psiCashViewController)
-                }
-                if let parent = vc.presentingViewController {
-                    return findPsiCashViewController(vc: parent)
-                }
-                return .none
-            }
-
-            // Ensure the PsiCash view controller is either the top most view controller
-            // or in the presented view hierarchy.
-            if let psiCashViewController = findPsiCashViewController(vc: topMostViewController) {
-                if psiCashViewController == topMostViewController {
-                    psiCashViewController.activeTab = .addPsiCash
-                }
-            } else if let psiCashViewController = makePsiCashViewController(.addPsiCash) {
-                AppDelegate.getTopMostViewController().present(psiCashViewController,
-                                                               animated: true,
-                                                               completion: .none)
-            }
-
-            return true
-        }
-
-        return false
+        
+        return navigator.handle(url: url)
     }
     
     @objc func makeSubscriptionBarView() -> SubscriptionBarView {
@@ -432,7 +409,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     
     @objc func makePsiCashViewController(
         _ initialTab: PsiCashViewController.Tabs
-    ) -> UIViewController? {
+    ) -> UIViewController {
         PsiCashViewController(
             initialTab: initialTab,
             store: self.store.projection(
@@ -676,4 +653,28 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func getLocaleForCurrentAppLanguage() -> NSLocale {
         return self.userDefaultsConfig.localeForAppLanguage as NSLocale
     }
+}
+
+fileprivate extension SwiftDelegate {
+    
+    func tryPresentPsiCashViewController(_ tab: PsiCashViewController.Tabs) {
+        let topMostViewController = AppDelegate.getTopPresentedViewController()
+        
+        let found = topMostViewController
+            .traversePresentingStackFor(type: PsiCashViewController.self)
+        
+        switch found {
+        case .presentInStack(_):
+            // NO-OP if
+            break
+            
+        case .presentTopOfStack(let psiCashViewController):
+            psiCashViewController.activeTab = tab
+            
+        case .notPresent:
+            let psiCashViewController = makePsiCashViewController(tab)
+            topMostViewController.present(psiCashViewController, animated: true)
+        }
+    }
+    
 }

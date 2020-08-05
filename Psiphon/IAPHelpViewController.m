@@ -214,7 +214,8 @@
     if (buyProgressAlert != nil) {
         [buyProgressAlert hideAnimated:YES];
     }
-    buyProgressAlert = [MBProgressHUD showHUDAddedTo:AppDelegate.getTopMostViewController.view animated:YES];
+    buyProgressAlert = [MBProgressHUD showHUDAddedTo:
+                        [AppDelegate getTopPresentedViewController].view animated:YES];
 
     buyProgressAlertTimer = [NSTimer scheduledTimerWithTimeInterval:60 repeats:NO block:^(NSTimer * _Nonnull timer) {
         if (buyProgressAlert  != nil) {

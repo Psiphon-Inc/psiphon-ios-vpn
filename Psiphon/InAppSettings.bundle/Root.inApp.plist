@@ -32,7 +32,7 @@
 		</dict>
 		<dict>
 			<key>Title</key>
-			<string>CHANGE_REGION</string>
+			<string>SELECT_SERVER_REGION</string>
 			<key>BundleTable</key>
 			<string>PsiphonClientCommonLibrary</string>
 			<key>Key</key>

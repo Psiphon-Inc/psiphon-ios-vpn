@@ -61,7 +61,6 @@
 		4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526220AB8DBE000B4BEA /* Pastel.m */; };
 		4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526520AB8DCD000B4BEA /* PastelView.m */; };
 		5202011D2360D34000D00C8E /* EitherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5202011C2360D34000D00C8E /* EitherView.swift */; };
-		520201212360F5B800D00C8E /* IndexedViewSwitcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520201202360F5B800D00C8E /* IndexedViewSwitcher.swift */; };
 		52055D04230C823100244F9E /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D03230C823100244F9E /* GradientButton.swift */; };
 		52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D05230C833700244F9E /* SpeedBoostButton.swift */; };
 		521FD0EF219E0D5600F748EC /* DebugDirectoryViewerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E5219E0D5500F748EC /* DebugDirectoryViewerViewController.m */; };
@@ -115,6 +114,7 @@
 		8D1F62C0247DC3350028AFAF /* Authorization+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */; };
 		8D1F62C2247DC4840028AFAF /* PsiCashClient+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */; };
 		8D255E2D24620E2900FD5D1C /* NoConnectionBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */; };
+		8D26455F24D4842E000F46C0 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D26455E24D4842E000F46C0 /* Navigator.swift */; };
 		8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E982411954A00FEE587 /* PsiCashReducer.swift */; };
 		8D417EB124147C6D00FEE587 /* LandingPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB024147C6D00FEE587 /* LandingPage.swift */; };
 		8D417EB324148C1E00FEE587 /* URLHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB224148C1E00FEE587 /* URLHandler.swift */; };
@@ -480,7 +480,6 @@
 		4EC5526520AB8DCD000B4BEA /* PastelView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PastelView.m; sourceTree = "<group>"; };
 		4EC82F8E20C713DF004C2E9F /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = Strings/hi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		5202011C2360D34000D00C8E /* EitherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EitherView.swift; sourceTree = "<group>"; };
-		520201202360F5B800D00C8E /* IndexedViewSwitcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IndexedViewSwitcher.swift; sourceTree = "<group>"; };
 		52055D03230C823100244F9E /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
 		52055D05230C833700244F9E /* SpeedBoostButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedBoostButton.swift; sourceTree = "<group>"; };
 		521FD0E5219E0D5500F748EC /* DebugDirectoryViewerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugDirectoryViewerViewController.m; path = Psiphon/Debug/DebugDirectoryViewerViewController.m; sourceTree = SOURCE_ROOT; };
@@ -586,6 +585,7 @@
 		8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Authorization+Additions.swift"; sourceTree = "<group>"; };
 		8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PsiCashClient+Additions.swift"; sourceTree = "<group>"; };
 		8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoConnectionBannerView.swift; sourceTree = "<group>"; };
+		8D26455E24D4842E000F46C0 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		8D417E982411954A00FEE587 /* PsiCashReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashReducer.swift; sourceTree = "<group>"; };
 		8D417EB024147C6D00FEE587 /* LandingPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingPage.swift; sourceTree = "<group>"; };
 		8D417EB224148C1E00FEE587 /* URLHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLHandler.swift; sourceTree = "<group>"; };
@@ -1126,7 +1126,6 @@
 				52D363CC230EEBAC002C2221 /* AnimatedUIButton.swift */,
 				52D363CE230F112E002C2221 /* TabControlView.swift */,
 				5202011C2360D34000D00C8E /* EitherView.swift */,
-				520201202360F5B800D00C8E /* IndexedViewSwitcher.swift */,
 				52C8F0AA237CA26200E5F9C0 /* ImageViewBuilder.swift */,
 				52CAC4302385D06600A92842 /* Spinner.swift */,
 				52B3C54B23E0E895003F6B12 /* ButtonBuilder.swift */,
@@ -1358,6 +1357,7 @@
 				8DCA6863247C7CF8001D026E /* Bindable.swift */,
 				8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */,
 				8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */,
+				8D26455E24D4842E000F46C0 /* Navigator.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -2100,7 +2100,6 @@
 				524B4E6E2316F27F004E9891 /* AnimatedControl.m in Sources */,
 				445F24EA20E1A5BA00D004E9 /* per_decoder.c in Sources */,
 				445F24F520E1A85D00D004E9 /* IA5String.c in Sources */,
-				520201212360F5B800D00C8E /* IndexedViewSwitcher.swift in Sources */,
 				CED6794824A4F95D00C4CA81 /* RunningBins.m in Sources */,
 				CED6795924A4FA1200C4CA81 /* FileRegistry.m in Sources */,
 				52DF5E9E23D0D01F00A1B067 /* BridgingTypes.swift in Sources */,
@@ -2145,6 +2144,7 @@
 				A8408AACE30F860F2C961A04 /* WhiteSkyButton.m in Sources */,
 				A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */,
 				8D9E603524366D71003A46D8 /* FeedbackDescriptions.swift in Sources */,
+				8D26455F24D4842E000F46C0 /* Navigator.swift in Sources */,
 				CED6791B24A4F88D00C4CA81 /* JSONCodable.m in Sources */,
 				A8408FA13890CD67154033C6 /* RegionSelectionButton.m in Sources */,
 				A8408E611665FC60D5DFF339 /* SubscriptionStatusView.m in Sources */,

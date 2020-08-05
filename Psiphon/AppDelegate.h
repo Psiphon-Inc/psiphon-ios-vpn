@@ -34,7 +34,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)startStopVPNWithAd:(BOOL)showAd;
 
-+ (UIViewController *)getTopMostViewController;
+/**
+ Returns top most view controller in the presented stack from the app's key window.
+ 
+ This returns the top most view controller that is modally presented, so the returned view controller
+ might have child view controllers, but it's `presentedViewController` property is `nil`.
+ */
++ (UIViewController *)getTopPresentedViewController;
 
 @end
 
