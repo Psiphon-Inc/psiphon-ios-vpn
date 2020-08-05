@@ -107,14 +107,15 @@ fileprivate func createControlButton(title: String) -> GradientButton {
     control.setTitleColor(.white, for: .highlighted)
     control.titleLabel!.font = AvenirFont.demiBold.font(.h3)
     control.layer.cornerRadius = 0.0 // Remove GradientLayer corner radius.
+    control.setClearBackground()
     return control
 }
 
 fileprivate func mutate(button: GradientButton, to state:ControlState) {
     switch state {
     case .normal:
-        button.setGradientBackground()
-    case .selected:
         button.setClearBackground()
+    case .selected:
+        button.setGradientBackground()
     }
 }
