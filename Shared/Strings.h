@@ -87,7 +87,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)privacyPolicyButtonTitle;
 
-+ (NSString *)privacyPolicyHTMLText;
++ (NSString *)privacyPolicyHTMLText_v2018;
 
 + (NSString *)privacyPolicyDeclinedAlertBody;
 

@@ -35,6 +35,8 @@ import PsiCashClient
 /// All Delegate functions are called on the main thread.
 @objc protocol ObjCBridgeDelegate {
     
+    @objc func updateAvailableEgressRegionsOnFirstRunOfAppVersion()
+    
     @objc func startStopVPNWithInterstitial()
     
     @objc func onPsiCashBalanceUpdate(_ balance: BridgedBalanceViewBindingType)
@@ -72,11 +74,11 @@ import PsiCashClient
     
     @objc func applicationWillFinishLaunching(
         _ application: UIApplication,
-        launchOptions: [UIApplication.LaunchOptionsKey : Any]?
+        launchOptions: [UIApplication.LaunchOptionsKey : Any]?,
+        objcBridge: ObjCBridgeDelegate
     ) -> Bool
     
-    @objc func applicationDidFinishLaunching(_ application: UIApplication,
-                                             objcBridge: ObjCBridgeDelegate)
+    @objc func applicationDidFinishLaunching(_ application: UIApplication)
     @objc func applicationWillEnterForeground(_ application: UIApplication)
     @objc func applicationDidEnterBackground(_ application: UIApplication)
     @objc func applicationDidBecomeActive(_ application: UIApplication)
@@ -93,6 +95,19 @@ import PsiCashClient
     @objc func makePsiCashViewController(
         _ initialTab: PsiCashViewController.PsiCashViewControllerTabs
     ) -> UIViewController
+    
+    /// Returns `nil` if there are no onboarding stages to complete.
+    @objc func makeOnboardingViewControllerWithStagesNotCompleted(
+        _ completionHandler: @escaping (OnboardingViewController) -> Void
+    ) -> OnboardingViewController?
+    
+    /// Returns true if all onboarding stages have been completed.
+    @objc func completedAllOnboardingStages() -> Bool
+    
+    /// Returns true if current app launch is a new installation.
+    /// - Important: It's a fatal error of this method is called before AppUpgrade is checked.
+    @objc func isNewInstallation() -> Bool
+    
     @objc func getCustomRewardData(_ callback: @escaping (String?) -> Void)
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError>
     @objc func buyAppStoreSubscriptionProduct(

@@ -18,7 +18,6 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "MainViewController.h"
 
 @interface RootContainerController : UIViewController
 

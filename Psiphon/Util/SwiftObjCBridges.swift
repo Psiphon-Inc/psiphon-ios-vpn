@@ -21,7 +21,7 @@ import UIKit
 
 // MARK: UIControl Swift Bridge
 
-@objc class EventHandler: NSObject {
+@objc final class EventHandler: NSObject {
 
     private let handler: () -> Void
 
@@ -35,7 +35,21 @@ import UIKit
 
 }
 
-class SwiftUIButton: UIButton {
+@objc class SwiftUIControl: UIControl {
+ 
+    private var eventHandler: EventHandler!
+    
+    /// Sets `handler` as the event handler for this instance.
+    /// - Note: Current implementation resets any previously set handler.
+    func setEventHandler(for event: UIControl.Event = .touchUpInside,
+                         _ handler: @escaping () -> Void) {
+        self.eventHandler = EventHandler(handler)
+        addTarget(self.eventHandler, action: #selector(EventHandler.handleEvent), for: event)
+    }
+    
+}
+
+@objc class SwiftUIButton: UIButton {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -49,8 +63,8 @@ class SwiftUIButton: UIButton {
 
     private var eventHandler: EventHandler!
 
-    /// Sets `handler` closure as the event handler for this instance.
-    /// - Note: Current implementation resets previously set handlers.
+    /// Sets `handler` as the event handler for this instance.
+    /// - Note: Current implementation resets any previously set handler.
     func setEventHandler(for event: UIControl.Event = .touchUpInside,
                          _ handler: @escaping () -> Void) {
         self.eventHandler = EventHandler(handler)

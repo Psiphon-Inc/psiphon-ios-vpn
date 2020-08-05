@@ -22,6 +22,7 @@
 #import <NetworkExtension/NEIPv4Settings.h>
 #import <NetworkExtension/NEDNSSettings.h>
 #import <NetworkExtension/NEPacketTunnelFlow.h>
+#import <UserNotifications/UserNotifications.h>
 #import <ifaddrs.h>
 #import <arpa/inet.h>
 #import <net/if.h>
@@ -53,8 +54,13 @@
 #import "SubscriptionAuthCheck.h"
 #import "SessionConfigValues.h"
 #import "FeedbackUtils.h"
+#import "VPNStrings.h"
 
 NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
+
+// UserNotifications identifiers
+NSString *_Nonnull const UserNotificationDisallowedTrafficAlertIdentifier =
+@"DisallowedTrafficAlertId";
 
 // UserDefaults key for the ID of the last authorization obtained from the verifier server.
 NSString *_Nonnull const UserDefaultsLastAuthID = @"LastAuthID";
@@ -363,7 +369,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         // If the container StartVPN command has not been received from the container,
         // and the container goes to the background, then alert the user to open the app.
         if (self.waitForContainerStartVPNCommand && tunnelIntent == TUNNEL_INTENT_START) {
-            [self displayMessage:NSLocalizedStringWithDefaultValue(@"OPEN_PSIPHON_APP", nil, [NSBundle mainBundle], @"Please open Psiphon app to finish connecting.", @"Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'.")];
+            [self displayMessage:VPNStrings.openPsiphonAppToFinishConnecting];
         }
 
     } else if ([NotifierUpdatedNonSubscriptionAuths isEqualToString:message]) {
@@ -541,8 +547,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     const int64_t intervalSec = 60; // Every minute.
 
-    [self displayMessage:
-        NSLocalizedStringWithDefaultValue(@"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION", nil, [NSBundle mainBundle], @"You don't have an active subscription.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app to start.", @"Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'.")
+    [self displayMessage: VPNStrings.cannotStartTunnelDueToSubscription
        completionHandler:^(BOOL success) {
            // If the user dismisses the message, show the alert again in intervalSec seconds.
            dispatch_after(dispatch_time(DISPATCH_TIME_NOW, intervalSec * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
@@ -552,8 +557,39 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (void)displayCorruptSettingsFileMessage {
-    NSString *message = NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_MESSAGE", nil, [NSBundle mainBundle], @"Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.", @"Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app.");
-    [self displayMessage:message];
+    [self displayMessage:VPNStrings.corruptSettingsFileAlertMessage];
+}
+
+// presentDisallowedTrafficAlertNotification presents user notification if enabled,
+// or falls back to the simple NEProvider `displayMessage:completionHandler:` mechanism.
+// Thread-safety: This method is thread-safe.
+- (void)presentDisallowedTrafficAlertNotification {
+    UNUserNotificationCenter* centre = [UNUserNotificationCenter currentNotificationCenter];
+    
+    [centre getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
+        
+        if (settings.authorizationStatus != UNAuthorizationStatusAuthorized) {
+            [self displayMessage: VPNStrings.disallowedTrafficAlertMessage];
+        } else {
+            UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
+            content.title = [NSString localizedUserNotificationStringForKey:@"NOTIFICATION_TITLE_UPGRADE_PSIPHON" arguments:nil];
+            content.body = [NSString localizedUserNotificationStringForKey:@"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" arguments:nil];
+             
+            // Delivers the notification immediately.
+            UNNotificationRequest* request = [UNNotificationRequest
+                                              requestWithIdentifier:UserNotificationDisallowedTrafficAlertIdentifier
+                                              content:content
+                                              trigger:nil];
+             
+            // Schedule the notification.
+            [centre addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+                // Falls back to presenting alert if the notification request failed.
+                if (error != nil) {
+                    [self displayMessage:VPNStrings.disallowedTrafficAlertMessage];
+                }
+            }];
+        }
+    }];
 }
 
 @end
@@ -709,7 +745,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 // Displays an alert to the user for the expired subscription.
                 // This only happens if the container has not been up for 24 hours before expiry.
                 if ([self.sharedDB getAppForegroundState] == FALSE) {
-                    [self displayMessage: NSLocalizedStringWithDefaultValue(@"EXTENSION_EXPIRED_SUBSCRIPTION_ALERT", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired.\n\n Please open Psiphon app to renew your subscription.", @"")];
+                    [self displayMessage: VPNStrings.subscriptionExpiredAlertMessage];
                 }
                 break;
             }
@@ -752,7 +788,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 [self.sharedDB incrementDisallowedTrafficAlertWriteSequenceNum];
                 [[Notifier sharedInstance] post:NotifierDisallowedTrafficAlert];
                 
-                [self displayMessage:NSLocalizedStringWithDefaultValue(@"DISALLOWED_TRAFFIC_EXTENSION_ALERT", nil, [NSBundle mainBundle], @"Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.", @"Alert dialog which is shown to the user when if unsupported Internet traffic has been requested")];
+                // Displays notification to the user.
+                [self presentDisallowedTrafficAlertNotification];
             }
         }
     });
@@ -811,8 +848,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
 
     NSString *alertDisplayMessage = [NSString stringWithFormat:@"%@\n\n(%@)",
-        NSLocalizedStringWithDefaultValue(@"CHECK_UPSTREAM_PROXY_SETTING", nil, [NSBundle mainBundle], @"You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.", @"Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'."),
-            message];
+        VPNStrings.upstreamProxySettingsErrorMessage, message];
 
     [self displayMessage:alertDisplayMessage];
 }

@@ -221,6 +221,19 @@ import Foundation
                                  value: "Refresh Receipt",
                                  comment: "Button title on an error alert that indicates it refreshes the user's purchase receipt on device.")
     }
+    
+    static func Onboarding_user_notification_permission_title() -> String {
+        return NSLocalizedString("ONBOARDING_NOTIFICATION_PERMISSION_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Get notified about important network events",
+                                 comment: "Onboarding screen title that will be asking the user permission to send notifications about important network events while they use the app.")
+    }
+    
+    static func Onboarding_user_notification_permission_body() -> String {
+        return NSLocalizedString("ONBOARDING_NOTIFICATION_PERMISSION_BODY", tableName: nil, bundle: Bundle.main,
+                                 value: "Allow Psiphon to send notifications so that you can be notified of important network events.",
+                                 comment: "Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app.")
+    }
+    
 }
 
 // MARK: Internet reachability

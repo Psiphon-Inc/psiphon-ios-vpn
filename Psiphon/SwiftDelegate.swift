@@ -138,30 +138,36 @@ func appDelegateReducer(
                 let found = AppDelegate.getTopPresentedViewController()
                     .traversePresentingStackFor(type: RootContainerController.self)
                 
-                guard case .presentTopOfStack(let mainViewController) = found else {
-                    fulfill(._disallowedNotificationAlertPresentation(success: false))
-                    return
+                switch found {
+                case .notPresent:
+                   fulfill(._disallowedNotificationAlertPresentation(success: false))
+                   return
+                    
+                case .presentTopOfStack(let rootViewController),
+                     .presentInStack(let rootViewController):
+                
+                    // FIXME: Accessing global singleton variable
+                    let alertController = makeDisallowedTrafficAlertController(
+                        onSpeedBoostClicked: {
+                            tryPresentPsiCashViewController(
+                                tab: .speedBoost,
+                                makePsiCashViewController:
+                                    SwiftDelegate.instance.makePsiCashViewController(initialTab:),
+                                getTopMostPresentedViewController:
+                                    AppDelegate.getTopPresentedViewController
+                            )
+                        },
+                        onSubscriptionClicked: {
+                            tryPresentSubscriptionViewController(getTopMostPresentedViewController:
+                                    AppDelegate.getTopPresentedViewController)
+                        })
+                    
+                    let success = rootViewController.safePresent(alertController, animated: true)
+                    
+                    fulfill(._disallowedNotificationAlertPresentation(success: success))
+                 
                 }
                 
-                // FIXME: Accessing global singleton variable
-                let alertController = makeDisallowedTrafficAlertController(
-                    onSpeedBoostClicked: {
-                        tryPresentPsiCashViewController(
-                            tab: .speedBoost,
-                            makePsiCashViewController:
-                                SwiftDelegate.instance.makePsiCashViewController(initialTab:),
-                            getTopMostPresentedViewController:
-                                AppDelegate.getTopPresentedViewController
-                        )
-                    },
-                    onSubscriptionClicked: {
-                        tryPresentSubscriptionViewController(getTopMostPresentedViewController:
-                                AppDelegate.getTopPresentedViewController)
-                    })
-                
-                let success = mainViewController.safePresent(alertController, animated: true)
-                
-                fulfill(._disallowedNotificationAlertPresentation(success: success))
             }
         ]
         
@@ -196,6 +202,7 @@ func appDelegateReducer(
     private let supportedProducts =
         SupportedAppStoreProducts.fromPlists(types: [.subscription, .psiCash])
     private let userDefaultsConfig = UserDefaultsConfig()
+    private let appUpgrade = AppUpgrade()
     
     private var (lifetime, token) = Lifetime.make()
     private var objcBridge: ObjCBridgeDelegate!
@@ -230,6 +237,88 @@ extension SwiftDelegate: RewardedVideoAdBridgeDelegate {
         }
         self.store.send(.psiCash(.rewardedVideoLoad(loadResult)))
     }
+    
+    func installVPNConfig() -> Promise<VPNConfigInstallResult> {
+        let promise = Promise<VPNConfigInstallResult>.pending()
+        
+        self.store.$value.signalProducer
+            .map(\.vpnState.value.loadState.value)
+            .skipRepeats()
+            .scan(IndexedPsiphonTPMLoadState(index: 0, value: .nonLoaded))
+            { (previous, tpmLoadState) -> IndexedPsiphonTPMLoadState in
+                // Indexes `tpmLoadState` emitted items, starting from 0.
+                return IndexedPsiphonTPMLoadState(index: previous.index + 1, value: tpmLoadState)
+            }.flatMap(.latest) { [unowned self] indexed
+                -> SignalProducer<IndexedPsiphonTPMLoadState, Never> in
+                
+                // Index 1 represents the value of ProviderManagerLoadState before
+                // `.reinstallVPNConfig` action is sent.
+                
+                switch indexed.index {
+                case 0:
+                    self.feedbackLogger.fatalError("Unexpected index 0")
+                    return .empty
+                case 1:
+                    switch indexed.value {
+                    case .nonLoaded:
+                        return Effect.never
+                    case .noneStored, .loaded(_), .error(_):
+                        return Effect(value: indexed)
+                    }
+                default:
+                    switch indexed.value {
+                    case .nonLoaded,.noneStored:
+                        return Effect.never
+                    case .loaded(_), .error(_):
+                        return Effect(value: indexed)
+                    }
+                }
+            }
+            .take(first: 2)
+            .startWithValues { [promise, unowned self] indexed in
+                switch indexed.index {
+                case 0:
+                    self.feedbackLogger.fatalError("Unexpected index 0")
+                    return
+                case 1:
+                    self.store.send(vpnAction: .reinstallVPNConfig)
+                default:
+                    switch indexed.value {
+                    case .nonLoaded, .noneStored:
+                        self.feedbackLogger.fatalError("Unexpected value '\(indexed.value)'")
+                        return
+                    case .loaded(_):
+                        promise.fulfill(.installedSuccessfully)
+                    case .error(let errorEvent):
+                        if case .failedConfigLoadSave(let error) = errorEvent.error {
+                            if error.configurationReadWriteFailedPermissionDenied {
+                                promise.fulfill(.permissionDenied)
+                            } else {
+                                promise.fulfill(.otherError)
+                            }
+                        }
+                    }
+                }
+            }
+        
+        return promise
+    }
+    
+}
+
+extension SwiftDelegate: UNUserNotificationCenterDelegate {
+    
+    func userNotificationCenter(
+        _ center: UNUserNotificationCenter,
+        didReceive response: UNNotificationResponse,
+        withCompletionHandler completionHandler: @escaping () -> Void
+    ) {
+        self.feedbackLogger.immediate(.info, """
+            received user notification: identifier: '\(response.notification.request.identifier)'
+            """)
+        completionHandler()
+    }
+    
 }
 
 // API exposed to ObjC.
@@ -241,15 +330,29 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     
     @objc func applicationWillFinishLaunching(
         _ application: UIApplication,
-        launchOptions: [UIApplication.LaunchOptionsKey : Any]?
+        launchOptions: [UIApplication.LaunchOptionsKey : Any]?,
+        objcBridge: ObjCBridgeDelegate
     ) -> Bool {
+        self.objcBridge = objcBridge
+        
         // Updates appForegroundState that is shared with the extension.
         self.sharedDB.setAppForegroundState(true)
+        
+        self.appUpgrade.checkForUpgrade(userDefaultsConfig: self.userDefaultsConfig,
+                                        appInfo: AppInfoObjC(),
+                                        feedbackLogger: self.feedbackLogger)
+        
+        if appUpgrade.firstRunOfVersion == true {
+            self.objcBridge.updateAvailableEgressRegionsOnFirstRunOfAppVersion()
+        }
+        
+        UNUserNotificationCenter.current().delegate = self
+        
         return true
     }
     
     @objc func applicationDidFinishLaunching(
-        _ application: UIApplication, objcBridge: ObjCBridgeDelegate
+        _ application: UIApplication
     ) {
         self.feedbackLogger.immediate(.info, "applicationDidFinishLaunching")
         
@@ -270,9 +373,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             )
             return true
         }
-        
-        self.objcBridge = objcBridge
-        
+                
         self.psiCashLib = PsiCash.make(flags: Debugging)
         
         self.store = Store(
@@ -322,7 +423,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .map(\.psiCashBalanceViewModel)
             .skipRepeats()
             .startWithValues { [unowned objcBridge] viewModel in
-                objcBridge.onPsiCashBalanceUpdate(.init(swiftState: viewModel))
+                objcBridge!.onPsiCashBalanceUpdate(.init(swiftState: viewModel))
         }
         
         // Forwards `SubscriptionStatus` updates to ObjCBridgeDelegate.
@@ -330,7 +431,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .map(\.subscription.status)
             .skipRepeats()
             .startWithValues { [unowned objcBridge] in
-                objcBridge.onSubscriptionStatus(BridgedUserSubscription.from(state: $0))
+                objcBridge!.onSubscriptionStatus(BridgedUserSubscription.from(state: $0))
         }
         
         // Forwards subscription auth status to ObjCBridgeDelegate.
@@ -347,7 +448,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .skipRepeats()
             .startWithValues { [unowned objcBridge] newValue in
                 
-                objcBridge.onSubscriptionBarViewStatusUpdate(
+                objcBridge!.onSubscriptionBarViewStatusUpdate(
                     ObjcSubscriptionBarViewState(swiftState: newValue)
                 )
         }
@@ -356,7 +457,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
             .skipRepeats()
             .startWithValues { [unowned objcBridge] in
-                objcBridge.onVPNStatusDidChange($0)
+                objcBridge!.onVPNStatusDidChange($0)
             }
         
         // Monitors state of VPN status and tunnel intent.
@@ -403,7 +504,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 case .failure(let errorEvent):
                     self.feedbackLogger.immediate(.error, "\(errorEvent)")
                     
-                    objcBridge.onVPNStateSyncError(
+                    self.objcBridge!.onVPNStateSyncError(
                         UserStrings.Tunnel_provider_sync_failed_reinstall_config()
                     )
                 }
@@ -421,7 +522,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
             .skipRepeats()
             .startWithValues{ [unowned objcBridge] speedBoostExpiry in
-                objcBridge.onSpeedBoostActivePurchase(speedBoostExpiry)
+                objcBridge!.onSpeedBoostActivePurchase(speedBoostExpiry)
             }
         
         self.lifetime += self.store.$value.signalProducer
@@ -429,7 +530,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .skipRepeats()
             .startWithValues { [unowned objcBridge] startStopState in
                 let value = VPNStartStopStatus.from(startStopState: startStopState)
-                objcBridge.onVPNStartStopStateDidChange(value)
+                objcBridge!.onVPNStartStopStateDidChange(value)
             }
         
         // Forwards AppState `internetReachability` value to ObjCBridgeDelegate.
@@ -437,7 +538,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .map(\.internetReachability)
             .skipRepeats()
             .startWithValues { [unowned objcBridge] reachabilityStatus in
-                objcBridge.onReachabilityStatusDidChange(reachabilityStatus.networkStatus)
+                objcBridge!.onReachabilityStatusDidChange(reachabilityStatus.networkStatus)
             }
         
         // Opens landing page whenever Psiphon tunnel is connected, with
@@ -537,6 +638,49 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         _ initialTab: PsiCashViewController.PsiCashViewControllerTabs
     ) -> UIViewController {
         self.makePsiCashViewController(initialTab: initialTab)
+    }
+    
+    @objc func makeOnboardingViewControllerWithStagesNotCompleted(
+        _ completionHandler: @escaping (OnboardingViewController) -> Void
+    ) -> OnboardingViewController? {
+        
+        // Finds stages that are not completed by the user.
+        let stagesNotCompleted = OnboardingStage.findStagesNotCompleted(
+            completedStages: self.userDefaultsConfig.onboardingStagesCompletedTyped
+        )
+        
+        guard !stagesNotCompleted.isEmpty else {
+            return nil
+        }
+        
+        return OnboardingViewController(
+            onboardingStages: stagesNotCompleted,
+            feedbackLogger: self.feedbackLogger,
+            installVPNConfig: self.installVPNConfig,
+            onOnboardingFinished: { [unowned self] onboardingViewController in
+                // Updates `userDefaultsConfig` with the latest
+                // onboarding stages that are completed.
+                self.userDefaultsConfig.onboardingStagesCompleted =
+                    OnboardingStage.stagesToComplete.map(\.rawValue)
+                
+                completionHandler(onboardingViewController)
+            }
+        )
+    }
+    
+    @objc func completedAllOnboardingStages() -> Bool {
+        // Finds stages that are not completed by the user.
+        let stagesNotCompleted = OnboardingStage.findStagesNotCompleted(
+            completedStages: self.userDefaultsConfig.onboardingStagesCompletedTyped)
+        
+        return stagesNotCompleted.isEmpty
+    }
+    
+    @objc func isNewInstallation() -> Bool {
+        guard let newInstallation = self.appUpgrade.newInstallation else {
+            fatalError()
+        }
+        return newInstallation
     }
     
     @objc func getCustomRewardData(_ callback: @escaping (CustomData?) -> Void) {
@@ -698,69 +842,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func installVPNConfigWithPromise() ->
         Promise<VPNConfigInstallResultWrapper>.ObjCPromise<VPNConfigInstallResultWrapper>
     {
-        let promise = Promise<VPNConfigInstallResultWrapper>.pending()
-        
-        self.store.$value.signalProducer
-            .map(\.vpnState.value.loadState.value)
-            .skipRepeats()
-            .scan(IndexedPsiphonTPMLoadState(index: 0, value: .nonLoaded))
-            { (previous, tpmLoadState) -> IndexedPsiphonTPMLoadState in
-                // Indexes `tpmLoadState` emitted items, starting from 0.
-                return IndexedPsiphonTPMLoadState(index: previous.index + 1, value: tpmLoadState)
-        }.flatMap(.latest) { [unowned self] indexed
-            -> SignalProducer<IndexedPsiphonTPMLoadState, Never> in
-            
-            // Index 1 represents the value of ProviderManagerLoadState before
-            // `.reinstallVPNConfig` action is sent.
-            
-            switch indexed.index {
-            case 0:
-                self.feedbackLogger.fatalError("Unexpected index 0")
-                return .empty
-            case 1:
-                switch indexed.value {
-                case .nonLoaded:
-                    return Effect.never
-                case .noneStored, .loaded(_), .error(_):
-                    return Effect(value: indexed)
-                }
-            default:
-                switch indexed.value {
-                case .nonLoaded,.noneStored:
-                    return Effect.never
-                case .loaded(_), .error(_):
-                    return Effect(value: indexed)
-                }
-            }
-        }
-        .take(first: 2)
-        .startWithValues { [promise, unowned self] indexed in
-            switch indexed.index {
-            case 0:
-                self.feedbackLogger.fatalError("Unexpected index 0")
-                return
-            case 1:
-                self.store.send(vpnAction: .reinstallVPNConfig)
-            default:
-                switch indexed.value {
-                case .nonLoaded, .noneStored:
-                    self.feedbackLogger.fatalError("Unexpected value '\(indexed.value)'")
-                    return
-                case .loaded(_):
-                    promise.fulfill(.init(.installedSuccessfully))
-                case .error(let errorEvent):
-                    if case .failedConfigLoadSave(let error) = errorEvent.error {
-                        if error.configurationReadWriteFailedPermissionDenied {
-                            promise.fulfill(.init(.permissionDenied))
-                        } else {
-                            promise.fulfill(.init(.otherError))
-                        }
-                    }
-                }
-            }
-        }
-        
-        return promise.asObjCPromise()
+        // Maps Swift type `Promise<VPNConfigInstallResult>` to equivalent ObjC type.
+        self.installVPNConfig().then { VPNConfigInstallResultWrapper($0) }.asObjCPromise()
     }
     
     @objc func getLocaleForCurrentAppLanguage() -> NSLocale {
@@ -833,8 +916,8 @@ fileprivate func tryPresentSubscriptionViewController(
         // NO-OP
         break
     case .notPresent:
-        let iapViewController = IAPViewController()
-        topMostViewController.present(iapViewController, animated: true)
+        let navCtrl = UINavigationController(rootViewController: IAPViewController())
+        topMostViewController.present(navCtrl, animated: true)
         
     }
 }

@@ -51,10 +51,10 @@
 #import "RACReplaySubject.h"
 #import "Asserts.h"
 #import "ContainerDB.h"
-#import "AppUpgrade.h"
 #import "AppEvent.h"
 #import "AppObservables.h"
 #import <PsiphonTunnel/PsiphonTunnel.h>
+#import "RegionAdapter.h"
 
 PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 
@@ -96,10 +96,6 @@ PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 - (BOOL)application:(UIApplication *)application
 willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
-    if ([AppUpgrade firstRunOfAppVersion]) {
-        [self updateAvailableEgressRegionsOnFirstRunOfAppVersion];
-    }
-
     // Immediately register to receive notifications from the Network Extension process.
     [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
 
@@ -107,15 +103,16 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [PsiphonClientCommonLibraryHelpers initializeDefaultsForPlistsFromRoot:@"Root.inApp"];
 
     return [SwiftDelegate.bridge applicationWillFinishLaunching:application
-                                                  launchOptions:launchOptions];
+                                                  launchOptions:launchOptions
+                                                     objcBridge:(id<ObjCBridgeDelegate>) self];
 }
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     LOG_DEBUG();
+    
+    [SwiftDelegate.bridge applicationDidFinishLaunching:application];
+    
     [AppObservables.shared appLaunched];
-
-    [SwiftDelegate.bridge applicationDidFinishLaunching:application
-                                             objcBridge:(id<ObjCBridgeDelegate>) self];
 
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
@@ -274,7 +271,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     NSSet<NSString*> *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:embeddedServerEntriesPath
                                                                                      error:&e];
 
-    // Note: server entries may have been decoded before the error occured and
+    // Note: server entries may have been decoded before the error occurred and
     // they will be present in the result.
     if (e != nil) {
         [PsiFeedbackLogger error:e message:@"Error decoding embedded server entries"];
