@@ -43,8 +43,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)presentIAPViewController;
 
-//- (void)presentPsiCashViewController:(PsiCashViewControllerTabs)tab;
-
 @end
 
 NS_ASSUME_NONNULL_END
