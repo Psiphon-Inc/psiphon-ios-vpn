@@ -28,3 +28,11 @@ func plistReader<DecodeType: Decodable>(key: String, toType: DecodeType.Type) th
     let decoder = PropertyListDecoder()
     return try decoder.decode(toType, from: data)
 }
+
+extension URL {
+    
+    func isEqualInSchemeAndHost(to other: URL) -> Bool {
+        self.scheme == other.scheme && self.host == other.host
+    }
+    
+}

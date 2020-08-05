@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Psiphon Inc.
+ * Copyright (c) 2020, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,26 +17,21 @@
  *
  */
 
-
 import Foundation
 
-final class IndexedViewSwitcher: UIView {
-
-    private let viewBuilder: (Int) -> UIView?
-
-    var currentIndex = 0 {
-        didSet {
-
+struct Navigator {
+    
+    private var registered: [URL: () -> Bool] = [:]
+    
+    mutating func register(url: URL, completionHandler: @escaping () -> Bool) {
+        registered[url] = completionHandler
+    }
+    
+    func handle(url: URL) -> Bool {
+        if let handler = registered[url] {
+            return handler()
         }
+        return false
     }
-
-    init(viewBuilder: @escaping (Int) -> UIView?) {
-        self.viewBuilder = viewBuilder
-        super.init(frame: CGRect.zero)
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
-
+    
 }

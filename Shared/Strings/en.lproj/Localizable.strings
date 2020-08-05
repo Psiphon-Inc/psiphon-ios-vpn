@@ -51,9 +51,6 @@
 /* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "CONNECT_TO_USE_SPEED_BOOST" = "Connect to Psiphon to use Speed Boost";
 
-/* Title for screen that allows user to select their desired server region. Use all capital letters in the translation only if it makes sense. */
-"CONNECT_VIA" = "CONNECT VIA";
-
 /* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
 "CORRUPT_SETTINGS_ALERT_TITLE" = "Corrupt Settings";
 
@@ -294,6 +291,9 @@
 /* Select language button title. */
 "SELECT_LANG_BUTTON_TITLE" = "Select Language";
 
+/* Title for screen that allows user to select their desired server region. */
+"SELECT_SERVER_REGION" = "Select server region";
+
 /* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Reinstall VPN profile";
 
@@ -378,8 +378,8 @@
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "An error occurred while starting Psiphon. Please try again.";
 
-/* Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to to 'Fastest Country', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
-"VPN_START_FAIL_REGION_INVALID_MESSAGE_2" = "The region you selected is no longer available. You have automatically been switched to \"Fastest Country\".\n\n You can also select a new region from the Psiphon app.";
+/* Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to 'Best performance', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
+"VPN_START_FAIL_REGION_INVALID_MESSAGE_3" = "The region you selected is no longer available. You have automatically been switched to \"Best performance\".\n\n You can also select a new region from the Psiphon app.";
 
 /* Alert dialog title indicating to the user that Psiphon was unable to start */
 "VPN_START_FAIL_TITLE" = "Unable to start";

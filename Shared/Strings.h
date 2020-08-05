@@ -55,7 +55,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Misc
 
-+ (NSString *)connectViaTitle;
++ (NSString *)selectServerRegionTitle;
 
 + (NSString *)selectLanguageTitle;
 

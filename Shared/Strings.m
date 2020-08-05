@@ -115,8 +115,8 @@
     return NSLocalizedStringWithDefaultValue(@"ALERT_TITLE_OPERATION_FAILED", nil, [NSBundle mainBundle], @"Operation Failed", @"Alert dialog title.");
 }
 
-+ (NSString *)connectViaTitle {
-    return  NSLocalizedStringWithDefaultValue(@"CONNECT_VIA", nil, [NSBundle mainBundle], @"CONNECT VIA", @"Title for screen that allows user to select their desired server region. Use all capital letters in the translation only if it makes sense.");
++ (NSString *)selectServerRegionTitle {
+    return  NSLocalizedStringWithDefaultValue(@"SELECT_SERVER_REGION", nil, [NSBundle mainBundle], @"Select server region", @"Title for screen that allows user to select their desired server region.");
 }
 
 + (NSString *)selectLanguageTitle {
@@ -273,7 +273,7 @@
 }
 
 + (NSString *)selectedRegionUnavailableAlertBody {
-    return NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_REGION_INVALID_MESSAGE_2", nil, [NSBundle mainBundle], @"The region you selected is no longer available. You have automatically been switched to \"Fastest Country\".\n\n You can also select a new region from the Psiphon app.", @"Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to to 'Fastest Country', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting.");
+    return NSLocalizedStringWithDefaultValue(@"VPN_START_FAIL_REGION_INVALID_MESSAGE_3", nil, [NSBundle mainBundle], @"The region you selected is no longer available. You have automatically been switched to \"Best performance\".\n\n You can also select a new region from the Psiphon app.", @"Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to 'Best performance', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting.");
 }
 
 #if !(TARGET_IS_EXTENSION)
