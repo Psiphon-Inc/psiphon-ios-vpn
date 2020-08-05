@@ -41,9 +41,21 @@ final class UserDefaultsConfig: PsiCashPersistedValues {
     @UserDefault(.standard, "appLanguage", defaultValue: "")
     var appLanguage: String
     
+    /// Set of onboardings that have been completed by the user.
+    @UserDefault(.standard, "onboarding_stages_completed", defaultValue: [])
+    var onboardingStagesCompleted: [String]
+    
+    @UserDefault(.standard, "LastCFBundleVersion", defaultValue: "")
+    var lastBundleVersion: String
 }
 
 extension UserDefaultsConfig {
+    
+    /// Returned `onboardingStagesCompleted` parsed into types.
+    /// Drops values that are not recognized by `OnboardingStage`.
+    var onboardingStagesCompletedTyped: [OnboardingStage] {
+        return self.onboardingStagesCompleted.compactMap(OnboardingStage.init(rawValue:))
+    }
     
     /// Returns Locale object for user-selected app language.
     /// - Note: that this can be different from device locale value `Locale.current`.

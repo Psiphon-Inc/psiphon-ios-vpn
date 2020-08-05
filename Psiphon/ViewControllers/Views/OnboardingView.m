@@ -74,6 +74,9 @@
     titleLabel.adjustsFontSizeToFitWidth = TRUE;
     titleLabel.font = [UIFont avenirNextDemiBold:22.f];
     titleLabel.textColor = UIColor.whiteColor;
+    titleLabel.numberOfLines = 0;
+    titleLabel.lineBreakMode = NSLineBreakByWordWrapping;
+    titleLabel.textAlignment = NSTextAlignmentCenter;
 
     bodyLabel = [[UILabel alloc] init];
     bodyLabel.text = body;
@@ -132,7 +135,8 @@
     titleLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
     [NSLayoutConstraint activateConstraints:@[
       [titleLabel.topAnchor constraintEqualToAnchor:imageView.bottomAnchor constant:10.f],
-      [titleLabel.centerXAnchor constraintEqualToAnchor:self.centerXAnchor]
+      [titleLabel.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:20.f],
+      [titleLabel.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-20.f]
     ]];
 
     bodyLabel.translatesAutoresizingMaskIntoConstraints = FALSE;

@@ -142,6 +142,17 @@ extension UIButton {
     func contentEdgeInset(_ inset: EdgeInsets) {
         self.contentEdgeInsets = inset.value
     }
+    
+    func setContentEdgeInsets(top: CGFloat, leading: CGFloat, bottom: CGFloat, trailing: CGFloat) {
+        switch UIApplication.shared.userInterfaceLayoutDirection {
+        case .leftToRight:
+            self.contentEdgeInsets = UIEdgeInsets(top: top, left: leading, bottom: bottom, right: trailing)
+        case .rightToLeft:
+            self.contentEdgeInsets = UIEdgeInsets(top: top, left: trailing, bottom: bottom, right: leading)
+        @unknown default:
+            fatalError()
+        }
+    }
 
 }
 
@@ -355,12 +366,27 @@ extension UIView: Anchorable {
 }
 
 extension UIView {
+    
+    var safeAreaAnchors: Anchorable {
+        if #available(iOS 11.0, *) {
+            return self.safeAreaLayoutGuide
+        } else {
+            return self
+        }
+    }
 
     func constraintToParent(_ anchors: Anchor...) -> [NSLayoutConstraint] {
         guard let parent = self.superview else {
             fatalError("'constraintToParent' requires the view to have a parent view")
         }
         return constraint(to: parent, anchors)
+    }
+    
+    func constraintToParentSafeArea(_ anchors: Anchor...) -> [NSLayoutConstraint] {
+        guard let parent = self.superview else {
+            fatalError("'constraintToParent' requires the view to have a parent view")
+        }
+        return constraint(to: parent.safeAreaAnchors, anchors)
     }
 
     func matchParentConstraints(top: Float = 0, leading: Float = 0, trailing: Float = 0,

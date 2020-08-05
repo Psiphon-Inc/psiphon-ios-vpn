@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2020, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -19,22 +19,25 @@
 
 #import <Foundation/Foundation.h>
 
-
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AppUpgrade : NSObject
+@interface VPNStrings : NSObject
 
-/**
- * Handles app upgrade.
- * If this is an app upgrade, blocks until necessary app upgrade steps are done.
- *
- * This should be called in AppDelegate `-application:willFinishLaunchingWithOptions:` as the first
- * operation performed by the app, since the upgrade procedure is allowed to change any of the data
- * stored in the app.
- *
- * @return TRUE if this is the first run of current app version, FALSE otherwise.
- */
-+ (BOOL)firstRunOfAppVersion;
++ (NSString *)disallowedTrafficAlertMessage;
+
++ (NSString *)disallowedTrafficNotificationTitle;
+
++ (NSString *)disallowedTrafficNotificationBody;
+
++ (NSString *)corruptSettingsFileAlertMessage;
+
++ (NSString *)cannotStartTunnelDueToSubscription;
+
++ (NSString *)openPsiphonAppToFinishConnecting;
+
++ (NSString *)upstreamProxySettingsErrorMessage;
+
++ (NSString *)subscriptionExpiredAlertMessage;
 
 @end
 

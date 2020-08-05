@@ -46,7 +46,6 @@
 #import "VPNStartAndStopButton.h"
 #import "AlertDialogs.h"
 #import "RACSignal+Operations2.h"
-#import "ContainerDB.h"
 #import "NSDate+Comparator.h"
 #import "PickerViewController.h"
 #import "Strings.h"
@@ -158,21 +157,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 - (void)viewDidLoad {
     LOG_DEBUG();
     [super viewDidLoad];
-
-    // Check privacy policy accepted date.
-    {
-        // `[ContainerDB privacyPolicyLastUpdateTime]` should be equal to `[ContainerDB lastAcceptedPrivacyPolicy]`.
-        // Log error if this is not the case.
-        ContainerDB *containerDB = [[ContainerDB alloc] init];
-
-        if (![containerDB hasAcceptedLatestPrivacyPolicy]) {
-            NSDictionary *jsonDescription = @{@"event": @"PrivacyPolicyDateMismatch",
-              @"got": [PsiFeedbackLogger safeValue:[containerDB lastAcceptedPrivacyPolicy]],
-              @"expected": [containerDB privacyPolicyLastUpdateTime]};
-
-            [PsiFeedbackLogger errorWithType:MainViewControllerLogType json:jsonDescription];
-        }
-    }
 
     availableServerRegions = [[AvailableServerRegions alloc] init];
     [availableServerRegions sync];
