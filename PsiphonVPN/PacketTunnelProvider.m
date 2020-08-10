@@ -583,6 +583,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
              
             // Schedule the notification.
             [centre addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+                
+                [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
+                                         format:@"Added notification request: error: '%@'", error];
+                
                 // Falls back to presenting alert if the notification request failed.
                 if (error != nil) {
                     [self displayMessage:VPNStrings.disallowedTrafficAlertMessage];
