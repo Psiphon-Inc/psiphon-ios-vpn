@@ -143,8 +143,7 @@ func appDelegateReducer(
                    fulfill(._disallowedNotificationAlertPresentation(success: false))
                    return
                     
-                case .presentTopOfStack(let rootViewController),
-                     .presentInStack(let rootViewController):
+                case .presentTopOfStack(_), .presentInStack(_):
                 
                     // FIXME: Accessing global singleton variable
                     let alertController = makeDisallowedTrafficAlertController(
@@ -162,7 +161,8 @@ func appDelegateReducer(
                                     AppDelegate.getTopPresentedViewController)
                         })
                     
-                    let success = rootViewController.safePresent(alertController, animated: true)
+                    let success = AppDelegate.getTopPresentedViewController()
+                        .safePresent(alertController, animated: true)
                     
                     fulfill(._disallowedNotificationAlertPresentation(success: success))
                  
@@ -909,7 +909,7 @@ fileprivate func tryPresentSubscriptionViewController(
     let topMostViewController = getTopMostPresentedViewController()
     
     let found = topMostViewController
-        .traversePresentingStackFor(type: IAPViewController.self)
+        .traversePresentingStackFor(type: IAPViewController.self, searchChildren: true)
     
     switch found {
     case .presentTopOfStack(_), .presentInStack(_):

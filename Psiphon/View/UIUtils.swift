@@ -679,11 +679,12 @@ extension UIViewController {
     }
     
     func traversePresentingStackFor<ViewController: UIViewController>(
-        type: ViewController.Type
+        type: ViewController.Type,
+        searchChildren: Bool = false
     ) -> ViewControllerPresent<ViewController> {
         
         if let viewController = UIViewController.traversePresentingStackFor(
-            viewControllerType: type, startingFrom: self
+            viewControllerType: type, startingFrom: self, searchChildren: searchChildren
         ) {
             if viewController == self && viewController.presentedViewController == nil {
                 return .presentTopOfStack(viewController)
@@ -697,13 +698,22 @@ extension UIViewController {
     
     /// Traverses the presenting stack starting from `topViewController`, searching for view controller
     /// with type `viewControllerType`.
+    /// - Parameter searchChildren: Also searches children in the view controller hierarchy.
     static func traversePresentingStackFor<ViewController: UIViewController>(
         viewControllerType: ViewController.Type,
-        startingFrom topViewController: UIViewController
+        startingFrom topViewController: UIViewController,
+        searchChildren: Bool = false
     ) -> ViewController? {
         
         if let viewController = topViewController as? ViewController {
             return .some(viewController)
+        }
+        
+        // NOTE: Current implementation limits itself to only the last child added.
+        if searchChildren {
+            if let viewController = topViewController.children.last as? ViewController {
+                return .some(viewController)
+            }
         }
         
         if let parent = topViewController.presentingViewController {
