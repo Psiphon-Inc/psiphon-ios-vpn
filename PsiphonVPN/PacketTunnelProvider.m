@@ -785,8 +785,15 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     dispatch_async(self->workQueue, ^{
         if ([reason isEqualToString:@"disallowed-traffic"] && [subject isEqualToString:@""]) {
             
+            BOOL hasActiveSpeedBoostOrSubscription = [self->sessionConfigValues
+                                                      hasActiveSpeedBoostOrSubscription];
+            
+            [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
+                                     format:@"disallowed-traffic server alert: notify user: %@",
+             NSStringFromBOOL(!hasActiveSpeedBoostOrSubscription)];
+            
             // Determines if the user is subscribed or speed-boosted.
-            if ([self->sessionConfigValues hasActiveSpeedBoostOrSubscription] == FALSE) {
+            if (hasActiveSpeedBoostOrSubscription == FALSE) {
                 
                 // Notifies the extension of the server alert.
                 [self.sharedDB incrementDisallowedTrafficAlertWriteSequenceNum];
