@@ -71,7 +71,12 @@ extension TunnelProviderSyncReason: CustomStringFeedbackDescription {
 extension UserDefaultsConfig: CustomFieldFeedbackDescription {
     
     var feedbackFields: [String: CustomStringConvertible] {
-        ["expectedPsiCashReward": self.expectedPsiCashReward]
+        [
+            "expectedPsiCashReward": self.expectedPsiCashReward,
+            "appLanguage": self.appLanguage,
+            "onboarding_stages_completed": self.onboardingStagesCompleted,
+            "LastCFBundleVersion": self.lastBundleVersion
+        ]
     }
     
 }
