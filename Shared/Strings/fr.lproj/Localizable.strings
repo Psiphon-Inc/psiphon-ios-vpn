@@ -11,7 +11,7 @@
 "ADD_PSICASH" = "Ajouter du PsiCash";
 
 /* Alert dialog body when requested operation by the user failed. */
-"ALERT_BODY_OPERATION_FAILED" = "Échec de l’opération, veuillez ressayer.";
+"ALERT_BODY_OPERATION_FAILED" = "Échec de l’opération, veuillez réessayer.";
 
 /* Alert dialog title. */
 "ALERT_TITLE_OPERATION_FAILED" = "Échec de l’opération";
@@ -35,7 +35,7 @@
 "CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Vous n’avez pas d’abonnement en cours.\nComme vous n’êtes pas abonné ou que votre abonnement est expiré, Psiphon ne peut être démarré qu’à partir de l’appli Psiphon.\n\nVeuillez ouvrir l’appli Psiphon pour démarrer.";
 
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
-"CHECK_UPSTREAM_PROXY_SETTING" = "Vous avez configuré Psiphon pour qu’il utilise un serveur mandataire ascendant.\nCependant, il semble que nous ne soyons pas en mesure de nous connecter à un serveur Psiphon par ce mandataire.\nVeuillez corriger les paramètres et ressayer.";
+"CHECK_UPSTREAM_PROXY_SETTING" = "Vous avez configuré Psiphon pour qu’il utilise un serveur mandataire ascendant.\nCependant, il semble que nous ne soyons pas en mesure de nous connecter à un serveur Psiphon par ce mandataire.\nVeuillez corriger les paramètres et réessayer.";
 
 /* Action button title, that when pressed connects the user to Psiphon network. */
 "CONNECT_BUTTON_TITLE" = "Connexion";
@@ -48,9 +48,6 @@
 
 /* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "CONNECT_TO_USE_SPEED_BOOST" = "Connectez-vous à Psiphon pour utiliser la Survitesse";
-
-/* Title for screen that allows user to select their desired server region. Use all capital letters in the translation only if it makes sense. */
-"CONNECT_VIA" = "PAYS DE CONNEXION";
 
 /* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
 "CORRUPT_SETTINGS_ALERT_TITLE" = "Réglages corrompus";
@@ -66,9 +63,6 @@
 
 /* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
 "DISMISS_BUTTON_TITLE" = "Fermer";
-
-/* Title of the button that dismisses the subscriptions menu */
-"DONE_ACTION" = "Terminé";
 
 /* Title of the button that dismisses a screen or a dialog */
 "DONE_BUTTON_TITLE" = "Terminé";
@@ -86,7 +80,7 @@
 "FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Échec de vérification de l’achat";
 
 /* Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
-"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "Une erreur est survenue lors du téléversement de votre rétroaction. Veuillez ressayer. Votre rétroaction nous permet d’améliorer le réseau Psiphon.";
+"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "Une erreur est survenue lors du téléversement de votre rétroaction. Veuillez réessayer. Votre rétroaction nous permet d’améliorer le réseau Psiphon.";
 
 /* Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
 "FEEDBACK_UPLOAD_FAILED_TITLE" = "Échec de téléversement de la rétroaction";
@@ -128,7 +122,7 @@
 "NO_INTERNET_CONNECTION_TITLE" = "Aucune connexion à Internet";
 
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
-"NO_PRODUCTS_TEXT_2" = "Impossible de récupérer les abonnements du magasin d’applications App Store. Veuillez ressayer plus tard.";
+"NO_PRODUCTS_TEXT_2" = "Impossible de récupérer les abonnements du magasin d’applications App Store. Veuillez réessayer plus tard.";
 
 /*[UNTRANSLATED] Alert OK Button */
 "OK_BUTTON" = "OK";
@@ -155,7 +149,7 @@
 "PERMISSION_REQUIRED_ALERT__TITLE" = "Une autorisation est requise";
 
 /* Subtitle shown when the current operation failed, asking the user to try again at a later time. */
-"PLEASE_TRY_AGAIN_LATER" = "Veuillez ressayer plus tard.";
+"PLEASE_TRY_AGAIN_LATER" = "Veuillez réessayer plus tard.";
 
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
 "PRIVACY_POLICY_DECLINED_ALERT_BODY" = "Vous devez accepter notre politique de confidentialité avant de poursuivre l’utilisation de Psiphon.";
@@ -250,11 +244,17 @@
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon n’est pas connecté";
 
+/* 'App Store' refers to Apple's App Store, do not translate or transliterate 'App Store'. This alert message informs the user that the purchase they made has not been recorded by App Store. */
+"PURCHASE_NOT_RECORDED_BY_APPSTORE" = "L’achat n’a pas été enregistré par l’App Store";
+
 /* Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
 "PURCHASING_PSICASH" = "Achat de PsiCash…";
 
 /* Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "PURCHASING_SPEED_BOOST" = "Achat de Survitesse…";
+
+/* Button title on an error alert that indicates it refreshes the user's purchase receipt on device. */
+"RECEIPT_REFRESH_BUTTON" = "Actualiser le reçu";
 
 /* Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "Actualisez votre reçu d’appli si :";
@@ -264,6 +264,9 @@
 
 /* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "Vous ne voyez pas un abonnement que vous avez acheté sur cet appareil";
+
+/* This alert message informs the user that the purchase they made has not been recorded and that they can tap the button 'Refresh Receipt' to try again. */
+"REFRESH_APP_RECEIPT_TO_TRY_AGAIN" = "Actualisez le reçu d’appli pour réessayer.";
 
 /* Title for a confirmation button that resets a user's previous consent. */
 "RESET_IDENTIFIER_BUTTON_TITLE" = "Réinitialiser le consentement";
@@ -275,16 +278,19 @@
 "RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restaurer mon abonnement";
 
 /* Action button title, that when pressed retries the recently failed operation. */
-"RETRY_BUTTON_TITLE" = "Ressayer";
+"RETRY_BUTTON_TITLE" = "Réssayer";
 
 /* Shown in a pop-up alert if user's rewarded video ad failed to load. */
-"REWARDED_VIDEO_LOAD_FAILED" = "Échec de chargement de la vidéo récompensée. Veuillez ressayer plus tard.";
+"REWARDED_VIDEO_LOAD_FAILED" = "Échec de chargement de la vidéo récompensée. Veuillez réessayer plus tard.";
 
 /* Title for screen that allows user to select language. Use all capital letters in the translation only if it makes sense. */
 "SELECT_LANG" = "SÉLECTIONNER UNE LANGUE";
 
 /* Select language button title. */
 "SELECT_LANG_BUTTON_TITLE" = "Sélectionner une langue";
+
+/* Title for screen that allows user to select their desired server region. */
+"SELECT_SERVER_REGION" = "Sélectionner la région du serveur";
 
 /* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Réinstaller le profil RPV";
@@ -362,16 +368,16 @@
 "SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Conditions générales d’utilisation ";
 
 /* Button title shown when something fails to load. Asks the user to tap the button to retry the operation */
-"TAP_TO_RETRY" = "Toucher pour ressayer";
+"TAP_TO_RETRY" = "Toucher pour réessayer";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Veuillez activer les données cellulaires ou utilisez le Wi-Fi.";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
-"VPN_START_FAIL_MESSAGE" = "Une erreur est survenue lors du démarrage de Psiphon. Veuillez ressayer.";
+"VPN_START_FAIL_MESSAGE" = "Une erreur est survenue lors du démarrage de Psiphon. Veuillez réessayer.";
 
-/* Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to to 'Fastest Country', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
-"VPN_START_FAIL_REGION_INVALID_MESSAGE_2" = "La région que vous avez sélectionnée n’est plus proposée. Vous êtes automatiquement passé à « Pays le plus rapide ».\n\nVous pouvez aussi sélectionner une autre région dans l’appli Psiphon.";
+/* Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to 'Best performance', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
+"VPN_START_FAIL_REGION_INVALID_MESSAGE_3" = "La région que vous avez sélectionnée n’est plus proposée. Vous êtes automatiquement passé à « Meilleures performances ».\n\nVous pouvez aussi sélectionner une autre région dans l’appli Psiphon.";
 
 /* Alert dialog title indicating to the user that Psiphon was unable to start */
 "VPN_START_FAIL_TITLE" = "Impossible de démarrer";

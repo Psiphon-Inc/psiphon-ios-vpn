@@ -49,9 +49,6 @@
 /*[UNTRANSLATED] User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "CONNECT_TO_USE_SPEED_BOOST" = "Connect to Psiphon to use Speed Boost";
 
-/* Title for screen that allows user to select their desired server region. Use all capital letters in the translation only if it makes sense. */
-"CONNECT_VIA" = "Conectar via";
-
 /*[UNTRANSLATED] Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
 "CORRUPT_SETTINGS_ALERT_TITLE" = "Corrupt Settings";
 
@@ -66,9 +63,6 @@
 
 /* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
 "DISMISS_BUTTON_TITLE" = "Dispensar";
-
-/* Title of the button that dismisses the subscriptions menu */
-"DONE_ACTION" = "Feito";
 
 /* Title of the button that dismisses a screen or a dialog */
 "DONE_BUTTON_TITLE" = "Feito";
@@ -250,11 +244,17 @@
 /*[UNTRANSLATED] Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon is not connected";
 
+/*[UNTRANSLATED] 'App Store' refers to Apple's App Store, do not translate or transliterate 'App Store'. This alert message informs the user that the purchase they made has not been recorded by App Store. */
+"PURCHASE_NOT_RECORDED_BY_APPSTORE" = "Purchase not recorded by App Store.";
+
 /*[UNTRANSLATED] Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
 "PURCHASING_PSICASH" = "Purchasing PsiCash…";
 
 /*[UNTRANSLATED] Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "PURCHASING_SPEED_BOOST" = "Purchasing Speed Boost…";
+
+/*[UNTRANSLATED] Button title on an error alert that indicates it refreshes the user's purchase receipt on device. */
+"RECEIPT_REFRESH_BUTTON" = "Refresh Receipt";
 
 /*[UNTRANSLATED] Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "Refresh your app receipt when:";
@@ -264,6 +264,9 @@
 
 /*[UNTRANSLATED] Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "You cannot see a subscription you purchased on this device";
+
+/*[UNTRANSLATED] This alert message informs the user that the purchase they made has not been recorded and that they can tap the button 'Refresh Receipt' to try again. */
+"REFRESH_APP_RECEIPT_TO_TRY_AGAIN" = "Refresh the app receipt to try again.";
 
 /*[UNTRANSLATED] Title for a confirmation button that resets a user's previous consent. */
 "RESET_IDENTIFIER_BUTTON_TITLE" = "Reset Consent";
@@ -285,6 +288,9 @@
 
 /* Select language button title. */
 "SELECT_LANG_BUTTON_TITLE" = "Selecionar idioma";
+
+/*[UNTRANSLATED] Title for screen that allows user to select their desired server region. */
+"SELECT_SERVER_REGION" = "Select server region";
 
 /*[UNTRANSLATED] Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Reinstall VPN profile";
@@ -370,8 +376,8 @@
 /*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "An error occurred while starting Psiphon. Please try again.";
 
-/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to to 'Fastest Country', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
-"VPN_START_FAIL_REGION_INVALID_MESSAGE_2" = "The region you selected is no longer available. You have automatically been switched to \"Fastest Country\".\n\n You can also select a new region from the Psiphon app.";
+/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to 'Best performance', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
+"VPN_START_FAIL_REGION_INVALID_MESSAGE_3" = "The region you selected is no longer available. You have automatically been switched to \"Best performance\".\n\n You can also select a new region from the Psiphon app.";
 
 /*[UNTRANSLATED] Alert dialog title indicating to the user that Psiphon was unable to start */
 "VPN_START_FAIL_TITLE" = "Unable to start";
