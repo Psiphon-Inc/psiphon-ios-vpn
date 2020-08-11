@@ -568,7 +568,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     
     [centre getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
         
-        if (settings.authorizationStatus != UNAuthorizationStatusAuthorized) {
+        // If the authorization has not been given for user notifications,
+        // or if the app is not backgrounded (in which case user notifications won't show),
+        // then display simple alert using NEProvider `displayMessage::` method.
+        // Otherwise, send schedule user notification.
+        if (settings.authorizationStatus != UNAuthorizationStatusAuthorized ||
+            [self.sharedDB getAppForegroundState] == TRUE) {
             [self displayMessage: VPNStrings.disallowedTrafficAlertMessage];
         } else {
             UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
