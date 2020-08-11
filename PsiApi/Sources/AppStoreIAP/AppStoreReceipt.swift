@@ -86,6 +86,10 @@ public struct ProductID: TypedIdentifier {
 }
 
 public struct ReceiptData: Hashable {
+    /// Receipt file name.
+    /// In debug build and Test Flight `filename` is expected to be "sandboxReceipt", however in production
+    /// it is expected to be "receipt".
+    public let filename: String
     /// Subscription in-app purchases within the receipt that have not expired at the time of `readDate`.
     public let subscriptionInAppPurchases: Set<SubscriptionIAPPurchase>
     /// Consumables in-app purchases within the receipt.
@@ -95,12 +99,27 @@ public struct ReceiptData: Hashable {
     /// Date at which the receipt `data` was read.
     public let readDate: Date
     
+    /// Whether the receipt file was created in the sandbox environment or not based on `filename`.
+    /// Value is `nil` if `filename` is not one of the expected values.
+    public var isReceiptSandbox: Bool? {
+        switch filename {
+        case "receipt":
+            return false
+        case "sandboxReceipt":
+            return true
+        default:
+            return .none
+        }
+    }
+    
     public init(
+        filename: String,
         subscriptionInAppPurchases: Set<SubscriptionIAPPurchase>,
         consumableInAppPurchases: Set<ConsumableIAPPurchase>,
         data: Data,
         readDate: Date
     ) {
+        self.filename = filename
         self.subscriptionInAppPurchases = subscriptionInAppPurchases
         self.consumableInAppPurchases = consumableInAppPurchases
         self.data = data
