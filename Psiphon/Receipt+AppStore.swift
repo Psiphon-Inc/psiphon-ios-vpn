@@ -112,8 +112,9 @@ extension ReceiptData {
                     purchaseDate: parsedIAP.purchaseDate
                 )
         })
-        
-        return ReceiptData(subscriptionInAppPurchases: subscriptionPurchases,
+                
+        return ReceiptData(filename: receiptURL.lastPathComponent,
+                           subscriptionInAppPurchases: subscriptionPurchases,
                            consumableInAppPurchases: consumablePurchases,
                            data: data, readDate: readDate)
     }
