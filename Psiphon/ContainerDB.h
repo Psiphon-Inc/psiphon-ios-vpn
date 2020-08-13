@@ -23,68 +23,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ContainerDB : NSObject
 
-#pragma mark - App Info
-
-/**
- * App string version from last lunch.
- * @return String version or nil if it doesn't exist.
- */
-- (NSString *_Nullable)storedAppVersion;
-
-/**
- * Stores current app version.
- * @param appVersion App version string should not be nil.
- */
-- (void)storeCurrentAppVersion:(NSString *)appVersion;
-
-#pragma mark - Onboarding
-
-/**
- * Returns TRUE if user has finished onboarding, FALSE otherwise.
- */
-- (BOOL)hasFinishedOnboarding;
-
-/**
- * Sets internal flag that the user has finished onboarding. `- hasFinishedOnboarding` will return TRUE from now on.
- */
-- (void)setHasFinishedOnboarding;
-
-#pragma mark - Privacy Policy
-
-/**
- * Returns RFC3339 formatted time of last update to Psiphon's Privacy Policy for iOS.
- */
-- (NSString *)privacyPolicyLastUpdateTime;
-
-/**
- * Returns RFC3339 formatted time of the privacy policy that was last accepted by the user.
- */
-- (NSString *_Nullable)lastAcceptedPrivacyPolicy;
-
-/**
- * Returns TRUE if the user has accepted the latest privacy policy, FALSE otherwise.
- */
-- (BOOL)hasAcceptedLatestPrivacyPolicy;
-
-/**
- * Stores privacyPolicyTimestamp as the privacy policy that was accepted.
- *
- * @note This is not the time that the user accepted the privacy policy, but rather,
- * the time that the privacy policy was updated.
- *
- * @param privacyPolicyTimestamp
- */
-- (void)setAcceptedPrivacyPolicy:(NSString *)privacyPolicyTimestamp;
-
-/**
- *
- * Stores `-privacyPolicyLastUpdateTime` as the privacy policy that was accepted.
- *
- * @note This is not the time that the user accepted the privacy policy, but rather,
- * the time that the privacy policy was updated.
- */
-- (void)setAcceptedLatestPrivacyPolicy;
-
 /**
  * Sets set of egress regions in standard NSUserDefaults
  */

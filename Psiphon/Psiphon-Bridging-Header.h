@@ -41,8 +41,16 @@
 #import "UIFont+Additions.h"
 #import "Strings.h"
 #import "WhiteSkyButton.h"
+#import "CloudsView.h"
+#import "RingSkyButton.h"
+#import "OnboardingView.h"
+#import "OnboardingScrollableView.h"
+#import "LanguageSelectionViewController.h"
+#import "RoyalSkyButton.h"
+#import "AlertDialogs.h"
 #import "SubscriptionStatusView.h"
-
+#import "RootContainerController.h"
+#import "IAPViewController.h"
 
 // Ads
 #import "AdControllerWrapper.h"

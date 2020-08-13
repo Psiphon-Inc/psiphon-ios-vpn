@@ -221,6 +221,19 @@ import Foundation
                                  value: "Refresh Receipt",
                                  comment: "Button title on an error alert that indicates it refreshes the user's purchase receipt on device.")
     }
+    
+    static func Onboarding_user_notification_permission_title() -> String {
+        return NSLocalizedString("ONBOARDING_NOTIFICATION_PERMISSION_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Get notified about important network events",
+                                 comment: "Onboarding screen title that will be asking the user permission to send notifications about important network events while they use the app.")
+    }
+    
+    static func Onboarding_user_notification_permission_body() -> String {
+        return NSLocalizedString("ONBOARDING_NOTIFICATION_PERMISSION_BODY", tableName: nil, bundle: Bundle.main,
+                                 value: "Allow Psiphon to send notifications so that you can be notified of important network events.",
+                                 comment: "Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app.")
+    }
+    
 }
 
 // MARK: Internet reachability
@@ -505,4 +518,20 @@ extension UserStrings {
             comment: "Action button title, that when pressed retries the recently failed operation.")
     }
     
+}
+
+// MARK: Disallowed traffic
+extension UserStrings {
+    
+    static func Upgrade_psiphon() -> String {
+        return NSLocalizedString("UPGRADE_PSIPHON", tableName: nil, bundle: Bundle.main,
+                                 value: "Upgrade Psiphon",
+                                 comment: "Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request.")
+    }
+    
+    static func Disallowed_traffic_alert_message() -> String {
+        return NSLocalizedString("DISALLOWED_TRAFFIC_ALERT_MESSAGE", tableName: nil, bundle: Bundle.main,
+                                 value: "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.",
+                                 comment: "Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request.")
+    }
 }

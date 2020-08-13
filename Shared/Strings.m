@@ -167,7 +167,7 @@
     return NSLocalizedStringWithDefaultValue(@"VPN_START_PRIVACY_POLICY_BUTTON", nil, [NSBundle mainBundle], @"Privacy Policy", @"Button label taking user's to our Privacy Policy page");
 }
 
-+ (NSString *)privacyPolicyHTMLText {
++ (NSString *)privacyPolicyHTMLText_v2018 {
     NSString *format = @"\
         <h2>%1$@</h2>\
         <p>%2$@</p>\

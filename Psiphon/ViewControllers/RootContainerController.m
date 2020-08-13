@@ -36,18 +36,18 @@
 #import <ReactiveObjC/RACSignal.h>
 #import "RootContainerController.h"
 #import "AppInfo.h"
-#import "LaunchScreenViewController.h"
 #import "Logging.h"
-#import "ContainerDB.h"
 #import "NSDate+Comparator.h"
-#import "OnboardingViewController.h"
 #import "RACCompoundDisposable.h"
+#import "LaunchScreenViewController.h"
+#import "MainViewController.h"
+#import "Psiphon-Swift.h"
 
 // Apple documentation for creating custom container view controllers:
 // https://developer.apple.com/library/content/featuredarticles/ViewControllerPGforiPhoneOS/ImplementingaContainerViewController.html
 // https://developer.apple.com/videos/play/wwdc2011/102/
 
-@interface RootContainerController () <OnboardingViewControllerDelegate>
+@interface RootContainerController ()
 
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
 
@@ -76,8 +76,6 @@
     [super viewDidLoad];
     [self.view setBackgroundColor:[UIColor blackColor]];
 
-    ContainerDB *containerDB = [[ContainerDB alloc] init];
-
 #if DEBUG
     if ([AppInfo runningUITest]) {
         [self switchToMainScreenAndStartVPN:FALSE];
@@ -85,18 +83,28 @@
     }
 #endif
     
-    if (![containerDB hasFinishedOnboarding]) {
-        [self switchToOnboarding];
-    } else {
+    if ([SwiftDelegate.bridge completedAllOnboardingStages]) {
         [self switchToMainScreenAndStartVPN:FALSE];
+    } else {
+        [self switchToOnboarding];
     }
 }
 
 - (void)switchToOnboarding {
     // onboarding view controller should always be the first view controller.
     assert([self.childViewControllers count] == 0);
-    OnboardingViewController *onboardingViewController = [[OnboardingViewController alloc] init];
-    onboardingViewController.delegate = self;
+    
+    RootContainerController *__weak weakSelf = self;
+    
+    OnboardingViewController *onboardingViewController =
+    [SwiftDelegate.bridge
+     makeOnboardingViewControllerWithStagesNotCompleted:^(OnboardingViewController * _Nonnull vc) {
+        RootContainerController *__strong strongSelf = weakSelf;
+        if (strongSelf != nil) {
+            [strongSelf onboardingFinished:vc];
+        }
+    }];
+    
     [self addAndDisplayChildVC:onboardingViewController];
 }
 
@@ -168,12 +176,13 @@
     return [self.childViewControllers lastObject];
 }
 
-#pragma mark - OnboardingViewController delegate methods
+#pragma mark - Onboarding callback method
 
 - (void)onboardingFinished:(OnboardingViewController *)onboardingViewController {
     assert([self.childViewControllers count] == 1);
     [self removeChildVC:onboardingViewController];
-    [self switchToMainScreenAndStartVPN:TRUE];
+    // Starts VPN if it is a new installation.
+    [self switchToMainScreenAndStartVPN:[SwiftDelegate.bridge isNewInstallation]];
 }
 
 #pragma mark - Public methods
