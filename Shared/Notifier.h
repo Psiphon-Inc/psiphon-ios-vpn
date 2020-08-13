@@ -34,6 +34,7 @@ extern NotifierMessage const NotifierAvailableEgressRegions;
 extern NotifierMessage const NotifierNetworkConnectivityFailed;
 /** Emitted only if network connectivity failed was previously posted. */
 extern NotifierMessage const NotifierNetworkConnectivityResolved;
+extern NotifierMessage const NotifierDisallowedTrafficAlert;
 
 // Messages sent by the container.
 extern NotifierMessage const NotifierStartVPN;

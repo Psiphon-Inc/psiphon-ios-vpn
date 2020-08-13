@@ -19,6 +19,16 @@
 
 #import <Foundation/Foundation.h>
 
+NS_ASSUME_NONNULL_BEGIN
+
+typedef NS_ENUM(NSInteger, AuthorizationAccessType) {
+    AuthorizationAccessTypeUnknown = 0,
+    AuthorizationAccessTypeAppleSubscription = 1,
+    AuthorizationAccessTypeAppleSubscriptionTest = 2,
+    AuthorizationAccessTypeSpeedBoost = 3,
+    AuthorizationAccessTypeSpeedBoostTest = 4
+};
+
 @interface Authorization : NSObject
 
 @property (nonatomic, readonly, nonnull) NSString *base64Representation;
@@ -34,4 +44,8 @@
 
 - (instancetype _Nullable)initWithEncodedAuthorization:(NSString *_Nullable)encodedAuthorization;
 
+- (AuthorizationAccessType)accessTypeValue;
+
 @end
+
+NS_ASSUME_NONNULL_END

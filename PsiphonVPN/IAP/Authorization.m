@@ -95,6 +95,8 @@
             [PsiFeedbackLogger error:@"authorization 'AccessType' is empty"];
             return nil;
         }
+        
+        
 
         // Get Expires date
         NSString *authExpiresDateString = (NSString *) authDict[@"Expires"];
@@ -130,6 +132,24 @@
 - (NSUInteger)hash {
     // Authorization ID is itself unique.
     return [self.ID hash];
+}
+
+- (AuthorizationAccessType)accessTypeValue {
+    if ([self.accessType isEqualToString:@"apple-subscription"]) {
+        return AuthorizationAccessTypeAppleSubscription;
+        
+    } else if ([self.accessType isEqualToString:@"apple-subscription-test"]) {
+        return AuthorizationAccessTypeAppleSubscriptionTest;
+        
+    } else if ([self.accessType isEqualToString:@"speed-boost"]) {
+        return AuthorizationAccessTypeSpeedBoost;
+        
+    } else if ([self.accessType isEqualToString:@"speed-boost-test"]) {
+        return AuthorizationAccessTypeSpeedBoostTest;
+        
+    } else {
+        return AuthorizationAccessTypeUnknown;
+    }
 }
 
 @end

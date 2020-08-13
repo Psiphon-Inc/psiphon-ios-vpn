@@ -142,6 +142,17 @@ extension UIButton {
     func contentEdgeInset(_ inset: EdgeInsets) {
         self.contentEdgeInsets = inset.value
     }
+    
+    func setContentEdgeInsets(top: CGFloat, leading: CGFloat, bottom: CGFloat, trailing: CGFloat) {
+        switch UIApplication.shared.userInterfaceLayoutDirection {
+        case .leftToRight:
+            self.contentEdgeInsets = UIEdgeInsets(top: top, left: leading, bottom: bottom, right: trailing)
+        case .rightToLeft:
+            self.contentEdgeInsets = UIEdgeInsets(top: top, left: trailing, bottom: bottom, right: leading)
+        @unknown default:
+            fatalError()
+        }
+    }
 
 }
 
@@ -355,12 +366,27 @@ extension UIView: Anchorable {
 }
 
 extension UIView {
+    
+    var safeAreaAnchors: Anchorable {
+        if #available(iOS 11.0, *) {
+            return self.safeAreaLayoutGuide
+        } else {
+            return self
+        }
+    }
 
     func constraintToParent(_ anchors: Anchor...) -> [NSLayoutConstraint] {
         guard let parent = self.superview else {
             fatalError("'constraintToParent' requires the view to have a parent view")
         }
         return constraint(to: parent, anchors)
+    }
+    
+    func constraintToParentSafeArea(_ anchors: Anchor...) -> [NSLayoutConstraint] {
+        guard let parent = self.superview else {
+            fatalError("'constraintToParent' requires the view to have a parent view")
+        }
+        return constraint(to: parent.safeAreaAnchors, anchors)
     }
 
     func matchParentConstraints(top: Float = 0, leading: Float = 0, trailing: Float = 0,
@@ -653,11 +679,12 @@ extension UIViewController {
     }
     
     func traversePresentingStackFor<ViewController: UIViewController>(
-        type: ViewController.Type
+        type: ViewController.Type,
+        searchChildren: Bool = false
     ) -> ViewControllerPresent<ViewController> {
         
         if let viewController = UIViewController.traversePresentingStackFor(
-            viewControllerType: type, startingFrom: self
+            viewControllerType: type, startingFrom: self, searchChildren: searchChildren
         ) {
             if viewController == self && viewController.presentedViewController == nil {
                 return .presentTopOfStack(viewController)
@@ -671,13 +698,22 @@ extension UIViewController {
     
     /// Traverses the presenting stack starting from `topViewController`, searching for view controller
     /// with type `viewControllerType`.
+    /// - Parameter searchChildren: Also searches children in the view controller hierarchy.
     static func traversePresentingStackFor<ViewController: UIViewController>(
         viewControllerType: ViewController.Type,
-        startingFrom topViewController: UIViewController
+        startingFrom topViewController: UIViewController,
+        searchChildren: Bool = false
     ) -> ViewController? {
         
         if let viewController = topViewController as? ViewController {
             return .some(viewController)
+        }
+        
+        // NOTE: Current implementation limits itself to only the last child added.
+        if searchChildren {
+            if let viewController = topViewController.children.last as? ViewController {
+                return .some(viewController)
+            }
         }
         
         if let parent = topViewController.presentingViewController {
@@ -686,6 +722,22 @@ extension UIViewController {
         }
         
         return .none
+    }
+    
+    /// Presents a view controller modally, and returns `true` if operation succeeded, returns `false` otherwise.
+    func safePresent(
+        _ viewControllerToPresent: UIViewController,
+        animated flag: Bool,
+        completion: (() -> Void)? = nil
+    ) -> Bool {
+        self.present(viewControllerToPresent, animated: flag, completion: completion)
+        
+        // `isBeingPresented` value here is interpreted as meaning that
+        // the view controller will be presented soon and that the operation
+        // has not failed (e.g. if `self` is already presenting another view controller).
+        // Documentation is sparse on this, and this interpretation might need to be
+        // re-evaluated at some point in the future.
+        return viewControllerToPresent.isBeingPresented
     }
     
 }
