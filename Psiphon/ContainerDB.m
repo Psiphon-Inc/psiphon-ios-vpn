@@ -27,64 +27,9 @@
 UserDefaultsKey const EmbeddedEgressRegionsStringArrayKey =
     @"embedded_server_entries_egress_regions";  // legacy key
 
-UserDefaultsKey const AppInfoLastCFBundleVersionStringKey = @"LastCFBundleVersion"; // legacy key
-
-UserDefaultsKey const FinishedOnboardingBoolKey = @"ContainerDB.FinishedOnboardingBoolKey";
-
-UserDefaultsKey const PrivacyPolicyAcceptedStringTimeKey = @"ContainerDB.PrivacyPolicyAcceptedStringTimeKey2";
-
 #pragma mark -
 
 @implementation ContainerDB
-
-- (NSString *_Nullable)storedAppVersion {
-    return [NSUserDefaults.standardUserDefaults stringForKey:AppInfoLastCFBundleVersionStringKey];
-}
-
-- (void)storeCurrentAppVersion:(NSString *)appVersion {
-    [NSUserDefaults.standardUserDefaults setObject:appVersion
-                                            forKey:AppInfoLastCFBundleVersionStringKey];
-}
-
-#pragma mark -
-
-- (BOOL)hasFinishedOnboarding {
-    return [NSUserDefaults.standardUserDefaults boolForKey:FinishedOnboardingBoolKey];
-}
-
-- (void)setHasFinishedOnboarding {
-    [NSUserDefaults.standardUserDefaults setBool:TRUE forKey:FinishedOnboardingBoolKey];
-}
-
-#pragma mark -
-
-- (NSString *)privacyPolicyLastUpdateTime {
-    return @"2018-05-15T19:39:57+00:00";
-}
-
-- (NSString *_Nullable)lastAcceptedPrivacyPolicy {
-    NSString *_Nullable unixTime = [NSUserDefaults.standardUserDefaults
-      stringForKey:PrivacyPolicyAcceptedStringTimeKey];
-
-    return unixTime;
-}
-
-- (BOOL)hasAcceptedLatestPrivacyPolicy {
-    NSString *_Nullable lastAccepted = [self lastAcceptedPrivacyPolicy];
-    return [[self privacyPolicyLastUpdateTime] isEqualToString:lastAccepted];
-}
-
-- (void)setAcceptedPrivacyPolicy:(NSString *)privacyPolicyTimestamp {
-    [NSUserDefaults.standardUserDefaults setObject:privacyPolicyTimestamp
-                                            forKey:PrivacyPolicyAcceptedStringTimeKey];
-}
-
-- (void)setAcceptedLatestPrivacyPolicy {
-    [NSUserDefaults.standardUserDefaults setObject:[self privacyPolicyLastUpdateTime]
-                                            forKey:PrivacyPolicyAcceptedStringTimeKey];
-}
-
-#pragma mark -
 
 - (void)setEmbeddedEgressRegions:(NSArray<NSString *> *_Nullable)regions {
     [NSUserDefaults.standardUserDefaults setObject:regions
