@@ -271,7 +271,7 @@ fileprivate extension OnboardingScreen {
             
         case (.userNotificationPermission, _):
             onboardingView = OnboardingView(
-                image: UIImage(named: "RedRocket_BlueCloudLarge")!, // TODO: Replace with final graphic
+                image: UIImage(named: "OnboardingPushNotificationPermission")!,
                 withTitle: UserStrings.Onboarding_user_notification_permission_title(),
                 withBody: UserStrings.Onboarding_user_notification_permission_body(),
                 withAccessoryView: nil
