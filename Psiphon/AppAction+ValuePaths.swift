@@ -206,13 +206,13 @@ extension AppState {
             AppDelegateReducerState(
                 psiCashBalance: self.psiCashBalance,
                 psiCash: self.psiCash,
-                adPresentationState: self.adPresentationState
+                appDelegate: self.appDelegateState
             )
         }
         set {
             self.psiCashBalance = newValue.psiCashBalance
             self.psiCash = newValue.psiCash
-            self.adPresentationState = newValue.adPresentationState
+            self.appDelegateState = newValue.appDelegate
         }
     }
     

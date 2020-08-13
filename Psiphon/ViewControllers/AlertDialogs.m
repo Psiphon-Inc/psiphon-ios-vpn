@@ -56,22 +56,6 @@
     return alert;
 }
 
-+ (UIAlertController *)privacyPolicyDeclinedAlert {
-    UIAlertController *alert = [UIAlertController
-      alertControllerWithTitle:[Strings privacyPolicyTitle]
-                       message:[Strings privacyPolicyDeclinedAlertBody]
-                preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:[UserStrings Dismiss_button_title]
-                                                            style:UIAlertActionStyleCancel
-                                                          handler:^(UIAlertAction *action) {
-                                                              // Do nothing.
-                                                          }];
-
-    [alert addAction:dismissAction];
-
-    return alert;
-}
-
 + (UIAlertController *)genericOperationFailedTryAgain {
     UIAlertController *alert = [UIAlertController
       alertControllerWithTitle:[Strings operationFailedAlertTitle]

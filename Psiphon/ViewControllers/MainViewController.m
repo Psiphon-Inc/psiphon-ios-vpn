@@ -46,7 +46,6 @@
 #import "VPNStartAndStopButton.h"
 #import "AlertDialogs.h"
 #import "RACSignal+Operations2.h"
-#import "ContainerDB.h"
 #import "NSDate+Comparator.h"
 #import "PickerViewController.h"
 #import "Strings.h"
@@ -54,6 +53,7 @@
 #import "UIView+Additions.h"
 #import "AppObservables.h"
 #import <PersonalizedAdConsent/PersonalizedAdConsent.h>
+#import "Psiphon-Swift.h"
 
 PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 
@@ -157,21 +157,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 - (void)viewDidLoad {
     LOG_DEBUG();
     [super viewDidLoad];
-
-    // Check privacy policy accepted date.
-    {
-        // `[ContainerDB privacyPolicyLastUpdateTime]` should be equal to `[ContainerDB lastAcceptedPrivacyPolicy]`.
-        // Log error if this is not the case.
-        ContainerDB *containerDB = [[ContainerDB alloc] init];
-
-        if (![containerDB hasAcceptedLatestPrivacyPolicy]) {
-            NSDictionary *jsonDescription = @{@"event": @"PrivacyPolicyDateMismatch",
-              @"got": [PsiFeedbackLogger safeValue:[containerDB lastAcceptedPrivacyPolicy]],
-              @"expected": [containerDB privacyPolicyLastUpdateTime]};
-
-            [PsiFeedbackLogger errorWithType:MainViewControllerLogType json:jsonDescription];
-        }
-    }
 
     availableServerRegions = [[AvailableServerRegions alloc] init];
     [availableServerRegions sync];
@@ -1050,30 +1035,22 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self presentViewController:navController animated:YES completion:nil];
 }
 
-#pragma mark - Subscription
-
-- (void)openIAPViewController {
-    IAPViewController *iapViewController = [[IAPViewController alloc] init];
-    iapViewController.openedFromSettings = NO;
-    UINavigationController *navController = [[UINavigationController alloc]
-      initWithRootViewController:iapViewController];
-    [self presentViewController:navController animated:YES completion:nil];
-}
-
 #pragma mark - PsiCash
 
 #pragma mark - PsiCash UI
 
-- (void)addPsiCashButtonTapped {
+- (void)presentPsiCashViewController:(PsiCashViewControllerTabs)tab {
     UIViewController *psiCashViewController = [SwiftDelegate.bridge
-                                               makePsiCashViewController:TabsAddPsiCash];
+                                               makePsiCashViewController:tab];
     [self presentViewController:psiCashViewController animated:YES completion:nil];
 }
 
+- (void)addPsiCashButtonTapped {
+    [self presentPsiCashViewController:PsiCashViewControllerTabsAddPsiCash];
+}
+
 - (void)speedBoostButtonTapped {
-    UIViewController *psiCashViewController = [SwiftDelegate.bridge
-                                               makePsiCashViewController:TabsSpeedBoost];
-    [self presentViewController:psiCashViewController animated:YES completion:nil];
+    [self presentPsiCashViewController:PsiCashViewControllerTabsSpeedBoost];
 }
 
 - (void)setupPsiphonLogoView {

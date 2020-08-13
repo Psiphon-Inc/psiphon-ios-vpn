@@ -108,6 +108,9 @@
 		6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		668AF9BF1E92CBD3008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
 		668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
+		8D0017D724DB233200EC3409 /* VPNStrings.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D0017D624DB233200EC3409 /* VPNStrings.m */; };
+		8D0017D924DB4B1200EC3409 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0017D824DB4B1200EC3409 /* OnboardingViewController.swift */; };
+		8D0017DB24DDD99A00EC3409 /* AppUpgrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0017DA24DDD99A00EC3409 /* AppUpgrade.swift */; };
 		8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62B9247DBB0D0028AFAF /* Utilities */; };
 		8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62BB247DBB130028AFAF /* PsiApi */; };
 		8D1F62BE247DC1690028AFAF /* Receipt+AppStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62BD247DC1690028AFAF /* Receipt+AppStore.swift */; };
@@ -125,6 +128,7 @@
 		8D497A2C247CEF50009CEBA8 /* GoogleUtilities.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */; };
 		8D497A2E247CEF50009CEBA8 /* nanopb.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A27247CEF4F009CEBA8 /* nanopb.xcframework */; };
 		8D4ACD32247E3626008E404C /* AppStoreIAP+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */; };
+		8D53C6A824C5EED8001E4E2D /* SessionConfigValues.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D53C6A724C5EED8001E4E2D /* SessionConfigValues.m */; };
 		8D778978247469FE0038BFDA /* AppInfo.h in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920620F3DA190033114B /* AppInfo.h */; };
 		8D7789B9247491CA0038BFDA /* PsiphonBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */; };
 		8D7789BD247493300038BFDA /* VPNState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789BC247493300038BFDA /* VPNState.swift */; };
@@ -180,13 +184,11 @@
 		A84087AFA5806D689C3BF6D2 /* PickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408390A766C7C2C246797C /* PickerViewController.m */; };
 		A84088BD3CFC8C511F22182C /* RoyalSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408F08BFF80A05CF46C00A /* RoyalSkyButton.m */; };
 		A84088D3FD4B01A7D14CCC53 /* SupportedLanguages.m in Sources */ = {isa = PBXBuildFile; fileRef = A84080B68F307C79F3BCCC59 /* SupportedLanguages.m */; };
-		A84088DD7FBB838689BC1FCC /* OnboardingViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408D96EC06ED36F86C690D /* OnboardingViewController.m */; };
 		A8408A3A478ECD6E3562CDF4 /* CloudsView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84081E39C751846A6009BEC /* CloudsView.m */; };
 		A8408AACE30F860F2C961A04 /* WhiteSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408FA077C517546DF6033C /* WhiteSkyButton.m */; };
 		A8408B83167EBE21E215C471 /* OnboardingView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84088889983161FB859D8A9 /* OnboardingView.m */; };
 		A8408BC29B903A6C0A32F32C /* SkyRegionSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408C8A7CA3C009F01FDA3B /* SkyRegionSelectionViewController.m */; };
 		A8408C424E64BF3D70273464 /* ConnectionStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408E0115540B5B2B305EAE /* ConnectionStatusView.m */; };
-		A8408D8C16D136075590193C /* AppUpgrade.m in Sources */ = {isa = PBXBuildFile; fileRef = A84089CB9E8B0DF1D88D0500 /* AppUpgrade.m */; };
 		A8408E281270691F61F9C20C /* AppVersionNumberView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84087C37CFC6977102EB09D /* AppVersionNumberView.m */; };
 		A8408E611665FC60D5DFF339 /* SubscriptionStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408BA05DC0D983E6740558 /* SubscriptionStatusView.m */; };
 		A8408EB13777DDCBEF7DE3C0 /* SwoopView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408B9A66413A25FC1A2BE1 /* SwoopView.m */; };
@@ -580,6 +582,10 @@
 		836B78D735F8B947A373FB00 /* Pods-Psiphon-PsiphonTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiphonTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiphonTests/Pods-Psiphon-PsiphonTests.release.xcconfig"; sourceTree = "<group>"; };
 		8422B782F6ACED7897FCAC25 /* libPods-PsiApi-PsiApiTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiApi-PsiApiTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		894580B71199444DBB2C3FA2 /* Pods-Psiphon-Testing.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Testing.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Testing/Pods-Psiphon-Testing.release.xcconfig"; sourceTree = "<group>"; };
+		8D0017D524DB233200EC3409 /* VPNStrings.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = VPNStrings.h; sourceTree = "<group>"; };
+		8D0017D624DB233200EC3409 /* VPNStrings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VPNStrings.m; sourceTree = "<group>"; };
+		8D0017D824DB4B1200EC3409 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
+		8D0017DA24DDD99A00EC3409 /* AppUpgrade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpgrade.swift; sourceTree = "<group>"; };
 		8D14CCB4BB61E10B351D20DC /* Pods-Psiphon-PsiApi.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi/Pods-Psiphon-PsiApi.release.xcconfig"; sourceTree = "<group>"; };
 		8D1F62BD247DC1690028AFAF /* Receipt+AppStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Receipt+AppStore.swift"; sourceTree = "<group>"; };
 		8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Authorization+Additions.swift"; sourceTree = "<group>"; };
@@ -596,6 +602,8 @@
 		8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = GoogleUtilities.xcframework; sourceTree = "<group>"; };
 		8D497A27247CEF4F009CEBA8 /* nanopb.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = nanopb.xcframework; sourceTree = "<group>"; };
 		8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppStoreIAP+Additions.swift"; sourceTree = "<group>"; };
+		8D53C6A624C5EED8001E4E2D /* SessionConfigValues.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SessionConfigValues.h; sourceTree = "<group>"; };
+		8D53C6A724C5EED8001E4E2D /* SessionConfigValues.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SessionConfigValues.m; sourceTree = "<group>"; };
 		8D5D8494247CE6420018A35B /* libPromisesObjC.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libPromisesObjC.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5F08A5247DB21700F51A42 /* Testing */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Testing; sourceTree = SOURCE_ROOT; };
 		8D5F08A6247DB23A00F51A42 /* Utilities */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Utilities; sourceTree = SOURCE_ROOT; };
@@ -661,7 +669,6 @@
 		A8408058458E7BFC4C3DFDDE /* AppEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppEvent.m; sourceTree = "<group>"; };
 		A84080B68F307C79F3BCCC59 /* SupportedLanguages.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SupportedLanguages.m; sourceTree = "<group>"; };
 		A84080E2A20C786DDAD17D48 /* RoyalSkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RoyalSkyButton.h; sourceTree = "<group>"; };
-		A840812E38D27BF4328678E0 /* OnboardingViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OnboardingViewController.h; sourceTree = "<group>"; };
 		A840816C0C9B0658776A8B91 /* RegionSelectionButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegionSelectionButton.h; sourceTree = "<group>"; };
 		A84081B66B02DF8283448409 /* AutoLayoutProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoLayoutProtocol.h; sourceTree = "<group>"; };
 		A84081E39C751846A6009BEC /* CloudsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CloudsView.m; sourceTree = "<group>"; };
@@ -695,7 +702,6 @@
 		A84088889983161FB859D8A9 /* OnboardingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingView.m; sourceTree = "<group>"; };
 		A8408902709B9D562B559532 /* CloudsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CloudsView.h; sourceTree = "<group>"; };
 		A840896A2A9959280DAE2DA1 /* LanguageSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LanguageSelectionViewController.m; sourceTree = "<group>"; };
-		A84089CB9E8B0DF1D88D0500 /* AppUpgrade.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppUpgrade.m; sourceTree = "<group>"; };
 		A8408A0C4220563DA1FE3048 /* ImageUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageUtils.m; sourceTree = "<group>"; };
 		A8408AAD421C096147E3FC8B /* Strings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Strings.h; sourceTree = "<group>"; };
 		A8408ABFCA9BBDD281E8A4FD /* SkyRegionSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyRegionSelectionViewController.h; sourceTree = "<group>"; };
@@ -712,11 +718,9 @@
 		A8408CEB0E34BC897F3FA7D6 /* OnboardingScrollableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingScrollableView.m; sourceTree = "<group>"; };
 		A8408D462EEE90AA7F2A8AFA /* SwoopView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SwoopView.h; sourceTree = "<group>"; };
 		A8408D7A1D96FE89B4FB49C1 /* ActivityIndicatorRoyalSkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityIndicatorRoyalSkyButton.h; sourceTree = "<group>"; };
-		A8408D96EC06ED36F86C690D /* OnboardingViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingViewController.m; sourceTree = "<group>"; };
 		A8408DB71B7BE2CF13F9CD04 /* UIView+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Additions.h"; sourceTree = "<group>"; };
 		A8408DBEEDCF56EC798536BF /* LayerAutoResizeUIView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LayerAutoResizeUIView.m; sourceTree = "<group>"; };
 		A8408E0115540B5B2B305EAE /* ConnectionStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConnectionStatusView.m; sourceTree = "<group>"; };
-		A8408E40526B0BDD6FED69E9 /* AppUpgrade.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppUpgrade.h; sourceTree = "<group>"; };
 		A8408E812B209E39BE1A36DF /* OnboardingScrollableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OnboardingScrollableView.h; sourceTree = "<group>"; };
 		A8408EF0378D6C5C22CC3FE2 /* OnboardingView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OnboardingView.h; sourceTree = "<group>"; };
 		A8408F08BFF80A05CF46C00A /* RoyalSkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RoyalSkyButton.m; sourceTree = "<group>"; };
@@ -1001,6 +1005,8 @@
 		4E0DCB101F28458100495781 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				4E10920620F3DA190033114B /* AppInfo.h */,
+				4E10920720F3DA190033114B /* AppInfo.m */,
 				CED6791824A4F82A00C4CA81 /* JetsamMetrics */,
 				521FD102219E0E8400F748EC /* Annotations.h */,
 				521FD101219E0E6300F748EC /* NotificationCenter.h */,
@@ -1068,8 +1074,6 @@
 				EFC2F5B720226780007B52F9 /* UIAlertController+Additions.h */,
 				EFC2F5C020226782007B52F9 /* UIAlertController+Additions.m */,
 				A8408C3BCEFC35B4744B684E /* Views */,
-				A8408D96EC06ED36F86C690D /* OnboardingViewController.m */,
-				A840812E38D27BF4328678E0 /* OnboardingViewController.h */,
 				A840841151FC43C5E1658677 /* AlertDialogs.m */,
 				A8408BAC196A108FFE3A5957 /* AlertDialogs.h */,
 				A8408390A766C7C2C246797C /* PickerViewController.m */,
@@ -1080,6 +1084,7 @@
 				A84088779C0DA0B8A46BCC1A /* LanguageSelectionViewController.h */,
 				52D363C8230DE215002C2221 /* PsiCashViewController.swift */,
 				52A2466C23A172A800A01FF1 /* AlertViewController.swift */,
+				8D0017D824DB4B1200EC3409 /* OnboardingViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -1318,8 +1323,6 @@
 				EF652CCF1F3521F8002AFB48 /* Supporting Files */,
 				4ED48C06215058C900B1A9A5 /* Util */,
 				4ED48C05215056E800B1A9A5 /* ViewControllers */,
-				4E10920620F3DA190033114B /* AppInfo.h */,
-				4E10920720F3DA190033114B /* AppInfo.m */,
 				4EB846402151830600687344 /* AvailableServerRegions.h */,
 				4EB846412151830600687344 /* AvailableServerRegions.m */,
 				EF652CD21F35224C002AFB48 /* AppDelegate.h */,
@@ -1330,8 +1333,6 @@
 				4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */,
 				A84086716D701D0F5B48E4C0 /* ContainerDB.m */,
 				A8408319CD72511CABBE4CD4 /* ContainerDB.h */,
-				A84089CB9E8B0DF1D88D0500 /* AppUpgrade.m */,
-				A8408E40526B0BDD6FED69E9 /* AppUpgrade.h */,
 				A84080B68F307C79F3BCCC59 /* SupportedLanguages.m */,
 				A8408C79DD812741E678AB94 /* SupportedLanguages.h */,
 				A8408058458E7BFC4C3DFDDE /* AppEvent.m */,
@@ -1358,6 +1359,7 @@
 				8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */,
 				8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */,
 				8D26455E24D4842E000F46C0 /* Navigator.swift */,
+				8D0017DA24DDD99A00EC3409 /* AppUpgrade.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -1377,6 +1379,10 @@
 				EFC2F5B520226758007B52F9 /* PacketTunnelUtils.h */,
 				EFC2F5B420226757007B52F9 /* PacketTunnelUtils.m */,
 				9BFEC1C9F506CE1DF07306D2 /* NEBridge.h */,
+				8D53C6A624C5EED8001E4E2D /* SessionConfigValues.h */,
+				8D53C6A724C5EED8001E4E2D /* SessionConfigValues.m */,
+				8D0017D524DB233200EC3409 /* VPNStrings.h */,
+				8D0017D624DB233200EC3409 /* VPNStrings.m */,
 			);
 			path = PsiphonVPN;
 			sourceTree = "<group>";
@@ -2029,6 +2035,7 @@
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
 				445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */,
 				52A2466F23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift in Sources */,
+				8D0017D924DB4B1200EC3409 /* OnboardingViewController.swift in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
 				EF90D7A5204F22C900228A63 /* timestamp_parse.c in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
@@ -2039,6 +2046,7 @@
 				8DCA6864247C7CF8001D026E /* Bindable.swift in Sources */,
 				CED6795D24A4FA3200C4CA81 /* RotatingFile.m in Sources */,
 				445F239620E1817C00D004E9 /* AppStoreParsedReceiptData.m in Sources */,
+				8D0017DB24DDD99A00EC3409 /* AppUpgrade.swift in Sources */,
 				445F24E420E1A5BA00D004E9 /* constr_SEQUENCE.c in Sources */,
 				CEBA9C132481AA9F0097D700 /* SharedDB.swift in Sources */,
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
@@ -2155,7 +2163,6 @@
 				A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */,
 				8D417ED9241844FA00FEE587 /* FloatingPoint+Additions.swift in Sources */,
 				A840875B190F7666A1BD98E5 /* UIView+AutoLayoutViewGroup.m in Sources */,
-				A84088DD7FBB838689BC1FCC /* OnboardingViewController.m in Sources */,
 				A8408B83167EBE21E215C471 /* OnboardingView.m in Sources */,
 				A84088BD3CFC8C511F22182C /* RoyalSkyButton.m in Sources */,
 				A8408161701C8F50F52866FC /* LayerAutoResizeUIView.m in Sources */,
@@ -2170,7 +2177,6 @@
 				A8408FF45D08D31E102FA41F /* ContainerDB.m in Sources */,
 				5245C5C92342A6840033EE13 /* UserDefaults.swift in Sources */,
 				52B3C54C23E0E895003F6B12 /* ButtonBuilder.swift in Sources */,
-				A8408D8C16D136075590193C /* AppUpgrade.m in Sources */,
 				A8408692D005E8599267522E /* UIView+Additions.m in Sources */,
 				8D1F62BE247DC1690028AFAF /* Receipt+AppStore.swift in Sources */,
 				A84087AFA5806D689C3BF6D2 /* PickerViewController.m in Sources */,
@@ -2203,6 +2209,7 @@
 				EF90D7B1204F231E00228A63 /* timestamp_tm.c in Sources */,
 				8D90FD5724C748E000E11C66 /* FeedbackUtils.m in Sources */,
 				8DD6E7E524591E270041DAC5 /* SubscriptionAuthCheck.m in Sources */,
+				8D0017D724DB233200EC3409 /* VPNStrings.m in Sources */,
 				8DD6E7E82459C83B0041DAC5 /* StoredAuthorizations.m in Sources */,
 				EF90D7B3204F232300228A63 /* timestamp_parse.c in Sources */,
 				CED6795024A4F9D400C4CA81 /* DelimitedFile.m in Sources */,
@@ -2237,6 +2244,7 @@
 				9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */,
 				CED6796B24A4FAA700C4CA81 /* ExtensionDataStoreKeys.m in Sources */,
 				CED6794324A4F95D00C4CA81 /* RunningStdev.m in Sources */,
+				8D53C6A824C5EED8001E4E2D /* SessionConfigValues.m in Sources */,
 				CED6791124A4F82400C4CA81 /* JetsamEvent.m in Sources */,
 				CED6790F24A4F82400C4CA81 /* JetsamTracking.m in Sources */,
 				521FD100219E0E3800F748EC /* DebugUtils.m in Sources */,

@@ -18,8 +18,16 @@
 */
 
 #import "AnimatedControl.h"
+#import "Psiphon-Swift.h"
 
-@implementation AnimatedControl
+@implementation AnimatedControl {
+    EventHandler *eventHandler;
+}
+
+- (void)setEventHandlerFor:(UIControlEvents)event handler:(EventHandler *_Nonnull)eventHandler {
+    self->eventHandler = eventHandler;
+    [self addTarget:self->eventHandler action:@selector(handleEvent) forControlEvents:event];
+}
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event {
     [super touchesBegan:touches withEvent:event];

@@ -21,7 +21,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+@class EventHandler;
+
 @interface AnimatedControl : UIControl
+
+- (void)setEventHandlerFor:(UIControlEvents)event handler:(EventHandler *_Nonnull)eventHandler;
 
 @end
 

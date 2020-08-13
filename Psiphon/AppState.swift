@@ -39,9 +39,9 @@ struct AppState: Equatable {
     var subscriptionAuthState = SubscriptionAuthState()
     var iapState = IAPState()
     var products = PsiCashAppStoreProductsState()
-    var adPresentationState: Bool = false
     var pendingLandingPageOpening: Bool = false
     var internetReachability = ReachabilityState()
+    var appDelegateState = AppDelegateState()
 }
 
 struct BalanceState: Equatable {
@@ -208,7 +208,7 @@ func makeEnvironment(
             }
         },
         vpnStartCondition: { [unowned store] () -> Bool in
-            return !store.value.adPresentationState
+            return !store.value.appDelegateState.adPresentationState
         },
         getCurrentTime: { () -> Date in
             return Date()
@@ -335,6 +335,7 @@ fileprivate func toRequestDelegateReducerEnvironment(
 
 fileprivate func toAppDelegateReducerEnvironment(env: AppEnvironment) -> AppDelegateEnvironment {
     AppDelegateEnvironment(
+        feedbackLogger: env.feedbackLogger,
         psiCashPersistedValues: env.userConfigs,
         sharedDB: env.sharedDB,
         psiCashEffects: env.psiCashEffects,
