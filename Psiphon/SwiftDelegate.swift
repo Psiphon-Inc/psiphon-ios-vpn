@@ -951,5 +951,13 @@ fileprivate func makeDisallowedTrafficAlertController(
             })
     )
     
+    alertController.addAction(
+        UIAlertAction(
+            title: UserStrings.Dismiss_button_title(),
+            style: .cancel,
+            handler: nil
+        )
+    )
+    
     return alertController
 }
