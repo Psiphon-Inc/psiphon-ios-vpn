@@ -1,0 +1,37 @@
+sw:
+  app_name: Psiphon
+  subtitle: Zaidi ya mipaka
+  description: |
+      Baada ya kusaidia makumi ya mamilioni ya watumiaji waliweza kufikia kwenye programu na tovuti ambazo wanapenda, Psiphon ilizindua programu ya kwanza kwa iOS! programu yetu mpya inajumuisha kulingana kufikia mtandao wa Psiphon,usalama wa kuunganishwa kwenye programu yako na tovuti.
+
+      Haijalishi wapi ulipo katika Dunia, programu ya Psiphon itakuunganisha kwenye programu uipendayo na tovuti. programu pia itakuweka wewe kwenye safu ya ziada kwa kukulinda wakati unatumia huduma ya Wi-Fi ya umma au mitandao mingine inayoweza kua isiyoaminika.
+
+      Sifa muhimu ni pamoja na:
+      Bure,matumizi ya kibinafsi isiyo na kikomo.
+      • Rahisi kupakua, sakinisha, na tumi. hakuna usajili au usanidi unahitajika.
+      •Uteuzi wa kiautomatic ya kiitifaki inayotoa haraka, kufikia kuaminika, Kila mda. • Husaidia Lugha nyingi, na eneo linaloweza kusanidiwa la seva.
+
+      Kuhusu usajili:
+      •Matangano ya usajili yalitolewa inakuruhusu kupata surf ya mtandao kwa haraka!
+      • Siku-3 kwa kipindi cha jaribio la bure.
+      • Bei: US$2.99 kwa wiki moja,US$9.99 kwa mwezi mmoja, au US$99.99 kwa mwaka mmoja.
+      • Malipo yatabadilika kwenye akaunti yako ya iTunes yenye uthibitisho wa manunuzi.
+      • Usajili wa kiautomatiki utapanga upya isipokua auto mpya itazima angalau kwa masaa 24 kabla ya mwisho wa kipindi cha sasa.
+      • Akauti yako itabadilika upya ndani ya masaa 24 kabla ya mwisho wa kipindi cha sasa, na tambua usajili wa gharama.
+      • Hakuna kufuta usajili wa sasa inaruhusu wakati wa kipindi cha usajili.
+      • Usajili unaweza kusimamia na auto mpya inaweza kuzima kwenda kwenye mpangilio wa akaunti yako kabla ya manunuzi.
+      • Sehemu yeyote isiyotumika kwa jaribio la bure inaeza kupotea wakatiwa usajili wa manunuzi.
+
+      Sera ya faragha://psiphon.ca/en/faragha.html
+      Masharti ya kutumia://psiphon.ca/en/leseni.html
+  keywords: Psiphon, proksi
+  subscriptions:
+    weekly:
+      title: Malipo ya wiki 1
+      description: Usajili unaoweza kurejeshwa
+    monthly:
+      title: Malipo ya mwezi 1
+      description: Usajili unaoweza kurejeshwa
+    yearly:
+      title: Malipo ya mwaka 1
+      description: Usajili unaoweza kurejeshwa
