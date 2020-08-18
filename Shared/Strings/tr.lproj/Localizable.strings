@@ -58,6 +58,12 @@
 /* Decline button title */
 "DECLINE_BUTTON_TITLE" = "Reddet";
 
+/*[UNTRANSLATED] Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
+"DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
+
+/*[UNTRANSLATED] Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
+"DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
+
 /* Text next to the button indicating to the user that the rewarded video advertisement is only available when they are not connected to Psiphon. Do not translate or transliterate 'PsiCash'. Do not translate or transliterate 'Psiphon'. */
 "DISCONNECT_TO_WATCH_AND_EARN_PSICASH" = "PsiCash kazanmak amacıyla görüntü seyretmek için Psiphon bağlantısını kesmelisiniz.";
 
@@ -124,6 +130,12 @@
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
 "NO_PRODUCTS_TEXT_2" = "App Store üzerinden abonelik bilgileri alınamadı. Lütfen bir süre sonra yeniden deneyin.";
 
+/*[UNTRANSLATED] Content of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
+"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" = "Apps not working? Tap here to improve your Psiphon experience!";
+
+/*[UNTRANSLATED] Title of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
+"NOTIFICATION_TITLE_UPGRADE_PSIPHON" = "Upgrade Psiphon";
+
 /* Alert OK Button */
 "OK_BUTTON" = "Tamam";
 
@@ -138,6 +150,12 @@
 
 /* Onboarding header */
 "ONBOARDING_GETTING_STARTED_HEADER" = "Başlarken";
+
+/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app. */
+"ONBOARDING_NOTIFICATION_PERMISSION_BODY" = "Allow Psiphon to send notifications so that you can be notified of important network events.";
+
+/*[UNTRANSLATED] Onboarding screen title that will be asking the user permission to send notifications about important network events while they use the app. */
+"ONBOARDING_NOTIFICATION_PERMISSION_TITLE" = "Get notified about important network events";
 
 /* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
 "ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "Bağlantı kurabilmek için Psiphon uygulamasına VPN yapılandırması ekleme izni vermelisiniz.";
@@ -290,7 +308,7 @@
 "SELECT_LANG_BUTTON_TITLE" = "Dil seçin";
 
 /* Title for screen that allows user to select their desired server region. */
-"SELECT_SERVER_REGION" = "Sunucu bölgesi seçin";
+"SELECT_SERVER_REGION" = "Sunucu bölgesini seçin";
 
 /* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "VPN profilini yeniden kur";
@@ -373,11 +391,14 @@
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Lütfen hücresel veriyi açın ya da Wi-Fi kullanın.";
 
+/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
+"UPGRADE_PSIPHON" = "Upgrade Psiphon";
+
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "Psiphon başlatılırken bir sorun çıktı. Lütfen yeniden deneyin.";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to 'Best performance', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
-"VPN_START_FAIL_REGION_INVALID_MESSAGE_3" = "Seçtiğiniz bölge artık kullanılamıyor. Sizin için otomatik olarak \"En İyi Performans\" seçildi.\n\nPsiphon uygulamasından yeni bir bölge seçebilirsiniz.";
+"VPN_START_FAIL_REGION_INVALID_MESSAGE_3" = "Seçtiğiniz bölge artık kullanılamıyor. Sizin için otomatik olarak \"En iyi başarım\" seçildi.\n\nİsterseniz Psiphon uygulamasından yeni bir bölge seçebilirsiniz.";
 
 /* Alert dialog title indicating to the user that Psiphon was unable to start */
 "VPN_START_FAIL_TITLE" = "Başlatılamadı";
