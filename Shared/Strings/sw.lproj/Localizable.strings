@@ -1,438 +1,438 @@
 /* Accept button title */
-"ACCEPT_BUTTON_TITLE" = "Aceptar";
+"ACCEPT_BUTTON_TITLE" = "Kubali";
 
 /* After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
-"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Activando...";
+"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Kuamilisha";
 
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
-"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "¡Está suscripto!";
+"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Umesajiliwa";
 
 /* Button title to add to user's PsiCash balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
-"ADD_PSICASH" = "Agrega PsiCash";
+"ADD_PSICASH" = "Ongeza PsiCash";
 
 /* Alert dialog body when requested operation by the user failed. */
-"ALERT_BODY_OPERATION_FAILED" = "La operación falló, por favor inténtelo de nuevo.";
+"ALERT_BODY_OPERATION_FAILED" = "Uendeshaji umeshindwa, tafadhali jaribu tena.";
 
 /* Alert dialog title. */
-"ALERT_TITLE_OPERATION_FAILED" = "La operación falló";
+"ALERT_TITLE_OPERATION_FAILED" = "uendeshaji umeshindwa";
 
 /* Title of the button which takes the user to the previous screen. Text should be short and one word when possible. */
-"BACK_BUTTON" = "Atrás";
+"BACK_BUTTON" = "Nyuma";
 
 /* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
-"BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Descartar";
+"BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Ondoa";
 
 /* Buy subscription dialog footer text explaining where the user can cancel an active subscription */
-"BUY_SUBSCRIPTIONS_FOOTER_CANCEL_INSTRUCTIONS_TEXT" = "Puede cancelar una suscripción activa en las Configuraciones de su Cuenta iTunes.";
+"BUY_SUBSCRIPTIONS_FOOTER_CANCEL_INSTRUCTIONS_TEXT" = "Unaweza kughairi usajili wa kazi katika mipangilio yako ya Akaunti ya iTunes.";
 
 /* Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Una suscripción es auto-renovable, lo que significa que una vez comprada será renovada automáticamente hasta que la cancele en las 24 horas previas al final del periodo actual.\n\nSu Cuenta iTunes será cargada para la renovación dentro de las 24 horas previas al final del periodo actual por el costo de la suscripción.";
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Usajili unaweza kufanya kazi upya kiautomati inayo maanisha kuwa ikisha nunuliwa itaweza kufanya kazi upya kiatomati  hadi uikatishe masaa 24 kabla ya mwisho wa kipindi cha sasa.\n\nAkaunti yako ya iTunes itatozwa malipo kwa ajili ya kufanya kazi upya ndani ya masaa 24 kabla ya mwisho wa kipindi cha sasa pamoja na gharama za usajili.";
 
 /* Title for a button that cancels an action. This should be generic enough to make sense whenever a cancel button is used. */
-"CANCEL_BUTTON_TITLE" = "Cancelar";
+"CANCEL_BUTTON_TITLE" = "futa";
 
 /* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
-"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "No tiene una suscripción activa.\nAl no ser un suscriptor, o al haber expirado su suscripción, Psiphon sólo puede ser iniciado desde la aplicación Psiphon.\n\nPor favor abra la aplicación Psiphon para empezar.";
+"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Hauna usajili unao fanya kazi.\nKwani wewe sio msajili au usajili wako umepitwa na wakati, Psiphon inaweza tu kuanzishwa kutoka katika programu ya  Psiphon.\n\nTafadhali fungua programu ya  Psiphon ili kuanza.";
 
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
-"CHECK_UPSTREAM_PROXY_SETTING" = "Ha configurado Psiphon para que use un proxy hacia Internet.\nSin embargo, parece que no podemos conectar al servidor Psiphon a través de ese proxy.\nPor favor, corrija la configuración e inténtelo de nuevo.";
+"CHECK_UPSTREAM_PROXY_SETTING" = "Unatakiwa mpangilio wa Psiphon kwa kutumia proxy ya juu.\nWalakini, tunaona kua haiwezi kungana na Psiphon seva kupitia proxy.\nTafadhali imarisha mpangilio na jaribu tena.";
 
 /* Action button title, that when pressed connects the user to Psiphon network. */
-"CONNECT_BUTTON_TITLE" = "Conectar";
+"CONNECT_BUTTON_TITLE" = "Unganisha";
 
 /* Text shown to the user telling them to connect to 'Psiphon', to finish their unfinished transaction. Do not translate or transliterate 'Psiphon'. */
-"CONNECT_TO_FINISH_PSICASH_TRANSACTION" = "Por favor conéctate a Psiphon para finalizar tu transacción";
+"CONNECT_TO_FINISH_PSICASH_TRANSACTION" = "Tafahali unganisha kwenye Psiphon kumalizia shughuli yako";
 
 /* Button title that lets the user to connect to the Psiphon network. Do not translate or transliterate 'Psiphon' */
-"CONNECT_TO_PSIPHON" = "Conectar a Psiphon";
+"CONNECT_TO_PSIPHON" = "Unganisha kwenye Psiphon";
 
 /* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"CONNECT_TO_USE_SPEED_BOOST" = "Conéctate a Psiphon para usar Aumento de Velocidad";
+"CONNECT_TO_USE_SPEED_BOOST" = "Unganisha kwenye Psiphon ili kutumia kiongeza kasi";
 
 /* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
-"CORRUPT_SETTINGS_ALERT_TITLE" = "Configuración corrupta";
+"CORRUPT_SETTINGS_ALERT_TITLE" = "Haribu Mipangilio";
 
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
-"CORRUPT_SETTINGS_MESSAGE" = "El fichero de configuración de su aplicación parece estar corrupto. Pruebe a reinstalar la aplicación para reparar el fichero.";
+"CORRUPT_SETTINGS_MESSAGE" = "Mpangilio wako wa faili la programu unaonesha kushindwa. Jaribu kufungua upya programu kwa kurekebisha faili.";
 
 /* Decline button title */
-"DECLINE_BUTTON_TITLE" = "Declinar";
+"DECLINE_BUTTON_TITLE" = "kataa";
 
-/*[UNTRANSLATED] Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
-"DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
+/* Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
+"DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "Wavuti nyingine za trafiki hazitoi msaada kwa toleo la bure kwa Psiphon. Ujasiri wa manunuzi au kuongeza kasi kwa kufungua uwezo kamili wa uzoefu wa Psiphon yako.";
 
-/*[UNTRANSLATED] Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
-"DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
+/* Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
+"DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "Wavuti nyingine za trafiki hazitoi msaada kwa toleo la bure kwa Psiphon. Ujasiri wa manunuzi au kuongeza kasi kwa kufungua uwezo kamili wa uzoefu wa Psiphon yako.";
 
 /* Text next to the button indicating to the user that the rewarded video advertisement is only available when they are not connected to Psiphon. Do not translate or transliterate 'PsiCash'. Do not translate or transliterate 'Psiphon'. */
-"DISCONNECT_TO_WATCH_AND_EARN_PSICASH" = "Debes desconectarte de Psiphon para mirar un vídeo y ganar PsiCash";
+"DISCONNECT_TO_WATCH_AND_EARN_PSICASH" = "Lazima usiunganishwe kwa Psiphon kwa kuangalia video na kupata PsiCash";
 
 /* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
-"DISMISS_BUTTON_TITLE" = "Descartar";
+"DISMISS_BUTTON_TITLE" = "Ondoa";
 
 /* Title of the button that dismisses a screen or a dialog */
-"DONE_BUTTON_TITLE" = "Hecho";
+"DONE_BUTTON_TITLE" = "Maliza";
 
-/*[UNTRANSLATED] Error alert title */
-"ERROR_TITLE" = "Error";
+/* Error alert title */
+"ERROR_TITLE" = "Kosa";
 
 /* No comment provided by engineer. */
-"EXTENSION_EXPIRED_SUBSCRIPTION_ALERT" = "Tu suscripción a Psiphon ha expirado.\n\nPor favor abre la aplicación Psiphon para renovarla.";
+"EXTENSION_EXPIRED_SUBSCRIPTION_ALERT" = "Usajili wa  Psiphon yako umepitwa na wakati.\n\nTafadhali fungua programu ya  Psiphon kuanzisha upya usajli wako.";
 
 /* Message shown when something fails to load */
-"FAILED_TO_LOAD" = "Fallo al cargar";
+"FAILED_TO_LOAD" = "Imeshindwa Kupakia";
 
 /* Message shown when verification of a product already purchased fails. */
-"FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Fallo al verificar la compra";
+"FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Imeshindwa kuhakiki ununuzi";
 
 /* Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
-"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "Ocurrió un error al subir sus comentarios. Por favor, inténtelo de nuevo. Sus comentarios nos ayudan a mejorar la red Psiphon.";
+"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "Kosa limetokea kipindi cha upakiaji wa mrejesho wako. Tafadhali jaribu tena. Mrejesho wako unatusaidia kuboresha mtandao wa Psiphon.";
 
 /* Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
-"FEEDBACK_UPLOAD_FAILED_TITLE" = "No se pudieron subir sus comentarios";
+"FEEDBACK_UPLOAD_FAILED_TITLE" = "Kupakia mrejesho kumeshindikana";
 
 /* Title of button on alert view which shows the progress of the users feedback being uploaded to Psiphon's servers. Hitting this button dismisses the alert and the upload continues in the background. */
-"FEEDBACK_UPLOAD_IN_PROGRESS_BACKGROUND_BUTTON_TITLE" = "Escenario";
+"FEEDBACK_UPLOAD_IN_PROGRESS_BACKGROUND_BUTTON_TITLE" = "Msingi";
 
 /* Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "Enviando sus comentarios...";
+"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "Kutuma mrejesho...";
 
 /* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
-"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "¡Gracias por ayudarnos a mejorar Psiphon!";
+"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "Asante kwa kusaidia kuboresha Psiphon!";
 
 /* Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Sus comentarios se subieron con éxito";
+"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Mrejesho umefanikiwa kupakiwa";
 
 /* Button title for a product that is free. There is no cost or payment associated. */
-"FREE_PSICASH_COIN" = "Gratis";
+"FREE_PSICASH_COIN" = "Bure";
 
 /* Generic alert shown when purchase of a product fails. */
-"GENERIC_PURCHASE_FAILED" = "Falló la Compra";
+"GENERIC_PURCHASE_FAILED" = "Ununuzi Umeshindikana";
 
 /* User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
-"INSUFFICIENT_PSICASH_BALANCE" = "Saldo insuficiente de PsiCash";
+"INSUFFICIENT_PSICASH_BALANCE" = "Usawa wa PsiCash sio wa kutosha";
 
-/* External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
-"LICENSE_PAGE_URL" = "https://psiphon.ca/es/license.html";
+/*[UNTRANSLATED] External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
+"LICENSE_PAGE_URL" = "https://psiphon.ca/en/license.html";
 
 /* Text displayed while app loads */
-"LOADING" = "Cargando...";
+"LOADING" = "Upakiaji...";
 
 /* Button title that takes user to the next page */
-"NEXT_PAGE_BUTTON_TITLE" = "Siguiente";
+"NEXT_PAGE_BUTTON_TITLE" = "Inayo fuata";
 
 /* Alert title informing user there is no internet connection */
-"NO_INTERNET" = "No hay conexión a Internet";
+"NO_INTERNET" = "Hakuna Mtandao ulio Unganishwa";
 
 /* Message shown to the user when there is no internet connect. */
-"NO_INTERNET_CONNECTION_TITLE" = "No hay conexión a Internet";
+"NO_INTERNET_CONNECTION_TITLE" = "Hakuna mtandao ulio unganishwa";
 
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
-"NO_PRODUCTS_TEXT_2" = "No se pudieron obtener las suscripciones desde la App Store. Por favor inténtelo de nuevo más tarde.";
+"NO_PRODUCTS_TEXT_2" = "Imeshindwa kurudisha usajili kutoka kwenye progamu ya kuhifadhi. Tafadhali jaribu tena badae.";
 
-/*[UNTRANSLATED] Content of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
-"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" = "Apps not working? Tap here to improve your Psiphon experience!";
+/* Content of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
+"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" = "Programu haifanyikazi? Bofya hapa kuhakiki uwezo wa Psiphon yako!";
 
-/*[UNTRANSLATED] Title of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
-"NOTIFICATION_TITLE_UPGRADE_PSIPHON" = "Upgrade Psiphon";
+/* Title of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
+"NOTIFICATION_TITLE_UPGRADE_PSIPHON" = "Boresha Psiphon";
 
-/*[UNTRANSLATED] Alert OK Button */
-"OK_BUTTON" = "OK";
+/* Alert OK Button */
+"OK_BUTTON" = "sawa";
 
 /* Onboarding screen text. (Do not translate 'Psiphon'). */
-"ONBOARDING_BEYOND_BORDERS_BODY_2" = "Psiphon lo conecta al contenido que quiere, sin importar dónde esté.";
+"ONBOARDING_BEYOND_BORDERS_BODY_2" = "Psiphon ina kuunganisha na maudhui unayo yahitaji, haijalishi mahali ulipo.";
 
 /* Beyond Borders title */
-"ONBOARDING_BEYOND_BORDERS_HEADER" = "Cruzando fronteras";
+"ONBOARDING_BEYOND_BORDERS_HEADER" = "Zaidi ya mipaka";
 
 /* Onboarding screen 'getting started' body. (Do not translate 'Psiphon'). */
-"ONBOARDING_GETTING_STARTED_BODY_2" = "Para poder conectar, Psiphon necesita la habilidad de añadir configuraciones VPN.";
+"ONBOARDING_GETTING_STARTED_BODY_2" = "Ili kuweza kuunganisha, Psiphon inahitaji uwezo wa kuongeza usanidi wa VPN.";
 
 /* Onboarding header */
-"ONBOARDING_GETTING_STARTED_HEADER" = "Iniciar con Martus";
+"ONBOARDING_GETTING_STARTED_HEADER" = "Kuanza";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app. */
-"ONBOARDING_NOTIFICATION_PERMISSION_BODY" = "Allow Psiphon to send notifications so that you can be notified of important network events.";
+/* Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app. */
+"ONBOARDING_NOTIFICATION_PERMISSION_BODY" = "Fikia Psiphon yako kwa kutuma taarifa hiyo basi unaweza kutoa taarifa kwa tukio la muhimu la mtandao.";
 
-/*[UNTRANSLATED] Onboarding screen title that will be asking the user permission to send notifications about important network events while they use the app. */
-"ONBOARDING_NOTIFICATION_PERMISSION_TITLE" = "Get notified about important network events";
+/* Onboarding screen title that will be asking the user permission to send notifications about important network events while they use the app. */
+"ONBOARDING_NOTIFICATION_PERMISSION_TITLE" = "Pata taarifa kuhusu matukio ya umuhimu ya mtandao";
 
 /* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
-"ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "Necesitará permitir a Psiphon el añadir configuraciones VPN para poder conectar.";
+"ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "Utahitaji kuruhusu Psiphon kuongeza usanidi wa VPN ili kuunganisha.";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
-"OPEN_PSIPHON_APP" = "Por favor, abra la aplicación Psiphon para finalizar la conexión.";
+"OPEN_PSIPHON_APP" = "Tafadhali fungua programu ya Psiphon kumaliza kuunganisha.";
 
 /* Alert dialog title indicating to the user that Psiphon needs their permission */
-"PERMISSION_REQUIRED_ALERT__TITLE" = "Se requiere permiso";
+"PERMISSION_REQUIRED_ALERT__TITLE" = "Inahitaji kupata ruhusa";
 
 /* Subtitle shown when the current operation failed, asking the user to try again at a later time. */
-"PLEASE_TRY_AGAIN_LATER" = "Por favor, inténtalo de nuevo más tarde.";
+"PLEASE_TRY_AGAIN_LATER" = "Tafadhali jaribu tena badae.";
 
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
-"PRIVACY_POLICY_DECLINED_ALERT_BODY" = "Debe aceptar nuestra Política de Privacidad antes de continuar con el uso de Psiphon.";
+"PRIVACY_POLICY_DECLINED_ALERT_BODY" = "Ni lazima ukubali sera ya faragha kabla ya kuendelea kutumia Psiphon.";
 
-/* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
-"PRIVACY_POLICY_URL" = "https://psiphon.ca/es/privacy.html";
-
-/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara1" = "Psiphon mira sus datos solamente en el grado necesario para recopilar estadísticas acerca del uso de nuestro sistema. Registramos el total de bytes transferidos por una conexión de usuario, como así también los bytes transferidos por algunos dominios específicos. Estas estadísticas se descartan luego de 60 días.";
+/*[UNTRANSLATED] External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
+"PRIVACY_POLICY_URL" = "https://psiphon.ca/en/privacy.html";
 
 /* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara2" = "Psiphon no inspecciona o registra URLs completos (solamente nombres de dominio), y tampoco inspecciona sus datos en profundidad. Psiphon no modifica sus datos al pasar a través de la VPN.";
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara1" = "Psiphon ina angalia data yako tu kwa kiwango muhimu cha ukusanyaji wa takwimu kuhusu matumizi ya mfumo wetu. Tuna rekodi jumla ya baiti zilizo hamishwa kwa uunganishwaji wa mtumiaji, pamoja na baiti zilizo hamishwa kwa kikoa fulani. Takwimu hizi zitatengwa baada ya siku 60.";
 
 /* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara3" = "Aún estos datos en bruto serían dificultosos de ser relacionados a usted, ya que convertimos inmediatamente su dirección IP a información geográfica, y luego descartamos el IP. Ninguna otra información identificatoria es almacenada.";
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara2" = "Psiphon haina kukagua au kurekodi URLs kamili (majina ya kikoa tu), na haifanyi mbali ukaguzi wa data yako. Psiphon haibadilishi data yako kadri inavyo pita kupitia VPN.";
+
+/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara3" = "Hata hii course data ingekuwa ngumu kurudi kuunganisha kwako, Tangu tumebadili mara moja anuani yako ya IP kwa taarifa ya jiografia na kutupa IP. Wala taarifa yoyote iliyo tambulika kuhifadhiwa.";
 
 /* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithSubhead" = "¿Qué hace Psiphon con sus datos de VPN?";
+"PrivacyInformationCollectedVpndataWhatdoespsiphondowithSubhead" = "Nini Psiphon inafanya kwa data ya VPN yako?";
 
 /* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara1" = "Al compartir con terceros, Psiphon solamente provee estadísticas en bruto o consolidadas en bytes de dominio. Nunca compartimos información por sesión, o cualquier otra información posiblemente identificatoria.";
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara1" = "Wakati wa ushiriki wa watu wengine, Psiphon pekee milele hutoa coarse, kukusanya takwimu za baiti za kikoa. Hatushiriki taarifa za kikao cha kabla au uwezekano mwingine wowote wa kubaini taarifa.";
 
 /* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara2" = "Lo que compartimos, lo hacemos típicamente con servicios u organizaciones con los que colaboramos — como lo <a href=\"http://www.dw.com/en/psiphon-helps-dodge-the-online-trackers/a-16765092\" target=\"_blank\">hicimos con DW</a> unos años atrás. Estas estadísticas ayudan a que tanto nosotros como ellos respondan preguntas tales como “¿cuántos bytes fueron transferidos a través de Psiphon desde DW.com hacia todos los usuarios en Irán en Abril?”";
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara2" = "Huu ushiriki kawaida hufanywa pamoja na huduma au taasisi tunazo shirikiana nazo —kama 1tulivyo fanya pamoja na DW1 miaka michache iliyo pita. Hizi takwimu zinaweza kutusaidia sisi na wao kujibu maswali kama,  “ni baiti ngapi zimehamishwa kupitia  Psiphon kwa DW.com kwa watumiaji wote wa Iran katika kipindi cha mwezi wa 4?”";
 
 /* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara3" = "De nuevo, específicamente no damos información detallada o potencialmente identificatoria a nivel de usuario a nuestros socios o terceros.";
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara3" = "Kwa mara nyingine, kwa kawaida hatutoi taarifa bainifu za kina au uwezekano za mtumiaji kwa washirika au vyama vingine vyote.";
 
 /* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithSubhead" = "¿Con quién comparte estas estadísticas Psiphon?";
+"PrivacyInformationCollectedVpndataWhopsiphonshareswithSubhead" = "Ni nani Psiphon anamshirikisha hizi takwimu?";
 
 /* Paragraph text in the 'Why should you care?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhycarePara1" = "Al emplear una VPN o proxy, debiera estar preocupado acerca de qué puede ver el proveedor en sus datos, recopilar a partir de los mismos, y hacer con ellos. Para algunas conexiones web y de correo electrónico, es teóricamente posible para una VPN el ver, recopilar y modificar los contenidos.";
+"PrivacyInformationCollectedVpndataWhycarePara1" = "Pindi unapo tumia VPN au proxy unatakiwa kujali kuhusu nini mtoaji anaweza kuona katika data yako, kusanya kutoka kwake, na ufanye hivyo. Kwa unganisho fulani la tovuti na barua pepe, kinadharia inawezekana kwa VPN kuweza kuona, kukusanya, na kubadili maudhui.";
 
 /* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
-"PrivacyInformationCollectedVpndataWhycareSubhead" = "¿Por qué debiera importarle?";
+"PrivacyInformationCollectedVpndataWhycareSubhead" = "Kwanini unapaswa kujali?";
 
 /* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item1" = "Estimar costos futuros: La enorme cantidad de datos de usuario que transferimos cada mes es un factor preponderante en nuestros costos. Nos es vital el ver y entender fluctuaciones en el uso.";
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item1" = "Makadirio ya gharama za siku zijazo: Kiasi kikubwa cha data ya mtumiaji tunahamisha kila mwezini sababu kuu ya gharama zetu. Ni muhimu kwetu kuona na kuelewa kushuka kwa matumizi.";
 
 /* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item2" = "Optimizar por tipos de tráfico: La transmisión de vídeo tiene diferentes requerimientos de red que la navegación web, la cual es diferente del chat, la cual es diferente de voz, y así sucesivamente. Las estadísticas acerca del número de bytes transferidos por algunos de los proveedores de medios masivos nos ayudan a entender cómo proveer la mejor experiencia a nuestros usuarios.";
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item2" = "Kungeza kwa aina ya trafiki: Utiririshaji wa video una mtandao tofauti mahitaji kuliko inavyofanya kuvinjari kwa wavuti, ambayo ni tofauti kuliko sauti, na  kadhaliko. Tarakimu kuhusu namba za baiti kuhamishwa kwa baadhi ya vyombo vya habari watoa hudum wanatusaidia kuelewa jinsi ya  kutoa uzoefu mzuri kwa watumiaji wetu.";
 
 /* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. If available in your language, the blog post URLs should be updated to the localized post. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item3" = "Determinar la naturaleza de eventos mayoritarios de censura: Sitios y servicios a menudo se ven bloqueados súbitamente y sin advertencia, lo cual puede conducir a enormes variaciones en el uso regional de Psiphon. Por ejemplo, tuvimos incrementos en uso del orden de 20 veces dentro de un día cuando <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">Brasil bloqueó WhatsApp</a> o <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">Turquía bloqueó las redes sociales</a>.";
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item3" = "Kuamua asili ya matukio ya udhamini mkubwa: Tovuti na huduma maranyingi hufungiwa ghafla na kutokua na tahadhari, Ambayo inaweza kusababisha tofauti kubwa katika maeneo yanayotumiwa na Psiphon. Kwa mfano, tutakua juu ya 20x surges kwa utumiaji ndani ya siku wakati <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">Brazil imefunga WhatsApp</a> au <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\"> Turkey imefunga mtandao wa kijamii</a>.";
 
 /* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. (English is using 'who' instead of 'whom' to reflect common idiom.) */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item4" = "Entender a quién necesitamos ayudar: Algunos sitios y servicios nunca serán bloqueados en ningún lado, algunos serán bloqueados siempre en ciertos países, y algunos serán bloqueados ocasionalmente en algunos otros. Para asegurar que nuestros usuarios son capaces de comunicarse y aprender libremente, necesitamos entender estos patrones, ver quiénes son afectados y trabajar con nuestros socios para asegurar que sus servicios funcionan de la mejor manera con Psiphon.";
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item4" = "Elewa nani tunatakiwa kumsaidia: baadhi ya tovuti na huduma haziwezi kufungiwa popote pale, baadhi mara kwa mara zitakua zimefungiwa katika nchi chache, na baadhi zitakua mara kwa mara zimefungiwa baadhi ya nchi. kuhakikisha kua watumiaji wetu wanauwezo wa kuzungumza na kusoma kwa uhuru, Tunatakiwa kujua mifumo hii, angalia nani aliyeathirika, na kufanya kazi na wahusika kwa kuhakikisha huduma zao zinafanya kazi na Psiphon.";
 
 /* Paragraph text in the 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. This paragraph serves as preamble for a detailed list, which is why it ends with a colon. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1ListStart" = "Estos datos son usados para determinar cómo está siendo usada nuestra red. Nos permite hacer cosas como:";
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1ListStart" = "Hii data tunaitumia kwa kuamua vipi mtandao wetu utakua ukitumika. Hii huturuhusu kufanya kitu kama:";
 
 /* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why Psiphon needs VPN data stats. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead" = "¿Por qué precisa Psiphon estas estadísticas?";
+"PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead" = "Kwanini hufanya Psiphon kuhitaji takwimu hizi?";
 
 /* page title for the Privacy Policy page */
-"PrivacyTitle" = "Política de privacidad";
+"PrivacyTitle" = "Sera ya faragha";
 
 /* Message shown when products available for purchase could not be retrieved. */
-"PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "La lista de productos no pudo ser obtenida";
+"PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "listi ya bidhaa haiwezi sahihisha";
 
 /* PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
-"PSICASH_BALANCE" = "Balance de PsiCash:";
+"PSICASH_BALANCE" = "Usawa wa PsiCash:";
 
 /* User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
-"PSICASH_BALANCE_OUT_OF_DATE_ALERT_BODY" = "Conéctate a Psiphon para actualizar tu balance de PsiCash.";
+"PSICASH_BALANCE_OUT_OF_DATE_ALERT_BODY" = "Kuunganisha Psiphon kwa kujisasisha uswa wa PsiCash";
 
 /* User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
-"PSICASH_BALANCE_OUT_OF_DATE_ALERT_TITLE" = "Balance de PsiCash Desactualizado";
+"PSICASH_BALANCE_OUT_OF_DATE_ALERT_TITLE" = "PsiCash haipo sawa na tarehe";
 
 /* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
-"PSICASH_PURCHASE_SCREEN_NOTICE" = "IMPORTANTE: Tu PsiCash no será preservado si desinstalas Psiphon.";
+"PSICASH_PURCHASE_SCREEN_NOTICE" = "UMUHIMU: PsiCash yako haita hifadhiwa kama ulisakinusha Psiphon.";
 
 /* An error that signifies a state where the user has made a 'PsiCash' purchase, but extra action is needed from the user to finish the transaction. Do not translate or transliterate 'PsiCash'. */
-"PSICASH_TRANSACTION_PENDING" = "Transacción Pendiente";
+"PSICASH_TRANSACTION_PENDING" = "Kusubiri shughuli";
 
 /* PsiCash currently unavailable. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
-"PSICASH_UNAVAILABLE" = "PsiCash no disponible";
+"PSICASH_UNAVAILABLE" = "PsiCash haipatikani";
 
 /* 'PsiCash' features are unavailable while the app the connecting to 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash' */
-"PSICASH_UNAVAILABLE_WHILE_CONNECTING" = "PsiCash no está disponible mientras se está conectando a Psiphon";
+"PSICASH_UNAVAILABLE_WHILE_CONNECTING" = "PsiCash haipatikani wakati wa kuunganisha Psiphon";
 
 /* 'PsiCash' features are unavailable while the app the is disconnecting from 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash' */
-"PSICASH_UNAVAILABLE_WHILE_DISCONNECTING" = "PsiCash no está disponible mientras se está desconectando a Psiphon";
+"PSICASH_UNAVAILABLE_WHILE_DISCONNECTING" = "PsiCash haipatikani wakati hajaunganishwa na Psiphon";
 
 /* 'PsiCash' features are unavailable while the user has a subscription. Do not translate or transliterate 'PsiCash' */
-"PSICASH_UNAVAILABLE_WHILE_SUBSCRIBED" = "PsiCash no está disponible mientras está suscripto";
+"PSICASH_UNAVAILABLE_WHILE_SUBSCRIBED" = "PsiCash haipatikani wakati wa usajili";
 
 /* Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
-"PSICASH_WAIT_TRANSACTION_VERIFIED" = "Por favor espera mientras tu transacción está siendo verificada";
+"PSICASH_WAIT_TRANSACTION_VERIFIED" = "Tafadhali subiri wakati shunghuli zako zimethibitishwa";
 
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
-"PSIPHON_IS_NOT_CONNECTED" = "Psiphon no está conectado";
+"PSIPHON_IS_NOT_CONNECTED" = "Psiphon haijaunganishwa";
 
 /* 'App Store' refers to Apple's App Store, do not translate or transliterate 'App Store'. This alert message informs the user that the purchase they made has not been recorded by App Store. */
-"PURCHASE_NOT_RECORDED_BY_APPSTORE" = "Compra no registrada por  App Store.";
+"PURCHASE_NOT_RECORDED_BY_APPSTORE" = "Ununuzi na sio kurekodi kwa kuhifadhi programu.";
 
 /* Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
-"PURCHASING_PSICASH" = "Comprando PsiCash…";
+"PURCHASING_PSICASH" = "Ununuzi wa PsiCash...";
 
 /* Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PURCHASING_SPEED_BOOST" = "Comprando Aumento de Velocidad...";
+"PURCHASING_SPEED_BOOST" = "Kasi ya Ununuzi Kuongezeka...";
 
 /* Button title on an error alert that indicates it refreshes the user's purchase receipt on device. */
-"RECEIPT_REFRESH_BUTTON" = "Refrescar Recibo";
+"RECEIPT_REFRESH_BUTTON" = "Sasisha Risiti";
 
 /* Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
-"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "Refresque el recibo de su aplicación cuando:";
+"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "Sasisha risiti ya programu lini:";
 
 /* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
-"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_1" = "Necesite recuperar una suscripción en su cuenta con un nuevo teléfono";
+"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_1" = "Unahitaji kupata usajili katika akaunti yako kwa simu yako mpya";
 
 /* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
-"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "No puede ver una suscripción que compró en éste dispositivo.";
+"REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "Haipatikani kasi ya kuongeza ";
 
 /* This alert message informs the user that the purchase they made has not been recorded and that they can tap the button 'Refresh Receipt' to try again. */
-"REFRESH_APP_RECEIPT_TO_TRY_AGAIN" = "Refrescar recibo de la app para intentar de nuevo.";
+"REFRESH_APP_RECEIPT_TO_TRY_AGAIN" = "Sasisha risiti ya programu ili kujaribu tena.";
 
 /* Title for a confirmation button that resets a user's previous consent. */
-"RESET_IDENTIFIER_BUTTON_TITLE" = "Restablecer Consentimiento";
+"RESET_IDENTIFIER_BUTTON_TITLE" = "Idhini ya kuweka upya";
 
 /* Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
-"RESTORE_SUBSCRIPTION_BUTTON" = "Restaurar Suscripción";
+"RESTORE_SUBSCRIPTION_BUTTON" = "Kurudisha usajili";
 
 /* Title of button which triggers an attempt to restore the user's existing subscription */
-"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restaurar mi suscripción";
+"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Kurudisha usajili wangu";
 
-/*[UNTRANSLATED] Action button title, that when pressed retries the recently failed operation. */
-"RETRY_BUTTON_TITLE" = "Retry";
+/* Action button title, that when pressed retries the recently failed operation. */
+"RETRY_BUTTON_TITLE" = "Jaribu tena";
 
 /* Shown in a pop-up alert if user's rewarded video ad failed to load. */
-"REWARDED_VIDEO_LOAD_FAILED" = "Fallo al cargar vídeo de recompensa. Por favor intenta de nuevo más tarde.";
+"REWARDED_VIDEO_LOAD_FAILED" = "Imeshindwa kupakia video iliyo pendekezwa. Tafadhali jaribu tena badae.";
 
 /* Title for screen that allows user to select language. Use all capital letters in the translation only if it makes sense. */
-"SELECT_LANG" = "SELECCIONAR LENGUAJE";
+"SELECT_LANG" = "CHAGUA LUGHA";
 
 /* Select language button title. */
-"SELECT_LANG_BUTTON_TITLE" = "Seleccionar idioma";
+"SELECT_LANG_BUTTON_TITLE" = "Chagua Lugha";
 
 /* Title for screen that allows user to select their desired server region. */
-"SELECT_SERVER_REGION" = "Seleccionar región del servidor";
+"SELECT_SERVER_REGION" = "Chagua eneo la seva";
 
 /* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
-"SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Reinstalar perfil de VPN";
+"SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Weka tena wasifu wa VPN ";
 
 /* (Do not translate 'AdMob') Title of cell in settings menu which indicates the user can change or revoke the consent they've given to admob */
-"SETTINGS_RESET_ADMOB_CONSENT" = "Restablecer consentimiento de AdMob";
+"SETTINGS_RESET_ADMOB_CONSENT" = "Idhini mpya ya AdMob";
 
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
-"SETTINGS_SUBSCRIPTION_ACTIVE" = "Suscripciones";
+"SETTINGS_SUBSCRIPTION_ACTIVE" = "Michango";
 
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"SPEED_BOOST" = "Turbo Velocidad";
+"SPEED_BOOST" = "Kuongeza kasi";
 
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"SPEED_BOOST_ACTIVE" = "Turbo Velocidad activa";
+"SPEED_BOOST_ACTIVE" = "kuongeza kasi ya utendaji";
 
 /* '%@' is going to be replace by a timer (e.g. '02:12'). Place the exact string '%@' at the appropriate place. This string is shown when the user's 'Speed Boost' is active. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"SPEED_BOOST_IS_ACTIVE" = "Aumento de Velocidad Activo %@";
+"SPEED_BOOST_IS_ACTIVE" = "Kuongeza kasi ya utendaji %@";
 
 /* 'Speed Boost' product is currently unavailable. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"SPEED_BOOST_UNAVAILABLE" = "Aumento de Velocidad no disponible";
+"SPEED_BOOST_UNAVAILABLE" = "Haipatikani kasi ya kuongeza";
 
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"SPEED_BOOST_YOU_ALREADY_HAVE" = "Ya tienes Aumento de Velocidad.";
+"SPEED_BOOST_YOU_ALREADY_HAVE" = "Umeshakua tayari kunganishwa haraka";
 
 /* Footer text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. Please keep this text concise as the width of the text box is restricted in size. */
-"SUBSCRIPTION_BAR_FOOTER_TEXT_NOT_SUBSCRIBED_2" = "Remover publicidades • Máxima velocidad";
+"SUBSCRIPTION_BAR_FOOTER_TEXT_NOT_SUBSCRIBED_2" = "Ondoa ads. Max kwa kasi";
 
 /* Footer text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
-"SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED_V2" = "Premium • Máxima velocidad";
+"SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED_V2" = "Malipo • Max kwa kasi";
 
 /* Header text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
-"SUBSCRIPTION_BAR_HEADER_TEXT_NOT_SUBSCRIBED" = "OBTENER PREMIUM";
+"SUBSCRIPTION_BAR_HEADER_TEXT_NOT_SUBSCRIBED" = "KUPATA MALIPO";
 
 /* Header text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. Please keep this text concise as the width of the text box is restricted in size. */
-"SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIBED" = "SUSCRIPCIÓN";
+"SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIBED" = "MIICHANGO";
 
 /* After a user successfully purchases a subscription, it needs to be activated. This title is displayed on the main screen indicating that the subscription is pending activation. */
-"SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIPTION_PENDING" = "SUSCRIPCIÓN PENDIENTE";
+"SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIPTION_PENDING" = "KUSUBIRI MICHANGO";
 
 /* After a user successfully purchases a subscription, it needs to be activated. Label with this text displayed on the main screen, indicating that the user needs to connect to Psiphon in order to activate the subscription. */
-"SUBSCRIPTION_CONNECT_TO_ACTIVATE" = "Conectar para activar";
+"SUBSCRIPTION_CONNECT_TO_ACTIVATE" = " kuunganisha kwa amilisha";
 
 /* After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating that activation of user's subscription failed. */
-"SUBSCRIPTION_FAILED_TO_ACTIVATE" = "Fallo al activar";
+"SUBSCRIPTION_FAILED_TO_ACTIVATE" = "Kushindwa kuamilisha";
 
 /* After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating to the user that the subscription is in the process of getting activated */
-"SUBSCRIPTION_PLEASE_WAIT_WHILE_ACTIVATING" = "Por favor espera mientras se está activando";
+"SUBSCRIPTION_PLEASE_WAIT_WHILE_ACTIVATING" = "Tafadhali subiri wakati wa kuamilisha";
 
 /* Title of the dialog for available in-app paid subscriptions */
-"SUBSCRIPTIONS" = "Suscripciones";
+"SUBSCRIPTIONS" = "Michango";
 
 /* Label on a button which, when pressed, opens a screen where the user can manage their currently active subscription. */
-"SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_BUTTON" = "Administrar";
+"SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_BUTTON" = "Simamia";
 
 /* Subtitle of the banner on the subscriptions page informing the user that the subscriptions require no commitment, and can be cancelled anytime */
-"SUBSCRIPTIONS_PAGE_BANNER_SUBTITLE" = "Sin compromisos, cancela en cualquier momento.";
+"SUBSCRIPTIONS_PAGE_BANNER_SUBTITLE" = "Hakuna ahadi, Futa muda wowote.";
 
 /* Title of the banner on the subscriptions page advertising that subscriptions enable no ads and maximum speed. */
-"SUBSCRIPTIONS_PAGE_BANNER_TITLE_2" = "Sin publicidades y a máxima velocidad.";
+"SUBSCRIPTIONS_PAGE_BANNER_TITLE_2" = "Hakuna ads na kasi ya kiwango cha juu.";
 
 /* Title of the button on the subscriptions page which takes the user of of the app to iTunes where they can view detailed information about their subscription */
-"SUBSCRIPTIONS_PAGE_MANAGE_SUBSCRIPTION_BUTTON" = "Gestione su suscripción";
+"SUBSCRIPTIONS_PAGE_MANAGE_SUBSCRIPTION_BUTTON" = "Simamia michango yako";
 
 /* Title of the button on the subscriptions page which, when pressed, navigates the user to the page where they can restore their existing subscription */
-"SUBSCRIPTIONS_PAGE_RESTORE_SUBSCRIPTION_BUTTON" = "No veo mi suscripción";
+"SUBSCRIPTIONS_PAGE_RESTORE_SUBSCRIPTION_BUTTON" = "Sioni michango yangu";
 
 /* Title of button on subscriptions page which opens Psiphon's privacy policy webpage */
-"SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT" = "Política de privacidad";
+"SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT" = "Sera ya faragha";
 
 /* Label on a button which, when pressed, opens a screen where the user can choose from multiple subscription plans. */
-"SUBSCRIPTIONS_SUBSCRIBE_BUTTON" = "Suscribirse";
+"SUBSCRIPTIONS_SUBSCRIBE_BUTTON" = "Jiunga";
 
 /* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
-"SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Condiciones de uso";
+"SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Muda wa matumizi";
 
 /* Button title shown when something fails to load. Asks the user to tap the button to retry the operation */
-"TAP_TO_RETRY" = "Pulse para reintentar";
+"TAP_TO_RETRY" = "Bonyeza kwa kujaribu";
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
-"TURN_ON_DATE" = "Activa los datos móviles o usa Wi-Fi.";
+"TURN_ON_DATE" = "Tafadhali wacha data seli au tumia Wi-Fi.";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
-"UPGRADE_PSIPHON" = "Upgrade Psiphon";
+/* Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
+"UPGRADE_PSIPHON" = "Boresha Psiphon";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
-"VPN_START_FAIL_MESSAGE" = "Ocurrió un error mientras se iniciaba Psiphon. Por favor, inténtelo de nuevo.";
+"VPN_START_FAIL_MESSAGE" = "Makosa yamejitokeza wakati wakuanza kwa Psiphon.Tafadhali jaribu tena.";
 
-/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to 'Best performance', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
-"VPN_START_FAIL_REGION_INVALID_MESSAGE_3" = "The region you selected is no longer available. You have automatically been switched to \"Best performance\".\n\n You can also select a new region from the Psiphon app.";
+/* Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to 'Best performance', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
+"VPN_START_FAIL_REGION_INVALID_MESSAGE_3" = "Maeneo uliyoyachagua hayapatikani tena. unatakiwa uwe umeshawasha kwenye \"Utendaji mzuri\".\n\nUnaweza pia kuchagua eneo jipya kwenye programu ya Psiphon. ";
 
 /* Alert dialog title indicating to the user that Psiphon was unable to start */
-"VPN_START_FAIL_TITLE" = "No se pudo iniciar.";
+"VPN_START_FAIL_TITLE" = "Kushindwa kuanza";
 
 /* ('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon') */
-"VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon necesita su permiso para instalar un perfil VPN para conectar.\n\nPsiphon está comprometido a proteger la privacidad de nuestros usuarios. Puede revisar nuestra política de privacidad pulsando \"Política de privacidad\".";
+"VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon inahitaji ruhusa yako kwa kusakinisha VPN profili kwa ajili ya kunganisha\n\nPsiphon ina nia ya kulinda siri kwa watumiaji wetu. Unaweza kupitia sera za faragha kwa kugonga \"sera ya faragha\".";
 
 /* Button label taking user's to our Privacy Policy page */
-"VPN_START_PRIVACY_POLICY_BUTTON" = "Política de privacidad";
+"VPN_START_PRIVACY_POLICY_BUTTON" = "Sera ya faragha";
 
 /* Status when the VPN is connected to a Psiphon server */
-"VPN_STATUS_CONNECTED" = "Conectado";
+"VPN_STATUS_CONNECTED" = "Kushikamana";
 
 /* Status when the VPN is connecting; that is, trying to connect to a Psiphon server */
-"VPN_STATUS_CONNECTING" = "Conectando";
+"VPN_STATUS_CONNECTING" = "Kuunganisha";
 
 /* Status when the VPN is not connected to a Psiphon server, not trying to connect, and not in an error state */
-"VPN_STATUS_DISCONNECTED" = "Desconectado";
+"VPN_STATUS_DISCONNECTED" = "Tenganisha";
 
 /* Status when the VPN is disconnecting. Sometimes going from connected to disconnected can take some time, and this is that state. */
-"VPN_STATUS_DISCONNECTING" = "Desconectando";
+"VPN_STATUS_DISCONNECTING" = "Kutokuunganisha";
 
 /* Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect. */
-"VPN_STATUS_INVALID" = "Desconectado";
+"VPN_STATUS_INVALID" = "Tenganisha";
 
 /* Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
-"VPN_STATUS_RECONNECTING" = "Reconectando";
+"VPN_STATUS_RECONNECTING" = "Kwa kuunganisha";
 
 /* Status when the VPN is restarting. */
-"VPN_STATUS_RESTARTING" = "Reiniciando";
+"VPN_STATUS_RESTARTING" = "Kuanzisha";
 
 /* Error message when something was wrong with the VPN. Asks the user that if the error persists, try tapping the 'Reinstall VPN Profile' button in the settings menu. 'Reinstall VPN Profile' translation has key SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE */
-"VPN_SYNC_FAILED_REINSTALL_CONFIG" = "Si este error persiste, por favor intenta 'Reinstalar Perfil de VPN'.";
+"VPN_SYNC_FAILED_REINSTALL_CONFIG" = "Kama haya makosa ya kudumu,tafadhali jaribu 'kufungua upya VPN profile'. ";
 
 /* Button subtitle informing the user that if pressed a rewarded video ad will be displayed and they will earn credit. */
-"WATCH_REWARDED_VIDEO_AND_EARN" = "Mira un vídeo y gana";
+"WATCH_REWARDED_VIDEO_AND_EARN" = "Angalia video na kupata";
 
