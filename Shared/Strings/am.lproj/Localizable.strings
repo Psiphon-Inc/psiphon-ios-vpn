@@ -58,6 +58,12 @@
 /* Decline button title */
 "DECLINE_BUTTON_TITLE" = "ውድቅ አድርግ";
 
+/* Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
+"DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "አንዳንድ የኢንተርኔት ትራፊክ በነጻው የPsiphon ሥሪት አይደገፍም። የPsiphon ተሞክሮዎን ሙሉ እምቅ ኃይል ለመተግበር የፍጥነት ጭማሪን ይግዙ ወይም ለደንበኝነት ይመዝገቡ።";
+
+/* Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
+"DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "አንዳንድ የኢንተርኔት ትራፊክ በነጻው የPsiphon ሥሪት አይደገፍም። የPsiphon ተሞክሮዎን ሙሉ እምቅ ኃይል ለመተግበር የፍጥነት ጭማሪን ይግዙ ወይም ለደንበኝነት ይመዝገቡ።";
+
 /* Text next to the button indicating to the user that the rewarded video advertisement is only available when they are not connected to Psiphon. Do not translate or transliterate 'PsiCash'. Do not translate or transliterate 'Psiphon'. */
 "DISCONNECT_TO_WATCH_AND_EARN_PSICASH" = "ቪድዮ አይቶ PsiCash ለማግኘት ከPsiphon ግንኙነት ማቋርጥ አለብዎት";
 
@@ -124,6 +130,12 @@
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
 "NO_PRODUCTS_TEXT_2" = "የደንበኝነት ምዝገባዎችን ከApp Store ማምጣት አልተቻለም።";
 
+/* Content of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
+"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" = "መተግበሪያዎ እየሠራ አይደለም? እዚህ ጋር ጠቅ ያድርጉ የPsiphon ተሞክሮዎን ለማሻሻል!";
+
+/* Title of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
+"NOTIFICATION_TITLE_UPGRADE_PSIPHON" = "የPsiphon ደረጃን አልቅ";
+
 /* Alert OK Button */
 "OK_BUTTON" = "እሺ";
 
@@ -138,6 +150,12 @@
 
 /* Onboarding header */
 "ONBOARDING_GETTING_STARTED_HEADER" = "ጅማሮ";
+
+/* Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app. */
+"ONBOARDING_NOTIFICATION_PERMISSION_BODY" = "አስፈላጊ የአውታረመረብ ኩነቶችን በተመለከተ ማሳወቂያ ያገኙ ዘንድ Psiphon ማሳወቂያ እንዲልክ ፈቃድ ይስጡት";
+
+/* Onboarding screen title that will be asking the user permission to send notifications about important network events while they use the app. */
+"ONBOARDING_NOTIFICATION_PERMISSION_TITLE" = "አስፈላጊ የአውታረመረብ ኩነቶችን በተመለከተ ማሳወቂያ ያግኙ";
 
 /* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
 "ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "ለመገናኘት Psiphon ምናባዊ የግል አውታረ መረብ (ቪፒኤን) ውቅረቶችን እንዲያክል ይፍቀዱ።";
@@ -372,6 +390,9 @@
 
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "እባክዎትን የህዋስ ውሂብን ያብሩ ወይም ዋይፋይ ይጠቀሙ።";
+
+/* Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
+"UPGRADE_PSIPHON" = "የPsiphon ደረጃን አልቅ";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "Psiphon በሚጀምርበት ወቅት ስህተት ተፈጥሯል። እባክዎትን ደግመው ይሞክሩ።";
