@@ -622,6 +622,7 @@
 		8D9D9C29247C77AB0093220E /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNStateReducer.swift; sourceTree = "<group>"; };
 		8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackDescriptions.swift; sourceTree = "<group>"; };
+		8DB0F5A624EC830F0051AF44 /* sw */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sw; path = Strings/sw.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageWithRetryView.swift; sourceTree = "<group>"; };
 		8DB6C637242A4D06005E2F4C /* DuskButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuskButton.swift; sourceTree = "<group>"; };
 		8DCA6863247C7CF8001D026E /* Bindable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bindable.swift; sourceTree = "<group>"; };
@@ -1852,6 +1853,7 @@
 				hi,
 				he,
 				it,
+				sw,
 			);
 			mainGroup = CE26FC811BBDC7B700B83375;
 			productRefGroup = CE26FC8B1BBDC7B800B83375 /* Products */;
@@ -2348,6 +2350,7 @@
 				4EC82F8E20C713DF004C2E9F /* hi */,
 				CE50A256246997250047D3FE /* he */,
 				CE50A25724699CD80047D3FE /* it */,
+				8DB0F5A624EC830F0051AF44 /* sw */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
