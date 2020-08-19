@@ -18,8 +18,7 @@
 */
 
 // PsiCash
-#import <PsiCashLib/PsiCash.h>
-#import <PsiCashLib/PsiCashAPIModels.h>
+#import <PsiCashLib/PsiCashLib.h>
 
 // Tunnel Provider
 #import "NEBridge.h"
