@@ -363,12 +363,6 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
 
 #pragma mark - Helper methods
 
-- (void)displayMessage:(NSString *_Nonnull)message {
-    [self displayMessage:message completionHandler:^(BOOL success) {
-        // Do nothing.
-    }];
-}
-
 - (NSString *)extensionStartMethodTextDescription {
     switch (self.extensionStartMethod) {
         case ExtensionStartMethodFromContainer: return @"Container";
