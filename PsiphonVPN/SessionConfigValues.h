@@ -60,25 +60,28 @@ typedef NS_ENUM(NSInteger, AuthorizationUpdateResult) {
 - (instancetype)initWithSharedDB:(PsiphonDataSharedDB *)sharedDB NS_DESIGNATED_INITIALIZER;
 
 // Checks for updated in stored authorizations relative to last time
-// since `-getEncodedAuthsWithSponsorID:` was called.
+// since `-newSessionEncodedAuthsWithSponsorID:` was called.
 //
-// -Note: Can call `getEncodedAuthsWithSponsorID:` to get the new authorizations.
+// -Note: Can call `newSessionEncodedAuthsWithSponsorID:` to get the new authorizations.
 //
 // - Important: Throws an exception if this function is called before a call
-// to `-getEncodedAuthsWithSponsorID:` for the first time.
+// to `-newSessionEncodedAuthsWithSponsorID:` for the first time.
 - (AuthorizationUpdateResult)updateStoredAuthorizations;
 
+// Indicates start of a new tunnel session.
+//
 // Returns array of authorizations to be passed to tunnel-core, and populates `sponsorID`
 // with the appropriate value depending on the authorizations present.
 //
 // - Important: Throws an exception if this function is called more than once, unless
 // call to `updateStoredAuthorizations` returns AuthorizationUpdateResultNewAuthsAvailable.
-- (NSArray<NSString *> *)getEncodedAuthsWithSponsorID:(NSString *_Nonnull *_Nullable)sponsorID;
+- (NSArray<NSString *> *)
+newSessionEncodedAuthsWithSponsorID:(NSString *_Nonnull *_Nullable)sponsorID;
 
-// Sets which of the authorizations returned from previous call to `-getEncodedAuthsWithSponsorID:`
+// Sets which of the authorizations returned from previous call to `-newSessionEncodedAuthsWithSponsorID:`
 // are active.
 // 
-// - Important: Throws an exception if `getEncodedAuthsWithSponsorID:` has not
+// - Important: Throws an exception if `newSessionEncodedAuthsWithSponsorID:` has not
 // already been called.
 - (ActiveAuthorizationResult)
 setActiveAuthorizationIDs:(NSArray<NSString *> *_Nonnull)authorizationIds;
