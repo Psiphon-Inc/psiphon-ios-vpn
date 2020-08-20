@@ -55,6 +55,8 @@ typedef NS_ENUM(NSInteger, AuthorizationUpdateResult) {
 
 @property (nonatomic, nonnull, readonly) PsiphonConfigSponsorIds *cachedSponsorIDs;
 
+@property (nonatomic, readonly) BOOL showExpiredSubscriptionAlert;
+
 - (instancetype _Nonnull)init NS_UNAVAILABLE;
 
 - (instancetype)initWithSharedDB:(PsiphonDataSharedDB *)sharedDB NS_DESIGNATED_INITIALIZER;
@@ -91,6 +93,10 @@ setActiveAuthorizationIDs:(NSArray<NSString *> *_Nonnull)authorizationIds;
 
 // Returns TRUE if the latest stored auths contain a speed-boost or subscription auth.
 - (BOOL)hasActiveSpeedBoostOrSubscription;
+
+// Should be called to indicate that expired subscription alert for the current session
+// has been displayed;
+- (void)setShowedExpiredSubscriptionAlertForSession;
 
 @end
 
