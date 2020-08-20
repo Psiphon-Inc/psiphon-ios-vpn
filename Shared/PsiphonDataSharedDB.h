@@ -65,8 +65,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (id)initForAppGroupIdentifier:(NSString*)identifier;
 
-- (NSDictionary<NSString *, NSString *> *)objcFeedbackFields;
-
 #pragma mark - Logging
 
 /// Directory under which PsiphonTunnel is configured to store all of its files.
