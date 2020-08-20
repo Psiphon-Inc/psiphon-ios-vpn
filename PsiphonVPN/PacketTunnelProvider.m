@@ -753,9 +753,17 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 
             case ActiveAuthorizationResultInactiveSubscription: {
                 // Displays an alert to the user for the expired subscription.
-                // This only happens if the container has not been up for 24 hours before expiry.
-                if ([strongSelf.sharedDB getAppForegroundState] == FALSE) {
-                    [strongSelf displayMessage: VPNStrings.subscriptionExpiredAlertMessage];
+                // Alert should be displayed only once per session.
+                if (strongSelf->sessionConfigValues.showExpiredSubscriptionAlert == TRUE) {
+                    
+                    // The user is either notified through an alert,
+                    // or the container state is updated to indicate that subscription has
+                    // expired.
+                    [strongSelf->sessionConfigValues setShowedExpiredSubscriptionAlertForSession];
+                    
+                    if ([strongSelf.sharedDB getAppForegroundState] == FALSE) {
+                        [strongSelf displayMessage: VPNStrings.subscriptionExpiredAlertMessage];
+                    }
                 }
                 break;
             }

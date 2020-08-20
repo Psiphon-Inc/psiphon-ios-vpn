@@ -52,7 +52,7 @@ PsiFeedbackLogType const SessionConfigValuesLogType = @"SessionConfigValues";
         self->lastSessionAuths = nil;
         
         self->_cachedSponsorIDs = [PsiphonConfigReader fromConfigFile].sponsorIds;
-        
+        self->_showExpiredSubscriptionAlert = TRUE;
     }
     return self;
 }
@@ -100,6 +100,8 @@ PsiFeedbackLogType const SessionConfigValuesLogType = @"SessionConfigValues";
                                      userInfo:nil];
     }
     
+    // Updates state for a new session
+    self->_showExpiredSubscriptionAlert = TRUE;
     lastSessionAuths = latestAuths;
     hasRetrievedLatestEncodedAuths = TRUE;
     
@@ -205,6 +207,10 @@ setActiveAuthorizationIDs:(NSArray<NSString *> *_Nonnull)authorizationIds {
     }
     
     return FALSE;
+}
+
+- (void)setShowedExpiredSubscriptionAlertForSession {
+    self->_showExpiredSubscriptionAlert = FALSE;
 }
 
 @end
