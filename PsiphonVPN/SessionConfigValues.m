@@ -37,7 +37,7 @@ PsiFeedbackLogType const SessionConfigValuesLogType = @"SessionConfigValues";
     StoredAuthorizations *_Nullable lastSessionAuths;
     
     // hasRetrievedLatestEncodedAuths flag keeps track of whether
-    // latest auths have been retrieved (by calling `getEncodedAuthsWithSponsorID:`) or not.
+    // latest auths have been retrieved (by calling `newSessionEncodedAuthsWithSponsorID:`) or not.
     // This is important for guaranteeing that tunnel-core is using the same authorizations
     // that are present in `storedAuths`.
     BOOL hasRetrievedLatestEncodedAuths;
@@ -92,7 +92,7 @@ PsiFeedbackLogType const SessionConfigValuesLogType = @"SessionConfigValues";
     
 }
 
-- (NSArray<NSString *> *)getEncodedAuthsWithSponsorID:(NSString *_Nonnull *_Nullable)sponsorID {
+- (NSArray<NSString *> *)newSessionEncodedAuthsWithSponsorID:(NSString *_Nonnull *_Nullable)sponsorID {
     
     if (hasRetrievedLatestEncodedAuths == TRUE) {
         @throw [NSException exceptionWithName:@"StateInconsistency"

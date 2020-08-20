@@ -113,7 +113,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     AppProfiler *_Nullable appProfiler;
     
-    // sessionConfigValues is not thread-safe.
+    // sessionConfigValues should only be accessed through the `workQueue`.
     SessionConfigValues *_Nonnull sessionConfigValues;
 }
 
@@ -181,8 +181,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 
             case AuthorizationUpdateResultNewAuthsAvailable: {
                 NSString *sponsorID = nil;
-                NSArray<NSString *> *_Nonnull auths = [self->sessionConfigValues
-                                                       getEncodedAuthsWithSponsorID:&sponsorID];
+                NSArray<NSString *> *_Nonnull auths =
+                [self->sessionConfigValues newSessionEncodedAuthsWithSponsorID:&sponsorID];
                 
                 [AppProfiler logMemoryReportWithTag:@"reconnectWithConfig"];
                 [self.psiphonTunnel reconnectWithConfig:sponsorID :auths];
@@ -696,7 +696,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     
     // Provide auth tokens
     NSString *sponsorID;
-    NSArray *authorizations = [self->sessionConfigValues getEncodedAuthsWithSponsorID:&sponsorID];
+    NSArray *authorizations = [self->sessionConfigValues
+                               newSessionEncodedAuthsWithSponsorID:&sponsorID];
     if ([authorizations count] > 0) {
         mutableConfigCopy[@"Authorizations"] = [authorizations copy];
     }
