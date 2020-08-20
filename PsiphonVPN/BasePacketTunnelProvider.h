@@ -110,8 +110,6 @@ typedef NS_ENUM(NSInteger, ExtensionStartMethodEnum) {
 
 - (BOOL)isDeviceLocked;
 
-- (void)displayMessage:(NSString *)message;
-
 - (NSString *)extensionStartMethodTextDescription;
 
 @end
