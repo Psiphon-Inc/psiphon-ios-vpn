@@ -627,7 +627,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 // presentDisallowedTrafficAlertNotification presents user notification if enabled,
 // or falls back to the simple NEProvider `displayMessage:completionHandler:` mechanism.
-// Thread-safety: This method should only be called from `workQueue`.
+// Thread-safety: This method is thread-safe.
 - (void)presentDisallowedTrafficAlertNotification {
     UNUserNotificationCenter* centre = [UNUserNotificationCenter currentNotificationCenter];
     
