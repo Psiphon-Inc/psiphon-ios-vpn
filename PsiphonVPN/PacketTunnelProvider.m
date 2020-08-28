@@ -633,52 +633,57 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     
     [centre getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
         
-        // If the authorization has not been given for user notifications,
-        // or if the app is not backgrounded (in which case user notifications won't show),
-        // then display simple alert using NEProvider `displayMessage::` method.
-        // Otherwise, send schedule user notification.
-        if (settings.authorizationStatus != UNAuthorizationStatusAuthorized ||
-            [self.sharedDB getAppForegroundState] == TRUE) {
-            
-            [self displayMessageOnce:VPNStrings.disallowedTrafficAlertMessage
-                          identifier:AlertIdDisallowedTraffic];
-            
-        } else {
-            
-            BOOL alertAdded = [self->localDataStore addSessionAlert:@(AlertIdDisallowedTraffic)];
-            if (alertAdded == FALSE) {
-                // The alert has already been added (for the current session).
-                return;
-            }
-            
-            UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
-            content.title = [NSString localizedUserNotificationStringForKey:@"NOTIFICATION_TITLE_UPGRADE_PSIPHON" arguments:nil];
-            content.body = [NSString localizedUserNotificationStringForKey:@"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" arguments:nil];
-             
-            // Delivers the notification immediately.
-            UNNotificationRequest* request = [UNNotificationRequest
-                                              requestWithIdentifier:UserNotificationDisallowedTrafficAlertIdentifier
-                                              content:content
-                                              trigger:nil];
-             
-            // Schedule the notification.
-            
-            [centre addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+        dispatch_async(self->workQueue, ^{
+
+            // If the authorization has not been given for user notifications,
+            // or if the app is not backgrounded (in which case user notifications won't show),
+            // then display simple alert using NEProvider `displayMessage::` method.
+            // Otherwise, send schedule user notification.
+            if (settings.authorizationStatus != UNAuthorizationStatusAuthorized ||
+                [self.sharedDB getAppForegroundState] == TRUE) {
                 
-                [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
-                                         format:@"Added notification request: error: '%@'", error];
+                [self displayMessageOnce:VPNStrings.disallowedTrafficAlertMessage
+                              identifier:AlertIdDisallowedTraffic];
                 
-                // Falls back to presenting alert if the notification request failed.
-                if (error != nil) {
-                    // Failed to display alert through UNUserNotification.
-                    // Removes alert id from set of session alerts,
-                    // and retries to display the alert using `-displayMessageOnce::` mechanism.
-                    [self->localDataStore removeSessionAlert:@(AlertIdDisallowedTraffic)];
-                    [self displayMessageOnce:VPNStrings.disallowedTrafficAlertMessage
-                                  identifier:AlertIdDisallowedTraffic];
+            } else {
+                
+                BOOL alertAdded = [self->localDataStore addSessionAlert:@(AlertIdDisallowedTraffic)];
+                if (alertAdded == FALSE) {
+                    // The alert has already been added (for the current session).
+                    return;
                 }
-            }];
-        }
+                
+                UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
+                content.title = [NSString localizedUserNotificationStringForKey:@"NOTIFICATION_TITLE_UPGRADE_PSIPHON" arguments:nil];
+                content.body = [NSString localizedUserNotificationStringForKey:@"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" arguments:nil];
+                
+                // Delivers the notification immediately.
+                UNNotificationRequest* request = [UNNotificationRequest
+                                                  requestWithIdentifier:UserNotificationDisallowedTrafficAlertIdentifier
+                                                  content:content
+                                                  trigger:nil];
+                
+                // Schedule the notification.
+                
+                [centre addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+                    
+                    dispatch_async(self->workQueue, ^{
+                        [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
+                                                 format:@"Added notification request: error: '%@'", error];
+                        
+                        // Falls back to presenting alert if the notification request failed.
+                        if (error != nil) {
+                            // Failed to display alert through UNUserNotification.
+                            // Removes alert id from set of session alerts,
+                            // and retries to display the alert using `-displayMessageOnce::` mechanism.
+                            [self->localDataStore removeSessionAlert:@(AlertIdDisallowedTraffic)];
+                            [self displayMessageOnce:VPNStrings.disallowedTrafficAlertMessage
+                                          identifier:AlertIdDisallowedTraffic];
+                        }
+                    });
+                }];
+            }
+        });
     }];
 }
 
