@@ -55,6 +55,8 @@
 #import "SessionConfigValues.h"
 #import "FeedbackUtils.h"
 #import "VPNStrings.h"
+#import "NSUserDefaults+KeyedDataStore.h"
+#import "ExtensionDataStore.h"
 
 NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
 
@@ -72,12 +74,14 @@ PsiFeedbackLogType const PsiphonTunnelDelegateLogType = @"PsiphonTunnelDelegate"
 PsiFeedbackLogType const PacketTunnelProviderLogType = @"PacketTunnelProvider";
 PsiFeedbackLogType const ExitReasonLogType = @"ExitReason";
 
+// AlertId values are persisted, do not use re-use values.
 typedef NS_ENUM(NSInteger, AlertId) {
-    AlertIdOpenContainerToFinishConnecting,
-    AlertIdCorruptSettingsFile,
-    AlertIdSubscriptionExpired,
-    AlertIdSelectedRegionUnavailable,
-    AlertIdUpstreamProxyError
+    AlertIdOpenContainerToFinishConnecting = 1,
+    AlertIdCorruptSettingsFile = 2,
+    AlertIdSubscriptionExpired = 3,
+    AlertIdSelectedRegionUnavailable = 4,
+    AlertIdUpstreamProxyError = 5,
+    AlertIdDisallowedTraffic = 6,
 };
 
 /** PacketTunnelProvider state */
@@ -122,8 +126,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // sessionConfigValues should only be accessed through the `workQueue`.
     SessionConfigValues *_Nonnull sessionConfigValues;
     
-    // sessionAlerts should only be accessed through the `workQueue`.
-    NSMutableSet<NSNumber *> *_Nonnull sessionAlerts;
+    // localDataStore should only be accessed through the `workQueue`.
+    ExtensionDataStore *_Nonnull localDataStore;
 }
 
 - (id)init {
@@ -142,7 +146,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         _startWithSubscriptionCheckSponsorID = FALSE;
         
         sessionConfigValues = [[SessionConfigValues alloc] initWithSharedDB:self.sharedDB];
-        sessionAlerts = [NSMutableSet set];
+        
+        localDataStore = [[ExtensionDataStore alloc]
+                          initWithDataStore:[NSUserDefaults standardUserDefaults]];
     }
     return self;
 }
@@ -190,7 +196,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             case AuthorizationUpdateResultNewAuthsAvailable: {
                 // Updates PacketTunnelProvider state to indicate a new session.
                 
-                self->sessionAlerts = [NSMutableSet set];
+                [self->localDataStore removeAllSessionAlerts];
                 
                 NSString *sponsorID = nil;
                 NSArray<NSString *> *_Nonnull auths =
@@ -216,13 +222,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             return;
         }
         
-        // Guards that alert is not already displayed for `alertId`.
-        if ([strongSelf->sessionAlerts containsObject:@(alertId)]) {
+        // Adds `alertId` to set of alerts displayed for current session.
+        BOOL alertAdded = [strongSelf->localDataStore addSessionAlert:@(alertId)];
+        if (alertAdded == FALSE) {
+            // The alert has already been added (for the current session).
             return;
         }
-        
-        // Adds `alertId` to set of alerts displayed for current session.
-        [strongSelf->sessionAlerts addObject:@(alertId)];
         
         [strongSelf displayMessage:message completionHandler:^(BOOL success) {
             // If failed to display alert, resets the flag for `alertId`.
@@ -232,7 +237,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                     if (!strongSelf) {
                         return;
                     }
-                    [strongSelf->sessionAlerts removeObject:@(alertId)];
+                    [strongSelf->localDataStore removeSessionAlert:@(alertId)];
                 });
                 return;
             }
@@ -281,6 +286,15 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         self.startWithSubscriptionCheckSponsorID = TRUE;
     } else {
         self.startWithSubscriptionCheckSponsorID = FALSE;
+    }
+    
+    // If the VPN process is started after a crash, persisted session alerts from
+    // the previous session are used, and current tunnel session is deemed
+    // to be a continuation of the previous session.
+    // Otherwise, there is a new tunnel session, and session alerts from the
+    // previous session are removed.
+    if (self.extensionStartMethod != ExtensionStartMethodFromCrash) {
+        [self->localDataStore removeAllSessionAlerts];
     }
 
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
@@ -613,7 +627,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 // presentDisallowedTrafficAlertNotification presents user notification if enabled,
 // or falls back to the simple NEProvider `displayMessage:completionHandler:` mechanism.
-// Thread-safety: This method is thread-safe.
+// Thread-safety: This method should only be called from `workQueue`.
 - (void)presentDisallowedTrafficAlertNotification {
     UNUserNotificationCenter* centre = [UNUserNotificationCenter currentNotificationCenter];
     
@@ -625,9 +639,18 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         // Otherwise, send schedule user notification.
         if (settings.authorizationStatus != UNAuthorizationStatusAuthorized ||
             [self.sharedDB getAppForegroundState] == TRUE) {
-            [self displayMessage:VPNStrings.disallowedTrafficAlertMessage
-               completionHandler:^(BOOL success) {}];
+            
+            [self displayMessageOnce:VPNStrings.disallowedTrafficAlertMessage
+                          identifier:AlertIdDisallowedTraffic];
+            
         } else {
+            
+            BOOL alertAdded = [self->localDataStore addSessionAlert:@(AlertIdDisallowedTraffic)];
+            if (alertAdded == FALSE) {
+                // The alert has already been added (for the current session).
+                return;
+            }
+            
             UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
             content.title = [NSString localizedUserNotificationStringForKey:@"NOTIFICATION_TITLE_UPGRADE_PSIPHON" arguments:nil];
             content.body = [NSString localizedUserNotificationStringForKey:@"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" arguments:nil];
@@ -639,6 +662,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                                               trigger:nil];
              
             // Schedule the notification.
+            
             [centre addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
                 
                 [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
@@ -646,8 +670,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 
                 // Falls back to presenting alert if the notification request failed.
                 if (error != nil) {
-                    [self displayMessage:VPNStrings.disallowedTrafficAlertMessage
-                       completionHandler:^(BOOL success) {}];
+                    // Failed to display alert through UNUserNotification.
+                    // Removes alert id from set of session alerts,
+                    // and retries to display the alert using `-displayMessageOnce::` mechanism.
+                    [self->localDataStore removeSessionAlert:@(AlertIdDisallowedTraffic)];
+                    [self displayMessageOnce:VPNStrings.disallowedTrafficAlertMessage
+                                  identifier:AlertIdDisallowedTraffic];
                 }
             }];
         }

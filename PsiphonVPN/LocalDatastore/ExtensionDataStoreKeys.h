@@ -38,3 +38,6 @@ FOUNDATION_EXTERN KeyedDataStoreKey const ExtensionStartTimeKey;
 
 /// Key for the time when the ticker last fired in the extension. Type: NSDate.
 FOUNDATION_EXTERN KeyedDataStoreKey const TickerTimeKey;
+
+/// Session alerts set key. Type: `NSSet<NSNumber>`.
+FOUNDATION_EXTERN KeyedDataStoreKey const SessionAlertsKey;
