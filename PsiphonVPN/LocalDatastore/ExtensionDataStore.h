@@ -52,7 +52,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSSet<NSNumber *> *)getSessionAlerts;
 
 /// Adds a new session alert object to set of session alerts.
-/// @return TRUE if the session alerts did not contain obj, and obj wad added. FALSE otherwise.
+/// @return TRUE if the session alerts did not contain `alertId`, and `alertId` was added. FALSE otherwise.
 - (BOOL)addSessionAlert:(NSNumber *)alertId;
 
 /// Removes `alertId` from session alerts.

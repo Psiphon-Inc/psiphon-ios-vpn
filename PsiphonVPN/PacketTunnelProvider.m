@@ -635,10 +635,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         
         dispatch_async(self->workQueue, ^{
 
-            // If the authorization has not been given for user notifications,
-            // or if the app is not backgrounded (in which case user notifications won't show),
-            // then display simple alert using NEProvider `displayMessage::` method.
-            // Otherwise, send schedule user notification.
+            // If the authorization has not been given for user notifications, or if
+            // the app is not backgrounded (in which case user notifications won't be shown),
+            // then displays simple alert using NEProvider `displayMessage::` method.
+            // Otherwise, schedules user notification.
             if (settings.authorizationStatus != UNAuthorizationStatusAuthorized ||
                 [self.sharedDB getAppForegroundState] == TRUE) {
                 
