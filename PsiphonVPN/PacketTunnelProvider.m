@@ -430,9 +430,11 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         
         // If the container StartVPN command has not been received from the container,
         // and the container goes to the background, then alert the user to open the app.
-        if (self.waitForContainerStartVPNCommand && tunnelIntent == TUNNEL_INTENT_START) {
-            [self displayMessageOnce:VPNStrings.openPsiphonAppToFinishConnecting
-                          identifier:AlertIdOpenContainerToFinishConnecting];
+        if (self.waitForContainerStartVPNCommand) {
+            if (tunnelIntent == TUNNEL_INTENT_START || tunnelIntent == TUNNEL_INTENT_RESTART) {
+                [self displayMessageOnce:VPNStrings.openPsiphonAppToFinishConnecting
+                              identifier:AlertIdOpenContainerToFinishConnecting];
+            }
         }
 
     } else if ([NotifierUpdatedNonSubscriptionAuths isEqualToString:message]) {
