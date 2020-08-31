@@ -629,11 +629,11 @@ fileprivate func vpnStatusDidChangeReducer<T: TunnelProviderManager>(
     // sends a `.startPsiphonTunnel` or `.stopVPN` message.
     switch (state.tunnelIntent, vpnStatus) {
     case (.start(transition: _), .disconnected):
-        return [ Effect(value: .startPsiphonTunnel) ]
+        return effects + [ Effect(value: .startPsiphonTunnel) ]
     case (.stop, .reasserting), (.stop, .connecting), (.stop, .connected):
-        return [ Effect(value: .stopVPN) ]
+        return effects + [ Effect(value: .stopVPN) ]
     default:
-        return []
+        return effects
     }
 }
 
@@ -774,7 +774,7 @@ extension TunnelStartStopIntent {
     
     var integerCode: Int {
         switch self {
-        case .start(transition: .some(_)): return Int(TUNNEL_INTENT_UNDEFINED)
+        case .start(transition: .restart): return Int(TUNNEL_INTENT_RESTART)
         case .start(transition: .none): return Int(TUNNEL_INTENT_START)
         case .stop: return Int(TUNNEL_INTENT_STOP)
         }
@@ -894,6 +894,9 @@ fileprivate func wrapVPNObserverWithTPMResult<T: TunnelProviderManager, Failure>
 
 fileprivate extension Optional where Wrapped == TunnelStartStopIntent {
     
+    /// Note: persisted tunnel intent status value that is shared with the extension
+    /// should be updated before starting/stopping the VPN so that the extension
+    /// can read the latest intent status value.
     mutating func updateState(
         newValue: TunnelStartStopIntent?, sharedDB: PsiphonDataSharedDB
     ) -> Effect<Never> {
