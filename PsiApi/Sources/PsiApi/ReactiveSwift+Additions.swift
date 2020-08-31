@@ -34,6 +34,44 @@ public struct Combined<Value> {
     }
 }
 
+/// A value that represents either the next value in a stream of values
+/// or that the signal should be completed. Allows for an inclusive
+/// `take(while:)` operator, e.g.:
+///
+///     .flatMap(.latest) { (done: Bool) -> SignalProducer<SignalTermination<String>, Never> in
+///         if done {
+///             // End the stream.
+///             return SignalProducer(value:.terminate).prefix(value:.value("last value emitted"))
+///         } else {
+///             return SignalProducer(value:.value("next value emitted"))
+///         }
+///     }
+///     .take(while: { (signalTermination: SignalTermination<String>) -> Bool in
+///         // Forwards values while the `.terminate` value has not been emitted.
+///         guard case .value(_) = signalTermination else {
+///             return false
+///         }
+///         return true
+///     })
+///     .map { (signalTermination: SignalTermination<String>) -> String in
+///         guard case let .value(x) = signalTermination else {
+///             // Will never happen.
+///             fatalError()
+///         }
+///         return x
+///     }
+///
+/// - Note: can be replaced by an inclusive `take(while:)` operator.
+public enum SignalTermination<Value> {
+
+    /// The next value in the stream.
+    case value(Value)
+
+    /// Value which indicates that the signal should be completed.
+    case terminate
+
+}
+
 extension Signal where Error == Never {
 
     public func observe<A>(store: Store<A, Value>) -> Disposable? {
@@ -114,4 +152,3 @@ extension SignalProducer where Value: Collection, Error == Never {
     }
     
 }
-

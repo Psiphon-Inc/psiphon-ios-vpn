@@ -52,7 +52,7 @@
 
         [self setTitle:title];
         logFilePath = logPath;
-        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
 
         // NSFileHandle opened with fileHandleForReadingFromURL ows its associated
         // file descriptor, and will close it automatically when deallocated.
@@ -63,7 +63,7 @@
 
         bytesReadFileOffset = (unsigned long long) 0;
 
-        workQueue = dispatch_queue_create([(APP_GROUP_IDENTIFIER @".LogViewWorkQueue") UTF8String],
+        workQueue = dispatch_queue_create([[PsiphonAppGroupIdentifier stringByAppendingString:@".LogViewWorkQueue"] UTF8String],
           DISPATCH_QUEUE_SERIAL);
     }
     return self;
