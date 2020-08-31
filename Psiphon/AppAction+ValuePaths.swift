@@ -134,6 +134,17 @@ extension AppAction {
             self = .vpnStateAction(newValue)
         }
     }
+
+    var feedbackAction: FeedbackAction? {
+        get {
+            guard case let .feedbackAction(value) = self else { return nil }
+            return value
+        }
+        set {
+            guard case .feedbackAction = self, let newValue = newValue else { return }
+            self = .feedbackAction(newValue)
+        }
+    }
 }
 
 
@@ -263,5 +274,16 @@ extension AppState {
             pendingPsiCashRefresh: self.psiCash.pendingPsiCashRefresh,
             psiCashBalance: self.psiCashBalance
         )
+    }
+
+    var feedbackReducerState: FeedbackReducerState {
+        get {
+            FeedbackReducerState(
+                queuedFeedbacks: self.queuedFeedbacks
+            )
+        }
+        set {
+            self.queuedFeedbacks = newValue.queuedFeedbacks
+        }
     }
 }

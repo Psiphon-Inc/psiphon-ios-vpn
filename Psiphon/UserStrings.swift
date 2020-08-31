@@ -535,3 +535,12 @@ extension UserStrings {
                                  comment: "Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request.")
     }
 }
+
+// MARK: Feedback upload
+extension UserStrings {
+    static func Submitted_feedback() -> String {
+        return NSLocalizedString("FEEDBACK_UPLOAD_SUCCESSFUL_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Thank you for helping improve Psiphon!",
+                                 comment: "Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback.")
+    }
+}

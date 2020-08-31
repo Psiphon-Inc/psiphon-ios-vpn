@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017, Psiphon Inc.
+ * Copyright (c) 2020, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,10 +17,6 @@
  *
  */
 
-#import <Foundation/Foundation.h>
+#import "SharedConstants.h"
 
-NS_ASSUME_NONNULL_BEGIN
-
-FOUNDATION_EXPORT NSString* PsiphonAppGroupIdentifier;
-
-NS_ASSUME_NONNULL_END
+NSString *_Nonnull PsiphonAppGroupIdentifier = @"group.ca.psiphon.Psiphon";
