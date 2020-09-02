@@ -24,9 +24,11 @@ import UIKit
 @objc final class EventHandler: NSObject {
 
     private let handler: () -> Void
+    @objc let event: UIControl.Event
 
-    init(_ handler:@escaping () -> Void) {
+    init(_ handler: @escaping () -> Void, for event: UIControl.Event = .touchUpInside) {
         self.handler = handler
+        self.event = event
     }
 
     @objc func handleEvent() {
@@ -43,7 +45,16 @@ import UIKit
     /// - Note: Current implementation resets any previously set handler.
     func setEventHandler(for event: UIControl.Event = .touchUpInside,
                          _ handler: @escaping () -> Void) {
-        self.eventHandler = EventHandler(handler)
+        
+        // Removes previously assigned event handler.´
+        if self.eventHandler != nil {
+            removeTarget(self.eventHandler,
+                         action: #selector(EventHandler.handleEvent),
+                         for: self.eventHandler.event)
+        }
+        
+        self.eventHandler = EventHandler(handler, for: event)
+        
         addTarget(self.eventHandler, action: #selector(EventHandler.handleEvent), for: event)
     }
     
@@ -67,7 +78,16 @@ import UIKit
     /// - Note: Current implementation resets any previously set handler.
     func setEventHandler(for event: UIControl.Event = .touchUpInside,
                          _ handler: @escaping () -> Void) {
-        self.eventHandler = EventHandler(handler)
+        
+        // Removes previously assigned event handler.´
+        if self.eventHandler != nil {
+            removeTarget(self.eventHandler,
+                         action: #selector(EventHandler.handleEvent),
+                         for: self.eventHandler.event)
+        }
+        
+        self.eventHandler = EventHandler(handler, for: event)
+        
         addTarget(self.eventHandler, action: #selector(EventHandler.handleEvent), for: event)
     }
 
