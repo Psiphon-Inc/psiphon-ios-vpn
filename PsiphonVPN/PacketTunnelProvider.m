@@ -731,6 +731,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     mutableConfigCopy[@"PacketTunnelTunFileDescriptor"] = fd;
 
     mutableConfigCopy[@"ClientVersion"] = [AppInfo appVersion];
+    
+    [PsiFeedbackLogger infoWithType:PsiphonTunnelDelegateLogType
+                             format:@"EgressRegion: region code: %@",
+     psiphonConfigUserDefaults.egressRegion];
 
     // Configure data root directory.
     // PsiphonTunnel will store all of its files under this directory.
