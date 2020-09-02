@@ -24,9 +24,14 @@
     EventHandler *eventHandler;
 }
 
-- (void)setEventHandlerFor:(UIControlEvents)event handler:(EventHandler *_Nonnull)eventHandler {
+- (void)setEventHandler:(EventHandler *_Nonnull)eventHandler {
+    if (self->eventHandler != nil) {
+        [self removeTarget:self->eventHandler
+                    action:@selector(handleEvent) forControlEvents:eventHandler.event];
+    }
     self->eventHandler = eventHandler;
-    [self addTarget:self->eventHandler action:@selector(handleEvent) forControlEvents:event];
+    [self addTarget:self->eventHandler
+             action:@selector(handleEvent) forControlEvents:eventHandler.event];
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(nullable UIEvent *)event {
