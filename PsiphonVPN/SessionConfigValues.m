@@ -34,12 +34,14 @@ PsiFeedbackLogType const SessionConfigValuesLogType = @"SessionConfigValues";
     // or after the processing of `-onActiveAuthorizationIDs:` callback from tunnel-core.
     StoredAuthorizations *_Nonnull latestAuths;
     
+    // lastSessionsAuths are points to the auths that were last retrieved
+    // by a call to `-newSessionEncodedAuthsWithSponsorID:`.
     StoredAuthorizations *_Nullable lastSessionAuths;
     
     // hasRetrievedLatestEncodedAuths flag keeps track of whether
     // latest auths have been retrieved (by calling `newSessionEncodedAuthsWithSponsorID:`) or not.
     // This is important for guaranteeing that tunnel-core is using the same authorizations
-    // that are present in `storedAuths`.
+    // that are present in `lastSessionAuths`.
     BOOL hasRetrievedLatestEncodedAuths;
 }
 
@@ -60,7 +62,7 @@ PsiFeedbackLogType const SessionConfigValuesLogType = @"SessionConfigValues";
     
     if (lastSessionAuths == nil) {
         @throw [NSException exceptionWithName:@"StateInconsistency"
-                                       reason:@"undefined state"
+                                       reason:@"(updateStoredAuthorizations)lastSessionAuths is nil"
                                      userInfo:nil];
     }
     
@@ -89,6 +91,10 @@ PsiFeedbackLogType const SessionConfigValuesLogType = @"SessionConfigValues";
         return AuthorizationUpdateResultNewAuthsAvailable;
     }
     
+}
+
+- (void)explicitlySetNewSession {
+    hasRetrievedLatestEncodedAuths = FALSE;
 }
 
 - (NSArray<NSString *> *)newSessionEncodedAuthsWithSponsorID:(NSString *_Nonnull *_Nullable)sponsorID {
@@ -132,10 +138,16 @@ setActiveAuthorizationIDs:(NSArray<NSString *> *_Nonnull)authorizationIds {
     ActiveAuthorizationResult result = ActiveAuthorizationResultNone;
     
     // If `hasRetrievedEncodedAuths` is FALSE, then there is no guarantee that the authorizations
-    // passed to tunnel-core are the same as the authorizations in `storedAuths`.
+    // passed to tunnel-core are the same as the authorizations in `lastSessionAuths`.
     if (hasRetrievedLatestEncodedAuths == FALSE) {
         @throw [NSException exceptionWithName:@"StateInconsistency"
-                                       reason:@"undefined state"
+                                       reason:@"hasRetrievedLatestEncodedAuths is FALSE"
+                                     userInfo:nil];
+    }
+    
+    if (lastSessionAuths == nil) {
+        @throw [NSException exceptionWithName:@"StateInconsistency"
+                                       reason:@"(setActiveAuthorizationIDs)lastSessionAuths is nil"
                                      userInfo:nil];
     }
     
