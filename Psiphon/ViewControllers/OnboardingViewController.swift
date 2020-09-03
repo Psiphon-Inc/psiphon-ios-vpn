@@ -65,10 +65,6 @@ fileprivate extension OnboardingStage {
         }
     }
     
-    static var totalNumberOfScreens: Int {
-        return Self.stagesToComplete.map(\.screens.count).reduce(0, +)
-    }
-    
 }
 
 // TODO: Temporary struct for when tuples conform to Hashable.
@@ -182,9 +178,6 @@ fileprivate extension OnboardingScreen {
         nextButton.setTitle(Strings.nextPageButtonTitle(), for: .normal)
         nextButton.setTitleColor(.white, for: .normal)
         nextButton.titleLabel!.font = .avenirNextDemiBold(16.0)
-        nextButton.setEventHandler { [unowned self] in
-            self.gotoNextScreen()
-        }
         
         self.view.addSubview(nextButton)
         nextButton.activateConstraints {
@@ -206,10 +199,14 @@ fileprivate extension OnboardingScreen {
         self.nextButton.isUserInteractionEnabled = true
     }
     
-    private func gotoNextScreen() {
-        if let nextScreen = self.screens[maybe: self.currentScreenIndex + 1] {
+    private func gotoScreenFollowing(screenIndex: Int) {
+        guard self.currentScreenIndex == screenIndex else {
+            return
+        }
+        
+        if self.screens[maybe: self.currentScreenIndex + 1] != nil {
             self.currentScreenIndex += 1
-            self.displayScreen(nextScreen)
+            self.displayScreen(self.currentScreen)
         } else {
             // Onboarding finished.
             self.onOnboardingFinished(self)
@@ -220,8 +217,8 @@ fileprivate extension OnboardingScreen {
     /// It is an error to call this method if current screen is already the starting screen of current index.
     private func gotoStartOfCurrentStage() {
         guard self.currentScreen.screenIndex > 0 else {
-            // Already at the starting index of the current stage.
-            fatalError()
+            // Already at the start of the current stage.
+            return
         }
         
         self.currentScreenIndex -= 1
@@ -230,7 +227,9 @@ fileprivate extension OnboardingScreen {
     
     private func displayScreen(_ screen: OnboardingScreen) {
         
+        let currentIndex = self.currentScreenIndex
         let onboardingView: UIView
+        
         switch (screen.stage, screen.screenIndex) {
         case (.languageSelection, 0):
             onboardingView = makeLanguageSelectionOnboardingView { [unowned self] in
@@ -250,7 +249,7 @@ fileprivate extension OnboardingScreen {
         case (.privacyPolicy_v2018_05_15, 0):
             onboardingView = makePrivacyPolicyOnboardingView(
                 onAccepted: { [unowned self] in
-                    self.gotoNextScreen()
+                    self.gotoScreenFollowing(screenIndex: currentIndex)
                 },
                 onDeclined: { [unowned self] in
                     let alert = makePrivacyPolicyDeclinedAlert()
@@ -283,6 +282,11 @@ fileprivate extension OnboardingScreen {
         
         self.updateView(onboardingView: onboardingView)
         
+        // Updates `nextButton` event handler.
+        nextButton.setEventHandler { [unowned self] in
+            self.gotoScreenFollowing(screenIndex: currentIndex)
+        }
+        
         // Carries out any effects based on which screen is presented.
         
         switch screen {
@@ -300,7 +304,7 @@ fileprivate extension OnboardingScreen {
                 switch vpnConfigInstallResult {
                 case .installedSuccessfully:
                     // Go to next onboarding screen.
-                    self.gotoNextScreen()
+                    self.gotoScreenFollowing(screenIndex: currentIndex)
                 
                 case .permissionDenied:
                     // Re-start VPN config permission onboarding stage.
@@ -325,7 +329,7 @@ fileprivate extension OnboardingScreen {
             centre.getNotificationSettings { settings in
                 guard settings.authorizationStatus == .notDetermined else {
                     DispatchQueue.main.async {
-                        self.gotoNextScreen()
+                        self.gotoScreenFollowing(screenIndex: currentIndex)
                     }
                     return
                 }
@@ -340,10 +344,9 @@ fileprivate extension OnboardingScreen {
                     }
                     
                     DispatchQueue.main.async {
-                        self.gotoNextScreen()
+                        self.gotoScreenFollowing(screenIndex: currentIndex)
                     }
                 }
-                
             }
             
         default:
@@ -392,7 +395,7 @@ fileprivate func makeLanguageSelectionOnboardingView(
     selectLangButton.includeChevron = true
     selectLangButton.setTitle(Strings.onboardingSelectLanguageButtonTitle())
     
-    selectLangButton.setEventHandlerFor(.touchUpInside, handler: EventHandler(onLanguageSelected))
+    selectLangButton.setEventHandler(onLanguageSelected)
     
     return OnboardingView(
         image: UIImage(named: "OnboardingStairs")!,
@@ -409,11 +412,11 @@ fileprivate func makePrivacyPolicyOnboardingView(
     let acceptButton = RoyalSkyButton(forAutoLayout: ())
     acceptButton.setTitle(UserStrings.Accept_button_title())
     acceptButton.shadow = true
-    acceptButton.setEventHandlerFor(.touchUpInside, handler: EventHandler(onAccepted))
+    acceptButton.setEventHandler(onAccepted)
     
     let declineButton = RingSkyButton(forAutoLayout: ())
     declineButton.setTitle(UserStrings.Decline_button_title())
-    declineButton.setEventHandlerFor(.touchUpInside, handler: EventHandler(onDeclined))
+    declineButton.setEventHandler(onDeclined)
     
     let stackView = UIStackView(arrangedSubviews: [declineButton, acceptButton])
     stackView.spacing = 20.0
