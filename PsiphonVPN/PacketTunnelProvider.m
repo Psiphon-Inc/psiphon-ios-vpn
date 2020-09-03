@@ -246,8 +246,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     });
 }
 
+// This method is not thread-safe.
 - (NSError *_Nullable)startPsiphonTunnel {
-
+    
+    // Indicates that a new tunnel session is about to begin.
+    [self->sessionConfigValues explicitlySetNewSession];
+    
     BOOL success = [self.psiphonTunnel start:FALSE];
 
     if (!success) {
