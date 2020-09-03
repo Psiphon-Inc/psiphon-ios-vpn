@@ -395,7 +395,7 @@ fileprivate func makeLanguageSelectionOnboardingView(
     selectLangButton.includeChevron = true
     selectLangButton.setTitle(Strings.onboardingSelectLanguageButtonTitle())
     
-    selectLangButton.setEventHandler(EventHandler(onLanguageSelected))
+    selectLangButton.setEventHandler(onLanguageSelected)
     
     return OnboardingView(
         image: UIImage(named: "OnboardingStairs")!,
@@ -412,11 +412,11 @@ fileprivate func makePrivacyPolicyOnboardingView(
     let acceptButton = RoyalSkyButton(forAutoLayout: ())
     acceptButton.setTitle(UserStrings.Accept_button_title())
     acceptButton.shadow = true
-    acceptButton.setEventHandler(EventHandler(onAccepted))
+    acceptButton.setEventHandler(onAccepted)
     
     let declineButton = RingSkyButton(forAutoLayout: ())
     declineButton.setTitle(UserStrings.Decline_button_title())
-    declineButton.setEventHandler(EventHandler(onDeclined))
+    declineButton.setEventHandler(onDeclined)
     
     let stackView = UIStackView(arrangedSubviews: [declineButton, acceptButton])
     stackView.spacing = 20.0

@@ -37,20 +37,29 @@ import UIKit
 
 }
 
-@objc class SwiftUIControl: UIControl {
- 
-    private var eventHandler: EventHandler!
+/// Enables sharing implementation of `setEventHandler(for::)` between different subclasses of UIControl.
+protocol UIControlEventHandler: class {
+    
+    var eventHandler: EventHandler? { get set }
+    
+    func addTarget(_ target: Any?, action: Selector, for controlEvents: UIControl.Event)
+    
+    func removeTarget(_ target: Any?, action: Selector?, for controlEvents: UIControl.Event)
+    
+}
+
+extension UIControlEventHandler {
     
     /// Sets `handler` as the event handler for this instance.
     /// - Note: Current implementation resets any previously set handler.
     func setEventHandler(for event: UIControl.Event = .touchUpInside,
                          _ handler: @escaping () -> Void) {
         
-        // Removes previously assigned event handler.´
-        if self.eventHandler != nil {
+        // Removes previously assigned event handler.
+        if let current = self.eventHandler {
             removeTarget(self.eventHandler,
                          action: #selector(EventHandler.handleEvent),
-                         for: self.eventHandler.event)
+                         for: current.event)
         }
         
         self.eventHandler = EventHandler(handler, for: event)
@@ -60,7 +69,14 @@ import UIKit
     
 }
 
-@objc class SwiftUIButton: UIButton {
+
+@objc class SwiftUIControl: UIControl, UIControlEventHandler {
+    var eventHandler: EventHandler?
+}
+
+@objc class SwiftUIButton: UIButton, UIControlEventHandler {
+    
+    var eventHandler: EventHandler?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -71,27 +87,10 @@ import UIKit
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    private var eventHandler: EventHandler!
-
-    /// Sets `handler` as the event handler for this instance.
-    /// - Note: Current implementation resets any previously set handler.
-    func setEventHandler(for event: UIControl.Event = .touchUpInside,
-                         _ handler: @escaping () -> Void) {
-        
-        // Removes previously assigned event handler.´
-        if self.eventHandler != nil {
-            removeTarget(self.eventHandler,
-                         action: #selector(EventHandler.handleEvent),
-                         for: self.eventHandler.event)
-        }
-        
-        self.eventHandler = EventHandler(handler, for: event)
-        
-        addTarget(self.eventHandler, action: #selector(EventHandler.handleEvent), for: event)
-    }
-
+    
 }
+
+extension AnimatedControl: UIControlEventHandler {}
 
 // MARK: NSNotification Bridge
 
