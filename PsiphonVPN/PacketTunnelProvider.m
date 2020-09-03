@@ -246,8 +246,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     });
 }
 
+// This method is not thread-safe.
 - (NSError *_Nullable)startPsiphonTunnel {
-
+    
+    // Indicates that a new tunnel session is about to begin.
+    [self->sessionConfigValues explicitlySetNewSession];
+    
     BOOL success = [self.psiphonTunnel start:FALSE];
 
     if (!success) {
@@ -731,6 +735,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     mutableConfigCopy[@"PacketTunnelTunFileDescriptor"] = fd;
 
     mutableConfigCopy[@"ClientVersion"] = [AppInfo appVersion];
+    
+    [PsiFeedbackLogger infoWithType:PsiphonTunnelDelegateLogType
+                             format:@"EgressRegion: region code: %@",
+     psiphonConfigUserDefaults.egressRegion];
 
     // Configure data root directory.
     // PsiphonTunnel will store all of its files under this directory.
