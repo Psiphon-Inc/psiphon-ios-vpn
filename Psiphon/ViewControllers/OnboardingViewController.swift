@@ -218,7 +218,7 @@ fileprivate extension OnboardingScreen {
     private func gotoStartOfCurrentStage() {
         guard self.currentScreen.screenIndex > 0 else {
             // Already at the start of the current stage.
-            fatalError()
+            return
         }
         
         self.currentScreenIndex -= 1
