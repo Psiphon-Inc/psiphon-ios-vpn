@@ -12,10 +12,11 @@ target 'Psiphon' do
   #pod "InAppSettingsKit", :path => "../InAppSettingsKit"
   #pod "PsiphonClientCommonLibrary", :path => "../psiphon-ios-client-common-library"
   pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => 'ce74ccf'
+  
+  pod 'GoogleUserMessagingPlatform', '~> 1.1.0'
 
   # Swift dependencies
   pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
-  pod 'PersonalizedAdConsent', '~> 1.0'  # Google Mobile Ads Consent SDK
   pod 'MBProgressHUD', '~> 1.1.0'
   pod 'SVProgressHUD', '~> 2.2.5'
   pod 'EFCountingLabel', '~> 5.1.1'

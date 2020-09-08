@@ -39,11 +39,9 @@
 #import "NSError+Convenience.h"
 #import "AdMobInterstitialAdControllerWrapper.h"
 #import "AdMobRewardedAdControllerWrapper.h"
-#import <PersonalizedAdConsent/PersonalizedAdConsent.h>
-#import "AdMobConsent.h"
 #import "AppEvent.h"
 #import "AppObservables.h"
-
+#import "Psiphon-Swift.h"
 
 NSErrorDomain const AdControllerWrapperErrorDomain = @"AdControllerWrapperErrorDomain";
 
@@ -204,27 +202,42 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     RACSignal<RACUnit *> *adSDKInitConsent = [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
         dispatch_async_main(^{
             
-            [AdMobConsent collectConsentForPublisherID:AdMobPublisherID withCompletionHandler:^(NSError * _Nullable error, PACConsentStatus s) {
-                
-                if  (error != nil) {
+            // AdMob Warning: Ads may be preloaded by the Mobile Ads SDK or mediation partner SDKs
+            // upon calling startWithCompletionHandler:. If you need to obtain consent from
+            // users in the European Economic Area (EEA), set any request-specific flags (such as
+            // tagForChildDirectedTreatment or tag_for_under_age_of_consent), or otherwise
+            // take action before loading ads, ensure you do so before
+            // initializing the Mobile Ads SDK.
+            
+            [AdConsent.sharedInstance consentInfoUpdateWithCompletionHandler:^(NSError * _Nullable error) {
+                if (error != nil) {
                     [subscriber sendError:error];
                     return;
                 }
                 
-                // Starts Google AdMob SDK.
-                [GADMobileAds.sharedInstance startWithCompletionHandler:
-                 ^(GADInitializationStatus * _Nonnull status) {
-                    [PsiFeedbackLogger
-                     infoWithType:AdManagerLogType
-                     message:[NSString stringWithFormat:@"Initialized AdMob SDK '%@'",
-                              status.adapterStatusesByClassName]];
+                [AdConsent.sharedInstance presentConsentFormIfNeededFromViewController:^UIViewController * _Nonnull{
+                    return [AppDelegate getTopPresentedViewController];
+                } completionHandler:^(NSError * _Nullable error, UMPConsentStatus status) {
                     
-                    [subscriber sendNext:RACUnit.defaultUnit];
-                    [subscriber sendCompleted];
+                    if (error != nil) {
+                        [subscriber sendError:error];
+                        return;
+                    }
+                    
+                    // Starts Google AdMob SDK.
+                    [GADMobileAds.sharedInstance startWithCompletionHandler:
+                     ^(GADInitializationStatus * _Nonnull status) {
+
+                        [PsiFeedbackLogger
+                         infoWithType:AdManagerLogType
+                         message:[NSString stringWithFormat:@"Initialized AdMob SDK '%@'",
+                                  status.adapterStatusesByClassName]];
+                        
+                        [subscriber sendNext:RACUnit.defaultUnit];
+                        [subscriber sendCompleted];
+                    }];
                 }];
-                
             }];
-            
         });
 
         return nil;
@@ -232,7 +245,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 
     // Ad SDK initialization
     {
-        self.adSDKInitMultiCast = [[[[[[[[AppObservables shared].appEvents.signal filter:^BOOL(AppEvent *event) {
+        self.adSDKInitMultiCast = [[[[[[[[[AppObservables shared].appEvents.signal filter:^BOOL(AppEvent *event) {
               // Initialize Ads SDK if network is reachable, and device is either tunneled or untunneled, and the
               // user is not a subscriber.
               return (event.networkIsReachable &&
@@ -241,7 +254,11 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
           }]
           take:1]
           flattenMap:^RACSignal<RACUnit *> *(AppEvent *value) {
-            return adSDKInitConsent;
+              return adSDKInitConsent;
+          }] doError:^(NSError * _Nonnull error) {
+              // Logs error emitted by `adSDKInitConsent` signal.
+              [PsiFeedbackLogger errorWithType:AdManagerLogType message:@"Ad SDK init failed"
+                                        object:error];
           }]
           retry:3]
           take:1]
@@ -339,7 +356,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
 }
 
 - (void)resetUserConsent {
-    [AdMobConsent resetConsent];
+    [AdConsent.sharedInstance resetConsent];
 }
 
 - (RACSignal<NSNumber *> *)presentInterstitialOnViewController:(UIViewController *)viewController {
