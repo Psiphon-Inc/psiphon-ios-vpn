@@ -26,7 +26,6 @@
 #import "Nullity.h"
 #import "NSError+Convenience.h"
 #import "Asserts.h"
-#import "AdMobConsent.h"
 #import "RelaySubject.h"
 #import "Psiphon-Swift.h"
 
@@ -108,7 +107,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
                 strongSelf.rewardedAd = [[GADRewardedAd alloc]
                                          initWithAdUnitID:strongSelf.adUnitID];
                 
-                GADRequest *request = [AdMobConsent createGADRequestWithUserConsentStatus];
+                GADRequest *request = [AdConsent.sharedInstance makeGADRequestWithNPA];
                 
                 GADServerSideVerificationOptions *ssvOptions = [[GADServerSideVerificationOptions alloc] init];
                 ssvOptions.customRewardString = customData;

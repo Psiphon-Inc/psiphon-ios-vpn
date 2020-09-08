@@ -31,10 +31,10 @@ public struct DebugFlags {
     public var devServers = true
     public var ignoreTunneledChecks = false
     public var disableConnectOnDemand = false
-    
+    public var adNetworkGeographicDebugging: AdNetworkGeographicDebugging = .disabled
     public var printStoreLogs = false
     public var printAppState = false
-    public var printHttpRequests = true
+    public var printHttpRequests = false
     
     public static func disabled() -> Self {
         return .init(mainThreadChecks: false,
@@ -42,8 +42,18 @@ public struct DebugFlags {
                      devServers: false,
                      ignoreTunneledChecks: false,
                      disableConnectOnDemand: false,
+                     adNetworkGeographicDebugging: .disabled,
                      printStoreLogs: false,
                      printAppState: false,
                      printHttpRequests: false)
     }
+}
+
+public enum AdNetworkGeographicDebugging: Equatable {
+    /// Geographic debugging is disabled.
+    case disabled
+    /// Geography appears as in EEA for debug devices that are set.
+    case EEA
+    /// Geography appears as not in EEA for debug devices that are set.
+    case notEEA
 }

@@ -26,10 +26,10 @@
 #import "RACUnit.h"
 #import "Logging.h"
 #import "Asserts.h"
-#import "AdMobConsent.h"
 #import <GoogleMobileAds/GADInterstitialDelegate.h>
 #import "RACTuple.h"
 #import "RelaySubject.h"
+#import "Psiphon-Swift.h"
 
 PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobInterstitialAdControllerWrapper";
 
@@ -101,7 +101,7 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
                 weakSelf.interstitial.delegate = weakSelf;
             }
 
-            GADRequest *request = [AdMobConsent createGADRequestWithUserConsentStatus];
+            GADRequest *request = [AdConsent.sharedInstance makeGADRequestWithNPA];
 
             [weakSelf.interstitial loadRequest:request];
 

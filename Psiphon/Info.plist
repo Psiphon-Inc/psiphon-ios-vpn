@@ -33,10 +33,6 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>150</string>
-	<key>GADApplicationIdentifier</key>
-	<string>ca-app-pub-1072041961750291~2085686375</string>
-	<key>GADDelayAppMeasurementInit</key>
-	<true/>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
@@ -74,12 +70,18 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-    <key>SKAdNetworkItems</key>
-    <array>
-        <dict>
-            <key>SKAdNetworkIdentifier</key>
-            <string>cstr6suwn9.skadnetwork</string>
-        </dict>
-    </array>
+	<key>GADApplicationIdentifier</key>
+	<string>ca-app-pub-1072041961750291~2085686375</string>
+	<key>GADDelayAppMeasurementInit</key>
+	<true/>
+	<key>SKAdNetworkItems</key>
+	<array>
+		<dict>
+			<key>SKAdNetworkIdentifier</key>
+			<string>cstr6suwn9.skadnetwork</string>
+		</dict>
+	</array>
+	<key>NSUserTrackingUsageDescription</key>
+	<string>This identifier will be used to deliver personalized ads to you.</string>
 </dict>
 </plist>
