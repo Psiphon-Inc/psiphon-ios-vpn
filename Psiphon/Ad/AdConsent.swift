@@ -69,6 +69,8 @@ extension UMPConsentType {
         }
         
         let params = UMPRequestParameters()
+        
+        // Psiphon VPN app is age restricted at 17+ through the App Store.
         params.tagForUnderAgeOfConsent = false // false means users are not under age.
         
         if Debugging.adNetworkGeographicDebugging != .disabled {
