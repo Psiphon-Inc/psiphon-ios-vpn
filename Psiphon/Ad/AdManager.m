@@ -192,7 +192,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     });
 }
 
-// This should be called only once during application at application load time
+// This should be called only once at application launch time
 - (void)_initializeAdManager {
 
     AdManager *__weak weakSelf = self;
@@ -343,7 +343,7 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     }
 }
 
-// This should be called only once during application at application load time
+// This should be called only once at application launch time
 - (void)_initializeRewardedVideos {
 
     // Untunneled rewarded video
