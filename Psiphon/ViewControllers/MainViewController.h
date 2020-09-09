@@ -41,8 +41,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) RACSignal<RACUnit *> *activeStateLoadingSignal;
 
-- (void)presentIAPViewController;
-
 @end
 
 NS_ASSUME_NONNULL_END
