@@ -126,7 +126,8 @@
           [PsiFeedbackLogger info:@"dismiss loading screen"];
           [weakSelf removeLaunchScreen];
       } error:^(NSError *error) {
-          [weakSelf.compoundDisposable removeDisposable:disposable];
+          [NSException raise:@"Unexpected signal error termination"
+                      format:@"activeStateLoadingSignal terminated in an error"];
       } completed:^{
           [weakSelf.compoundDisposable removeDisposable:disposable];
       }];
