@@ -3,7 +3,7 @@ PODS:
   - InAppSettingsKit (2.15)
   - MBProgressHUD (1.1.0)
   - PersonalizedAdConsent (1.0.5)
-  - PsiphonClientCommonLibrary (2.0.10):
+  - PsiphonClientCommonLibrary (2.0.11):
     - InAppSettingsKit (= 2.15)
   - ReactiveObjC (3.1.0)
   - SVProgressHUD (2.2.5)
@@ -13,7 +13,7 @@ DEPENDENCIES:
   - InAppSettingsKit (from `https://github.com/Psiphon-Inc/InAppSettingsKit.git`, commit `8bd203c`)
   - MBProgressHUD (~> 1.1.0)
   - PersonalizedAdConsent (~> 1.0)
-  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `ce74ccf`)
+  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `4d90586`)
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `8bbf9dd`)
   - SVProgressHUD (~> 2.2.5)
 
@@ -29,7 +29,7 @@ EXTERNAL SOURCES:
     :commit: 8bd203c
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: ce74ccf
+    :commit: 4d90586
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: 8bbf9dd
@@ -40,7 +40,7 @@ CHECKOUT OPTIONS:
     :commit: 8bd203c
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: ce74ccf
+    :commit: 4d90586
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: 8bbf9dd
@@ -51,10 +51,10 @@ SPEC CHECKSUMS:
   InAppSettingsKit: 4890a44f9df7a1742c632920f0ea939cbeb29ea2
   MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
   PersonalizedAdConsent: dbecabb3467df967c16d9cebc2ef4a8890e4bbd8
-  PsiphonClientCommonLibrary: 107640f83c34a461ff75d55383b766d789323521
+  PsiphonClientCommonLibrary: 788ef3cc1d7aa9ce1e88ed1e30a77ec181d89910
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
 
-PODFILE CHECKSUM: 4f494812a381e5b211a4faa7ebbbafcc463a86b5
+PODFILE CHECKSUM: 06556bef42d645309ddab07c5601a3daaf9810a7
 
 COCOAPODS: 1.8.4
