@@ -44,16 +44,20 @@ extension PsiCashState {
         libLoaded = false
     }
     
-    public mutating func appDidLaunch(_ libData: PsiCashLibData) {
+    public mutating func initialized(_ libData: PsiCashLibData) {
         self.libData = libData
         self.libLoaded = true
     }
     
-    // Returns the first Speed Boost product that has not expired.
-    public var activeSpeedBoost: PurchasedExpirableProduct<SpeedBoostProduct>? {
-        let activeSpeedBoosts = libData.activePurchases.items
-            .compactMap { $0.speedBoost }
-            .filter { !$0.transaction.expired }
+    /// Returns the first Speed Boost product that has not expired.
+    public func activeSpeedBoost(
+        _ dateCompare: DateCompare
+    ) -> PurchasedExpirableProduct<SpeedBoostProduct>? {
+        
+        let activeSpeedBoosts = libData.activePurchases.toPairs().successes
+            .compactMap(\.speedBoost)
+            .filter { !$0.transaction.isExpired(dateCompare) }
+        
         return activeSpeedBoosts[maybe: 0]
     }
 }
@@ -136,9 +140,8 @@ public struct RewardedVideoState: Equatable {
 
 public enum PsiCashPurchaseResponseError: HashableError {
     case tunnelNotConnected
-    case parseError(PsiCashParseError)
-    // TODO: map Int to PsiCashStatus from PsiCashLib
-    case serverError(status: Int, shouldRetry: Bool, error: SystemError?)
+    case purchaseFailed(psiStatus: Int, shouldRetry: Bool)
+    case requestFailed(message: String)
 }
 
 public enum PsiCashRefreshError: HashableError {
@@ -151,7 +154,7 @@ public enum PsiCashRefreshError: HashableError {
     /// (PsiCash  v1.3.1-0-gd1471c1) Should never happen. The local user ID will be cleared.
     case invalidTokens
     /// Some other error.
-    case error(SystemError)
+    case error(String)
 }
 
 /// `PsiCashTransactionMismatchError` represents errors that are due to state mismatch between
@@ -172,12 +175,14 @@ enum PsiCashTransactionMismatchError: HashableError {
 public struct PsiCashPurchaseResult: Equatable {
     public let purchasable: PsiCashPurchasableType
     public let refreshedLibData: PsiCashLibData
-    public let result: Result<PsiCashPurchasedType, ErrorEvent<PsiCashPurchaseResponseError>>
+    public let result: Result<Result<PsiCashPurchasedType, PsiCashParseError>,
+                              ErrorEvent<PsiCashPurchaseResponseError>>
     
     public init (
         purchasable: PsiCashPurchasableType,
         refreshedLibData: PsiCashLibData,
-        result: Result<PsiCashPurchasedType, ErrorEvent<PsiCashPurchaseResponseError>>
+        result: Result<Result<PsiCashPurchasedType, PsiCashParseError>,
+                       ErrorEvent<PsiCashPurchaseResponseError>>
     ) {
         self.purchasable = purchasable
         self.refreshedLibData = refreshedLibData
@@ -194,9 +199,10 @@ extension PsiCashPurchaseResult {
         }
         switch errorEvent.error {
         case .tunnelNotConnected: return false
-        case .parseError(_): return false
-        case let .serverError(_, retry, _):
+        case .purchaseFailed(psiStatus: _, shouldRetry: let retry):
             return retry
+        case .requestFailed(message: _):
+            return false
         }
     }
 
@@ -278,7 +284,7 @@ extension PsiCashBalance {
 
 }
 
-extension PsiCashAuthPackage {
+extension PsiCashValidTokenTypes {
     
     /// true if the user has minimal tokens for the PsiCash features to function.
     public var hasMinimalTokens: Bool {

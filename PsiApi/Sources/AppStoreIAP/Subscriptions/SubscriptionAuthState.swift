@@ -100,8 +100,7 @@ public struct SubscriptionAuthStateReducerEnvironment {
     public let tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
     public let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
     public let clientMetaData: () -> ClientMetaData
-    public let getCurrentTime: () -> Date
-    public let compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
+    public let dateCompare: DateCompare
 
     public init(feedbackLogger: FeedbackLogger, httpClient: HTTPClient,
                httpRequestRetryCount: Int, httpRequestRetryInterval: DispatchTimeInterval,
@@ -110,8 +109,7 @@ public struct SubscriptionAuthStateReducerEnvironment {
                tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
                tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
                clientMetaData: @escaping () -> ClientMetaData,
-               getCurrentTime: @escaping () -> Date,
-               compareDates: @escaping (Date, Date, Calendar.Component) -> ComparisonResult) {
+               dateCompare: DateCompare) {
 
         self.feedbackLogger = feedbackLogger
         self.httpClient = httpClient
@@ -123,8 +121,7 @@ public struct SubscriptionAuthStateReducerEnvironment {
         self.tunnelStatusSignal = tunnelStatusSignal
         self.tunnelConnectionRefSignal = tunnelConnectionRefSignal
         self.clientMetaData = clientMetaData
-        self.getCurrentTime = getCurrentTime
-        self.compareDates = compareDates
+        self.dateCompare = dateCompare
     }
 }
 
@@ -296,10 +293,7 @@ public func subscriptionAuthStateReducer(
         // Filters `purchasesAuthState` for purchases that do not have an authorization,
         // or an authorization request could be retried.
         let purchasesWithoutAuth = state.subscription.purchasesAuthState?.values.filter {
-            $0.canRequestAuthorization(
-                getCurrentTime: environment.getCurrentTime,
-                compareDates: environment.compareDates
-            )
+            $0.canRequestAuthorization(dateCompare: environment.dateCompare)
         }
         
         let sortedByExpiry = purchasesWithoutAuth?.sorted(by: {
@@ -312,10 +306,9 @@ public func subscriptionAuthStateReducer(
         }
         
         // If the transaction is expired according to device's clock
-        let isExpired = purchaseWithLatestExpiry.purchase.isApproximatelyExpired(
-            getCurrentTime: environment.getCurrentTime,
-            compareDates: environment.compareDates
-        )
+        let isExpired = purchaseWithLatestExpiry.purchase
+            .isApproximatelyExpired(environment.dateCompare)
+        
         guard !isExpired else {
             return []
         }
@@ -358,7 +351,7 @@ public func subscriptionAuthStateReducer(
         
         return effects + [
             authRequest.callAsFunction(
-                getCurrentTime: environment.getCurrentTime,
+                getCurrentTime: environment.dateCompare.getCurrentTime,
                 tunnelStatusSignal: environment.tunnelStatusSignal,
                 tunnelConnectionRefSignal: environment.tunnelConnectionRefSignal,
                 httpClient: environment.httpClient
@@ -671,10 +664,7 @@ extension SubscriptionPurchaseAuthState {
     
     /// `canRequestAuthorization` determines whether an authorization request could be sent to the purchase verifier
     /// server based on the current state of `signedAuthorization`, and device clock.
-    func canRequestAuthorization(
-        getCurrentTime: () -> Date,
-        compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
-    ) -> Bool {
+    func canRequestAuthorization(dateCompare: DateCompare) -> Bool {
         switch self.signedAuthorization {
         case .notRequested:
             return true
@@ -685,10 +675,7 @@ extension SubscriptionPurchaseAuthState {
         case .authorization(_):
             return false
         case .rejectedByPsiphon(_):
-            let isExpired = self.purchase.isApproximatelyExpired(
-                getCurrentTime: getCurrentTime,
-                compareDates: compareDates
-            )
+            let isExpired = self.purchase.isApproximatelyExpired(dateCompare)
             return !isExpired
         }
     }

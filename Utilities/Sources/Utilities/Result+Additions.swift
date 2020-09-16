@@ -21,14 +21,18 @@ import Foundation
 
 public extension Result {
 
-    var success: Bool {
+    var isSuccess: Bool {
         switch self {
         case .success(_): return true
         case .failure(_): return false
         }
     }
     
-    func projectSuccess() -> Success? {
+    var isFailure: Bool {
+        !isSuccess
+    }
+    
+    func successToOptional() -> Success? {
         switch self {
         case .success(let value):
             return value
@@ -37,7 +41,7 @@ public extension Result {
         }
     }
 
-    func projectError() -> Failure? {
+    func failureToOptional() -> Failure? {
         switch self {
         case .success:
             return .none
@@ -55,11 +59,23 @@ public extension Result {
         }
     }
     
+    func biFlatMap<C, D: Error>(
+        _ transformSuccess: (Success) -> Result<C, D>,
+        _ transformFailure: (Failure) -> Result<C, D>
+    ) -> Result<C, D> {
+        switch self {
+        case let .success(success):
+            return transformSuccess(success)
+        case let .failure(error):
+            return transformFailure(error)
+        }
+    }
+    
 }
 
 public extension Result where Success == () {
     
-    func mapToUnit() -> Result<Unit, Failure> {
+    func toUnit() -> Result<Unit, Failure> {
         self.map { _ in
             .unit
         }

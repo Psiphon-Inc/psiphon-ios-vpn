@@ -269,7 +269,7 @@ extension UserStrings {
 
 // MARK: General Strings
 extension UserStrings {
-    @objc static func Operation_failed_alert_message() -> String {
+    @objc static func Operation_failed_please_try_again_alert_message() -> String {
         return NSLocalizedString("ALERT_BODY_OPERATION_FAILED", tableName: nil, bundle: Bundle.main,
                                  value: "Operation failed, please try again.",
                                  comment: "Alert dialog body when requested operation by the user failed.")

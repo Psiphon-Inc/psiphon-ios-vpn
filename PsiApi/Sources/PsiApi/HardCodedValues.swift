@@ -79,3 +79,9 @@ public struct PsiphonDeepLinking {
     public static let psiCashDeepLink = URL(string: "\(scheme)://\(psiCashHost)")!
     public static let speedBoostDeepLink = URL(string: "\(scheme)://\(speedBoostHost)")!
 }
+
+public struct PsiCashClientHardCodedValues {
+    
+    public static let userAgent = "Psiphon-PsiCash-iOS"
+    
+}

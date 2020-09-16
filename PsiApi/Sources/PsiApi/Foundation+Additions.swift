@@ -422,7 +422,7 @@ public extension URLRequest {
             Header:
             \(String(describing: self.allHTTPHeaderFields!))
             Body:
-            \(String(data: self.httpBody!, encoding: .utf8)!)
+            \(String(data: self.httpBody ?? Data(), encoding: .utf8)!)
             """)
     }
 }

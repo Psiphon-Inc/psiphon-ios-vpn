@@ -40,7 +40,8 @@ typealias LandingPageEnvironment = (
     sharedDB: PsiphonDataSharedDB,
     urlHandler: URLHandler,
     psiCashEffects: PsiCashEffects,
-    psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>
+    psiCashAuthPackageSignal: SignalProducer<PsiCashValidTokenTypes, Never>,
+    mainDispatcher: MainDispatcher
 )
 
 func landingPageReducer(
@@ -78,7 +79,7 @@ func landingPageReducer(
                 authPackageSignal: environment.psiCashAuthPackageSignal,
                 psiCashEffects: environment.psiCashEffects
             ).flatMap(.latest) {
-                environment.urlHandler.open($0, tunnelConnection)
+                environment.urlHandler.open($0, tunnelConnection, environment.mainDispatcher)
             }
             .map(LandingPageAction._urlOpened(success:))
         ]
@@ -91,7 +92,7 @@ func landingPageReducer(
 }
 
 fileprivate func modifyLandingPagePendingEarnerToken(
-    url: URL, authPackageSignal: SignalProducer<PsiCashAuthPackage, Never>,
+    url: URL, authPackageSignal: SignalProducer<PsiCashValidTokenTypes, Never>,
     psiCashEffects: PsiCashEffects
 ) -> Effect<URL> {
     authPackageSignal

@@ -20,6 +20,25 @@
 import Foundation
 import ReactiveSwift
 
+extension URL {
+    
+    public static func make(scheme: String, hostname: String, port: Int32,
+          path: String, queryParams: [(field: String, value: String)]) -> URL? {
+
+        // Syntax components of URLs: https://tools.ietf.org/html/rfc3986#section-3
+        
+        let query = queryParams.map { "\($0.field)=\($0.value)" }
+            .joined(separator: "&")
+        
+        let authority = "\(hostname):\(port)"
+        
+        let queryString = query.isEmpty ? "" : "?\(query)"
+        
+        return URL(string: "\(scheme)://\(authority)\(path)\(queryString)")
+    }
+    
+}
+
 public enum HTTPMethod: String {
     case get = "GET"
     case post = "POST"
@@ -28,7 +47,18 @@ public enum HTTPMethod: String {
 public enum HTTPContentType: String, HTTPHeader {
     case json = "application/json"
     
-    public static var headerKey: String { "Content-Type" }
+    public static let headerKey = "Content-Type"
+}
+
+public struct HTTPDateHeader: HTTPHeader {
+    
+    public let value: String
+    
+    public init(_ value: String) {
+        self.value = value
+    }
+    
+    public static let headerKey = "Date"
 }
 
 public struct HTTPResponseData: Hashable {
@@ -72,6 +102,7 @@ public protocol HTTPResponse {
     associatedtype Success: Equatable
     associatedtype Failure: HashableError
     typealias FailureEvent = ErrorEvent<Failure>
+    
     typealias ResultType = Result<Success, FailureEvent>
     
     var result: ResultType { get }
@@ -101,22 +132,26 @@ extension RetriableHTTPResponse {
     
 }
 
+/// Represents a HTTP request.
+/// `Response` is a phantom type.
 public struct HTTPRequest<Response: HTTPResponse>: Equatable {
     
     let urlRequest: URLRequest
     
-    private init(url: URL, body: Data?, clientMetaData: String, method: HTTPMethod,
-                 contentType: HTTPContentType, response: Response.Type
-    ) {
+    public init(url: URL, httpMethod: HTTPMethod, headers: [String: String],
+                body: Data?, response: Response.Type) {
         var request = URLRequest(
             url: url,
             cachePolicy: UrlRequestParameters.cachePolicy,
             timeoutInterval: UrlRequestParameters.timeoutInterval
         )
+        
+        request.httpMethod = httpMethod.rawValue
         request.httpBody = body
-        request.httpMethod = method.rawValue
-        request.setValue(contentType.rawValue, forHTTPHeaderField: HTTPContentType.headerKey)
-        request.setValue(clientMetaData, forHTTPHeaderField: "X-Verifier-Metadata")
+        
+        for (field, value) in headers {
+            request.setValue(value, forHTTPHeaderField: field)
+        }
         
         if Debugging.printHttpRequests {
             request.debugPrint()
@@ -130,8 +165,10 @@ public struct HTTPRequest<Response: HTTPResponse>: Equatable {
         url: URL, jsonData: Data, clientMetaData: String, method: HTTPMethod,
         response: Response.Type
     ) -> Self {
-        return .init(url: url, body: jsonData, clientMetaData: clientMetaData,
-                     method: method, contentType: .json, response: response)
+        let headers = [HTTPContentType.headerKey: HTTPContentType.json.rawValue,
+                       "X-Verifier-Metadata": clientMetaData]
+        return .init(url: url, httpMethod: method, headers: headers,
+                     body: jsonData, response: response)
     }
     
 }

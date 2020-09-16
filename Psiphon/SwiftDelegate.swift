@@ -38,16 +38,9 @@ enum AppLifecycle: Equatable {
 
 enum AppDelegateAction {
     case appLifecycleEvent(AppLifecycle)
-    case appDidLaunch(psiCashData: PsiCashLibData)
     case adPresentationStatus(presenting: Bool)
     case checkForDisallowedTrafficAlertNotification
     case _disallowedNotificationAlertPresentation(success: Bool)
-}
-
-struct AppDelegateReducerState: Equatable {
-    var psiCashBalance: PsiCashBalance
-    var psiCash: PsiCashState
-    var appDelegate: AppDelegateState
 }
 
 struct AppDelegateState: Equatable {
@@ -62,47 +55,43 @@ struct AppDelegateState: Equatable {
 
 typealias AppDelegateEnvironment = (
     feedbackLogger: FeedbackLogger,
-    psiCashPersistedValues: PsiCashPersistedValues,
     sharedDB: PsiphonDataSharedDB,
     psiCashEffects: PsiCashEffects,
     paymentQueue: PaymentQueue,
     appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
-    psiCashStore: (PsiCashAction) -> Effect<Never>,
-    paymentTransactionDelegate: PaymentTransactionDelegate
+    paymentTransactionDelegate: PaymentTransactionDelegate,
+    mainDispatcher: MainDispatcher
 )
 
 func appDelegateReducer(
-    state: inout AppDelegateReducerState, action: AppDelegateAction,
+    state: inout AppDelegateState, action: AppDelegateAction,
     environment: AppDelegateEnvironment
 ) -> [Effect<AppDelegateAction>] {
+    
     switch action {
+    
     case .appLifecycleEvent(let lifecycle):
-        state.appDelegate.appLifecycle = lifecycle
+        
+        state.appLifecycle = lifecycle
         
         switch lifecycle {
+        case .didFinishLaunching:
+            
+            return [
+                environment.paymentQueue.addObserver(environment.paymentTransactionDelegate)
+                    .mapNever(),
+                
+                environment.appReceiptStore(.localReceiptRefresh).mapNever()
+            ]
+        
         case .didBecomeActive:
             return [ Effect(value: .checkForDisallowedTrafficAlertNotification) ]
         default:
             return []
         }
         
-    case .appDidLaunch(psiCashData: let libData):
-        state.psiCash.appDidLaunch(libData)
-        state.psiCashBalance = .fromStoredExpectedReward(
-            libData: libData,
-            persisted: environment.psiCashPersistedValues
-        )
-        
-        let nonSubscriptionAuths = environment.sharedDB.getNonSubscriptionEncodedAuthorizations()
-        
-        return [
-            environment.psiCashEffects.expirePurchases(nonSubscriptionAuths).mapNever(),
-            environment.paymentQueue.addObserver(environment.paymentTransactionDelegate).mapNever(),
-            environment.appReceiptStore(.localReceiptRefresh).mapNever()
-        ]
-        
     case .adPresentationStatus(presenting: let presenting):
-        state.appDelegate.adPresentationState = presenting
+        state.adPresentationState = presenting
         return []
         
     case .checkForDisallowedTrafficAlertNotification:
@@ -110,11 +99,11 @@ func appDelegateReducer(
         // If the app is in the background, view controllers can be presented, but
         // not seen by the user.
         // This guard ensures that the user sees the alert dialog.
-        guard case .didBecomeActive = state.appDelegate.appLifecycle else {
+        guard case .didBecomeActive = state.appLifecycle else {
             return []
         }
         
-        guard !state.appDelegate.pendingPresentingDisallowedTrafficAlert else {
+        guard !state.pendingPresentingDisallowedTrafficAlert else {
             return []
         }
         
@@ -128,7 +117,7 @@ func appDelegateReducer(
             return []
         }
         
-        state.appDelegate.pendingPresentingDisallowedTrafficAlert = true
+        state.pendingPresentingDisallowedTrafficAlert = true
         
         return [
             environment.feedbackLogger.log(.info, "Presenting disallowed traffic alert")
@@ -173,7 +162,7 @@ func appDelegateReducer(
         
     case let ._disallowedNotificationAlertPresentation(success: success):
         
-        state.appDelegate.pendingPresentingDisallowedTrafficAlert = false
+        state.pendingPresentingDisallowedTrafficAlert = false
         
         guard success else {
             return [
@@ -203,12 +192,24 @@ func appDelegateReducer(
         SupportedAppStoreProducts.fromPlists(types: [.subscription, .psiCash])
     private let userDefaultsConfig = UserDefaultsConfig()
     private let appUpgrade = AppUpgrade()
+    private let dateCompare: DateCompare
+    private let appSupportFileStore: ApplicationSupportFileStore
     
     private var (lifetime, token) = Lifetime.make()
     private var objcBridge: ObjCBridgeDelegate!
     private var store: Store<AppState, AppAction>!
-    private var psiCashLib: PsiCash!
+    private var psiCashLib: PsiCash
     private var environmentCleanup: (() -> Void)?
+    
+    private override init() {
+        dateCompare = DateCompare(
+            getCurrentTime: { Date () },
+            compareDates: { Calendar.current.compare($0, to: $1, toGranularity: $2) })
+        
+        appSupportFileStore = ApplicationSupportFileStore(fileManager: FileManager.default)
+        
+        psiCashLib = PsiCash(feedbackLogger: self.feedbackLogger)
+    }
     
 }
 
@@ -356,6 +357,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     ) {
         self.feedbackLogger.immediate(.info, "applicationDidFinishLaunching")
         
+        // Logs any filesystem errors stored.
+        if let error = appSupportFileStore.filesystemError {
+            self.feedbackLogger.immediate(.error, "\(error)")
+        }
+        
         navigator.register(url: PsiphonDeepLinking.psiCashDeepLink) { [unowned self] in
             tryPresentPsiCashViewController(
                 tab: .addPsiCash,
@@ -373,24 +379,29 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             )
             return true
         }
-                
-        self.psiCashLib = PsiCash.make(flags: Debugging)
+        
+        let mainDispatcher = MainDispatcher()
+        let globalDispatcher = GlobalDispatcher(qos: .default, name: "globalDispatcher")
         
         self.store = Store(
             initialValue: AppState(),
             reducer: makeAppReducer(feedbackLogger: self.feedbackLogger),
+            dispatcher: mainDispatcher,
             feedbackLogger: self.feedbackLogger,
             environment: { [unowned self] store in
                 let (environment, cleanup) = makeEnvironment(
                     store: store,
                     feedbackLogger: self.feedbackLogger,
                     sharedDB: self.sharedDB,
-                    psiCashLib: self.psiCashLib,
+                    psiCashClient: self.psiCashLib,
+                    psiCashFileStoreRoot: self.appSupportFileStore.psiCashFileStoreRootPath,
                     supportedAppStoreProducts: self.supportedProducts,
                     userDefaultsConfig: self.userDefaultsConfig,
                     objcBridgeDelegate: objcBridge,
                     rewardedVideoAdBridgeDelegate: self,
-                    calendar: Calendar.current
+                    dateCompare: self.dateCompare,
+                    mainDispatcher: mainDispatcher,
+                    globalDispatcher: globalDispatcher
                 )
                 self.environmentCleanup = cleanup
                 return environment
@@ -398,7 +409,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         
         self.store.send(.appDelegateAction(.appLifecycleEvent(.didFinishLaunching)))
         self.store.send(vpnAction: .appLaunched)
-        self.store.send(.appDelegateAction(.appDidLaunch(psiCashData: self.psiCashLib.dataModel())))
+        self.store.send(.psiCash(.initialize))
         
         // Maps connected events to refresh state messages sent to store.
         self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
@@ -513,11 +524,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // Forwards SpeedBoost purchase expiry date (if the user is not subscribed)
         // to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer
-            .map { appState -> Date? in
+            .map { [unowned self] appState -> Date? in
                 if case .subscribed(_) = appState.subscription.status {
                     return nil
                 } else {
-                    return appState.psiCash.activeSpeedBoost?.transaction.localTimeExpiry
+                    let activeSpeedBoost = appState.psiCash.activeSpeedBoost(self.dateCompare)
+                    return activeSpeedBoost?.transaction.localTimeExpiry
                 }
             }
             .skipRepeats()
@@ -684,16 +696,13 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func getCustomRewardData(_ callback: @escaping (CustomData?) -> Void) {
-        callback(
-            PsiCashEffects.default(psiCash: self.psiCashLib, feedbackLogger: self.feedbackLogger)
-                .rewardedVideoCustomData()
-        )
+        callback(self.psiCashLib.getRewardActivityData().successToOptional())
     }
     
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError> {
         let promise = Promise<Result<Utilities.Unit, SystemErrorEvent>>.pending()
         let objcPromise = promise.then { result -> Error? in
-            return result.projectError()?.error
+            return result.failureToOptional()?.error
         }
         self.store.send(.appReceipt(.remoteReceiptRefresh(optionalPromise: promise)))
         return objcPromise.asObjCPromise()
@@ -754,9 +763,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 psiCashState.libLoaded
             }
             .take(first: 1)
-            .startWithValues { psiCashState in
+            .startWithValues { [unowned self] psiCashState in
                 // Calls completionHandler with `true` if has an active Speed Boost.
-                completionHandler(psiCashState.activeSpeedBoost != nil)
+                completionHandler(psiCashState.activeSpeedBoost(self.dateCompare) != nil)
         }
         
     }
@@ -790,8 +799,10 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         
         let activeSpeedBoost: SignalProducer<PurchasedExpirableProduct<SpeedBoostProduct>?, Never> =
             self.store.$value.signalProducer
-                .map(\.psiCash.activeSpeedBoost)
-                .take(first: 1)
+            .map { [unowned self] in
+                $0.psiCash.activeSpeedBoost(self.dateCompare)
+            }
+            .take(first: 1)
         
         syncedVPNState.zip(with: subscription).zip(with: activeSpeedBoost)
             .map {
@@ -872,6 +883,7 @@ fileprivate extension SwiftDelegate {
                 action: { .appReceipt($0) } ),
             tunnelConnectedSignal: self.store.$value.signalProducer
                 .map(\.vpnState.value.providerVPNStatus.tunneled),
+            dateCompare: self.dateCompare,
             feedbackLogger: self.feedbackLogger
         )
     }

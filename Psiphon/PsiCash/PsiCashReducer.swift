@@ -32,6 +32,7 @@ struct PsiCashReducerState: Equatable {
 
 typealias PsiCashEnvironment = (
     feedbackLogger: FeedbackLogger,
+    psiCashFileStoreRoot: String?,
     psiCashEffects: PsiCashEffects,
     sharedDB: PsiphonDataSharedDB,
     psiCashPersistedValues: PsiCashPersistedValues,
@@ -40,23 +41,62 @@ typealias PsiCashEnvironment = (
     // TODO: Remove this dependency from reducer's environment. UI-related effects
     // unnecessarily complicate reducers.
     objcBridgeDelegate: ObjCBridgeDelegate?,
-    rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate
+    rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
+    metadata: () -> ClientMetaData
 )
 
 func psiCashReducer(
     state: inout PsiCashReducerState, action: PsiCashAction, environment: PsiCashEnvironment
 ) -> [Effect<PsiCashAction>] {
+    
     switch action {
+    
+    case .initialize:
+        
+        guard !state.psiCash.libLoaded else {
+            environment.feedbackLogger.fatalError("PsiCash already initialized")
+            return []
+        }
+        
+        return [
+            environment.psiCashEffects.initialize(environment.psiCashFileStoreRoot)
+                .map(PsiCashAction._initialized)
+        ]
+    
+    case ._initialized(let result):
+        
+        switch result {
+        case let .success(libData):
+            state.psiCash.initialized(libData)
+            state.psiCashBalance = .fromStoredExpectedReward(
+                libData: libData, persisted: environment.psiCashPersistedValues)
+            
+            let nonSubscriptionAuths = environment.sharedDB
+                .getNonSubscriptionEncodedAuthorizations()
+            
+            return [
+                environment.psiCashEffects.removePurchasesNotIn(nonSubscriptionAuths).mapNever()
+            ]
+            
+        case let .failure(error):
+            return [
+                environment.feedbackLogger.log(.error, "failed to initialize PsiCash: \(error)")
+                    .mapNever()
+            ]
+        }
+        
+        
     case .buyPsiCashProduct(let purchasableType):
-        guard let tunnelConnection = state.tunnelConnection else {
+        
+        guard
+            state.psiCash.libLoaded,
+            let tunnelConnection = state.tunnelConnection,
+            case .notSubscribed = state.subscription.status,
+            state.psiCash.purchasing.completed
+        else {
             return []
         }
-        guard case .notSubscribed = state.subscription.status else {
-            return []
-        }
-        guard state.psiCash.purchasing.completed else {
-            return []
-        }
+        
         guard let purchasable = purchasableType.speedBoost else {
             environment.feedbackLogger.fatalError(
                 "Expected a PsiCashPurchasable in '\(purchasableType)'")
@@ -64,7 +104,8 @@ func psiCashReducer(
         }
         state.psiCash.purchasing = .speedBoost(purchasable)
         return [
-            environment.psiCashEffects.purchaseProduct(purchasableType, tunnelConnection)
+            environment.psiCashEffects.purchaseProduct(purchasableType, tunnelConnection,
+                                                       environment.metadata())
                 .map(PsiCashAction.psiCashProductPurchaseResult)
         ]
         
@@ -86,7 +127,7 @@ func psiCashReducer(
         state.psiCashBalance = .refreshed(refreshedData: purchaseResult.refreshedLibData,
                                           persisted: environment.psiCashPersistedValues)
         switch purchaseResult.result {
-        case .success(let purchasedType):
+        case .success(.success(let purchasedType)):
             guard case .speedBoost(let purchasedProduct) = purchasedType else {
                 environment.feedbackLogger.fatalError("Expected '.speedBoost' purchased type")
                 return []
@@ -103,6 +144,11 @@ func psiCashReducer(
                     environment.objcBridgeDelegate?.dismiss(screen: .psiCash, completion: nil)
                 }
             ]
+        
+        case .success(.failure(let parseError)):
+            // Programming error
+            environment.feedbackLogger.fatalError("failed to parse purchase: '\(parseError)'")
+            return []
             
         case .failure(let errorEvent):
             state.psiCash.purchasing = .error(errorEvent)
@@ -110,13 +156,13 @@ func psiCashReducer(
         }
         
     case .refreshPsiCashState:
-        guard let tunnelConnection = state.tunnelConnection else {
-            return []
-        }
-        guard case .notSubscribed = state.subscription.status else {
-            return []
-        }
-        guard case .completed(_) = state.psiCash.pendingPsiCashRefresh else {
+        
+        guard
+            state.psiCash.libLoaded,
+            let tunnelConnection = state.tunnelConnection,
+            case .notSubscribed = state.subscription.status,
+            case .completed(_) = state.psiCash.pendingPsiCashRefresh
+        else {
             return []
         }
         
@@ -125,7 +171,8 @@ func psiCashReducer(
         return [
             environment.feedbackLogger.log(.info, "PsiCash: refresh state started").mapNever(),
             environment.psiCashEffects
-                .refreshState(PsiCashTransactionClass.allCases, tunnelConnection)
+                .refreshState(PsiCashTransactionClass.allCases, tunnelConnection,
+                              environment.metadata())
                 .map(PsiCashAction.refreshPsiCashStateResult)
         ]
         
@@ -152,6 +199,11 @@ func psiCashReducer(
         }
         
     case .showRewardedVideoAd:
+        
+        guard state.psiCash.libLoaded else {
+            return []
+        }
+        
         guard case .notSubscribed = state.subscription.status else {
             return []
         }

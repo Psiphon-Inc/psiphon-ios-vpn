@@ -69,7 +69,7 @@ public final class Store<Value: Equatable, Action> {
 
     @State public private(set) var value: Value
 
-    private let scheduler: UIScheduler
+    private let dispatcher: Dispatcher
     private var reducer: StoreReducer!
     private var disposable: Disposable? = .none
     private var effectDisposables = CompositeDisposable()
@@ -81,11 +81,12 @@ public final class Store<Value: Equatable, Action> {
     public init<Environment>(
         initialValue: Value,
         reducer: @escaping Reducer<Value, Action, Environment>,
+        dispatcher: Dispatcher,
         feedbackLogger: FeedbackLogger,
         environment makeEnvironment: (Store<Value, Action>) -> Environment
     ) {
         self.value = initialValue
-        self.scheduler = .init()
+        self.dispatcher = dispatcher
         self.feedbackLogger = feedbackLogger
         
         let environment = makeEnvironment(self)
@@ -94,11 +95,11 @@ public final class Store<Value: Equatable, Action> {
         }
     }
     
-    private init(scheduler: UIScheduler, feedbackLogger: FeedbackLogger,
+    private init(dispatcher: Dispatcher, feedbackLogger: FeedbackLogger,
                  initialValue: Value, reducer: @escaping StoreReducer) {
         self.reducer = reducer
         self.value = initialValue
-        self.scheduler = scheduler
+        self.dispatcher = dispatcher
         self.feedbackLogger = feedbackLogger
     }
     
@@ -108,7 +109,7 @@ public final class Store<Value: Equatable, Action> {
      
     /// Sends action to the store.
     public func send(_ action: Action) {
-        self.scheduler.schedule { [unowned self] in
+        self.dispatcher.dispatch { [unowned self] in
             // Executes the reducer and collects the effects
             let effects = self.reducer!(&self.value, action, ())
             
@@ -116,7 +117,7 @@ public final class Store<Value: Equatable, Action> {
 
             effects.forEach { effect in
                 var disposable: Disposable?
-                disposable = effect.observe(on: self.scheduler)
+                disposable = effect.observe(on: self.dispatcher.rxScheduler!)
                     .sink(
                         receiveCompletion: {
                             disposable?.dispose()
@@ -141,7 +142,7 @@ public final class Store<Value: Equatable, Action> {
     ) -> Store<LocalValue, LocalAction> {
         
         let localStore = Store<LocalValue, LocalAction>(
-            scheduler: self.scheduler,
+            dispatcher: self.dispatcher,
             feedbackLogger: self.feedbackLogger,
             initialValue: toLocalValue(self.value),
             reducer: { localValue, localAction, _ in

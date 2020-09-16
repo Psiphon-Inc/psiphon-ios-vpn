@@ -201,21 +201,6 @@ extension AppState {
         }
     }
     
-    var appDelegateReducerState: AppDelegateReducerState {
-        get {
-            AppDelegateReducerState(
-                psiCashBalance: self.psiCashBalance,
-                psiCash: self.psiCash,
-                appDelegate: self.appDelegateState
-            )
-        }
-        set {
-            self.psiCashBalance = newValue.psiCashBalance
-            self.psiCash = newValue.psiCash
-            self.appDelegateState = newValue.appDelegate
-        }
-    }
-    
     var landingPageReducerState: LandingPageReducerState {
         get {
             LandingPageReducerState(

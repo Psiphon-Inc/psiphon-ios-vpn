@@ -23,7 +23,7 @@ import Foundation
 /// `CustomDebugStringConvertible` or `CustomStringConvertible`.
 /// https://forums.swift.org/t/why-is-an-enum-returning-enumname-rather-than-caselabel-for-string-describing/27327/3
 
-extension PsiCashStatus: CustomDebugStringConvertible {
+extension PSIStatus: CustomDebugStringConvertible {
     
     public var debugDescription: String {
         switch self {
