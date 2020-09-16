@@ -35,6 +35,8 @@ import Foundation
 
 public typealias AuthorizationID = String
 
+public typealias SignedAuthorizationData = SignedData<SignedAuthorization>
+
 public struct SignedAuthorization: Hashable, Codable {
     public let authorization: Authorization
     public let signingKeyID: String

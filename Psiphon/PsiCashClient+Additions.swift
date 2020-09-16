@@ -78,14 +78,14 @@ extension PsiCashPurchaseResponseError: ErrorUserDescription {
         switch self {
         case .tunnelNotConnected:
             return UserStrings.Psiphon_is_not_connected()
-        case .parseError(_):
-            return UserStrings.Operation_failed_alert_message()
-        case let .serverError(psiCashStatus, _, _):
-            switch PsiCashStatus(rawValue: psiCashStatus) {
+        case .requestFailed(message: _):
+            return UserStrings.Operation_failed_please_try_again_alert_message()
+        case let .purchaseFailed(psiStatus: psiStatus, shouldRetry: _):
+            switch PSIStatus(rawValue: psiStatus) {
             case .insufficientBalance:
                 return UserStrings.Insufficient_psiCash_balance()
             default:
-                return UserStrings.Operation_failed_alert_message()
+                return UserStrings.Operation_failed_please_try_again_alert_message()
             }
         }
     }
@@ -93,7 +93,7 @@ extension PsiCashPurchaseResponseError: ErrorUserDescription {
 }
 
 
-extension PsiCashStatus {
+extension PSIStatus {
     
     /// Whether or not the request should be retried given the PsiCashStatus code.
     var shouldRetry: Bool {
@@ -120,49 +120,171 @@ extension PsiCashAmount: CustomStringFeedbackDescription {
 }
 
 
+fileprivate struct PsiCashHTTPResponse: HTTPResponse {
+    typealias Success = PSIHTTPResult
+    typealias Failure = Never
+    
+    var result: ResultType
+    
+    var psiHTTPResult: PSIHTTPResult {
+        result.successToOptional()!
+    }
+    
+    init(urlSessionResult: URLSessionResult) {
+        switch urlSessionResult {
+        case let .success(r):
+            
+            let statusCode = Int32(r.metadata.statusCode.rawValue)
+            
+            guard let body = String(data: r.data, encoding: .utf8) else {
+                result = .success(PSIHTTPResult(criticalError: ()))
+                return
+            }
+            
+            guard let date = r.metadata.headers[HTTPDateHeader.headerKey] else {
+                result = .success(PSIHTTPResult(criticalError: ()))
+                return
+            }
+            
+            result = .success(PSIHTTPResult(code: statusCode, body: body, date: date, error: ""))
+            
+        case let .failure(httpRequestError):
+            if let partialResponse = httpRequestError.partialResponseMetadata {
+                let statusCode = Int32(partialResponse.statusCode.rawValue)
+                let date = partialResponse.headers[HTTPDateHeader.headerKey] ?? ""
+                result = .success(PSIHTTPResult(code: statusCode, body: "", date: date,
+                                                error: httpRequestError.localizedDescription))
+            } else {
+                result = .success(PSIHTTPResult(code: PSIHTTPResult.recoverable_ERROR(),
+                                                body: "", date: "",
+                                                error: httpRequestError.localizedDescription))
+            }
+        }
+    }
+    
+}
+
+
 extension PsiCashEffects {
     
-    static func `default`(psiCash: PsiCash, feedbackLogger: FeedbackLogger) -> PsiCashEffects {
+    static func `default`(
+        psiCash: PsiCash,
+        httpClient: HTTPClient,
+        globalDispatcher: GlobalDispatcher,
+        getCurrentTime: @escaping () -> Date,
+        feedbackLogger: FeedbackLogger
+    ) -> PsiCashEffects {
         PsiCashEffects(
+            initialize: { [psiCash] (fileStoreRoot: String?)
+                -> Effect<Result<PsiCashLibData, ErrorRepr>> in
+                
+                guard let fileStoreRoot = fileStoreRoot else {
+                    return Effect(value: .failure(ErrorRepr(repr: "nil psicash file store root")))
+                }
+                
+                let maybeError = psiCash.initialize(
+                    userAgent: PsiCashClientHardCodedValues.userAgent,
+                    fileStoreRoot: fileStoreRoot,
+                    httpRequestFunc: { (params: PSIHTTPParams) -> PSIHTTPResult in
+                        
+                        // Maps [PSIPair<NSString>] to Swift type `[(String, String)]`.
+                        let queryParams: [(String, String)] = params.query.map {
+                            ($0.first as String, $0.second as String)
+                        }
+                        
+                        guard let httpMethod = HTTPMethod(rawValue: params.method) else {
+                            return PSIHTTPResult(criticalError: ())
+                        }
+                        
+                        let maybeUrl = URL.make(scheme: params.scheme, hostname: params.hostname,
+                                                port: params.port, path: params.path,
+                                                queryParams: queryParams)
+                        
+                        guard let url = maybeUrl else {
+                            return PSIHTTPResult(criticalError: ())
+                        }
+                        
+                        let httpRequest = HTTPRequest(url: url, httpMethod: httpMethod,
+                                                      headers: params.headers, body: nil,
+                                                      response: PsiCashHTTPResponse.self)
+                        
+                        
+                        // Makes async HTTPClient call into a sync call.
+                        let sem = DispatchSemaphore(value: 0)
+                        
+                        var response: PsiCashHTTPResponse? = nil
+                        
+                        // Ignores `CancellableURLRequest` return value, as PsiCash
+                        // requests are never cancelled.
+                        let _ = httpClient.request(getCurrentTime, httpRequest) {
+                            response = $0
+                            sem.signal()
+                        }
+                        sem.wait()
+                        
+                        return response!.psiHTTPResult
+                    },
+                    test: Debugging.devServers)
+                
+                switch maybeError {
+                case .none:
+                    return Effect(value: .success(psiCash.dataModel))
+                case .some(let error):
+                    return Effect(value: .failure(ErrorRepr(repr: String(describing: error))))
+                }
+            } ,
             libData: { [psiCash] () -> PsiCashLibData in
-                psiCash.dataModel()
+                psiCash.dataModel
             },
-            refreshState: { [psiCash] (priceClasses, tunnelConnection) -> Effect<PsiCashRefreshResult> in
-                Effect.deferred { fulfilled in
+            refreshState: { [psiCash] (priceClasses, tunnelConnection, metadata) ->
+                Effect<PsiCashRefreshResult> in
+                Effect.deferred(dispatcher: globalDispatcher) { fulfilled in
                     guard case .connected = tunnelConnection.tunneled else {
                         fulfilled(.completed(.failure(ErrorEvent(.tunnelNotConnected))))
                         return
                     }
                     
                     // Updates request metadata before sending the request.
-                    psiCash.setRequestMetadata()
-                    let purchaseClasses = priceClasses.map { $0.rawValue }
-                    
-                    psiCash.refreshState(purchaseClasses) { [fulfilled] psiCashStatus, error in
-                        let result: Result<PsiCashLibData, ErrorEvent<PsiCashRefreshError>>
-                        switch (psiCashStatus, error) {
-                        case (.success, nil):
-                            result = .success(psiCash.dataModel())
-                        case (.serverError, nil):
-                            result = .failure(ErrorEvent(.serverError))
-                        case (.invalidTokens, nil):
-                            result = .failure(ErrorEvent(.invalidTokens))
-                        case (_, .some(let error)):
-                            result = .failure(ErrorEvent(.error(SystemError(error))))
-                        case (_, .none):
-                            fatalError("unknown PsiCash status '\(psiCashStatus)'")
-                        }
-                        fulfilled(.completed(result))
+                    let maybeError = psiCash.setRequestMetadata(metadata)
+                    guard maybeError == nil else {
+                        feedbackLogger.fatalError("failed to set request metadata")
+                        return
                     }
+                    
+                    let purchaseClasses = priceClasses.map(\.rawValue)
+    
+                    // Blocking call.
+                    let result = psiCash.refreshState(purchaseClasses: purchaseClasses)
+                    
+                    let mappedResult: Result<PsiCashLibData, ErrorEvent<PsiCashRefreshError>> =
+                        result.biFlatMap({ psiStatus in
+                            switch psiStatus {
+                            case .success:
+                                return .success(psiCash.dataModel)
+                            case .serverError:
+                                return .failure(ErrorEvent(.serverError))
+                            case .invalidTokens:
+                                return .failure(ErrorEvent(.invalidTokens))
+                            default:
+                                return .failure(
+                                    ErrorEvent(.error("unexpected status '\(psiStatus)'")))
+                            }
+                        }, { failure in
+                            return .failure(ErrorEvent(.error(failure.description)))
+                        })
+                    
+                    fulfilled(.completed(mappedResult))
                 }
             },
-            purchaseProduct: { [psiCash, feedbackLogger] (purchasable, tunnelConnection) -> Effect<PsiCashPurchaseResult> in
-                Effect.deferred { fulfilled in
+            purchaseProduct: { [psiCash, feedbackLogger] (purchasable, tunnelConnection, metadata) ->
+                Effect<PsiCashPurchaseResult> in
+                
+                Effect.deferred(dispatcher: globalDispatcher) { fulfilled in
                     guard case .connected = tunnelConnection.tunneled else {
                         fulfilled(
                             PsiCashPurchaseResult(
                                 purchasable: purchasable,
-                                refreshedLibData: psiCash.dataModel(),
+                                refreshedLibData: psiCash.dataModel,
                                 result: .failure(ErrorEvent(.tunnelNotConnected)))
                         )
                         return
@@ -172,82 +294,66 @@ extension PsiCashEffects {
                                              "Purchase: '\(String(describing: purchasable))'")
                     
                     // Updates request metadata before sending the request.
-                    psiCash.setRequestMetadata()
-                    
-                    psiCash.newExpiringPurchaseTransaction(
-                        forClass: purchasable.rawTransactionClass,
-                        withDistinguisher: purchasable.distinguisher,
-                        withExpectedPrice: NSNumber(value: purchasable.price.inNanoPsi))
-                    { (status: PsiCashStatus, purchase: PsiCashPurchase?, error: Error?) in
-                        let result: PsiCashPurchaseResult
-                        if status == .success, let purchase = purchase {
-                            result = PsiCashPurchaseResult(
-                                purchasable: purchasable,
-                                refreshedLibData: psiCash.dataModel(),
-                                result: purchase.mapToPurchased().mapError {
-                                    ErrorEvent(PsiCashPurchaseResponseError.parseError($0))
-                            })
-                            
-                        } else {
-                            result = PsiCashPurchaseResult(
-                                purchasable: purchasable,
-                                refreshedLibData: psiCash.dataModel(),
-                                result: .failure(ErrorEvent(
-                                    .serverError(status: status.rawValue,
-                                                 shouldRetry: status.shouldRetry,
-                                                 error: error.map(SystemError.init))
-                                ))
-                            )
-                        }
-                        
-                        fulfilled(result)
+                    let maybeError = psiCash.setRequestMetadata(metadata)
+                    guard maybeError == nil else {
+                        feedbackLogger.fatalError("failed to set request metadata")
+                        return
                     }
+                    
+                    // Blocking call.
+                    let result = psiCash.newExpiringPurchase(
+                        transactionClass: purchasable.rawTransactionClass,
+                        distinguisher: purchasable.distinguisher,
+                        expectedPrice: purchasable.price)
+                    
+                    let mappedResult:
+                        Result<Result<PsiCashPurchasedType, PsiCashParseError>, ErrorEvent<PsiCashPurchaseResponseError>> =
+                        result.biFlatMap({ (response: PsiCash.NewExpiringPurchaseResponse) in
+                            if case .success = response.status,
+                               let purchaseResult = response.purchaseResult {
+                                return .success(purchaseResult)
+                            } else {
+                                return .failure(
+                                    ErrorEvent(.purchaseFailed(
+                                                psiStatus: response.status.rawValue,
+                                                shouldRetry: response.status.shouldRetry)))
+                            }
+                        }, {
+                            return .failure(ErrorEvent(.requestFailed(message: $0.description)))
+                        })
+                    
+                    
+                    fulfilled(
+                        PsiCashPurchaseResult(
+                            purchasable: purchasable,
+                            refreshedLibData: psiCash.dataModel,
+                            result: mappedResult
+                        )
+                    )
                 }
             },
             modifyLandingPage: { [psiCash, feedbackLogger] url -> Effect<URL> in
                 Effect { () -> URL in
-                    var maybeModifiedURL: NSString?
-                    let error = psiCash.modifyLandingPage(url.absoluteString,
-                                                          modifiedURL: &maybeModifiedURL)
-                    guard error == nil else {
-                        feedbackLogger.immediate(.error,
-                                                 "ModifyURLFailed: '\(String(describing: error))'")
-                        feedbackLogger.immediate(.info,
-                                                 "DiagnosticInfo: '\(psiCash.getDiagnosticInfo())'")
+                    switch psiCash.modifyLandingPage(url: url.absoluteString) {
+                    case .success(let modifiedURL):
+                        return URL(string: modifiedURL)!
+                    case .failure(let error):
+                        feedbackLogger.immediate(.error, "failed to modify url: '\(error))'")
                         return url
                     }
-                    
-                    guard let modifiedURL = maybeModifiedURL else {
-                        
-                        feedbackLogger.immediate(.error, "ModifyURLFailed: modified URL is nil")
-                        
-                        feedbackLogger.immediate(.info,
-                                                 "DiagnosticInfo: '\(psiCash.getDiagnosticInfo())'")
-                        return url
-                    }
-                    
-                    return URL(string: modifiedURL as String)!
                 }
                 
             },
             rewardedVideoCustomData: { [psiCash, feedbackLogger] () -> String? in
-                var s: NSString?
-                let error = psiCash.getRewardedActivityData(&s)
-                
-                guard error == nil else {
-                    feedbackLogger.immediate(
-                        .error,
-                        "GetRewardedActivityDataFailed: '\(String(describing: error))'"
-                    )
-                    
-                    feedbackLogger.immediate(.info,
-                                             "DiagnosticInfo: '\(psiCash.getDiagnosticInfo())'")
+                switch psiCash.getRewardActivityData() {
+                case .success(let rewardActivityData):
+                    return rewardActivityData
+                case .failure(let error):
+                    feedbackLogger.immediate(.error, "GetRewardedActivityDataFailed: '\(error)'")
                     return nil
                 }
-                
-                return s as String?
-        },
-            expirePurchases: { [psiCash]
+            },
+            removePurchasesNotIn: { [psiCash]
                 (nonSubscriptionEncodedAuthorization: Set<String>) -> Effect<Never> in
                 .fireAndForget {
                     let decoder = JSONDecoder.makeRfc3339Decoder()
@@ -258,11 +364,17 @@ extension PsiCashEffects {
                                 return nil;
                             }
                             return try? decoder.decode(SignedAuthorization.self, from: data)
-                    }.map(\.authorization.id)
+                        }.map(\.authorization.id)
                     
-                    psiCash.expirePurchases(notFoundIn: nonSubscriptionAuthIDs)
+                    let result = psiCash.removePurchases(notFoundIn: nonSubscriptionAuthIDs)
+                    switch result {
+                    case .success(_):
+                        return
+                    case .failure(let error):
+                        feedbackLogger.immediate(.error, "removePurchasesNotIn failed: \(error)")
+                    }
                 }
-        }
+            }
         )
     }
     

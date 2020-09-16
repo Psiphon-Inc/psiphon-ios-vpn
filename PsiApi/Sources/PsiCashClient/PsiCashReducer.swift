@@ -19,8 +19,12 @@
 
 
 import Foundation
+import PsiApi
 
 public enum PsiCashAction {
+    case initialize
+    case _initialized(Result<PsiCashLibData, ErrorRepr>)
+    
     case buyPsiCashProduct(PsiCashPurchasableType)
     case psiCashProductPurchaseResult(PsiCashPurchaseResult)
     

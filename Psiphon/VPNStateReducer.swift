@@ -698,11 +698,11 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
                             return saveAndLoadConfig(tpm)
                                 .map { .configUpdated(.fromConfigSaveAndLoad($0)) }
                             .prefix(value:
-                                .startTunnelResult(startResult.dropSuccessValue().mapToUnit())
+                                .startTunnelResult(startResult.dropSuccessValue().toUnit())
                             )
                         case .failure(_):
                             return Effect(value:
-                                .startTunnelResult(startResult.dropSuccessValue().mapToUnit()))
+                                .startTunnelResult(startResult.dropSuccessValue().toUnit()))
                                 .prefix(value: .configUpdated(.success(tpm)))
                         }
                     }
@@ -944,7 +944,7 @@ fileprivate func loadAllConfigs<T: TunnelProviderManager>() -> Effect<ConfigUpda
                         .flatMap(.merge, removeFromPreferences)
                         .collect()
                         .map { results -> ConfigUpdatedResult<T> in
-                            let errors = results.compactMap { $0.projectError()?.error }
+                            let errors = results.compactMap { $0.failureToOptional()?.error }
                             if errors.count > 0 {
                                 return .failure(ErrorEvent(.failedRemovingConfigs(errors)))
                             } else {

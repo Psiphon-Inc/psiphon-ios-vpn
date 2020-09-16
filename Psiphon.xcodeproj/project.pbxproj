@@ -129,11 +129,12 @@
 		8D497A2C247CEF50009CEBA8 /* GoogleUtilities.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */; };
 		8D497A2E247CEF50009CEBA8 /* nanopb.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A27247CEF4F009CEBA8 /* nanopb.xcframework */; };
 		8D4ACD32247E3626008E404C /* AppStoreIAP+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */; };
+		8D4EEA9624F761630057E32D /* ApplicationSupportFileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4EEA9524F761620057E32D /* ApplicationSupportFileStore.swift */; };
 		8D53C6A824C5EED8001E4E2D /* SessionConfigValues.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D53C6A724C5EED8001E4E2D /* SessionConfigValues.m */; };
 		8D778978247469FE0038BFDA /* AppInfo.h in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920620F3DA190033114B /* AppInfo.h */; };
 		8D7789B9247491CA0038BFDA /* PsiphonBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */; };
 		8D7789BD247493300038BFDA /* VPNState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789BC247493300038BFDA /* VPNState.swift */; };
-		8D7789C5247496F60038BFDA /* PsiCashLib+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C4247496F60038BFDA /* PsiCashLib+Additions.swift */; };
+		8D7789C5247496F60038BFDA /* PsiCash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C4247496F60038BFDA /* PsiCash.swift */; };
 		8D7789CA247499110038BFDA /* Reachability+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C9247499110038BFDA /* Reachability+Additions.swift */; };
 		8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */; };
 		8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9E2425E053006F3A2F /* Animations.swift */; };
@@ -603,6 +604,7 @@
 		8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = GoogleUtilities.xcframework; sourceTree = "<group>"; };
 		8D497A27247CEF4F009CEBA8 /* nanopb.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = nanopb.xcframework; sourceTree = "<group>"; };
 		8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppStoreIAP+Additions.swift"; sourceTree = "<group>"; };
+		8D4EEA9524F761620057E32D /* ApplicationSupportFileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationSupportFileStore.swift; sourceTree = "<group>"; };
 		8D53C6A624C5EED8001E4E2D /* SessionConfigValues.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SessionConfigValues.h; sourceTree = "<group>"; };
 		8D53C6A724C5EED8001E4E2D /* SessionConfigValues.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SessionConfigValues.m; sourceTree = "<group>"; };
 		8D5D8494247CE6420018A35B /* libPromisesObjC.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libPromisesObjC.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -611,7 +613,7 @@
 		8D5F08A7247DB24C00F51A42 /* PsiApi */ = {isa = PBXFileReference; lastKnownFileType = folder; path = PsiApi; sourceTree = SOURCE_ROOT; };
 		8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonBundle.swift; sourceTree = "<group>"; };
 		8D7789BC247493300038BFDA /* VPNState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNState.swift; sourceTree = "<group>"; };
-		8D7789C4247496F60038BFDA /* PsiCashLib+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PsiCashLib+Additions.swift"; sourceTree = "<group>"; };
+		8D7789C4247496F60038BFDA /* PsiCash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCash.swift; sourceTree = "<group>"; };
 		8D7789C9247499110038BFDA /* Reachability+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reachability+Additions.swift"; sourceTree = "<group>"; };
 		8D7789CF2474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonRotatingFileFeedbackLogger.swift; sourceTree = "<group>"; };
 		8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedUIView.swift; sourceTree = "<group>"; };
@@ -1118,7 +1120,7 @@
 			isa = PBXGroup;
 			children = (
 				8D417E982411954A00FEE587 /* PsiCashReducer.swift */,
-				8D7789C4247496F60038BFDA /* PsiCashLib+Additions.swift */,
+				8D7789C4247496F60038BFDA /* PsiCash.swift */,
 			);
 			path = PsiCash;
 			sourceTree = "<group>";
@@ -1362,6 +1364,7 @@
 				8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */,
 				8D26455E24D4842E000F46C0 /* Navigator.swift */,
 				8D0017DA24DDD99A00EC3409 /* AppUpgrade.swift */,
+				8D4EEA9524F761620057E32D /* ApplicationSupportFileStore.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -2098,7 +2101,7 @@
 				521FD0F1219E0D5600F748EC /* DebugToolboxViewController.m in Sources */,
 				445F24ED20E1A5BA00D004E9 /* ber_tlv_tag.c in Sources */,
 				4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */,
-				8D7789C5247496F60038BFDA /* PsiCashLib+Additions.swift in Sources */,
+				8D7789C5247496F60038BFDA /* PsiCash.swift in Sources */,
 				4E10920820F3DA190033114B /* AppInfo.m in Sources */,
 				445F24EE20E1A5BA00D004E9 /* asn_codecs_prim.c in Sources */,
 				521FD0FA219E0DDF00F748EC /* AppProfiler.m in Sources */,
@@ -2114,6 +2117,7 @@
 				CED6795924A4FA1200C4CA81 /* FileRegistry.m in Sources */,
 				52DF5E9E23D0D01F00A1B067 /* BridgingTypes.swift in Sources */,
 				9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */,
+				8D4EEA9624F761630057E32D /* ApplicationSupportFileStore.swift in Sources */,
 				521FD0F9219E0DDF00F748EC /* AppStats.m in Sources */,
 				8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */,
 				8D7789BD247493300038BFDA /* VPNState.swift in Sources */,

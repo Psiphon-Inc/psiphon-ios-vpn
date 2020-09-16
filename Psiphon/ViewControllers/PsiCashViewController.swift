@@ -142,6 +142,7 @@ final class PsiCashViewController: ReactiveViewController {
          productRequestStore: Store<Utilities.Unit, ProductRequestAction>,
          appStoreReceiptStore: Store<Utilities.Unit, ReceiptStateAction>,
          tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>,
+         dateCompare: DateCompare,
          feedbackLogger: FeedbackLogger
     ) {
         
@@ -247,8 +248,8 @@ final class PsiCashViewController: ReactiveViewController {
                     
                     self.display(screen: .mainScreen)
                     
-                    if case let .serverError(psiCashStatus, _, nil) = psiCashErrorEvent.error,
-                       PsiCashStatus(rawValue: psiCashStatus)! == .insufficientBalance {
+                    if case .purchaseFailed(psiStatus: let psiStatus, _) = psiCashErrorEvent.error,
+                       PSIStatus(rawValue: psiStatus)! == PSIStatus.insufficientBalance {
                         
                         self.display(errorDesc: errorDesc,
                                      makeAlertController:
@@ -427,7 +428,7 @@ final class PsiCashViewController: ReactiveViewController {
                         
                     case (let tunnelState, .speedBoost):
                         
-                        let activeSpeedBoost = observed.state.psiCash.activeSpeedBoost
+                        let activeSpeedBoost = observed.state.psiCash.activeSpeedBoost(dateCompare)
                         
                         switch tunnelState {
                         case .notConnected, .connecting, .disconnecting:
@@ -453,10 +454,13 @@ final class PsiCashViewController: ReactiveViewController {
                             switch activeSpeedBoost {
                             case .none:
                                 // There is no active speed boost.
-                                let viewModel = NonEmpty(
-                                    array:observed.state.psiCash.libData.availableProducts
-                                        .items.compactMap { $0.speedBoost }
-                                        .map { SpeedBoostPurchasableViewModel(purchasable: $0) })
+                                
+                                let speedBoostPurchasables =
+                                    observed.state.psiCash.libData.purchasePrices.compactMap {
+                                        $0.successToOptional()?.speedBoost
+                                    }.map(SpeedBoostPurchasableViewModel.init(purchasable:))
+                                
+                                let viewModel = NonEmpty(array: speedBoostPurchasables)
                                 
                                 if let viewModel = viewModel {
                                     self.containerBindable.bind(.right(.left(viewModel)))

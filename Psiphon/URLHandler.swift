@@ -22,33 +22,31 @@ import ReactiveSwift
 import PsiApi
 
 struct URLHandler {
-    let open: (URL, TunnelConnection) -> Effect<Bool>
+    let open: (URL, TunnelConnection, MainDispatcher) -> Effect<Bool>
 }
 
 extension URLHandler {
     static func `default`() -> URLHandler {
         URLHandler(
-            open: { url, tunnelConnection in
-                Effect.deferred { fulfilled in
+            open: { url, tunnelConnection, mainDispatcher in
+                Effect.deferred(dispatcher: mainDispatcher) { fulfilled in
                     if Debugging.disableURLHandler {
                         fulfilled(true)
                         return
                     }
                     
-                    DispatchQueue.main.async {
-                        /// Due to memory pressure, the network extension is at high risk of jetsamming
-                        /// before the landing page can be opened.
-                        /// Tunnel status should be assessed directly (not through observables that might
-                        /// introduce some latency), before opening the landing page.
-                        switch tunnelConnection.connectionStatus() {
-                        case .connection(.connected):
-                            UIApplication.shared.open(url) { success in
-                                fulfilled(success)
-                            }
-                        default:
-                            fulfilled(false)
-                            return
+                    /// Due to memory pressure, the network extension is at high risk of jetsamming
+                    /// before the landing page can be opened.
+                    /// Tunnel status should be assessed directly (not through observables that might
+                    /// introduce some latency), before opening the landing page.
+                    switch tunnelConnection.connectionStatus() {
+                    case .connection(.connected):
+                        UIApplication.shared.open(url) { success in
+                            fulfilled(success)
                         }
+                    default:
+                        fulfilled(false)
+                        return
                     }
                 }
         })

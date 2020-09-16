@@ -24,26 +24,31 @@ public typealias PsiCashRefreshResult = PendingResult<PsiCashLibData, ErrorEvent
 
 public struct PsiCashEffects {
     
+    public let initialize: (String?) -> Effect<Result<PsiCashLibData, ErrorRepr>>
+    
     public let libData: () -> PsiCashLibData
-    public let refreshState: ([PsiCashTransactionClass], TunnelConnection) -> Effect<PsiCashRefreshResult>
-    public let purchaseProduct: (PsiCashPurchasableType, TunnelConnection) -> Effect<PsiCashPurchaseResult>
+    public let refreshState: ([PsiCashTransactionClass], TunnelConnection, ClientMetaData) -> Effect<PsiCashRefreshResult>
+    public let purchaseProduct: (PsiCashPurchasableType, TunnelConnection, ClientMetaData) -> Effect<PsiCashPurchaseResult>
     public let modifyLandingPage: (URL) -> Effect<URL>
     public let rewardedVideoCustomData: () -> String?
-    public let expirePurchases: (Set<String>) -> Effect<Never>
+    public let removePurchasesNotIn: (Set<String>) -> Effect<Never>
 
-    public init(libData: @escaping () -> PsiCashLibData,
-        refreshState: @escaping ([PsiCashTransactionClass], TunnelConnection) -> Effect<PsiCashRefreshResult>,
-        purchaseProduct: @escaping (PsiCashPurchasableType, TunnelConnection) -> Effect<PsiCashPurchaseResult>,
+    public init(
+        initialize: @escaping (String?) -> Effect<Result<PsiCashLibData, ErrorRepr>>,
+        libData: @escaping () -> PsiCashLibData,
+        refreshState: @escaping ([PsiCashTransactionClass], TunnelConnection, ClientMetaData) -> Effect<PsiCashRefreshResult>,
+        purchaseProduct: @escaping (PsiCashPurchasableType, TunnelConnection, ClientMetaData) -> Effect<PsiCashPurchaseResult>,
         modifyLandingPage: @escaping (URL) -> Effect<URL>,
         rewardedVideoCustomData: @escaping () -> String?,
-        expirePurchases: @escaping (Set<String>) -> Effect<Never>) {
-     
+        removePurchasesNotIn: @escaping (Set<String>) -> Effect<Never>
+    ) {
+        self.initialize = initialize
         self.libData = libData
         self.refreshState = refreshState
         self.purchaseProduct = purchaseProduct
         self.modifyLandingPage = modifyLandingPage
         self.rewardedVideoCustomData = rewardedVideoCustomData
-        self.expirePurchases = expirePurchases
+        self.removePurchasesNotIn = removePurchasesNotIn
     }
     
 }

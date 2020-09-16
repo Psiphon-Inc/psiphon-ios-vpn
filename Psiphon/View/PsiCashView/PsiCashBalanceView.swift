@@ -144,7 +144,7 @@ struct PsiCashBalanceViewModel: Equatable {
             }
                         
         } else {
-            balanceView.text = ""
+            balanceView.text = "-"
         }
     }
 

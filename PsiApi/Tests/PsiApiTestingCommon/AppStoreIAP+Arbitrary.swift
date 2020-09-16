@@ -88,7 +88,7 @@ extension SignedData: Arbitrary where Decoded == SignedAuthorization {
     }
 }
 
-extension ExpirableTransaction: Arbitrary {
+extension PsiCashExpirableTransaction: Arbitrary {
     public static var arbitrary: Gen<ExpirableTransaction> {
         Gen.zip(String.arbitrary, Date.arbitrary, Double.arbitrary.resize(10), SignedData.arbitrary)
             .map {
@@ -143,7 +143,7 @@ extension PsiCashParsed: Arbitrary where Value: Arbitrary {
     }
 }
 
-extension PsiCashAuthPackage: Arbitrary {
+extension PsiCashTokens: Arbitrary {
     public static var arbitrary: Gen<PsiCashAuthPackage> {
         Gen.weighted([
             (1, PsiCashAuthPackage(withTokenTypes: [])),
@@ -151,7 +151,7 @@ extension PsiCashAuthPackage: Arbitrary {
         ])
     }
     
-    public static let completeAuthPackage = PsiCashAuthPackage(withTokenTypes:
+    public static let completeAuthPackage = PsiCashTokens(withTokenTypes:
         ["earner", "indicator", "spender"])
 }
 
@@ -502,7 +502,7 @@ extension IAPReducerState: Arbitrary {
                 purchasing: [:]
             ),
             psiCashBalance: c.generate(),
-            psiCashAuth: PsiCashAuthPackage.completeAuthPackage
+            psiCashAuth: PsiCashTokens.completeAuthPackage
         )
     }
     
@@ -587,7 +587,7 @@ extension IAPReducerState: Arbitrary {
                 purchasing: c.generate()
             ),
             psiCashBalance: c.generate(),
-            psiCashAuth: PsiCashAuthPackage(withTokenTypes: [])
+            psiCashAuth: PsiCashTokens(withTokenTypes: [])
         )
     }
     
