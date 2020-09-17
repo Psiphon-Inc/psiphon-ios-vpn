@@ -58,7 +58,6 @@ add_library( # Sets the name of the library.
              # Provides a relative path to your source file(s).
              ${SOURCES} )
 
-# TODO: Coverage stuff should not be done unconditionally
 SET(GCC_COVERAGE_COMPILE_FLAGS "-Wall -fprofile-arcs -ftest-coverage -g -O0")
 SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
 
