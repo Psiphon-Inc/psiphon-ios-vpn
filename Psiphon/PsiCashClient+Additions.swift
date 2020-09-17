@@ -121,12 +121,12 @@ extension PsiCashAmount: CustomStringFeedbackDescription {
 
 
 fileprivate struct PsiCashHTTPResponse: HTTPResponse {
-    typealias Success = PSIHTTPResult
+    typealias Success = PSIHttpResult
     typealias Failure = Never
     
     var result: ResultType
     
-    var psiHTTPResult: PSIHTTPResult {
+    var psiHTTPResult: PSIHttpResult {
         result.successToOptional()!
     }
     
@@ -137,25 +137,25 @@ fileprivate struct PsiCashHTTPResponse: HTTPResponse {
             let statusCode = Int32(r.metadata.statusCode.rawValue)
             
             guard let body = String(data: r.data, encoding: .utf8) else {
-                result = .success(PSIHTTPResult(criticalError: ()))
+                result = .success(PSIHttpResult(criticalError: ()))
                 return
             }
             
             guard let date = r.metadata.headers[HTTPDateHeader.headerKey] else {
-                result = .success(PSIHTTPResult(criticalError: ()))
+                result = .success(PSIHttpResult(criticalError: ()))
                 return
             }
             
-            result = .success(PSIHTTPResult(code: statusCode, body: body, date: date, error: ""))
+            result = .success(PSIHttpResult(code: statusCode, body: body, date: date, error: ""))
             
         case let .failure(httpRequestError):
             if let partialResponse = httpRequestError.partialResponseMetadata {
                 let statusCode = Int32(partialResponse.statusCode.rawValue)
                 let date = partialResponse.headers[HTTPDateHeader.headerKey] ?? ""
-                result = .success(PSIHTTPResult(code: statusCode, body: "", date: date,
+                result = .success(PSIHttpResult(code: statusCode, body: "", date: date,
                                                 error: httpRequestError.localizedDescription))
             } else {
-                result = .success(PSIHTTPResult(code: PSIHTTPResult.recoverable_ERROR(),
+                result = .success(PSIHttpResult(code: PSIHttpResult.recoverable_ERROR(),
                                                 body: "", date: "",
                                                 error: httpRequestError.localizedDescription))
             }
@@ -185,27 +185,29 @@ extension PsiCashEffects {
                 let maybeError = psiCash.initialize(
                     userAgent: PsiCashClientHardCodedValues.userAgent,
                     fileStoreRoot: fileStoreRoot,
-                    httpRequestFunc: { (params: PSIHTTPParams) -> PSIHTTPResult in
+                    httpRequestFunc: { (request: PSIHttpRequest) -> PSIHttpResult in
                         
                         // Maps [PSIPair<NSString>] to Swift type `[(String, String)]`.
-                        let queryParams: [(String, String)] = params.query.map {
+                        let queryParams: [(String, String)] = request.query.map {
                             ($0.first as String, $0.second as String)
                         }
                         
-                        guard let httpMethod = HTTPMethod(rawValue: params.method) else {
-                            return PSIHTTPResult(criticalError: ())
+                        guard let httpMethod = HTTPMethod(rawValue: request.method) else {
+                            return PSIHttpResult(criticalError: ())
                         }
                         
-                        let maybeUrl = URL.make(scheme: params.scheme, hostname: params.hostname,
-                                                port: params.port, path: params.path,
+                        let maybeUrl = URL.make(scheme: request.scheme, hostname: request.hostname,
+                                                port: request.port, path: request.path,
                                                 queryParams: queryParams)
                         
                         guard let url = maybeUrl else {
-                            return PSIHTTPResult(criticalError: ())
+                            return PSIHttpResult(criticalError: ())
                         }
                         
-                        let httpRequest = HTTPRequest(url: url, httpMethod: httpMethod,
-                                                      headers: params.headers, body: nil,
+                        let httpRequest = HTTPRequest(url: url,
+                                                      httpMethod: httpMethod,
+                                                      headers: request.headers,
+                                                      body: request.body.data(using: .utf8),
                                                       response: PsiCashHTTPResponse.self)
                         
                         

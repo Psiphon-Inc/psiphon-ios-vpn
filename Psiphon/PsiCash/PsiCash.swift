@@ -85,6 +85,11 @@ final class PsiCash {
         let purchaseResult: Result<PsiCashPurchasedType, PsiCashParseError>?
     }
     
+    struct AccountLoginResponse {
+        let status: PSIStatus
+        let lastTrackerMerge: Bool?
+    }
+    
     private let client: PSIPsiCashLibWrapper
     private let feedbackLogger: FeedbackLogger
     
@@ -132,14 +137,29 @@ final class PsiCash {
     func initialize(
         userAgent: String,
         fileStoreRoot: String,
-        httpRequestFunc: @escaping (PSIHTTPParams) -> PSIHTTPResult,
+        httpRequestFunc: @escaping (PSIHttpRequest) -> PSIHttpResult,
+        forceReset: Bool = false,
         test: Bool = false
     ) -> Error? {
         let err = self.client.initialize(withUserAgent: userAgent,
                                           fileStoreRoot: fileStoreRoot,
                                           httpRequestFunc: httpRequestFunc,
+                                          forceReset: forceReset,
                                           test: test)
         return Error(err)
+    }
+    
+    /// Resets PsiCash data for the current user (Tracker or Account). This will typically
+    /// be called when wanting to revert to a Tracker from a previously logged in Account.
+    func resetUser() -> Error? {
+        Error(self.client.resetUser())
+    }
+    
+    /// Forces the given tokens and account status to be set in the datastore. Must be
+    /// called after Init(). RefreshState() must be called after method (and shouldn't be
+    /// be called before this method, although behaviour will be okay).
+    func migrateTokens(_ tokens: [String: String], isAccount: Bool) -> Error? {
+        Error(self.client.migrateTokens(tokens, isAccount: isAccount))
     }
     
     func setRequestMetadata(_ metadata: ClientMetaData) -> Error? {
@@ -255,6 +275,45 @@ final class PsiCash {
     
     // MARK: API Server Requests
 
+    /** Copied from PSIPsiCashLibWrapper
+     Refreshes the client state. Retrieves info about whether the user has an
+     Account (vs Tracker), balance, valid token types, and purchase prices. After a
+     successful request, the retrieved values can be accessed with the accessor
+     methods.
+     
+     If there are no tokens stored locally (e.g., if this is the first run), then
+     new Tracker tokens will obtained.
+     
+     If the user is/has an Account, then it is possible some tokens will be invalid
+     (they expire at different rates). Login may be necessary before spending, etc.
+     (It's even possible that validTokenTypes is empty -- i.e., there are no valid
+     tokens.)
+     
+     If there is no valid indicator token, then balance and purchase prices will not
+     be retrieved, but there may be stored (possibly stale) values that can be used.
+     
+     Input parameters:
+     
+     • purchase_classes: The purchase class names for which prices should be
+     retrieved, like `{"speed-boost"}`. If null or empty, no purchase prices will be retrieved.
+     
+     Result fields:
+     
+     • error: If set, the request failed utterly and no other params are valid.
+     
+     • status: Request success indicator. See below for possible values.
+     
+     Possible status codes:
+     
+     • Success: Call was successful. Tokens may now be available (depending on if
+     IsAccount is true, ValidTokenTypes should be checked, as a login may be required).
+     
+     • ServerError: The server returned 500 error response. Note that the request has
+     already been retried internally and any further retry should not be immediate.
+     
+     • InvalidTokens: Should never happen (indicates something like
+     local storage corruption). The local user state will be cleared.
+     */
     func refreshState(purchaseClasses: [String]) -> Result<PSIStatus, Error> {
         guard
             let result = Result(client.refreshState(withPurchaseClasses: purchaseClasses))
@@ -265,6 +324,51 @@ final class PsiCash {
         return result
     }
     
+    /** Copied from PSIPsiCashLibWrapper
+     Makes a new transaction for an "expiring-purchase" class, such as "speed-boost".
+     
+     Input parameters:
+     
+     • transaction_class: The class name of the desired purchase. (Like
+     "speed-boost".)
+     
+     • distinguisher: The distinguisher for the desired purchase. (Like "1hr".)
+     
+     • expected_price: The expected price of the purchase (previously obtained by RefreshState).
+     The transaction will fail if the expected_price does not match the actual price.
+     
+     Result fields:
+     
+     • error: If set, the request failed utterly and no other params are valid.
+     
+     • status: Request success indicator. See below for possible values.
+     
+     • purchase: The resulting purchase. Null if purchase was not successful (i.e., if
+     the `status` is anything except `Status.Success`).
+     
+     Possible status codes:
+     
+     • Success: The purchase transaction was successful. The `purchase` field will be non-null.
+     
+     • ExistingTransaction: There is already a non-expired purchase that prevents this
+     purchase from proceeding.
+     
+     • InsufficientBalance: The user does not have sufficient credit to make the requested
+     purchase. Stored balance will be updated and UI should be refreshed.
+     
+     • TransactionAmountMismatch: The actual purchase price does not match expectedPrice,
+     so the purchase cannot proceed. The price list should be updated immediately.
+     
+     • TransactionTypeNotFound: A transaction type with the given class and distinguisher
+     could not be found. The price list should be updated immediately, but it might also
+     indicate an out-of-date app.
+     
+     • InvalidTokens: The current auth tokens are invalid.
+     
+     • ServerError: An error occurred on the server. Probably report to the user and try
+     again later. Note that the request has already been retried internally and any
+     further retry should not be immediate.
+     */
     func newExpiringPurchase(
         transactionClass: String, distinguisher: String, expectedPrice: PsiCashAmount
     ) -> Result<NewExpiringPurchaseResponse, Error> {
@@ -286,6 +390,70 @@ final class PsiCash {
             }
         } else if let failure = result.failure {
             return .failure(Error(failure))
+        } else {
+            // Programming fault
+            fatalError()
+        }
+        
+    }
+    
+    /** Copied from PSIPsiCashLibWrapper
+    Logs out a currently logged-in account.
+    An error will be returned in these cases:
+    • If the user is not an account
+    • If the request to the server fails
+    • If the local datastore cannot be updated
+    These errors should always be logged, but the local state may end up being logged out,
+    even if they do occur -- such as when the server request fails -- so checks for state
+    will need to occur.
+    NOTE: This (usually) does involve a network operation, so wrappers may want to be
+    asynchronous.
+    */
+    func accountLogout() -> Error? {
+        Error(self.client.accountLogout())
+    }
+    
+    /** Copied from PSIPsiCashLibWrapper
+    Attempts to log the current user into an account. Will attempt to merge any available
+    Tracker balance.
+
+    If success, RefreshState should be called immediately afterward.
+
+    Input parameters:
+    • utf8_username: The username, encoded in UTF-8.
+    • utf8_password: The password, encoded in UTF-8.
+
+    Result fields:
+    • error: If set, the request failed utterly and no other params are valid.
+    • status: Request success indicator. See below for possible values.
+    • last_tracker_merge: If true, a Tracker was merged into the account, and this was
+      the last such merge that is allowed -- the user should be informed of this.
+
+    Possible status codes:
+    • Success: The credentials were correct and the login request was successful. There
+      are tokens available for future requests.
+    • InvalidCredentials: One or both of the username and password did not match a known
+      Account.
+    • BadRequest: The data sent to the server was invalid in some way. This should not
+      happen in normal operation.
+    • ServerError: An error occurred on the server. Probably report to the user and try
+      again later. Note that the request has already been retried internally and any
+      further retry should not be immediate.
+    */
+    func accountLogin(username: String, password: String) -> Result<AccountLoginResponse, Error> {
+        
+        let result = self.client.accountLogin(withUsername: username, andPassword: password)
+        
+        if let success = result.success {
+            
+            return .success(AccountLoginResponse(
+                                status: success.status,
+                                lastTrackerMerge: success.lastTrackerMerge.toOptionalBool))
+            
+        } else if let failure = result.failure {
+            
+            return .failure(Error(failure))
+            
         } else {
             // Programming fault
             fatalError()

@@ -33,15 +33,31 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 
-@interface PSIHTTPParams : NSObject
+@interface PSIHttpRequest : NSObject
 
+// "https"
 @property (nonatomic, readonly) NSString *scheme;
+
+// "api.psi.cash"
 @property (nonatomic, readonly) NSString *hostname;
+
+// 443
 @property (nonatomic, readonly) int port;
+
+// "POST, "GET", etc.
 @property (nonatomic, readonly) NSString *method;
+
+// "/v1/tracker"
 @property (nonatomic, readonly) NSString *path;
+
+// { "User-Agent": "value", ...etc. }
 @property (nonatomic, readonly) NSDictionary<NSString *, NSString *> *headers;
+
+// name-value pairs: [ ["class", "speed-boost"], ["expectedAmount", "-10000"], ... ]
 @property (nonatomic, readonly) NSArray<PSIPair<NSString *> *> *query;
+
+// body must be omitted if empty
+@property (nonatomic, readonly) NSString *body;
 
 /**
  Creates complete URL including the query string.
@@ -51,7 +67,7 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 
-@interface PSIHTTPResult: NSObject
+@interface PSIHttpResult: NSObject
 
 + (int)CRITICAL_ERROR;
 + (int)RECOVERABLE_ERROR;
@@ -128,6 +144,8 @@ typedef NS_ENUM(NSInteger, PSIStatus) {
     PSIStatusTransactionAmountMismatch,
     PSIStatusTransactionTypeNotFound,
     PSIStatusInvalidTokens,
+    PSIStatusInvalidCredentials,
+    PSIStatusBadRequest,
     PSIStatusServerError
 };
 
@@ -146,6 +164,16 @@ typedef NS_ENUM(NSInteger, PSIStatus) {
 @end
 
 
+@interface PSIAccountLoginResponse : NSObject
+
+@property (nonatomic, readonly) PSIStatus status;
+
+/// Represents a nullable bool value.
+@property (nonatomic, readonly, nullable) NSNumber *lastTrackerMerge;
+
+@end
+
+
 // Enumeration of possible token types.
 @interface PSITokenType : NSObject
 
@@ -159,27 +187,35 @@ typedef NS_ENUM(NSInteger, PSIStatus) {
 
 @interface PSIPsiCashLibWrapper : NSObject
 
-/// Must be called once, before any other methods except Reset (or behaviour is undefined).
-/// `userAgent` is required and must be non-empty.
-/// `fileStoreRoot` is required and must be non-empty. `"."` can be used for the cwd.
-/// `httpRequestFunc` may be null and set later with SetHTTPRequestFn.
-/// Returns error if there's an unrecoverable error (such as an inability to use the
+/// Must be called once, before any other methods (or behaviour is undefined).
+/// `user_agent` is required and must be non-empty.
+/// `file_store_root` is required and must be non-empty. `"."` can be used for the cwd.
+/// `make_http_request_fn` may be null and set later with SetHTTPRequestFn.
+/// Returns false if there's an unrecoverable error (such as an inability to use the
 /// filesystem).
+/// If `force_reset` is true, the datastore will be completely wiped out and reset.
 /// If `test` is true, then the test server will be used, and other testing interfaces
 /// will be available. Should only be used for testing.
 /// When uninitialized, data accessors will return zero values, and operations (e.g.,
 /// RefreshState and NewExpiringPurchase) will return errors.
 - (PSIError *_Nullable)initializeWithUserAgent:(NSString *)userAgent
                                  fileStoreRoot:(NSString *)fileStoreRoot
-                               httpRequestFunc:(PSIHTTPResult * (^)(PSIHTTPParams *))httpRequestFunc
+                               httpRequestFunc:(PSIHttpResult * (^_Nullable)(PSIHttpRequest *))httpRequestFunc
+                                    forceReset:(BOOL)forceReset
                                           test:(BOOL)test WARN_UNUSED_RESULT;
-
-/// Resets the PsiCash datastore. `initializeWithUserAgent::::` must be called after this method is used.
-/// Returns an error if the reset failed, likely indicating a filesystem problem.
-- (PSIError *_Nullable)resetWithFileStoreRoot:(NSString *)fileStoreRoot test:(BOOL)test WARN_UNUSED_RESULT;
 
 /// Returns true if the library has been successfully initialized (i.e., `initializeWithUserAgent::::` called).
 - (BOOL)initialized;
+
+/// Resets PsiCash data for the current user (Tracker or Account). This will typically
+/// be called when wanting to revert to a Tracker from a previously logged in Account.
+- (PSIError *_Nullable)resetUser;
+
+/// Forces the given tokens and account status to be set in the datastore. Must be
+/// called after Init(). RefreshState() must be called after method (and shouldn't be
+/// be called before this method, although behaviour will be okay).
+- (PSIError *_Nullable)migrateTokens:(NSDictionary<NSString *, NSString *> *)tokens
+                           isAccount:(BOOL)isAccount;
 
 /// Set values that will be included in the request metadata. This includes
 /// client_version, client_region, sponsor_id, and propagation_channel_id.
@@ -348,6 +384,50 @@ refreshStateWithPurchaseClasses:(NSArray<NSString *> *)purchaseClasses WARN_UNUS
 newExpiringPurchaseWithTransactionClass:(NSString *)transactionClass
 distinguisher:(NSString *)distinguisher
 expectedPrice:(int64_t)expectedPrice WARN_UNUSED_RESULT;
+
+/**
+Logs out a currently logged-in account.
+An error will be returned in these cases:
+• If the user is not an account
+• If the request to the server fails
+• If the local datastore cannot be updated
+These errors should always be logged, but the local state may end up being logged out,
+even if they do occur -- such as when the server request fails -- so checks for state
+will need to occur.
+NOTE: This (usually) does involve a network operation, so wrappers may want to be
+asynchronous.
+*/
+- (PSIError *_Nullable)accountLogout;
+
+/**
+Attempts to log the current user into an account. Will attempt to merge any available
+Tracker balance.
+
+If success, RefreshState should be called immediately afterward.
+
+Input parameters:
+• utf8_username: The username, encoded in UTF-8.
+• utf8_password: The password, encoded in UTF-8.
+
+Result fields:
+• error: If set, the request failed utterly and no other params are valid.
+• status: Request success indicator. See below for possible values.
+• last_tracker_merge: If true, a Tracker was merged into the account, and this was
+  the last such merge that is allowed -- the user should be informed of this.
+
+Possible status codes:
+• Success: The credentials were correct and the login request was successful. There
+  are tokens available for future requests.
+• InvalidCredentials: One or both of the username and password did not match a known
+  Account.
+• BadRequest: The data sent to the server was invalid in some way. This should not
+  happen in normal operation.
+• ServerError: An error occurred on the server. Probably report to the user and try
+  again later. Note that the request has already been retried internally and any
+  further retry should not be immediate.
+*/
+- (PSIResult<PSIAccountLoginResponse *> *)accountLoginWithUsername:(NSString *)username
+                                                       andPassword:(NSString *)password;
 
 #if DEBUG
 
