@@ -40,7 +40,7 @@ typealias LandingPageEnvironment = (
     sharedDB: PsiphonDataSharedDB,
     urlHandler: URLHandler,
     psiCashEffects: PsiCashEffects,
-    psiCashAuthPackageSignal: SignalProducer<PsiCashValidTokenTypes, Never>,
+    psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType?, Never>,
     mainDispatcher: MainDispatcher
 )
 
@@ -74,9 +74,9 @@ func landingPageReducer(
         let randomlySelectedURL = landingPages.randomElement()!.url
         
         return [
-            modifyLandingPagePendingEarnerToken(
+            modifyLandingPagePendingObtainingToken(
                 url: randomlySelectedURL,
-                authPackageSignal: environment.psiCashAuthPackageSignal,
+                psiCashAccountTypeSignal: environment.psiCashAccountTypeSignal,
                 psiCashEffects: environment.psiCashEffects
             ).flatMap(.latest) {
                 environment.urlHandler.open($0, tunnelConnection, environment.mainDispatcher)
@@ -91,15 +91,20 @@ func landingPageReducer(
     }
 }
 
-fileprivate func modifyLandingPagePendingEarnerToken(
-    url: URL, authPackageSignal: SignalProducer<PsiCashValidTokenTypes, Never>,
+/// Modifies landing page with PsiCash custom data.
+/// If no PsiCash tokens are available, waits up to `PsiCashHardCodedValues.getEarnerTokenTimeout`
+/// for PsiCash tokens to be obtained.
+fileprivate func modifyLandingPagePendingObtainingToken(
+    url: URL, psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType?, Never>,
     psiCashEffects: PsiCashEffects
 ) -> Effect<URL> {
-    authPackageSignal
-        .map(\.hasEarnerToken)
+    psiCashAccountTypeSignal
+        .map {
+            $0.hasValue
+        }
         .falseIfNotTrue(within: PsiCashHardCodedValues.getEarnerTokenTimeout)
-        .flatMap(.latest) { hasEarnerToken -> SignalProducer<URL, Never> in
-            if hasEarnerToken {
+        .flatMap(.latest) { hasTokens -> SignalProducer<URL, Never> in
+            if hasTokens {
                 return psiCashEffects.modifyLandingPage(url)
             } else {
                 return SignalProducer(value: url)

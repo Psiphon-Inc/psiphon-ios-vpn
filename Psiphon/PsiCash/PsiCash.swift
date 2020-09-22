@@ -22,14 +22,9 @@ import PsiApi
 import PsiCashClient
 
 // Should match all cases defined in PSITokenType
-enum PsiCashTokenType: RawRepresentable, CaseIterable {
+extension PsiCashTokenType: RawRepresentable {
     
-    case earner
-    case spender
-    case indicator
-    case account
-    
-    init?(rawValue: String) {
+    public init?(rawValue: String) {
         switch rawValue {
         case PSITokenType.earnerTokenType:
             self = .earner
@@ -44,7 +39,7 @@ enum PsiCashTokenType: RawRepresentable, CaseIterable {
         }
     }
     
-    var rawValue: String {
+    public var rawValue: String {
         switch self {
         case .earner:
             return PSITokenType.earnerTokenType
@@ -102,22 +97,37 @@ final class PsiCash {
         self.client.initialized()
     }
     
-    var validTokenTypes: PsiCashValidTokenTypes {
+    var validTokenTypes: Set<PsiCashTokenType> {
         
-        let tokens = self.client.validTokenTypes()
+        let tokenTypes = self.client.validTokenTypes().map { rawTokenType -> PsiCashTokenType in
+            guard let tokenType = PsiCashTokenType(rawValue: rawTokenType) else {
+                // Programming error.
+                fatalError()
+            }
+            return tokenType
+        }
         
-        return PsiCashValidTokenTypes(
-            hasEarnerToken: tokens.contains(PsiCashTokenType.earner.rawValue),
-            hasSpenderToken: tokens.contains(PsiCashTokenType.spender.rawValue),
-            hasIndicatorToken: tokens.contains(PsiCashTokenType.indicator.rawValue),
-            hasAccountToken: tokens.contains(PsiCashTokenType.account.rawValue)
-        )
+        return Set(tokenTypes)
+    }
+    
+    var accountType: PsiCashAccountType? {
+        let tokenTypes = self.client.validTokenTypes()
+        
+        if tokenTypes.count == 0 {
+            return .none
+        }
+                
+        if self.client.isAccount() {
+            return .account(loggedIn: tokenTypes.count >= 3)
+        } else {
+            return .tracker
+        }
     }
     
     var dataModel: PsiCashLibData {
         PsiCashLibData(
-            authPackage: self.validTokenTypes,
-            isAccount: self.client.isAccount(),
+            validTokens: self.validTokenTypes,
+            accountType: self.accountType,
             balance: PsiCashAmount(nanoPsi: self.client.balance()),
             availableProducts: self.purchasePrices(),
             activePurchases: self.activePurchases()
@@ -149,7 +159,7 @@ final class PsiCash {
         return Error(err)
     }
     
-    /// Resets PsiCash data for the current user (Tracker or Account). This will typically
+    /// Resets PsiCash data for the current user (Tracker or Account). This will typicallyfi
     /// be called when wanting to revert to a Tracker from a previously logged in Account.
     func resetUser() -> Error? {
         Error(self.client.resetUser())

@@ -279,7 +279,7 @@ final class PsiCashViewController: ReactiveViewController {
                     return
                 }
                 
-                guard observed.state.psiCash.libData.authPackage.hasMinimalTokens else {
+                guard observed.state.psiCash.libData.accountType.hasValue else {
                     self.balanceView.isHidden = true
                     self.tabControl.isHidden = true
                     self.containerBindable.bind(

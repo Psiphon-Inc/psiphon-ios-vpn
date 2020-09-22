@@ -177,7 +177,7 @@ extension AppState {
             IAPReducerState(
                 iap: self.iapState,
                 psiCashBalance: self.psiCashBalance,
-                psiCashAuth: self.psiCash.libData.authPackage
+                psiCashAccountType: self.psiCash.libData.accountType
             )
         }
         set {
