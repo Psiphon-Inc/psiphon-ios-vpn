@@ -172,6 +172,18 @@ func join<A>(_ optional: Optional<Optional<A>>) -> Optional<A> {
     }
 }
 
+public extension Optional {
+    
+    /// Returns true if optional has a value, otherwise false.
+    var hasValue: Bool {
+        switch self {
+        case .some(_): return true
+        case .none: return false
+        }
+    }
+    
+}
+
 public extension Optional where Wrapped == Bool {
 
     /// Returns `nilValue` if nil, otherwise returns wrapped value.

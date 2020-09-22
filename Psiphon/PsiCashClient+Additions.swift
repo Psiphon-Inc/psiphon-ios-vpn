@@ -101,7 +101,7 @@ extension PSIStatus {
         case .invalid, .serverError:
             return true
         case .success, .existingTransaction, .insufficientBalance, .transactionAmountMismatch,
-             .transactionTypeNotFound, .invalidTokens:
+             .transactionTypeNotFound, .invalidTokens, .invalidCredentials, .badRequest:
             return false
         @unknown default:
             return false

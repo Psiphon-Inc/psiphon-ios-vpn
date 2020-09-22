@@ -37,23 +37,34 @@ public enum PsiCashRequestMetadataKey: String {
 
 public typealias PsiCashParsed<Value: Equatable> = Result<Value, PsiCashParseError>
 
+/// Represents whether the user has tracker tokens only
+/// or has account tokens.
+/// Note that a user that has upgraded from tracker to account,
+/// cannot go back to being a tracker only.
+public enum PsiCashAccountType: Equatable {
+    case account(loggedIn: Bool)
+    case tracker
+}
+
 // MARK: PsiCash data model
 public struct PsiCashLibData: Equatable {
-    public let authPackage: PsiCashValidTokenTypes
-    public let isAccount: Bool
+    
+    /// Stored valid token types. Will be empty if no tokens are available.
+    public let validTokens: Set<PsiCashTokenType>
+    public let accountType: PsiCashAccountType?
     public let balance: PsiCashAmount
     public let purchasePrices: [PsiCashParsed<PsiCashPurchasableType>]
     public let activePurchases: [PsiCashParsed<PsiCashPurchasedType>]
     
     public init(
-        authPackage: PsiCashValidTokenTypes,
-        isAccount: Bool,
+        validTokens: Set<PsiCashTokenType>,
+        accountType: PsiCashAccountType?,
         balance: PsiCashAmount,
         availableProducts: [PsiCashParsed<PsiCashPurchasableType>],
         activePurchases: [PsiCashParsed<PsiCashPurchasedType>]
     ) {
-        self.authPackage = authPackage
-        self.isAccount = isAccount
+        self.validTokens = validTokens
+        self.accountType = accountType
         self.balance = balance
         self.purchasePrices = availableProducts
         self.activePurchases = activePurchases
@@ -62,13 +73,15 @@ public struct PsiCashLibData: Equatable {
 }
 
 extension PsiCashLibData {
+    
     public init() {
-        authPackage = .init()
-        isAccount = false
+        validTokens = Set()
+        accountType = .none
         balance = .zero
         purchasePrices = []
         activePurchases = []
     }
+    
 }
 
 // MARK: Data models
@@ -95,24 +108,11 @@ public func + (lhs: PsiCashAmount, rhs: PsiCashAmount) -> PsiCashAmount {
 }
 
 /// Represents stored valid token types.
-public struct PsiCashValidTokenTypes: Equatable {
-    public let hasEarnerToken: Bool
-    public let hasSpenderToken: Bool
-    public let hasIndicatorToken: Bool
-    public let hasAccountToken: Bool
-    
-    public init(
-        hasEarnerToken: Bool = false,
-        hasSpenderToken: Bool = false,
-        hasIndicatorToken: Bool = false,
-        hasAccountToken: Bool = false
-    ) {
-        self.hasEarnerToken = hasEarnerToken
-        self.hasIndicatorToken = hasIndicatorToken
-        self.hasSpenderToken = hasSpenderToken
-        self.hasAccountToken = hasAccountToken
-    }
-    
+public enum PsiCashTokenType: Hashable {
+    case earner
+    case spender
+    case indicator
+    case account
 }
 
 // MARK: PsiCash products

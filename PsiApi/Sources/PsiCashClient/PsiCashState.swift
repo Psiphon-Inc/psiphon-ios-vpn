@@ -283,12 +283,3 @@ extension PsiCashBalance {
     }
 
 }
-
-extension PsiCashValidTokenTypes {
-    
-    /// true if the user has minimal tokens for the PsiCash features to function.
-    public var hasMinimalTokens: Bool {
-        hasSpenderToken && hasIndicatorToken
-    }
-    
-}

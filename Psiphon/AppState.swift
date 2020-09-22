@@ -77,7 +77,7 @@ typealias AppEnvironment = (
     userConfigs: UserDefaultsConfig,
     notifier: PsiApi.Notifier,
     tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
-    psiCashAuthPackageSignal: SignalProducer<PsiCashValidTokenTypes, Never>,
+    psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType?, Never>,
     tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
     urlHandler: URLHandler,
     paymentQueue: PaymentQueue,
@@ -159,7 +159,7 @@ func makeEnvironment(
         notifier: NotifierObjC(notifier:Notifier.sharedInstance()),
         tunnelStatusSignal: store.$value.signalProducer
             .map(\.vpnState.value.providerVPNStatus),
-        psiCashAuthPackageSignal: store.$value.signalProducer.map(\.psiCash.libData.authPackage),
+        psiCashAccountTypeSignal: store.$value.signalProducer.map(\.psiCash.libData.accountType),
         tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
         urlHandler: .default(),
         paymentQueue: .default,
@@ -255,7 +255,7 @@ fileprivate func toLandingPageEnvironment(env: AppEnvironment) -> LandingPageEnv
         sharedDB: env.sharedDB,
         urlHandler: env.urlHandler,
         psiCashEffects: env.psiCashEffects,
-        psiCashAuthPackageSignal: env.psiCashAuthPackageSignal,
+        psiCashAccountTypeSignal: env.psiCashAccountTypeSignal,
         mainDispatcher: env.mainDispatcher
     )
 }
