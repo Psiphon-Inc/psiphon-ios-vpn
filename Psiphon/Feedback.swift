@@ -161,31 +161,23 @@ final class FeedbackUpload {
         // stopSend call intended for the current feedback upload operation does not get scheduled
         // after the sendFeedback call of the next upload; which would result in the next upload
         // being cancelled in error.
-        return SignalProducer { [weak self] observer, lifetime in
-
-            guard let self = self else {
-                return
-            }
+        return SignalProducer { [self] observer, lifetime in
 
             // Transform `FeedbackUploadProvider` callbacks into a stream of values.
-            let f = FeedbackHandler(feedbackUploadProvider: self.feedbackUploadProvider, completionHandler: { [weak self] err in
-                if let self = self {
-                    if !lifetime.hasEnded {
-                        // Immediately return so we move off the callstack of sendCompleted
-                        // callback: see PsiphonTunnel.h for more details.
-                        self.workQueue.async {
-                            observer.send(value: .completed(err))
-                            observer.sendCompleted()
-                        }
+            let f = FeedbackHandler(feedbackUploadProvider: self.feedbackUploadProvider, completionHandler: { [self] err in
+                if !lifetime.hasEnded {
+                    // Immediately return so we move off the callstack of sendCompleted
+                    // callback: see PsiphonTunnel.h for more details.
+                    self.workQueue.async {
+                        observer.send(value: .completed(err))
+                        observer.sendCompleted()
                     }
                 }
-            }, noticeHandler: { [weak self] notice in
-                if let self = self {
-                    if !lifetime.hasEnded {
-                        // Note: this closure will not be called after `completionHandler` is called.
-                        self.workQueue.async {
-                            observer.send(value:.notice(notice))
-                        }
+            }, noticeHandler: { [self] notice in
+                if !lifetime.hasEnded {
+                    // Note: this closure will not be called after `completionHandler` is called.
+                    self.workQueue.async {
+                        observer.send(value:.notice(notice))
                     }
                 }
             })
