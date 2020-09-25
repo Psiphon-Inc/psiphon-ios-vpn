@@ -131,8 +131,11 @@ fileprivate final class FeedbackHandler : NSObject,
 /// FeedbackUpload creates an interface around FeedbackUploadProvider which provides some guarantees with regards to call and
 /// callback ordering by scheduling work on a serial queue.
 ///
-/// - Warning: Only a single instance of FeedbackUpload should be used at a time. Using multiple instances in parallel, or
-/// concurrently, can result in undefined behavior.
+/// - Note: An assumption is made that the underlying FeedbackUploadProvider only supports one upload at a time. This is true for
+/// the implementation backed by the PsiphonTunnelFeedback class (provided by PsiphonTunnel.framework), which is used in production.
+/// See the comments on the PsiphonTunnelFeedback class in PsiphonTunnel/PsiphonTunnel.h for more details. Therefore one
+/// FeedbackUpload instance should be used to schedule all feedback upload work and using multiple instances to schedule, or stop,
+/// work is unsupported and can result in undefined behavior.
 final class FeedbackUpload {
 
     let feedbackUploadProvider: FeedbackUploadProvider
@@ -147,13 +150,17 @@ final class FeedbackUpload {
 
 
     /// Returns a cold signal which will perform the feedback upload operation once observed. See `FeedbackUploadProviderResult`
-    /// for more information on the items emitted.
+    /// for more information on the items emitted. The upload will be cancelled if the returned signal is disposed of before it completes.
     ///
     /// - Warning: Only one upload is supported at a time and the returned signal must complete or be disposed before calling this
     /// function again.
     func sendFeedback(feedbackJson: String,
                       feedbackConfigJson: [AnyHashable: Any])
                      -> SignalProducer<FeedbackUploadProviderResult, Never> {
+        // Note: Calls to the underlying FeedbackUploadProvider are synchronized to ensure that a
+        // stopSend call intended for the current feedback upload operation does not get scheduled
+        // after the sendFeedback call of the next upload; which would result in the next upload
+        // being cancelled in error.
         return SignalProducer { [weak self] observer, lifetime in
 
             guard let self = self else {
