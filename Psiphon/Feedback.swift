@@ -130,7 +130,10 @@ fileprivate final class FeedbackHandler : NSObject,
 
 /// FeedbackUpload creates an interface around FeedbackUploadProvider which provides some guarantees with regards to call and
 /// callback ordering by scheduling work on a serial queue.
-class FeedbackUpload {
+///
+/// - Warning: Only a single instance of FeedbackUpload should be used at a time. Using multiple instances in parallel, or
+/// concurrently, can result in undefined behavior.
+final class FeedbackUpload {
 
     let feedbackUploadProvider: FeedbackUploadProvider
     let workQueue: DispatchQueue
@@ -146,43 +149,45 @@ class FeedbackUpload {
     /// Returns a cold signal which will perform the feedback upload operation once observed. See `FeedbackUploadProviderResult`
     /// for more information on the items emitted.
     ///
-    /// - Warning: only one upload is supported at a time and the returned signal must complete or be disposed before calling this
+    /// - Warning: Only one upload is supported at a time and the returned signal must complete or be disposed before calling this
     /// function again.
     func sendFeedback(feedbackJson: String,
                       feedbackConfigJson: [AnyHashable: Any])
                      -> SignalProducer<FeedbackUploadProviderResult, Never> {
         return SignalProducer { [weak self] observer, lifetime in
 
-            guard let strongSelf = self else {
+            guard let self = self else {
                 return
             }
 
             // Transform `FeedbackUploadProvider` callbacks into a stream of values.
-            let f = FeedbackHandler(feedbackUploadProvider: strongSelf.feedbackUploadProvider, completionHandler: { [weak self] err in
-                if let strongSelf = self {
+            let f = FeedbackHandler(feedbackUploadProvider: self.feedbackUploadProvider, completionHandler: { [weak self] err in
+                if let self = self {
                     if !lifetime.hasEnded {
                         // Immediately return so we move off the callstack of sendCompleted
                         // callback: see PsiphonTunnel.h for more details.
-                        strongSelf.workQueue.async {
+                        self.workQueue.async {
                             observer.send(value: .completed(err))
                             observer.sendCompleted()
                         }
                     }
                 }
             }, noticeHandler: { [weak self] notice in
-                if let strongSelf = self {
-                    // Note: this closure will not be called after `completionHandler` is called.
+                if let self = self {
                     if !lifetime.hasEnded {
-                        strongSelf.workQueue.async {
+                        // Note: this closure will not be called after `completionHandler` is called.
+                        self.workQueue.async {
                             observer.send(value:.notice(notice))
                         }
                     }
                 }
             })
             lifetime.observeEnded {
+                // Note: this call can trigger the completionHandler and noticeHandler callbacks and
+                // they should check if the lifetime has ended to avoid doing unnecessary work.
                 f.stopSend()
             }
-            strongSelf.workQueue.async {
+            self.workQueue.async {
                 f.sendFeedback(feedbackJson: feedbackJson, feedbackConfigJson: feedbackConfigJson)
             }
         }
