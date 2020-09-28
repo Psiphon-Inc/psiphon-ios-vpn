@@ -116,12 +116,13 @@ open class ReactiveViewController: UIViewController {
         lifeCycle = .viewDidDisappear(animated: animated)
     }
     
+    /// Presents `viewControllerToPresent` only after `viewDidAppear(_:)` has been called
+    /// on this view controller.
     public func presentOnViewDidAppear(
         _ viewControllerToPresent: UIViewController,
         animated flag: Bool,
         completion: (() -> Void)? = nil
     ) {
-        
         self.$lifeCycle.signalProducer
             .filter{ $0.viewDidAppear }.take(first: 1).startWithValues { [weak self] _ in
                 guard let self = self else {

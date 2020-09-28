@@ -56,7 +56,7 @@ struct PsiCashCoinPurchaseTable: ViewBuilder {
 
     func build(
         _ container: UIView?
-    ) -> StrictBindableViewable<[PsiCashPurchasableViewModel], PsiCashCoinTable> {
+    ) -> ImmutableBindableViewable<[PsiCashPurchasableViewModel], PsiCashCoinTable> {
         .init(viewable: PsiCashCoinTable(purchaseHandler: purchaseHandler))
         { table -> (([PsiCashPurchasableViewModel]) -> Void) in
             return {

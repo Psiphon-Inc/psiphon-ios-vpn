@@ -17,22 +17,21 @@
  *
  */
 
+import Foundation
 
-import UIKit
-import Utilities
-
-struct ImageViewBuilder: ViewBuilder {
-
-    let image: UIImage
-
-    func build(_ container: UIView?) -> ImmutableBindableViewable<Utilities.Unit, UIImageView> {
-        let imageView = UIImageView(image: image)
-        imageView.contentMode = .scaleAspectFit
-
-        return .init(viewable: imageView) { _ -> ((Utilities.Unit) -> Void) in
-            return { _ in }
-        }
+final class DividerView: UIView {
+    
+    init(color: UIColor) {
+        super.init(frame: .zero)
+        backgroundColor = color
     }
-
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override var intrinsicContentSize: CGSize {
+        return CGSize(width: UIView.noIntrinsicMetric, height:0.5)
+    }
+    
 }
-

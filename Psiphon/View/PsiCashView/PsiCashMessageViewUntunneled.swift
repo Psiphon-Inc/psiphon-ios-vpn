@@ -34,7 +34,7 @@ struct PsiCashMessageViewUntunneled: ViewBuilder {
 
     let action: () -> Void
 
-    func build(_ container: UIView?) -> StrictBindableViewable<Message, UIView> {
+    func build(_ container: UIView?) -> ImmutableBindableViewable<Message, UIView> {
         let root = UIView(frame: .zero)
 
         let imageView = UIImageView()

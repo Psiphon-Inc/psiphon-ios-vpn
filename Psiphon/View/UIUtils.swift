@@ -19,7 +19,7 @@
 
 import UIKit
 
-protocol UICases: Hashable, CaseIterable, CustomStringConvertible {}
+protocol UICases: Hashable, CaseIterable {}
 
 /// Represents global app styles.
 struct AppStyle {
@@ -32,6 +32,8 @@ struct Styling {
     var borderWidth: CGFloat = 5.0
     var cornerRadius: CGFloat = 8.0
     var padding: CGFloat = 15.0
+    var largePadding: CGFloat = 20.0
+    var buttonHeight: CGFloat = 44.0
     var largeButtonHeight: CGFloat = 60.0
     var statusBarStyle = UIStatusBarStyle.lightContent
     var buttonContentEdgeInsets = UIEdgeInsets(top: 10.0, left: 15.0, bottom: 10.0, right: 15.0)
@@ -53,10 +55,22 @@ enum Gradients: Int {
 }
 
 enum FontSize: Float {
+    
+    /// 26-pt font size.
     case h1 = 26.0
+    
+    /// 18-pt font size.
+    case h2 = 18.0
+    
+    /// 16-pt font size.
     case h3 = 16.0
+    
+    /// 14-pt font size.
     case normal = 14.0
+    
+    /// 12-pt font size.
     case subtitle = 12.0
+    
 }
 
 enum AvenirFont: String {
@@ -79,17 +93,31 @@ enum Loading<Value: Equatable>: Equatable {
     case loaded(Value)
 }
 
+/// Applies `applyMutation` function to each of the `values` in order.
+func mutate<Ref: AnyObject>(_ values: Ref..., applyMutations: (Ref) -> Void) {
+    for value in values {
+        applyMutations(value)
+    }
+}
+
+/// Applies `applyMutation` function to each of the `values` in order.
+func mutate<Ref: AnyObject>(_ values: [Ref], applyMutations: (Ref) -> Void) {
+    for value in values {
+        applyMutations(value)
+    }
+}
+
 extension UILabel {
 
-    static func make<Label: UILabel>(
+    static func make<LabelView: UILabel>(
         text: String = "",
         fontSize: FontSize = .normal,
         typeface: AvenirFont = .demiBold,
         color: UIColor = .white,
         numberOfLines: Int = 1,
-        alignment: NSTextAlignment = .natural) -> Label {
+        alignment: NSTextAlignment = .natural) -> LabelView {
 
-        let label = Label(frame: .zero)
+        let label = LabelView(frame: .zero)
         label.apply(text: text,
                     fontSize: fontSize,
                     typeface: typeface,
@@ -123,6 +151,33 @@ extension UILabel {
         }
     }
 
+}
+
+extension UITextField {
+    
+    static func make<TextFieldView: UITextField>(
+        placeholder: String?,
+        textColor: UIColor = .white,
+        underline: Bool = true
+    ) -> TextFieldView {
+        let v = TextFieldView(frame: .zero)
+        
+        mutate(v) {
+            $0.textColor = textColor
+            
+            if let placeholder = placeholder {
+                $0.attributedPlaceholder = NSAttributedString(
+                    string: placeholder,
+                    attributes: [NSAttributedString.Key.foregroundColor:
+                                    textColor.withAlphaComponent(0.25)]
+                )
+            }
+            
+        }
+        
+        return v
+    }
+    
 }
 
 enum EdgeInsets {
@@ -537,9 +592,9 @@ protocol ViewBuilder {
     associatedtype BuildType: BindableViewable
 
     /// Builds a `BindableViewable`. In current implementation the `BindableViewable`
-    /// is either a `StrictBindableViewable` or a `MutableBindableViewable`.
+    /// is either a `ImmutableBindableViewable` or a `MutableBindableViewable`.
     ///
-    /// - A `StrictBindableViewable` should ignore the `container` parameter, and never rely on it.
+    /// - A `ImmutableBindableViewable` should ignore the `container` parameter, and never rely on it.
     /// This value may or may not be nil, depending on whether the `container` is being re-used.
     ///
     /// - A `MutableBindableViewable` should add it's views to the passed in `container`.
@@ -557,7 +612,7 @@ extension UIView: ViewWrapper {
     var view: UIView { self }
 }
 
-final class StrictBindableViewable<BindingType: Equatable, WrappedView: ViewWrapper>: BindableViewable {
+final class ImmutableBindableViewable<BindingType: Equatable, WrappedView: ViewWrapper>: BindableViewable {
     typealias WrappedView = WrappedView
     typealias BindingType = BindingType
 
@@ -738,6 +793,15 @@ extension UIViewController {
         // Documentation is sparse on this, and this interpretation might need to be
         // re-evaluated at some point in the future.
         return viewControllerToPresent.isBeingPresented
+    }
+    
+}
+
+extension UINavigationBar {
+    
+    /// Hides iOS default 1px bottom border from navigation bar.
+    func hideDefaultBottomBorder() {
+        self.setValue(true, forKey: "hidesShadow")
     }
     
 }
