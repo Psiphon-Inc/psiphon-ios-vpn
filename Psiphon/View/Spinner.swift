@@ -26,7 +26,7 @@ struct Spinner: ViewBuilder {
         self.style = style
     }
 
-    func build(_ container: UIView?) -> StrictBindableViewable<Bool, UIActivityIndicatorView> {
+    func build(_ container: UIView?) -> ImmutableBindableViewable<Bool, UIActivityIndicatorView> {
         let spinner = UIActivityIndicatorView(style: self.style)
         return .init(viewable: spinner) { spinner -> ((Bool) -> Void) in
             return { animate in
