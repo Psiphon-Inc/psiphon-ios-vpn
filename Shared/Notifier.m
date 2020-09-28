@@ -206,7 +206,7 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
     // thread to send the message to `messageSubject`.
 #if !(TARGET_IS_EXTENSION)
     dispatch_async_global(^{
-        [messagesSubject sendNext:message];
+        [self->messagesSubject sendNext:message];
     });
 #endif
 

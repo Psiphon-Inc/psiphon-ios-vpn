@@ -39,8 +39,14 @@
 }
 
 - (void)sync {
+    __weak AvailableServerRegions *weakSelf = self;
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSArray<NSString *> *regions = [sharedDB emittedEgressRegions];
+        __strong AvailableServerRegions *strongSelf = weakSelf;
+        if (strongSelf == nil) {
+            return;
+        }
+
+        NSArray<NSString *> *regions = [strongSelf->sharedDB emittedEgressRegions];
 
         if (regions == nil) {
             regions = [[[ContainerDB alloc] init] embeddedEgressRegions];

@@ -35,6 +35,6 @@
  * Adds "Cancel" button to the receiver alert controller.
  * @param handler Optional callback.
  */
-- (void)addCancelAction:(void (^_Nullable)(UIAlertAction *action))handler;
+- (void)addCancelAction:(void (^_Nullable)(UIAlertAction *_Nonnull action))handler;
 
 @end
