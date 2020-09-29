@@ -102,7 +102,7 @@ final class PsiCashViewController: ReactiveViewController {
         case addPsiCash
         case speedBoost
         
-        var description: String {
+        var localizedUserDescription: String {
             switch self {
             case .addPsiCash: return UserStrings.Add_psiCash()
             case .speedBoost: return UserStrings.Speed_boost()
@@ -243,7 +243,7 @@ final class PsiCashViewController: ReactiveViewController {
                 case (_, .error(let psiCashErrorEvent), _):
                     let errorDesc = ErrorEventDescription(
                         event: psiCashErrorEvent.eraseToRepr(),
-                        localizedUserDescription: psiCashErrorEvent.error.userDescription
+                        localizedUserDescription: psiCashErrorEvent.error.localizedUserDescription
                     )
                     
                     self.display(screen: .mainScreen)
@@ -678,7 +678,7 @@ extension ErrorEvent where E == IAPError {
                 } else {
                     optionalDescription = """
                         \(UserStrings.Purchase_failed())
-                        (\(skEmittedError.localizedDescription))
+                        (\(skEmittedError.localizedUserDescription))
                         """
                 }
             }

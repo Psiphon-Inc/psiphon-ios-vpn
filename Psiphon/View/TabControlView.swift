@@ -55,7 +55,7 @@ final class TabControlView<Tabs: UICases>: UIView, Bindable {
 
         // Add the controls
         for tab in Tabs.allCases {
-            let control = createControlButton(title: tab.description)
+            let control = createControlButton(title: tab.localizedUserDescription)
             stackView.addArrangedSubview(control)
             self.controlButtons[tab] = control
         }

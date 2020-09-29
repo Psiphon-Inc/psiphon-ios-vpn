@@ -18,8 +18,9 @@
  */
 
 import UIKit
+import protocol PsiApi.LocalizedUserDescription
 
-protocol UICases: Hashable, CaseIterable {}
+protocol UICases: Hashable, CaseIterable, LocalizedUserDescription {}
 
 /// Represents global app styles.
 struct AppStyle {

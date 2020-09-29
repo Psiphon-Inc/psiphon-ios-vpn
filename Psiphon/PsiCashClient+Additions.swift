@@ -72,9 +72,9 @@ extension RewardedVideoLoadStatus {
 }
 
 
-extension PsiCashPurchaseResponseError: ErrorUserDescription {
+extension PsiCashPurchaseResponseError: LocalizedUserDescription {
     
-    public var userDescription: String {
+    public var localizedUserDescription: String {
         switch self {
         case .tunnelNotConnected:
             return UserStrings.Psiphon_is_not_connected()

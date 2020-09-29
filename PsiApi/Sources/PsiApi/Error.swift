@@ -47,7 +47,7 @@ public struct ErrorRepr: HashableError, Codable {
 /// Wraps an error event with a localized user description of the error.
 /// Note that `ErrorEventDescription` values are equal up to their `event` value only,
 /// i.e. `localizedUserDescription` value does not participate in hashValue or equality check.
-public struct ErrorEventDescription<E: HashableError>: HashableError {
+public struct ErrorEventDescription<E: HashableError>: HashableError, LocalizedUserDescription {
     public let event: ErrorEvent<E>
     public let localizedUserDescription: String
 
@@ -96,42 +96,39 @@ public struct ErrorEvent<E: HashableError>: HashableError, FeedbackDescription {
 extension ErrorEvent: Codable where E: Codable {}
 
 /// `SystemError` represents an error that originates from Apple frameworks (i.e. constructed from NSError).
-public struct SystemError: HashableError {
+public struct SystemError: HashableError, LocalizedUserDescription {
     let domain: String
     let code: Int
+    public let localizedUserDescription: String
     
     public init(_ nsError: NSError) {
         self.domain = nsError.domain
         self.code = nsError.code
+        self.localizedUserDescription = nsError.localizedDescription
     }
     
     public init(_ error: Error) {
         let nsError = error as NSError
         self.domain = nsError.domain
         self.code = nsError.code
+        self.localizedUserDescription = nsError.localizedDescription
     }
 }
 
 public typealias SystemErrorEvent = ErrorEvent<SystemError>
 
-extension Either: Error where A: Error, B: Error {
-    public var localizedDescription: String {
+extension Either: Error, LocalizedUserDescription where
+    A: Error & LocalizedUserDescription,
+    B: Error & LocalizedUserDescription {
+    
+    public var localizedUserDescription: String {
         switch self {
         case let .left(error):
-            return error.localizedDescription
+            return error.localizedUserDescription
         case let .right(error):
-            return error.localizedDescription
+            return error.localizedUserDescription
         }
     }
-}
-
-//extension Array: Error where Element: Error {}
-
-public protocol ErrorUserDescription where Self: Error {
-    
-    /// User-facing description of error.
-    var userDescription: String { get }
-    
 }
 
 public typealias CodableError = Codable & Error
