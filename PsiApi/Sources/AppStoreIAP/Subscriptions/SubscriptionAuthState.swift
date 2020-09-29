@@ -153,10 +153,11 @@ public struct SubscriptionReducerState: Equatable {
 
 }
 
-public func subscriptionAuthStateReducer(
-    state: inout SubscriptionReducerState, action: SubscriptionAuthStateAction,
-    environment: SubscriptionAuthStateReducerEnvironment
-) -> [Effect<SubscriptionAuthStateAction>] {
+public let subscriptionAuthStateReducer = Reducer<SubscriptionReducerState
+                                                  , SubscriptionAuthStateAction
+                                                  , SubscriptionAuthStateReducerEnvironment> {
+    state, action, environment in
+
     switch action {
     
     case .localDataUpdate(type: let updateType):

@@ -25,7 +25,7 @@ import PsiCashClient
 
 fileprivate let landingPageTag = LogTag("LandingPage")
 
-struct LandingPageReducerState {
+struct LandingPageReducerState: Equatable {
     var pendingLandingPageOpening: Bool
     let tunnelConnection: TunnelConnection?
 }
@@ -44,10 +44,11 @@ typealias LandingPageEnvironment = (
     mainDispatcher: MainDispatcher
 )
 
-func landingPageReducer(
-    state: inout LandingPageReducerState, action: LandingPageAction,
-    environment: LandingPageEnvironment
-) -> [Effect<LandingPageAction>] {
+let landingPageReducer = Reducer<LandingPageReducerState
+                                 , LandingPageAction
+                                 , LandingPageEnvironment> {
+    state, action, environment in
+    
     switch action {
     case .tunnelConnectedAfterIntentSwitchedToStart:
         guard !state.pendingLandingPageOpening else {

@@ -50,10 +50,11 @@ public typealias SubscriptionReducerEnvironment = (
     (_ interval: TimeInterval, _ leeway: DispatchTimeInterval) -> Effect<()>
 )
 
-public func subscriptionReducer(
-    state: inout SubscriptionState, action: SubscriptionAction,
-    environment: SubscriptionReducerEnvironment
-) -> [Effect<SubscriptionAction>] {
+public let subscriptionReducer = Reducer<SubscriptionState
+                                         , SubscriptionAction
+                                         , SubscriptionReducerEnvironment> {
+    state, action, environment in
+    
     switch action {
     case .updatedReceiptData(let receipt):
         guard let subscriptionPurchases = receipt?.subscriptionInAppPurchases else {

@@ -115,9 +115,9 @@ public struct IAPEnvironment {
     }
 }
 
-public func iapReducer(
-    state: inout IAPReducerState, action: IAPAction, environment: IAPEnvironment
-) -> [Effect<IAPAction>] {
+public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
+    state, action, environment in
+    
     switch action {
     case .checkUnverifiedTransaction:
         // Checks if there is an unverified transaction.

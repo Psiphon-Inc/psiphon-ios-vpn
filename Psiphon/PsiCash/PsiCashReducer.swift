@@ -45,9 +45,8 @@ typealias PsiCashEnvironment = (
     metadata: () -> ClientMetaData
 )
 
-func psiCashReducer(
-    state: inout PsiCashReducerState, action: PsiCashAction, environment: PsiCashEnvironment
-) -> [Effect<PsiCashAction>] {
+let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironment> {
+    state, action, environment in
     
     switch action {
     

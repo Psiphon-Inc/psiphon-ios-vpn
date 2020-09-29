@@ -132,10 +132,11 @@ typealias ProductRequestEnvironment = (
     supportedAppStoreProducts: SupportedAppStoreProducts
 )
 
-func productRequestReducer(
-    state: inout PsiCashAppStoreProductsState, action: ProductRequestAction,
-    environment: ProductRequestEnvironment
-) -> [Effect<ProductRequestAction>] {
+let productRequestReducer = Reducer<PsiCashAppStoreProductsState
+                                    , ProductRequestAction
+                                    , ProductRequestEnvironment> {
+    state, action, environment in
+    
     switch action {
     case .getProductList:
         guard case .completed(_) = state.psiCashProducts else {

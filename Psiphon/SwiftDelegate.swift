@@ -63,10 +63,8 @@ typealias AppDelegateEnvironment = (
     mainDispatcher: MainDispatcher
 )
 
-func appDelegateReducer(
-    state: inout AppDelegateState, action: AppDelegateAction,
-    environment: AppDelegateEnvironment
-) -> [Effect<AppDelegateAction>] {
+let appDelegateReducer = Reducer<AppDelegateState, AppDelegateAction, AppDelegateEnvironment> {
+    state, action, environment in
     
     switch action {
     
