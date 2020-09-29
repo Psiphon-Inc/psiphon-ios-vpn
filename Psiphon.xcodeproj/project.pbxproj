@@ -119,6 +119,7 @@
 		8D21FE8424ECC96C00343D32 /* PsiCashLib.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8D255E2D24620E2900FD5D1C /* NoConnectionBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */; };
 		8D26455F24D4842E000F46C0 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D26455E24D4842E000F46C0 /* Navigator.swift */; };
+		8D2A332B2522C3C600D58130 /* Error+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D2A332A2522C3C600D58130 /* Error+Additions.swift */; };
 		8D335A52251A929E005F62CA /* PsiCashAccountLogInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D335A51251A929E005F62CA /* PsiCashAccountLogInView.swift */; };
 		8D335A7B251BC789005F62CA /* DividerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D335A7A251BC789005F62CA /* DividerView.swift */; };
 		8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E982411954A00FEE587 /* PsiCashReducer.swift */; };
@@ -596,6 +597,7 @@
 		8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PsiCashClient+Additions.swift"; sourceTree = "<group>"; };
 		8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoConnectionBannerView.swift; sourceTree = "<group>"; };
 		8D26455E24D4842E000F46C0 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
+		8D2A332A2522C3C600D58130 /* Error+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Error+Additions.swift"; sourceTree = "<group>"; };
 		8D335A51251A929E005F62CA /* PsiCashAccountLogInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashAccountLogInView.swift; sourceTree = "<group>"; };
 		8D335A7A251BC789005F62CA /* DividerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividerView.swift; sourceTree = "<group>"; };
 		8D417E982411954A00FEE587 /* PsiCashReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashReducer.swift; sourceTree = "<group>"; };
@@ -1116,6 +1118,7 @@
 				8DDA60282425BB4800DBA8EC /* DebugStrings.swift */,
 				8DE4E6D1244E97D000275362 /* Result+Codable.swift */,
 				8DD642C0248AAD8A006C94D2 /* Utils.swift */,
+				8D2A332A2522C3C600D58130 /* Error+Additions.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -2176,6 +2179,7 @@
 				A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */,
 				8D417ED9241844FA00FEE587 /* FloatingPoint+Additions.swift in Sources */,
 				A840875B190F7666A1BD98E5 /* UIView+AutoLayoutViewGroup.m in Sources */,
+				8D2A332B2522C3C600D58130 /* Error+Additions.swift in Sources */,
 				A8408B83167EBE21E215C471 /* OnboardingView.m in Sources */,
 				A84088BD3CFC8C511F22182C /* RoyalSkyButton.m in Sources */,
 				A8408161701C8F50F52866FC /* LayerAutoResizeUIView.m in Sources */,
