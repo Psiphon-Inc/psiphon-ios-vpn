@@ -33,9 +33,9 @@ typealias ReceiptReducerEnvironment = (
     dateCompare: DateCompare
 )
 
-func receiptReducer(
-    state: inout ReceiptState, action: ReceiptStateAction, environment: ReceiptReducerEnvironment
-) -> [Effect<ReceiptStateAction>] {
+let receiptReducer = Reducer<ReceiptState, ReceiptStateAction, ReceiptReducerEnvironment> {
+    state, action, environment in
+    
     switch action {
     case .localReceiptRefresh:
          return [

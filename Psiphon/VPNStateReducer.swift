@@ -68,11 +68,6 @@ typealias VPNReducerState<T: TunnelProviderManager> =
 typealias VPNStateAction<T: TunnelProviderManager> =
     SerialEffectAction<VPNProviderManagerStateAction<T>>
 
-func makeVpnStateReducer<T: TunnelProviderManager>(feedbackLogger: FeedbackLogger)
-    -> Reducer<VPNReducerState<T>, VPNStateAction<T>, VPNReducerEnvironment<T>> {
-        makeSerialEffectReducer(vpnProviderManagerStateReducer, feedbackLogger: feedbackLogger)
-}
-
 /// `TunnelProviderStartStopAction` represents start/stop actions for tunnel provider.
 enum TunnelProviderStartStopAction: Int {
     case startPsiphonTunnel
@@ -160,213 +155,222 @@ typealias VPNReducerEnvironment<T: TunnelProviderManager> = (
     internetReachability: InternetReachability
 )
 
-fileprivate func vpnProviderManagerStateReducer<T: TunnelProviderManager>(
-    state: inout VPNProviderManagerReducerState<T>, action: VPNProviderManagerStateAction<T>,
-    environment: VPNReducerEnvironment<T>
-) -> [Effect<VPNProviderManagerStateAction<T>>] {
-    switch action {
-
-    case ._tpmEffectResultWrapper(let tunnelProviderAction):
-        return tunnelProviderReducer(state: &state.vpnState, action: tunnelProviderAction,
-                                     environment: environment)
+func vpnStateReducer<T: TunnelProviderManager>(
+    feedbackLogger: FeedbackLogger
+) -> Reducer<VPNReducerState<T>, VPNStateAction<T>, VPNReducerEnvironment<T>> {
+    
+    Reducer<VPNProviderManagerReducerState<T>
+            , VPNProviderManagerStateAction<T>
+            , VPNReducerEnvironment<T>>
+    { state, action, environment in
         
-    case ._vpnStatusDidChange(let vpnStatus):
-        return vpnStatusDidChangeReducer(
-            state: &state.vpnState,
-            vpnStatus: vpnStatus,
-            sharedDB: environment.sharedDB
-        )
+        switch action {
         
-    case .startPsiphonTunnel:
-        return startPsiphonTunnelReducer(state: &state, environment: environment)
-        
-    case .stopVPN:
-        guard state.vpnState.noPendingProviderStartStopAction else {
-            environment.feedbackLogger.fatalError("""
+        case ._tpmEffectResultWrapper(let tunnelProviderAction):
+            return tunnelProviderReducer(state: &state.vpnState, action: tunnelProviderAction,
+                                         environment: environment)
+            
+        case ._vpnStatusDidChange(let vpnStatus):
+            return vpnStatusDidChangeReducer(
+                state: &state.vpnState,
+                vpnStatus: vpnStatus,
+                sharedDB: environment.sharedDB
+            )
+            
+        case .startPsiphonTunnel:
+            return startPsiphonTunnelReducer(state: &state, environment: environment)
+            
+        case .stopVPN:
+            guard state.vpnState.noPendingProviderStartStopAction else {
+                environment.feedbackLogger.fatalError("""
                 cannot stopVPN since there is pending action \
                 '\(String(describing: state.vpnState.startStopState))'
                 """)
-            return []
-        }
-        
-        guard case .loaded(let tpm) = state.vpnState.loadState.value,
-            tpm.connectionStatus.providerNotStopped else {
                 return []
-        }
-        
-        state.vpnState.startStopState = .pending(.stopVPN)
-        
-        return [
-            updateConfig(tpm, for: .stopVPN)
-                .flatMap(.latest, saveAndLoadConfig)
-                .flatMap(.latest) { result -> Effect<TPMEffectResultWrapper<T>> in
-                    switch result {
-                    case .success(let tpm):
-                        return stopVPN(tpm)
-                            .map { .stopTunnelResult(.unit) }
-                            .prefix(value: .configUpdated(.success(tpm)))
-                    case .failure(let errorEvent):
-                        return Effect(value:
-                            .configUpdated(.failure(errorEvent.map { .failedConfigLoadSave($0) }))
-                        )
-                    }
-            }.map {
-                ._tpmEffectResultWrapper($0)
             }
-        ]
-        
-    case .public(let publicAction):
-        switch publicAction {
-        case .appLaunched:
-            // Loads current VPN configuration from VPN preferences.
-            // After VPN configuration is loaded, `.syncWithProvider` action is sent.
             
-            guard case .nonLoaded = state.vpnState.loadState.value else {
-                environment.feedbackLogger.fatalError("Expected load status of '.nonLoaded' at app launch")
+            guard case .loaded(let tpm) = state.vpnState.loadState.value,
+                  tpm.connectionStatus.providerNotStopped else {
                 return []
             }
-            state.vpnState.providerSyncResult = .pending
+            
+            state.vpnState.startStopState = .pending(.stopVPN)
+            
             return [
-                loadAllConfigs().map { ._tpmEffectResultWrapper(.configUpdated($0)) },
-                Effect(value: .public(.syncWithProvider(reason: .appLaunched)))
+                updateConfig(tpm, for: .stopVPN)
+                    .flatMap(.latest, saveAndLoadConfig)
+                    .flatMap(.latest) { result -> Effect<TPMEffectResultWrapper<T>> in
+                        switch result {
+                        case .success(let tpm):
+                            return stopVPN(tpm)
+                                .map { .stopTunnelResult(.unit) }
+                                .prefix(value: .configUpdated(.success(tpm)))
+                        case .failure(let errorEvent):
+                            return Effect(value:
+                                            .configUpdated(.failure(errorEvent.map { .failedConfigLoadSave($0) }))
+                            )
+                        }
+                    }.map {
+                        ._tpmEffectResultWrapper($0)
+                    }
             ]
             
-        case .syncWithProvider(reason: let reason):
-            guard case .loaded(let tpm) = state.vpnState.loadState.value else {
-                state.vpnState.providerSyncResult = .completed(.none)
-                return []
-            }
-            
-            switch reason {
+        case .public(let publicAction):
+            switch publicAction {
             case .appLaunched:
-                // At app launch, `state.vpnState.providerSyncResult` defaults to `.pending`.
-                guard case .pending = state.vpnState.providerSyncResult else {
-                    environment.feedbackLogger.fatalError("""
+                // Loads current VPN configuration from VPN preferences.
+                // After VPN configuration is loaded, `.syncWithProvider` action is sent.
+                
+                guard case .nonLoaded = state.vpnState.loadState.value else {
+                    environment.feedbackLogger.fatalError(
+                        "Expected load status of '.nonLoaded' at app launch")
+                    return []
+                }
+                state.vpnState.providerSyncResult = .pending
+                return [
+                    loadAllConfigs().map { ._tpmEffectResultWrapper(.configUpdated($0)) },
+                    Effect(value: .public(.syncWithProvider(reason: .appLaunched)))
+                ]
+                
+            case .syncWithProvider(reason: let reason):
+                guard case .loaded(let tpm) = state.vpnState.loadState.value else {
+                    state.vpnState.providerSyncResult = .completed(.none)
+                    return []
+                }
+                
+                switch reason {
+                case .appLaunched:
+                    // At app launch, `state.vpnState.providerSyncResult` defaults to `.pending`.
+                    guard case .pending = state.vpnState.providerSyncResult else {
+                        environment.feedbackLogger.fatalError("""
                         Expected sync '.pending' synced state at app launch \
                         instead got \(state.vpnState.providerSyncResult)
                         """)
-                    return []
-                }
-                return [
-                    syncStateWithProvider(syncReason: reason, tpm, environment.feedbackLogger)
-                        .map { ._tpmEffectResultWrapper($0) }
-                ]
-                
-            case .appEnteredForeground:
-                guard case .completed(_) = state.vpnState.providerSyncResult else {
-                    return []
-                }
-                state.vpnState.providerSyncResult = .pending
-                return [
-                    syncStateWithProvider(syncReason: reason, tpm, environment.feedbackLogger).map {
-                        ._tpmEffectResultWrapper($0)
+                        return []
                     }
-                ]
-                
-            case .providerNotificationPsiphonTunnelConnected:
-                guard case .completed(_) = state.vpnState.providerSyncResult else {
-                    environment.feedbackLogger.fatalError("""
+                    return [
+                        syncStateWithProvider(syncReason: reason, tpm, environment.feedbackLogger)
+                            .map { ._tpmEffectResultWrapper($0) }
+                    ]
+                    
+                case .appEnteredForeground:
+                    guard case .completed(_) = state.vpnState.providerSyncResult else {
+                        return []
+                    }
+                    state.vpnState.providerSyncResult = .pending
+                    return [
+                        syncStateWithProvider(
+                            syncReason: reason, tpm, environment.feedbackLogger
+                        ).map {
+                            ._tpmEffectResultWrapper($0)
+                        }
+                    ]
+                    
+                case .providerNotificationPsiphonTunnelConnected:
+                    guard case .completed(_) = state.vpnState.providerSyncResult else {
+                        environment.feedbackLogger.fatalError("""
                     Expected sync '.completed(_)' synced state \
                         instead got \(state.vpnState.providerSyncResult)
                     """)
+                        return []
+                    }
+                    state.vpnState.providerSyncResult = .pending
+                    return [
+                        syncStateWithProvider(syncReason: reason, tpm, environment.feedbackLogger)
+                            .map { ._tpmEffectResultWrapper($0) }
+                    ]
+                }
+                
+            case .reinstallVPNConfig:
+                if case let .loaded(tpm) = state.vpnState.loadState.value {
+                    // Returned effect calls `stop()` on the tunnel provider manager object first,
+                    // before removing the VPN config.
+                    return [
+                        stopVPN(tpm).flatMap(.latest) {
+                            removeFromPreferences(tpm)
+                                .flatMap(.latest) { result -> Effect<TPMEffectResultWrapper<T>> in
+                                    switch result {
+                                    case .success(()):
+                                        return installNewVPNConfig()
+                                        
+                                    case .failure(let errorEvent):
+                                        return Effect(value:
+                                                        .configUpdated(
+                                                            .failure(errorEvent.map{ .failedRemovingConfigs([$0]) })
+                                                        )
+                                        )
+                                    }
+                                }.map {
+                                    ._tpmEffectResultWrapper($0)
+                                }
+                        }
+                    ]
+                } else {
+                    return [ installNewVPNConfig().map { ._tpmEffectResultWrapper($0) } ]
+                }
+                
+            case let .tunnelStateIntent(intent, reason):
+                if intent == state.vpnState.tunnelIntent {
                     return []
                 }
-                state.vpnState.providerSyncResult = .pending
-                return [
-                    syncStateWithProvider(syncReason: reason, tpm, environment.feedbackLogger)
-                        .map { ._tpmEffectResultWrapper($0) }
-                ]
-            }
-            
-        case .reinstallVPNConfig:
-            if case let .loaded(tpm) = state.vpnState.loadState.value {
-                // Returned effect calls `stop()` on the tunnel provider manager object first,
-                // before removing the VPN config.
-                return [
-                    stopVPN(tpm).flatMap(.latest) {
-                        removeFromPreferences(tpm)
-                            .flatMap(.latest) { result -> Effect<TPMEffectResultWrapper<T>> in
-                                switch result {
-                                case .success(()):
-                                    return installNewVPNConfig()
-                                    
-                                case .failure(let errorEvent):
-                                    return Effect(value:
-                                        .configUpdated(
-                                            .failure(errorEvent.map{ .failedRemovingConfigs([$0]) })
-                                        )
-                                    )
-                                }
-                        }.map {
-                            ._tpmEffectResultWrapper($0)
-                        }
-                    }
-                ]
-            } else {
-                return [ installNewVPNConfig().map { ._tpmEffectResultWrapper($0) } ]
-            }
-            
-        case let .tunnelStateIntent(intent, reason):
-            if intent == state.vpnState.tunnelIntent {
-                return []
-            }
-            
-            var effects = [Effect<VPNProviderManagerStateAction<T>>]()
-            
-            effects.append(
-                environment.feedbackLogger.log(
-                    .info, tag: "VPNStateIntent",
-                    """
+                
+                var effects = [Effect<VPNProviderManagerStateAction<T>>]()
+                
+                effects.append(
+                    environment.feedbackLogger.log(
+                        .info, tag: "VPNStateIntent",
+                        """
                     tunnel state intent changed: intent: \(makeFeedbackEntry(intent)) \
                     reason: \(makeFeedbackEntry(reason))
                     """
-                ).mapNever()
-            )
-            
-            switch intent {
-            case .start(transition: .none):
-                // Starts Psiphon tunnel.
-                let intentUpdateEffect = state.vpnState.tunnelIntent.updateState(
-                    newValue: .start(transition: .none),
-                    sharedDB: environment.sharedDB
+                    ).mapNever()
                 )
                 
-                return [
-                    intentUpdateEffect.mapNever(),
-                    Effect(value: .startPsiphonTunnel)
-                ] + effects
-                
-            case .start(transition: .restart):
-                // Restarts tunnel provider if not stopped.
-                guard case let .loaded(tpm) = state.vpnState.loadState.value,
-                    tpm.connectionStatus.providerNotStopped else {
+                switch intent {
+                case .start(transition: .none):
+                    // Starts Psiphon tunnel.
+                    let intentUpdateEffect = state.vpnState.tunnelIntent.updateState(
+                        newValue: .start(transition: .none),
+                        sharedDB: environment.sharedDB
+                    )
+                    
+                    return [
+                        intentUpdateEffect.mapNever(),
+                        Effect(value: .startPsiphonTunnel)
+                    ] + effects
+                    
+                case .start(transition: .restart):
+                    // Restarts tunnel provider if not stopped.
+                    guard case let .loaded(tpm) = state.vpnState.loadState.value,
+                          tpm.connectionStatus.providerNotStopped else {
                         return effects
+                    }
+                    
+                    let intentUpdateEffect = state.vpnState.tunnelIntent.updateState(
+                        newValue: .start(transition: .restart),
+                        sharedDB: environment.sharedDB
+                    )
+                    
+                    return [
+                        intentUpdateEffect.mapNever(),
+                        Effect(value: .stopVPN)
+                    ] + effects
+                    
+                case .stop:
+                    // Stops tunnel provider.
+                    
+                    let intentUpdateEffect = state.vpnState.tunnelIntent.updateState(
+                        newValue: .stop,
+                        sharedDB: environment.sharedDB
+                    )
+                    return [
+                        intentUpdateEffect.mapNever(),
+                        Effect(value: .stopVPN)
+                    ] + effects
                 }
-                
-                let intentUpdateEffect = state.vpnState.tunnelIntent.updateState(
-                    newValue: .start(transition: .restart),
-                    sharedDB: environment.sharedDB
-                )
-                
-                return [
-                    intentUpdateEffect.mapNever(),
-                    Effect(value: .stopVPN)
-                ] + effects
-                
-            case .stop:
-                // Stops tunnel provider.
-
-                let intentUpdateEffect = state.vpnState.tunnelIntent.updateState(
-                    newValue: .stop,
-                    sharedDB: environment.sharedDB
-                )
-                return [
-                    intentUpdateEffect.mapNever(),
-                    Effect(value: .stopVPN)
-                ] + effects
             }
         }
-    }
+    }.serializeEffects(feedbackLogger: feedbackLogger)
 }
 
 fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(

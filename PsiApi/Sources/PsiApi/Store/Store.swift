@@ -21,56 +21,72 @@ import Foundation
 import Promises
 import ReactiveSwift
 
-public typealias Reducer<Value, Action, Environment> =
-    (inout Value, Action, Environment) -> [Effect<Action>]
-
-public func combine<Value, Action, Environment>(
-    _ reducers: Reducer<Value, Action, Environment>...
-) -> Reducer<Value, Action, Environment> {
-    return { value, action, environment in
-        let effects = reducers.flatMap { $0(&value, action, environment) }
-        return effects
+public struct Reducer<Value: Equatable, Action, Environment> {
+    
+    private let reducer: (inout Value, Action, Environment) -> [Effect<Action>]
+    
+    public init(_ reducer: @escaping (inout Value, Action, Environment) -> [Effect<Action>]) {
+        self.reducer = reducer
     }
+    
+    public func callAsFunction(
+        _ value: inout Value, _ action: Action, _ environment: Environment
+    ) -> [Effect<Action>] {
+        self.reducer(&value, action, environment)
+    }
+    
 }
 
-public func pullback<LocalValue, GlobalValue, LocalAction, GlobalAction, LocalEnv, GlobalEnv>(
-    _ localReducer: @escaping Reducer<LocalValue, LocalAction, LocalEnv>,
-    value valuePath: WritableKeyPath<GlobalValue, LocalValue>,
-    action actionPath: WritableKeyPath<GlobalAction, LocalAction?>,
-    environment toLocalEnvironment: @escaping (GlobalEnv) -> (LocalEnv)
-) -> Reducer<GlobalValue, GlobalAction, GlobalEnv> {
-    return { globalValue, globalAction, globalEnv in
-
-        // Converts GlobalAction into LocalAction accepted by `localReducer`.
-        guard let localAction = globalAction[keyPath: actionPath] else { return [] }
-
-        let effects = localReducer(&globalValue[keyPath: valuePath], localAction,
-                                   toLocalEnvironment(globalEnv))
-
-        // Pulls local action into global action.
-        let pulledLocalEffects = effects.map { localEffect in
-            localEffect.map { localAction -> GlobalAction in
-                var globalAction = globalAction
-                globalAction[keyPath: actionPath] = localAction
-                return globalAction
-            }
+public extension Reducer {
+    
+    static func combine(_ reducers: Reducer<Value, Action, Environment>...) -> Self {
+        .init { value, action, environment in
+            let effects = reducers.flatMap { $0(&value, action, environment) }
+            return effects
         }
-
-        return pulledLocalEffects
     }
+
+    
+    func pullback<GlobalValue, GlobalAction, GlobalEnvironment>(
+        value valuePath: WritableKeyPath<GlobalValue, Value>,
+        action actionPath: WritableKeyPath<GlobalAction, Action?>,
+        environment toLocalEnvironment: @escaping (GlobalEnvironment) -> (Environment)
+    ) -> Reducer<GlobalValue, GlobalAction, GlobalEnvironment> {
+        .init { globalValue, globalAction, globalEnv in
+
+            // Converts GlobalAction into LocalAction accepted by `self.reducer`.
+            guard let localAction = globalAction[keyPath: actionPath] else { return [] }
+
+            let effects: [Effect<Action>] = self(&globalValue[keyPath: valuePath],
+                                                 localAction,
+                                                 toLocalEnvironment(globalEnv))
+
+            // Pulls local action into global action.
+            let pulledLocalEffects: [Effect<GlobalAction>] = effects.map { localEffect in
+                localEffect.map { localAction -> GlobalAction in
+                    var globalAction = globalAction
+                    globalAction[keyPath: actionPath] = localAction
+                    return globalAction
+                }
+            }
+
+            return pulledLocalEffects
+        }
+    }
+    
 }
+
 
 /// An event-driven state machine that runs it's effects on the main thread.
 /// Can be observed from any other thread, however, events can only be sent to it on the main-thread.
 public final class Store<Value: Equatable, Action> {
     public typealias OutputType = Value
     public typealias OutputErrorType = Never
-    public typealias StoreReducer = Reducer<Value, Action, ()>
 
     @State public private(set) var value: Value
 
     private let dispatcher: Dispatcher
-    private var reducer: StoreReducer!
+    private var reducer: Reducer<Value, Action, ()>!
     private var disposable: Disposable? = .none
     private var effectDisposables = CompositeDisposable()
     private let feedbackLogger: FeedbackLogger
@@ -80,7 +96,7 @@ public final class Store<Value: Equatable, Action> {
     
     public init<Environment>(
         initialValue: Value,
-        reducer: @escaping Reducer<Value, Action, Environment>,
+        reducer: Reducer<Value, Action, Environment>,
         dispatcher: Dispatcher,
         feedbackLogger: FeedbackLogger,
         environment makeEnvironment: (Store<Value, Action>) -> Environment
@@ -90,13 +106,13 @@ public final class Store<Value: Equatable, Action> {
         self.feedbackLogger = feedbackLogger
         
         let environment = makeEnvironment(self)
-        self.reducer = { value, action, _ in
+        self.reducer = .init { value, action, _ in
             reducer(&value, action, environment)
         }
     }
     
     private init(dispatcher: Dispatcher, feedbackLogger: FeedbackLogger,
-                 initialValue: Value, reducer: @escaping StoreReducer) {
+                 initialValue: Value, reducer: Reducer<Value, Action, ()>) {
         self.reducer = reducer
         self.value = initialValue
         self.dispatcher = dispatcher
@@ -111,7 +127,7 @@ public final class Store<Value: Equatable, Action> {
     public func send(_ action: Action) {
         self.dispatcher.dispatch { [unowned self] in
             // Executes the reducer and collects the effects
-            let effects = self.reducer!(&self.value, action, ())
+            let effects = self.reducer(&self.value, action, ())
             
             self.outstandingEffectCount += effects.count
 
@@ -145,7 +161,7 @@ public final class Store<Value: Equatable, Action> {
             dispatcher: self.dispatcher,
             feedbackLogger: self.feedbackLogger,
             initialValue: toLocalValue(self.value),
-            reducer: { localValue, localAction, _ in
+            reducer: .init { localValue, localAction, _ in
                 // Local projection sends actions to the global MainStore.
                 self.send(toGlobalAction(localAction))
                 // Updates local stores value immediately.

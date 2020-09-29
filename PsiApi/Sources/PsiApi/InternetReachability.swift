@@ -53,15 +53,16 @@ public struct ReachabilityState: Equatable {
     }
 }
 
-public func internetReachabilityReducer(
-    state: inout ReachabilityState, action: ReachabilityAction, environment: ()
-) -> [Effect<ReachabilityAction>] {
+public let internetReachabilityReducer = Reducer<ReachabilityState, ReachabilityAction, ()> {
+    state, action, environment in
+    
     switch action {
     case let .reachabilityStatus(updatedStatus, updatedCodedStatus):
         state.networkStatus = updatedStatus
         state.codedStatus = updatedCodedStatus
         return []
     }
+    
 }
 
 public protocol InternetReachability {

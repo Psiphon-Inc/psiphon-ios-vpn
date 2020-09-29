@@ -51,72 +51,75 @@ public struct SerialEffectState<Value: Equatable, Action: Equatable>: Equatable 
     
 }
 
-public func makeSerialEffectReducer<Value, Action: Equatable, Environment>(
-    _ reducer: @escaping Reducer<Value, Action, Environment>,
-    feedbackLogger: FeedbackLogger
-) -> Reducer<SerialEffectState<Value, Action>, SerialEffectAction<Action>, Environment> {
-    return { serialEffectState, serialEffectAction, environment in
+extension Reducer where Action: Equatable {
 
-        let actionToRun: Action
-        
-        switch serialEffectAction {
-        case ._effectCompleted:
-            guard serialEffectState.pendingEffectCompletion else {
-                feedbackLogger.fatalError("Expected 'pendingEffectCompletion' to be true")
-                return []
-            }
+    public func serializeEffects(
+        feedbackLogger: FeedbackLogger
+    ) -> Reducer<SerialEffectState<Value, Action>, SerialEffectAction<Action>, Environment> {
+        .init { serialEffectState, serialEffectAction, environment in
             
-            // Actions from pendingEffectActionQueue are prioritized over pendingEffectActionQueue.
-            if let queuedAction = serialEffectState.pendingEffectActionQueue.dequeue() {
-                actionToRun = queuedAction
-            } else if let queuedAction = serialEffectState.pendingActionQueue.dequeue() {
-                actionToRun = queuedAction
-            } else {
-                // There are no more actions in the queues.
-                serialEffectState.pendingEffectCompletion = false
-                return []
-            }
+            let actionToRun: Action
             
-        case ._effectAction(let action):
-            guard !serialEffectState.pendingEffectCompletion else {
-                serialEffectState.pendingEffectActionQueue.enqueue(action)
-                return []
-            }
-            actionToRun = action
-            
-        case .action(let action):
-            // Enqueues the action only if there are no effects pending completion.
-            guard !serialEffectState.pendingEffectCompletion else {
-                serialEffectState.pendingActionQueue.enqueue(action)
-                return []
-            }
-            actionToRun = action
-        }
-        
-        let returnedEffects = reducer(&serialEffectState.value, actionToRun, environment)
-        serialEffectState.pendingEffectCompletion = true
-        
-        guard let effects = NonEmpty(array: returnedEffects) else {
-            return [ Effect(value: ._effectCompleted) ]
-        }
-        
-        var concatenatedEffect = effects.head
-        for effect in effects.tail {
-            concatenatedEffect = concatenatedEffect.concat(effect)
-        }
-        return [
-            concatenatedEffect.materialize().map { event in
-                switch event {
-                case .value(let action):
-                    return ._effectAction(action)
-                case .completed:
-                    return ._effectCompleted
-                case .interrupted:
-                    feedbackLogger.fatalError("Signal interrupted unexpectedly")
-                    return ._effectCompleted
+            switch serialEffectAction {
+            case ._effectCompleted:
+                guard serialEffectState.pendingEffectCompletion else {
+                    feedbackLogger.fatalError("Expected 'pendingEffectCompletion' to be true")
+                    return []
                 }
+                
+                // Actions from pendingEffectActionQueue are prioritized over pendingEffectActionQueue.
+                if let queuedAction = serialEffectState.pendingEffectActionQueue.dequeue() {
+                    actionToRun = queuedAction
+                } else if let queuedAction = serialEffectState.pendingActionQueue.dequeue() {
+                    actionToRun = queuedAction
+                } else {
+                    // There are no more actions in the queues.
+                    serialEffectState.pendingEffectCompletion = false
+                    return []
+                }
+                
+            case ._effectAction(let action):
+                guard !serialEffectState.pendingEffectCompletion else {
+                    serialEffectState.pendingEffectActionQueue.enqueue(action)
+                    return []
+                }
+                actionToRun = action
+                
+            case .action(let action):
+                // Enqueues the action only if there are no effects pending completion.
+                guard !serialEffectState.pendingEffectCompletion else {
+                    serialEffectState.pendingActionQueue.enqueue(action)
+                    return []
+                }
+                actionToRun = action
             }
-        ]
-        
+            
+            let returnedEffects = self(&serialEffectState.value, actionToRun, environment)
+            serialEffectState.pendingEffectCompletion = true
+            
+            guard let effects = NonEmpty(array: returnedEffects) else {
+                return [ Effect(value: ._effectCompleted) ]
+            }
+            
+            var concatenatedEffect = effects.head
+            for effect in effects.tail {
+                concatenatedEffect = concatenatedEffect.concat(effect)
+            }
+            return [
+                concatenatedEffect.materialize().map { event in
+                    switch event {
+                    case .value(let action):
+                        return ._effectAction(action)
+                    case .completed:
+                        return ._effectCompleted
+                    case .interrupted:
+                        feedbackLogger.fatalError("Signal interrupted unexpectedly")
+                        return ._effectCompleted
+                    }
+                }
+            ]
+            
+        }
     }
+    
 }
