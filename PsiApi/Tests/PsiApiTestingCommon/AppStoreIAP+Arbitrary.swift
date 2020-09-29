@@ -89,20 +89,20 @@ extension SignedData: Arbitrary where Decoded == SignedAuthorization {
 }
 
 extension PsiCashExpirableTransaction: Arbitrary {
-    public static var arbitrary: Gen<ExpirableTransaction> {
+    public static var arbitrary: Gen<PsiCashExpirableTransaction> {
         Gen.zip(String.arbitrary, Date.arbitrary, Double.arbitrary.resize(10), SignedData.arbitrary)
             .map {
                 // Applies small time drift in the order of 10s of seconds ($2)
                 // to generated server time ($1).
-                ExpirableTransaction(transactionId: $0, serverTimeExpiry: $1,
-                                     localTimeExpiry: $1 + $2, authorization: $3)
+                PsiCashExpirableTransaction(transactionId: $0, serverTimeExpiry: $1,
+                                            localTimeExpiry: $1 + $2, authorization: $3)
         }
     }
 }
 
 extension PurchasedExpirableProduct: Arbitrary where Product == SpeedBoostProduct {
     public static var arbitrary: Gen<PurchasedExpirableProduct<SpeedBoostProduct>> {
-        Gen.zip(ExpirableTransaction.arbitrary, SpeedBoostProduct.arbitrary)
+        Gen.zip(PsiCashExpirableTransaction.arbitrary, SpeedBoostProduct.arbitrary)
             .map(PurchasedExpirableProduct.init(transaction:product:))
     }
 }
@@ -131,28 +131,50 @@ extension PsiCashParseError: Arbitrary {
     public static var arbitrary: Gen<PsiCashParseError> {
         Gen.fromElements(of: [
             // Should cover all cases.
-            PsiCashParseError.speedBoostParseFailure(message:"Failed to parse")
+            PsiCashParseError.speedBoostParseFailure(message:"Failed to parse"),
+            PsiCashParseError.expirableTransactionParseFailure(message: "Failed to parse")
         ])
     }
 }
 
-extension PsiCashParsed: Arbitrary where Value: Arbitrary {
-    public static var arbitrary: Gen<PsiCashParsed<Value>> {
-        Gen.zip(Value.arbitrary.proliferate, PsiCashParseError.arbitrary.proliferate)
-            .map(PsiCashParsed.init(items:parseErrors:))
-    }
-}
-
-extension PsiCashTokens: Arbitrary {
-    public static var arbitrary: Gen<PsiCashAuthPackage> {
-        Gen.weighted([
-            (1, PsiCashAuthPackage(withTokenTypes: [])),
-            (3, PsiCashAuthPackage.completeAuthPackage),
+extension PsiCashTokenType: Arbitrary {
+    public static var arbitrary: Gen<PsiCashTokenType> {
+        Gen.fromElements(of: [
+            // Should cover all cases.
+            PsiCashTokenType.earner,
+            PsiCashTokenType.spender,
+            PsiCashTokenType.indicator,
+            PsiCashTokenType.account
         ])
     }
     
-    public static let completeAuthPackage = PsiCashTokens(withTokenTypes:
-        ["earner", "indicator", "spender"])
+    /// Gen with a bit of domain-specific knowledge that a PsiCash user either
+    /// has only tracker tokens or an account.
+    ///
+    /// There are three possible values:
+    /// - 1: Empty set.
+    /// - 2: Set of tokens for a tracker.
+    /// - 3: Set of tokens for an account.
+    public static var arbitrarySetOfTokens: Gen<Set<PsiCashTokenType>> {
+        Gen.fromElements(of: [
+            Set([]),
+            
+            Set([.earner, .spender, .indicator]),
+            
+            Set([.earner, .spender, .indicator, .account]),
+        ])
+    }
+}
+
+extension PsiCashAccountType: Arbitrary {
+    public static var arbitrary: Gen<PsiCashAccountType> {
+        Gen.fromElements(of: [
+            // Should cover all possible values.
+            .account(loggedIn: false),
+            .account(loggedIn: true),
+            .tracker
+        ])
+    }
 }
 
 extension PsiCashLibData: Arbitrary {
@@ -167,11 +189,12 @@ extension PsiCashLibData: Arbitrary {
             // Uses generated bool values to determine availability of PsiCash.
             if hasPsiCash {
                 return Gen.zip(
-                    Gen.pure(PsiCashAuthPackage.completeAuthPackage),
+                    PsiCashTokenType.arbitrarySetOfTokens,
+                    PsiCashAccountType.arbitrary,
                     PsiCashAmount.arbitrary,
-                    PsiCashParsed<PsiCashPurchasableType>.arbitrary,
-                    PsiCashParsed<PsiCashPurchasedType>.arbitrary
-                ).map(PsiCashLibData.init(authPackage:balance:availableProducts:activePurchases:))
+                    [PsiCashParsed<PsiCashPurchasableType>].arbitrary,
+                    [PsiCashParsed<PsiCashPurchasedType>].arbitrary
+                ).map(PsiCashLibData.init(validTokens: accountType: balance: availableProducts: activePurchases: ))
             } else {
                 return Gen.pure(PsiCashLibData())
             }
@@ -475,16 +498,12 @@ extension PsiCashBalance: Arbitrary {
 extension IAPReducerState: Arbitrary {
     
     public static var arbitrary: Gen<IAPReducerState> {
-        PsiCashAuthPackage.arbitrary.flatMap { (authPackage: PsiCashAuthPackage) in
-            if authPackage.hasMinimalTokens {
-                return Gen.zip(IAPState.arbitrary, PsiCashBalance.arbitrary,
-                               Gen.pure(PsiCashAuthPackage.completeAuthPackage))
-                    .map(IAPReducerState.init(iap:psiCashBalance:psiCashAuth:))
-            } else {
-                return Gen.zip(IAPState.arbitrary, Gen.pure(PsiCashBalance()),
-                               Gen.pure(PsiCashAuthPackage(withTokenTypes: [])))
-                    .map(IAPReducerState.init(iap:psiCashBalance:psiCashAuth:))
-            }
+        Gen.compose { c in
+            IAPReducerState(
+                iap: c.generate(),
+                psiCashBalance: c.generate(),
+                psiCashAccountType: c.generate()
+            )
         }
     }
     
@@ -493,7 +512,7 @@ extension IAPReducerState: Arbitrary {
     /// ```
     ///  (∀ type, state.iap.purchasing[type] == nil) &&
     ///  state.iap.unverifiedPsiCashTx == nil &&
-    ///  state.psiCashAuth.hasMinimalTokens
+    ///  state.psiCashAccountType ≠ nil
     /// ```
     static let arbitraryWithNonPurchasingState = Gen<IAPReducerState>.compose { c in
         IAPReducerState(
@@ -502,7 +521,7 @@ extension IAPReducerState: Arbitrary {
                 purchasing: [:]
             ),
             psiCashBalance: c.generate(),
-            psiCashAuth: PsiCashTokens.completeAuthPackage
+            psiCashAccountType: c.generate(using: PsiCashAccountType.arbitrary)
         )
     }
     
@@ -561,7 +580,7 @@ extension IAPReducerState: Arbitrary {
     /// `arbitraryWithPendingVerificationPurchaseState` satisfies the following condition:
     ///
     /// ```
-    /// state.iap.unverifiedPsiCashTx != nil
+    /// state.iap.unverifiedPsiCashTx ≠ nil
     /// ```
     static let arbitraryWithPendingVerificationPurchaseState = Gen<IAPReducerState>.compose { c in
         IAPReducerState(
@@ -570,7 +589,7 @@ extension IAPReducerState: Arbitrary {
                 purchasing: c.generate()
             ),
             psiCashBalance: c.generate(),
-            psiCashAuth: c.generate()
+            psiCashAccountType: c.generate()
         )
     }
     
@@ -578,7 +597,7 @@ extension IAPReducerState: Arbitrary {
     ///
     /// ```
     ///  state.iap.unverifiedPsiCashTx == nil &&
-    ///     !(state.psiCashAuth.hasMinimalTokens)
+    ///  state.psiCashAccountType == nil
     /// ```
     static let arbitraryWithMissingPsiCashTokens = Gen<IAPReducerState>.compose { c in
         IAPReducerState(
@@ -587,7 +606,7 @@ extension IAPReducerState: Arbitrary {
                 purchasing: c.generate()
             ),
             psiCashBalance: c.generate(),
-            psiCashAuth: PsiCashTokens(withTokenTypes: [])
+            psiCashAccountType: nil
         )
     }
     
@@ -620,7 +639,7 @@ extension PsiCashRefreshError: Arbitrary {
             Gen.pure(.tunnelNotConnected),
             Gen.pure(.serverError),
             Gen.pure(.invalidTokens),
-            SystemError.arbitrary.map(PsiCashRefreshError.error)
+            String.arbitrary.map(PsiCashRefreshError.error)
         ])
     }
 }
@@ -708,10 +727,13 @@ extension ConsumableIAPPurchase: Arbitrary {
 extension ReceiptData: Arbitrary {
     public static var arbitrary: Gen<ReceiptData> {
         Gen.compose { c in
-            ReceiptData(subscriptionInAppPurchases: c.generate(),
-                        consumableInAppPurchases: c.generate(),
-                        data: Data(), // TODO: currently unused in testing
-                        readDate: c.generate())
+            ReceiptData(
+                filename: "receipt",
+                subscriptionInAppPurchases: c.generate(),
+                consumableInAppPurchases: c.generate(),
+                data: Data(), // TODO: currently unused in testing
+                readDate: c.generate()
+            )
         }
     }
 }
@@ -735,4 +757,14 @@ func compareDates(_ date1: Date, to date2: Date) -> ComparisonResult {
     return Calendar.current.compare(date1,
                                     to: date2,
                                     toGranularity: .second)
+}
+
+extension DateCompare {
+    
+    static let mock = DateCompare { () -> Date in
+        Date()
+    } compareDates: { (date1, date2, granularity) -> ComparisonResult in
+        Calendar.current.compare(date1, to: date2, toGranularity: granularity)
+    }
+    
 }

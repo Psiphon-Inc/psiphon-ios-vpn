@@ -24,6 +24,7 @@ public typealias PsiCashRefreshResult = PendingResult<PsiCashLibData, ErrorEvent
 
 public struct PsiCashEffects {
     
+    /// Initializes PsiCash client lib given path of file store root directory.
     public let initialize: (String?) -> Effect<Result<PsiCashLibData, ErrorRepr>>
     
     public let libData: () -> PsiCashLibData

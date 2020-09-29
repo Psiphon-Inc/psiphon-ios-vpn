@@ -281,7 +281,7 @@ public struct SubscriptionIAPPurchase: RecordedIAPPurchase, Codable {
     
     /// Returns true if given current time, the subscription is almost expired with a granularity of a minute.
     public func isApproximatelyExpired(_ dateCompare: DateCompare) -> Bool {
-        switch dateCompare.compareDates(dateCompare.getCurrentTime(), expires, .minute) {
+        switch dateCompare.compareDates(dateCompare.getCurrentTime(), expires, .second) {
         case .orderedAscending: return false
         case .orderedDescending: return true
         case .orderedSame: return true

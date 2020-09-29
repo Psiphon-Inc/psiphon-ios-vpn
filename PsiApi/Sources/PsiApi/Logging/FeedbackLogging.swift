@@ -70,6 +70,11 @@ final class ArrayFeedbackLogHandler: FeedbackLogHandler {
         logs.append(Log(level: .nonFatal(level), type: type, message: message))
     }
     
+    /// True if all recorded logs are level 'Info' and not above.
+    func allLogsLevelInfo() -> Bool {
+        logs.allSatisfy { $0.level == .nonFatal(.info) }
+    }
+    
 }
 
 public struct LogMessage: ExpressibleByStringLiteral, ExpressibleByStringInterpolation,
