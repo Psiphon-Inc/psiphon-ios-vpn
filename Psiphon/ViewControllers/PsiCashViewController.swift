@@ -98,7 +98,7 @@ final class PsiCashViewController: ReactiveViewController {
         case speedBoostPurchaseDialog
     }
     
-    @objc enum PsiCashViewControllerTabs: Int, UICases {
+    @objc enum PsiCashViewControllerTabs: Int, TabControlViewTabType {
         case addPsiCash
         case speedBoost
         
