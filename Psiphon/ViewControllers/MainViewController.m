@@ -26,7 +26,6 @@
 #import "AvailableServerRegions.h"
 #import "DispatchUtils.h"
 #import "FeedbackManager.h"
-#import "IAPViewController.h"
 #import "Logging.h"
 #import "DebugViewController.h"
 #import "PsiphonConfigUserDefaults.h"
