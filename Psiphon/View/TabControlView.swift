@@ -18,13 +18,16 @@
 */
 
 import UIKit
+import protocol PsiApi.LocalizedUserDescription
 
 fileprivate enum ControlState {
     case normal
     case selected
 }
 
-final class TabControlView<Tabs: UICases>: UIView, Bindable {
+typealias TabControlViewTabType = Hashable & CaseIterable & LocalizedUserDescription
+
+final class TabControlView<Tabs: TabControlViewTabType>: UIView, Bindable {
 
     let borderGradient: CAGradientLayer
     let borderMask: CAShapeLayer
