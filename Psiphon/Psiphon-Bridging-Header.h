@@ -29,7 +29,6 @@
 
 // Utilities
 #import "AppInfo.h"
-#import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "Notifier.h"
 #import "AppDelegate.h"
@@ -55,3 +54,12 @@
 // Ads
 #import "AdControllerWrapper.h"
 
+// Data stores
+#import "PsiphonConfigReader.h"
+#import "PsiphonDataSharedDB.h"
+#import "PsiphonConfigUserDefaults.h"
+
+// Feedback
+#import "Feedback.h"
+#import "JetsamTracking.h"
+#import "JetsamMetrics+Feedback.h"
