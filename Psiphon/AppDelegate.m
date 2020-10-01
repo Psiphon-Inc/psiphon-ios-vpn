@@ -76,7 +76,7 @@ PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
     self = [super init];
     if (self) {
         pendingStartStopSignalCompletion = FALSE;
-        _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+        _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
     }
     return self;
