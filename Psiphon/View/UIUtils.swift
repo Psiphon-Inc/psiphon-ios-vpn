@@ -315,17 +315,18 @@ func setBackgroundGradient(for view: UIView) {
 // MARK: AutoLayout
 
 enum Anchor {
-    case top(Float = 0)
-    case leading(Float = 0)
-    case trailing(Float = 0)
-    case bottom(Float = 0)
-    case centerX(Float = 0)
-    case centerY(Float = 0)
-    case width(const: Float = 0, multiplier: Float = 0)
-    case height(const: Float = 0, multiplier: Float = 0)
+    case top(Float = 0.0, UILayoutPriority = .required)
+    case leading(Float = 0.0, UILayoutPriority = .required)
+    case trailing(Float = 0.0, UILayoutPriority = .required)
+    case bottom(Float = 0.0, UILayoutPriority = .required)
+    case centerX(Float = 0.0, UILayoutPriority = .required)
+    case centerY(Float = 0.0, UILayoutPriority = .required)
+    case width(const: Float = 0.0, multiplier: Float = 1.0, UILayoutPriority = .required)
+    case height(const: Float = 0.0, multiplier: Float = 1.0, UILayoutPriority = .required)
 }
 
 protocol Anchorable {
+    
     var leadingAnchor: NSLayoutXAxisAnchor { get }
 
     var trailingAnchor: NSLayoutXAxisAnchor { get }
@@ -360,40 +361,70 @@ extension Anchorable {
         var constraints = [NSLayoutConstraint]()
         for anchor in anchors {
             switch anchor {
-            case .top(let const):
+            case let .top(const, priority):
                 constraints.append(
-                    self.topAnchor.constraint(equalTo: anchorable.topAnchor,
-                                              constant: CGFloat(const)))
-            case .leading(let const):
+                    self.topAnchor.constraint(
+                        equalTo: anchorable.topAnchor,
+                        constant: CGFloat(const)
+                    ).priority(priority)
+                )
+            case let .leading(const, priority):
                 constraints.append(
-                    self.leadingAnchor.constraint(equalTo: anchorable.leadingAnchor,
-                                                  constant: CGFloat(const)))
-            case .trailing(let const):
+                    self.leadingAnchor.constraint(
+                        equalTo: anchorable.leadingAnchor,
+                        constant: CGFloat(const)
+                    ).priority(priority)
+                )
+                
+            case let .trailing(const, priority):
                 constraints.append(
-                    self.trailingAnchor.constraint(equalTo: anchorable.trailingAnchor,
-                                                   constant: CGFloat(const)))
-            case .bottom(let const):
+                    self.trailingAnchor.constraint(
+                        equalTo: anchorable.trailingAnchor,
+                        constant: CGFloat(const)
+                    ).priority(priority)
+                )
+
+            case let .bottom(const, priority):
                 constraints.append(
-                    self.bottomAnchor.constraint(equalTo: anchorable.bottomAnchor,
-                                                 constant: CGFloat(const)))
-            case .centerX(let const):
+                    self.bottomAnchor.constraint(
+                        equalTo: anchorable.bottomAnchor,
+                        constant: CGFloat(const)
+                    ).priority(priority)
+                )
+
+            case let .centerX(const, priority):
                 constraints.append(
-                    self.centerXAnchor.constraint(equalTo: anchorable.centerXAnchor,
-                                                  constant: CGFloat(const)))
-            case .centerY(let const):
+                    self.centerXAnchor.constraint(
+                        equalTo: anchorable.centerXAnchor,
+                        constant: CGFloat(const)
+                    ).priority(priority)
+                )
+                
+            case let .centerY(const, priority):
                 constraints.append(
-                    self.centerYAnchor.constraint(equalTo: anchorable.centerYAnchor,
-                                                  constant: CGFloat(const)))
-            case let .width(const: const, multiplier: multiplier):
+                    self.centerYAnchor.constraint(
+                        equalTo: anchorable.centerYAnchor,
+                        constant: CGFloat(const)
+                    ).priority(priority)
+                )
+                
+            case let .width(const: const, multiplier: multiplier, priority):
                 constraints.append(
-                    self.widthAnchor.constraint(equalTo: anchorable.widthAnchor,
-                                                multiplier: CGFloat(multiplier),
-                                                constant: CGFloat(const)))
-            case let .height(const: const, multiplier: multiplier):
+                    self.widthAnchor.constraint(
+                        equalTo: anchorable.widthAnchor,
+                        multiplier: CGFloat(multiplier),
+                        constant: CGFloat(const)
+                    ).priority(priority)
+                )
+                
+            case let .height(const: const, multiplier: multiplier, priority):
                 constraints.append(
-                    self.heightAnchor.constraint(equalTo: anchorable.heightAnchor,
-                                                 multiplier: CGFloat(multiplier),
-                                                 constant: CGFloat(const)))
+                    self.heightAnchor.constraint(
+                        equalTo: anchorable.heightAnchor,
+                        multiplier: CGFloat(multiplier),
+                        constant: CGFloat(const)
+                    ).priority(priority)
+                )
             }
         }
         return constraints
