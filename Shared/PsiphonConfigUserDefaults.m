@@ -23,6 +23,9 @@
 #import "UpstreamProxySettings.h"
 #import "SharedConstants.h"
 
+NSString* _Nonnull const PsiphonConfigEgressRegion = @"EgressRegion";
+NSString* _Nonnull const PsiphonConfigUpstreamProxyURL = @"UpstreamProxyUrl";
+NSString* _Nonnull const PsiphonConfigCustomHeaders = @"CustomHeaders";
 
 @implementation PsiphonConfigUserDefaults {
     NSUserDefaults *userDefaults;
@@ -34,7 +37,7 @@
 	static dispatch_once_t once;
 	static id sharedInstance;
 	dispatch_once(&once, ^{
-		sharedInstance = [[self alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
+		sharedInstance = [[self alloc] initWithSuiteName:PsiphonAppGroupIdentifier];
 	});
 	return sharedInstance;
 }
@@ -48,39 +51,39 @@
 }
 
 - (NSString*)egressRegion {
-    return [userDefaults stringForKey:PSIPHON_CONFIG_EGRESS_REGION];
+    return [userDefaults stringForKey:PsiphonConfigEgressRegion];
 }
 
 /*!
  * @return True if new data is saved to disk successfully, FALSE otherwise.
  */
 - (BOOL)setEgressRegion:(NSString *)newRegion {
-    [self setStringValue:newRegion forKey:PSIPHON_CONFIG_EGRESS_REGION];
+    [self setStringValue:newRegion forKey:PsiphonConfigEgressRegion];
     return [userDefaults synchronize];
 }
 
 - (NSDictionary *)dictionaryRepresentation {
     NSMutableDictionary *userConfigs = [[NSMutableDictionary alloc] init];
 
-    NSString *egressRegion = [userDefaults stringForKey:PSIPHON_CONFIG_EGRESS_REGION];
+    NSString *egressRegion = [userDefaults stringForKey:PsiphonConfigEgressRegion];
     if (egressRegion) {
-        [userConfigs setObject:egressRegion forKey:PSIPHON_CONFIG_EGRESS_REGION];
+        [userConfigs setObject:egressRegion forKey:PsiphonConfigEgressRegion];
     }
 
     if ([userDefaults boolForKey:kDisableTimeouts]) {
         [userConfigs setObject:@(0.1) forKey:@"NetworkLatencyMultiplierLambda"];
     }
 
-    NSString *upstreamProxyUrl = [userDefaults stringForKey:PSIPHON_CONFIG_UPSTREAM_PROXY_URL];
+    NSString *upstreamProxyUrl = [userDefaults stringForKey:PsiphonConfigUpstreamProxyURL];
     if (upstreamProxyUrl) {
-        [userConfigs setObject:upstreamProxyUrl forKey:PSIPHON_CONFIG_UPSTREAM_PROXY_URL];
+        [userConfigs setObject:upstreamProxyUrl forKey:PsiphonConfigUpstreamProxyURL];
     }
 
-    id upstreamProxyCustomHeaders = [userDefaults objectForKey:PSIPHON_CONFIG_UPSTREAM_PROXY_CUSTOM_HEADERS];
+    id upstreamProxyCustomHeaders = [userDefaults objectForKey:PsiphonConfigCustomHeaders];
     if ([upstreamProxyCustomHeaders isKindOfClass:[NSDictionary class]]) {
         NSDictionary *customHeaders = (NSDictionary*)upstreamProxyCustomHeaders;
         if ([customHeaders count] > 0) {
-            [userConfigs setObject:customHeaders forKey:PSIPHON_CONFIG_UPSTREAM_PROXY_CUSTOM_HEADERS];
+            [userConfigs setObject:customHeaders forKey:PsiphonConfigCustomHeaders];
         }
     }
 

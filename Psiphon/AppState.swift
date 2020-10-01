@@ -42,6 +42,7 @@ struct AppState: Equatable {
     var pendingLandingPageOpening: Bool = false
     var internetReachability = ReachabilityState()
     var appDelegateState = AppDelegateState()
+    var queuedFeedbacks: [UserFeedback] = []
 }
 
 struct BalanceState: Equatable {
@@ -62,6 +63,7 @@ enum AppAction {
     case subscriptionAuthStateAction(SubscriptionAuthStateAction)
     case productRequest(ProductRequestAction)
     case reachabilityAction(ReachabilityAction)
+    case feedbackAction(FeedbackAction)
 }
 
 // MARK: Environment
@@ -71,13 +73,15 @@ typealias AppEnvironment = (
     feedbackLogger: FeedbackLogger,
     httpClient: HTTPClient,
     psiCashEffects: PsiCashEffects,
-    clientMetaData: () -> ClientMetaData,
+    appInfo: () -> AppInfoProvider,
     sharedDB: PsiphonDataSharedDB,
     userConfigs: UserDefaultsConfig,
     notifier: PsiApi.Notifier,
+    internetReachabilityStatusSignal: SignalProducer<ReachabilityStatus, Never>,
     tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
-    psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>,
     tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
+    subscriptionStatusSignal: SignalProducer<AppStoreIAP.SubscriptionStatus, Never>,
+    psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>,
     urlHandler: URLHandler,
     paymentQueue: PaymentQueue,
     supportedAppStoreProducts: SupportedAppStoreProducts,
@@ -99,7 +103,10 @@ typealias AppEnvironment = (
     /// the VPN to be started. If false is returned the VPN should not be started.
     vpnStartCondition: () -> Bool,
     getCurrentTime: () -> Date,
-    compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
+    compareDates: (Date, Date, Calendar.Component) -> ComparisonResult,
+    getPsiphonConfig: () -> [AnyHashable: Any]?,
+    getAppStateFeedbackEntry: SignalProducer<DiagnosticEntry, Never>,
+    getFeedbackUpload: () -> FeedbackUploadProvider
 )
 
 /// Creates required environment for store `Store<AppState, AppAction>`.
@@ -141,14 +148,16 @@ func makeEnvironment(
         feedbackLogger: feedbackLogger,
         httpClient: HTTPClient.default(urlSession: urlSession),
         psiCashEffects: PsiCashEffects.default(psiCash: psiCashLib, feedbackLogger: feedbackLogger),
-        clientMetaData: { ClientMetaData(AppInfoObjC()) },
+        appInfo: { AppInfoObjC() },
         sharedDB: sharedDB,
         userConfigs: userDefaultsConfig,
         notifier: NotifierObjC(notifier:Notifier.sharedInstance()),
+        internetReachabilityStatusSignal: store.$value.signalProducer.map(\.internetReachability.networkStatus),
         tunnelStatusSignal: store.$value.signalProducer
             .map(\.vpnState.value.providerVPNStatus),
-        psiCashAuthPackageSignal: store.$value.signalProducer.map(\.psiCash.libData.authPackage),
         tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
+        subscriptionStatusSignal: store.$value.signalProducer.map(\.subscription.status),
+        psiCashAuthPackageSignal: store.$value.signalProducer.map(\.psiCash.libData.authPackage),
         urlHandler: .default(),
         paymentQueue: .default,
         supportedAppStoreProducts: supportedAppStoreProducts,
@@ -215,7 +224,19 @@ func makeEnvironment(
         },
         compareDates: { date1, date2, granularity -> ComparisonResult in
             return calendar.compare(date1, to: date2, toGranularity: granularity)
-        }
+        },
+        getPsiphonConfig: {
+            return PsiphonConfigReader.fromConfigFile()?.config
+        },
+        getAppStateFeedbackEntry:
+            store.$value.signalProducer
+            .take(first: 1)
+            .map { appState -> DiagnosticEntry in
+                return appState.feedbackEntry(userDefaultsConfig: UserDefaultsConfig(),
+                                              sharedDB: sharedDB,
+                                              store: store)
+            },
+        getFeedbackUpload: {PsiphonTunnelFeedback()}
     )
     
     let cleanup = { [paymentTransactionDelegate] in
@@ -256,7 +277,7 @@ fileprivate func toIAPReducerEnvironment(env: AppEnvironment) -> IAPEnvironment 
         tunnelStatusSignal: env.tunnelStatusSignal,
         tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
         psiCashEffects: env.psiCashEffects,
-        clientMetaData: env.clientMetaData,
+        appInfo: env.appInfo,
         paymentQueue: env.paymentQueue,
         psiCashPersistedValues: env.userConfigs,
         isSupportedProduct: env.supportedAppStoreProducts.isSupportedProduct(_:),
@@ -317,7 +338,7 @@ fileprivate func toSubscriptionAuthStateReducerEnvironment(
         sharedDB: SharedDBContainerObjC(sharedDB:env.sharedDB),
         tunnelStatusSignal: env.tunnelStatusSignal,
         tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
-        clientMetaData: env.clientMetaData,
+        appInfo: env.appInfo,
         getCurrentTime: env.getCurrentTime,
         compareDates: env.compareDates
     )
@@ -343,6 +364,22 @@ fileprivate func toAppDelegateReducerEnvironment(env: AppEnvironment) -> AppDele
         appReceiptStore: env.appReceiptStore,
         psiCashStore: env.psiCashStore,
         paymentTransactionDelegate: env.paymentTransactionDelegate
+    )
+}
+
+fileprivate func toFeedbackReducerEnvironment(env: AppEnvironment) -> FeedbackReducerEnvironment {
+    FeedbackReducerEnvironment(
+        feedbackLogger: env.feedbackLogger,
+        getFeedbackUpload: env.getFeedbackUpload,
+        internetReachabilityStatusSignal: env.internetReachabilityStatusSignal,
+        tunnelStatusSignal: env.tunnelStatusSignal,
+        tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
+        subscriptionStatusSignal: env.subscriptionStatusSignal,
+        getAppStateFeedbackEntry: env.getAppStateFeedbackEntry,
+        sharedDB: env.sharedDB,
+        appInfo: env.appInfo,
+        getPsiphonConfig: env.getPsiphonConfig,
+        getCurrentTime: env.getCurrentTime
     )
 }
 
@@ -399,7 +436,11 @@ func makeAppReducer(
         pullback(appDelegateReducer,
                  value: \.appDelegateReducerState,
                  action: \.appDelegateAction,
-                 environment: toAppDelegateReducerEnvironment(env:))
+                 environment: toAppDelegateReducerEnvironment(env:)),
+        pullback(feedbackReducer,
+                 value: \.feedbackReducerState,
+                 action: \.feedbackAction,
+                 environment: toFeedbackReducerEnvironment(env:))
     )
 }
 

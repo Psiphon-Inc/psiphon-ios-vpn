@@ -20,9 +20,9 @@
 #import <Foundation/Foundation.h>
 
 // Psiphon config keys
-#define PSIPHON_CONFIG_EGRESS_REGION @"EgressRegion"
-#define PSIPHON_CONFIG_UPSTREAM_PROXY_URL @"UpstreamProxyUrl"
-#define PSIPHON_CONFIG_UPSTREAM_PROXY_CUSTOM_HEADERS @"CustomHeaders"
+FOUNDATION_EXPORT NSString* const PsiphonConfigEgressRegion;
+FOUNDATION_EXPORT NSString* const PsiphonConfigUpstreamProxyURL;
+FOUNDATION_EXPORT NSString* const PsiphonConfigCustomHeaders;
 
 @interface PsiphonConfigUserDefaults : NSObject
 
