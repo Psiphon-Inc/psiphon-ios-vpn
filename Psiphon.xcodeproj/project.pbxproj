@@ -2560,7 +2560,7 @@
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 184;
+				CURRENT_PROJECT_VERSION = 185;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = Q6HLNEX92A;
@@ -2604,7 +2604,7 @@
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 184;
+				CURRENT_PROJECT_VERSION = 185;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
