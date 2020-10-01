@@ -42,17 +42,17 @@ UserDefaultsKey const AppInfoFastLaneSnapShotBoolKey = @"FASTLANE_SNAPSHOT";
 }
 
 + (NSString*)clientRegion {
-    PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+    PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
     return [sharedDB emittedClientRegion];
 }
 
 + (NSString*)propagationChannelId {
-    NSDictionary *configs = [PsiphonConfigReader fromConfigFile].configs;
-    if (!configs) {
+    NSDictionary *config = [PsiphonConfigReader fromConfigFile].config;
+    if (!config) {
         // PsiphonConfigReader has logged an error
         return nil;
     }
-    id propChanId = [configs objectForKey:@"PropagationChannelId"];
+    id propChanId = [config objectForKey:@"PropagationChannelId"];
     if (![propChanId isKindOfClass:[NSString class]]) {
         [PsiFeedbackLogger errorWithType:AppInfoLogType format:@"PropagationChannelId invalid type %@", NSStringFromClass([propChanId class])];
     }
@@ -61,7 +61,7 @@ UserDefaultsKey const AppInfoFastLaneSnapShotBoolKey = @"FASTLANE_SNAPSHOT";
 }
 
 + (NSString*)sponsorId {
-    PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+    PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
     return [sharedDB getCurrentSponsorId];
 }
 

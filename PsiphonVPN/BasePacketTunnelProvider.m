@@ -64,7 +64,7 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
         [PsiFeedbackLogger infoWithType:BasePacketTunnelProviderLogType json:@{@"Event": @"Init",
                                                                                @"PID":@(pid)}];
 
-       _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+       _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
     }
     return self;
 }
@@ -169,7 +169,7 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
           // Note that this directory is not accessible in the container.
           [[[[NSFileManager defaultManager] URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask] lastObject] path],
           // Shared container, containing logs and other data.
-          [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path],
+          [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:PsiphonAppGroupIdentifier] path],
         ];
 
         // Set file protection of all files needed by the extension and Psiphon tunnel framework to NSFileProtectionNone.
@@ -317,7 +317,7 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
 #pragma mark - Boot test
 
 - (NSString *)getBootTestFilePath {
-    return [[[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path]
+    return [[[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:PsiphonAppGroupIdentifier] path]
       stringByAppendingPathComponent:BOOT_TEST_FILE_NAME];
 }
 

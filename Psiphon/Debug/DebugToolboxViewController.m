@@ -45,7 +45,7 @@ NSString * const StateCellIdentifier = @"StateCell";
 - (instancetype)init {
     self = [super init];
     if (self) {
-        _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+        _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
     }
     return self;
 }
@@ -246,7 +246,7 @@ NSString * const StateCellIdentifier = @"StateCell";
 }
 
 - (void)onResetPsiphonDataSharedDB {
-    NSUserDefaults *sharedDB = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
+    NSUserDefaults *sharedDB = [[NSUserDefaults alloc] initWithSuiteName:PsiphonAppGroupIdentifier];
     [self clearUserDefaults:sharedDB];
 }
 

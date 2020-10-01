@@ -39,7 +39,7 @@
     self = [super init];
     if (self) {
         PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc]
-                                         initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+                                         initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
         
         self.subscriptionAuth = [SubscriptionAuthCheck getLatestAuthorizationNotRejected];
         

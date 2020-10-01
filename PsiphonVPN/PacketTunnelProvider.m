@@ -712,16 +712,16 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 - (NSDictionary * _Nullable)getPsiphonConfig {
 
-    NSDictionary *configs = [PsiphonConfigReader fromConfigFile].configs;
-    if (!configs) {
+    NSDictionary *config = [PsiphonConfigReader fromConfigFile].config;
+    if (config == nil) {
         [PsiFeedbackLogger errorWithType:PsiphonTunnelDelegateLogType
-                                 format:@"Failed to get config"];
+                                  format:@"Failed to get config"];
         [self displayCorruptSettingsFileMessage];
         [self exitGracefully];
     }
 
     // Get a mutable copy of the Psiphon configs.
-    NSMutableDictionary *mutableConfigCopy = [configs mutableCopy];
+    NSMutableDictionary *mutableConfigCopy = [config mutableCopy];
 
     // Applying mutations to config
     NSNumber *fd = (NSNumber*)[[self packetFlow] valueForKeyPath:@"socket.fileDescriptor"];
@@ -729,7 +729,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // In case of duplicate keys, value from psiphonConfigUserDefaults
     // will replace mutableConfigCopy value.
     PsiphonConfigUserDefaults *psiphonConfigUserDefaults =
-        [[PsiphonConfigUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
+        [[PsiphonConfigUserDefaults alloc] initWithSuiteName:PsiphonAppGroupIdentifier];
     [mutableConfigCopy addEntriesFromDictionary:[psiphonConfigUserDefaults dictionaryRepresentation]];
 
     mutableConfigCopy[@"PacketTunnelTunFileDescriptor"] = fd;
@@ -748,7 +748,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     NSURL *dataRootDirectory = [PsiphonDataSharedDB dataRootDirectory];
     if (dataRootDirectory == nil) {
         [PsiFeedbackLogger errorWithType:PsiphonTunnelDelegateLogType
-                                 format:@"Failed to get data root directory"];
+                                  format:@"Failed to get data root directory"];
         [self displayCorruptSettingsFileMessage];
         [self exitGracefully];
     }
