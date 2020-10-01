@@ -18,6 +18,7 @@
  */
 
 import UIKit
+import class PsiApi.ReactiveViewController
 
 /// Represents global app styles.
 struct AppStyle {
@@ -226,6 +227,16 @@ extension UITableViewCell {
     var hasContent: Bool {
         return contentView.subviews.count > 0
     }
+}
+
+extension UIStackView {
+    
+    func addArrangedSubviews(_ subviews: UIView...) {
+        for view in subviews {
+            self.addArrangedSubview(view)
+        }
+    }
+    
 }
 
 /// Sets `translatesAutoresizingMaskIntoConstraints` to false for each child of given view.
@@ -481,6 +492,22 @@ extension UIView {
 
     func contentHuggingPriority(lowerThan view: UIView, for axis: NSLayoutConstraint.Axis) {
         self.setContentHuggingPriority(view.contentHuggingPriority(for: axis) - 1, for: axis)
+    }
+    
+    func setContentHuggingPriority(
+        _ values: (priority: UILayoutPriority, axis: NSLayoutConstraint.Axis)...
+    ) {
+        for (priority, axis) in values {
+            self.setContentHuggingPriority(priority, for: axis)
+        }
+    }
+    
+    open func setContentCompressionResistancePriority(
+        _ values: (priority: UILayoutPriority, axis: NSLayoutConstraint.Axis)...
+    ) {
+        for (priority, axis) in values {
+            self.setContentCompressionResistancePriority(priority, for: axis)
+        }
     }
 
     func widthConstraint(to normal: CGFloat, withMax max: CGFloat) -> [NSLayoutConstraint] {

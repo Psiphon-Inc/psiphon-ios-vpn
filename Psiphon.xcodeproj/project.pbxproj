@@ -76,7 +76,7 @@
 		5237387423AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5237387323AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift */; };
 		5245C5C92342A6840033EE13 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5245C5C82342A6840033EE13 /* UserDefaults.swift */; };
 		5246800722D51AA3009AEC6E /* PsiCashWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5246800622D51AA3009AEC6E /* PsiCashWidgetView.swift */; };
-		5246800922D51CE4009AEC6E /* PsiCashBalanceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5246800822D51CE4009AEC6E /* PsiCashBalanceView.swift */; };
+		5246800922D51CE4009AEC6E /* PsiCashBalanceViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5246800822D51CE4009AEC6E /* PsiCashBalanceViewWrapper.swift */; };
 		5246800D22D65926009AEC6E /* UIUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5246800C22D65926009AEC6E /* UIUtils.swift */; };
 		5248B4CE23203781008C00D4 /* SwiftObjCBridges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5248B4CD23203781008C00D4 /* SwiftObjCBridges.swift */; };
 		524B4E6B2316F0E3004E9891 /* BorderedSubtitleButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6A2316F0E3004E9891 /* BorderedSubtitleButton.m */; };
@@ -510,7 +510,7 @@
 		5237387323AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchasingSpeedBoostAlertViewBuilder.swift; sourceTree = "<group>"; };
 		5245C5C82342A6840033EE13 /* UserDefaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaults.swift; sourceTree = "<group>"; };
 		5246800622D51AA3009AEC6E /* PsiCashWidgetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashWidgetView.swift; sourceTree = "<group>"; };
-		5246800822D51CE4009AEC6E /* PsiCashBalanceView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashBalanceView.swift; sourceTree = "<group>"; };
+		5246800822D51CE4009AEC6E /* PsiCashBalanceViewWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashBalanceViewWrapper.swift; sourceTree = "<group>"; };
 		5246800C22D65926009AEC6E /* UIUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UIUtils.swift; sourceTree = "<group>"; };
 		5248B4CD23203781008C00D4 /* SwiftObjCBridges.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftObjCBridges.swift; sourceTree = "<group>"; };
 		524B4E692316F0E3004E9891 /* BorderedSubtitleButton.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BorderedSubtitleButton.h; sourceTree = "<group>"; };
@@ -1189,7 +1189,7 @@
 			isa = PBXGroup;
 			children = (
 				5246800622D51AA3009AEC6E /* PsiCashWidgetView.swift */,
-				5246800822D51CE4009AEC6E /* PsiCashBalanceView.swift */,
+				5246800822D51CE4009AEC6E /* PsiCashBalanceViewWrapper.swift */,
 				52055D05230C833700244F9E /* SpeedBoostButton.swift */,
 				52C8F0AC237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift */,
 				528D81322384823F00AA2D77 /* PsiCashMessageView.swift */,
@@ -2023,7 +2023,7 @@
 				CED6791424A4F82400C4CA81 /* JetsamPerAppVersionStat.m in Sources */,
 				4EB846422151830600687344 /* AvailableServerRegions.m in Sources */,
 				8D7789CA247499110038BFDA /* Reachability+Additions.swift in Sources */,
-				5246800922D51CE4009AEC6E /* PsiCashBalanceView.swift in Sources */,
+				5246800922D51CE4009AEC6E /* PsiCashBalanceViewWrapper.swift in Sources */,
 				8DD642C1248AAD8A006C94D2 /* Utils.swift in Sources */,
 				52D363CF230F112E002C2221 /* TabControlView.swift in Sources */,
 				445F24D620E1A5BA00D004E9 /* xer_decoder.c in Sources */,

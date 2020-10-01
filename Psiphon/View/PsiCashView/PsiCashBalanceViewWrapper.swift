@@ -29,12 +29,12 @@ struct PsiCashBalanceViewModel: Equatable {
     let balanceState: BalanceState
 }
 
-@objc final class PsiCashBalanceView: UIView, Bindable {
+@objc final class PsiCashBalanceViewWrapper: NSObject, ViewWrapper, Bindable {
     typealias BindingType = PsiCashBalanceViewModel
-
     private typealias IconType = EitherView<ImageViewBuilder, EitherView<Spinner, ButtonBuilder>>
 
     private let psiCashPriceFormatter = PsiCashAmountFormatter(locale: Locale.current)
+    private let wrapperView = UIStackView(frame: .zero)
     private let title: UILabel
     private let iconContainer = UIView(frame: .zero)
     private let icon: IconType
@@ -42,10 +42,14 @@ struct PsiCashBalanceViewModel: Equatable {
     private let balanceView: EFCountingLabel
     private let typeface = AvenirFont.bold
     
-    
     private var currentAmount: PsiCashAmount?
+    
+    @objc var view: UIView {
+        wrapperView
+    }
 
-    override init(frame: CGRect) {
+    override init() {
+        
         let titleString = UserStrings.PsiCash_balance().localizedUppercase
         let fontSize: FontSize = .normal
 
@@ -78,50 +82,31 @@ struct PsiCashBalanceViewModel: Equatable {
                            })))
         iconBindable = icon.build(iconContainer)
 
-        super.init(frame: frame)
+        super.init()
+        
+        mutate(self.wrapperView) {
+            $0.axis = .horizontal
+            $0.distribution = .fill
+            $0.alignment = .center
+            $0.autoresizingMask = [ .flexibleWidth ]
+            $0.spacing = 2.0
+        }
+        
+        self.wrapperView.addArrangedSubviews(
+            title,
+            iconContainer,
+            balanceView
+        )
+        
+        iconContainer.activateConstraints {[
+                $0.heightAnchor.constraint(equalToConstant: CGFloat(1.33 * fontSize.rawValue))
+        ]}
         
         balanceView.setUpdateBlock { [unowned self] (value, label) in
             label.text = self.psiCashPriceFormatter.string(from: Double(value).rounded(.down))
         }
         
         balanceView.counter.timingFunction = EFTimingFunction.easeInOut(easingRate: 5)
-
-        layer.masksToBounds = false
-        backgroundColor = .clear
-
-        addSubview(title)
-        addSubview(iconContainer)
-        addSubview(balanceView)
-
-        title.translatesAutoresizingMaskIntoConstraints = false
-        iconContainer.translatesAutoresizingMaskIntoConstraints = false
-        balanceView.translatesAutoresizingMaskIntoConstraints = false
-
-        iconContainer.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
-        iconContainer.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-        iconContainer.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-        iconContainer.setContentHuggingPriority(.defaultHigh, for: .vertical)
-
-        NSLayoutConstraint.activate([
-            title.leadingAnchor.constraint(equalTo: self.leadingAnchor),
-            title.topAnchor.constraint(equalTo: self.topAnchor),
-            title.bottomAnchor.constraint(equalTo: self.bottomAnchor),
-
-            iconContainer.leadingAnchor.constraint(equalTo: title.trailingAnchor, constant: 3.0),
-            iconContainer.centerYAnchor.constraint(equalTo: self.centerYAnchor),
-            iconContainer.heightAnchor.constraint(equalToConstant:
-                CGFloat(1.33 * fontSize.rawValue)),
-            iconContainer.widthAnchor.constraint(equalTo: iconContainer.heightAnchor),
-
-            balanceView.leadingAnchor.constraint(equalTo: iconContainer.trailingAnchor, constant: 5.0),
-            balanceView.trailingAnchor.constraint(equalTo: self.trailingAnchor),
-            balanceView.topAnchor.constraint(equalTo: self.topAnchor),
-            balanceView.bottomAnchor.constraint(equalTo: self.bottomAnchor),
-        ])
-    }
-
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
 
     private func setAmount(_ newAmount: PsiCashAmount?) {
@@ -170,7 +155,7 @@ struct PsiCashBalanceViewModel: Equatable {
 }
 
 // ObjC bindings for updating balance view.
-extension PsiCashBalanceView {
+extension PsiCashBalanceViewWrapper {
 
     @objc func objcBind(_ bindingValue: BridgedBalanceViewBindingType) {
         self.bind(bindingValue.state)
