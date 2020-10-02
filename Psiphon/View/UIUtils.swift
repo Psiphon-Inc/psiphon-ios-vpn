@@ -152,6 +152,39 @@ extension UILabel {
 
 }
 
+extension UIStackView {
+    
+    static func make(
+        axis: NSLayoutConstraint.Axis = .horizontal,
+        distribution: UIStackView.Distribution = .fill,
+        alignment: UIStackView.Alignment = .fill,
+        spacing: CGFloat = 0,
+        margins: (top: CGFloat, bottom: CGFloat)? = nil
+    ) -> UIStackView {
+        let v = UIStackView(frame: .zero)
+        mutate(v) {
+            $0.axis = axis
+            $0.distribution = distribution
+            $0.alignment = alignment
+            $0.spacing = spacing
+            
+            if let margins = margins {
+                $0.isLayoutMarginsRelativeArrangement = true
+                if #available(iOS 11.0, *) {
+                    $0.directionalLayoutMargins = .init(top: margins.top, leading: 0.0,
+                                                        bottom: margins.bottom, trailing: 0)
+                } else {
+                    $0.layoutMargins = .init(top: margins.top, left: 0.0,
+                                             bottom: margins.bottom, right: 0)
+                }
+            }
+            
+        }
+        return v
+    }
+    
+}
+
 extension UITextField {
     
     static func make<TextFieldView: UITextField>(
@@ -325,6 +358,13 @@ func setBackgroundGradient(for view: UIView) {
 
 // MARK: AutoLayout
 
+extension UILayoutPriority {
+    
+    /// Priority value of `UILayoutPriority.requied - 1` (i.e. 999)
+    static let belowRequired = UILayoutPriority(999)
+    
+}
+
 enum Anchor {
     case top(Float = 0.0, UILayoutPriority = .required)
     case leading(Float = 0.0, UILayoutPriority = .required)
@@ -490,8 +530,12 @@ extension UIView {
                                        .trailing(trailing), .bottom(bottom))
     }
 
-    func contentHuggingPriority(lowerThan view: UIView, for axis: NSLayoutConstraint.Axis) {
+    func setContentHuggingPriority(lowerThan view: UIView, for axis: NSLayoutConstraint.Axis) {
         self.setContentHuggingPriority(view.contentHuggingPriority(for: axis) - 1, for: axis)
+    }
+    
+    func setContentHuggingPriority(higherThan view: UIView, for axis: NSLayoutConstraint.Axis) {
+        self.setContentHuggingPriority(view.contentHuggingPriority(for: axis) + 1, for: axis)
     }
     
     func setContentHuggingPriority(
