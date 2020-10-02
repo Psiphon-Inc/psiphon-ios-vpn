@@ -80,6 +80,12 @@ extension ViewControllerLifeCycle {
         viewWillDisappear || viewDidDisappear
     }
     
+    /// Returns true while the view controller life cycle in somewhere between
+    /// `viewDidLoad` and `viewDidAppear` (inclusive).
+    public var viewDidLoadOrAppeared: Bool {
+        viewDidLoad || viewWillAppear || viewDidAppear
+    }
+    
 }
 
 /// ReactiveViewController makes the values of UIViewController lifecycle calls available in a stream

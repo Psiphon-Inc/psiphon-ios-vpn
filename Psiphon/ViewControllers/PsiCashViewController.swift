@@ -187,7 +187,7 @@ final class PsiCashViewController: ReactiveViewController {
             .map(ObservedState.init)
             .skipRepeats()
             .filter { observed in
-                !observed.lifeCycle.viewWillOrDidDisappear
+                observed.lifeCycle.viewDidLoadOrAppeared
             }
             .startWithValues { [unowned self] observed in
                 
