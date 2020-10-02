@@ -245,10 +245,26 @@ extension UIButton {
 
 extension UIImageView {
 
-    static func make(image: String,
-                     contentMode: UIView.ContentMode = .scaleAspectFit) -> UIImageView {
-        let v = UIImageView(image: UIImage(named: image))
+    static func make(
+        image imageName: String? = nil,
+        contentMode: UIView.ContentMode = .scaleAspectFit,
+        easyToShrink: Bool = false
+    ) -> UIImageView {
+        let v = UIImageView(frame: .zero)
+        
+        if let imageName = imageName {
+            v.image = UIImage(named: imageName)
+        }
+        
         v.contentMode = contentMode
+        
+        if easyToShrink {
+            v.setContentCompressionResistancePriority(
+                (.defaultHigh - 1, .vertical),
+                (.defaultHigh - 1, .horizontal)
+            )
+        }
+        
         return v
     }
 

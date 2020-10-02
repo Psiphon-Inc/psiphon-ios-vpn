@@ -35,10 +35,19 @@ struct PsiCashMessageViewUntunneled: ViewBuilder {
     let action: () -> Void
 
     func build(_ container: UIView?) -> ImmutableBindableViewable<Message, UIView> {
-        let root = UIView(frame: .zero)
+        
+        let stackView = UIStackView.make(
+            axis: .vertical,
+            distribution: .fill,
+            alignment: .fill,
+            spacing: Style.default.padding,
+            margins: (top: 5.0, bottom: Style.default.padding)
+        )
 
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
+        let imageView = UIImageView.make(
+            contentMode: .scaleAspectFit,
+            easyToShrink: true
+        )
 
         let title = UILabel.make(fontSize: .h1,
                                  numberOfLines: 0,
@@ -56,29 +65,19 @@ struct PsiCashMessageViewUntunneled: ViewBuilder {
         button.setEventHandler(self.action)
 
         // Add subviews
-        root.addSubviews(imageView, title, subtitle, button)
+        stackView.addArrangedSubviews(
+            imageView,
+            title,
+            subtitle,
+            SpacerView(.flexible),
+            button
+        )
+        
+        button.activateConstraints {[
+            $0.heightAnchor.constraint(equalToConstant: Style.default.largeButtonHeight)
+        ]}
 
-        // Autolayout
-        imageView.activateConstraints {
-            $0.constraintToParent(.top(40), .centerX())
-        }
-
-        title.activateConstraints {
-            $0.constraintToParent(.leading(), .trailing()) +
-                [ $0.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20) ]
-        }
-
-        subtitle.activateConstraints {
-            $0.constraintToParent(.leading(), .trailing()) +
-                [ $0.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 13) ]
-        }
-
-        button.activateConstraints {
-            $0.constraintToParent(.leading(), .trailing(), .bottom(Float(-Style.default.padding))) +
-                [ $0.heightAnchor.constraint(equalToConstant: Style.default.largeButtonHeight) ]
-        }
-
-        return .init(viewable: root) { _ -> ((Message) -> Void) in
+        return .init(viewable: stackView) { _ -> ((Message) -> Void) in
             return { message in
                 switch message {
                 case .speedBoostAlreadyActive:
