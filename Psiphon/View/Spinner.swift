@@ -26,15 +26,40 @@ struct Spinner: ViewBuilder {
         self.style = style
     }
 
-    func build(_ container: UIView?) -> ImmutableBindableViewable<Bool, UIActivityIndicatorView> {
+    // The spinner view needs to be wrapped inside another view so that it can be centred.
+    // Instead of wrapping the spinner inside a new wrapper UIView with a ImmutableBindableViewable,
+    // we can instead reuse the container view that's passed in with a MutableBindableViewable.
+    
+    func build(_ container: UIView?) -> MutableBindableViewable<Bool, UIActivityIndicatorView> {
+        
+        // container will always be passed in for a MutableBindableViewable.
+        guard let container = container else {
+            fatalError()
+        }
+        
         let spinner = UIActivityIndicatorView(style: self.style)
-        return .init(viewable: spinner) { spinner -> ((Bool) -> Void) in
+        
+        container.addSubview(spinner)
+        
+        spinner.activateConstraints {
+            $0.constraintToParent(.centerX(), .centerY()) + [
+                container.widthAnchor.constraint(greaterThanOrEqualTo: $0.widthAnchor),
+                container.heightAnchor.constraint(greaterThanOrEqualTo: $0.heightAnchor)
+            ]
+        }
+        
+        return .init(viewable: spinner) { spinner -> ((Bool) -> UIActivityIndicatorView?) in
             return { animate in
+                // viewable will always be passed in for a MutableBindableViewable.
+                guard let spinner = spinner else {
+                    fatalError()
+                }
                 if animate {
                     spinner.startAnimating()
                 } else {
                     spinner.stopAnimating()
                 }
+                return spinner
             }
         }
     }
