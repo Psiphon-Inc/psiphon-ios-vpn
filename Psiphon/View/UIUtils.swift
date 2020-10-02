@@ -734,8 +734,9 @@ final class ImmutableBindableViewable<BindingType: Equatable, WrappedView: ViewW
 
     var view: UIView { viewable.view }
 
-    let viewable: WrappedView
-    let binding: (BindingType) -> Void
+    private var state: BindingType? = nil
+    private let viewable: WrappedView
+    private let binding: (BindingType) -> Void
 
     init(viewable: WrappedView, _ bindingWrapper: (WrappedView) -> ((BindingType) -> Void)) {
         self.viewable = viewable
@@ -743,6 +744,13 @@ final class ImmutableBindableViewable<BindingType: Equatable, WrappedView: ViewW
     }
 
     func bind(_ newValue: BindingType) {
+        // As an optimization, skips calling bind if `newValue`
+        // is not different from the current state.
+        if let current = self.state, newValue == current {
+            return
+        }
+        self.state = newValue
+        
         binding(newValue)
     }
 
@@ -769,6 +777,7 @@ final class MutableBindableViewable<BindingType: Equatable, WrappedView: ViewWra
 
     var view: UIView { viewable!.view }
 
+    private var state: BindingType? = nil
     private var viewable: WrappedView?
     private let bindingWrapper: (WrappedView?) -> ((BindingType) -> WrappedView?)
 
@@ -779,6 +788,13 @@ final class MutableBindableViewable<BindingType: Equatable, WrappedView: ViewWra
     }
 
     func bind(_ newValue: BindingType) {
+        // As an optimization, skips calling bind if `newValue`
+        // is not different from the current state.
+        if let current = self.state, newValue == current {
+            return
+        }
+        self.state = newValue
+        
         viewable = bindingWrapper(viewable)(newValue)
     }
 
