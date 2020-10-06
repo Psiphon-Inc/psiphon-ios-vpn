@@ -209,4 +209,4 @@ extension String {
 
 // MARK: Default FeedbackDescription conformances
 
-extension Optional: FeedbackDescription {}
+extension Optional: FeedbackDescription where Wrapped: FeedbackDescription {}

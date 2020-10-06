@@ -34,7 +34,7 @@ public enum IAPError: HashableError {
     case storeKitError(PaymentTransaction.TransactionState.TransactionErrorState)
 }
 
-public struct IAPPurchasing: Hashable {
+public struct IAPPurchasing: Hashable, FeedbackDescription {
     public typealias PurchasingState = PendingValue<Payment?, ErrorEvent<IAPError>>
     
     public enum TransactionUniqueness: Equatable {
@@ -119,7 +119,7 @@ public struct IAPPurchasing: Hashable {
 }
 
 /// Represents  a consumable transaction has not been finished, pending verification by the purchase-verifier server.
-public struct UnfinishedConsumableTransaction: Equatable {
+public struct UnfinishedConsumableTransaction: Equatable, FeedbackDescription {
     
     public enum VerificationRequestState: Equatable {
         /// No verification request for this purchase has been made.
