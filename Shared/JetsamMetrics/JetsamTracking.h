@@ -54,7 +54,7 @@ typedef NS_ERROR_ENUM(ContainerJetsamTrackingErrorDomain, ContainerJetsamTrackin
 /// @param registryFilepath Filepath at which to store the registry file (which is used to track file reads).
 /// @param readChunkSize Number of bytes to read at a time.
 /// @param binRanges A collection of bin ranges in which to bin jetsam times.
-/// @param outError  If non-nill on return, then initializing the reader failed with the provided error.
+/// @param outError  If non-nil on return, then initializing the reader failed with the provided error.
 /// @return Returns nil when `outError` is non-nil.
 + (JetsamMetrics *_Nullable)getMetricsFromFilePath:(NSString*)filepath
                                withRotatedFilepath:(NSString*)rotatedFilepath
@@ -85,7 +85,7 @@ typedef NS_ERROR_ENUM(ExtensionJetsamTrackingErrorDomain, ExtensionJetsamTrackin
 /// @param filepath File where the event should be logged.
 /// @param rotatedFilepath Filepath where the logfile should be rotated to when it exceeds the configured max filesize.
 /// @param maxFilesizeBytes Configured max filesize.
-/// @param outError If non-nill on return, then logging the jetsam event failed with the provided error.
+/// @param outError If non-nil on return, then logging the jetsam event failed with the provided error.
 + (void)logJetsamEvent:(JetsamEvent*)jetsamEvent
             toFilepath:(NSString*)filepath
    withRotatedFilepath:(NSString*)rotatedFilepath

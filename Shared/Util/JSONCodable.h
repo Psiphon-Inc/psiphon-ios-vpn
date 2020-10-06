@@ -38,7 +38,7 @@ typedef NS_ERROR_ENUM(JSONCodableErrorDomain, JSONCodableErrorCode) {
 
 /// Recreate object from JSON dictionary.
 /// @param dict Dictionary valid for JSON de-/serialization with NSJSONSerialization (see NSJSONSerialization:isValidJSONObject:).
-/// @param outError If non-nill on return, then initialization failed with the provided error.
+/// @param outError If non-nil on return, then initialization failed with the provided error.
 /// @return Returns nil when `outError` is non-nil.
 + (id)jsonCodableObjectFromJSONDictionary:(NSDictionary*)dict
                                     error:(NSError *_Nullable *)outError;
@@ -50,7 +50,7 @@ typedef NS_ERROR_ENUM(JSONCodableErrorDomain, JSONCodableErrorCode) {
 
 /// Encode object to JSON data.
 /// @param object Object to encode.
-/// @param outError If non-nill on return, then initialization failed with the provided error.
+/// @param outError If non-nil on return, then initialization failed with the provided error.
 /// @return Returns nil when `outError` is non-nil.
 + (NSData *_Nullable)jsonCodableEncodeObject:(id<JSONCodable>)object
                                        error:(NSError *_Nullable *)outError;
@@ -58,7 +58,7 @@ typedef NS_ERROR_ENUM(JSONCodableErrorDomain, JSONCodableErrorCode) {
 /// Decode object from JSON data.
 /// @param aClass JSONCodable class to decode.
 /// @param data Data to decode.
-/// @param outError If non-nill on return, then initialization failed with the provided error.
+/// @param outError If non-nil on return, then initialization failed with the provided error.
 /// @return Returns nil when `outError` is non-nil.
 + (id _Nullable)jsonCodableDecodeObjectofClass:(Class<JSONCodable>)aClass
                                           data:(NSData*)data
