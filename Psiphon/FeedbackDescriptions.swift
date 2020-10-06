@@ -177,10 +177,11 @@ extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
     
 }
 
-extension UserFeedback: CustomStringFeedbackDescription {
+extension UserFeedback: CustomFieldFeedbackDescription {
 
-    public var description: String {
-        "UserFeedback(uploadDiagnostics: \(String(describing: uploadDiagnostics)), submitTime: \(String(describing:submitTime)))"
+    public var feedbackFields: [String: CustomStringConvertible] {
+        ["uploadDiagnostics": uploadDiagnostics,
+         "submitTime": submitTime]
     }
 
 }
