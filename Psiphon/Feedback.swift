@@ -50,14 +50,16 @@ public struct UserFeedback: Equatable {
     let email: String
     let uploadDiagnostics: Bool
     let submitTime: Date
+    let feedbackId: String
 
     public init(selectedThumbIndex: Int, comments: String, email: String,
-                uploadDiagnostics: Bool, submitTime: Date) {
+                uploadDiagnostics: Bool, feedbackId: String, submitTime: Date) {
 
         self.selectedThumbIndex = selectedThumbIndex
         self.comments = comments
         self.email = email
         self.uploadDiagnostics = uploadDiagnostics
+        self.feedbackId = feedbackId
         self.submitTime = submitTime;
     }
 }
@@ -310,9 +312,10 @@ func feedbackJSON(userFeedback: UserFeedback,
                 comments: userFeedback.comments,
                 email: userFeedback.email,
                 sendDiagnosticInfo: userFeedback.uploadDiagnostics,
-                withPsiphonConfig: psiphonConfig,
-                withClientPlatform: "ios-vpn",
-                withConnectionType: reachabilityStatus.connectionTypeForFeedback,
+                feedbackId: userFeedback.feedbackId,
+                psiphonConfig: psiphonConfig,
+                clientPlatform: "ios-vpn",
+                connectionType: reachabilityStatus.connectionTypeForFeedback,
                 isJailbroken: JailbreakCheck.isDeviceJailbroken(),
                 diagnosticEntries: diagnosticEntries,
                 statusEntries: .none)

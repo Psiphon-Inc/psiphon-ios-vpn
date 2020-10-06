@@ -147,9 +147,19 @@ public func feedbackReducer(
         }
         return []
     case .userSubmittedFeedback(let selectedThumbIndex, let comments, let email, let uploadDiagnostics):
+        // Generate feedback ID once per user feedback.
+        // Using the same feedback ID for each upload attempt makes it easier to identify feedbacks
+        // which are uploaded more than once, e.g. the upload succeeds but the connection with the
+        // server is disrupted before the response is received by the client.
+        guard let randomFeedbackId = Feedback.generateId() else {
+            return [
+                environment.feedbackLogger.log(.error, "failed to generate random feedback ID").mapNever()
+            ]
+        }
         state.queuedFeedbacks.append(
             UserFeedback(selectedThumbIndex: selectedThumbIndex, comments: comments, email: email,
-                         uploadDiagnostics: uploadDiagnostics, submitTime: environment.getCurrentTime())
+                         uploadDiagnostics: uploadDiagnostics, feedbackId: randomFeedbackId,
+                         submitTime: environment.getCurrentTime())
         )
 
         let effects: [SignalProducer<FeedbackAction, Never>] =
@@ -277,6 +287,14 @@ fileprivate func sendFeedback(userFeedback: UserFeedback,
                                 }
                             }
 
+                            // Note: It is possible that the upload could succeed at the same moment
+                            // one of the trigger signals (VPN state change, etc.) changes. Then
+                            // there would be a race between the this signal emitting a value and
+                            // it being disposed of, which would result in the value being ignored.
+                            // If this happens, the feedback upload will be attempted again even
+                            // though it already succeeded. For this reason the same feedback ID is
+                            // used for all upload attempts, which will provide visibility into
+                            // these occurrences and allow for mitigation.
                             return
                                 feedbackUpload.sendFeedback(feedbackJson: feedbackJSON,
                                                             feedbackConfigJson: psiphonConfig)
