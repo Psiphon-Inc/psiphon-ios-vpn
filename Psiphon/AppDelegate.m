@@ -258,34 +258,6 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [rootContainerController reloadOnboardingViewController];
 }
 
-#pragma mark - Embedded Server Entries
-
-/*!
- * @brief Updates available egress regions from embedded server entries.
- *
- * This function should only be called once per app version on first launch.
- */
-- (void)updateAvailableEgressRegionsOnFirstRunOfAppVersion {
-    NSString *embeddedServerEntriesPath = PsiphonConfigReader.embeddedServerEntriesPath;
-    NSError *e;
-    NSSet<NSString*> *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:embeddedServerEntriesPath
-                                                                                     error:&e];
-
-    // Note: server entries may have been decoded before the error occurred and
-    // they will be present in the result.
-    if (e != nil) {
-        [PsiFeedbackLogger error:e message:@"Error decoding embedded server entries"];
-    }
-
-    if (embeddedEgressRegions != nil && [embeddedEgressRegions count] > 0) {
-        LOG_DEBUG("Available embedded egress regions: %@.", embeddedEgressRegions);
-        ContainerDB *containerDB = [[ContainerDB alloc] init];
-        [containerDB setEmbeddedEgressRegions:[NSArray arrayWithArray:[embeddedEgressRegions allObjects]]];
-    } else {
-        [PsiFeedbackLogger error:@"Error no egress regions found in %@.", embeddedServerEntriesPath];
-    }
-}
-
 #pragma mark - Notifier callback
 
 - (void)onMessageReceived:(NotifierMessage)message {
@@ -563,6 +535,32 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [[AppDelegate getTopPresentedViewController] presentViewController:navCtrl
                                                          animated:TRUE
                                                        completion:nil];
+}
+
+/*!
+ * @brief Updates available egress regions from embedded server entries.
+ *
+ * This function should only be called once per app version on first launch.
+ */
+- (void)updateAvailableEgressRegionsOnFirstRunOfAppVersion {
+    NSString *embeddedServerEntriesPath = PsiphonConfigReader.embeddedServerEntriesPath;
+    NSError *e;
+    NSSet<NSString*> *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:embeddedServerEntriesPath
+                                                                                     error:&e];
+
+    // Note: server entries may have been decoded before the error occurred and
+    // they will be present in the result.
+    if (e != nil) {
+        [PsiFeedbackLogger error:e message:@"Error decoding embedded server entries"];
+    }
+
+    if (embeddedEgressRegions != nil && [embeddedEgressRegions count] > 0) {
+        LOG_DEBUG("Available embedded egress regions: %@.", embeddedEgressRegions);
+        ContainerDB *containerDB = [[ContainerDB alloc] init];
+        [containerDB setEmbeddedEgressRegions:[NSArray arrayWithArray:[embeddedEgressRegions allObjects]]];
+    } else {
+        [PsiFeedbackLogger error:@"Error no egress regions found in %@.", embeddedServerEntriesPath];
+    }
 }
 
 @end

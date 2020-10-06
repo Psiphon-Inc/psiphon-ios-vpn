@@ -31,7 +31,7 @@ typedef NS_ERROR_ENUM(AppStatsErrorDomain, AppStatsErrorCode) {
 
 @implementation AppStats
 
-+ (vm_size_t)pageSize:(NSError *_Nullable *_Nullable)error {
++ (vm_size_t)pageSize:(NSError *_Nullable *_Nonnull)error {
     vm_size_t page_size;
 
     kern_return_t kerr = host_page_size(mach_host_self(), &page_size);
