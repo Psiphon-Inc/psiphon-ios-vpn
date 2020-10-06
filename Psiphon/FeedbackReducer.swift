@@ -209,8 +209,7 @@ fileprivate func sendFeedback(userFeedback: UserFeedback,
         .combineLatest(environment.internetReachabilityStatusSignal,
                        environment.tunnelStatusSignal,
                        environment.tunnelConnectionRefSignal,
-                       environment.subscriptionStatusSignal,
-                       environment.getAppStateFeedbackEntry)
+                       environment.subscriptionStatusSignal)
 
     return
         triggers
@@ -218,8 +217,7 @@ fileprivate func sendFeedback(userFeedback: UserFeedback,
              return lhs == rhs
          })
         .flatMap(.latest) { (value: (ReachabilityStatus, TunnelProviderVPNStatus,
-                                     TunnelConnection?, AppStoreIAP.SubscriptionStatus,
-                                     DiagnosticEntry))
+                                     TunnelConnection?, AppStoreIAP.SubscriptionStatus))
             -> SignalProducer<SignalTermination<FeedbackAction>, Never> in
 
             let reachabilityStatus = value.0
@@ -254,49 +252,52 @@ fileprivate func sendFeedback(userFeedback: UserFeedback,
                                                appInfo: environment.appInfo()) {
 
             case .success(let psiphonConfig):
-                let appStateFeedbackEntry = value.4
-                let feedback =
-                    feedbackJSON(userFeedback: userFeedback,
-                                 psiphonConfig: psiphonConfig,
-                                 appStateFeedbackEntry: appStateFeedbackEntry,
-                                 sharedDB: environment.sharedDB,
-                                 getCurrentTime: environment.getCurrentTime,
-                                 reachabilityStatus: reachabilityStatus)
+                return environment.getAppStateFeedbackEntry.take(first: 1).flatMap(.latest) { appStateFeedbackEntry in
+                    let feedback =
+                        feedbackJSON(userFeedback: userFeedback,
+                                     psiphonConfig: psiphonConfig,
+                                     appStateFeedbackEntry: appStateFeedbackEntry,
+                                     sharedDB: environment.sharedDB,
+                                     getCurrentTime: environment.getCurrentTime,
+                                     reachabilityStatus: reachabilityStatus)
 
-                switch feedback {
-                case .success(let feedbackJSON):
-                    // Last moment VPN status check.
-                    if let tunnelConnection = value.2 {
-                        if case .connection(let tunnelConnectionVPNStatus) = tunnelConnection.connectionStatus() {
-                            guard tunnelConnectionVPNStatus == .invalid ||
-                                    tunnelConnectionVPNStatus == .disconnected ||
-                                    tunnelConnectionVPNStatus == .connected else {
-                                return
-                                    SignalProducer(value: .value(
-                                                    ._log("waiting for VPN to be disconnected or connected")))
+                    switch feedback {
+                    case .success(let feedbackJSON):
+
+                            // Last moment VPN status check.
+                            if let tunnelConnection = value.2 {
+                                if case .connection(let tunnelConnectionVPNStatus) = tunnelConnection.connectionStatus() {
+                                    guard tunnelConnectionVPNStatus == .invalid ||
+                                            tunnelConnectionVPNStatus == .disconnected ||
+                                            tunnelConnectionVPNStatus == .connected else {
+                                        return
+                                            SignalProducer(value: .value(
+                                                            ._log("waiting for VPN to be disconnected or connected")))
+                                    }
+                                }
                             }
-                        }
+
+                            return
+                                feedbackUpload.sendFeedback(feedbackJson: feedbackJSON,
+                                                            feedbackConfigJson: psiphonConfig)
+                                .flatMap(.concat) {
+                                    (value: FeedbackUploadProviderResult)
+                                    -> SignalProducer<SignalTermination<FeedbackAction>, Never> in
+                                    switch value {
+                                    case .notice(let notice):
+                                        return SignalProducer(value:.value(._feedbackUploadProviderNotice(notice)))
+                                    case .completed(let error):
+                                        return
+                                            SignalProducer(value:.terminate)
+                                            .prefix(value: .value(._feedbackUploadProviderCompleted(error)))
+                                    }
+                                }
+
+                    case .failure(let error):
+                        return
+                            SignalProducer(value:.terminate)
+                            .prefix(value:.value(._feedbackUploadProviderCompleted(.some(error))))
                     }
-
-                    return
-                        feedbackUpload.sendFeedback(feedbackJson: feedbackJSON,
-                                                    feedbackConfigJson: psiphonConfig)
-                        .flatMap(.concat) {
-                            (value: FeedbackUploadProviderResult)
-                            -> SignalProducer<SignalTermination<FeedbackAction>, Never> in
-                            switch value {
-                            case .notice(let notice):
-                                return SignalProducer(value:.value(._feedbackUploadProviderNotice(notice)))
-                            case .completed(let error):
-                                return
-                                    SignalProducer(value:.terminate)
-                                    .prefix(value: .value(._feedbackUploadProviderCompleted(error)))
-                            }
-                        }
-                case .failure(let error):
-                    return
-                        SignalProducer(value:.terminate)
-                        .prefix(value:.value(._feedbackUploadProviderCompleted(.some(error))))
                 }
 
             case .failure(let error):
