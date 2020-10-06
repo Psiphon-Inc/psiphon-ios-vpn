@@ -62,11 +62,6 @@
 		5202011D2360D34000D00C8E /* EitherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5202011C2360D34000D00C8E /* EitherView.swift */; };
 		52055D04230C823100244F9E /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D03230C823100244F9E /* GradientButton.swift */; };
 		52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D05230C833700244F9E /* SpeedBoostButton.swift */; };
-		521FD0EF219E0D5600F748EC /* DebugDirectoryViewerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E5219E0D5500F748EC /* DebugDirectoryViewerViewController.m */; };
-		521FD0F0219E0D5600F748EC /* DebugLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E6219E0D5500F748EC /* DebugLogViewController.m */; };
-		521FD0F1219E0D5600F748EC /* DebugToolboxViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E7219E0D5600F748EC /* DebugToolboxViewController.m */; };
-		521FD0F2219E0D5600F748EC /* DebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0EA219E0D5600F748EC /* DebugViewController.m */; };
-		521FD0F3219E0D5600F748EC /* DebugTextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0EC219E0D5600F748EC /* DebugTextViewController.m */; };
 		521FD0F9219E0DDF00F748EC /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F6219E0DDF00F748EC /* AppStats.m */; };
 		521FD0FA219E0DDF00F748EC /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F8219E0DDF00F748EC /* AppProfiler.m */; };
 		521FD0FD219E0E0F00F748EC /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0FB219E0E0E00F748EC /* DebugUtils.m */; };
@@ -161,7 +156,6 @@
 		9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */; };
 		9BFECEA225F023F895CC8DA1 /* Authorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */; };
 		9BFECF61970F215F32E76280 /* AdMobInterstitialAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC4F42A7FC2F11FF43636 /* AdMobInterstitialAdControllerWrapper.m */; };
-		9BFECF65871BB6B522C33F1E /* UserDefaults.h in Resources */ = {isa = PBXBuildFile; fileRef = 9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */; };
 		9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
 		9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
@@ -201,14 +195,17 @@
 		CE234A7624F46AEC0007709A /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE234A7524F46AEC0007709A /* Feedback.swift */; };
 		CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC941BBDC7B800B83375 /* Assets.xcassets */; };
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */; };
-		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
 		CE551C6A24FBFB8E00011C51 /* PsiphonFeedback+FeedbackUploadProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE551C6924FBFB8E00011C51 /* PsiphonFeedback+FeedbackUploadProvider.swift */; };
 		CE58B642251A31370081C73C /* AppState+Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE58B641251A31370081C73C /* AppState+Feedback.swift */; };
 		CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE93EE5524F55B92001F4EC9 /* SharedConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = CE93EE5424F55B92001F4EC9 /* SharedConstants.m */; };
 		CE93EE5624F55B92001F4EC9 /* SharedConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = CE93EE5424F55B92001F4EC9 /* SharedConstants.m */; };
+		CE8420472522823D00796032 /* DebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE84203D2522823D00796032 /* DebugViewController.m */; };
+		CE8420482522823D00796032 /* DebugToolboxViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE84203F2522823D00796032 /* DebugToolboxViewController.m */; };
+		CE8420492522823D00796032 /* DebugTextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8420432522823D00796032 /* DebugTextViewController.m */; };
+		CE84204A2522823D00796032 /* DebugDirectoryViewerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8420452522823D00796032 /* DebugDirectoryViewerViewController.m */; };
+		CE84204B2522823D00796032 /* DebugLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8420462522823D00796032 /* DebugLogViewController.m */; };
 		CEA1B787249AAA13006D9853 /* EmbeddedServerEntriesTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA1B786249AAA13006D9853 /* EmbeddedServerEntriesTest.m */; };
 		CEA1B788249AB144006D9853 /* EmbeddedServerEntries.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */; };
 		CEA1B789249AB229006D9853 /* EmbeddedServerEntriesHelpers.c in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */; };
@@ -487,16 +484,6 @@
 		5202011C2360D34000D00C8E /* EitherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EitherView.swift; sourceTree = "<group>"; };
 		52055D03230C823100244F9E /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
 		52055D05230C833700244F9E /* SpeedBoostButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedBoostButton.swift; sourceTree = "<group>"; };
-		521FD0E5219E0D5500F748EC /* DebugDirectoryViewerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugDirectoryViewerViewController.m; path = Psiphon/Debug/DebugDirectoryViewerViewController.m; sourceTree = SOURCE_ROOT; };
-		521FD0E6219E0D5500F748EC /* DebugLogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugLogViewController.m; path = Psiphon/Debug/DebugLogViewController.m; sourceTree = SOURCE_ROOT; };
-		521FD0E7219E0D5600F748EC /* DebugToolboxViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugToolboxViewController.m; path = Psiphon/Debug/DebugToolboxViewController.m; sourceTree = SOURCE_ROOT; };
-		521FD0E8219E0D5600F748EC /* DebugToolboxViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugToolboxViewController.h; path = Psiphon/Debug/DebugToolboxViewController.h; sourceTree = SOURCE_ROOT; };
-		521FD0E9219E0D5600F748EC /* DebugTextViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugTextViewController.h; path = Psiphon/Debug/DebugTextViewController.h; sourceTree = SOURCE_ROOT; };
-		521FD0EA219E0D5600F748EC /* DebugViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugViewController.m; path = Psiphon/Debug/DebugViewController.m; sourceTree = SOURCE_ROOT; };
-		521FD0EB219E0D5600F748EC /* DebugDirectoryViewerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugDirectoryViewerViewController.h; path = Psiphon/Debug/DebugDirectoryViewerViewController.h; sourceTree = SOURCE_ROOT; };
-		521FD0EC219E0D5600F748EC /* DebugTextViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugTextViewController.m; path = Psiphon/Debug/DebugTextViewController.m; sourceTree = SOURCE_ROOT; };
-		521FD0ED219E0D5600F748EC /* DebugViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugViewController.h; path = Psiphon/Debug/DebugViewController.h; sourceTree = SOURCE_ROOT; };
-		521FD0EE219E0D5600F748EC /* DebugLogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugLogViewController.h; path = Psiphon/Debug/DebugLogViewController.h; sourceTree = SOURCE_ROOT; };
 		521FD0F5219E0DDF00F748EC /* AppProfiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppProfiler.h; path = Shared/Profiling/AppProfiler.h; sourceTree = SOURCE_ROOT; };
 		521FD0F6219E0DDF00F748EC /* AppStats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppStats.m; path = Shared/Profiling/AppStats.m; sourceTree = SOURCE_ROOT; };
 		521FD0F7219E0DDF00F748EC /* AppStats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppStats.h; path = Shared/Profiling/AppStats.h; sourceTree = SOURCE_ROOT; };
@@ -757,6 +744,16 @@
 		CE6C3F6824366AE1007A17F0 /* ClientMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ClientMetadata.h; sourceTree = "<group>"; };
 		CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ClientMetadata.m; sourceTree = "<group>"; };
 		CE93EE5424F55B92001F4EC9 /* SharedConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharedConstants.m; sourceTree = "<group>"; };
+		CE84203D2522823D00796032 /* DebugViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugViewController.m; sourceTree = "<group>"; };
+		CE84203E2522823D00796032 /* DebugTextViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugTextViewController.h; sourceTree = "<group>"; };
+		CE84203F2522823D00796032 /* DebugToolboxViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugToolboxViewController.m; sourceTree = "<group>"; };
+		CE8420402522823D00796032 /* DebugLogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugLogViewController.h; sourceTree = "<group>"; };
+		CE8420412522823D00796032 /* DebugDirectoryViewerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugDirectoryViewerViewController.h; sourceTree = "<group>"; };
+		CE8420422522823D00796032 /* DebugToolboxViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugToolboxViewController.h; sourceTree = "<group>"; };
+		CE8420432522823D00796032 /* DebugTextViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugTextViewController.m; sourceTree = "<group>"; };
+		CE8420442522823D00796032 /* DebugViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugViewController.h; sourceTree = "<group>"; };
+		CE8420452522823D00796032 /* DebugDirectoryViewerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugDirectoryViewerViewController.m; sourceTree = "<group>"; };
+		CE8420462522823D00796032 /* DebugLogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugLogViewController.m; sourceTree = "<group>"; };
 		CEA1B778249AA9A0006D9853 /* PsiphonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsiphonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEA1B786249AAA13006D9853 /* EmbeddedServerEntriesTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EmbeddedServerEntriesTest.m; sourceTree = "<group>"; };
 		CEBA9C102481A5C80097D700 /* Notifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifier.swift; sourceTree = "<group>"; };
@@ -1154,24 +1151,6 @@
 			path = View;
 			sourceTree = "<group>";
 		};
-		521FD0E4219E0D4500F748EC /* Debug */ = {
-			isa = PBXGroup;
-			children = (
-				521FD0EB219E0D5600F748EC /* DebugDirectoryViewerViewController.h */,
-				521FD0E5219E0D5500F748EC /* DebugDirectoryViewerViewController.m */,
-				521FD0EE219E0D5600F748EC /* DebugLogViewController.h */,
-				521FD0E6219E0D5500F748EC /* DebugLogViewController.m */,
-				521FD0E9219E0D5600F748EC /* DebugTextViewController.h */,
-				521FD0EC219E0D5600F748EC /* DebugTextViewController.m */,
-				521FD0E8219E0D5600F748EC /* DebugToolboxViewController.h */,
-				521FD0E7219E0D5600F748EC /* DebugToolboxViewController.m */,
-				521FD0ED219E0D5600F748EC /* DebugViewController.h */,
-				521FD0EA219E0D5600F748EC /* DebugViewController.m */,
-			);
-			name = Debug;
-			path = "New Group";
-			sourceTree = "<group>";
-		};
 		521FD0F4219E0DC300F748EC /* Profiling */ = {
 			isa = PBXGroup;
 			children = (
@@ -1321,7 +1300,7 @@
 			children = (
 				EF90D79E204F22C900228A63 /* ReactiveExtensions */,
 				52055D02230C821200244F9E /* View */,
-				521FD0E4219E0D4500F748EC /* Debug */,
+				CE84203C2522823D00796032 /* Debug */,
 				CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */,
 				CE26FC991BBDC7B800B83375 /* Info.plist */,
 				4E0774951F566ADA0097BC8C /* InAppSettings.bundle */,
@@ -1397,6 +1376,23 @@
 				8D0017D624DB233200EC3409 /* VPNStrings.m */,
 			);
 			path = PsiphonVPN;
+			sourceTree = "<group>";
+		};
+		CE84203C2522823D00796032 /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				CE84203D2522823D00796032 /* DebugViewController.m */,
+				CE84203E2522823D00796032 /* DebugTextViewController.h */,
+				CE84203F2522823D00796032 /* DebugToolboxViewController.m */,
+				CE8420402522823D00796032 /* DebugLogViewController.h */,
+				CE8420412522823D00796032 /* DebugDirectoryViewerViewController.h */,
+				CE8420422522823D00796032 /* DebugToolboxViewController.h */,
+				CE8420432522823D00796032 /* DebugTextViewController.m */,
+				CE8420442522823D00796032 /* DebugViewController.h */,
+				CE8420452522823D00796032 /* DebugDirectoryViewerViewController.m */,
+				CE8420462522823D00796032 /* DebugLogViewController.m */,
+			);
+			path = Debug;
 			sourceTree = "<group>";
 		};
 		CED6791824A4F82A00C4CA81 /* JetsamMetrics */ = {
@@ -1899,7 +1895,6 @@
 				CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */,
 				445F24E720E1A5BA00D004E9 /* pkcs7-signed-data.asn1 in Resources */,
 				F136C2951F62E3E1000D3EAB /* LaunchScreen.xib in Resources */,
-				CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */,
 				445F24DE20E1A5BA00D004E9 /* pkcs7-signed-data-simplified.asn1 in Resources */,
 				EF743FCA1F99549000AC89A2 /* subscriptionProductIds.plist in Resources */,
 			);
@@ -1910,11 +1905,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				EF6C1F551F59E46500709554 /* psiphon_config in Resources */,
-				CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */,
 				6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */,
 				EF6C1F531F59E46500709554 /* embedded_server_entries in Resources */,
 				EF743FCB1F99549000AC89A2 /* subscriptionProductIds.plist in Resources */,
-				9BFECF65871BB6B522C33F1E /* UserDefaults.h in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2042,7 +2035,6 @@
 				CED6791224A4F82400C4CA81 /* JetsamMetrics.m in Sources */,
 				445F24E220E1A5BA00D004E9 /* der_encoder.c in Sources */,
 				445F24DC20E1A5BA00D004E9 /* NativeInteger.c in Sources */,
-				521FD0F3219E0D5600F748EC /* DebugTextViewController.m in Sources */,
 				8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */,
 				EF90D7A9204F22C900228A63 /* FileUtils.m in Sources */,
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
@@ -2056,6 +2048,7 @@
 				4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */,
 				EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */,
 				EF90D7A7204F22C900228A63 /* NSDate+PSIDateExtension.m in Sources */,
+				CE8420482522823D00796032 /* DebugToolboxViewController.m in Sources */,
 				8DCA6864247C7CF8001D026E /* Bindable.swift in Sources */,
 				CED6795D24A4FA3200C4CA81 /* RotatingFile.m in Sources */,
 				445F239620E1817C00D004E9 /* AppStoreParsedReceiptData.m in Sources */,
@@ -2065,6 +2058,7 @@
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
 				EFC2F5C720226782007B52F9 /* UIAlertController+Additions.m in Sources */,
 				4E0A366C21666B99008A3D7B /* NSString+Additions.m in Sources */,
+				CE84204B2522823D00796032 /* DebugLogViewController.m in Sources */,
 				EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
 				445F24DA20E1A5BA00D004E9 /* constr_SET_OF.c in Sources */,
 				8D417EB124147C6D00FEE587 /* LandingPage.swift in Sources */,
@@ -2089,6 +2083,7 @@
 				445F24D820E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c in Sources */,
 				445F24D920E1A5BA00D004E9 /* BIT_STRING.c in Sources */,
 				445F24E820E1A5BA00D004E9 /* NativeEnumerated.c in Sources */,
+				CE8420492522823D00796032 /* DebugTextViewController.m in Sources */,
 				8D417EB324148C1E00FEE587 /* URLHandler.swift in Sources */,
 				445F24E320E1A5BA00D004E9 /* OCTET_STRING.c in Sources */,
 				445F24E120E1A5BA00D004E9 /* ReceiptAttribute.c in Sources */,
@@ -2106,11 +2101,10 @@
 				CED6796124A4FA6D00C4CA81 /* ExtensionContainerFile.m in Sources */,
 				52C8F0AB237CA26200E5F9C0 /* ImageViewBuilder.swift in Sources */,
 				445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */,
-				521FD0F0219E0D5600F748EC /* DebugLogViewController.m in Sources */,
-				521FD0F1219E0D5600F748EC /* DebugToolboxViewController.m in Sources */,
 				445F24ED20E1A5BA00D004E9 /* ber_tlv_tag.c in Sources */,
 				4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */,
 				8D7789C5247496F60038BFDA /* PsiCashLib+Additions.swift in Sources */,
+				CE84204A2522823D00796032 /* DebugDirectoryViewerViewController.m in Sources */,
 				4E10920820F3DA190033114B /* AppInfo.m in Sources */,
 				445F24EE20E1A5BA00D004E9 /* asn_codecs_prim.c in Sources */,
 				521FD0FA219E0DDF00F748EC /* AppProfiler.m in Sources */,
@@ -2132,10 +2126,10 @@
 				9BFECD174E254989EC97A437 /* IAPHelpViewController.m in Sources */,
 				52055D04230C823100244F9E /* GradientButton.swift in Sources */,
 				8D9D9BCC247C6A9D0093220E /* PsiphonRotatingFileFeedbackLogger.swift in Sources */,
-				521FD0F2219E0D5600F748EC /* DebugViewController.m in Sources */,
 				52CAC4312385D06600A92842 /* Spinner.swift in Sources */,
 				445F24EF20E1A5BA00D004E9 /* constraints.c in Sources */,
 				CED6794224A4F95D00C4CA81 /* RunningStdev.m in Sources */,
+				CE8420472522823D00796032 /* DebugViewController.m in Sources */,
 				5248B4CE23203781008C00D4 /* SwiftObjCBridges.swift in Sources */,
 				52D363CB230DEBED002C2221 /* CloseButton.swift in Sources */,
 				445F24DB20E1A5BA00D004E9 /* ber_decoder.c in Sources */,
@@ -2151,7 +2145,6 @@
 				52C8F0AD237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift in Sources */,
 				8DE4E6D2244E97D000275362 /* Result+Codable.swift in Sources */,
 				8D92A33124928E4900F75254 /* SubscriptionBarView.swift in Sources */,
-				521FD0EF219E0D5600F748EC /* DebugDirectoryViewerViewController.m in Sources */,
 				9BFECF61970F215F32E76280 /* AdMobInterstitialAdControllerWrapper.m in Sources */,
 				52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */,
 				9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */,

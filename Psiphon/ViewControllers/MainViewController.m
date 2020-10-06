@@ -507,7 +507,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 
 #if DEBUG
 - (void)onVersionLabelTap:(UIButton *)sender {
-    DebugViewController *viewController = [[DebugViewController alloc] initWithCoder:nil];
+    DebugViewController *viewController = [[DebugViewController alloc] init];
     [self presentViewController:viewController animated:YES completion:nil];
 }
 #endif
