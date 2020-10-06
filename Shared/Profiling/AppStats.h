@@ -29,7 +29,7 @@
  * Gets size of each memory page in bytes.
  * @return Memory page size.
  */
-+ (vm_size_t)pageSize:(NSError **)error;
++ (vm_size_t)pageSize:(NSError *_Nullable *_Nonnull)error;
 
 /**
  * Returns current mach tasks's resident set size.
