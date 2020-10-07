@@ -49,20 +49,17 @@
 /* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "CONNECT_TO_USE_SPEED_BOOST" = "Speed Boost kullanmak için Psiphon bağlantısı kurun";
 
-/* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
-"CORRUPT_SETTINGS_ALERT_TITLE" = "Ayarlar Bozulmuş";
-
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "Uygulama ayarları dosyanız bozulmuş gibi görünüyor. Dosyayı onarmak için uygulamayı yeniden kurmayı deneyin.";
 
 /* Decline button title */
 "DECLINE_BUTTON_TITLE" = "Reddet";
 
-/*[UNTRANSLATED] Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
-"DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
+/* Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
+"DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "Psiphon uygulamasının ücretsiz sürümünde bazı İnternet trafiği türleri desteklenmez. Psiphon deneyimini tam olarak yaşamak için bir abonelik veya Hız Artışı satın alın.";
 
-/*[UNTRANSLATED] Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
-"DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
+/* Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
+"DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "Psiphon uygulamasının ücretsiz sürümünde bazı İnternet trafiği türleri desteklenmez. Psiphon deneyimini tam olarak yaşamak için bir abonelik veya Hız Artışı satın alın.";
 
 /* Text next to the button indicating to the user that the rewarded video advertisement is only available when they are not connected to Psiphon. Do not translate or transliterate 'PsiCash'. Do not translate or transliterate 'Psiphon'. */
 "DISCONNECT_TO_WATCH_AND_EARN_PSICASH" = "PsiCash kazanmak amacıyla görüntü seyretmek için Psiphon bağlantısını kesmelisiniz.";
@@ -85,23 +82,8 @@
 /* Message shown when verification of a product already purchased fails. */
 "FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Satın alma doğrulanamadı";
 
-/* Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
-"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "Geri bildiriminiz yüklenirken bir sorun çıktı. Lütfen yeniden deneyin. Geri bildiriminiz Psiphon ağını geliştirmemiz için önemli.";
-
-/* Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
-"FEEDBACK_UPLOAD_FAILED_TITLE" = "Geri bildirim yüklenemedi";
-
-/* Title of button on alert view which shows the progress of the users feedback being uploaded to Psiphon's servers. Hitting this button dismisses the alert and the upload continues in the background. */
-"FEEDBACK_UPLOAD_IN_PROGRESS_BACKGROUND_BUTTON_TITLE" = "Arka planda";
-
-/* Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "Geri bildirim gönderiliyor…";
-
 /* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
-"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "Psiphon gelişimine katkıda bulunduğunuz için teşekkür ederiz!";
-
-/* Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Geri bildirim yüklendi";
+"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Psiphon gelişimine katkıda bulunduğunuz için teşekkür ederiz!";
 
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "Ücretsiz";
@@ -130,11 +112,11 @@
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
 "NO_PRODUCTS_TEXT_2" = "App Store üzerinden abonelik bilgileri alınamadı. Lütfen bir süre sonra yeniden deneyin.";
 
-/*[UNTRANSLATED] Content of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
-"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" = "Apps not working? Tap here to improve your Psiphon experience!";
+/* Content of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
+"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" = "Uygulamalar çalışmıyor mu? Psiphon deneyiminizi iyileştirmek için buraya dokunun!";
 
-/*[UNTRANSLATED] Title of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
-"NOTIFICATION_TITLE_UPGRADE_PSIPHON" = "Upgrade Psiphon";
+/* Title of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
+"NOTIFICATION_TITLE_UPGRADE_PSIPHON" = "Psiphon Uygulamasını Yükseltin";
 
 /* Alert OK Button */
 "OK_BUTTON" = "Tamam";
@@ -151,11 +133,11 @@
 /* Onboarding header */
 "ONBOARDING_GETTING_STARTED_HEADER" = "Başlarken";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app. */
-"ONBOARDING_NOTIFICATION_PERMISSION_BODY" = "Allow Psiphon to send notifications so that you can be notified of important network events.";
+/* Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app. */
+"ONBOARDING_NOTIFICATION_PERMISSION_BODY" = "Önemli ağ gelişmelerinin bildirilmesi için Psiphon uygulamasına bildirim gönderme izni verin.";
 
-/*[UNTRANSLATED] Onboarding screen title that will be asking the user permission to send notifications about important network events while they use the app. */
-"ONBOARDING_NOTIFICATION_PERMISSION_TITLE" = "Get notified about important network events";
+/* Onboarding screen title that will be asking the user permission to send notifications about important network events while they use the app. */
+"ONBOARDING_NOTIFICATION_PERMISSION_TITLE" = "Önemli ağ olayları ile ilgili bildirim alın";
 
 /* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
 "ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "Bağlantı kurabilmek için Psiphon uygulamasına VPN yapılandırması ekleme izni vermelisiniz.";
@@ -391,8 +373,8 @@
 /* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Lütfen hücresel veriyi açın ya da Wi-Fi kullanın.";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
-"UPGRADE_PSIPHON" = "Upgrade Psiphon";
+/* Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
+"UPGRADE_PSIPHON" = "Psiphon Uygulamasını Yükseltin";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "Psiphon başlatılırken bir sorun çıktı. Lütfen yeniden deneyin.";
