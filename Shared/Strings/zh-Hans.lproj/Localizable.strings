@@ -49,9 +49,6 @@
 /* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "CONNECT_TO_USE_SPEED_BOOST" = "连接至Psiphon以使用加速功能。";
 
-/* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
-"CORRUPT_SETTINGS_ALERT_TITLE" = "被损坏的设置";
-
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "您的应用设置文件似乎已损坏。请尝试重新安装应用来修复设置文件。";
 
@@ -85,23 +82,8 @@
 /* Message shown when verification of a product already purchased fails. */
 "FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "无法验证购买";
 
-/* Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
-"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "上传您的反馈时发生错误。请再试一次。您的反馈有助于我们改进 Psiphon 网络。";
-
-/* Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
-"FEEDBACK_UPLOAD_FAILED_TITLE" = "反馈上传失败";
-
-/* Title of button on alert view which shows the progress of the users feedback being uploaded to Psiphon's servers. Hitting this button dismisses the alert and the upload continues in the background. */
-"FEEDBACK_UPLOAD_IN_PROGRESS_BACKGROUND_BUTTON_TITLE" = "背景";
-
-/* Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "正在发送反馈…";
-
 /* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
-"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "感谢您帮助改进 Psiphon！";
-
-/* Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "反馈上传成功";
+"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "感谢您帮助改进 Psiphon！";
 
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "免费";
