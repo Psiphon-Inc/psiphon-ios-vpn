@@ -49,9 +49,6 @@
 /* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "CONNECT_TO_USE_SPEED_BOOST" = "الاتصال بـPsiphon لاستعمال تعزيز السرعة";
 
-/* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
-"CORRUPT_SETTINGS_ALERT_TITLE" = "الإعدادات تالفة.";
-
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "يبدو أن ملف إعدادات التطبيق لديك تالف. حاول إعادة تثبيت التطبيق لإصلاح الملف.";
 
@@ -85,23 +82,8 @@
 /*[UNTRANSLATED] Message shown when verification of a product already purchased fails. */
 "FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Failed to verify purchase";
 
-/* Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
-"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "حدث خطأ أثناء تحميل ملاحظاتك. حاول مرة اخرى. تساعدنا ملاحظاتك على تحسين شبكة Psiphon.";
-
-/* Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
-"FEEDBACK_UPLOAD_FAILED_TITLE" = "فشل تحميل التعليقات";
-
-/* Title of button on alert view which shows the progress of the users feedback being uploaded to Psiphon's servers. Hitting this button dismisses the alert and the upload continues in the background. */
-"FEEDBACK_UPLOAD_IN_PROGRESS_BACKGROUND_BUTTON_TITLE" = "خَلْفِيَّة حَوَل المَوْضُوع";
-
-/* Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "ارسال التعليقات";
-
 /* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
-"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "شكراً للمساعدة في تحسين اداء سايفون!";
-
-/* Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "تم تحميل التعليقات بنجاح";
+"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "شكراً للمساعدة في تحسين اداء سايفون!";
 
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "مجّانًا";
@@ -307,8 +289,8 @@
 /* Select language button title. */
 "SELECT_LANG_BUTTON_TITLE" = "اختر اللغة";
 
-/*[UNTRANSLATED] Title for screen that allows user to select their desired server region. */
-"SELECT_SERVER_REGION" = "Select server region";
+/* Title for screen that allows user to select their desired server region. */
+"SELECT_SERVER_REGION" = "تحديد منطقة الخادوم";
 
 /* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "اعادة تثبيت ملف تعريف الـ VPN";
@@ -395,7 +377,7 @@
 "UPGRADE_PSIPHON" = "Upgrade Psiphon";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
-"VPN_START_FAIL_MESSAGE" = "حدث خطأ أثناء بدء سايفون. حاول مرة اخرى. إذا استمرت هذه المشكلة ، فحاول إعادة تثبيت تطبيق سايفون.";
+"VPN_START_FAIL_MESSAGE" = "حدث خطأ أثناء بدء Psiphon. من فضلك حاول مرة أخرى.";
 
 /*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to 'Best performance', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
 "VPN_START_FAIL_REGION_INVALID_MESSAGE_3" = "The region you selected is no longer available. You have automatically been switched to \"Best performance\".\n\n You can also select a new region from the Psiphon app.";

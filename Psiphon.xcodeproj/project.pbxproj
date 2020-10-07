@@ -199,13 +199,13 @@
 		CE58B642251A31370081C73C /* AppState+Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE58B641251A31370081C73C /* AppState+Feedback.swift */; };
 		CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */; };
 		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CE93EE5524F55B92001F4EC9 /* SharedConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = CE93EE5424F55B92001F4EC9 /* SharedConstants.m */; };
-		CE93EE5624F55B92001F4EC9 /* SharedConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = CE93EE5424F55B92001F4EC9 /* SharedConstants.m */; };
 		CE8420472522823D00796032 /* DebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE84203D2522823D00796032 /* DebugViewController.m */; };
 		CE8420482522823D00796032 /* DebugToolboxViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE84203F2522823D00796032 /* DebugToolboxViewController.m */; };
 		CE8420492522823D00796032 /* DebugTextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8420432522823D00796032 /* DebugTextViewController.m */; };
 		CE84204A2522823D00796032 /* DebugDirectoryViewerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8420452522823D00796032 /* DebugDirectoryViewerViewController.m */; };
 		CE84204B2522823D00796032 /* DebugLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8420462522823D00796032 /* DebugLogViewController.m */; };
+		CE93EE5524F55B92001F4EC9 /* SharedConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = CE93EE5424F55B92001F4EC9 /* SharedConstants.m */; };
+		CE93EE5624F55B92001F4EC9 /* SharedConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = CE93EE5424F55B92001F4EC9 /* SharedConstants.m */; };
 		CEA1B787249AAA13006D9853 /* EmbeddedServerEntriesTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA1B786249AAA13006D9853 /* EmbeddedServerEntriesTest.m */; };
 		CEA1B788249AB144006D9853 /* EmbeddedServerEntries.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */; };
 		CEA1B789249AB229006D9853 /* EmbeddedServerEntriesHelpers.c in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */; };
@@ -743,7 +743,6 @@
 		CE58B641251A31370081C73C /* AppState+Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppState+Feedback.swift"; sourceTree = "<group>"; };
 		CE6C3F6824366AE1007A17F0 /* ClientMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ClientMetadata.h; sourceTree = "<group>"; };
 		CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ClientMetadata.m; sourceTree = "<group>"; };
-		CE93EE5424F55B92001F4EC9 /* SharedConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharedConstants.m; sourceTree = "<group>"; };
 		CE84203D2522823D00796032 /* DebugViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugViewController.m; sourceTree = "<group>"; };
 		CE84203E2522823D00796032 /* DebugTextViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugTextViewController.h; sourceTree = "<group>"; };
 		CE84203F2522823D00796032 /* DebugToolboxViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugToolboxViewController.m; sourceTree = "<group>"; };
@@ -754,6 +753,8 @@
 		CE8420442522823D00796032 /* DebugViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugViewController.h; sourceTree = "<group>"; };
 		CE8420452522823D00796032 /* DebugDirectoryViewerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugDirectoryViewerViewController.m; sourceTree = "<group>"; };
 		CE8420462522823D00796032 /* DebugLogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugLogViewController.m; sourceTree = "<group>"; };
+		CE8723EF252E54140016AF57 /* ti */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ti; path = Strings/ti.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CE93EE5424F55B92001F4EC9 /* SharedConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharedConstants.m; sourceTree = "<group>"; };
 		CEA1B778249AA9A0006D9853 /* PsiphonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsiphonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEA1B786249AAA13006D9853 /* EmbeddedServerEntriesTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EmbeddedServerEntriesTest.m; sourceTree = "<group>"; };
 		CEBA9C102481A5C80097D700 /* Notifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifier.swift; sourceTree = "<group>"; };
@@ -1861,6 +1862,7 @@
 				he,
 				it,
 				sw,
+				ti,
 			);
 			mainGroup = CE26FC811BBDC7B700B83375;
 			productRefGroup = CE26FC8B1BBDC7B800B83375 /* Products */;
@@ -2360,6 +2362,7 @@
 				CE50A256246997250047D3FE /* he */,
 				CE50A25724699CD80047D3FE /* it */,
 				8DB0F5A624EC830F0051AF44 /* sw */,
+				CE8723EF252E54140016AF57 /* ti */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
