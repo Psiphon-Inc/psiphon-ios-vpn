@@ -1,11 +1,11 @@
 /*[UNTRANSLATED] Accept button title */
 "ACCEPT_BUTTON_TITLE" = "Accept";
 
-/* After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
-"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Activating...";
+/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
+"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Activating…";
 
-/* Title of the section in the subscription dialog that shows currently active subscription information. */
-"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Current subscription";
+/*[UNTRANSLATED] Title of the section in the subscription dialog that shows currently active subscription information. */
+"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "You're subscribed!";
 
 /*[UNTRANSLATED] Button title to add to user's PsiCash balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
 "ADD_PSICASH" = "Add PsiCash";
@@ -29,7 +29,7 @@
 "BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of the subscription.";
 
 /* Title for a button that cancels an action. This should be generic enough to make sense whenever a cancel button is used. */
-"CANCEL_BUTTON_TITLE" = "Болдырмау";
+"CANCEL_BUTTON_TITLE" = "لغو";
 
 /*[UNTRANSLATED] Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
 "CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "You don't have an active subscription.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app to start.";
@@ -38,7 +38,7 @@
 "CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
 
 /* Action button title, that when pressed connects the user to Psiphon network. */
-"CONNECT_BUTTON_TITLE" = "Қосылу ";
+"CONNECT_BUTTON_TITLE" = "اتصال";
 
 /*[UNTRANSLATED] Text shown to the user telling them to connect to 'Psiphon', to finish their unfinished transaction. Do not translate or transliterate 'Psiphon'. */
 "CONNECT_TO_FINISH_PSICASH_TRANSACTION" = "Please connect to Psiphon to finish your transaction";
@@ -67,11 +67,11 @@
 /*[UNTRANSLATED] Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
 "DISMISS_BUTTON_TITLE" = "Dismiss";
 
-/* Title of the button that dismisses a screen or a dialog */
-"DONE_BUTTON_TITLE" = "Дайын";
+/*[UNTRANSLATED] Title of the button that dismisses a screen or a dialog */
+"DONE_BUTTON_TITLE" = "Done";
 
-/* Error alert title */
-"ERROR_TITLE" = "Қате";
+/*[UNTRANSLATED] Error alert title */
+"ERROR_TITLE" = "Error";
 
 /*[UNTRANSLATED] No comment provided by engineer. */
 "EXTENSION_EXPIRED_SUBSCRIPTION_ALERT" = "Your Psiphon subscription has expired.\n\n Please open Psiphon app to renew your subscription.";
@@ -94,17 +94,17 @@
 /*[UNTRANSLATED] User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
 "INSUFFICIENT_PSICASH_BALANCE" = "Insufficient PsiCash balance";
 
-/* External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
-"LICENSE_PAGE_URL" = "https://psiphon.ca/kk/license.html";
+/*[UNTRANSLATED] External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
+"LICENSE_PAGE_URL" = "https://psiphon.ca/en/license.html";
 
-/* Text displayed while app loads */
-"LOADING" = "Жүктелуде...";
+/*[UNTRANSLATED] Text displayed while app loads */
+"LOADING" = "Loading...";
 
-/* Button title that takes user to the next page */
-"NEXT_PAGE_BUTTON_TITLE" = "Келесі";
+/*[UNTRANSLATED] Button title that takes user to the next page */
+"NEXT_PAGE_BUTTON_TITLE" = "Next";
 
-/* Alert title informing user there is no internet connection */
-"NO_INTERNET" = "Интернетпен байланыс жоқ";
+/*[UNTRANSLATED] Alert title informing user there is no internet connection */
+"NO_INTERNET" = "No Internet Connection";
 
 /*[UNTRANSLATED] Message shown to the user when there is no internet connect. */
 "NO_INTERNET_CONNECTION_TITLE" = "No internet connection";
@@ -118,14 +118,14 @@
 /*[UNTRANSLATED] Title of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
 "NOTIFICATION_TITLE_UPGRADE_PSIPHON" = "Upgrade Psiphon";
 
-/* Alert OK Button */
-"OK_BUTTON" = "ОК";
+/*[UNTRANSLATED] Alert OK Button */
+"OK_BUTTON" = "OK";
 
 /*[UNTRANSLATED] Onboarding screen text. (Do not translate 'Psiphon'). */
 "ONBOARDING_BEYOND_BORDERS_BODY_2" = "Psiphon connects you to the content you want, no matter where you are.";
 
 /* Beyond Borders title */
-"ONBOARDING_BEYOND_BORDERS_HEADER" = "Шекарасыз";
+"ONBOARDING_BEYOND_BORDERS_HEADER" = "فراتر از مرزها";
 
 /*[UNTRANSLATED] Onboarding screen 'getting started' body. (Do not translate 'Psiphon'). */
 "ONBOARDING_GETTING_STARTED_BODY_2" = "In order to connect, Psiphon needs the ability to add VPN configurations.";
@@ -142,8 +142,8 @@
 /*[UNTRANSLATED] Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
 "ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "You’ll need to allow Psiphon to add VPN configurations in order to connect.";
 
-/* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
-"OPEN_PSIPHON_APP" = "Байланыс орнатуды аяқтау үшін Psiphon қолданбасын ашыңыз.";
+/*[UNTRANSLATED] Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
+"OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
 
 /*[UNTRANSLATED] Alert dialog title indicating to the user that Psiphon needs their permission */
 "PERMISSION_REQUIRED_ALERT__TITLE" = "Permission required";
@@ -154,8 +154,8 @@
 /*[UNTRANSLATED] Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
 "PRIVACY_POLICY_DECLINED_ALERT_BODY" = "You must accept our Privacy Policy before continuing to use Psiphon.";
 
-/* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
-"PRIVACY_POLICY_URL" = "https://psiphon.ca/kk/privacy.html";
+/*[UNTRANSLATED] External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
+"PRIVACY_POLICY_URL" = "https://psiphon.ca/en/privacy.html";
 
 /*[UNTRANSLATED] Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
 "PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara1" = "Psiphon looks at your data only to the degree necessary to collect statistics about the usage of our system. We record the total bytes transferred for a user connection, as well as the bytes transferred for some specific domains. These statistics are discarded after 60 days.";
@@ -206,7 +206,7 @@
 "PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead" = "Why does Psiphon need these statistics?";
 
 /* page title for the Privacy Policy page */
-"PrivacyTitle" = "Құпиялық саясаты";
+"PrivacyTitle" = "پالیسی حفظ حریم خصوصی ";
 
 /*[UNTRANSLATED] Message shown when products available for purchase could not be retrieved. */
 "PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "Product list could not be retrieved";
@@ -274,11 +274,11 @@
 /*[UNTRANSLATED] Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "Restore Subscription";
 
-/* Title of button which triggers an attempt to restore the user's existing subscription */
-"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my existing subscription";
+/*[UNTRANSLATED] Title of button which triggers an attempt to restore the user's existing subscription */
+"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my subscription";
 
-/* Action button title, that when pressed retries the recently failed operation. */
-"RETRY_BUTTON_TITLE" = "Қайталау";
+/*[UNTRANSLATED] Action button title, that when pressed retries the recently failed operation. */
+"RETRY_BUTTON_TITLE" = "Retry";
 
 /*[UNTRANSLATED] Shown in a pop-up alert if user's rewarded video ad failed to load. */
 "REWARDED_VIDEO_LOAD_FAILED" = "Failed to load rewarded video. Please try again later.";
@@ -359,13 +359,13 @@
 "SUBSCRIPTIONS_PAGE_RESTORE_SUBSCRIPTION_BUTTON" = "I don't see my subscription";
 
 /* Title of button on subscriptions page which opens Psiphon's privacy policy webpage */
-"SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT" = "Құпиялық саясаты";
+"SUBSCRIPTIONS_PRIVACY_POLICY_BUTTON_TEXT" = "پالیسی حفظ حریم خصوصی ";
 
 /* Label on a button which, when pressed, opens a screen where the user can choose from multiple subscription plans. */
-"SUBSCRIPTIONS_SUBSCRIBE_BUTTON" = "Жазылу";
+"SUBSCRIPTIONS_SUBSCRIBE_BUTTON" = "اشتراک";
 
 /* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
-"SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Пайдалану шарттары";
+"SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "شرایط استفاده";
 
 /*[UNTRANSLATED] Button title shown when something fails to load. Asks the user to tap the button to retry the operation */
 "TAP_TO_RETRY" = "Tap to Retry";
@@ -389,28 +389,28 @@
 "VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon needs your permission to install a VPN profile in order to connect.\n\nPsiphon is committed to protecting the privacy of our users. You can review our privacy policy by tapping \"Privacy Policy\".";
 
 /* Button label taking user's to our Privacy Policy page */
-"VPN_START_PRIVACY_POLICY_BUTTON" = "Құпиялық саясаты";
+"VPN_START_PRIVACY_POLICY_BUTTON" = "پالیسی حفظ حریم خصوصی ";
 
 /* Status when the VPN is connected to a Psiphon server */
-"VPN_STATUS_CONNECTED" = "Байланысқан";
+"VPN_STATUS_CONNECTED" = "متصل شد";
 
 /* Status when the VPN is connecting; that is, trying to connect to a Psiphon server */
-"VPN_STATUS_CONNECTING" = "Байланысуда";
+"VPN_STATUS_CONNECTING" = "درحال اتصال";
 
 /* Status when the VPN is not connected to a Psiphon server, not trying to connect, and not in an error state */
-"VPN_STATUS_DISCONNECTED" = "Байланыс үзілді";
+"VPN_STATUS_DISCONNECTED" = "اتصال قطع شد";
 
 /* Status when the VPN is disconnecting. Sometimes going from connected to disconnected can take some time, and this is that state. */
-"VPN_STATUS_DISCONNECTING" = "Байланыс үзілуде";
+"VPN_STATUS_DISCONNECTING" = "قطع اتصال";
 
 /* Status when the VPN is in an invalid state. For example, if the user doesn't give permission for the VPN configuration to be installed, and therefore the Psiphon VPN can't even try to connect. */
-"VPN_STATUS_INVALID" = "Байланыс үзілді";
+"VPN_STATUS_INVALID" = "اتصال قطع شد";
 
-/* Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
-"VPN_STATUS_RECONNECTING" = "Қайта байланысу";
+/*[UNTRANSLATED] Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
+"VPN_STATUS_RECONNECTING" = "Reconnecting";
 
-/* Status when the VPN is restarting. */
-"VPN_STATUS_RESTARTING" = "Қайта іске қосылу";
+/*[UNTRANSLATED] Status when the VPN is restarting. */
+"VPN_STATUS_RESTARTING" = "Restarting";
 
 /*[UNTRANSLATED] Error message when something was wrong with the VPN. Asks the user that if the error persists, try tapping the 'Reinstall VPN Profile' button in the settings menu. 'Reinstall VPN Profile' translation has key SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE */
 "VPN_SYNC_FAILED_REINSTALL_CONFIG" = "If this error persists, please try 'Reinstall VPN Profile'.";
