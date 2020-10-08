@@ -654,6 +654,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         }
         
         return OnboardingViewController(
+            userDefaultsConfig: self.userDefaultsConfig,
+            mainBundle: .main,
             onboardingStages: stagesNotCompleted,
             feedbackLogger: self.feedbackLogger,
             installVPNConfig: self.installVPNConfig,
