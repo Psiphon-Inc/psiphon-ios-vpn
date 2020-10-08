@@ -31,3 +31,24 @@ struct PsiphonBundle {
                              appStoreReceiptURL: bundle.appStoreReceiptURL!)
     }
 }
+
+struct PsiphonCommonLibBundle: Equatable {
+    
+    private let bundle: Bundle
+    
+    init?(mainBundle: Bundle) {
+        guard
+            let path = mainBundle.path(forResource: "PsiphonClientCommonLibrary", ofType: "bundle"),
+            let bundle = Bundle(path: path)
+        else {
+            return nil
+        }
+        self.bundle = bundle
+    }
+    
+    func localizedString(forKey key: String) -> String {
+        self.bundle.localizedString(forKey: key, value: "!!!Value not found!!!", table: "Root")
+    }
+    
+}
+
