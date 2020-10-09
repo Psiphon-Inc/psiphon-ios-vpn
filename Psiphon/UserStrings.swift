@@ -234,6 +234,12 @@ import Foundation
                                  comment: "Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app.")
     }
     
+    static func Select_language() -> String {
+        return NSLocalizedString("SELECT_LANG", tableName: nil, bundle: Bundle.main,
+                                 value: "SELECT LANGUAGE",
+                                 comment: "Title for screen that allows user to select language. Use all capital letters in the translation only if it makes sense.")
+    }
+    
 }
 
 // MARK: Internet reachability

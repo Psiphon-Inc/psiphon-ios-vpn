@@ -104,6 +104,9 @@ fileprivate extension OnboardingScreen {
     /// Total number of screens given `onboardingStages`.
     let numberOfScreens: Int
     
+    private let userDefaultsConfig: UserDefaultsConfig
+    private let mainBundle: Bundle
+    
     private let screens: OrderedSet<OnboardingScreen>
     private var currentScreenIndex: Int
     
@@ -122,6 +125,8 @@ fileprivate extension OnboardingScreen {
     private let onOnboardingFinished: (OnboardingViewController) -> Void
 
     init(
+        userDefaultsConfig: UserDefaultsConfig,
+        mainBundle: Bundle,
         onboardingStages: OrderedSet<OnboardingStage>,
         feedbackLogger: FeedbackLogger,
         installVPNConfig: @escaping () -> Promise<VPNConfigInstallResult>,
@@ -130,6 +135,9 @@ fileprivate extension OnboardingScreen {
         guard onboardingStages.count > 0 else {
             fatalError()
         }
+        
+        self.userDefaultsConfig = userDefaultsConfig
+        self.mainBundle = mainBundle
         
         self.onboardingStages = onboardingStages
         self.numberOfScreens = onboardingStages.map(\.screens.count).reduce(0, +)
@@ -233,10 +241,21 @@ fileprivate extension OnboardingScreen {
         switch (screen.stage, screen.screenIndex) {
         case (.languageSelection, 0):
             onboardingView = makeLanguageSelectionOnboardingView { [unowned self] in
-                let langSelectionViewController =
-                    LanguageSelectionViewController(supportedLanguages: ())
+                let langSelectionViewController = LanguageSelectionViewController(
+                    supportedLocalizations: SupportedLocalizations(
+                        userDefaultsConfig: self.userDefaultsConfig, mainBundle: self.mainBundle
+                    )
+                )
                 
-                langSelectionViewController.selectionHandler = { _, _, viewController in
+                langSelectionViewController.selectionHandler = { _, selectedLang, viewController in
+                    
+                    guard let selectedLang = selectedLang as? Language else {
+                        fatalError()
+                    }
+                    
+                    // Updates user's default app language.
+                    userDefaultsConfig.appLanguage = selectedLang.code
+                    
                     viewController.dismiss(animated: true, completion: nil)
                     // Reload the onboarding to reflect the newly selected language.
                     AppDelegate.shared().reloadOnboardingViewController()
