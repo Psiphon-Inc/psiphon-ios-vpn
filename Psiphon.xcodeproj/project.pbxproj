@@ -144,6 +144,8 @@
 		8DD6E7E82459C83B0041DAC5 /* StoredAuthorizations.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DD6E7E72459C83B0041DAC5 /* StoredAuthorizations.m */; };
 		8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDA60282425BB4800DBA8EC /* DebugStrings.swift */; };
 		8DE4E6D2244E97D000275362 /* Result+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DE4E6D1244E97D000275362 /* Result+Codable.swift */; };
+		8DEEE12F252F757600B0A9EC /* SupportedLocalizations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DEEE12E252F757600B0A9EC /* SupportedLocalizations.swift */; };
+		8DEEE137252FB4C900B0A9EC /* LanguageSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DEEE136252FB4C900B0A9EC /* LanguageSelectionViewController.swift */; };
 		9BFEC2458D1346F537E9089E /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
 		9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC5F8D8BB828703CCCC2F /* AdMobConsent.m */; };
 		9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */; };
@@ -176,7 +178,6 @@
 		A840875B190F7666A1BD98E5 /* UIView+AutoLayoutViewGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = A840867F8062E477F0B355DD /* UIView+AutoLayoutViewGroup.m */; };
 		A84087AFA5806D689C3BF6D2 /* PickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408390A766C7C2C246797C /* PickerViewController.m */; };
 		A84088BD3CFC8C511F22182C /* RoyalSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408F08BFF80A05CF46C00A /* RoyalSkyButton.m */; };
-		A84088D3FD4B01A7D14CCC53 /* SupportedLanguages.m in Sources */ = {isa = PBXBuildFile; fileRef = A84080B68F307C79F3BCCC59 /* SupportedLanguages.m */; };
 		A8408A3A478ECD6E3562CDF4 /* CloudsView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84081E39C751846A6009BEC /* CloudsView.m */; };
 		A8408AACE30F860F2C961A04 /* WhiteSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408FA077C517546DF6033C /* WhiteSkyButton.m */; };
 		A8408B83167EBE21E215C471 /* OnboardingView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84088889983161FB859D8A9 /* OnboardingView.m */; };
@@ -187,7 +188,6 @@
 		A8408EB13777DDCBEF7DE3C0 /* SwoopView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408B9A66413A25FC1A2BE1 /* SwoopView.m */; };
 		A8408EB1E9DABE35016580A7 /* ImageUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408A0C4220563DA1FE3048 /* ImageUtils.m */; };
 		A8408F5F45CDBDF42701063E /* Strings.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083974C8CF9DDFE7A341D /* Strings.m */; };
-		A8408F99941C9664E3E7C48A /* LanguageSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A840896A2A9959280DAE2DA1 /* LanguageSelectionViewController.m */; };
 		A8408FA13890CD67154033C6 /* RegionSelectionButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408C84138113DE79F0DCD0 /* RegionSelectionButton.m */; };
 		A8408FF45D08D31E102FA41F /* ContainerDB.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086716D701D0F5B48E4C0 /* ContainerDB.m */; };
 		CB0CFCFF11CEECCAA1A2C8BF /* libPods-PsiphonVPN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A44F0D2E7AB9F499D75A1AC4 /* libPods-PsiphonVPN.a */; };
@@ -624,6 +624,8 @@
 		8DD6E7E72459C83B0041DAC5 /* StoredAuthorizations.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StoredAuthorizations.m; sourceTree = "<group>"; };
 		8DDA60282425BB4800DBA8EC /* DebugStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugStrings.swift; sourceTree = "<group>"; };
 		8DE4E6D1244E97D000275362 /* Result+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Codable.swift"; sourceTree = "<group>"; };
+		8DEEE12E252F757600B0A9EC /* SupportedLocalizations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedLocalizations.swift; sourceTree = "<group>"; };
+		8DEEE136252FB4C900B0A9EC /* LanguageSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageSelectionViewController.swift; sourceTree = "<group>"; };
 		9433F6FADEFD218CED8B343A /* Pods-PsiApi-PsiApiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-PsiApiTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-PsiApiTests/Pods-PsiApi-PsiApiTests.release.xcconfig"; sourceTree = "<group>"; };
 		9876294EDE951EF39C9F97BE /* Pods-PsiApi-Testing-Utilities.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-Utilities.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-Utilities/Pods-PsiApi-Testing-Utilities.release.xcconfig"; sourceTree = "<group>"; };
 		9A06EEF4B515E4AE40E5CA93 /* Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Utilities-UtilitiesTests/Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -658,7 +660,6 @@
 		A44F0D2E7AB9F499D75A1AC4 /* libPods-PsiphonVPN.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiphonVPN.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A840802C7AEFA7F375205DCB /* VPNStartAndStopButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPNStartAndStopButton.h; sourceTree = "<group>"; };
 		A8408058458E7BFC4C3DFDDE /* AppEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppEvent.m; sourceTree = "<group>"; };
-		A84080B68F307C79F3BCCC59 /* SupportedLanguages.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SupportedLanguages.m; sourceTree = "<group>"; };
 		A84080E2A20C786DDAD17D48 /* RoyalSkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RoyalSkyButton.h; sourceTree = "<group>"; };
 		A840816C0C9B0658776A8B91 /* RegionSelectionButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegionSelectionButton.h; sourceTree = "<group>"; };
 		A84081B66B02DF8283448409 /* AutoLayoutProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoLayoutProtocol.h; sourceTree = "<group>"; };
@@ -689,10 +690,8 @@
 		A84087D31D8D9A1FD30337E4 /* SubscriptionStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionStatusView.h; sourceTree = "<group>"; };
 		A84087FA4B1BC2C725D900D9 /* PsiphonProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonProgressView.m; sourceTree = "<group>"; };
 		A840886E2E6D8EA82B0EC427 /* UIImageView+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+Additions.m"; sourceTree = "<group>"; };
-		A84088779C0DA0B8A46BCC1A /* LanguageSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LanguageSelectionViewController.h; sourceTree = "<group>"; };
 		A84088889983161FB859D8A9 /* OnboardingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingView.m; sourceTree = "<group>"; };
 		A8408902709B9D562B559532 /* CloudsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CloudsView.h; sourceTree = "<group>"; };
-		A840896A2A9959280DAE2DA1 /* LanguageSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LanguageSelectionViewController.m; sourceTree = "<group>"; };
 		A8408A0C4220563DA1FE3048 /* ImageUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageUtils.m; sourceTree = "<group>"; };
 		A8408AAD421C096147E3FC8B /* Strings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Strings.h; sourceTree = "<group>"; };
 		A8408ABFCA9BBDD281E8A4FD /* SkyRegionSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyRegionSelectionViewController.h; sourceTree = "<group>"; };
@@ -703,7 +702,6 @@
 		A8408BA05DC0D983E6740558 /* SubscriptionStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionStatusView.m; sourceTree = "<group>"; };
 		A8408BAC196A108FFE3A5957 /* AlertDialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertDialogs.h; sourceTree = "<group>"; };
 		A8408C3C21E6934EAE9C0977 /* RelaySubject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RelaySubject.h; sourceTree = "<group>"; };
-		A8408C79DD812741E678AB94 /* SupportedLanguages.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SupportedLanguages.h; sourceTree = "<group>"; };
 		A8408C84138113DE79F0DCD0 /* RegionSelectionButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegionSelectionButton.m; sourceTree = "<group>"; };
 		A8408C8A7CA3C009F01FDA3B /* SkyRegionSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SkyRegionSelectionViewController.m; sourceTree = "<group>"; };
 		A8408CEB0E34BC897F3FA7D6 /* OnboardingScrollableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingScrollableView.m; sourceTree = "<group>"; };
@@ -1089,11 +1087,10 @@
 				A840864BAA38AA3E4620EC35 /* PickerViewController.h */,
 				A8408C8A7CA3C009F01FDA3B /* SkyRegionSelectionViewController.m */,
 				A8408ABFCA9BBDD281E8A4FD /* SkyRegionSelectionViewController.h */,
-				A840896A2A9959280DAE2DA1 /* LanguageSelectionViewController.m */,
-				A84088779C0DA0B8A46BCC1A /* LanguageSelectionViewController.h */,
 				52D363C8230DE215002C2221 /* PsiCashViewController.swift */,
 				52A2466C23A172A800A01FF1 /* AlertViewController.swift */,
 				8D0017D824DB4B1200EC3409 /* OnboardingViewController.swift */,
+				8DEEE136252FB4C900B0A9EC /* LanguageSelectionViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -1324,8 +1321,6 @@
 				4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */,
 				A84086716D701D0F5B48E4C0 /* ContainerDB.m */,
 				A8408319CD72511CABBE4CD4 /* ContainerDB.h */,
-				A84080B68F307C79F3BCCC59 /* SupportedLanguages.m */,
-				A8408C79DD812741E678AB94 /* SupportedLanguages.h */,
 				A8408058458E7BFC4C3DFDDE /* AppEvent.m */,
 				A8408710CC81EFA1CB22CAEC /* AppEvent.h */,
 				52D2581022BADE1900CA956A /* SwiftDelegate.swift */,
@@ -1352,6 +1347,7 @@
 				8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */,
 				8D26455E24D4842E000F46C0 /* Navigator.swift */,
 				8D0017DA24DDD99A00EC3409 /* AppUpgrade.swift */,
+				8DEEE12E252F757600B0A9EC /* SupportedLocalizations.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -2059,6 +2055,7 @@
 				CEBA9C132481AA9F0097D700 /* SharedDB.swift in Sources */,
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
 				EFC2F5C720226782007B52F9 /* UIAlertController+Additions.m in Sources */,
+				8DEEE137252FB4C900B0A9EC /* LanguageSelectionViewController.swift in Sources */,
 				4E0A366C21666B99008A3D7B /* NSString+Additions.m in Sources */,
 				CE84204B2522823D00796032 /* DebugLogViewController.m in Sources */,
 				EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
@@ -2171,6 +2168,7 @@
 				8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */,
 				CED6794424A4F95D00C4CA81 /* RunningStat.m in Sources */,
 				8D1F62C0247DC3350028AFAF /* Authorization+Additions.swift in Sources */,
+				8DEEE12F252F757600B0A9EC /* SupportedLocalizations.swift in Sources */,
 				A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */,
 				8D417ED9241844FA00FEE587 /* FloatingPoint+Additions.swift in Sources */,
 				A840875B190F7666A1BD98E5 /* UIView+AutoLayoutViewGroup.m in Sources */,
@@ -2194,8 +2192,6 @@
 				52A2467123A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift in Sources */,
 				A8408EB1E9DABE35016580A7 /* ImageUtils.m in Sources */,
 				A8408BC29B903A6C0A32F32C /* SkyRegionSelectionViewController.m in Sources */,
-				A84088D3FD4B01A7D14CCC53 /* SupportedLanguages.m in Sources */,
-				A8408F99941C9664E3E7C48A /* LanguageSelectionViewController.m in Sources */,
 				A8408A3A478ECD6E3562CDF4 /* CloudsView.m in Sources */,
 				A84081194DA12328ABB5A43E /* UIImageView+Additions.m in Sources */,
 				CE551C6A24FBFB8E00011C51 /* PsiphonFeedback+FeedbackUploadProvider.swift in Sources */,
