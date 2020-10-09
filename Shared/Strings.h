@@ -57,8 +57,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)selectServerRegionTitle;
 
-+ (NSString *)selectLanguageTitle;
-
 + (NSString *)resetConsentButtonTitle;
 
 #pragma mark - Onboarding

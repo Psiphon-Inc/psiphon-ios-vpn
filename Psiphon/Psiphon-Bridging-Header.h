@@ -44,7 +44,7 @@
 #import "RingSkyButton.h"
 #import "OnboardingView.h"
 #import "OnboardingScrollableView.h"
-#import "LanguageSelectionViewController.h"
+#import "PickerViewController.h"
 #import "RoyalSkyButton.h"
 #import "AlertDialogs.h"
 #import "SubscriptionStatusView.h"
