@@ -81,22 +81,23 @@ final class SupportedLocalizations {
         
         let data = try! Data(contentsOf: url)
         
-        let someValue = try! PropertyListSerialization.propertyList(
+        let plistData = try! PropertyListSerialization.propertyList(
             from: data, options: .mutableContainers, format: nil
         ) as! [String: Any]
         
-        let settingsLanguage = ((someValue["PreferenceSpecifiers"] as! [Any])[4]) as! [String: Any]
+        // Traverses InAppSettings.bundle/Root.inApp.plist to get to
+        // the "SETTINGS_LANGUAGE" dict (4th index of array under key "PreferenceSpecifiers").
+        let preferenceSpecifiers = plistData["PreferenceSpecifiers"] as! [Any]
+        let settingsLanguage = preferenceSpecifiers[4] as! [String: Any]
+        let titles = settingsLanguage["Titles"] as! [[String: String]]
+        let langCodes = settingsLanguage["Values"] as! [String]
+        let langDisplayName = titles.map { $0["Title"]! }
         
         // Checks if the correct dict from the plist file is being read.
         let title = settingsLanguage["Title"] as! String
         guard title == "SETTINGS_LANGUAGE" else {
             fatalError()
         }
-        
-        let titles = settingsLanguage["Titles"] as! [[String: String]]
-        
-        let langCodes = settingsLanguage["Values"] as! [String]
-        let langDisplayName = titles.map { $0["Title"]! }
         
         self.languages = zip(langCodes, langDisplayName).map { code, displayName in
             if code == Language.defaultLanguageCode &&
