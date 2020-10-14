@@ -177,62 +177,64 @@ extension PsiCashEffects {
         PsiCashEffects(
             initialize: { [psiCash] (fileStoreRoot: String?)
                 -> Effect<Result<PsiCashLibData, ErrorRepr>> in
-                
-                guard let fileStoreRoot = fileStoreRoot else {
-                    return Effect(value: .failure(ErrorRepr(repr: "nil psicash file store root")))
-                }
-                
-                let maybeError = psiCash.initialize(
-                    userAgent: PsiCashClientHardCodedValues.userAgent,
-                    fileStoreRoot: fileStoreRoot,
-                    httpRequestFunc: { (request: PSIHttpRequest) -> PSIHttpResult in
-                        
-                        // Maps [PSIPair<NSString>] to Swift type `[(String, String)]`.
-                        let queryParams: [(String, String)] = request.query.map {
-                            ($0.first as String, $0.second as String)
-                        }
-                        
-                        guard let httpMethod = HTTPMethod(rawValue: request.method) else {
-                            return PSIHttpResult(criticalError: ())
-                        }
-                        
-                        let maybeUrl = URL.make(scheme: request.scheme, hostname: request.hostname,
-                                                port: request.port, path: request.path,
-                                                queryParams: queryParams)
-                        
-                        guard let url = maybeUrl else {
-                            return PSIHttpResult(criticalError: ())
-                        }
-                        
-                        let httpRequest = HTTPRequest(url: url,
-                                                      httpMethod: httpMethod,
-                                                      headers: request.headers,
-                                                      body: request.body.data(using: .utf8),
-                                                      response: PsiCashHTTPResponse.self)
-                        
-                        
-                        // Makes async HTTPClient call into a sync call.
-                        let sem = DispatchSemaphore(value: 0)
-                        
-                        var response: PsiCashHTTPResponse? = nil
-                        
-                        // Ignores `CancellableURLRequest` return value, as PsiCash
-                        // requests are never cancelled.
-                        let _ = httpClient.request(getCurrentTime, httpRequest) {
-                            response = $0
-                            sem.signal()
-                        }
-                        sem.wait()
-                        
-                        return response!.psiHTTPResult
-                    },
-                    test: Debugging.devServers)
-                
-                switch maybeError {
-                case .none:
-                    return Effect(value: .success(psiCash.dataModel))
-                case .some(let error):
-                    return Effect(value: .failure(ErrorRepr(repr: String(describing: error))))
+                Effect { () -> Result<PsiCashLibData, ErrorRepr> in
+
+                    guard let fileStoreRoot = fileStoreRoot else {
+                        return .failure(ErrorRepr(repr: "nil psicash file store root"))
+                    }
+                    
+                    let maybeError = psiCash.initialize(
+                        userAgent: PsiCashClientHardCodedValues.userAgent,
+                        fileStoreRoot: fileStoreRoot,
+                        httpRequestFunc: { (request: PSIHttpRequest) -> PSIHttpResult in
+                            
+                            // Maps [PSIPair<NSString>] to Swift type `[(String, String)]`.
+                            let queryParams: [(String, String)] = request.query.map {
+                                ($0.first as String, $0.second as String)
+                            }
+                            
+                            guard let httpMethod = HTTPMethod(rawValue: request.method) else {
+                                return PSIHttpResult(criticalError: ())
+                            }
+                            
+                            let maybeUrl = URL.make(scheme: request.scheme, hostname: request.hostname,
+                                                    port: request.port, path: request.path,
+                                                    queryParams: queryParams)
+                            
+                            guard let url = maybeUrl else {
+                                return PSIHttpResult(criticalError: ())
+                            }
+                            
+                            let httpRequest = HTTPRequest(url: url,
+                                                          httpMethod: httpMethod,
+                                                          headers: request.headers,
+                                                          body: request.body.data(using: .utf8),
+                                                          response: PsiCashHTTPResponse.self)
+                            
+                            
+                            // Makes async HTTPClient call into a sync call.
+                            let sem = DispatchSemaphore(value: 0)
+                            
+                            var response: PsiCashHTTPResponse? = nil
+                            
+                            // Ignores `CancellableURLRequest` return value, as PsiCash
+                            // requests are never cancelled.
+                            let _ = httpClient.request(getCurrentTime, httpRequest) {
+                                response = $0
+                                sem.signal()
+                            }
+                            sem.wait()
+                            
+                            return response!.psiHTTPResult
+                        },
+                        test: Debugging.devServers)
+                    
+                    switch maybeError {
+                    case .none:
+                        return .success(psiCash.dataModel)
+                    case .some(let error):
+                        return .failure(ErrorRepr(repr: String(describing: error)))
+                    }
                 }
             } ,
             libData: { [psiCash] () -> PsiCashLibData in
