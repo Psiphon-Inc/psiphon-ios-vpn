@@ -289,7 +289,8 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         switch state.tunnelConnection?.tunneled {
         case .connected:
             state.psiCash.rewardedVideo.combine(
-                loading: .failure(ErrorEvent(.noTunneledRewardedVideoAd))
+                loading: .failure(ErrorEvent(.noTunneledRewardedVideoAd,
+                                             date: environment.getCurrentTime()))
             )
             return []
         case .connecting, .disconnecting:
@@ -297,7 +298,8 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         case .notConnected, .none:
             guard let customData = environment.psiCashEffects.rewardedVideoCustomData() else {
                 state.psiCash.rewardedVideo.combine(
-                    loading: .failure(ErrorEvent(.customDataNotPresent)))
+                    loading: .failure(ErrorEvent(.customDataNotPresent,
+                                                 date: environment.getCurrentTime())))
                 return []
             }
             return [

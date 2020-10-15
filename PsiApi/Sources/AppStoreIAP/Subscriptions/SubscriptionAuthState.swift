@@ -780,7 +780,7 @@ fileprivate enum StoredSubscriptionPurchasesAuthState {
                     .decode(StoredDataType.self, from: data)
                 return .success(decoded)
             } catch {
-                return .failure(SystemErrorEvent(SystemError(error)))
+                return .failure(SystemErrorEvent(SystemError(error), date: Date()))
             }
         }
     }
@@ -799,7 +799,7 @@ fileprivate enum StoredSubscriptionPurchasesAuthState {
                 sharedDB.setSubscriptionAuths(data)
                 return .success(())
             } catch {
-                return .failure(SystemErrorEvent(SystemError(error)))
+                return .failure(SystemErrorEvent(SystemError(error), date: Date()))
             }
         }
     }
