@@ -868,7 +868,7 @@ fileprivate extension SwiftDelegate {
         PsiCashViewController(
             initialTab: initialTab,
             store: self.store.projection(
-                value: { $0.psiCashViewController },
+                value: { $0.psiCashViewControllerReaderState },
                 action: { .psiCash($0) }),
             iapStore: self.store.projection(
                 value: erase,

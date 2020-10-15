@@ -21,6 +21,59 @@ import Foundation
 import PsiApi
 import PsiCashClient
 
+fileprivate func psiStatusToRefreshStatus(
+    _ status: PSIStatus
+) -> Result<(), PsiCashRefreshErrorStatus>? {
+    switch status {
+    case .success:
+        return .success(())
+    case .serverError:
+        return .failure(.serverError)
+    case .invalidTokens:
+        return .failure(.invalidTokens)
+    default:
+        return nil
+    }
+}
+
+fileprivate func psiStatusToNewExpiringPurchaseStatus(
+    _ status: PSIStatus
+) -> Result<(), PsiCashNewExpiringPurchaseErrorStatus>? {
+    switch status {
+    case .success:
+        return .success(())
+    case .existingTransaction:
+        return .failure(.existingTransaction)
+    case .insufficientBalance:
+        return .failure(.insufficientBalance)
+    case .transactionAmountMismatch:
+        return .failure(.transactionAmountMismatch)
+    case .transactionTypeNotFound:
+        return .failure(.transactionTypeNotFound)
+    case .invalidTokens:
+        return .failure(.invalidTokens)
+    case .serverError:
+        return .failure(.serverError)
+    default:
+        return nil
+    }
+}
+
+fileprivate func psiStatusToAccountLoginStatus(_ status: PSIStatus) -> Result<(), PsiCashAccountLoginErrorStatus>? {
+    switch status {
+    case .success:
+        return .success(())
+    case .invalidCredentials:
+        return .failure(.invalidCredentials)
+    case .badRequest:
+        return .failure(.badRequest)
+    case .serverError:
+        return .failure(.serverError)
+    default:
+        return nil
+    }
+}
+
 // Should match all cases defined in PSITokenType
 extension PsiCashTokenType: RawRepresentable {
     
@@ -54,36 +107,27 @@ extension PsiCashTokenType: RawRepresentable {
     
 }
 
-// Swift wrapper for PSIPsiCashLibWrapper
+extension PsiCashLibError {
+    
+    fileprivate init?(_ error: PSIError?) {
+        guard let error = error else {
+            return nil;
+        }
+        self.init(critical: error.critical, description: error.description)
+    }
+    
+    fileprivate init(_ error: PSIError) {
+        self.init(critical: error.critical, description: error.description)
+    }
+    
+}
+
+extension PsiCashLibError: FeedbackDescription {}
+
+/// `PsiCash` is a thin wrapper around `PSIPsiCashLibWrapper`.
+/// This class is mostly concerned with translating the raw data types used by `PSIPsiCashLibWrapper`
+/// to those defined in the `PsiCashClient` module.
 final class PsiCash {
-    
-    struct Error: Swift.Error {
-        let critical: Bool
-        let description: String
-        
-        fileprivate init?(_ error: PSIError?) {
-            guard let error = error else {
-                return nil;
-            }
-            self.critical = error.critical
-            self.description = error.description
-        }
-        
-        fileprivate init(_ error: PSIError) {
-            self.critical = error.critical
-            self.description = error.description
-        }
-    }
-    
-    struct NewExpiringPurchaseResponse {
-        let status: PSIStatus
-        let purchaseResult: Result<PsiCashPurchasedType, PsiCashParseError>?
-    }
-    
-    struct AccountLoginResponse {
-        let status: PSIStatus
-        let lastTrackerMerge: Bool?
-    }
     
     private let client: PSIPsiCashLibWrapper
     private let feedbackLogger: FeedbackLogger
@@ -150,29 +194,29 @@ final class PsiCash {
         httpRequestFunc: @escaping (PSIHttpRequest) -> PSIHttpResult,
         forceReset: Bool = false,
         test: Bool = false
-    ) -> Error? {
+    ) -> PsiCashLibError? {
         let err = self.client.initialize(withUserAgent: userAgent,
                                           fileStoreRoot: fileStoreRoot,
                                           httpRequestFunc: httpRequestFunc,
                                           forceReset: forceReset,
                                           test: test)
-        return Error(err)
+        return PsiCashLibError(err)
     }
     
     /// Resets PsiCash data for the current user (Tracker or Account). This will typicallyfi
     /// be called when wanting to revert to a Tracker from a previously logged in Account.
     func resetUser() -> Error? {
-        Error(self.client.resetUser())
+        PsiCashLibError(self.client.resetUser())
     }
     
     /// Forces the given tokens and account status to be set in the datastore. Must be
     /// called after Init(). RefreshState() must be called after method (and shouldn't be
     /// be called before this method, although behaviour will be okay).
-    func migrateTokens(_ tokens: [String: String], isAccount: Bool) -> Error? {
-        Error(self.client.migrateTokens(tokens, isAccount: isAccount))
+    func migrateTokens(_ tokens: [String: String], isAccount: Bool) -> PsiCashLibError? {
+        PsiCashLibError(self.client.migrateTokens(tokens, isAccount: isAccount))
     }
     
-    func setRequestMetadata(_ metadata: ClientMetaData) -> Error? {
+    func setRequestMetadata(_ metadata: ClientMetaData) -> PsiCashLibError? {
         var err: PSIError?
         
         err = self.client.setRequestMetadataItem(
@@ -180,7 +224,7 @@ final class PsiCash {
             withValue: metadata.clientVersion
         )
         guard err == nil else {
-            return Error(err)
+            return PsiCashLibError(err)
         }
         
         err = self.client.setRequestMetadataItem(
@@ -188,7 +232,7 @@ final class PsiCash {
             withValue: metadata.clientRegion
         )
         guard err == nil else {
-            return Error(err)
+            return PsiCashLibError(err)
         }
         
         err = self.client.setRequestMetadataItem(
@@ -196,7 +240,7 @@ final class PsiCash {
             withValue: metadata.propagationChannelId
         )
         guard err == nil else {
-            return Error(err)
+            return PsiCashLibError(err)
         }
         
         err = self.client.setRequestMetadataItem(
@@ -204,7 +248,7 @@ final class PsiCash {
             withValue: metadata.sponsorId
         )
         guard err == nil else {
-            return Error(err)
+            return PsiCashLibError(err)
         }
     
         return nil
@@ -241,7 +285,7 @@ final class PsiCash {
     /// any  authorization stored by PsiCash library that is not in `sourceOfTruth`.
     func removePurchases(
         notFoundIn sourceOfTruth: [AuthorizationID]
-    ) -> Result<[PsiCashParsed<PsiCashPurchasedType>], Error> {
+    ) -> Result<[PsiCashParsed<PsiCashPurchasedType>], PsiCashLibError> {
         
         let activePurchasesAuthIds = Set(
             self.client.getPurchases().compactMap(\.authorization?.id))
@@ -252,13 +296,13 @@ final class PsiCash {
         
         let psiResult = self.client.removePurchases(withTransactionID: Array(authIdsToExpire))
         
-        let result: Result<[PsiCashParsed<PsiCashPurchasedType>], Error>
+        let result: Result<[PsiCashParsed<PsiCashPurchasedType>], PsiCashLibError>
         if let purchases = psiResult.success {
             result = .success(purchases.map {
                 PsiCashPurchasedType.parse(purchase: $0 as! PSIPurchase)
             })
         } else if let failure = psiResult.failure {
-            result = .failure(Error(failure))
+            result = .failure(PsiCashLibError(failure))
         } else {
             // Programming fault
             fatalError()
@@ -267,7 +311,7 @@ final class PsiCash {
         return result
     }
     
-    func modifyLandingPage(url: String) -> Result<String, Error> {
+    func modifyLandingPage(url: String) -> Result<String, PsiCashLibError> {
         guard let result = Result(client.modifyLandingPage(url)) else {
             // Programming fault
             fatalError()
@@ -275,7 +319,7 @@ final class PsiCash {
         return result
     }
     
-    func getRewardActivityData() -> Result<CustomData, Error> {
+    func getRewardActivityData() -> Result<CustomData, PsiCashLibError> {
         guard let result = Result(client.getRewardedActivityData()) else {
             // Programming fault
             fatalError()
@@ -324,14 +368,32 @@ final class PsiCash {
      • InvalidTokens: Should never happen (indicates something like
      local storage corruption). The local user state will be cleared.
      */
-    func refreshState(purchaseClasses: [String]) -> Result<PSIStatus, Error> {
+    func refreshState(
+        purchaseClasses: [String]
+    ) -> Result<PsiCashLibData, PsiCashRefreshError> {
         guard
             let result = Result(client.refreshState(withPurchaseClasses: purchaseClasses))
         else {
             // Programming fault
             fatalError()
         }
-        return result
+        
+        return result.biFlatMap {
+            guard let statusResult = psiStatusToRefreshStatus($0) else {
+                // Programming fault
+                fatalError()
+            }
+            
+            switch statusResult {
+            case .success(()):
+                return .success(self.dataModel)
+            case .failure(let errorStatus):
+                return .failure(.errorStatus(errorStatus))
+            }
+            
+        } transformFailure: {
+            return .failure(.requestFailed($0))
+        }
     }
     
     /** Copied from PSIPsiCashLibWrapper
@@ -380,31 +442,47 @@ final class PsiCash {
      further retry should not be immediate.
      */
     func newExpiringPurchase(
-        transactionClass: String, distinguisher: String, expectedPrice: PsiCashAmount
-    ) -> Result<NewExpiringPurchaseResponse, Error> {
+        purchasable: PsiCashPurchasableType
+    ) -> Result<NewExpiringPurchaseResponse, PsiCashNewExpiringPurchaseError> {
         
-        let result = self.client.newExpiringPurchase(
-            withTransactionClass: transactionClass,
-            distinguisher: distinguisher,
-            expectedPrice: expectedPrice.inNanoPsi
+        let maybeResult = Result(
+            self.client.newExpiringPurchase(
+                withTransactionClass: purchasable.rawTransactionClass,
+                distinguisher: purchasable.distinguisher,
+                expectedPrice: purchasable.price.inNanoPsi
+            )
         )
         
-        if let success = result.success {
-            if let purchase = success.purchase {
-                return .success(NewExpiringPurchaseResponse(
-                                    status: success.status,
-                                    purchaseResult: PsiCashPurchasedType.parse(purchase: purchase)))
-            } else {
-                return .success(NewExpiringPurchaseResponse(status: success.status,
-                                                            purchaseResult: .none))
-            }
-        } else if let failure = result.failure {
-            return .failure(Error(failure))
-        } else {
+        guard let result = maybeResult else {
             // Programming fault
             fatalError()
         }
         
+        return result.biFlatMap {
+            guard let statusResult = psiStatusToNewExpiringPurchaseStatus($0.status) else {
+                // Programming fault
+                fatalError()
+            }
+            
+            switch statusResult {
+            case .success(()):
+                guard let purchase = $0.purchase else {
+                    // Programming fault
+                    fatalError()
+                }
+                let parsedPurchasedType = PsiCashPurchasedType.parse(purchase: purchase)
+                return .success(
+                    NewExpiringPurchaseResponse(refreshedLibData: self.dataModel,
+                                                purchasedType: parsedPurchasedType)
+                )
+                
+            case .failure(let errorStatus):
+                return .failure(.errorStatus(errorStatus))
+            }
+            
+        } transformFailure: {
+            return .failure(.requestFailed($0))
+        }
     }
     
     /** Copied from PSIPsiCashLibWrapper
@@ -419,8 +497,8 @@ final class PsiCash {
     NOTE: This (usually) does involve a network operation, so wrappers may want to be
     asynchronous.
     */
-    func accountLogout() -> Error? {
-        Error(self.client.accountLogout())
+    func accountLogout() -> PsiCashLibError? {
+        PsiCashLibError(self.client.accountLogout())
     }
     
     /** Copied from PSIPsiCashLibWrapper
@@ -450,23 +528,41 @@ final class PsiCash {
       again later. Note that the request has already been retried internally and any
       further retry should not be immediate.
     */
-    func accountLogin(username: String, password: String) -> Result<AccountLoginResponse, Error> {
+    func accountLogin(
+        username: String, password: SecretString
+    ) -> Result<AccountLoginResponse, PsiCashAccountLoginError> {
         
-        let result = self.client.accountLogin(withUsername: username, andPassword: password)
-        
-        if let success = result.success {
+        password.map { passwordValue in
             
-            return .success(AccountLoginResponse(
-                                status: success.status,
-                                lastTrackerMerge: success.lastTrackerMerge.toOptionalBool))
+            let maybeResult = Result(self.client.accountLogin(withUsername: username,
+                                                              andPassword: passwordValue))
             
-        } else if let failure = result.failure {
+            guard let result = maybeResult else {
+                // Programming fault
+                fatalError()
+            }
             
-            return .failure(Error(failure))
-            
-        } else {
-            // Programming fault
-            fatalError()
+            return result.biFlatMap {
+                guard let statusResult = psiStatusToAccountLoginStatus($0.status) else {
+                    // Programming fault
+                    fatalError()
+                }
+                
+                switch statusResult {
+                case .success(()):
+                    return .success(
+                        AccountLoginResponse(
+                            lastTrackerMerge: $0.lastTrackerMerge.toOptionalBool ?? false
+                        )
+                    )
+                    
+                case .failure(let errorStatus):
+                    return .failure(.errorStatus(errorStatus))
+                }
+                
+            } transformFailure: {
+                return .failure(.requestFailed($0))
+            }
         }
         
     }
@@ -542,7 +638,7 @@ extension PsiCashExpirableTransaction {
 
 extension PsiCashPurchasedType {
  
-    static func parse(purchase: PSIPurchase) -> Result<Self, PsiCashParseError> {
+    static func parse(purchase: PSIPurchase) -> PsiCashParsed<Self> {
         
         switch PsiCashTransactionClass.parse(transactionClass: purchase.transactionClass) {
         
@@ -598,13 +694,13 @@ fileprivate extension PsiCashPurchasableType {
     
 }
 
-fileprivate extension Result where Success == String, Failure == PsiCash.Error {
+fileprivate extension Result where Success == String, Failure == PsiCashLibError {
     
     init?(_ psiResult: PSIResult<NSString>) {
         if let success = psiResult.success {
             self = .success(String(success))
         } else if let failure = psiResult.failure {
-            self = .failure(PsiCash.Error(failure))
+            self = .failure(PsiCashLibError(failure))
         } else {
             return nil
         }
@@ -612,13 +708,43 @@ fileprivate extension Result where Success == String, Failure == PsiCash.Error {
     
 }
 
-fileprivate extension Result where Success == PSIStatus, Failure == PsiCash.Error {
+fileprivate extension Result where Success == PSIStatus, Failure == PsiCashLibError {
     
     init?(_ psiResult: PSIResult<PSIStatusWrapper>) {
         if let success = psiResult.success {
             self = .success(success.status)
         } else if let failure = psiResult.failure {
-            self = .failure(Error(failure))
+            self = .failure(PsiCashLibError(failure))
+        } else {
+            return nil
+        }
+    }
+    
+}
+
+fileprivate extension Result where Success == PSINewExpiringPurchaseResponse,
+                                   Failure == PsiCashLibError {
+    
+    init?(_ psiResult: PSIResult<PSINewExpiringPurchaseResponse>) {
+        if let success = psiResult.success {
+            self = .success(success)
+        } else if let failure = psiResult.failure {
+            self = .failure(PsiCashLibError(failure))
+        } else {
+            return nil
+        }
+    }
+    
+}
+
+fileprivate extension Result where Success == PSIAccountLoginResponse,
+                                   Failure == PsiCashLibError {
+    
+    init?(_ psiResult: PSIResult<PSIAccountLoginResponse>) {
+        if let success = psiResult.success {
+            self = .success(success)
+        } else if let failure = psiResult.failure {
+            self = .failure(PsiCashLibError(failure))
         } else {
             return nil
         }

@@ -157,7 +157,9 @@ fileprivate extension OnboardingScreen {
         
         self.onOnboardingFinished = onOnboardingFinished
         
-        super.init(nibName: nil, bundle: nil)
+        super.init(onDismiss: {
+            // No-op.
+        })
     }
     
     required init?(coder: NSCoder) {

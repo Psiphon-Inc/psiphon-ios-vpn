@@ -50,7 +50,7 @@ public extension Result {
         }
     }
     
-    func dropSuccessValue() -> Result<(), Failure> {
+    func successToUnit() -> Result<(), Failure> {
         switch self {
         case .success(_):
             return .success(())
@@ -60,8 +60,8 @@ public extension Result {
     }
     
     func biFlatMap<C, D: Error>(
-        _ transformSuccess: (Success) -> Result<C, D>,
-        _ transformFailure: (Failure) -> Result<C, D>
+        transformSuccess: (Success) -> Result<C, D>,
+        transformFailure: (Failure) -> Result<C, D>
     ) -> Result<C, D> {
         switch self {
         case let .success(success):

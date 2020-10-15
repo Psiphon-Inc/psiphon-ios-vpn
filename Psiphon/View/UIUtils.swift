@@ -27,6 +27,11 @@ struct AppStyle {
 }
 
 struct Styling {
+    
+    /// No layout should be larger in width than this constant.
+    var layoutMaxWidth: CGFloat = 700.0
+    var layoutWidthToHeightRatio: Float = 0.91
+    
     var animationDuration: TimeInterval = 0.1
     var borderWidth: CGFloat = 5.0
     var cornerRadius: CGFloat = 8.0
@@ -104,6 +109,27 @@ func mutate<Ref: AnyObject>(_ values: [Ref], applyMutations: (Ref) -> Void) {
     for value in values {
         applyMutations(value)
     }
+}
+
+struct Padding: Equatable {
+    
+    let top: Float
+    let bottom: Float
+    let leading: Float
+    let trailing: Float
+    
+    init(
+        top: Float = 0,
+        bottom: Float = 0,
+        leading: Float = 0,
+        trailing: Float = 0
+    ) {
+        self.top = top
+        self.bottom = bottom
+        self.leading = leading
+        self.trailing = trailing
+    }
+    
 }
 
 extension UILabel {
@@ -185,32 +211,6 @@ extension UIStackView {
     
 }
 
-extension UITextField {
-    
-    static func make<TextFieldView: UITextField>(
-        placeholder: String?,
-        textColor: UIColor = .white,
-        underline: Bool = true
-    ) -> TextFieldView {
-        let v = TextFieldView(frame: .zero)
-        
-        mutate(v) {
-            $0.textColor = textColor
-            
-            if let placeholder = placeholder {
-                $0.attributedPlaceholder = NSAttributedString(
-                    string: placeholder,
-                    attributes: [NSAttributedString.Key.foregroundColor:
-                                    textColor.withAlphaComponent(0.25)]
-                )
-            }
-            
-        }
-        
-        return v
-    }
-    
-}
 
 enum EdgeInsets {
     case normal
@@ -322,23 +322,6 @@ func addShadow(toLayer layer: CALayer?) {
     layer.shadowRadius = 2.0
 }
 
-/// Should set frame on returned `CAGradientLayer` and set path on returned `CAShapeLayer`.
-func makeGradientBorderLayer(colors: [CGColor], width: CGFloat = 2.0)
-    -> (CAGradientLayer, CAShapeLayer) {
-    let gradient = CAGradientLayer()
-    gradient.startPoint = CGPoint(x: 0.5, y: 0.0)
-    gradient.endPoint = CGPoint(x: 0.5, y: 1.0)
-    gradient.colors = colors
-
-    let borderMask = CAShapeLayer()
-    borderMask.lineWidth = width
-    borderMask.fillColor = nil
-    borderMask.strokeColor = UIColor.black.cgColor
-    gradient.mask = borderMask
-
-    return (gradient, borderMask)
-}
-
 
 func setBackgroundGradient(for view: UIView) {
     guard view.bounds.size != CGSize.zero else {
@@ -400,8 +383,45 @@ protocol Anchorable {
 
 }
 
-extension Anchorable {
+extension NSLayoutDimension {
+    
+    func constraint(default: CGFloat, max: CGFloat?) -> [NSLayoutConstraint] {
+        let defaultConstraint = self.constraint(equalToConstant: `default`)
+            .priority(.defaultHigh)
+        
+        if let max = max {
+            let maxConstraint = self.constraint(lessThanOrEqualToConstant: max)
+                .priority(.required)
+            
+            return [maxConstraint, defaultConstraint]
+            
+        } else {
+            return [defaultConstraint]
+        }
+    }
+    
+    func constraint(
+        toDimension dimension: NSLayoutDimension, ratio: Float = 1.0, max maybeMax: CGFloat? = nil
+    ) -> [NSLayoutConstraint] {
+        
+        var constraints = [
+            self.constraint(equalTo: dimension, multiplier: CGFloat(ratio))
+                .priority(.belowRequired),
+        ]
+        
+        if let max = maybeMax {
+            constraints.append(
+                self.constraint(lessThanOrEqualToConstant: max).priority(.required)
+            )
+        }
+        
+        return constraints
+    }
+    
+}
 
+extension Anchorable {
+    
     func constraint(to anchorable: Anchorable,
                     _ anchors: Anchor...) -> [NSLayoutConstraint] {
         constraint(to: anchorable, anchors)
@@ -553,29 +573,7 @@ extension UIView {
             self.setContentCompressionResistancePriority(priority, for: axis)
         }
     }
-
-    func widthConstraint(to normal: CGFloat, withMax max: CGFloat) -> [NSLayoutConstraint] {
-        let max = self.widthAnchor.constraint(lessThanOrEqualToConstant: max)
-        max.priority = .required
-        max.isActive = true
-
-        let normal = self.widthAnchor.constraint(equalToConstant: normal)
-        normal.priority = .defaultHigh
-        normal.isActive = true
-        return [max, normal]
-    }
-
-    func heightConstraint(to normal: CGFloat, withMax max: CGFloat) -> [NSLayoutConstraint] {
-        let max = self.heightAnchor.constraint(lessThanOrEqualToConstant: max)
-        max.priority = .required
-        max.isActive = true
-
-        let normal = self.heightAnchor.constraint(equalToConstant: normal)
-        normal.priority = .defaultHigh
-        normal.isActive = true
-        return [max, normal]
-    }
-
+    
 }
 
 extension NSLayoutConstraint {
@@ -743,7 +741,9 @@ final class ImmutableBindableViewable<BindingType: Equatable, WrappedView: ViewW
     static func build<Builder: ViewBuilder>(
         with builder: Builder, addTo container: UIView
     ) -> Builder.BuildType where BindingType == Builder.BuildType.BindingType {
-
+        
+        container.translatesAutoresizingMaskIntoConstraints = false
+        
         // Cleans up the container.
         container.subviews.forEach { $0.removeFromSuperview() }
 
@@ -786,6 +786,7 @@ final class MutableBindableViewable<BindingType: Equatable, WrappedView: ViewWra
     static func build<Builder: ViewBuilder>(
         with builder: Builder, addTo container: UIView
     ) -> Builder.BuildType where MutableBindableViewable == Builder.BuildType {
+        container.translatesAutoresizingMaskIntoConstraints = false
         container.subviews.forEach { $0.removeFromSuperview() }
         return builder.build(container)
     }
@@ -911,12 +912,23 @@ extension UIViewController {
         return viewControllerToPresent.isBeingPresented
     }
     
+    /// This method is an attempt to organize dismissal of view controller's in order
+    /// to build a typed navigation hierarchy.
+    /// This method is functionally equivalent to calling dismiss on the presented view controller.
+    static func safeDismiss(
+        _ viewControllerToDismiss: UIViewController,
+        animated flag: Bool,
+        completion: (() -> Void)?
+    ) {
+        viewControllerToDismiss.dismiss(animated: flag, completion: completion)
+    }
+    
 }
 
 extension UINavigationBar {
     
     /// Hides iOS default 1px bottom border from navigation bar.
-    func hideDefaultBottomBorder() {
+    func hideSystemBottomBorder() {
         self.setValue(true, forKey: "hidesShadow")
     }
     

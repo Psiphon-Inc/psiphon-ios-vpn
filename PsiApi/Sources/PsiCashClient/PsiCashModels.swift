@@ -86,6 +86,42 @@ extension PsiCashLibData {
 
 // MARK: Data models
 
+/// Represents an error emitted by the PsiCash client library.
+public struct PsiCashLibError: HashableError {
+    public let critical: Bool
+    public let description: String
+    
+    public init(critical: Bool, description: String) {
+        self.critical = critical
+        self.description = description
+    }
+}
+
+/// Represents a successful expiring purchase response.
+public struct NewExpiringPurchaseResponse: Equatable {
+    public let refreshedLibData: PsiCashLibData
+    public let purchasedType: PsiCashParsed<PsiCashPurchasedType>
+    
+    public init(
+        refreshedLibData: PsiCashLibData,
+        purchasedType: PsiCashParsed<PsiCashPurchasedType>
+    ) {
+        self.refreshedLibData = refreshedLibData
+        self.purchasedType = purchasedType
+    }
+}
+
+/// Represents a successful account login response.
+public struct AccountLoginResponse: Equatable {
+    
+    public let lastTrackerMerge: Bool
+    
+    public init(lastTrackerMerge: Bool) {
+        self.lastTrackerMerge = lastTrackerMerge
+    }
+    
+}
+
 public struct PsiCashAmount: Comparable, Hashable, Codable {
     private let _storage: Int64
     public var inPsi: Double { Double(_storage) / 1e9 }

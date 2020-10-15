@@ -289,7 +289,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
                                 subscribeNext:^(BridgedBalanceViewBindingType * _Nullable balance) {
             MainViewController *__strong strongSelf = weakSelf;
             if (strongSelf) {
-                [strongSelf->psiCashWidget.balanceView objcBind:balance];
+                [strongSelf->psiCashWidget.balanceViewWrapper objcBind:balance];
             }
         }]];
     }
@@ -1130,7 +1130,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
                                              initWithTarget:self
                                              action:@selector(addPsiCashButtonTapped)];
-    [psiCashWidget.balanceView addGestureRecognizer:tapRecognizer];
+    [psiCashWidget.balanceViewWrapper.view addGestureRecognizer:tapRecognizer];
 }
 
 - (void)setPsiCashContentHidden:(BOOL)hidden {
