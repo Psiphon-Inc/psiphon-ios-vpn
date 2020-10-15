@@ -274,7 +274,7 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
         }
         
         return effects + [
-            psiCashVerifyRequest.callAsFunction(
+            psiCashVerifyRequest(
                 getCurrentTime: environment.getCurrentTime,
                 tunnelStatusSignal: environment.tunnelStatusSignal,
                 tunnelConnectionRefSignal: environment.tunnelConnectionRefSignal,

@@ -351,7 +351,7 @@ public let subscriptionAuthStateReducer = Reducer<SubscriptionReducerState
         }
         
         return effects + [
-            authRequest.callAsFunction(
+            authRequest(
                 getCurrentTime: environment.dateCompare.getCurrentTime,
                 tunnelStatusSignal: environment.tunnelStatusSignal,
                 tunnelConnectionRefSignal: environment.tunnelConnectionRefSignal,

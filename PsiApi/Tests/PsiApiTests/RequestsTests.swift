@@ -111,7 +111,7 @@ func generateRetriableTunneledHttpRequestTest(
     }
 
     // Act
-    let result = request.callAsFunction(
+    let result = request(
         getCurrentTime: currentTimeFunc,
         tunnelStatusSignal: SignalProducer.just(
             values: vpnStatusSeq,
@@ -153,7 +153,7 @@ final class RequestsTests: XCTestCase {
         }
         
         // Act
-        let result = request.callAsFunction(
+        let result = request(
             getCurrentTime: { Date() },
             tunnelStatusSignal: SignalProducer.neverComplete(value: .connected),
             tunnelConnectionRefSignal: SignalProducer.neverComplete(value: connectedConnection),
