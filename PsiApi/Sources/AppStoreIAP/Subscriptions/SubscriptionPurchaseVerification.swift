@@ -132,7 +132,7 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
         self.urlSessionResult = urlSessionResult
 
         // TODO: The mapping of types of `urlSessionResult` to `result` can be generalized.
-        switch urlSessionResult {
+        switch urlSessionResult.result {
         case let .success(r):
             switch r.metadata.statusCode {
             case .ok:
@@ -141,17 +141,18 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
                     let decodedBody = try decoder.decode(SuccessResult.self, from: r.data)
                     self.result = .success(decodedBody)
                 } catch {
-                    self.result = .failure(ErrorEvent(.responseParseError(SystemError(error))))
+                    self.result = .failure(ErrorEvent(.responseParseError(SystemError(error)),
+                                                      date: urlSessionResult.date))
                 }
             case .badRequest:
-                self.result = .failure(ErrorEvent(.badRequest))
+                self.result = .failure(ErrorEvent(.badRequest, date: urlSessionResult.date))
             default:
-                self.result = .failure(ErrorEvent(
-                    .otherErrorStatusCode(r.metadata.statusCode)))
+                self.result = .failure(ErrorEvent(.otherErrorStatusCode(r.metadata.statusCode),
+                                                  date: urlSessionResult.date))
             }
         case let .failure(httpRequestError):
-            self.result = .failure(httpRequestError.errorEvent.map { .failedRequest($0) })
-
+            self.result = .failure(ErrorEvent(.failedRequest(httpRequestError.error),
+                                              date: urlSessionResult.date))
         }
     }
 

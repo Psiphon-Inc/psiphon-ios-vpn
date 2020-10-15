@@ -950,7 +950,8 @@ fileprivate func loadAllConfigs<T: TunnelProviderManager>() -> Effect<ConfigUpda
                         .map { results -> ConfigUpdatedResult<T> in
                             let errors = results.compactMap { $0.failureToOptional()?.error }
                             if errors.count > 0 {
-                                return .failure(ErrorEvent(.failedRemovingConfigs(errors)))
+                                return .failure(ErrorEvent(.failedRemovingConfigs(errors),
+                                                           date: Date()))
                             } else {
                                 return .success(nil)
                             }
@@ -1089,7 +1090,7 @@ fileprivate func sendProviderStateQuery<T: TunnelProviderManager>(
             } catch {
                 return (tpm,
                         connectionStatus,
-                        .failure(ErrorEvent(.parseError(String(describing: error)))))
+                        .failure(ErrorEvent(.parseError(String(describing: error)), date: Date())))
             }
             
         case .failure(let errorEvent):
@@ -1101,7 +1102,7 @@ fileprivate func sendProviderStateQuery<T: TunnelProviderManager>(
              raising: ProviderMessageSendError.timedout(timeoutInterval),
              on: QueueScheduler.main)
     .flatMapError { [tpm] error -> Effect<(T, TunnelProviderVPNStatus, ProviderStateQueryResult)> in
-        return Effect(value: (tpm, tpm.connectionStatus, .failure(ErrorEvent(error))))
+        return Effect(value: (tpm, tpm.connectionStatus, .failure(ErrorEvent(error, date: Date()))))
     }
     
 }

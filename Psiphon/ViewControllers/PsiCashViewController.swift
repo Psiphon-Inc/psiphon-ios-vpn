@@ -203,7 +203,8 @@ final class PsiCashViewController: ReactiveViewController {
                 self.display(screen: .logInScreen)
             } else {
                 let error = ErrorEventDescription(
-                    event: ErrorEvent(ErrorRepr(repr: "tunnel not connected")),
+                    event: ErrorEvent(ErrorRepr(repr: "tunnel not connected"),
+                                      date: dateCompare.getCurrentTime()),
                     localizedUserDescription: UserStrings.Psiphon_is_not_connected())
                 
                 self.displayBasicAlert(errorDesc: error)

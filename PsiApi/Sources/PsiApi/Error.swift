@@ -78,7 +78,7 @@ public struct ErrorEvent<E: HashableError>: HashableError, FeedbackDescription {
     public let error: E
     public let date: Date
 
-    public init(_ error: E, date: Date = Date()) {
+    public init(_ error: E, date: Date) {
         self.error = error
         self.date = date
     }

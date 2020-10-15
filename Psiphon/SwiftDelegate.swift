@@ -226,10 +226,10 @@ extension SwiftDelegate: RewardedVideoAdBridgeDelegate {
             // Note that error event is created here as opposed to the origin
             // of where the error occurred. However this is acceptable as long as
             // this function is called once for each error that happened almost immediately.
-            loadResult = .failure(ErrorEvent(.adSDKError(SystemError(error))))
+            loadResult = .failure(ErrorEvent(.adSDKError(SystemError(error)), date: Date()))
         } else {
             if case .error = status {
-                loadResult = .failure(ErrorEvent(.requestedAdFailedToLoad))
+                loadResult = .failure(ErrorEvent(.requestedAdFailedToLoad, date: Date()))
             } else {
                 loadResult = .success(RewardedVideoLoadStatus(objcAdLoadStatus: status))
             }
@@ -477,7 +477,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 Pair(appState.vpnState.value.vpnStatusWithIntent, appState.vpnState.value.loadState)
             }
             .skipRepeats()
-            .flatMap(.latest) { vpnStateTunnelLoadStatePair ->
+            .flatMap(.latest) { [unowned self] vpnStateTunnelLoadStatePair ->
                 SignalProducer<Result<Utilities.Unit, ErrorEvent<ErrorRepr>>, Never> in
                 
                 guard case .loaded(_) = vpnStateTunnelLoadStatePair.second.value else {
@@ -490,7 +490,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 switch compareValue {
                 case (current: .notConnected, expected: .start(transition: .none)):
                     let error = ErrorEvent(
-                        ErrorRepr(repr: "Unexpected value '\(vpnStateTunnelLoadStatePair.second)'")
+                        ErrorRepr(repr: "Unexpected value '\(vpnStateTunnelLoadStatePair.second)'"),
+                        date: self.dateCompare.getCurrentTime()
                     )
                     
                     // Waits for the specified amount of time before emitting the vpn status

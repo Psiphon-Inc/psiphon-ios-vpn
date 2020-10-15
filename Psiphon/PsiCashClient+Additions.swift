@@ -137,7 +137,7 @@ fileprivate struct PsiCashHTTPResponse: HTTPResponse {
     }
     
     init(urlSessionResult: URLSessionResult) {
-        switch urlSessionResult {
+        switch urlSessionResult.result {
         case let .success(r):
             
             let statusCode = Int32(r.metadata.statusCode.rawValue)

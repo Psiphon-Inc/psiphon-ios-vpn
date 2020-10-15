@@ -226,7 +226,8 @@ final class ProductRequestDelegate: StoreDelegate<ProductRequestAction>, SKProdu
     func request(_ request: SKRequest, didFailWithError error: Error) {
         storeSend(
             .productRequestResult(
-                request as! SKProductsRequest, .failure(SystemErrorEvent(SystemError(error)))
+                request as! SKProductsRequest, .failure(SystemErrorEvent(SystemError(error),
+                                                                         date: Date()))
             )
         )
     }
