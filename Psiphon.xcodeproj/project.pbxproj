@@ -97,7 +97,7 @@
 		52D363C9230DE215002C2221 /* PsiCashViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363C8230DE215002C2221 /* PsiCashViewController.swift */; };
 		52D363CB230DEBED002C2221 /* CloseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CA230DEBED002C2221 /* CloseButton.swift */; };
 		52D363CD230EEBAC002C2221 /* AnimatedUIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CC230EEBAC002C2221 /* AnimatedUIButton.swift */; };
-		52D363CF230F112E002C2221 /* TabControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CE230F112E002C2221 /* TabControlView.swift */; };
+		52D363CF230F112E002C2221 /* TabControlViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CE230F112E002C2221 /* TabControlViewWrapper.swift */; };
 		52DF5E9223C675EC00A1B067 /* ViewController+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9123C675EC00A1B067 /* ViewController+Additions.swift */; };
 		52DF5E9823CE5A8300A1B067 /* AppAction+ValuePaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9723CE5A8300A1B067 /* AppAction+ValuePaths.swift */; };
 		52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9923CE835100A1B067 /* UserStrings.swift */; };
@@ -538,7 +538,7 @@
 		52D363C8230DE215002C2221 /* PsiCashViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashViewController.swift; sourceTree = "<group>"; };
 		52D363CA230DEBED002C2221 /* CloseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseButton.swift; sourceTree = "<group>"; };
 		52D363CC230EEBAC002C2221 /* AnimatedUIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedUIButton.swift; sourceTree = "<group>"; };
-		52D363CE230F112E002C2221 /* TabControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabControlView.swift; sourceTree = "<group>"; };
+		52D363CE230F112E002C2221 /* TabControlViewWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabControlViewWrapper.swift; sourceTree = "<group>"; };
 		52DF5E9123C675EC00A1B067 /* ViewController+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ViewController+Additions.swift"; sourceTree = "<group>"; };
 		52DF5E9723CE5A8300A1B067 /* AppAction+ValuePaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppAction+ValuePaths.swift"; sourceTree = "<group>"; };
 		52DF5E9923CE835100A1B067 /* UserStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStrings.swift; sourceTree = "<group>"; };
@@ -1146,7 +1146,7 @@
 				52055D03230C823100244F9E /* GradientButton.swift */,
 				52D363CA230DEBED002C2221 /* CloseButton.swift */,
 				52D363CC230EEBAC002C2221 /* AnimatedUIButton.swift */,
-				52D363CE230F112E002C2221 /* TabControlView.swift */,
+				52D363CE230F112E002C2221 /* TabControlViewWrapper.swift */,
 				5202011C2360D34000D00C8E /* EitherView.swift */,
 				52C8F0AA237CA26200E5F9C0 /* ImageViewBuilder.swift */,
 				52CAC4302385D06600A92842 /* Spinner.swift */,
@@ -2034,7 +2034,7 @@
 				8D7789CA247499110038BFDA /* Reachability+Additions.swift in Sources */,
 				5246800922D51CE4009AEC6E /* PsiCashBalanceViewWrapper.swift in Sources */,
 				8DD642C1248AAD8A006C94D2 /* Utils.swift in Sources */,
-				52D363CF230F112E002C2221 /* TabControlView.swift in Sources */,
+				52D363CF230F112E002C2221 /* TabControlViewWrapper.swift in Sources */,
 				445F24D620E1A5BA00D004E9 /* xer_decoder.c in Sources */,
 				EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */,
 				EF90D7A4204F22C900228A63 /* timestamp_format.c in Sources */,
