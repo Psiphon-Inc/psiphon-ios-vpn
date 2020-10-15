@@ -135,6 +135,8 @@
 		8D4ACD32247E3626008E404C /* AppStoreIAP+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */; };
 		8D4EEA9624F761630057E32D /* ApplicationSupportFileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4EEA9524F761620057E32D /* ApplicationSupportFileStore.swift */; };
 		8D53C6A824C5EED8001E4E2D /* SessionConfigValues.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D53C6A724C5EED8001E4E2D /* SessionConfigValues.m */; };
+		8D75EF6125264A7600D44101 /* ContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D75EF6025264A7600D44101 /* ContainerView.swift */; };
+		8D75EF6625265F3C00D44101 /* SpacerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D75EF6525265F3B00D44101 /* SpacerView.swift */; };
 		8D778978247469FE0038BFDA /* AppInfo.h in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920620F3DA190033114B /* AppInfo.h */; };
 		8D7789B9247491CA0038BFDA /* PsiphonBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */; };
 		8D7789BD247493300038BFDA /* VPNState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789BC247493300038BFDA /* VPNState.swift */; };
@@ -619,6 +621,8 @@
 		8D5F08A5247DB21700F51A42 /* Testing */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Testing; sourceTree = SOURCE_ROOT; };
 		8D5F08A6247DB23A00F51A42 /* Utilities */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Utilities; sourceTree = SOURCE_ROOT; };
 		8D5F08A7247DB24C00F51A42 /* PsiApi */ = {isa = PBXFileReference; lastKnownFileType = folder; path = PsiApi; sourceTree = SOURCE_ROOT; };
+		8D75EF6025264A7600D44101 /* ContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContainerView.swift; sourceTree = "<group>"; };
+		8D75EF6525265F3B00D44101 /* SpacerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpacerView.swift; sourceTree = "<group>"; };
 		8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonBundle.swift; sourceTree = "<group>"; };
 		8D7789BC247493300038BFDA /* VPNState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNState.swift; sourceTree = "<group>"; };
 		8D7789C4247496F60038BFDA /* PsiCash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCash.swift; sourceTree = "<group>"; };
@@ -1153,6 +1157,8 @@
 				8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */,
 				8D92A33024928E4900F75254 /* SubscriptionBarView.swift */,
 				8D335A7A251BC789005F62CA /* DividerView.swift */,
+				8D75EF6025264A7600D44101 /* ContainerView.swift */,
+				8D75EF6525265F3B00D44101 /* SpacerView.swift */,
 				8D13232E25310661005F83C8 /* SecretValueTextField.swift */,
 			);
 			path = View;
@@ -2109,6 +2115,7 @@
 				52DF5E9223C675EC00A1B067 /* ViewController+Additions.swift in Sources */,
 				CED6796124A4FA6D00C4CA81 /* ExtensionContainerFile.m in Sources */,
 				52C8F0AB237CA26200E5F9C0 /* ImageViewBuilder.swift in Sources */,
+				8D75EF6125264A7600D44101 /* ContainerView.swift in Sources */,
 				445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */,
 				521FD0F0219E0D5600F748EC /* DebugLogViewController.m in Sources */,
 				521FD0F1219E0D5600F748EC /* DebugToolboxViewController.m in Sources */,
@@ -2119,6 +2126,7 @@
 				445F24EE20E1A5BA00D004E9 /* asn_codecs_prim.c in Sources */,
 				521FD0FA219E0DDF00F748EC /* AppProfiler.m in Sources */,
 				CED6794624A4F95D00C4CA81 /* RunningMinMax.m in Sources */,
+				8D75EF6625265F3C00D44101 /* SpacerView.swift in Sources */,
 				445F24E620E1A5BA00D004E9 /* per_opentype.c in Sources */,
 				445F24EC20E1A5BA00D004E9 /* SignedData.c in Sources */,
 				9BFEC2458D1346F537E9089E /* Nullity.m in Sources */,
