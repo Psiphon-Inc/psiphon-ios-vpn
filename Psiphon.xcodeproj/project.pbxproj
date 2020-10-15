@@ -110,6 +110,7 @@
 		8D0017D724DB233200EC3409 /* VPNStrings.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D0017D624DB233200EC3409 /* VPNStrings.m */; };
 		8D0017D924DB4B1200EC3409 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0017D824DB4B1200EC3409 /* OnboardingViewController.swift */; };
 		8D0017DB24DDD99A00EC3409 /* AppUpgrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0017DA24DDD99A00EC3409 /* AppUpgrade.swift */; };
+		8D13232F25310661005F83C8 /* SecretValueTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D13232E25310661005F83C8 /* SecretValueTextField.swift */; };
 		8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62B9247DBB0D0028AFAF /* Utilities */; };
 		8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62BB247DBB130028AFAF /* PsiApi */; };
 		8D1F62BE247DC1690028AFAF /* Receipt+AppStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62BD247DC1690028AFAF /* Receipt+AppStore.swift */; };
@@ -591,6 +592,7 @@
 		8D0017D624DB233200EC3409 /* VPNStrings.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = VPNStrings.m; sourceTree = "<group>"; };
 		8D0017D824DB4B1200EC3409 /* OnboardingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingViewController.swift; sourceTree = "<group>"; };
 		8D0017DA24DDD99A00EC3409 /* AppUpgrade.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppUpgrade.swift; sourceTree = "<group>"; };
+		8D13232E25310661005F83C8 /* SecretValueTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretValueTextField.swift; sourceTree = "<group>"; };
 		8D14CCB4BB61E10B351D20DC /* Pods-Psiphon-PsiApi.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi/Pods-Psiphon-PsiApi.release.xcconfig"; sourceTree = "<group>"; };
 		8D1F62BD247DC1690028AFAF /* Receipt+AppStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Receipt+AppStore.swift"; sourceTree = "<group>"; };
 		8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Authorization+Additions.swift"; sourceTree = "<group>"; };
@@ -1151,6 +1153,7 @@
 				8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */,
 				8D92A33024928E4900F75254 /* SubscriptionBarView.swift */,
 				8D335A7A251BC789005F62CA /* DividerView.swift */,
+				8D13232E25310661005F83C8 /* SecretValueTextField.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2205,6 +2208,7 @@
 				A8408F99941C9664E3E7C48A /* LanguageSelectionViewController.m in Sources */,
 				A8408A3A478ECD6E3562CDF4 /* CloudsView.m in Sources */,
 				A84081194DA12328ABB5A43E /* UIImageView+Additions.m in Sources */,
+				8D13232F25310661005F83C8 /* SecretValueTextField.swift in Sources */,
 				A840849074861D633B3EB4D1 /* AppEvent.m in Sources */,
 				A84080E9FC63E29F71A79A63 /* RelaySubject.m in Sources */,
 				CED6794F24A4F9D400C4CA81 /* DelimitedFile.m in Sources */,
