@@ -511,7 +511,7 @@ final class PsiCashViewController: ReactiveViewController {
         view.addSubview(containerView)
         
         // Setup layout guide
-        let rootViewLayoutGuide = addSafeAreaLayoutGuide(to: view)
+        let rootViewLayoutGuide = makeSafeAreaLayoutGuide(addToView: view)
         
         let paddedLayoutGuide = UILayoutGuide()
         view.addLayoutGuide(paddedLayoutGuide)
