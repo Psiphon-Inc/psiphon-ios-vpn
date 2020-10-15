@@ -702,11 +702,11 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
                             return saveAndLoadConfig(tpm)
                                 .map { .configUpdated(.fromConfigSaveAndLoad($0)) }
                             .prefix(value:
-                                .startTunnelResult(startResult.dropSuccessValue().toUnit())
+                                .startTunnelResult(startResult.successToUnit().toUnit())
                             )
                         case .failure(_):
                             return Effect(value:
-                                .startTunnelResult(startResult.dropSuccessValue().toUnit()))
+                                .startTunnelResult(startResult.successToUnit().toUnit()))
                                 .prefix(value: .configUpdated(.success(tpm)))
                         }
                     }

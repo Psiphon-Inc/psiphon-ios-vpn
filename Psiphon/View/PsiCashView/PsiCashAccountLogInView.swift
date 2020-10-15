@@ -28,8 +28,8 @@ final class PsiCashAccountLogInView: UIView {
     
     private let button: GradientButton
     
-    init(onLogInTapped: @escaping () -> Void) {
-        let title = UILabel.make(text: "Log In to your PsiCash account",
+    init() {
+        let title = UILabel.make(text: UserStrings.Create_your_PsiCash_account(),
                                  fontSize: .normal,
                                  typeface: .bold,
                                  numberOfLines: 0)
@@ -43,8 +43,7 @@ final class PsiCashAccountLogInView: UIView {
         backgroundColor = .white(withAlpha: 0.42)
         
         mutate(button) {
-            $0.setTitleColor(.darkBlue(), for: .normal)
-            $0.setTitle("Log In", for: .normal)
+            $0.setTitle(UserStrings.Sign_up(), for: .normal)
             $0.setTitleColor(.darkBlue(), for: .normal)
             $0.titleLabel?.font = UIFont.avenirNextBold(CGFloat(FontSize.h3.rawValue))
             $0.contentEdgeInsets = Style.default.buttonMinimumContentEdgeInsets
@@ -62,10 +61,17 @@ final class PsiCashAccountLogInView: UIView {
         
         button.activateConstraints {
             $0.constraintToParent(.centerY(0), .trailing(-12)) +
-                $0.widthConstraint(to: 80, withMax: 150)
+                $0.widthAnchor.constraint(default: 80, max: 150)
         }
         
-        button.setEventHandler(onLogInTapped)
+    }
+    
+    override var intrinsicContentSize: CGSize {
+        CGSize(width: UIView.noIntrinsicMetric, height: Style.default.buttonHeight)
+    }
+    
+    func onLogInTapped(_ handler: @escaping () -> Void) {
+        button.setEventHandler(handler)
     }
     
 }

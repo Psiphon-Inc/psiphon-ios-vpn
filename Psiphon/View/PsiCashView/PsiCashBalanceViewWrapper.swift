@@ -34,7 +34,7 @@ struct PsiCashBalanceViewModel: Equatable {
     private typealias IconType = EitherView<ImageViewBuilder, EitherView<Spinner, ButtonBuilder>>
 
     private let psiCashPriceFormatter = PsiCashAmountFormatter(locale: Locale.current)
-    private let wrapperView = UIStackView(frame: .zero)
+    private let hStack: UIStackView
     private let title: UILabel
     private let iconContainer = UIView(frame: .zero)
     private let icon: IconType
@@ -45,13 +45,20 @@ struct PsiCashBalanceViewModel: Equatable {
     private var currentAmount: PsiCashAmount?
     
     @objc var view: UIView {
-        wrapperView
+        hStack
     }
 
     override init() {
         
         let titleString = UserStrings.PsiCash_balance().localizedUppercase
         let fontSize: FontSize = .normal
+        
+        hStack = UIStackView.make(
+            axis: .horizontal,
+            distribution: .fill,
+            alignment: .center,
+            spacing: 2.0
+        )
 
         title = UILabel.make(text: titleString,
                              fontSize: fontSize,
@@ -67,32 +74,32 @@ struct PsiCashBalanceViewModel: Equatable {
             fatalError("Could not find 'PsiCash_Alert' image")
         }
 
-        icon = .init(ImageViewBuilder(image: coinImage),
-                     .init(Spinner(style: .white),
-                           ButtonBuilder(style: .custom, tint: .none, image: waitingForExpectedIncreaseImage, eventHandler: {
-                            let alert = UIAlertController(
-                                title: UserStrings.PsiCash_balance_out_of_date(),
-                                message: UserStrings.Connect_to_psiphon_to_update_psiCash(),
-                                preferredStyle: .alert)
-                            alert.addAction(.init(title: UserStrings.Done_button_title(),
-                                                  style: .default, handler: nil))
-                            AppDelegate.getTopPresentedViewController().present(alert,
-                                                                           animated: true,
-                                                                           completion: nil)
-                           })))
+        icon = EitherView(
+            ImageViewBuilder(image: coinImage),
+            EitherView(
+                Spinner(style: .white),
+                ButtonBuilder(style: .custom, tint: .none, image: waitingForExpectedIncreaseImage) {
+                    let alert = UIAlertController(
+                        title: UserStrings.PsiCash_balance_out_of_date(),
+                        message: UserStrings.Connect_to_psiphon_to_update_psiCash(),
+                        preferredStyle: .alert)
+                    alert.addAction(.init(title: UserStrings.Done_button_title(),
+                                          style: .default, handler: nil))
+                    AppDelegate.getTopPresentedViewController().present(alert,
+                                                                        animated: true,
+                                                                        completion: nil)
+                })
+        )
+        
         iconBindable = icon.build(iconContainer)
 
         super.init()
         
-        mutate(self.wrapperView) {
-            $0.axis = .horizontal
-            $0.distribution = .fill
-            $0.alignment = .center
-            $0.autoresizingMask = [ .flexibleWidth ]
-            $0.spacing = 2.0
-        }
+        // Sets some default value so that hStack's
+        // width and horizontal position are not ambiguous.
+        iconBindable.bind(.left(.unit))
         
-        self.wrapperView.addArrangedSubviews(
+        self.hStack.addArrangedSubviews(
             title,
             iconContainer,
             balanceView
@@ -100,7 +107,14 @@ struct PsiCashBalanceViewModel: Equatable {
         
         iconContainer.activateConstraints {[
                 $0.heightAnchor.constraint(equalToConstant: CGFloat(1.33 * fontSize.rawValue))
+                    .priority(.belowRequired)
         ]}
+        
+        // Additional constraints so that hStack height would not grow
+        // beyond the tallest view (in this case the title view).
+        self.hStack.activateConstraints {
+            $0.constraint(to: title, .top(), .bottom())
+        }
         
         balanceView.setUpdateBlock { [unowned self] (value, label) in
             label.text = self.psiCashPriceFormatter.string(from: Double(value).rounded(.down))

@@ -225,8 +225,8 @@ extension AppState {
         }
     }
     
-    var psiCashViewController: PsiCashViewControllerState {
-        PsiCashViewControllerState(
+    var psiCashViewControllerReaderState: PsiCashViewControllerReaderState {
+        PsiCashViewControllerReaderState(
             psiCashBalanceViewModel: self.psiCashBalanceViewModel,
             psiCash: self.psiCash,
             iap: self.iapState,

@@ -17,7 +17,7 @@
  *
  */
 
-#if !os(macOS)
+#if os(iOS)
 
 import Foundation
 import UIKit
@@ -92,12 +92,30 @@ extension ViewControllerLifeCycle {
 /// and also buffers the last value.
 open class ReactiveViewController: UIViewController {
     
+    /// The time at which this view controller's `viewDidLoad` got called.
+    /// Value is nil beforehand.
+    public private(set) var viewControllerDidLoadDate: Date?
+    
     /// Value of the last UIViewController lifecycle call. The property wrapper provides
     /// an interface to obtain a stream of UIViewController lifecycle call values, which starts
     /// with the current value of this variable.
     @State public private(set) var lifeCycle: ViewControllerLifeCycle = .initing
+    private let onDismiss: () -> Void
+    
+    /// - Parameter onDismiss: Called once after the view controller is either dismissed
+    /// (when viewD
+    public init(onDismiss: @escaping () -> Void) {
+        self.onDismiss = onDismiss
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     open override func viewDidLoad() {
+        self.viewControllerDidLoadDate = Date()
         super.viewDidLoad()
         lifeCycle = .viewDidLoad
     }
@@ -120,6 +138,7 @@ open class ReactiveViewController: UIViewController {
     open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         lifeCycle = .viewDidDisappear(animated: animated)
+        onDismiss()
     }
     
     /// Presents `viewControllerToPresent` only after `viewDidAppear(_:)` has been called
@@ -130,7 +149,9 @@ open class ReactiveViewController: UIViewController {
         completion: (() -> Void)? = nil
     ) {
         self.$lifeCycle.signalProducer
-            .filter{ $0.viewDidAppear }.take(first: 1).startWithValues { [weak self] _ in
+            .filter{ $0.viewDidAppear }
+            .take(first: 1)
+            .startWithValues { [weak self] _ in
                 guard let self = self else {
                     return
                 }

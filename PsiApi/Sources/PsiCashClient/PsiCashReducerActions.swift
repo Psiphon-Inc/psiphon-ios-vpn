@@ -26,10 +26,19 @@ public enum PsiCashAction {
     case _initialized(Result<PsiCashLibData, ErrorRepr>)
     
     case buyPsiCashProduct(PsiCashPurchasableType)
-    case psiCashProductPurchaseResult(PsiCashPurchaseResult)
+    case _psiCashProductPurchaseResult(
+            purchasable: PsiCashPurchasableType,
+            result: PsiCashEffects.PsiCashNewExpiringPurchaseResult
+         )
     
     case refreshPsiCashState
-    case refreshPsiCashStateResult(PsiCashRefreshResult)
+    case _refreshPsiCashStateResult(PsiCashEffects.PsiCashRefreshResult)
+    
+    case accountLogout
+    case _accountLogoutResult(Result<PsiCashLibData, ErrorEvent<PsiCashLibError>>)
+    
+    case accountLogin(username: String, password: SecretString)
+    case _accountLoginResult(PsiCashEffects.PsiCashAccountLoginResult)
     
     case showRewardedVideoAd
     case rewardedVideoPresentation(RewardedVideoPresentation)

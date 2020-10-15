@@ -22,14 +22,21 @@ import ReactiveSwift
 import Utilities
 import PsiApi
 
-public typealias PendingPsiCashRefresh =
-    PendingResult<Utilities.Unit, ErrorEvent<PsiCashRefreshError>>
-
 public struct PsiCashState: Equatable {
+    
+    // Failure type matches PsiCashEffects.PsiCashRefreshResult.Failure
+    public typealias PendingRefresh =
+        PendingResult<Utilities.Unit,
+                      ErrorEvent<TunneledPsiCashRequestError<PsiCashRefreshErrorStatus>>>
+    
+    public typealias PendingAccountLogin = Pending<PsiCashEffects.PsiCashAccountLoginResult>
+    
     public var purchasing: PsiCashPurchasingState
     public var rewardedVideo: RewardedVideoState
     public var libData: PsiCashLibData
-    public var pendingPsiCashRefresh: PendingPsiCashRefresh
+    
+    public var pendingAccountLogin: Event<PendingAccountLogin>?
+    public var pendingPsiCashRefresh: PendingRefresh
     /// True if PsiCashLibData has been loaded from persisted value.
     public var libLoaded: Bool
 }
@@ -40,6 +47,7 @@ extension PsiCashState {
         purchasing = .none
         rewardedVideo = .init()
         libData = .init()
+        pendingAccountLogin = nil
         pendingPsiCashRefresh = .completed(.success(.unit))
         libLoaded = false
     }
@@ -65,7 +73,7 @@ extension PsiCashState {
 public enum PsiCashPurchasingState: Equatable {
     case none
     case speedBoost(SpeedBoostPurchasable)
-    case error(ErrorEvent<PsiCashPurchaseResponseError>)
+    case error(PsiCashEffects.PsiCashNewExpiringPurchaseResult.Error)
     
     /// True if purchasing is completed (succeeded or failed)
     public var completed: Bool {
@@ -138,75 +146,41 @@ public struct RewardedVideoState: Equatable {
     }
 }
 
-public enum PsiCashPurchaseResponseError: HashableError {
-    case tunnelNotConnected
-    case purchaseFailed(psiStatus: Int, shouldRetry: Bool)
-    case requestFailed(message: String)
-}
-
-public enum PsiCashRefreshError: HashableError {
-    /// Refresh request is rejected due to tunnel not connected.
-    case tunnelNotConnected
-    /// Server has returned 500 error response.
-    /// (PsiCash v1.3.1-0-gd1471c1) the request has already been retried internally and any further retry should not be immediate/
-    case serverError
-    /// Tokens passed in are invalid.
-    /// (PsiCash  v1.3.1-0-gd1471c1) Should never happen. The local user ID will be cleared.
-    case invalidTokens
-    /// Some other error.
-    case error(String)
-}
-
-/// `PsiCashTransactionMismatchError` represents errors that are due to state mismatch between
-/// the client and the PsiCash server, ignoring programmer error.
-/// The client should probably sync its state with the server, and it probably shouldn't retry automatically.
-/// The user also probably needs to be informed for an error of this type.
-enum PsiCashTransactionMismatchError: HashableError {
-    /// Insufficient balance to make the transaction.
-    case insufficientBalance
-    /// Client has out of date purchase price.
-    case transactionAmountMismatch
-    /// Client has out of date product list.
-    case transactionTypeNotFound
-    /// There exists a transaction for the purchase class specified.
-    case existingTransaction
-}
-
-public struct PsiCashPurchaseResult: Equatable {
-    public let purchasable: PsiCashPurchasableType
-    public let refreshedLibData: PsiCashLibData
-    public let result: Result<Result<PsiCashPurchasedType, PsiCashParseError>,
-                              ErrorEvent<PsiCashPurchaseResponseError>>
+public enum PsiCashRequestError<ErrorStatus>: HashableError where
+    ErrorStatus: PsiCashErrorStatusProtocol {
     
-    public init (
-        purchasable: PsiCashPurchasableType,
-        refreshedLibData: PsiCashLibData,
-        result: Result<Result<PsiCashPurchasedType, PsiCashParseError>,
-                       ErrorEvent<PsiCashPurchaseResponseError>>
-    ) {
-        self.purchasable = purchasable
-        self.refreshedLibData = refreshedLibData
-        self.result = result
-    }
+    /// Request was submitted successfully, but returned an error status.
+    case errorStatus(ErrorStatus)
     
+    /// Sending the request failed utterly.
+    case requestFailed(PsiCashLibError)
 }
 
-extension PsiCashPurchaseResult {
-
-    var shouldRetry: Bool {
-        guard case let .failure(errorEvent) = self.result else {
-            return false
-        }
-        switch errorEvent.error {
-        case .tunnelNotConnected: return false
-        case .purchaseFailed(psiStatus: _, shouldRetry: let retry):
-            return retry
-        case .requestFailed(message: _):
-            return false
-        }
-    }
-
+/// Represents a PsiCash client library produced request error, along with the an additional
+/// `.tunnelNotConnected` error case.
+public enum TunneledPsiCashRequestError<ErrorStatus>: HashableError where
+    ErrorStatus: PsiCashErrorStatusProtocol {
+    
+    /// Request was not sent since tunnel was not connected.
+    case tunnelNotConnected
+    
+    case requestError(PsiCashRequestError<ErrorStatus>)
 }
+
+/// Represents error values of a PsiCash library refresh action.
+/// Errors generated by the app are not represented here e.g. a tunnel not connected error.
+public typealias PsiCashRefreshError = PsiCashRequestError<PsiCashRefreshErrorStatus>
+
+/// Represents error values of a PsiCash library new expiring purchase action.
+/// Errors generated by the app are not represented here e.g. a tunnel not connected error.
+public typealias PsiCashNewExpiringPurchaseError =
+    PsiCashRequestError<PsiCashNewExpiringPurchaseErrorStatus>
+
+/// Represents error values of a PsiCash library account login action.
+/// Errors generated by the app are not represented here e.g. a tunnel not connected error.
+public typealias PsiCashAccountLoginError =
+    PsiCashRequestError<PsiCashAccountLoginErrorStatus>
+
 
 public struct PsiCashBalance: Equatable {
 

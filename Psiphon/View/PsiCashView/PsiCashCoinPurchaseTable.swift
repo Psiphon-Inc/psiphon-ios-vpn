@@ -259,7 +259,7 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
         ]}
         
         button.activateConstraints {
-            $0.widthConstraint(to: 80.0, withMax: 160.0) + [
+            $0.widthAnchor.constraint(default: 80.0, max: 160.0) + [
                 $0.widthAnchor.constraint(equalTo: hStack.widthAnchor,
                                           multiplier: 0.3).priority(.belowRequired),
                 $0.widthAnchor.constraint(lessThanOrEqualTo: hStack.widthAnchor,

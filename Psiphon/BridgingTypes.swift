@@ -314,9 +314,9 @@ import PsiCashClient
 
 /// Wraps `BalanceState` struct.
 @objc final class BridgedBalanceViewBindingType: NSObject {
-    let state: PsiCashBalanceView.BindingType
+    let state: PsiCashBalanceViewWrapper.BindingType
 
-    init(swiftState state: PsiCashBalanceView.BindingType) {
+    init(swiftState state: PsiCashBalanceViewWrapper.BindingType) {
         self.state = state
     }
 }

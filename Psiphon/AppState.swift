@@ -45,7 +45,7 @@ struct AppState: Equatable {
 }
 
 struct BalanceState: Equatable {
-    let pendingPsiCashRefresh: PendingPsiCashRefresh
+    let pendingPsiCashRefresh: PsiCashState.PendingRefresh
     let psiCashBalance: PsiCashBalance
 }
  
@@ -245,7 +245,8 @@ fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment
         vpnActionStore: env.vpnActionStore,
         objcBridgeDelegate: env.objcBridgeDelegate,
         rewardedVideoAdBridgeDelegate: env.rewardedVideoAdBridgeDelegate,
-        metadata: env.clientMetaData
+        metadata: env.clientMetaData,
+        getCurrentTime: env.dateCompare.getCurrentTime
     )
 }
 

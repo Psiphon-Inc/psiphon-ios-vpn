@@ -21,9 +21,9 @@ import Foundation
 
 final class DividerView: UIView {
     
-    init(color: UIColor) {
+    init(colour: UIColor) {
         super.init(frame: .zero)
-        backgroundColor = color
+        backgroundColor = colour
     }
     
     required init?(coder: NSCoder) {
@@ -31,7 +31,7 @@ final class DividerView: UIView {
     }
     
     override var intrinsicContentSize: CGSize {
-        return CGSize(width: UIView.noIntrinsicMetric, height:0.5)
+        return CGSize(width: UIView.noIntrinsicMetric, height: 1)
     }
     
 }

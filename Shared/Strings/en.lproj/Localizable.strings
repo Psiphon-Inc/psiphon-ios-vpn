@@ -57,6 +57,12 @@
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.";
 
+/* Button label that lets users create a new account. */
+"CREATE_NEW_ACCOUNT_BUTTON_TITLE" = "Create New Account";
+
+/* Title label next to a button that lets users create a PsiCash account. Do not translate or transliterate 'PsiCash' */
+"CREATE_PSICASH_YOUR_ACCOUNT" = "Create your PsiCash account";
+
 /* Decline button title */
 "DECLINE_BUTTON_TITLE" = "Decline";
 
@@ -105,6 +111,9 @@
 /* Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Feedback uploaded successfully";
 
+/* Button title that lets users reset their password if they forgot their account's password. */
+"FORGOT_PASSWORD" = "Forgot Password?";
+
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "Free";
 
@@ -119,6 +128,9 @@
 
 /* Text displayed while app loads */
 "LOADING" = "Loading...";
+
+/* Title on a button that lets users login to their account with the username and password they have entered. */
+"LOG_IN_BUTTON_TITLE" = "Log In";
 
 /* Button title that takes user to the next page */
 "NEXT_PAGE_BUTTON_TITLE" = "Next";
@@ -164,6 +176,12 @@
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
+
+/* Label visually separating Sign up section and sign in section of the app. */
+"OR_SIGNUP_SIGNIN" = "Or";
+
+/* Text field label where users can enter their account's password */
+"PASSWORD_TEXT_FIELD" = "Password";
 
 /* Alert dialog title indicating to the user that Psiphon needs their permission */
 "PERMISSION_REQUIRED_ALERT__TITLE" = "Permission required";
@@ -321,6 +339,9 @@
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";
 
+/* Title on a button that lets users sign up for an account */
+"SIGN_UP_BUTTON_TITLE" = "Sign Up";
+
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST" = "Speed Boost";
 
@@ -395,6 +416,9 @@
 
 /* Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
 "UPGRADE_PSIPHON" = "Upgrade Psiphon";
+
+/* Text field label where users can enter their account's username */
+"USERNAME_TEXT_FIELD" = "Username";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "An error occurred while starting Psiphon. Please try again.";

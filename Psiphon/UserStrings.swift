@@ -286,6 +286,55 @@ extension UserStrings {
                                  value: "Purchase Failed",
                                  comment: "Generic alert shown when purchase of a product fails.")
     }
+    
+    static func Create_your_PsiCash_account() -> String {
+        return NSLocalizedString("CREATE_PSICASH_YOUR_ACCOUNT", tableName: nil, bundle: Bundle.main,
+                                 value: "Create your PsiCash account",
+                                 comment: "Title label next to a button that lets users create a PsiCash account. Do not translate or transliterate 'PsiCash'")
+    }
+    
+    static func Create_new_account_button_title() -> String {
+        return NSLocalizedString("CREATE_NEW_ACCOUNT_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Create New Account",
+                                 comment: "Button label that lets users create a new account.")
+    }
+    
+    static func Sign_up() -> String {
+        return NSLocalizedString("SIGN_UP_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Sign Up",
+                                 comment: "Title on a button that lets users sign up for an account")
+    }
+    
+    static func Log_in() -> String {
+        return NSLocalizedString("LOG_IN_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Log In",
+                                 comment: "Title on a button that lets users login to their account with the username and password they have entered.")
+    }
+    
+    static func Username() -> String {
+        return NSLocalizedString("USERNAME_TEXT_FIELD", tableName: nil, bundle: Bundle.main,
+                                 value: "Username",
+                                 comment: "Text field label where users can enter their account's username")
+    }
+    
+    static func Password() -> String {
+        return NSLocalizedString("PASSWORD_TEXT_FIELD", tableName: nil, bundle: Bundle.main,
+                                 value: "Password",
+                                 comment: "Text field label where users can enter their account's password")
+    }
+    
+    static func Forgot_password_button_title() -> String {
+        return NSLocalizedString("FORGOT_PASSWORD", tableName: nil, bundle: Bundle.main,
+                                 value: "Forgot Password?",
+                                 comment: "Button title that lets users reset their password if they forgot their account's password.")
+    }
+    
+    static func Or() -> String {
+        return NSLocalizedString("OR_SIGNUP_SIGNIN", tableName: nil, bundle: Bundle.main,
+                                 value: "Or",
+                                 comment: "Label visually separating Sign up section and sign in section of the app.")
+    }
+    
 }
 
 // MARK: Generic values

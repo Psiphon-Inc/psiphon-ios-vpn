@@ -71,45 +71,51 @@ extension RewardedVideoLoadStatus {
     
 }
 
-
-extension PsiCashPurchaseResponseError: LocalizedUserDescription {
+extension TunneledPsiCashRequestError: LocalizedUserDescription where
+    ErrorStatus: LocalizedUserDescription {
     
     public var localizedUserDescription: String {
         switch self {
         case .tunnelNotConnected:
             return UserStrings.Psiphon_is_not_connected()
-        case .requestFailed(message: _):
+        case .requestError(let requestError):
+            return requestError.localizedDescription
+        }
+    }
+    
+}
+
+extension PsiCashNewExpiringPurchaseErrorStatus: LocalizedUserDescription {
+    
+    public var localizedUserDescription: String {
+        switch self {
+        case .insufficientBalance:
+            return UserStrings.Insufficient_psiCash_balance()
+        default:
             return UserStrings.Operation_failed_please_try_again_alert_message()
-        case let .purchaseFailed(psiStatus: psiStatus, shouldRetry: _):
-            switch PSIStatus(rawValue: psiStatus) {
-            case .insufficientBalance:
-                return UserStrings.Insufficient_psiCash_balance()
-            default:
-                return UserStrings.Operation_failed_please_try_again_alert_message()
-            }
         }
     }
     
 }
 
 
-extension PSIStatus {
+extension PsiCashNewExpiringPurchaseErrorStatus {
     
-    /// Whether or not the request should be retried given the PsiCashStatus code.
+    /// Whether or not the request should be retried given this status.
     var shouldRetry: Bool {
         switch self {
-        case .invalid, .serverError:
+        case .serverError:
             return true
-        case .success, .existingTransaction, .insufficientBalance, .transactionAmountMismatch,
-             .transactionTypeNotFound, .invalidTokens, .invalidCredentials, .badRequest:
-            return false
-        @unknown default:
+        case .existingTransaction,
+             .insufficientBalance,
+             .transactionAmountMismatch,
+             .transactionTypeNotFound,
+             .invalidTokens:
             return false
         }
     }
     
 }
-
 
 extension PsiCashAmount: CustomStringFeedbackDescription {
     
@@ -240,11 +246,15 @@ extension PsiCashEffects {
             libData: { [psiCash] () -> PsiCashLibData in
                 psiCash.dataModel
             },
-            refreshState: { [psiCash] (priceClasses, tunnelConnection, metadata) ->
-                Effect<PsiCashRefreshResult> in
+            refreshState: { [psiCash, getCurrentTime] (priceClasses, tunnelConnection, metadata) ->
+                Effect<PsiCashEffects.PsiCashRefreshResult> in
                 Effect.deferred(dispatcher: globalDispatcher) { fulfilled in
                     guard case .connected = tunnelConnection.tunneled else {
-                        fulfilled(.completed(.failure(ErrorEvent(.tunnelNotConnected))))
+                        fulfilled(
+                            .failure(
+                                ErrorEvent(.tunnelNotConnected, date: getCurrentTime())
+                            )
+                        )
                         return
                     }
                     
@@ -256,40 +266,25 @@ extension PsiCashEffects {
                     }
                     
                     let purchaseClasses = priceClasses.map(\.rawValue)
-    
+                    
                     // Blocking call.
                     let result = psiCash.refreshState(purchaseClasses: purchaseClasses)
                     
-                    let mappedResult: Result<PsiCashLibData, ErrorEvent<PsiCashRefreshError>> =
-                        result.biFlatMap({ psiStatus in
-                            switch psiStatus {
-                            case .success:
-                                return .success(psiCash.dataModel)
-                            case .serverError:
-                                return .failure(ErrorEvent(.serverError))
-                            case .invalidTokens:
-                                return .failure(ErrorEvent(.invalidTokens))
-                            default:
-                                return .failure(
-                                    ErrorEvent(.error("unexpected status '\(psiStatus)'")))
-                            }
-                        }, { failure in
-                            return .failure(ErrorEvent(.error(failure.description)))
-                        })
-                    
-                    fulfilled(.completed(mappedResult))
+                    fulfilled(
+                        result.mapError {
+                            ErrorEvent(.requestError($0), date: getCurrentTime())
+                        }
+                    )
                 }
             },
-            purchaseProduct: { [psiCash, feedbackLogger] (purchasable, tunnelConnection, metadata) ->
-                Effect<PsiCashPurchaseResult> in
+            purchaseProduct: { [psiCash, feedbackLogger, getCurrentTime]
+                (purchasable, tunnelConnection, metadata) ->
+                Effect<PsiCashEffects.PsiCashNewExpiringPurchaseResult> in
                 
                 Effect.deferred(dispatcher: globalDispatcher) { fulfilled in
                     guard case .connected = tunnelConnection.tunneled else {
                         fulfilled(
-                            PsiCashPurchaseResult(
-                                purchasable: purchasable,
-                                refreshedLibData: psiCash.dataModel,
-                                result: .failure(ErrorEvent(.tunnelNotConnected)))
+                            .failure(ErrorEvent(.tunnelNotConnected, date: getCurrentTime()))
                         )
                         return
                     }
@@ -305,34 +300,14 @@ extension PsiCashEffects {
                     }
                     
                     // Blocking call.
-                    let result = psiCash.newExpiringPurchase(
-                        transactionClass: purchasable.rawTransactionClass,
-                        distinguisher: purchasable.distinguisher,
-                        expectedPrice: purchasable.price)
-                    
-                    let mappedResult:
-                        Result<Result<PsiCashPurchasedType, PsiCashParseError>, ErrorEvent<PsiCashPurchaseResponseError>> =
-                        result.biFlatMap({ (response: PsiCash.NewExpiringPurchaseResponse) in
-                            if case .success = response.status,
-                               let purchaseResult = response.purchaseResult {
-                                return .success(purchaseResult)
-                            } else {
-                                return .failure(
-                                    ErrorEvent(.purchaseFailed(
-                                                psiStatus: response.status.rawValue,
-                                                shouldRetry: response.status.shouldRetry)))
-                            }
-                        }, {
-                            return .failure(ErrorEvent(.requestFailed(message: $0.description)))
-                        })
-                    
+                    let result = psiCash.newExpiringPurchase(purchasable: purchasable)
                     
                     fulfilled(
-                        PsiCashPurchaseResult(
-                            purchasable: purchasable,
-                            refreshedLibData: psiCash.dataModel,
-                            result: mappedResult
-                        )
+                        result.mapError {
+                            return ErrorEvent(.requestError($0),
+                                              date: getCurrentTime())
+                        }
+                        
                     )
                 }
             },
@@ -377,6 +352,30 @@ extension PsiCashEffects {
                     case .failure(let error):
                         feedbackLogger.immediate(.error, "removePurchasesNotIn failed: \(error)")
                     }
+                }
+            },
+            accountLogout: { [psiCash, getCurrentTime] ()
+                -> Effect<Result<PsiCashLibData, ErrorEvent<PsiCashLibError>>> in
+                Effect.deferred(dispatcher: globalDispatcher) { fulfilled in
+                    // This may involve a network operation and so can be blocking.
+                    fulfilled(
+                        psiCash.accountLogout()
+                            .optionalToFailure(success: psiCash.dataModel)
+                            .mapError { ErrorEvent($0, date: getCurrentTime()) }
+                    )
+                }
+            },
+            accountLogin: { [psiCash, getCurrentTime] username, password
+                -> Effect<PsiCashAccountLoginResult> in
+                Effect.deferred(dispatcher: globalDispatcher) { fulfilled in
+                    // This is a blocking call.
+                    let result = psiCash.accountLogin(username: username, password: password)
+                    
+                    fulfilled(
+                        result.mapError {
+                            ErrorEvent(.requestError($0), date: getCurrentTime())
+                        }
+                    )
                 }
             }
         )
