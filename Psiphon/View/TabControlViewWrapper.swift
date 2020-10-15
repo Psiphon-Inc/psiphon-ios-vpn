@@ -27,58 +27,65 @@ fileprivate enum ControlState {
 
 typealias TabControlViewTabType = Hashable & CaseIterable & LocalizedUserDescription
 
-final class TabControlView<Tabs: TabControlViewTabType>: UIView, Bindable {
-
-    let borderGradient: CAGradientLayer
-    let borderMask: CAShapeLayer
+final class TabControlViewWrapper<Tabs: TabControlViewTabType>: ViewWrapper, Bindable {
 
     // Note that UIStackView is a non-rendering view,
     // so it can't draw a background or any other layer added to it.
 
-    let stackView = UIStackView()
-    var controlButtons: [Tabs: GradientButton]
+    let wrapperView: UIView
+    var controlButtons = [Tabs: GradientButton]()
+    
+    var view: UIView {
+        wrapperView
+    }
 
     private var selectedControl: GradientButton? {
         didSet {
             if let control = oldValue {
-                mutate(button: control, to: .normal)
+                setBackgroundColor(button: control, to: .normal)
             }
             if let control = selectedControl {
-                mutate(button: control, to: .selected)
+                setBackgroundColor(button: control, to: .selected)
             }
         }
     }
 
     init() {
-        self.controlButtons = [:]
-        (borderGradient, borderMask) = makeGradientBorderLayer(colors: Gradients.blue.colors,
-                                                               width: Style.default.borderWidth)
-
-        super.init(frame: .zero)
-
+        let cornerRadius = Style.default.cornerRadius
+                
+        let stackView = UIStackView.make(
+            axis: .horizontal,
+            distribution: .fillEqually
+        )
+        
+        self.wrapperView = ContainerView.makeGradientBackground(
+            wraps: stackView,
+            cornerRadius: cornerRadius)
+                
+        self.wrapperView.activateConstraints {
+            $0.constraint(to: stackView, .width(.belowRequired), .height(.belowRequired))
+        }
+        
+        mutate(stackView) {
+            $0.isUserInteractionEnabled = true
+        }
+        
+        stackView.activateConstraints {
+            $0.constraintToParent(.leading(), .top()) + [
+                // Height constraint can be broken when the view is hidden.
+                // In current implementation, it is the UIStackView that hides the views.
+                $0.heightAnchor.constraint(equalToConstant: Style.default.buttonHeight)
+                    .priority(.belowRequired)
+            ]
+        }
+        
         // Add the controls
         for tab in Tabs.allCases {
             let control = createControlButton(title: tab.localizedUserDescription)
             stackView.addArrangedSubview(control)
             self.controlButtons[tab] = control
         }
-
-        isUserInteractionEnabled = true
-
-        stackView.axis = .horizontal
-        stackView.distribution = .fillEqually
-        stackView.isUserInteractionEnabled = true
-        stackView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-        addSubview(stackView)
-
-        layer.cornerRadius = Style.default.cornerRadius
-        layer.cornerRadius = Style.default.cornerRadius
-        layer.addSublayer(borderGradient)
-        clipsToBounds = true
-    }
-
-    required init(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
+        
     }
 
     func bind(_ newValue: Tabs) {
@@ -92,14 +99,7 @@ final class TabControlView<Tabs: TabControlViewTabType>: UIView, Bindable {
             }
         }
     }
-
-    override func layoutSublayers(of layer: CALayer) {
-        super.layoutSublayers(of: layer)
-        borderGradient.frame = bounds
-        borderMask.path = UIBezierPath(roundedRect: bounds,
-                                       cornerRadius: Style.default.cornerRadius).cgPath
-    }
-
+    
 }
 
 fileprivate func createControlButton(title: String) -> GradientButton {
@@ -114,7 +114,7 @@ fileprivate func createControlButton(title: String) -> GradientButton {
     return control
 }
 
-fileprivate func mutate(button: GradientButton, to state:ControlState) {
+fileprivate func setBackgroundColor(button: GradientButton, to state:ControlState) {
     switch state {
     case .normal:
         button.setClearBackground()
