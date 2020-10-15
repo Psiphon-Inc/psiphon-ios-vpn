@@ -297,28 +297,12 @@ func setChildrenAutoresizingMaskIntoConstraintsFlagToFalse(forView view: UIView)
 
 
 /// Backwards compatible safe area layout guide.
-func addSafeAreaLayoutGuide(to view: UIView) -> UILayoutGuide {
+func makeSafeAreaLayoutGuide(addToView view: UIView) -> UILayoutGuide {
     let layoutGuide = UILayoutGuide()
     view.addLayoutGuide(layoutGuide)
-
-    if #available(iOS 11.0, *) {
-        NSLayoutConstraint.activate([
-            layoutGuide.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            layoutGuide.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            layoutGuide.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            layoutGuide.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-        ])
-
-    } else {
-        // Fallback on earlier versions
-        NSLayoutConstraint.activate([
-            layoutGuide.topAnchor.constraint(equalTo: view.topAnchor),
-            layoutGuide.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            layoutGuide.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            layoutGuide.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-        ])
+    layoutGuide.activateConstraints {
+        $0.constraint(to: view.safeAreaAnchors, [.top(), .bottom(), .leading(), .trailing()])
     }
-
     return layoutGuide
 }
 
