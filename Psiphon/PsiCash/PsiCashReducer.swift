@@ -213,10 +213,11 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         
     case .accountLogout:
         guard case .account(loggedIn: _) = state.psiCash.libData.accountType else {
-            environment.feedbackLogger.fatalError("""
-                user is not an account: '\(String(describing: state.psiCash.libData.accountType))'
-                """)
-            return []
+            return [
+                environment.feedbackLogger.log(.warn ,"""
+                    user is not an account: '\(String(describing: state.psiCash.libData.accountType))'
+                    """).mapNever()
+            ]
         }
         
         return [

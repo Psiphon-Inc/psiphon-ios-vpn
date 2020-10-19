@@ -234,6 +234,30 @@ import Foundation
                                  comment: "Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app.")
     }
     
+    @objc static func Reset_admob_consent() -> String {
+        return NSLocalizedString("SETTINGS_RESET_ADMOB_CONSENT", tableName: nil, bundle: Bundle.main,
+                                 value: "Reset AdMob Consent",
+                                 comment: "(Do not translate 'AdMob') Title of cell in settings menu which indicates the user can change or revoke the consent they've given to admob")
+    }
+    
+    @objc static func Logout_of_psicash_account() -> String {
+        return NSLocalizedString("LOG_OUT_PSICASH_ACCOUNT", tableName: nil, bundle: Bundle.main,
+                                 value: "Log out of PsiCash account",
+                                 comment: "Do not translate or transliterate 'PsiCash'. Settings menu logout button that lets users log out of their PsiCash account.")
+    }
+    
+    @objc static func Are_you_sure_psicash_account_logout() -> String {
+        return NSLocalizedString("PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT", tableName: nil, bundle: Bundle.main,
+                                 value: "Are you sure you want to log out of your PsiCash account?",
+                                 comment: "Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account")
+    }
+    
+    @objc static func Log_out() -> String {
+        return NSLocalizedString("LOG_OUT_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Log Out",
+                                 comment: "Title of the button that lets users log out of their account")
+    }
+    
 }
 
 // MARK: Internet reachability

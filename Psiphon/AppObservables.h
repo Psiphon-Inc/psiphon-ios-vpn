@@ -57,6 +57,11 @@ NS_ASSUME_NONNULL_BEGIN
 // reachabilityStatus subject forwards AppState `internetReachability` ReachabilityStatus values.
 @property (nonatomic, readonly) RACReplaySubject<NSNumber *> *reachabilityStatus;
 
+// isLoggedInToPsiCashAccount carries BOOL wrapped in NSNumber.
+// Values are forwarded from AppState.
+
+@property (nonatomic, readonly) RACReplaySubject<NSNumber *> *isLoggedInToPsiCashAccount;
+
 + (AppObservables *)shared;
 
 // Should be called when app is launched for the first time.
