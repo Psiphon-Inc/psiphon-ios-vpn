@@ -12,15 +12,15 @@ chdir build
 
 
 REM Make the MSVC project
-cmake -G "Visual Studio 14 2015" ..
+cmake -G "Visual Studio 16 2019" -A Win32 ..
 if "%ERRORLEVEL%" == "1" exit /B 1
 
 REM Build for Debug and MinSizeRel
-call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\vcvars32.bat"
+call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars32.bat"
 if "%ERRORLEVEL%" == "1" exit /B 1
-msbuild.exe -p:Configuration=Debug -p:PlatformToolset=v140_xp -p:PreferredToolArchitecture=x86 psicash.vcxproj
+msbuild.exe -p:Configuration=Debug -p:PlatformToolset=v140_xp -p:PreferredToolArchitecture=x86 -p:Platform=x86 -p:PlatformTarget=x86 psicash.vcxproj
 if "%ERRORLEVEL%" == "1" exit /B 1
-msbuild.exe -p:Configuration=MinSizeRel -p:PlatformToolset=v140_xp -p:PreferredToolArchitecture=x86 psicash.vcxproj
+msbuild.exe -p:Configuration=MinSizeRel -p:PlatformToolset=v140_xp -p:PreferredToolArchitecture=x86 -p:Platform=x86 -p:PlatformTarget=x86 psicash.vcxproj
 if "%ERRORLEVEL%" == "1" exit /B 1
 REM Resulting libs (and pdb) are in build/Debug and build/MinSizeRel
 
