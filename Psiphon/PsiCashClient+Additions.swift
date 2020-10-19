@@ -147,23 +147,34 @@ fileprivate struct PsiCashHTTPResponse: HTTPResponse {
                 return
             }
             
-            guard let date = r.metadata.headers[HTTPDateHeader.headerKey] else {
-                result = .success(PSIHttpResult(criticalError: ()))
-                return
-            }
+            let psiHttpResult = PSIHttpResult(
+                code: statusCode,
+                headers: r.metadata.headers.mapValues { [$0] },
+                body: body,
+                error: "")
             
-            result = .success(PSIHttpResult(code: statusCode, body: body, date: date, error: ""))
+            result = .success(psiHttpResult)
             
         case let .failure(httpRequestError):
             if let partialResponse = httpRequestError.partialResponseMetadata {
                 let statusCode = Int32(partialResponse.statusCode.rawValue)
-                let date = partialResponse.headers[HTTPDateHeader.headerKey] ?? ""
-                result = .success(PSIHttpResult(code: statusCode, body: "", date: date,
-                                                error: httpRequestError.localizedDescription))
+                
+                let psiHttpResult = PSIHttpResult(
+                    code: statusCode,
+                    headers: partialResponse.headers.mapValues { [$0] },
+                    body: "",
+                    error: "")
+                
+                result = .success(psiHttpResult)
+                
             } else {
-                result = .success(PSIHttpResult(code: PSIHttpResult.recoverable_ERROR(),
-                                                body: "", date: "",
-                                                error: httpRequestError.localizedDescription))
+                let psiHttpResult = PSIHttpResult(
+                    code: PSIHttpResult.recoverable_ERROR(),
+                    headers: [String: [String]](),
+                    body: "",
+                    error: "")
+                
+                result = .success(psiHttpResult)
             }
         }
     }

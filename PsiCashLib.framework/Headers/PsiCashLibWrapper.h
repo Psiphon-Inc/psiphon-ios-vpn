@@ -73,8 +73,8 @@ NS_ASSUME_NONNULL_BEGIN
 + (int)RECOVERABLE_ERROR;
 
 - (instancetype)initWithCode:(int)code
+                     headers:(NSDictionary<NSString *, NSArray<NSString *> *> *)headers
                         body:(NSString *)body
-                        date:(NSString *)date
                        error:(NSString *)error;
 
 // Convenience initializer with `code` set to `CRITICAL_ERROR`, and all other fields

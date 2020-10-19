@@ -10,6 +10,8 @@ This library relies on the native environment to provide an HTTP request callbac
 
 There is an _example_ implementation in the Android wrapper project. But note that it _does not support proxied requests_, which may be necessary depending on the environment. (E.g., it probably doesn't matter on iOS, since our app only supported full-device VPN. But on Windows the app mostly uses a local proxy, so the HTTP Requester must support proxying.)
 
+Note that the requester _must_ do HTTPS certificate validation.
+
 ### Thread Safety
 
 All datastore reads and writes are mutexed. So, the only consistency guarantee is for individual data accesses. This means that multiple data accesses might get data from different states; for example, between getting the balance and getting the purchases list, there might have been a purchase, which would alter the balance. We will state this in positive terms as: "you will always get the very latest value". This is fine for our use cases at this time, but we might want to add "get a consistent set of data" in the future.
