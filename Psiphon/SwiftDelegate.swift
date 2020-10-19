@@ -552,6 +552,18 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 objcBridge!.onReachabilityStatusDidChange(reachabilityStatus.networkStatus)
             }
         
+        // Forwards AppState `psiCash.libData.accountTyp` to ObjCBridgeDelegate.
+        self.lifetime += self.store.$value.signalProducer
+            .map(\.psiCash.libData.accountType)
+            .skipRepeats()
+            .startWithValues { [unowned objcBridge] accountType in
+                if case .account(loggedIn: true) = accountType {
+                    objcBridge!.onPsiCashAccountStatusDidChange(true)
+                } else {
+                    objcBridge!.onPsiCashAccountStatusDidChange(false)
+                }
+            }
+        
         // Opens landing page whenever Psiphon tunnel is connected, with
         // change in value of `VPNState` tunnel intent.
         // Landing page should not be opened after a reconnection due to an In-App purchase.
@@ -854,6 +866,10 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     {
         // Maps Swift type `Promise<VPNConfigInstallResult>` to equivalent ObjC type.
         self.installVPNConfig().then { VPNConfigInstallResultWrapper($0) }.asObjCPromise()
+    }
+    
+    @objc func logOutPsiCashAccount() {
+        self.store.send(.psiCash(.accountLogout))
     }
     
     @objc func getLocaleForCurrentAppLanguage() -> NSLocale {

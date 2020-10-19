@@ -132,6 +132,12 @@
 /* Title on a button that lets users login to their account with the username and password they have entered. */
 "LOG_IN_BUTTON_TITLE" = "Log In";
 
+/* Title of the button that lets users log out of their account */
+"LOG_OUT_BUTTON_TITLE" = "Log Out";
+
+/* Do not translate or transliterate 'PsiCash'. Settings menu logout button that lets users log out of their PsiCash account. */
+"LOG_OUT_PSICASH_ACCOUNT" = "Log out of PsiCash account";
+
 /* Button title that takes user to the next page */
 "NEXT_PAGE_BUTTON_TITLE" = "Next";
 
@@ -248,6 +254,9 @@
 
 /* Message shown when products available for purchase could not be retrieved. */
 "PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "Product list could not be retrieved";
+
+/* Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
+"PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "Are you sure you want to log out of your PsiCash account?";
 
 /* PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
 "PSICASH_BALANCE" = "PsiCash Balance:";

@@ -57,6 +57,8 @@ import PsiCashClient
     @objc func onVPNStateSyncError(_ userErrorMessage: String)
     
     @objc func onReachabilityStatusDidChange(_ previousStats: ReachabilityStatus)
+    
+    @objc func onPsiCashAccountStatusDidChange(_ isLoggedIn: Bool)
 
     @objc func dismiss(screen: DismissibleScreen, completion: (() -> Void)?)
 
@@ -129,6 +131,9 @@ import PsiCashClient
     @objc func reinstallVPNConfig()
     @objc func installVPNConfigWithPromise()
         -> Promise<VPNConfigInstallResultWrapper>.ObjCPromise<VPNConfigInstallResultWrapper>
+    
+    // PsiCash accounts
+    @objc func logOutPsiCashAccount()
     
     // User defaults
     
