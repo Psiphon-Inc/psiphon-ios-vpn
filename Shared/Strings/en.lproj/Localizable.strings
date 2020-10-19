@@ -255,6 +255,9 @@
 /* Message shown when products available for purchase could not be retrieved. */
 "PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "Product list could not be retrieved";
 
+/* Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts. */
+"PSICASH_ACCOUNT" = "PsiCash Account";
+
 /* Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
 "PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "Are you sure you want to log out of your PsiCash account?";
 
@@ -350,6 +353,12 @@
 
 /* Title on a button that lets users sign up for an account */
 "SIGN_UP_BUTTON_TITLE" = "Sign Up";
+
+/* Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
+"SIGN_UP_LOG_IN_TO_PSICASH_ACCOUNT_TO_CONTINUE" = "Sign Up or Log In to your PsiCash account to continue";
+
+/* Message title informing the user that they must sign up for an account or log in to their account */
+"SIGN_UP_OR_LOG_IN" = "Sign Up or Log In";
 
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST" = "Speed Boost";

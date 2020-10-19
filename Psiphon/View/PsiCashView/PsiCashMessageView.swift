@@ -28,6 +28,7 @@ struct PsiCashMessageView: ViewBuilder {
         case unavailableWhileConnecting
         case unavailableWhileDisconnecting
         case otherErrorTryAgain
+        case signupOrLoginToPsiCash
     }
 
     func build(_ container: UIView?) -> ImmutableBindableViewable<Message, UIView> {
@@ -110,6 +111,11 @@ struct PsiCashMessageView: ViewBuilder {
                     imageView.image =  UIImage(named: "PsiCashCoinCloud")!
                     title.text = UserStrings.PsiCash_unavailable()
                     subtitle.text = UserStrings.Please_try_again_later()
+                
+                case .signupOrLoginToPsiCash:
+                    imageView.image = UIImage(named: "PsiCashCoinCloud")!
+                    title.text = ""
+                    subtitle.text = UserStrings.Sign_up_or_login_to_psicash_account_to_continue()
                 }
             }
         }

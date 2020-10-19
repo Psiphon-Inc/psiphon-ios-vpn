@@ -258,6 +258,24 @@ import Foundation
                                  comment: "Title of the button that lets users log out of their account")
     }
     
+    static func Sign_up_or_log_in() -> String {
+        return NSLocalizedString("SIGN_UP_OR_LOG_IN", tableName: nil, bundle: Bundle.main,
+                                 value: "Sign Up or Log In",
+                                 comment: "Message title informing the user that they must sign up for an account or log in to their account")
+    }
+    
+    static func Sign_up_or_login_to_psicash_account_to_continue() -> String {
+        return NSLocalizedString("SIGN_UP_LOG_IN_TO_PSICASH_ACCOUNT_TO_CONTINUE", tableName: nil, bundle: Bundle.main,
+                                 value: "Sign Up or Log In to your PsiCash account to continue",
+                                 comment: "Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features.")
+    }
+    
+    static func Psicash_account() -> String {
+        return NSLocalizedString("PSICASH_ACCOUNT", tableName: nil, bundle: Bundle.main,
+                                 value: "PsiCash Account",
+                                 comment: "Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts.")
+    }
+    
 }
 
 // MARK: Internet reachability

@@ -310,8 +310,9 @@ final class PsiCashViewController: ReactiveViewController {
                 return
             }
             
-            // Updates state according to PsiCash account type.
-            guard let accountType = observed.state.psiCash.libData.accountType else {
+            // PsiCash account type
+            switch observed.state.psiCash.libData.accountType {
+            case .none:
                 self.balanceViewWrapper.view.isHidden = true
                 self.tabControl.view.isHidden = true
                 self.logInView.isHidden = true
@@ -319,6 +320,23 @@ final class PsiCashViewController: ReactiveViewController {
                     .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
                 )
                 return
+            
+            case .account(loggedIn: false):
+                // User was previously logged in, and now they are logged out.
+                
+                self.balanceViewWrapper.view.isHidden = true
+                self.tabControl.view.isHidden = true
+                
+                self.logInView.isHidden = false
+                self.logInView.bind(.signUpOrLogIn)
+                
+                self.containerBindable.bind(
+                    .left(.right(.right(.right(.right(.signupOrLoginToPsiCash)))))
+                )
+                return
+            
+            case .account(loggedIn: true), .tracker:
+                break
             }
             
             switch observed.state.subscription.status {
@@ -363,14 +381,12 @@ final class PsiCashViewController: ReactiveViewController {
                 case .connected, .notConnected:
                     self.tabControl.view.isHidden = false
                     
-                    switch accountType {
-                    case .tracker:
+                    if case .tracker = observed.state.psiCash.libData.accountType {
                         // LogIn button is displayed to encourage the user to login.
                         self.logInView.isHidden = false
-                        
-                    case .account(loggedIn: let loggedIn):
-                        // LogIn button is hidden if the user is logged in.
-                        self.logInView.isHidden = loggedIn
+                        self.logInView.bind(.signUp)
+                    } else {
+                        self.logInView.isHidden = true
                     }
                 }
                 
