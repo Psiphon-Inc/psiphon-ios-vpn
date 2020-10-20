@@ -45,8 +45,11 @@ public enum FeedbackAction {
                                uploadDiagnostics: Bool)
 }
 
-public struct FeedbackReducerState {
+public struct FeedbackReducerState: Equatable {
+    
     public var queuedFeedbacks: [UserFeedback]
+    
+    // TODO: FeedbackUpload is not a value type, and should not be part of the state.
     var feedbackUpload: FeedbackUpload? // initialized lazily
 
     public init(queuedFeedbacks: [UserFeedback]) {
@@ -94,10 +97,10 @@ public struct FeedbackReducerEnvironment {
     }
 }
 
-public func feedbackReducer(
-    state: inout FeedbackReducerState, action: FeedbackAction, environment: FeedbackReducerEnvironment
-) -> [Effect<FeedbackAction>] {
-
+public let feedbackReducer = Reducer<FeedbackReducerState,
+           FeedbackAction,
+           FeedbackReducerEnvironment> { state, action, environment in
+    
     switch action {
     case ._log(let message):
         return [

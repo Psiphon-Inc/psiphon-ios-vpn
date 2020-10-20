@@ -77,7 +77,7 @@ public struct IAPEnvironment {
     var tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
     var tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
     var psiCashEffects: PsiCashEffects
-    var appInfo: () -> AppInfoProvider
+    var clientMetaData: () -> ClientMetaData
     var paymentQueue: PaymentQueue
     var psiCashPersistedValues: PsiCashPersistedValues
     var isSupportedProduct: (ProductID) -> AppStoreProductType?
@@ -91,7 +91,7 @@ public struct IAPEnvironment {
         tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
         tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
         psiCashEffects: PsiCashEffects,
-        appInfo: @escaping () -> AppInfoProvider,
+        clientMetaData: @escaping () -> ClientMetaData,
         paymentQueue: PaymentQueue,
         psiCashPersistedValues: PsiCashPersistedValues,
         isSupportedProduct: @escaping (ProductID) -> AppStoreProductType?,
@@ -104,7 +104,7 @@ public struct IAPEnvironment {
         self.tunnelStatusSignal = tunnelStatusSignal
         self.tunnelConnectionRefSignal = tunnelConnectionRefSignal
         self.psiCashEffects = psiCashEffects
-        self.appInfo = appInfo
+        self.clientMetaData = clientMetaData
         self.paymentQueue = paymentQueue
         self.psiCashPersistedValues = psiCashPersistedValues
         self.isSupportedProduct = isSupportedProduct
@@ -258,7 +258,7 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
                 receipt: receiptData,
                 customData: customData
             ),
-            clientMetaData: ClientMetaData(environment.appInfo())
+            clientMetaData: environment.clientMetaData()
         )
         
         let psiCashVerifyRequest = RetriableTunneledHttpRequest(
