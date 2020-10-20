@@ -100,6 +100,11 @@ open class ReactiveViewController: UIViewController {
     /// an interface to obtain a stream of UIViewController lifecycle call values, which starts
     /// with the current value of this variable.
     @State public private(set) var lifeCycle: ViewControllerLifeCycle = .initing
+    
+    /// Set of presented error alerts.
+    /// Note: Once an error alert has been dismissed by the user, it will be removed from the set.
+    private(set) var errorAlerts = Set<ErrorEventDescription<ErrorRepr>>()
+    
     private let onDismiss: () -> Void
     
     /// - Parameter onDismiss: Called once after the view controller is either dismissed
@@ -160,6 +165,40 @@ open class ReactiveViewController: UIViewController {
                 }
                 self.present(viewControllerToPresent, animated: flag, completion: completion)
             }
+    }
+    
+}
+
+extension ReactiveViewController {
+    
+    /// Display error alert if `errorDesc` is a unique alert not in `self.errorAlerts`, and
+    /// the error event `errorDesc.event` date is not before the init date of
+    /// the view controller `viewControllerInitTime`.
+    /// Only if the error is unique `makeAlertController` is called for creating the alert controller.
+    public func display(errorDesc: ErrorEventDescription<ErrorRepr>,
+                        makeAlertController: @autoclosure () -> UIAlertController) {
+        
+        guard let viewDidLoadDate = self.viewControllerDidLoadDate else {
+            return
+        }
+        
+        // Displays errors that have been emitted after the init date of the view controller.
+        guard errorDesc.event.date > viewDidLoadDate else {
+            return
+        }
+        
+        // Inserts `errorDesc` into `errorAlerts` set.
+        // If a member of `errorAlerts` is equal to `errorDesc.event.error`, then
+        // that member is removed and `errorDesc` is inserted.
+        let inserted = self.errorAlerts.insert(orReplaceIfEqual: \.event.error, errorDesc)
+        
+        // Prevent display of the same error event.
+        guard inserted else {
+            return
+        }
+        
+        let alertController = makeAlertController()
+        self.presentOnViewDidAppear(alertController, animated: true, completion: nil)
     }
     
 }

@@ -126,10 +126,6 @@ final class PsiCashViewController: ReactiveViewController {
     @State var activeTab: PsiCashViewControllerTabs
     private var navigation: Screen = .mainScreen
     
-    /// Set of presented error alerts.
-    /// Note: Once an error alert has been dismissed by the user, it will be removed from the set.
-    private var errorAlerts = Set<ErrorEventDescription<ErrorRepr>>()
-    
     // Views
     private let balanceViewWrapper = PsiCashBalanceViewWrapper()
     private let closeButton = CloseButton(frame: .zero)
@@ -635,43 +631,6 @@ final class PsiCashViewController: ReactiveViewController {
 
 // Navigations
 extension PsiCashViewController {
-    
-    /// Display an error alert with a single "OK" button.
-    private func displayBasicAlert(errorDesc: ErrorEventDescription<ErrorRepr>) {
-        self.display(errorDesc: errorDesc,
-                     makeAlertController:
-                        .makeSimpleAlertWithOKButton(message: errorDesc.localizedUserDescription))
-    }
-    
-    /// Display error alert if `errorDesc` is a unique alert not in `self.errorAlerts`, and
-    /// the error event `errorDesc.event` date is not before the init date of
-    /// the view controller `viewControllerInitTime`.
-    /// Only if the error is unique `makeAlertController` is called for creating the alert controller.
-    private func display(errorDesc: ErrorEventDescription<ErrorRepr>,
-                         makeAlertController: @autoclosure () -> UIAlertController) {
-        
-        guard let viewDidLoadDate = self.viewControllerDidLoadDate else {
-            return
-        }
-        
-        // Displays errors that have been emitted after the init date of the view controller.
-        guard errorDesc.event.date > viewDidLoadDate else {
-            return
-        }
-        
-        // Inserts `errorDesc` into `errorAlerts` set.
-        // If a member of `errorAlerts` is equal to `errorDesc.event.error`, then
-        // that member is removed and `errorDesc` is inserted.
-        let inserted = self.errorAlerts.insert(orReplaceIfEqual: \.event.error, errorDesc)
-        
-        // Prevent display of the same error event.
-        guard inserted else {
-            return
-        }
-        
-        let alertController = makeAlertController()
-        self.presentOnViewDidAppear(alertController, animated: true, completion: nil)
-    }
     
     private func display(screen: Screen) -> Bool {
         
