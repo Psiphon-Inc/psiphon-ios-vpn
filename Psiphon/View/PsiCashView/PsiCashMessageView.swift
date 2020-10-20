@@ -74,7 +74,6 @@ struct PsiCashMessageView: ViewBuilder {
         
         wrapper.activateConstraints {
             [
-                $0.topAnchor.constraint(equalTo: vStack.topAnchor),
                 $0.bottomAnchor.constraint(greaterThanOrEqualTo: vStack.bottomAnchor)
             ]
         }
