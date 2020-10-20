@@ -52,13 +52,19 @@ extension PsiCashState {
 }
 
 struct PsiCashCoinPurchaseTable: ViewBuilder {
+    
+    struct ViewModel: Equatable {
+        let purchasables: [PsiCashPurchasableViewModel]
+        let footerText: String?
+    }
+    
     let purchaseHandler: (PsiCashPurchasableViewModel.ProductType) -> Void
 
     func build(
         _ container: UIView?
-    ) -> ImmutableBindableViewable<[PsiCashPurchasableViewModel], PsiCashCoinTable> {
+    ) -> ImmutableBindableViewable<ViewModel, PsiCashCoinTable> {
         .init(viewable: PsiCashCoinTable(purchaseHandler: purchaseHandler))
-        { table -> (([PsiCashPurchasableViewModel]) -> Void) in
+        { table -> ((ViewModel) -> Void) in
             return {
                 table.bind($0)
             }
@@ -70,24 +76,24 @@ final class PsiCashCoinTable: NSObject, ViewWrapper, Bindable, UITableViewDataSo
 UITableViewDelegate {
 
     private let PurchaseCellID = "PurchaseCellID"
-    private let TermsCellID = "TermsCellID"
+    private let FooterCellID = "FooterCellID"
     private let priceFormatter = CurrencyFormatter(locale: Locale.current)
-    private var data: [PsiCashPurchasableViewModel]
+    private var data: PsiCashCoinPurchaseTable.ViewModel
     private let table: UITableView
     private let purchaseHandler: (PsiCashPurchasableViewModel.ProductType) -> Void
     var numRows: Int {
-        data.count + 1 // For the footer.
+        data.purchasables.count + (data.footerText.hasValue ? 1 : 0)
     }
 
     var view: UIView { table }
 
     init(purchaseHandler: @escaping (PsiCashPurchasableViewModel.ProductType) -> Void) {
-        self.data = []
+        self.data = .init(purchasables: [], footerText: nil)
         self.purchaseHandler = purchaseHandler
         table = UITableView(frame: .zero, style: .plain)
         super.init()
         table.register(UITableViewCell.self, forCellReuseIdentifier: PurchaseCellID)
-        table.register(UITableViewCell.self, forCellReuseIdentifier: TermsCellID)
+        table.register(UITableViewCell.self, forCellReuseIdentifier: FooterCellID)
         table.dataSource = self
         table.delegate = self
 
@@ -99,7 +105,7 @@ UITableViewDelegate {
         table.estimatedRowHeight = Style.default.largeButtonHeight
     }
 
-    func bind(_ newValue: [PsiCashPurchasableViewModel]) {
+    func bind(_ newValue: PsiCashCoinPurchaseTable.ViewModel) {
         guard data != newValue else { return }
         data = newValue
         table.reloadData()
@@ -115,9 +121,9 @@ UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 
         switch indexPath.row {
-        case 0..<data.count:
+        case 0..<data.purchasables.count:
             let cell = tableView.dequeueReusableCell(withIdentifier: PurchaseCellID, for: indexPath)
-            let cellData = data[indexPath.row]
+            let cellData = data.purchasables[indexPath.row]
             if !cell.hasContent {
                 let content = PurchaseCellContent(priceFormatter: self.priceFormatter,
                                                   clickHandler: self.purchaseHandler)
@@ -138,10 +144,14 @@ UITableViewDelegate {
             return cell
 
         case numRows - 1:
-            let cell = tableView.dequeueReusableCell(withIdentifier: TermsCellID, for: indexPath)
+            let cell = tableView.dequeueReusableCell(withIdentifier: FooterCellID, for: indexPath)
+            
             if !cell.hasContent {
-                addTermsView(toCell: cell)
+                addUILabelTo(toCell: cell)
             }
+            
+            (cell.contentView.subviews[0] as! UILabel).text = data.footerText!
+            
             return cell
 
         default:
@@ -150,11 +160,11 @@ UITableViewDelegate {
     }
 }
 
-fileprivate func addTermsView(toCell cell: UITableViewCell) {
+fileprivate func addUILabelTo(toCell cell: UITableViewCell) {
     cell.backgroundColor = .clear
     cell.selectionStyle = .none
 
-    let label = UILabel.make(text: UserStrings.PsiCash_purchase_notice(),
+    let label = UILabel.make(
         fontSize: .normal,
         typeface: .medium,
         color: .blueGrey(),
