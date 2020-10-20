@@ -99,7 +99,7 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 
 + (NSString *)containerRotatingLogNoticesPath {
     return [[[[NSFileManager defaultManager]
-      containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path]
+      containerURLForSecurityApplicationGroupIdentifier:PsiphonAppGroupIdentifier] path]
       stringByAppendingPathComponent:@NOTICE_FILENAME_CONTAINER];
 }
 
@@ -109,7 +109,7 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 
 + (NSString *)extensionRotatingLogNoticesPath {
     return [[[[NSFileManager defaultManager]
-      containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path]
+      containerURLForSecurityApplicationGroupIdentifier:PsiphonAppGroupIdentifier] path]
       stringByAppendingPathComponent:@NOTICE_FILENAME_EXTENSION];
 }
 
@@ -312,7 +312,12 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 }
 
 + (void)logNoticeWithType:(NSString *)noticeType message:(NSString *)message timestamp:(NSString *)timestamp {
-    [[PsiFeedbackLogger sharedInstance] writeData:@{@"message": message} noticeType:noticeType timestamp:timestamp];
+    NSDictionary *data = @{@"message": message};
+    [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:noticeType timestamp:timestamp];
+
+#if DEBUG
+    NSLog(@"<INFO> %@", data);
+#endif
 }
 
 # pragma mark - Private methods

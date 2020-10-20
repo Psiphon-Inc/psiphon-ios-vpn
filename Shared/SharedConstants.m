@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2020, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,9 +17,6 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import <PsiphonTunnel/PsiphonTunnel.h>
-#import "FeedbackViewController.h"
+#import "SharedConstants.h"
 
-@interface FeedbackManager : NSObject <FeedbackViewControllerDelegate, TunneledAppDelegate>
-@end
+NSString *_Nonnull PsiphonAppGroupIdentifier = @"group.ca.psiphon.Psiphon";

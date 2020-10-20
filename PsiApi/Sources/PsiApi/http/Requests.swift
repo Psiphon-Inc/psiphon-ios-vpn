@@ -380,14 +380,7 @@ public struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equ
         /// Request error due to response indicating a retry is needed.
         case responseRetryError(Response.Failure)
     }
-    
-    /// `SignalTermination` represents whether the authorization request signal has completed,
-    /// and that the signal should be completed.
-    private enum SignalTermination: Equatable {
-        case value(RequestResult)
-        case terminate
-    }
-    
+
     let request: HTTPRequest<Response>
     let retryCount: Int
     let retryInterval: DispatchTimeInterval
@@ -412,7 +405,7 @@ public struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equ
             return lhs.0 == rhs.0 && lhs.1 == rhs.1
         })
         .flatMap(.latest) { (value: (TunnelProviderVPNStatus, TunnelConnection?))
-            -> SignalProducer<SignalTermination, ErrorEvent<Response.Failure>> in
+            -> SignalProducer<SignalTermination<RequestResult>, ErrorEvent<Response.Failure>> in
             
             let vpnStatus = Debugging.ignoreTunneledChecks ? .connected : value.0
             guard case .connected = vpnStatus else {
@@ -437,7 +430,7 @@ public struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equ
                 tunnelErrorEvent.map { .tunnelError($0) }
             }
             .flatMap(.latest) { (response: Response)
-                -> SignalProducer<SignalTermination, ErrorEvent<RetryError>> in
+                -> SignalProducer<SignalTermination<RequestResult>, ErrorEvent<RetryError>> in
                 
                 // Determines if the request needs to be retried.
                 let (result, maybeRetryDueToError) = response.unpackRetriableResultError()
@@ -455,7 +448,7 @@ public struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equ
                 }
             }
             .flatMapError { (requestRetryErrorEvent: ErrorEvent<RetryError>)
-                -> SignalProducer<SignalTermination, ErrorEvent<Response.Failure>> in
+                -> SignalProducer<SignalTermination<RequestResult>, ErrorEvent<Response.Failure>> in
                 
                 // If the tunnel error request is not retriable, then the signal is completed
                 // and no further retries are carried out.
@@ -483,7 +476,7 @@ public struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equ
                    on: QueueScheduler(qos: .default, name: "RetryScheduler"))
         }
         .flatMapError { (responseError: ErrorEvent<Response.Failure>)
-            -> Effect<SignalTermination> in
+            -> Effect<SignalTermination<RequestResult>> in
             // Maps failure response error after all retries from a signal failure
             // to a signal value event.
             return SignalProducer(value: .value(.failed(responseError)))

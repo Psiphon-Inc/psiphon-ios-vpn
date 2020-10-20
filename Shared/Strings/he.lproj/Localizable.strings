@@ -49,14 +49,17 @@
 /* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "CONNECT_TO_USE_SPEED_BOOST" = "התחבר אל Psiphon כדי להשתמש בתמריץ מהירות";
 
-/* Alert dialog title of alert which informs the user that the settings file in the app is corrupt. */
-"CORRUPT_SETTINGS_ALERT_TITLE" = "הגדרות פגומות";
-
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "נראה כי קובץ הגדרות היישום שלך פגום. נסה להתקין מחדש את היישום כדי לתקן את הקובץ.";
 
 /* Decline button title */
 "DECLINE_BUTTON_TITLE" = "סרב";
+
+/*[UNTRANSLATED] Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
+"DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
+
+/*[UNTRANSLATED] Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
+"DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
 
 /* Text next to the button indicating to the user that the rewarded video advertisement is only available when they are not connected to Psiphon. Do not translate or transliterate 'PsiCash'. Do not translate or transliterate 'Psiphon'. */
 "DISCONNECT_TO_WATCH_AND_EARN_PSICASH" = "אתה חייב להתנתק מן Psiphon כדי לצפות בסרטון ולהרוויח PsiCash";
@@ -79,23 +82,8 @@
 /*[UNTRANSLATED] Message shown when verification of a product already purchased fails. */
 "FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Failed to verify purchase";
 
-/* Alert dialog message indicating to the user that the app has failed to upload their feedback and that they should try again.  */
-"FEEDBACK_UPLOAD_FAILED_MESSAGE" = "שגיאה  התרחשה בעת העלאת המשוב שלך. אנא נסה שוב. המשוב שלך עוזר לנו לשפר את רשת Psiphon.";
-
-/* Alert dialog title indicating to the user that the app has failed to upload their feedback to Psiphon's servers. */
-"FEEDBACK_UPLOAD_FAILED_TITLE" = "העלאת משוב נכשלה";
-
-/* Title of button on alert view which shows the progress of the users feedback being uploaded to Psiphon's servers. Hitting this button dismisses the alert and the upload continues in the background. */
-"FEEDBACK_UPLOAD_IN_PROGRESS_BACKGROUND_BUTTON_TITLE" = "רקע";
-
-/* Alert dialog title indicating to the user that their feedback is being encrypted and securely uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_IN_PROGRESS_MESSAGE" = "שולח משוב…";
-
 /* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
-"FEEDBACK_UPLOAD_SUCCESSFUL_MESSAGE" = "תודה על עזרה בשיפור Psiphon!";
-
-/* Alert dialog title indicating to the user that their feedback has been successfully uploaded to Psiphon's servers. */
-"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "משוב הועלה בהצלחה";
+"FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "תודה על עזרה בשיפור Psiphon!";
 
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "חינמי";
@@ -124,6 +112,12 @@
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
 "NO_PRODUCTS_TEXT_2" = "לא היה ניתן לאחזר מינויים מחנות היישומים. אנא נסה שוב מאוחר יותר.";
 
+/*[UNTRANSLATED] Content of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
+"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" = "Apps not working? Tap here to improve your Psiphon experience!";
+
+/*[UNTRANSLATED] Title of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
+"NOTIFICATION_TITLE_UPGRADE_PSIPHON" = "Upgrade Psiphon";
+
 /* Alert OK Button */
 "OK_BUTTON" = "אישור";
 
@@ -138,6 +132,12 @@
 
 /* Onboarding header */
 "ONBOARDING_GETTING_STARTED_HEADER" = "מתחילים";
+
+/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app. */
+"ONBOARDING_NOTIFICATION_PERMISSION_BODY" = "Allow Psiphon to send notifications so that you can be notified of important network events.";
+
+/*[UNTRANSLATED] Onboarding screen title that will be asking the user permission to send notifications about important network events while they use the app. */
+"ONBOARDING_NOTIFICATION_PERMISSION_TITLE" = "Get notified about important network events";
 
 /* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
 "ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "תצטרך להתיר אל Psiphon להוסיף תצורות VPN על מנת להתחבר.";
@@ -372,6 +372,9 @@
 
 /*[UNTRANSLATED] Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Please turn on cellular data or use Wi-Fi.";
+
+/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
+"UPGRADE_PSIPHON" = "Upgrade Psiphon";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "שגיאה  התרחשה בעת התחלת Psiphon. אנא נסה שוב. אם הבעיה נמשכת, נסה להתקין מחדש את יישום Psiphon.";

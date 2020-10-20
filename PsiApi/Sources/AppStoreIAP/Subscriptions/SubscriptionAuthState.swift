@@ -333,7 +333,7 @@ public let subscriptionAuthStateReducer = Reducer<SubscriptionReducerState
                 productID: purchaseWithLatestExpiry.purchase.productID,
                 receipt: receiptData
             ),
-         clientMetaData: environment.clientMetaData()
+            clientMetaData: ClientMetaData(environment.appInfo())
         )
 
         let authRequest = RetriableTunneledHttpRequest(

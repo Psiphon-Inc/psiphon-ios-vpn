@@ -47,14 +47,14 @@ typedef NS_ERROR_ENUM(DelimitedFileErrorDomain, DelimitedFileErrorCode) {
 /// Init the reader.
 /// @param filepath Location of the file to be read.
 /// @param chunkSize Number of bytes to read from the file at a time.
-/// @param outError If non-nill on return, then initialization failed with the provided error.
+/// @param outError If non-nil on return, then initialization failed with the provided error.
 /// @return Returns nil when `outError` is non-nil.
 - (nullable instancetype)initWithFilepath:(NSString*)filepath
                                 chunkSize:(NSUInteger)chunkSize
                                     error:(NSError * _Nullable *)outError NS_DESIGNATED_INITIALIZER;
 
 /// Read a line from the file.
-/// @param outError If non-nill on return, then reading data failed with the provided error.
+/// @param outError If non-nil on return, then reading data failed with the provided error.
 /// @return Returns nil when all lines have been read or `outError` is non-nil.
 - (NSString*_Nullable)readLineWithError:(NSError * _Nullable *)outError;
 

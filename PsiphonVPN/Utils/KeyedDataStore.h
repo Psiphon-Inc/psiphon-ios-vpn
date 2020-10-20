@@ -35,10 +35,14 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Insert data under the provided key in the datastore.
 /// @param object Data to be stored.
-/// @param key Key underwhich to store the data.
+/// @param key Key under which to store the data.
 /// @note should be changed to return an error when a datastore
 /// implements this protocol that can return an error from a store operation.
 - (void)insert:(id)object key:(KeyedDataStoreKey)key;
+
+/// Removes object associated with the given key.
+/// @param key The key whose value you want to remove.
+- (void)removeObjectForKey:(NSString *)key;
 
 @end
 

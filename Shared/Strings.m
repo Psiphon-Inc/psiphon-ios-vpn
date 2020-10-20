@@ -119,10 +119,6 @@
     return  NSLocalizedStringWithDefaultValue(@"SELECT_SERVER_REGION", nil, [NSBundle mainBundle], @"Select server region", @"Title for screen that allows user to select their desired server region.");
 }
 
-+ (NSString *)selectLanguageTitle {
-    return  NSLocalizedStringWithDefaultValue(@"SELECT_LANG", nil, [NSBundle mainBundle], @"SELECT LANGUAGE", @"Title for screen that allows user to select language. Use all capital letters in the translation only if it makes sense.");
-}
-
 + (NSString *)resetConsentButtonTitle {
     return  NSLocalizedStringWithDefaultValue(@"RESET_IDENTIFIER_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Reset Consent", @"Title for a confirmation button that resets a user's previous consent.");
 }

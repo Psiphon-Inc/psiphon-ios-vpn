@@ -184,7 +184,7 @@ let appDelegateReducer = Reducer<AppDelegateState, AppDelegateAction, AppDelegat
     static let instance = SwiftDelegate()
     
     private var navigator = Navigator()
-    private let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER)
+    private let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: PsiphonAppGroupIdentifier)
     private let feedbackLogger = FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler())
     private let supportedProducts =
         SupportedAppStoreProducts.fromPlists(types: [.subscription, .psiCash])
@@ -677,6 +677,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         }
         
         return OnboardingViewController(
+            userDefaultsConfig: self.userDefaultsConfig,
+            mainBundle: .main,
             onboardingStages: stagesNotCompleted,
             feedbackLogger: self.feedbackLogger,
             installVPNConfig: self.installVPNConfig,
@@ -751,22 +753,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func getAppStoreSubscriptionProductIDs() -> Set<String> {
         return self.supportedProducts.supported[.subscription]!.rawValues
     }
-    
-    @objc func getAppStateFeedbackEntry(completionHandler: @escaping (String) -> Void) {
-        self.store.$value.signalProducer
-            .take(first: 1)
-            .startWithValues { [unowned self] appState in
-                completionHandler("""
-                    ContainerInfo: {
-                    \"AppState\":\"\(makeFeedbackEntry(appState))\",
-                    \"UserDefaultsConfig\":\"\(makeFeedbackEntry(UserDefaultsConfig()))\",
-                    \"PsiphonDataSharedDB\": \"\(makeFeedbackEntry(self.sharedDB))\",
-                    \"OutstandingEffectCount\": \(self.store.outstandingEffectCount)
-                    }
-                    """)
-        }
-    }
-    
+
     @objc func isCurrentlySpeedBoosted(completionHandler: @escaping (Bool) -> Void) {
         self.store.$value.signalProducer
             .map(\.psiCash)
@@ -874,6 +861,18 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     
     @objc func getLocaleForCurrentAppLanguage() -> NSLocale {
         return self.userDefaultsConfig.localeForAppLanguage as NSLocale
+    }
+
+    @objc func userSubmittedFeedback(selectedThumbIndex: Int,
+                                     comments: String,
+                                     email: String,
+                                     uploadDiagnostics: Bool) {
+        self.store.send(
+            .feedbackAction(
+                .userSubmittedFeedback(selectedThumbIndex: selectedThumbIndex,
+                                       comments: comments,
+                                       email: email,
+                                       uploadDiagnostics: uploadDiagnostics)))
     }
 }
 

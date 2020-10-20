@@ -25,7 +25,6 @@
 #import "Asserts.h"
 #import "AvailableServerRegions.h"
 #import "DispatchUtils.h"
-#import "FeedbackManager.h"
 #import "Logging.h"
 #import "DebugViewController.h"
 #import "PsiphonConfigUserDefaults.h"
@@ -95,8 +94,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     PsiphonSettingsViewController *appSettingsViewController;
     AnimatedUIButton *settingsButton;
 
-    FeedbackManager *feedbackManager;
-
     // Psiphon Logo
     // Replaces the PsiCash UI when the user is subscribed
     UIImageView *psiphonLargeLogo;
@@ -133,9 +130,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
         
         _adManager = [AdManager sharedInstance];
 
-        feedbackManager = [[FeedbackManager alloc] init];
-
-        // TODO: remove persistance form init function.
+        // TODO: remove persistance from init function.
         [self persistSettingsToSharedUserDefaults];
         
         _openSettingImmediatelyOnViewDidAppear = FALSE;
@@ -511,8 +506,8 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 
 #if DEBUG
 - (void)onVersionLabelTap:(UIButton *)sender {
-    DebugViewController *v = [[DebugViewController alloc] init];
-    [self presentViewController:v animated:YES completion:nil];
+    DebugViewController *viewController = [[DebugViewController alloc] init];
+    [self presentViewController:viewController animated:YES completion:nil];
 }
 #endif
 
@@ -936,15 +931,18 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 
 #pragma mark - FeedbackViewControllerDelegate methods and helpers
 
-- (void)userSubmittedFeedback:(NSUInteger)selectedThumbIndex
+- (void)userSubmittedFeedback:(NSInteger)selectedThumbIndex
                      comments:(NSString *)comments
                         email:(NSString *)email
             uploadDiagnostics:(BOOL)uploadDiagnostics {
 
-    [feedbackManager userSubmittedFeedback:selectedThumbIndex
-                                  comments:comments
-                                     email:email
-                         uploadDiagnostics:uploadDiagnostics];
+    // Ensure any settings changes are persisted. E.g. upstream proxy configuration. 
+    [self persistSettingsToSharedUserDefaults];
+
+    [SwiftDelegate.bridge userSubmittedFeedbackWithSelectedThumbIndex:selectedThumbIndex
+                                                             comments:comments
+                                                                email:email
+                                                    uploadDiagnostics:uploadDiagnostics];
 }
 
 - (void)userPressedURL:(NSURL *)URL {
@@ -981,7 +979,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 
 - (void)persistDisableTimeouts {
     NSUserDefaults *containerUserDefaults = [NSUserDefaults standardUserDefaults];
-    NSUserDefaults *sharedUserDefaults = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
+    NSUserDefaults *sharedUserDefaults = [[NSUserDefaults alloc] initWithSuiteName:PsiphonAppGroupIdentifier];
     [sharedUserDefaults setObject:@([containerUserDefaults boolForKey:kDisableTimeouts]) forKey:kDisableTimeouts];
 }
 
@@ -990,11 +988,11 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 }
 
 - (void)persistUpstreamProxySettings {
-    NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
+    NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:PsiphonAppGroupIdentifier];
     NSString *upstreamProxyUrl = [[UpstreamProxySettings sharedInstance] getUpstreamProxyUrl];
-    [userDefaults setObject:upstreamProxyUrl forKey:PSIPHON_CONFIG_UPSTREAM_PROXY_URL];
+    [userDefaults setObject:upstreamProxyUrl forKey:PsiphonConfigUpstreamProxyURL];
     NSDictionary *upstreamProxyCustomHeaders = [[UpstreamProxySettings sharedInstance] getUpstreamProxyCustomHeaders];
-    [userDefaults setObject:upstreamProxyCustomHeaders forKey:PSIPHON_CONFIG_UPSTREAM_PROXY_CUSTOM_HEADERS];
+    [userDefaults setObject:upstreamProxyCustomHeaders forKey:PsiphonConfigCustomHeaders];
 }
 
 - (BOOL)shouldEnableSettingsLinks {

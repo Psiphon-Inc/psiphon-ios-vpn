@@ -44,14 +44,14 @@ typedef NS_ERROR_ENUM(DiskBackedFileErrorDomain, DiskBackedFileErrorCode) {
 
 /// Return the data contained within the file at the specified path.
 /// @param filepath Path of the file that should be read from.
-/// @param outError If non-nill on return, then writing data failed with the provided error.
+/// @param outError If non-nil on return, then writing data failed with the provided error.
 /// @return Returns nil when `outError` is non-nil.
 + (NSData *_Nullable)fileDataAtPath:(NSString*)filepath error:(NSError * _Nullable *)outError;
 
 /// Create file with given data.
 /// @param filepath Filepath to write to. If a file exists at this path, it will be overwritten.
 /// @param data Data to write.
-/// @param outError If non-nill on return, then writing data failed with the provided error.
+/// @param outError If non-nil on return, then writing data failed with the provided error.
 + (void)createFileAtPath:(NSString*)filepath
                     data:(NSData*)data
                    error:(NSError * _Nullable *)outError;
@@ -59,7 +59,7 @@ typedef NS_ERROR_ENUM(DiskBackedFileErrorDomain, DiskBackedFileErrorCode) {
 /// Append data to file.
 /// @param filepath Filepath of file to append to.
 /// @param data Data to append.
-/// @param outError If non-nill on return, then writing data failed with the provided error.
+/// @param outError If non-nil on return, then writing data failed with the provided error.
 + (void)appendDataToFileAtPath:(NSString*)filepath
                           data:(NSData*)data
                          error:(NSError * _Nullable *)outError;
@@ -67,7 +67,7 @@ typedef NS_ERROR_ENUM(DiskBackedFileErrorDomain, DiskBackedFileErrorCode) {
 /// Write data to file.
 /// @param filepath Filepath of file to write to.
 /// @param data Data to write.
-/// @param outError If non-nill on return, then writing data failed with the provided error.
+/// @param outError If non-nil on return, then writing data failed with the provided error.
 + (void)writeDataToFileAtPath:(NSString*)filepath
                          data:(NSData*)data
                         error:(NSError * _Nullable *)outError;

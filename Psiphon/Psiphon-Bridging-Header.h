@@ -28,7 +28,6 @@
 
 // Utilities
 #import "AppInfo.h"
-#import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "Notifier.h"
 #import "AppDelegate.h"
@@ -44,7 +43,7 @@
 #import "RingSkyButton.h"
 #import "OnboardingView.h"
 #import "OnboardingScrollableView.h"
-#import "LanguageSelectionViewController.h"
+#import "PickerViewController.h"
 #import "RoyalSkyButton.h"
 #import "AlertDialogs.h"
 #import "SubscriptionStatusView.h"
@@ -54,3 +53,12 @@
 // Ads
 #import "AdControllerWrapper.h"
 
+// Data stores
+#import "PsiphonConfigReader.h"
+#import "PsiphonDataSharedDB.h"
+#import "PsiphonConfigUserDefaults.h"
+
+// Feedback
+#import "Feedback.h"
+#import "JetsamTracking.h"
+#import "JetsamMetrics+Feedback.h"

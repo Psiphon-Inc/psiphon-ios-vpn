@@ -21,7 +21,7 @@ import Foundation
 import Utilities
 import ReactiveSwift
 
-@objc public  enum ReachabilityStatus: Int {
+@objc public enum ReachabilityStatus: Int {
     case notReachable
     case viaWiFi
     case viaWWAN

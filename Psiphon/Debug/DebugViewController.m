@@ -33,7 +33,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+    sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
 
     // Debug Toolbox
     DebugToolboxViewController *toolbox = [[DebugToolboxViewController alloc] init];
