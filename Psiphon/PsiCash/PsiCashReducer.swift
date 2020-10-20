@@ -247,6 +247,16 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         
     case let .accountLogin(username, password):
         
+        if let pendingAccountLogin = state.psiCash.pendingAccountLogin {
+            // Guards against another request being send whilst one is in progress.
+            guard case .completed(_) = pendingAccountLogin.wrapped else {
+                return [
+                    environment.feedbackLogger.log(.warn, "another login request is in flight")
+                        .mapNever()
+                ]
+            }
+        }
+        
         guard let tunnelConnection = state.tunnelConnection else {
             return [
                 environment.feedbackLogger.log(.error, "tunnel connection is nil")
