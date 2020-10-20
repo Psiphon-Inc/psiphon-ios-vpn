@@ -30,6 +30,10 @@ public struct SecretString: CustomStringConvertible, CustomReflectable {
     
     private let storage: String
     
+    public var isEmpty: Bool {
+        storage.isEmpty
+    }
+    
     public init(_ value: String) {
         self.storage = value
     }
