@@ -212,6 +212,14 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         }
         
     case .accountLogout:
+        
+        guard let tunnelConnection = state.tunnelConnection else {
+            return [
+                environment.feedbackLogger.log(.error, "tunnel connection is nil")
+                    .mapNever()
+            ]
+        }
+        
         guard case .account(loggedIn: _) = state.psiCash.libData.accountType else {
             return [
                 environment.feedbackLogger.log(.warn ,"""
@@ -221,7 +229,8 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         }
         
         return [
-            environment.psiCashEffects.accountLogout().map(PsiCashAction._accountLogoutResult)
+            environment.psiCashEffects.accountLogout(tunnelConnection)
+                .map(PsiCashAction._accountLogoutResult)
         ]
         
     case ._accountLogoutResult(let result):
@@ -238,11 +247,18 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         
     case let .accountLogin(username, password):
         
+        guard let tunnelConnection = state.tunnelConnection else {
+            return [
+                environment.feedbackLogger.log(.error, "tunnel connection is nil")
+                    .mapNever()
+            ]
+        }
+        
         state.psiCash.pendingAccountLogin = Event(.pending,
                                                   date: environment.getCurrentTime())
         
         return [
-            environment.psiCashEffects.accountLogin(username, password)
+            environment.psiCashEffects.accountLogin(tunnelConnection, username, password)
                 .map(PsiCashAction._accountLoginResult)
         ]
     
