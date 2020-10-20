@@ -795,9 +795,15 @@ final class MutableBindableViewable<BindingType: Equatable, WrappedView: ViewWra
 
 extension UIAlertController {
     
+    static func makeSimpleErrorAlertWithOKButton(message: String) -> UIAlertController {
+        makeSimpleAlertWithOKButton(title: UserStrings.Error_title(), message: message)
+    }
+    
     /// Creates a `UIAlertController` with a single "OK" button that dismisses the alert.
-    static func makeSimpleAlertWithOKButton(message: String) -> UIAlertController {
-        let alert = UIAlertController(title: UserStrings.Error_title(),
+    static func makeSimpleAlertWithOKButton(
+        title: String, message: String
+    ) -> UIAlertController {
+        let alert = UIAlertController(title: title,
                                       message: message,
                                       preferredStyle: .alert)
         
