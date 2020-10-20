@@ -71,6 +71,19 @@ extension RewardedVideoLoadStatus {
     
 }
 
+extension PsiCashRequestError: LocalizedUserDescription where ErrorStatus: LocalizedUserDescription {
+    
+    public var localizedUserDescription: String {
+        switch self {
+        case .errorStatus(let errorStatus):
+            return errorStatus.localizedUserDescription
+        case .requestFailed(let psiCashLibError):
+            return psiCashLibError.localizedDescription
+        }
+    }
+    
+}
+
 extension TunneledPsiCashRequestError: LocalizedUserDescription where
     ErrorStatus: LocalizedUserDescription {
     
@@ -79,7 +92,7 @@ extension TunneledPsiCashRequestError: LocalizedUserDescription where
         case .tunnelNotConnected:
             return UserStrings.Psiphon_is_not_connected()
         case .requestError(let requestError):
-            return requestError.localizedDescription
+            return requestError.localizedUserDescription
         }
     }
     
