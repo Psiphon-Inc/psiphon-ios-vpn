@@ -279,7 +279,7 @@ final class PsiCashViewController: ReactiveViewController {
                 
                 switch psiCashErrorEvent.error {
                 case .requestError(.errorStatus(.insufficientBalance)):
-                    self.display(errorDesc: errorDesc,
+                    self.display(errorEvent: errorDesc.event,
                                  makeAlertController:
                                     UIAlertController.makeSimpleAlertWithDismissButton(
                                         actionButtonTitle: UserStrings.Add_psiCash(),
