@@ -899,7 +899,8 @@ fileprivate extension SwiftDelegate {
             tunnelConnectedSignal: self.store.$value.signalProducer
                 .map(\.vpnState.value.providerVPNStatus.tunneled),
             dateCompare: self.dateCompare,
-            feedbackLogger: self.feedbackLogger
+            feedbackLogger: self.feedbackLogger,
+            tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection)
         )
     }
         

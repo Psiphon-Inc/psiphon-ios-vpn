@@ -20,19 +20,25 @@
 import Foundation
 import UIKit
 
-final class PsiCashAccountLogInView: UIView {
+final class PsiCashAccountLogInView: UIView, Bindable {
+    
+    enum Message: Equatable {
+        case signUp
+        case signUpOrLogIn
+    }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    private let title: UILabel
     private let button: GradientButton
+    private var message: Message? = nil
     
     init() {
-        let title = UILabel.make(text: UserStrings.Create_your_PsiCash_account(),
-                                 fontSize: .normal,
-                                 typeface: .bold,
-                                 numberOfLines: 0)
+        title = UILabel.make(fontSize: .normal,
+                             typeface: .bold,
+                             numberOfLines: 0)
         
         button = GradientButton(gradient: .grey)
         super.init(frame: .zero)
@@ -43,7 +49,6 @@ final class PsiCashAccountLogInView: UIView {
         backgroundColor = .white(withAlpha: 0.42)
         
         mutate(button) {
-            $0.setTitle(UserStrings.Sign_up(), for: .normal)
             $0.setTitleColor(.darkBlue(), for: .normal)
             $0.titleLabel?.font = UIFont.avenirNextBold(CGFloat(FontSize.h3.rawValue))
             $0.contentEdgeInsets = Style.default.buttonMinimumContentEdgeInsets
@@ -63,7 +68,7 @@ final class PsiCashAccountLogInView: UIView {
             $0.constraintToParent(.centerY(0), .trailing(-12)) +
                 $0.widthAnchor.constraint(default: 80, max: 150)
         }
-        
+
     }
     
     override var intrinsicContentSize: CGSize {
@@ -72,6 +77,23 @@ final class PsiCashAccountLogInView: UIView {
     
     func onLogInTapped(_ handler: @escaping () -> Void) {
         button.setEventHandler(handler)
+    }
+    
+    func bind(_ newValue: Message) {
+        guard message != newValue else {
+            return
+        }
+        
+        switch newValue {
+        case .signUp:
+            self.title.text = UserStrings.Create_your_PsiCash_account()
+            self.button.setTitle(UserStrings.Sign_up(), for: .normal)
+            
+        case .signUpOrLogIn:
+            self.title.text = UserStrings.Psicash_account()
+            self.button.setTitle(UserStrings.Sign_up_or_log_in(), for: .normal)
+        }
+        
     }
     
 }

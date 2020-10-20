@@ -155,9 +155,9 @@ import Foundation
                                  comment: "'PsiCash' features are unavailable while the app the is disconnecting from 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash'")
     }
     
-    static func PsiCash_purchase_notice() -> String {
-        return NSLocalizedString("PSICASH_PURCHASE_SCREEN_NOTICE", tableName: nil, bundle: Bundle.main,
-                                 value: "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon.",
+    static func PsiCash_non_account_purchase_notice() -> String {
+        return NSLocalizedString("PSICASH_NON_ACCOUNT_SCREEN_NOTICE", tableName: nil, bundle: Bundle.main,
+                                 value: "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon, unless you have created a PsiCash account and are logged into your PsiCash account.",
                                  comment: "PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash")
     }
 
@@ -274,6 +274,24 @@ import Foundation
         return NSLocalizedString("PSICASH_ACCOUNT", tableName: nil, bundle: Bundle.main,
                                  value: "PsiCash Account",
                                  comment: "Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts.")
+    }
+    
+    static func Psicash_accounts_last_merge_warning() -> String {
+        return NSLocalizedString("PSICASH_ACCOUNTS_LAST_MERGE_WARNING", tableName: nil, bundle: Bundle.main,
+                                 value: "Note that this will be the last time that you can merge your PsiCash account.",
+                                 comment: "Do not translate or transliterate 'PsiCash'.")
+    }
+    
+    static func Incorrect_username_or_password() -> String {
+        return NSLocalizedString("INCORRECT_USERNAME_OR_PASSWORD", tableName: nil, bundle: Bundle.main,
+                                 value: "The username or password you entered is incorrect. Please try again.",
+                                 comment: "Error message when username or password entered by the user to login into their account is incorrect.")
+    }
+    
+    static func Psicash_logged_in_successfully() -> String {
+        return NSLocalizedString("PSICASH_LOGGED_IN_SUCCESSFULLY", tableName: nil, bundle: Bundle.main,
+                                 value: "You successfully logged into your PsiCash account.",
+                                 comment: "Do not translate or transliterate 'PsiCash'. Alert message when the user has been able to successfully log into their PsiCash account.")
     }
     
 }

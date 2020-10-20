@@ -123,7 +123,7 @@
 		8D26455F24D4842E000F46C0 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D26455E24D4842E000F46C0 /* Navigator.swift */; };
 		8D2A332B2522C3C600D58130 /* Error+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D2A332A2522C3C600D58130 /* Error+Additions.swift */; };
 		8D335A52251A929E005F62CA /* PsiCashAccountLogInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D335A51251A929E005F62CA /* PsiCashAccountLogInView.swift */; };
-		8D335A57251A9B1D005F62CA /* PsiCashAuthViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D335A56251A9B1D005F62CA /* PsiCashAuthViewController.swift */; };
+		8D335A57251A9B1D005F62CA /* PsiCashAccountViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D335A56251A9B1D005F62CA /* PsiCashAccountViewController.swift */; };
 		8D335A7B251BC789005F62CA /* DividerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D335A7A251BC789005F62CA /* DividerView.swift */; };
 		8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417E982411954A00FEE587 /* PsiCashReducer.swift */; };
 		8D417EB124147C6D00FEE587 /* LandingPage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB024147C6D00FEE587 /* LandingPage.swift */; };
@@ -607,7 +607,7 @@
 		8D26455E24D4842E000F46C0 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		8D2A332A2522C3C600D58130 /* Error+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Error+Additions.swift"; sourceTree = "<group>"; };
 		8D335A51251A929E005F62CA /* PsiCashAccountLogInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashAccountLogInView.swift; sourceTree = "<group>"; };
-		8D335A56251A9B1D005F62CA /* PsiCashAuthViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashAuthViewController.swift; sourceTree = "<group>"; };
+		8D335A56251A9B1D005F62CA /* PsiCashAccountViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashAccountViewController.swift; sourceTree = "<group>"; };
 		8D335A7A251BC789005F62CA /* DividerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DividerView.swift; sourceTree = "<group>"; };
 		8D417E982411954A00FEE587 /* PsiCashReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashReducer.swift; sourceTree = "<group>"; };
 		8D417EB024147C6D00FEE587 /* LandingPage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LandingPage.swift; sourceTree = "<group>"; };
@@ -1104,10 +1104,11 @@
 				A8408ABFCA9BBDD281E8A4FD /* SkyRegionSelectionViewController.h */,
 				A840896A2A9959280DAE2DA1 /* LanguageSelectionViewController.m */,
 				A84088779C0DA0B8A46BCC1A /* LanguageSelectionViewController.h */,
+				8D259A1D253E971000E558C1 /* ReactiveViewController+Additions.swift */,
 				52D363C8230DE215002C2221 /* PsiCashViewController.swift */,
 				52A2466C23A172A800A01FF1 /* AlertViewController.swift */,
 				8D0017D824DB4B1200EC3409 /* OnboardingViewController.swift */,
-				8D259A1D253E971000E558C1 /* ReactiveViewController+Additions.swift */,
+				8D335A56251A9B1D005F62CA /* PsiCashAccountViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -1216,7 +1217,6 @@
 				5237387323AABB0F00DDE396 /* PurchasingSpeedBoostAlertViewBuilder.swift */,
 				8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */,
 				8D335A51251A929E005F62CA /* PsiCashAccountLogInView.swift */,
-				8D335A56251A9B1D005F62CA /* PsiCashAuthViewController.swift */,
 			);
 			path = PsiCashView;
 			sourceTree = "<group>";
@@ -2222,7 +2222,7 @@
 				A84087AFA5806D689C3BF6D2 /* PickerViewController.m in Sources */,
 				52A2467123A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift in Sources */,
 				A8408EB1E9DABE35016580A7 /* ImageUtils.m in Sources */,
-				8D335A57251A9B1D005F62CA /* PsiCashAuthViewController.swift in Sources */,
+				8D335A57251A9B1D005F62CA /* PsiCashAccountViewController.swift in Sources */,
 				A8408BC29B903A6C0A32F32C /* SkyRegionSelectionViewController.m in Sources */,
 				A84088D3FD4B01A7D14CCC53 /* SupportedLanguages.m in Sources */,
 				A8408F99941C9664E3E7C48A /* LanguageSelectionViewController.m in Sources */,
