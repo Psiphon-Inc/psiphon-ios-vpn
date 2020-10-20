@@ -157,14 +157,14 @@ final class PsiCash {
     var accountType: PsiCashAccountType? {
         let tokenTypes = self.client.validTokenTypes()
         
-        if tokenTypes.count == 0 {
-            return .none
-        }
-                
         if self.client.isAccount() {
             return .account(loggedIn: tokenTypes.count >= 3)
         } else {
-            return .tracker
+            if tokenTypes.count == 0 {
+                return .none
+            } else {
+                return .tracker
+            }
         }
     }
     
