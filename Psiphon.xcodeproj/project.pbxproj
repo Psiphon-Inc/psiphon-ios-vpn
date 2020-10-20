@@ -119,6 +119,7 @@
 		8D21FE8324ECC96C00343D32 /* PsiCashLib.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */; };
 		8D21FE8424ECC96C00343D32 /* PsiCashLib.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		8D255E2D24620E2900FD5D1C /* NoConnectionBannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */; };
+		8D259A1E253E971100E558C1 /* ReactiveViewController+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D259A1D253E971000E558C1 /* ReactiveViewController+Additions.swift */; };
 		8D26455F24D4842E000F46C0 /* Navigator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D26455E24D4842E000F46C0 /* Navigator.swift */; };
 		8D2A332B2522C3C600D58130 /* Error+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D2A332A2522C3C600D58130 /* Error+Additions.swift */; };
 		8D335A52251A929E005F62CA /* PsiCashAccountLogInView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D335A51251A929E005F62CA /* PsiCashAccountLogInView.swift */; };
@@ -602,6 +603,7 @@
 		8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Authorization+Additions.swift"; sourceTree = "<group>"; };
 		8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PsiCashClient+Additions.swift"; sourceTree = "<group>"; };
 		8D255E2C24620E2900FD5D1C /* NoConnectionBannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoConnectionBannerView.swift; sourceTree = "<group>"; };
+		8D259A1D253E971000E558C1 /* ReactiveViewController+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ReactiveViewController+Additions.swift"; sourceTree = "<group>"; };
 		8D26455E24D4842E000F46C0 /* Navigator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Navigator.swift; sourceTree = "<group>"; };
 		8D2A332A2522C3C600D58130 /* Error+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Error+Additions.swift"; sourceTree = "<group>"; };
 		8D335A51251A929E005F62CA /* PsiCashAccountLogInView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashAccountLogInView.swift; sourceTree = "<group>"; };
@@ -1105,6 +1107,7 @@
 				52D363C8230DE215002C2221 /* PsiCashViewController.swift */,
 				52A2466C23A172A800A01FF1 /* AlertViewController.swift */,
 				8D0017D824DB4B1200EC3409 /* OnboardingViewController.swift */,
+				8D259A1D253E971000E558C1 /* ReactiveViewController+Additions.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -2107,6 +2110,7 @@
 				445F24D820E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c in Sources */,
 				445F24D920E1A5BA00D004E9 /* BIT_STRING.c in Sources */,
 				445F24E820E1A5BA00D004E9 /* NativeEnumerated.c in Sources */,
+				8D259A1E253E971100E558C1 /* ReactiveViewController+Additions.swift in Sources */,
 				8D417EB324148C1E00FEE587 /* URLHandler.swift in Sources */,
 				445F24E320E1A5BA00D004E9 /* OCTET_STRING.c in Sources */,
 				445F24E120E1A5BA00D004E9 /* ReceiptAttribute.c in Sources */,
