@@ -23,10 +23,10 @@ extension ReactiveViewController {
     
     /// Display an error alert with a single "OK" button.
     func displayBasicErrorAlert(errorDesc: ErrorEventDescription<ErrorRepr>) {
-        
-        self.display(errorDesc: errorDesc,
-                     makeAlertController:
-                        .makeSimpleErrorAlertWithOKButton(message: errorDesc.localizedUserDescription))
+        self.display(
+            errorEvent: errorDesc.event,
+            makeAlertController:
+                .makeSimpleErrorAlertWithOKButton(message: errorDesc.localizedUserDescription))
     }
     
 }
