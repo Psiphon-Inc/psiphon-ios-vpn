@@ -26,15 +26,22 @@ public struct PsiCashEffects {
     
     public typealias PsiCashRefreshResult =
         Result<PsiCashLibData,
-               ErrorEvent<TunneledPsiCashRequestError<PsiCashRefreshErrorStatus>>>
+               ErrorEvent<TunneledPsiCashRequestError<
+                            PsiCashRequestError<PsiCashRefreshErrorStatus>>>>
     
     public typealias PsiCashNewExpiringPurchaseResult =
         Result<NewExpiringPurchaseResponse,
-               ErrorEvent<TunneledPsiCashRequestError<PsiCashNewExpiringPurchaseErrorStatus>>>
+               ErrorEvent<TunneledPsiCashRequestError<
+                            PsiCashRequestError<PsiCashNewExpiringPurchaseErrorStatus>>>>
     
     public typealias PsiCashAccountLoginResult =
         Result<AccountLoginResponse,
-               ErrorEvent<TunneledPsiCashRequestError<PsiCashAccountLoginErrorStatus>>>
+               ErrorEvent<TunneledPsiCashRequestError<
+                            PsiCashRequestError<PsiCashAccountLoginErrorStatus>>>>
+    
+    public typealias PsiCashAccountLogoutResult =
+        Result<PsiCashLibData,
+                ErrorEvent<TunneledPsiCashRequestError<PsiCashLibError>>>
     
     /// Initializes PsiCash client lib given path of file store root directory.
     public let initialize: (String?) -> Effect<Result<PsiCashLibData, ErrorRepr>>
@@ -46,8 +53,8 @@ public struct PsiCashEffects {
     public let modifyLandingPage: (URL) -> Effect<URL>
     public let rewardedVideoCustomData: () -> String?
     public let removePurchasesNotIn: (Set<String>) -> Effect<Never>
-    public let accountLogout: () -> Effect<Result<PsiCashLibData, ErrorEvent<PsiCashLibError>>>
-    public let accountLogin: (String, SecretString) -> Effect<PsiCashAccountLoginResult>
+    public let accountLogout: (TunnelConnection) -> Effect<PsiCashAccountLogoutResult>
+    public let accountLogin: (TunnelConnection, String, SecretString) -> Effect<PsiCashAccountLoginResult>
 
     public init(
         initialize: @escaping (String?) -> Effect<Result<PsiCashLibData, ErrorRepr>>,
@@ -59,8 +66,8 @@ public struct PsiCashEffects {
         modifyLandingPage: @escaping (URL) -> Effect<URL>,
         rewardedVideoCustomData: @escaping () -> String?,
         removePurchasesNotIn: @escaping (Set<String>) -> Effect<Never>,
-        accountLogout: @escaping () -> Effect<Result<PsiCashLibData, ErrorEvent<PsiCashLibError>>>,
-        accountLogin:@escaping (String, SecretString) -> Effect<PsiCashAccountLoginResult>
+        accountLogout: @escaping (TunnelConnection) -> Effect<PsiCashAccountLogoutResult>,
+        accountLogin:@escaping (TunnelConnection, String, SecretString) -> Effect<PsiCashAccountLoginResult>
     ) {
         self.initialize = initialize
         self.libData = libData

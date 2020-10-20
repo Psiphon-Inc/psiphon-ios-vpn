@@ -85,7 +85,7 @@ extension PsiCashRequestError: LocalizedUserDescription where ErrorStatus: Local
 }
 
 extension TunneledPsiCashRequestError: LocalizedUserDescription where
-    ErrorStatus: LocalizedUserDescription {
+    RequestError: LocalizedUserDescription {
     
     public var localizedUserDescription: String {
         switch self {
@@ -110,7 +110,6 @@ extension PsiCashNewExpiringPurchaseErrorStatus: LocalizedUserDescription {
     }
     
 }
-
 
 extension PsiCashNewExpiringPurchaseErrorStatus {
     
@@ -378,20 +377,36 @@ extension PsiCashEffects {
                     }
                 }
             },
-            accountLogout: { [psiCash, getCurrentTime] ()
-                -> Effect<Result<PsiCashLibData, ErrorEvent<PsiCashLibError>>> in
+            accountLogout: { [psiCash, getCurrentTime] tunnelConnection
+                -> Effect<PsiCashAccountLogoutResult> in
                 Effect.deferred(dispatcher: globalDispatcher) { fulfilled in
                     // This may involve a network operation and so can be blocking.
+                    
+                    guard case .connected = tunnelConnection.tunneled else {
+                        fulfilled(
+                            .failure(ErrorEvent(.tunnelNotConnected, date: getCurrentTime()))
+                        )
+                        return
+                    }
+                    
                     fulfilled(
                         psiCash.accountLogout()
                             .optionalToFailure(success: psiCash.dataModel)
-                            .mapError { ErrorEvent($0, date: getCurrentTime()) }
+                            .mapError { ErrorEvent(.requestError($0), date: getCurrentTime()) }
                     )
                 }
             },
-            accountLogin: { [psiCash, getCurrentTime] username, password
+            accountLogin: { [psiCash, getCurrentTime] tunnelConnection, username, password
                 -> Effect<PsiCashAccountLoginResult> in
                 Effect.deferred(dispatcher: globalDispatcher) { fulfilled in
+                    
+                    guard case .connected = tunnelConnection.tunneled else {
+                        fulfilled(
+                            .failure(ErrorEvent(.tunnelNotConnected, date: getCurrentTime()))
+                        )
+                        return
+                    }
+                    
                     // This is a blocking call.
                     let result = psiCash.accountLogin(username: username, password: password)
                     

@@ -35,7 +35,7 @@ public enum PsiCashAction {
     case _refreshPsiCashStateResult(PsiCashEffects.PsiCashRefreshResult)
     
     case accountLogout
-    case _accountLogoutResult(Result<PsiCashLibData, ErrorEvent<PsiCashLibError>>)
+    case _accountLogoutResult(PsiCashEffects.PsiCashAccountLogoutResult)
     
     case accountLogin(username: String, password: SecretString)
     case _accountLoginResult(PsiCashEffects.PsiCashAccountLoginResult)

@@ -27,7 +27,8 @@ public struct PsiCashState: Equatable {
     // Failure type matches PsiCashEffects.PsiCashRefreshResult.Failure
     public typealias PendingRefresh =
         PendingResult<Utilities.Unit,
-                      ErrorEvent<TunneledPsiCashRequestError<PsiCashRefreshErrorStatus>>>
+                      ErrorEvent<TunneledPsiCashRequestError<
+                                    PsiCashRequestError<PsiCashRefreshErrorStatus>>>>
     
     public typealias PendingAccountLogin = Pending<PsiCashEffects.PsiCashAccountLoginResult>
     
@@ -158,13 +159,11 @@ public enum PsiCashRequestError<ErrorStatus>: HashableError where
 
 /// Represents a PsiCash client library produced request error, along with the an additional
 /// `.tunnelNotConnected` error case.
-public enum TunneledPsiCashRequestError<ErrorStatus>: HashableError where
-    ErrorStatus: PsiCashErrorStatusProtocol {
-    
+public enum TunneledPsiCashRequestError<RequestError: HashableError>: HashableError {
     /// Request was not sent since tunnel was not connected.
     case tunnelNotConnected
     
-    case requestError(PsiCashRequestError<ErrorStatus>)
+    case requestError(RequestError)
 }
 
 /// Represents error values of a PsiCash library refresh action.
