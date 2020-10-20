@@ -89,7 +89,7 @@ final class PsiCashViewController: ReactiveViewController {
     typealias ContainerViewType = EitherView<AddPsiCashViewType, SpeedBoostViewType>
     
     struct ObservedState: Equatable {
-        let state: PsiCashViewControllerReaderState
+        let readerState: PsiCashViewControllerReaderState
         let activeTab: PsiCashViewController.PsiCashViewControllerTabs
         let tunneled: TunnelConnectedStatus
         let lifeCycle: ViewControllerLifeCycle
@@ -115,8 +115,13 @@ final class PsiCashViewController: ReactiveViewController {
     }
     
     private let feedbackLogger: FeedbackLogger
+    private let tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>
+    
+    private let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
+    
     private let (lifetime, token) = Lifetime.make()
     private let store: Store<PsiCashViewControllerReaderState, PsiCashAction>
+    
     private let productRequestStore: Store<Utilities.Unit, ProductRequestAction>
     
     // VC-specific UI state
@@ -147,10 +152,14 @@ final class PsiCashViewController: ReactiveViewController {
          appStoreReceiptStore: Store<Utilities.Unit, ReceiptStateAction>,
          tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>,
          dateCompare: DateCompare,
-         feedbackLogger: FeedbackLogger
+         feedbackLogger: FeedbackLogger,
+         tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
     ) {
         
         self.feedbackLogger = feedbackLogger
+        self.tunnelConnectedSignal = tunnelConnectedSignal
+        
+        self.tunnelConnectionRefSignal = tunnelConnectionRefSignal
         
         self.hStack = UIStackView.make(
             axis: .vertical,
@@ -196,7 +205,8 @@ final class PsiCashViewController: ReactiveViewController {
         self.logInView.onLogInTapped { [unowned self] in
             // Last minute check for tunnel status.
             if case .success(.connected) = tunnelConnectedSignal.first() {
-                self.display(screen: .logInScreen)
+                let _ = self.display(screen: .logInScreen)
+                
             } else {
                 let error = ErrorEventDescription(
                     event: ErrorEvent(ErrorRepr(repr: "tunnel not connected"),
@@ -230,7 +240,7 @@ final class PsiCashViewController: ReactiveViewController {
                 return
             }
             
-            if case let .failure(errorEvent) = observed.state.psiCash.rewardedVideo.loading {
+            if case let .failure(errorEvent) = observed.readerState.psiCash.rewardedVideo.loading {
                 switch errorEvent.error {
                 case .adSDKError(_), .requestedAdFailedToLoad:
                     let errorDesc = ErrorEventDescription(
@@ -248,23 +258,24 @@ final class PsiCashViewController: ReactiveViewController {
                 }
             }
             
-            let psiCashIAPPurchase = observed.state.iap.purchasing[.psiCash] ?? nil
+            let psiCashIAPPurchase = observed.readerState.iap.purchasing[.psiCash] ?? nil
             let purchasingNavState = (psiCashIAPPurchase?.purchasingState,
-                                      observed.state.psiCash.purchasing,
+                                      observed.readerState.psiCash.purchasing,
                                       self.navigation)
             
             switch purchasingNavState {
             case (.none, .none, _):
-                self.display(screen: .mainScreen)
+
+                self.dismissPurchasingScreens()
                 
             case (.pending(_), _, .mainScreen):
-                self.display(screen: .psiCashPurchaseDialog)
+                let _ = self.display(screen: .psiCashPurchaseDialog)
                 
             case (.pending(_), _, .psiCashPurchaseDialog):
                 break
                 
             case (_, .speedBoost(_), .mainScreen):
-                self.display(screen: .speedBoostPurchaseDialog)
+                let _ = self.display(screen: .speedBoostPurchaseDialog)
                 
             case (_, .speedBoost(_), .speedBoostPurchaseDialog):
                 break
@@ -275,7 +286,7 @@ final class PsiCashViewController: ReactiveViewController {
                     localizedUserDescription: psiCashErrorEvent.error.localizedUserDescription
                 )
                 
-                self.display(screen: .mainScreen)
+                self.dismissPurchasingScreens()
                 
                 switch psiCashErrorEvent.error {
                 case .requestError(.errorStatus(.insufficientBalance)):
@@ -293,7 +304,7 @@ final class PsiCashViewController: ReactiveViewController {
                 }
                 
             case (.completed(let iapErrorEvent), _, _):
-                self.display(screen: .mainScreen)
+                self.dismissPurchasingScreens()
                 if let errorDesc = iapErrorEvent.localizedErrorEventDescription {
                     self.displayBasicErrorAlert(errorDesc: errorDesc)
                 }
@@ -307,7 +318,7 @@ final class PsiCashViewController: ReactiveViewController {
             }
             
             // PsiCash account type
-            switch observed.state.psiCash.libData.accountType {
+            switch observed.readerState.psiCash.libData.accountType {
             case .none:
                 self.balanceViewWrapper.view.isHidden = true
                 self.tabControl.view.isHidden = true
@@ -335,7 +346,7 @@ final class PsiCashViewController: ReactiveViewController {
                 break
             }
             
-            switch observed.state.subscription.status {
+            switch observed.readerState.subscription.status {
             case .unknown:
                 // There is not PsiCash state or subscription state is unknown.
                 self.balanceViewWrapper.view.isHidden = true
@@ -350,7 +361,7 @@ final class PsiCashViewController: ReactiveViewController {
                 self.balanceViewWrapper.view.isHidden = false
                 self.tabControl.view.isHidden = true
                 self.logInView.isHidden = true
-                self.balanceViewWrapper.bind(observed.state.psiCashBalanceViewModel)
+                self.balanceViewWrapper.bind(observed.readerState.psiCashBalanceViewModel)
                 self.containerBindable.bind(
                     .left(.right(.right(.right(.right(.userSubscribed)))))
                 )
@@ -358,7 +369,7 @@ final class PsiCashViewController: ReactiveViewController {
             case .notSubscribed:
                 self.balanceViewWrapper.view.isHidden = false
                 self.tabControl.view.isHidden = false
-                self.balanceViewWrapper.bind(observed.state.psiCashBalanceViewModel)
+                self.balanceViewWrapper.bind(observed.readerState.psiCashBalanceViewModel)
                 
                 // Updates active tab UI
                 switch observed.activeTab {
@@ -377,7 +388,7 @@ final class PsiCashViewController: ReactiveViewController {
                 case .connected, .notConnected:
                     self.tabControl.view.isHidden = false
                     
-                    if case .tracker = observed.state.psiCash.libData.accountType {
+                    if case .tracker = observed.readerState.psiCash.libData.accountType {
                         // LogIn button is displayed to encourage the user to login.
                         self.logInView.isHidden = false
                         self.logInView.bind(.signUp)
@@ -398,7 +409,7 @@ final class PsiCashViewController: ReactiveViewController {
                 case (.notConnected, .addPsiCash),
                      (.connected, .addPsiCash):
                     
-                    if let unverifiedPsiCashTx = observed.state.iap.unfinishedPsiCashTx {
+                    if let unverifiedPsiCashTx = observed.readerState.iap.unfinishedPsiCashTx {
                         switch observed.tunneled {
                         case .connected:
                             
@@ -422,7 +433,7 @@ final class PsiCashViewController: ReactiveViewController {
                                 
                             case .purchaseNotRecordedByAppStore:
                                 self.containerBindable.bind(.left(.right(.right(.right(.left(.transactionNotRecordedByAppStore(
-                                    isRefreshingReceipt: observed.state.isRefreshingAppStoreReceipt,
+                                    isRefreshingReceipt: observed.readerState.isRefreshingAppStoreReceipt,
                                     retryAction: {
                                         appStoreReceiptStore.send(
                                             .remoteReceiptRefresh(optionalPromise: nil))
@@ -457,7 +468,7 @@ final class PsiCashViewController: ReactiveViewController {
                             fatalError()
                         }
                         
-                        let allProducts = observed.state.allProducts(
+                        let allProducts = observed.readerState.allProducts(
                             rewardedVideoClearedForSale: rewardedVideoClearedForSale,
                             rewardedVideoSubtitle: rewardedVideoSubtitle
                         )
@@ -470,12 +481,15 @@ final class PsiCashViewController: ReactiveViewController {
                             self.containerBindable.bind(.left(.right(.left(true))))
                         case .pending(let lastSuccess):
                             // Displays product list from previous retrieval.
-                            self.containerBindable.bind(.left(.left(lastSuccess)))
+
+                            self.containerBindable.bind(.left(.left(.makeViewModel(purchasables: lastSuccess, accountType: observed.readerState.psiCash.libData.accountType))))
+                            
                         case .completed(let productRequestResult):
                             // Product list retrieved from App Store.
                             switch productRequestResult {
                             case .success(let psiCashCoinProducts):
-                                self.containerBindable.bind(.left(.left(psiCashCoinProducts)))
+                                self.containerBindable.bind(.left(.left(.makeViewModel(purchasables: psiCashCoinProducts, accountType: observed.readerState.psiCash.libData.accountType))))
+                                
                             case .failure(_):
                                 // Shows failed to load message with tap to retry button.
                                 self.containerBindable.bind(
@@ -489,7 +503,7 @@ final class PsiCashViewController: ReactiveViewController {
                     
                 case (.notConnected, .speedBoost):
                     
-                    let activeSpeedBoost = observed.state.psiCash.activeSpeedBoost(dateCompare)
+                    let activeSpeedBoost = observed.readerState.psiCash.activeSpeedBoost(dateCompare)
                     
                     switch activeSpeedBoost {
                     case .none:
@@ -509,13 +523,13 @@ final class PsiCashViewController: ReactiveViewController {
                     
                 case (.connected, .speedBoost):
                     
-                    let activeSpeedBoost = observed.state.psiCash.activeSpeedBoost(dateCompare)
+                    let activeSpeedBoost = observed.readerState.psiCash.activeSpeedBoost(dateCompare)
                     
                     switch activeSpeedBoost {
                     case .none:
                         // There is no active speed boost.
                         let speedBoostPurchasables =
-                            observed.state.psiCash.libData.purchasePrices.compactMap {
+                            observed.readerState.psiCash.libData.purchasePrices.compactMap {
                                 $0.successToOptional()?.speedBoost
                             }.map(SpeedBoostPurchasableViewModel.init(purchasable:))
                         
@@ -632,6 +646,15 @@ final class PsiCashViewController: ReactiveViewController {
 // Navigations
 extension PsiCashViewController {
     
+    private func dismissPurchasingScreens() {
+        switch self.navigation {
+        case .logInScreen, .mainScreen:
+            return
+        case .psiCashPurchaseDialog, .speedBoostPurchaseDialog:
+            let _ = self.display(screen: .mainScreen)
+        }
+    }
+    
     private func display(screen: Screen) -> Bool {
         
         // Can only navigate to a new screen from the main screen,
@@ -657,7 +680,7 @@ extension PsiCashViewController {
             
         } else {
             
-            // Presenting a new screen is only well-defined current scree is the main screen.
+            // Presenting a new screen is only well-defined current screen is the main screen.
             guard case .mainScreen = self.navigation else {
                 return false
             }
@@ -678,8 +701,18 @@ extension PsiCashViewController {
                 self.presentOnViewDidAppear(vc, animated: false, completion: nil)
                 
             case .logInScreen:
-                let v = PsiCashAuthViewController(
+                let v = PsiCashAccountViewController(
+                    store: self.store.projection(
+                        value: {
+                            PsiCashAccountViewController.ReaderState(
+                                accountType: $0.psiCash.libData.accountType,
+                                pendingAccountLogin: $0.psiCash.pendingAccountLogin
+                            )
+                        },
+                        action: id
+                    ),
                     feedbackLogger: self.feedbackLogger,
+                    tunnelConnectionRefSignal: self.tunnelConnectionRefSignal,
                     createNewAccountURL: PsiCashHardCodedValues.devPsiCashSignUpURL,
                     forgotPasswordURL: PsiCashHardCodedValues.devPsiCashForgotPasswordURL,
                     onDismiss: {
@@ -769,6 +802,22 @@ extension ErrorEvent where E == IAPError {
         }
         return ErrorEventDescription(event: self.eraseToRepr(),
                                      localizedUserDescription: description)
+    }
+    
+}
+
+fileprivate extension PsiCashCoinPurchaseTable.ViewModel {
+    
+    static func makeViewModel(
+        purchasables: [PsiCashPurchasableViewModel], accountType: PsiCashAccountType?
+    ) -> Self {
+        let footerText: String?
+        if case .tracker = accountType {
+            footerText = UserStrings.PsiCash_non_account_purchase_notice()
+        } else {
+           footerText = nil
+        }
+        return .init(purchasables: purchasables, footerText: footerText)
     }
     
 }

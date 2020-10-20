@@ -103,6 +103,7 @@ public final class TunnelConnection: Equatable {
     
     public let connectionStatus: () -> ConnectionResourceStatus
     
+    /// `tunneled` takes `DebugFlags.ignoreTunneledChecks` into account.
     public var tunneled: TunnelConnectedStatus {
         switch self.connectionStatus() {
         case .resourceReleased:
