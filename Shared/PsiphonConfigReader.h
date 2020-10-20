@@ -36,7 +36,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (class, nonatomic, readonly) NSString *embeddedServerEntriesPath;
 @property (class, nonatomic, readonly) NSString *psiphonConfigPath;
 
-@property (nonatomic, readonly) NSDictionary *configs;
+@property (nonatomic, readonly) NSDictionary *config;
 @property (nonatomic, readonly) PsiphonConfigSponsorIds *sponsorIds;
 
 + (PsiphonConfigReader *_Nullable)fromConfigFile;

@@ -52,7 +52,7 @@
 
         [self setTitle:title];
         logFilePath = logPath;
-        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
 
         // NSFileHandle opened with fileHandleForReadingFromURL ows its associated
         // file descriptor, and will close it automatically when deallocated.
@@ -63,7 +63,7 @@
 
         bytesReadFileOffset = (unsigned long long) 0;
 
-        workQueue = dispatch_queue_create([(APP_GROUP_IDENTIFIER @".LogViewWorkQueue") UTF8String],
+        workQueue = dispatch_queue_create([[PsiphonAppGroupIdentifier stringByAppendingString:@".LogViewWorkQueue"] UTF8String],
           DISPATCH_QUEUE_SERIAL);
     }
     return self;
@@ -133,22 +133,22 @@
 
         unsigned long long newBytesReadFileOffset;
 
-        BOOL isFirstLogRead = (bytesReadFileOffset == 0);
+        BOOL isFirstLogRead = (self->bytesReadFileOffset == 0);
 
-        NSString *logData = [PsiphonDataSharedDB tryReadingFile:logFilePath
-                                                usingFileHandle:&logFileHandle
-                                                 readFromOffset:bytesReadFileOffset
+        NSString *logData = [PsiphonDataSharedDB tryReadingFile:self->logFilePath
+                                                usingFileHandle:&self->logFileHandle
+                                                 readFromOffset:self->bytesReadFileOffset
                                                    readToOffset:&newBytesReadFileOffset];
 
-        LOG_DEBUG(@"Log old file offset %llu", bytesReadFileOffset);
+        LOG_DEBUG(@"Log old file offset %llu", self->bytesReadFileOffset);
         LOG_DEBUG(@"Log new file offset %llu", newBytesReadFileOffset);
-        LOG_DEBUG(@"Log bytes read %llu", (newBytesReadFileOffset - bytesReadFileOffset));
+        LOG_DEBUG(@"Log bytes read %llu", (newBytesReadFileOffset - self->bytesReadFileOffset));
 
         if (logData && ([logData length] > 0)) {
 
-            bytesReadFileOffset = newBytesReadFileOffset;
+            self->bytesReadFileOffset = newBytesReadFileOffset;
             NSMutableArray *newEntries = [[NSMutableArray alloc] init];
-            [sharedDB readLogsData:logData intoArray:newEntries];
+            [self->sharedDB readLogsData:logData intoArray:newEntries];
 
             // On the first load, truncate array entries to MAX_LOGS_LOAD
             if (isFirstLogRead && ([newEntries count] > MAX_LOGS_LOAD)) {
@@ -171,7 +171,7 @@
                 }
 
                 if (userAction) {
-                    [activityIndicator stopAnimating];
+                    [self->activityIndicator stopAnimating];
                 }
             });
         } else {
@@ -179,7 +179,7 @@
             // we resort to scrolling to bottom of screen.
             if (userAction) {
                 dispatch_async(dispatch_get_main_queue(), ^{
-                    [activityIndicator stopAnimating];
+                    [self->activityIndicator stopAnimating];
                     [self scrollToBottom];
                 });
             }
@@ -206,7 +206,7 @@
       mask, workQueue);
 
     dispatch_source_set_event_handler(dispatchSource, ^{
-        unsigned long flag = dispatch_source_get_data(dispatchSource);
+        unsigned long flag = dispatch_source_get_data(self->dispatchSource);
 
         if (flag & DISPATCH_VNODE_WRITE) {
             LOG_DEBUG(@"Log Dispatch_vnode_write");
@@ -215,8 +215,8 @@
             LOG_DEBUG(@"Log Dispatch_vnode_extend");
         } else if (flag & DISPATCH_VNODE_DELETE) {
             LOG_DEBUG(@"Log Dispatch_vnode_delete");
-            bytesReadFileOffset = 0;
-            dispatch_source_cancel(dispatchSource);
+            self->bytesReadFileOffset = 0;
+            dispatch_source_cancel(self->dispatchSource);
         }
     });
 

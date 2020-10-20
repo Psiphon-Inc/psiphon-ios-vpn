@@ -30,7 +30,7 @@ PsiFeedbackLogType const SubscriptionAuthCheckLogType = @"SubscriptionAuthCheck"
 
 + (Authorization *_Nullable)getLatestAuthorizationNotRejected {
     PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc]
-                                     initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+                                     initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
     
     NSData *_Nullable storedData = [sharedDB getSubscriptionAuths];
     if (storedData == nil) {
@@ -137,7 +137,7 @@ PsiFeedbackLogType const SubscriptionAuthCheckLogType = @"SubscriptionAuthCheck"
 
 + (void)addRejectedSubscriptionAuthID:(NSString *)authorizationID {
     PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc]
-                                     initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+                                     initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
     
     [sharedDB insertRejectedSubscriptionAuthorizationID: authorizationID];
 }

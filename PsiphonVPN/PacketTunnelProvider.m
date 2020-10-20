@@ -55,6 +55,8 @@
 #import "SessionConfigValues.h"
 #import "FeedbackUtils.h"
 #import "VPNStrings.h"
+#import "NSUserDefaults+KeyedDataStore.h"
+#import "ExtensionDataStore.h"
 
 NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
 
@@ -71,6 +73,16 @@ PsiFeedbackLogType const ExtensionNotificationLogType = @"ExtensionNotification"
 PsiFeedbackLogType const PsiphonTunnelDelegateLogType = @"PsiphonTunnelDelegate";
 PsiFeedbackLogType const PacketTunnelProviderLogType = @"PacketTunnelProvider";
 PsiFeedbackLogType const ExitReasonLogType = @"ExitReason";
+
+// AlertId values are persisted, do not use re-use values.
+typedef NS_ENUM(NSInteger, AlertId) {
+    AlertIdOpenContainerToFinishConnecting = 1,
+    AlertIdCorruptSettingsFile = 2,
+    AlertIdSubscriptionExpired = 3,
+    AlertIdSelectedRegionUnavailable = 4,
+    AlertIdUpstreamProxyError = 5,
+    AlertIdDisallowedTraffic = 6,
+};
 
 /** PacketTunnelProvider state */
 typedef NS_ENUM(NSInteger, TunnelProviderState) {
@@ -106,23 +118,22 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 @implementation PacketTunnelProvider {
 
-    _Atomic BOOL showUpstreamProxyErrorMessage;
-
     // Serial queue of work to be done following callbacks from PsiphonTunnel.
     dispatch_queue_t workQueue;
 
     AppProfiler *_Nullable appProfiler;
     
-    // sessionConfigValues is not thread-safe.
+    // sessionConfigValues should only be accessed through the `workQueue`.
     SessionConfigValues *_Nonnull sessionConfigValues;
+    
+    // localDataStore should only be accessed through the `workQueue`.
+    ExtensionDataStore *_Nonnull localDataStore;
 }
 
 - (id)init {
     self = [super init];
     if (self) {
         [AppProfiler logMemoryReportWithTag:@"PacketTunnelProviderInit"];
-
-        atomic_init(&self->showUpstreamProxyErrorMessage, TRUE);
 
         workQueue = dispatch_queue_create("ca.psiphon.PsiphonVPN.workQueue", DISPATCH_QUEUE_SERIAL);
 
@@ -135,6 +146,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         _startWithSubscriptionCheckSponsorID = FALSE;
         
         sessionConfigValues = [[SessionConfigValues alloc] initWithSharedDB:self.sharedDB];
+        
+        localDataStore = [[ExtensionDataStore alloc]
+                          initWithDataStore:[NSUserDefaults standardUserDefaults]];
     }
     return self;
 }
@@ -180,9 +194,14 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 return;
                 
             case AuthorizationUpdateResultNewAuthsAvailable: {
+                // Updates PacketTunnelProvider state to indicate a new session.
+                
+                [self->localDataStore removeAllSessionAlerts];
+                
                 NSString *sponsorID = nil;
-                NSArray<NSString *> *_Nonnull auths = [self->sessionConfigValues
-                                                       getEncodedAuthsWithSponsorID:&sponsorID];
+                NSArray<NSString *> *_Nonnull auths =
+                [self->sessionConfigValues newSessionEncodedAuthsWithSponsorID:&sponsorID];
+                
                 
                 [AppProfiler logMemoryReportWithTag:@"reconnectWithConfig"];
                 [self.psiphonTunnel reconnectWithConfig:sponsorID :auths];
@@ -192,9 +211,47 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     });
 }
 
+// Facility that displays message with given identifier only once per session.
+// This method is thread-safe.
+- (void)displayMessageOnce:(NSString *)message identifier:(AlertId)alertId {
+    PacketTunnelProvider *__weak weakSelf = self;
 
+    dispatch_async(self->workQueue, ^{
+        PacketTunnelProvider *__strong strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+        
+        // Adds `alertId` to set of alerts displayed for current session.
+        BOOL alertAdded = [strongSelf->localDataStore addSessionAlert:@(alertId)];
+        if (alertAdded == FALSE) {
+            // The alert has already been added (for the current session).
+            return;
+        }
+        
+        [strongSelf displayMessage:message completionHandler:^(BOOL success) {
+            // If failed to display alert, resets the flag for `alertId`.
+            if (success == FALSE) {
+                dispatch_async(strongSelf->workQueue, ^{
+                    PacketTunnelProvider *__strong strongSelf = weakSelf;
+                    if (!strongSelf) {
+                        return;
+                    }
+                    [strongSelf->localDataStore removeSessionAlert:@(alertId)];
+                });
+                return;
+            }
+        }];
+        
+    });
+}
+
+// This method is not thread-safe.
 - (NSError *_Nullable)startPsiphonTunnel {
-
+    
+    // Indicates that a new tunnel session is about to begin.
+    [self->sessionConfigValues explicitlySetNewSession];
+    
     BOOL success = [self.psiphonTunnel start:FALSE];
 
     if (!success) {
@@ -233,6 +290,15 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         self.startWithSubscriptionCheckSponsorID = TRUE;
     } else {
         self.startWithSubscriptionCheckSponsorID = FALSE;
+    }
+    
+    // If the VPN process is started after a crash, persisted session alerts from
+    // the previous session are used, and current tunnel session is deemed
+    // to be a continuation of the previous session.
+    // Otherwise, there is a new tunnel session, and session alerts from the
+    // previous session are removed.
+    if (self.extensionStartMethod != ExtensionStartMethodFromCrash) {
+        [self->localDataStore removeAllSessionAlerts];
     }
 
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
@@ -368,8 +434,11 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         
         // If the container StartVPN command has not been received from the container,
         // and the container goes to the background, then alert the user to open the app.
-        if (self.waitForContainerStartVPNCommand && tunnelIntent == TUNNEL_INTENT_START) {
-            [self displayMessage:VPNStrings.openPsiphonAppToFinishConnecting];
+        if (self.waitForContainerStartVPNCommand) {
+            if (tunnelIntent == TUNNEL_INTENT_START || tunnelIntent == TUNNEL_INTENT_RESTART) {
+                [self displayMessageOnce:VPNStrings.openPsiphonAppToFinishConnecting
+                              identifier:AlertIdOpenContainerToFinishConnecting];
+            }
         }
 
     } else if ([NotifierUpdatedNonSubscriptionAuths isEqualToString:message]) {
@@ -404,7 +473,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                       withCPUSampleDurationSeconds:0
                     withBlockSampleDurationSeconds:0];
 
-        [self displayMessage:@"DEBUG: Finished writing runtime profiles."];
+        [self displayMessage:@"DEBUG: Finished writing runtime profiles."
+           completionHandler:^(BOOL success) {}];
 
     } else if ([NotifierDebugMemoryProfiler isEqualToString:message]) {
         [self updateAppProfiling];
@@ -557,7 +627,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (void)displayCorruptSettingsFileMessage {
-    [self displayMessage:VPNStrings.corruptSettingsFileAlertMessage];
+    [self displayMessageOnce:VPNStrings.corruptSettingsFileAlertMessage
+                  identifier:AlertIdCorruptSettingsFile];
 }
 
 // presentDisallowedTrafficAlertNotification presents user notification if enabled,
@@ -568,36 +639,57 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     
     [centre getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
         
-        // If the authorization has not been given for user notifications,
-        // or if the app is not backgrounded (in which case user notifications won't show),
-        // then display simple alert using NEProvider `displayMessage::` method.
-        // Otherwise, send schedule user notification.
-        if (settings.authorizationStatus != UNAuthorizationStatusAuthorized ||
-            [self.sharedDB getAppForegroundState] == TRUE) {
-            [self displayMessage: VPNStrings.disallowedTrafficAlertMessage];
-        } else {
-            UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
-            content.title = [NSString localizedUserNotificationStringForKey:@"NOTIFICATION_TITLE_UPGRADE_PSIPHON" arguments:nil];
-            content.body = [NSString localizedUserNotificationStringForKey:@"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" arguments:nil];
-             
-            // Delivers the notification immediately.
-            UNNotificationRequest* request = [UNNotificationRequest
-                                              requestWithIdentifier:UserNotificationDisallowedTrafficAlertIdentifier
-                                              content:content
-                                              trigger:nil];
-             
-            // Schedule the notification.
-            [centre addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+        dispatch_async(self->workQueue, ^{
+
+            // If the authorization has not been given for user notifications, or if
+            // the app is not backgrounded (in which case user notifications won't be shown),
+            // then displays simple alert using NEProvider `displayMessage::` method.
+            // Otherwise, schedules user notification.
+            if (settings.authorizationStatus != UNAuthorizationStatusAuthorized ||
+                [self.sharedDB getAppForegroundState] == TRUE) {
                 
-                [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
-                                         format:@"Added notification request: error: '%@'", error];
+                [self displayMessageOnce:VPNStrings.disallowedTrafficAlertMessage
+                              identifier:AlertIdDisallowedTraffic];
                 
-                // Falls back to presenting alert if the notification request failed.
-                if (error != nil) {
-                    [self displayMessage:VPNStrings.disallowedTrafficAlertMessage];
+            } else {
+                
+                BOOL alertAdded = [self->localDataStore addSessionAlert:@(AlertIdDisallowedTraffic)];
+                if (alertAdded == FALSE) {
+                    // The alert has already been added (for the current session).
+                    return;
                 }
-            }];
-        }
+                
+                UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
+                content.title = [NSString localizedUserNotificationStringForKey:@"NOTIFICATION_TITLE_UPGRADE_PSIPHON" arguments:nil];
+                content.body = [NSString localizedUserNotificationStringForKey:@"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" arguments:nil];
+                
+                // Delivers the notification immediately.
+                UNNotificationRequest* request = [UNNotificationRequest
+                                                  requestWithIdentifier:UserNotificationDisallowedTrafficAlertIdentifier
+                                                  content:content
+                                                  trigger:nil];
+                
+                // Schedule the notification.
+                
+                [centre addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+                    
+                    dispatch_async(self->workQueue, ^{
+                        [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
+                                                 format:@"Added notification request: error: '%@'", error];
+                        
+                        // Falls back to presenting alert if the notification request failed.
+                        if (error != nil) {
+                            // Failed to display alert through UNUserNotification.
+                            // Removes alert id from set of session alerts,
+                            // and retries to display the alert using `-displayMessageOnce::` mechanism.
+                            [self->localDataStore removeSessionAlert:@(AlertIdDisallowedTraffic)];
+                            [self displayMessageOnce:VPNStrings.disallowedTrafficAlertMessage
+                                          identifier:AlertIdDisallowedTraffic];
+                        }
+                    });
+                }];
+            }
+        });
     }];
 }
 
@@ -620,16 +712,16 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 - (NSDictionary * _Nullable)getPsiphonConfig {
 
-    NSDictionary *configs = [PsiphonConfigReader fromConfigFile].configs;
-    if (!configs) {
+    NSDictionary *config = [PsiphonConfigReader fromConfigFile].config;
+    if (config == nil) {
         [PsiFeedbackLogger errorWithType:PsiphonTunnelDelegateLogType
-                                 format:@"Failed to get config"];
+                                  format:@"Failed to get config"];
         [self displayCorruptSettingsFileMessage];
         [self exitGracefully];
     }
 
     // Get a mutable copy of the Psiphon configs.
-    NSMutableDictionary *mutableConfigCopy = [configs mutableCopy];
+    NSMutableDictionary *mutableConfigCopy = [config mutableCopy];
 
     // Applying mutations to config
     NSNumber *fd = (NSNumber*)[[self packetFlow] valueForKeyPath:@"socket.fileDescriptor"];
@@ -637,12 +729,16 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // In case of duplicate keys, value from psiphonConfigUserDefaults
     // will replace mutableConfigCopy value.
     PsiphonConfigUserDefaults *psiphonConfigUserDefaults =
-        [[PsiphonConfigUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
+        [[PsiphonConfigUserDefaults alloc] initWithSuiteName:PsiphonAppGroupIdentifier];
     [mutableConfigCopy addEntriesFromDictionary:[psiphonConfigUserDefaults dictionaryRepresentation]];
 
     mutableConfigCopy[@"PacketTunnelTunFileDescriptor"] = fd;
 
     mutableConfigCopy[@"ClientVersion"] = [AppInfo appVersion];
+    
+    [PsiFeedbackLogger infoWithType:PsiphonTunnelDelegateLogType
+                             format:@"EgressRegion: region code: %@",
+     psiphonConfigUserDefaults.egressRegion];
 
     // Configure data root directory.
     // PsiphonTunnel will store all of its files under this directory.
@@ -652,7 +748,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     NSURL *dataRootDirectory = [PsiphonDataSharedDB dataRootDirectory];
     if (dataRootDirectory == nil) {
         [PsiFeedbackLogger errorWithType:PsiphonTunnelDelegateLogType
-                                 format:@"Failed to get data root directory"];
+                                  format:@"Failed to get data root directory"];
         [self displayCorruptSettingsFileMessage];
         [self exitGracefully];
     }
@@ -696,7 +792,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     
     // Provide auth tokens
     NSString *sponsorID;
-    NSArray *authorizations = [self->sessionConfigValues getEncodedAuthsWithSponsorID:&sponsorID];
+    NSArray *authorizations = [self->sessionConfigValues
+                               newSessionEncodedAuthsWithSponsorID:&sponsorID];
     if ([authorizations count] > 0) {
         mutableConfigCopy[@"Authorizations"] = [authorizations copy];
     }
@@ -743,7 +840,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             return;
         }
         
-        ActiveAuthorizationResult result = [self->sessionConfigValues
+        ActiveAuthorizationResult result = [strongSelf->sessionConfigValues
                                             setActiveAuthorizationIDs:authorizationIds];
         
         switch (result) {
@@ -752,10 +849,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 
             case ActiveAuthorizationResultInactiveSubscription: {
                 // Displays an alert to the user for the expired subscription.
-                // This only happens if the container has not been up for 24 hours before expiry.
-                if ([self.sharedDB getAppForegroundState] == FALSE) {
-                    [self displayMessage: VPNStrings.subscriptionExpiredAlertMessage];
-                }
+                [strongSelf displayMessageOnce:VPNStrings.subscriptionExpiredAlertMessage
+                                    identifier:AlertIdSubscriptionExpired];
                 break;
             }
         }
@@ -826,7 +921,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         [[PsiphonConfigUserDefaults sharedInstance] setEgressRegion:kPsiphonRegionBestPerformance];
 
         dispatch_async(self->workQueue, ^{
-            [self displayMessage:[Strings selectedRegionUnavailableAlertBody]];
+            [self displayMessageOnce:Strings.selectedRegionUnavailableAlertBody
+                          identifier:AlertIdSelectedRegionUnavailable];
+            
             // Starting the tunnel with "Best Performance" region.
             [self startPsiphonTunnel];
         });
@@ -858,15 +955,11 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // would otherwise result in too many pop ups.
 
     // onUpstreamProxyError may be called concurrently.
-    BOOL expected = TRUE;
-    if (!atomic_compare_exchange_strong(&self->showUpstreamProxyErrorMessage, &expected, FALSE)) {
-        return;
-    }
-
+    
     NSString *alertDisplayMessage = [NSString stringWithFormat:@"%@\n\n(%@)",
         VPNStrings.upstreamProxySettingsErrorMessage, message];
 
-    [self displayMessage:alertDisplayMessage];
+    [self displayMessageOnce:alertDisplayMessage identifier:AlertIdUpstreamProxyError];
 }
 
 - (void)onClientRegion:(NSString *)region {

@@ -117,7 +117,7 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 // See comment in header
 + (NSURL *)dataRootDirectory {
     return [[[NSFileManager defaultManager]
-             containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER]
+             containerURLForSecurityApplicationGroupIdentifier:PsiphonAppGroupIdentifier]
             URLByAppendingPathComponent:@"com.psiphon3.ios.PsiphonTunnel"];
 }
 

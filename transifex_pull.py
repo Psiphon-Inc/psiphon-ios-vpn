@@ -49,6 +49,7 @@ DEFAULT_LANGS = {
     'el_GR': 'el',      # Greek
     'es': 'es',         # Spanish
     'fa': 'fa',         # Farsi/Persian
+    'fa_AF': 'fa-AF',   # Dari (Afgan Farsi)
     'fi_FI': 'fi',      # Finnish
     'fr': 'fr',         # French
     'he': 'he',         # Hebrew
@@ -66,8 +67,10 @@ DEFAULT_LANGS = {
     'pt_BR': 'pt-BR',   # Portuguese-Brazil
     'pt_PT': 'pt-PT',   # Portuguese-Portugal
     'ru': 'ru',         # Russian
+    'sw': 'sw',         # Swahili
     'tg': 'tg',         # Tajik
     'th': 'th',         # Thai
+    'ti': 'ti',         # Tigrinya
     'tk': 'tk',         # Turkmen
     'tr': 'tr',         # Turkish
     'uk': 'uk',         # Ukrainian

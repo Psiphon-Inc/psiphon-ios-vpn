@@ -37,5 +37,9 @@ final class PsiphonRotatingFileFeedbackLogHandler: FeedbackLogHandler {
             PsiFeedbackLogger.error(withType: type, message: message)
         }
     }
-    
+
+    func feedbackLogNotice(type: String, message: String, timestamp: String) {
+        PsiFeedbackLogger.logNotice(withType: type, message: message, timestamp: timestamp)
+    }
+
 }

@@ -42,6 +42,7 @@ struct AppState: Equatable {
     var pendingLandingPageOpening: Bool = false
     var internetReachability = ReachabilityState()
     var appDelegateState = AppDelegateState()
+    var queuedFeedbacks: [UserFeedback] = []
 }
 
 struct BalanceState: Equatable {
@@ -62,6 +63,7 @@ enum AppAction {
     case subscriptionAuthStateAction(SubscriptionAuthStateAction)
     case productRequest(ProductRequestAction)
     case reachabilityAction(ReachabilityAction)
+    case feedbackAction(FeedbackAction)
 }
 
 // MARK: Environment
@@ -76,9 +78,12 @@ typealias AppEnvironment = (
     sharedDB: PsiphonDataSharedDB,
     userConfigs: UserDefaultsConfig,
     notifier: PsiApi.Notifier,
+    internetReachabilityStatusSignal: SignalProducer<ReachabilityStatus, Never>,
     tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
     psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType?, Never>,
     tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
+    subscriptionStatusSignal: SignalProducer<AppStoreIAP.SubscriptionStatus, Never>,
+    psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>,
     urlHandler: URLHandler,
     paymentQueue: PaymentQueue,
     supportedAppStoreProducts: SupportedAppStoreProducts,
@@ -101,7 +106,10 @@ typealias AppEnvironment = (
     vpnStartCondition: () -> Bool,
     dateCompare: DateCompare,
     mainDispatcher: MainDispatcher,
-    globalDispatcher: GlobalDispatcher
+    globalDispatcher: GlobalDispatcher,
+    getPsiphonConfig: () -> [AnyHashable: Any]?,
+    getAppStateFeedbackEntry: SignalProducer<DiagnosticEntry, Never>,
+    getFeedbackUpload: () -> FeedbackUploadProvider
 )
 
 /// Creates required environment for store `Store<AppState, AppAction>`.
@@ -157,10 +165,13 @@ func makeEnvironment(
         sharedDB: sharedDB,
         userConfigs: userDefaultsConfig,
         notifier: NotifierObjC(notifier:Notifier.sharedInstance()),
+        internetReachabilityStatusSignal: store.$value.signalProducer.map(\.internetReachability.networkStatus),
         tunnelStatusSignal: store.$value.signalProducer
             .map(\.vpnState.value.providerVPNStatus),
         psiCashAccountTypeSignal: store.$value.signalProducer.map(\.psiCash.libData.accountType),
         tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
+        subscriptionStatusSignal: store.$value.signalProducer.map(\.subscription.status),
+        psiCashAuthPackageSignal: store.$value.signalProducer.map(\.psiCash.libData.authPackage),
         urlHandler: .default(),
         paymentQueue: .default,
         supportedAppStoreProducts: supportedAppStoreProducts,
@@ -224,7 +235,19 @@ func makeEnvironment(
         },
         dateCompare: dateCompare,
         mainDispatcher: mainDispatcher,
-        globalDispatcher: globalDispatcher
+        globalDispatcher: globalDispatcher,
+        getPsiphonConfig: {
+            return PsiphonConfigReader.fromConfigFile()?.config
+        },
+        getAppStateFeedbackEntry:
+            store.$value.signalProducer
+            .take(first: 1)
+            .map { appState -> DiagnosticEntry in
+                return appState.feedbackEntry(userDefaultsConfig: UserDefaultsConfig(),
+                                              sharedDB: sharedDB,
+                                              store: store)
+            },
+        getFeedbackUpload: { PsiphonTunnelFeedback() }
     )
     
     let cleanup = { [paymentTransactionDelegate] in
@@ -267,7 +290,7 @@ fileprivate func toIAPReducerEnvironment(env: AppEnvironment) -> IAPEnvironment 
         tunnelStatusSignal: env.tunnelStatusSignal,
         tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
         psiCashEffects: env.psiCashEffects,
-        clientMetaData: env.clientMetaData,
+        appInfo: env.appInfo,
         paymentQueue: env.paymentQueue,
         psiCashPersistedValues: env.userConfigs,
         isSupportedProduct: env.supportedAppStoreProducts.isSupportedProduct(_:),
@@ -353,6 +376,22 @@ fileprivate func toAppDelegateReducerEnvironment(env: AppEnvironment) -> AppDele
     )
 }
 
+fileprivate func toFeedbackReducerEnvironment(env: AppEnvironment) -> FeedbackReducerEnvironment {
+    FeedbackReducerEnvironment(
+        feedbackLogger: env.feedbackLogger,
+        getFeedbackUpload: env.getFeedbackUpload,
+        internetReachabilityStatusSignal: env.internetReachabilityStatusSignal,
+        tunnelStatusSignal: env.tunnelStatusSignal,
+        tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
+        subscriptionStatusSignal: env.subscriptionStatusSignal,
+        getAppStateFeedbackEntry: env.getAppStateFeedbackEntry,
+        sharedDB: env.sharedDB,
+        appInfo: env.appInfo,
+        getPsiphonConfig: env.getPsiphonConfig,
+        getCurrentTime: env.getCurrentTime
+    )
+}
+
 fileprivate func toVPNReducerEnvironment(env: AppEnvironment) -> VPNReducerEnvironment<PsiphonTPM> {
     VPNReducerEnvironment(
         feedbackLogger: env.feedbackLogger,
@@ -406,7 +445,11 @@ func makeAppReducer(
         appDelegateReducer.pullback(
                  value: \.appDelegateState,
                  action: \.appDelegateAction,
-                 environment: toAppDelegateReducerEnvironment(env:))
+                 environment: toAppDelegateReducerEnvironment(env:)),
+        pullback(feedbackReducer,
+                 value: \.feedbackReducerState,
+                 action: \.feedbackAction,
+                 environment: toFeedbackReducerEnvironment(env:))
     )
 }
 

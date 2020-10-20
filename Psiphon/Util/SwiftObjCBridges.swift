@@ -24,9 +24,11 @@ import UIKit
 @objc final class EventHandler: NSObject {
 
     private let handler: () -> Void
+    @objc let event: UIControl.Event
 
-    init(_ handler:@escaping () -> Void) {
+    init(_ handler: @escaping () -> Void, for event: UIControl.Event = .touchUpInside) {
         self.handler = handler
+        self.event = event
     }
 
     @objc func handleEvent() {
@@ -35,21 +37,46 @@ import UIKit
 
 }
 
-@objc class SwiftUIControl: UIControl {
- 
-    private var eventHandler: EventHandler!
+/// Enables sharing implementation of `setEventHandler(for::)` between different subclasses of UIControl.
+protocol UIControlEventHandler: class {
+    
+    var eventHandler: EventHandler? { get set }
+    
+    func addTarget(_ target: Any?, action: Selector, for controlEvents: UIControl.Event)
+    
+    func removeTarget(_ target: Any?, action: Selector?, for controlEvents: UIControl.Event)
+    
+}
+
+extension UIControlEventHandler {
     
     /// Sets `handler` as the event handler for this instance.
     /// - Note: Current implementation resets any previously set handler.
     func setEventHandler(for event: UIControl.Event = .touchUpInside,
                          _ handler: @escaping () -> Void) {
-        self.eventHandler = EventHandler(handler)
+        
+        // Removes previously assigned event handler.
+        if let current = self.eventHandler {
+            removeTarget(self.eventHandler,
+                         action: #selector(EventHandler.handleEvent),
+                         for: current.event)
+        }
+        
+        self.eventHandler = EventHandler(handler, for: event)
+        
         addTarget(self.eventHandler, action: #selector(EventHandler.handleEvent), for: event)
     }
     
 }
 
-@objc class SwiftUIButton: UIButton {
+
+@objc class SwiftUIControl: UIControl, UIControlEventHandler {
+    var eventHandler: EventHandler?
+}
+
+@objc class SwiftUIButton: UIButton, UIControlEventHandler {
+    
+    var eventHandler: EventHandler?
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -60,18 +87,10 @@ import UIKit
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
-    private var eventHandler: EventHandler!
-
-    /// Sets `handler` as the event handler for this instance.
-    /// - Note: Current implementation resets any previously set handler.
-    func setEventHandler(for event: UIControl.Event = .touchUpInside,
-                         _ handler: @escaping () -> Void) {
-        self.eventHandler = EventHandler(handler)
-        addTarget(self.eventHandler, action: #selector(EventHandler.handleEvent), for: event)
-    }
-
+    
 }
+
+extension AnimatedControl: UIControlEventHandler {}
 
 // MARK: NSNotification Bridge
 

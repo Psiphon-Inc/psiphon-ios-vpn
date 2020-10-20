@@ -176,3 +176,12 @@ extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
     }
     
 }
+
+extension UserFeedback: CustomFieldFeedbackDescription {
+
+    public var feedbackFields: [String: CustomStringConvertible] {
+        ["uploadDiagnostics": uploadDiagnostics,
+         "submitTime": submitTime]
+    }
+
+}

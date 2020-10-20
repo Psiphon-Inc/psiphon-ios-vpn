@@ -54,4 +54,35 @@
     [self.dataStore insert:[NSDate date] key:TickerTimeKey];
 }
 
+#pragma mark - Alerts
+
+- (NSSet<NSNumber *> *_Nonnull)getSessionAlerts {
+    NSSet *_Nullable set = [NSSet setWithArray:[self.dataStore lookup:SessionAlertsKey]];
+    if (set == nil) {
+        return [NSSet set];
+    } else {
+        return set;
+    }
+}
+
+- (BOOL)addSessionAlert:(NSNumber *)alertId {
+    NSMutableSet *_Nonnull set = [NSMutableSet setWithSet:[self getSessionAlerts]];
+    if ([set containsObject:alertId] == TRUE) {
+        return FALSE;
+    }
+    [set addObject:alertId];
+    [self.dataStore insert:[set allObjects] key:SessionAlertsKey];
+    return TRUE;
+}
+
+- (void)removeSessionAlert:(NSNumber *)alertId {
+    NSMutableSet *_Nonnull set = [NSMutableSet setWithSet:[self getSessionAlerts]];
+    [set removeObject:alertId];
+    [self.dataStore insert:[set allObjects] key:SessionAlertsKey];
+}
+
+- (void)removeAllSessionAlerts {
+    [self.dataStore removeObjectForKey:SessionAlertsKey];
+}
+
 @end

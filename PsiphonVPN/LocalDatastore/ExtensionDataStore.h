@@ -43,6 +43,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSDate*_Nullable)tickerTime;
 - (void)setTickerTimeToNow;
 
+/*
+ * Session Alerts persisted data.
+ * These methods are not thread-safe.
+ */
+
+/// Reads persisted session alerts.
+- (NSSet<NSNumber *> *)getSessionAlerts;
+
+/// Adds a new session alert object to set of session alerts.
+/// @return TRUE if the session alerts did not contain `alertId`, and `alertId` was added. FALSE otherwise.
+- (BOOL)addSessionAlert:(NSNumber *)alertId;
+
+/// Removes `alertId` from session alerts.
+- (void)removeSessionAlert:(NSNumber *)alertId;
+
+/// Removes all persisted session alerts
+- (void)removeAllSessionAlerts;
+
 @end
 
 NS_ASSUME_NONNULL_END

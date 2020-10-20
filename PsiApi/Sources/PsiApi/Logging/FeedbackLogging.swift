@@ -37,6 +37,8 @@ public protocol FeedbackLogHandler {
     func fatalError(type: String, message: String)
     
     func feedbackLog(level: NonFatalLogLevel, type: String, message: String)
+
+    func feedbackLogNotice(type: String, message: String, timestamp: String)
     
 }
 
@@ -49,6 +51,10 @@ public struct StdoutFeedbackLogger: FeedbackLogHandler {
     public func feedbackLog(level: NonFatalLogLevel, type: String, message: String) {
         print("[\(String(describing: level))] type: '\(type)' message: '\(message)'")
     }
+
+    public func feedbackLogNotice(type: String, message: String, timestamp: String) {
+        print("[Notice] type: '\(type)' message: '\(message)' timestamp: '\(timestamp)'")
+    }
     
 }
 
@@ -58,16 +64,21 @@ final class ArrayFeedbackLogHandler: FeedbackLogHandler {
         let level: LogLevel
         let type: String
         let message: String
+        let timestamp: String?
     }
     
     var logs = [Log]()
     
     func fatalError(type: String, message: String) {
-        logs.append(Log(level: .fatal, type: type, message: message))
+        logs.append(Log(level: .fatal, type: type, message: message, timestamp: .none))
     }
     
     func feedbackLog(level: NonFatalLogLevel, type: String, message: String) {
-        logs.append(Log(level: .nonFatal(level), type: type, message: message))
+        logs.append(Log(level: .nonFatal(level), type: type, message: message, timestamp: .none))
+    }
+
+    public func feedbackLogNotice(type: String, message: String, timestamp: String) {
+        logs.append(Log(level: .nonFatal(.info), type: type, message: message, timestamp: .some(timestamp)))
     }
     
     /// True if all recorded logs are level 'Info' and not above.
@@ -160,6 +171,12 @@ public struct FeedbackLogger {
     private func log(_ level: NonFatalLogLevel, type: String, value: String) -> Effect<Never> {
         .fireAndForget {
             self.handler.feedbackLog(level: level, type: type, message: value)
+        }
+    }
+
+    public func logNotice(type: String, value: String, timestamp: String) -> Effect<Never> {
+        .fireAndForget {
+            self.handler.feedbackLogNotice(type: type, message: value, timestamp: timestamp)
         }
     }
 
