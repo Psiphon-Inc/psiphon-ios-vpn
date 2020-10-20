@@ -74,7 +74,7 @@ typealias AppEnvironment = (
     httpClient: HTTPClient,
     psiCashEffects: PsiCashEffects,
     psiCashFileStoreRoot: String?,
-    clientMetaData: () -> ClientMetaData,
+    appInfo: () -> AppInfoProvider,
     sharedDB: PsiphonDataSharedDB,
     userConfigs: UserDefaultsConfig,
     notifier: PsiApi.Notifier,
@@ -83,7 +83,6 @@ typealias AppEnvironment = (
     psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType?, Never>,
     tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
     subscriptionStatusSignal: SignalProducer<AppStoreIAP.SubscriptionStatus, Never>,
-    psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>,
     urlHandler: URLHandler,
     paymentQueue: PaymentQueue,
     supportedAppStoreProducts: SupportedAppStoreProducts,
@@ -161,7 +160,7 @@ func makeEnvironment(
                                                getCurrentTime: dateCompare.getCurrentTime,
                                                feedbackLogger: feedbackLogger),
         psiCashFileStoreRoot: psiCashFileStoreRoot,
-        clientMetaData: { ClientMetaData(AppInfoObjC()) },
+        appInfo: { AppInfoObjC() },
         sharedDB: sharedDB,
         userConfigs: userDefaultsConfig,
         notifier: NotifierObjC(notifier:Notifier.sharedInstance()),
@@ -171,7 +170,6 @@ func makeEnvironment(
         psiCashAccountTypeSignal: store.$value.signalProducer.map(\.psiCash.libData.accountType),
         tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
         subscriptionStatusSignal: store.$value.signalProducer.map(\.subscription.status),
-        psiCashAuthPackageSignal: store.$value.signalProducer.map(\.psiCash.libData.authPackage),
         urlHandler: .default(),
         paymentQueue: .default,
         supportedAppStoreProducts: supportedAppStoreProducts,
@@ -268,7 +266,7 @@ fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment
         vpnActionStore: env.vpnActionStore,
         objcBridgeDelegate: env.objcBridgeDelegate,
         rewardedVideoAdBridgeDelegate: env.rewardedVideoAdBridgeDelegate,
-        metadata: env.clientMetaData,
+        metadata: { ClientMetaData(env.appInfo()) },
         getCurrentTime: env.dateCompare.getCurrentTime
     )
 }
@@ -290,7 +288,7 @@ fileprivate func toIAPReducerEnvironment(env: AppEnvironment) -> IAPEnvironment 
         tunnelStatusSignal: env.tunnelStatusSignal,
         tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
         psiCashEffects: env.psiCashEffects,
-        appInfo: env.appInfo,
+        clientMetaData: { ClientMetaData(env.appInfo()) },
         paymentQueue: env.paymentQueue,
         psiCashPersistedValues: env.userConfigs,
         isSupportedProduct: env.supportedAppStoreProducts.isSupportedProduct(_:),
@@ -349,7 +347,7 @@ fileprivate func toSubscriptionAuthStateReducerEnvironment(
         sharedDB: SharedDBContainerObjC(sharedDB:env.sharedDB),
         tunnelStatusSignal: env.tunnelStatusSignal,
         tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
-        clientMetaData: env.clientMetaData,
+        clientMetaData: { ClientMetaData(env.appInfo()) },
         dateCompare: env.dateCompare
     )
 }
@@ -388,7 +386,7 @@ fileprivate func toFeedbackReducerEnvironment(env: AppEnvironment) -> FeedbackRe
         sharedDB: env.sharedDB,
         appInfo: env.appInfo,
         getPsiphonConfig: env.getPsiphonConfig,
-        getCurrentTime: env.getCurrentTime
+        getCurrentTime: env.dateCompare.getCurrentTime
     )
 }
 
@@ -446,7 +444,7 @@ func makeAppReducer(
                  value: \.appDelegateState,
                  action: \.appDelegateAction,
                  environment: toAppDelegateReducerEnvironment(env:)),
-        pullback(feedbackReducer,
+        feedbackReducer.pullback(
                  value: \.feedbackReducerState,
                  action: \.feedbackAction,
                  environment: toFeedbackReducerEnvironment(env:))
