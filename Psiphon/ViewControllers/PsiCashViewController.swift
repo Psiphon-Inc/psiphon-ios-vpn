@@ -203,7 +203,7 @@ final class PsiCashViewController: ReactiveViewController {
                                       date: dateCompare.getCurrentTime()),
                     localizedUserDescription: UserStrings.Psiphon_is_not_connected())
                 
-                self.displayBasicAlert(errorDesc: error)
+                self.displayBasicErrorAlert(errorDesc: error)
             }
         }
         
@@ -237,7 +237,7 @@ final class PsiCashViewController: ReactiveViewController {
                         event: errorEvent.eraseToRepr(),
                         localizedUserDescription: UserStrings.Rewarded_video_load_failed())
                     
-                    self.displayBasicAlert(errorDesc: errorDesc)
+                    self.displayBasicErrorAlert(errorDesc: errorDesc)
                     
                 case .noTunneledRewardedVideoAd:
                     break
@@ -289,13 +289,13 @@ final class PsiCashViewController: ReactiveViewController {
                                         }
                                     ))
                 default:
-                    self.displayBasicAlert(errorDesc: errorDesc)
+                    self.displayBasicErrorAlert(errorDesc: errorDesc)
                 }
                 
             case (.completed(let iapErrorEvent), _, _):
                 self.display(screen: .mainScreen)
                 if let errorDesc = iapErrorEvent.localizedErrorEventDescription {
-                    self.displayBasicAlert(errorDesc: errorDesc)
+                    self.displayBasicErrorAlert(errorDesc: errorDesc)
                 }
                 
             default:

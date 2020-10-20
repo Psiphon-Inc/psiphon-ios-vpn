@@ -22,11 +22,11 @@ import PsiApi
 extension ReactiveViewController {
     
     /// Display an error alert with a single "OK" button.
-    func displayBasicAlert(errorDesc: ErrorEventDescription<ErrorRepr>) {
+    func displayBasicErrorAlert(errorDesc: ErrorEventDescription<ErrorRepr>) {
         
         self.display(errorDesc: errorDesc,
                      makeAlertController:
-                        .makeSimpleAlertWithOKButton(message: errorDesc.localizedUserDescription))
+                        .makeSimpleErrorAlertWithOKButton(message: errorDesc.localizedUserDescription))
     }
     
 }
