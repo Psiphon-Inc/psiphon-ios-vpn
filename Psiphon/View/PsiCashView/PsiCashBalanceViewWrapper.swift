@@ -153,15 +153,21 @@ struct PsiCashBalanceViewModel: Equatable {
         }
         let iconValue: IconType.BuildType.BindingType
         switch (newValue.balanceState.pendingPsiCashRefresh,
-                newValue.balanceState.psiCashBalance.pendingExpectedBalanceIncrease) {
+                newValue.balanceState.psiCashBalance.balanceOutOfDateReason) {
         case (.pending, _):
             iconValue = .right(.left(true))  // Spinner
+        
         case (.completed(_), .purchasedPsiCash):
             iconValue = .right(.right(.unit))  // Red "i" info button
+        
         case (.completed(_), .none),
              (.completed(_), .watchedRewardedVideo):
             iconValue = .left(.unit)  // Coin icon
+        
+        case (_, .otherBalanceUpdateError):
+            iconValue = .right(.right(.unit))  // Red "i" info button
         }
+        
         self.setAmount(newValue.balanceState.psiCashBalance.optimisticBalance)
         self.iconBindable.bind(iconValue)
     }

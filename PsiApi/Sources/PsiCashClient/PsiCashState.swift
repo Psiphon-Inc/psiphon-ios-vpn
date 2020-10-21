@@ -194,12 +194,13 @@ public typealias PsiCashAccountLoginError =
 
 public struct PsiCashBalance: Equatable {
 
-    public enum BalanceIncreaseExpectationReason: String, CaseIterable {
+    public enum BalanceOutOfDateReason: String, CaseIterable {
         case watchedRewardedVideo
         case purchasedPsiCash
+        case otherBalanceUpdateError
     }
     
-    public private(set) var pendingExpectedBalanceIncrease: BalanceIncreaseExpectationReason?
+    public private(set) var balanceOutOfDateReason: BalanceOutOfDateReason?
     
     /// Balance with expected reward amount added.
     /// - Note: This value is either equal to `PsiCashLibData.balance`, or higher if there is expected reward amount.
@@ -208,10 +209,10 @@ public struct PsiCashBalance: Equatable {
     /// PsiCash balance as of last PsiCash refresh state.
     public private(set) var lastRefreshBalance: PsiCashAmount
     
-    public init(pendingExpectedBalanceIncrease: BalanceIncreaseExpectationReason?,
+    public init(balanceOutOfDateReason: BalanceOutOfDateReason?,
          optimisticBalance: PsiCashAmount,
          lastRefreshBalance: PsiCashAmount) {
-        self.pendingExpectedBalanceIncrease = pendingExpectedBalanceIncrease
+        self.balanceOutOfDateReason = balanceOutOfDateReason
         self.optimisticBalance = optimisticBalance
         self.lastRefreshBalance = lastRefreshBalance
     }
@@ -221,7 +222,7 @@ public struct PsiCashBalance: Equatable {
 extension PsiCashBalance {
     
     public init() {
-        pendingExpectedBalanceIncrease = .none
+        balanceOutOfDateReason = .none
         optimisticBalance = .zero
         lastRefreshBalance = .zero
     }
@@ -231,28 +232,32 @@ extension PsiCashBalance {
 extension PsiCashBalance {
     
     public mutating func waitingForExpectedIncrease(
-        withAddedReward addedReward: PsiCashAmount, reason: BalanceIncreaseExpectationReason,
+        withAddedReward addedReward: PsiCashAmount, reason: BalanceOutOfDateReason,
         persisted: PsiCashPersistedValues
     ) {
-        pendingExpectedBalanceIncrease = reason
+        self.balanceOutOfDateReason = reason
         if addedReward > .zero {
             let totalExpectedReward = persisted.expectedPsiCashReward + addedReward
             persisted.setExpectedPsiCashReward(totalExpectedReward)
-            optimisticBalance = lastRefreshBalance + totalExpectedReward
+            self.optimisticBalance = self.lastRefreshBalance + totalExpectedReward
         }
+    }
+    
+    public mutating func balanceOutOfDate(reason: BalanceOutOfDateReason) {
+        self.balanceOutOfDateReason = reason
     }
     
     public static func fromStoredExpectedReward(
         libData: PsiCashLibData, persisted: PsiCashPersistedValues
     ) -> Self {
         let adReward = persisted.expectedPsiCashReward
-        let reason: BalanceIncreaseExpectationReason?
+        let reason: BalanceOutOfDateReason?
         if adReward.isZero {
             reason = .none
         } else {
             reason = .watchedRewardedVideo
         }
-        return .init(pendingExpectedBalanceIncrease: reason,
+        return .init(balanceOutOfDateReason: reason,
                      optimisticBalance: libData.balance + adReward,
                      lastRefreshBalance: libData.balance)
     }
@@ -261,7 +266,7 @@ extension PsiCashBalance {
         refreshedData libData: PsiCashLibData, persisted: PsiCashPersistedValues
     ) -> Self {
         persisted.setExpectedPsiCashReward(.zero)
-        return .init(pendingExpectedBalanceIncrease: .none,
+        return .init(balanceOutOfDateReason: .none,
                      optimisticBalance: libData.balance,
                      lastRefreshBalance: libData.balance)
     }
