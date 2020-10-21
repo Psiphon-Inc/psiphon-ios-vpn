@@ -596,6 +596,96 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
             .send(store: self.store)
 
+        // Displays alerts related to PsiCash accounts login events.
+        self.lifetime += self.store.$value.signalProducer
+            .map(\.psiCash.pendingAccountLoginLogout)
+            .skipRepeats()
+            .startWithValues { maybeLoginLogoutEvent in
+                guard let loginLogoutEvent = maybeLoginLogoutEvent else {
+                    return
+                }
+                
+                let maybeAlert: UIAlertController?
+                
+                switch loginLogoutEvent.wrapped {
+                case .pending(_):
+                    maybeAlert = nil
+                    
+                case let .completed(.left(completedLoginEvent)):
+                    
+                    switch completedLoginEvent {
+                    case let .success(loginResponse):
+                        
+                        let message: String
+                        if loginResponse.lastTrackerMerge {
+                            message = """
+                            \(UserStrings.Psicash_logged_in_successfully())\
+                            \n
+                            \(UserStrings.Psicash_accounts_last_merge_warning())
+                        """
+                        } else {
+                            message = UserStrings.Psicash_logged_in_successfully()
+                        }
+                        
+                        maybeAlert = .makeSimpleAlertWithOKButton(
+                            title: UserStrings.Psicash_account(),
+                            message: message)
+                        
+                    case let .failure(errorEvent):
+                        
+                        switch errorEvent.error {
+                        case .tunnelNotConnected:
+                            maybeAlert = .makeSimpleAlertWithOKButton(
+                                title: UserStrings.Psicash_account(),
+                                message: UserStrings.Psiphon_is_not_connected())
+                            
+                        case .requestError(.errorStatus(.invalidCredentials)):
+                            maybeAlert = .makeSimpleAlertWithOKButton(
+                                title: UserStrings.Psicash_account(),
+                                message: UserStrings.Incorrect_username_or_password())
+                            
+                        case .requestError(.errorStatus(_)),
+                             .requestError(.requestFailed(_)):
+                            maybeAlert = .makeSimpleAlertWithOKButton(
+                                title: UserStrings.Psicash_account(),
+                                message: UserStrings.Operation_failed_please_try_again_alert_message())
+                        }
+                    }
+                    
+                case let .completed(.right(completedLogoutEvent)):
+                    switch completedLogoutEvent {
+                    case .success(_):
+                        maybeAlert = .makeSimpleAlertWithOKButton(
+                            title: UserStrings.Psicash_account(),
+                            message: UserStrings.Psicash_logged_out_successfully())
+                        
+                    case let .failure(errorEvent):
+                        switch errorEvent.error {
+                        case .tunnelNotConnected:
+                            maybeAlert = .makeSimpleAlertWithOKButton(
+                                title: UserStrings.Psicash_account(),
+                                message: UserStrings.Psiphon_is_not_connected())
+                            
+                        case .requestError(_):
+                            maybeAlert = .makeSimpleAlertWithOKButton(
+                                title: UserStrings.Psicash_account(),
+                                message: UserStrings.Operation_failed_please_try_again_alert_message())
+                        }
+                    }
+                    
+                }
+                    
+                if let alert = maybeAlert {
+                    let success = AppDelegate.getTopPresentedViewController()
+                        .safePresent(alert, animated: true)
+                    
+                    if !success {
+                        self.feedbackLogger.immediate(.error, "failed to present alert controller")
+                    }
+                }
+            }
+        
+        
         if Debugging.printAppState {
             self.lifetime += self.store.$value.signalProducer.startWithValues { appState in
                 print("*", "-----")

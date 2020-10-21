@@ -261,6 +261,9 @@
 /* Do not translate or transliterate 'PsiCash'. Alert message when the user has been able to successfully log into their PsiCash account. */
 "PSICASH_LOGGED_IN_SUCCESSFULLY" = "You successfully logged into your PsiCash account.";
 
+/* Do not translate or transliterate 'PsiCash'. Alert message when the user has been able to successfully log out of their PsiCash account. */
+"PSICASH_LOGGED_OUT_SUCCESSFULLY" = "You successfully logged out of your PsiCash account.";
+
 /* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
 "PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon, unless you have created a PsiCash account and are logged into your PsiCash account.";
 

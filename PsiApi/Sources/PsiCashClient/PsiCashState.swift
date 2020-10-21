@@ -30,13 +30,24 @@ public struct PsiCashState: Equatable {
                       ErrorEvent<TunneledPsiCashRequestError<
                                     PsiCashRequestError<PsiCashRefreshErrorStatus>>>>
     
-    public typealias PendingAccountLogin = Pending<PsiCashEffects.PsiCashAccountLoginResult>
+    /// Represents whether PsiCash accounts is pending login or logout.
+    public enum LoginLogoutPendingValue: Equatable {
+        /// PsiCash accounts pending login.
+        case login
+        /// PsiCash accounts pending logout.
+        case logout
+    }
+    
+    public typealias PendingAccountLoginLogoutEvent =
+        Event<PendingValue<LoginLogoutPendingValue,
+                           Either<PsiCashEffects.PsiCashAccountLoginResult,
+                                  PsiCashEffects.PsiCashAccountLogoutResult>>>?
     
     public var purchasing: PsiCashPurchasingState
     public var rewardedVideo: RewardedVideoState
     public var libData: PsiCashLibData
     
-    public var pendingAccountLogin: Event<PendingAccountLogin>?
+    public var pendingAccountLoginLogout: PendingAccountLoginLogoutEvent
     public var pendingPsiCashRefresh: PendingRefresh
     /// True if PsiCashLibData has been loaded from persisted value.
     public var libLoaded: Bool
@@ -48,7 +59,7 @@ extension PsiCashState {
         purchasing = .none
         rewardedVideo = .init()
         libData = .init()
-        pendingAccountLogin = nil
+        pendingAccountLoginLogout = nil
         pendingPsiCashRefresh = .completed(.success(.unit))
         libLoaded = false
     }
