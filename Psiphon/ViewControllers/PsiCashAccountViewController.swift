@@ -167,9 +167,17 @@ final class PsiCashAccountViewController: ReactiveViewController {
                     self.updateNoPendingLoginEvent()
                     
                 case .pending(.logout), .completed(.right(_)):
+                    
+                    guard pendingAccountLoginEvent.date > lastLoginEventDate else {
+                        self.updateNoPendingLoginEvent()
+                        return
+                    }
+                    
                     // Dismisses current view controller if somehow the user
                     // is logging out.
-                    let _ = self.display(screenToPresent: .parent)
+                    DispatchQueue.main.async {
+                        let _ = self.display(screenToPresent: .parent)
+                    }
                 }
             }
         }
@@ -536,6 +544,17 @@ final class PsiCashAccountViewController: ReactiveViewController {
         safari.delegate = self
         
         return safari
+    }
+    
+}
+
+extension PsiCashAccountViewController: AlertDismissProtocol {
+    
+    func alertDismissed(type: AlertType) {
+        // Dismisses self if a PsiCash account login success alert is displayed to the user.
+        if case .psiCashAccountLoginSuccessAlert = type {
+            let _  = self.display(screenToPresent: .parent)
+        }
     }
     
 }

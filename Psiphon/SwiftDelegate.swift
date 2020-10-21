@@ -629,7 +629,20 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                         
                         maybeAlert = .makeSimpleAlertWithOKButton(
                             title: UserStrings.Psicash_account(),
-                            message: message)
+                            message: message,
+                            onDismissed: {
+                                // Note: alertController.presentingViewController is nil
+                                //       at this point.
+                                // If presenting view controller conforms to AlertDismissProtocol,
+                                // calls the alertDismissed callback on the view controller.
+                                let topVC = AppDelegate.getTopPresentedViewController()
+                                if let alertDismissProtocol = topVC as? AlertDismissProtocol {
+                                    alertDismissProtocol.alertDismissed(
+                                        type: .psiCashAccountLoginSuccessAlert)
+                                }
+                                
+                            }
+                        )
                         
                     case let .failure(errorEvent):
                         
