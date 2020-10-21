@@ -29,7 +29,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
     
     struct ReaderState: Equatable {
         let accountType: PsiCashAccountType?
-        let pendingAccountLogin: Event<PsiCashState.PendingAccountLogin>?
+        let pendingAccountLoginLogout: PsiCashState.PendingAccountLoginLogoutEvent
     }
     
     private struct ObservedState: Equatable {
@@ -64,7 +64,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
     
     /// Nil implies that no view controllers are presented.
     @State private var navigation: NavigationState<PresentedScreen> = .pending(.mainScreen)
-    private var lastLoginEventDate: Date? = nil
+    private var lastLoginLogoutEventDate: Date? = nil
     
     private let (lifetime, token) = Lifetime.make()
     
@@ -125,94 +125,43 @@ final class PsiCashAccountViewController: ReactiveViewController {
                 fatalError()
             }
             
-            if self.lastLoginEventDate == nil {
-                self.lastLoginEventDate = viewControllerDidLoadDate
+            if self.lastLoginLogoutEventDate == nil {
+                self.lastLoginLogoutEventDate = viewControllerDidLoadDate
             }
             
-            switch observed.readerState.pendingAccountLogin {
+            switch observed.readerState.pendingAccountLoginLogout {
             case .none:
                 self.updateNoPendingLoginEvent()
                 return
             
             case .some(let pendingAccountLoginEvent):
-                
+
                 defer {
-                    self.lastLoginEventDate = pendingAccountLoginEvent.date
+                    self.lastLoginLogoutEventDate = pendingAccountLoginEvent.date
                 }
                 
-                guard let lastLoginEventDate = self.lastLoginEventDate else {
+                guard let lastLoginEventDate = self.lastLoginLogoutEventDate else {
                     fatalError()
                 }
                 
-                // TODO: Is there a way to do this as part of the signal?
-                guard pendingAccountLoginEvent.date > lastLoginEventDate else {
-                    self.updateNoPendingLoginEvent()
-                    return
-                }
-                
                 switch pendingAccountLoginEvent.wrapped {
-                case .pending:
+                case .pending(.login):
                     self.updatePendingLoginEvent()
                 
-                case .completed(let loginRequestResult):
+                case .completed(.left(_)):
+                    // Login event completed.
+                    
+                    guard pendingAccountLoginEvent.date > lastLoginEventDate else {
+                        self.updateNoPendingLoginEvent()
+                        return
+                    }
                     
                     self.updateNoPendingLoginEvent()
                     
-                    switch loginRequestResult {
-                    case let .success(loginResponse):
-                        
-                        let message: String
-                        
-                        if loginResponse.lastTrackerMerge {
-                            message = """
-                                \(UserStrings.Psicash_logged_in_successfully())\
-                                \n
-                                \(UserStrings.Psicash_accounts_last_merge_warning())
-                            """
-                        } else {
-                            message = UserStrings.Psicash_logged_in_successfully()
-                        }
-                        
-                        let successAlert = UIAlertController.makeSimpleAlertWithOKButton(
-                            title: UserStrings.Psicash_account(),
-                            message: message,
-                            dismissed: {
-                                let _ = self.display(screenToPresent: .parent)
-                            }
-                        )
-                        
-                        self.presentOnViewDidAppear(successAlert, animated: true)
-                        
-                    case let .failure(errorEvent):
-                        
-                        switch errorEvent.error {
-                        case .requestError(.errorStatus(.invalidCredentials)):
-                            self.displayBasicErrorAlert(
-                                errorDesc: ErrorEventDescription(
-                                    event: errorEvent.eraseToRepr(),
-                                    localizedUserDescription:
-                                        UserStrings.Incorrect_username_or_password()
-                                )
-                            )
-                            
-                        case .requestError(_):
-                            self.displayBasicErrorAlert(
-                                errorDesc: ErrorEventDescription(
-                                    event: errorEvent.eraseToRepr(),
-                                    localizedUserDescription: UserStrings
-                                        .Operation_failed_please_try_again_alert_message()
-                                )
-                            )
-                            
-                        case .tunnelNotConnected:
-                            self.displayBasicErrorAlert(
-                                errorDesc: ErrorEventDescription(
-                                    event: errorEvent.eraseToRepr(),
-                                    localizedUserDescription: UserStrings.Psiphon_is_not_connected()
-                                )
-                            )
-                        }
-                    }
+                case .pending(.logout), .completed(.right(_)):
+                    // Dismisses current view controller if somehow the user
+                    // is logging out.
+                    let _ = self.display(screenToPresent: .parent)
                 }
             }
         }
@@ -462,8 +411,10 @@ final class PsiCashAccountViewController: ReactiveViewController {
         
         guard case .completed(let currentScreen) = self.navigation else {
             // Navigation is in a pending state.
-            self.feedbackLogger.immediate(
-                .warn, "navigation is in a pending state: '\(self.navigation)'")
+            self.feedbackLogger.immediate(.warn, """
+                requested: '\(screenToPresent)'\
+                : navigation is in a pending state: '\(self.navigation)'
+                """)
             return false
         }
         

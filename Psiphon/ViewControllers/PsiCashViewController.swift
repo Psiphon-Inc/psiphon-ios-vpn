@@ -706,7 +706,7 @@ extension PsiCashViewController {
                         value: {
                             PsiCashAccountViewController.ReaderState(
                                 accountType: $0.psiCash.libData.accountType,
-                                pendingAccountLogin: $0.psiCash.pendingAccountLogin
+                                pendingAccountLoginLogout: $0.psiCash.pendingAccountLoginLogout
                             )
                         },
                         action: id

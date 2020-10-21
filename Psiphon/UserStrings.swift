@@ -299,6 +299,12 @@ import Foundation
                                  value: "You successfully logged into your PsiCash account.",
                                  comment: "Do not translate or transliterate 'PsiCash'. Alert message when the user has been able to successfully log into their PsiCash account.")
     }
+    
+    static func Psicash_logged_out_successfully() -> String {
+        return NSLocalizedString("PSICASH_LOGGED_OUT_SUCCESSFULLY", tableName: nil, bundle: Bundle.main,
+                                 value: "You successfully logged out of your PsiCash account.",
+                                 comment: "Do not translate or transliterate 'PsiCash'. Alert message when the user has been able to successfully log out of their PsiCash account.")
+    }
 
 }
 

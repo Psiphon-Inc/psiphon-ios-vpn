@@ -213,6 +213,16 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         
     case .accountLogout:
         
+        if let pendingAccountLogin = state.psiCash.pendingAccountLoginLogout {
+            // Guards against another request being send whilst one is in progress.
+            guard case .completed(_) = pendingAccountLogin.wrapped else {
+                return [
+                    environment.feedbackLogger.log(
+                        .warn, "another login/logout request is in flight").mapNever()
+                ]
+            }
+        }
+        
         guard let tunnelConnection = state.tunnelConnection else {
             return [
                 environment.feedbackLogger.log(.error, "tunnel connection is nil")
@@ -228,12 +238,26 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             ]
         }
         
+        state.psiCash.pendingAccountLoginLogout = Event(.pending(.logout),
+                                                        date: environment.getCurrentTime())
+        
         return [
             environment.psiCashEffects.accountLogout(tunnelConnection)
                 .map(PsiCashAction._accountLogoutResult)
         ]
         
     case ._accountLogoutResult(let result):
+        guard
+            let pendingAccountLoginLogout = state.psiCash.pendingAccountLoginLogout,
+            case .pending(.logout) = pendingAccountLoginLogout.wrapped
+        else {
+            environment.feedbackLogger.fatalError("expected '.pending(.logout)' state")
+            return []
+        }
+                
+        state.psiCash.pendingAccountLoginLogout = Event(.completed(.right(result)),
+                                                        date: environment.getCurrentTime())
+        
         switch result {
         case .success(let refreshedLibData):
             state.psiCash.libData = refreshedLibData
@@ -247,12 +271,13 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         
     case let .accountLogin(username, password):
         
-        if let pendingAccountLogin = state.psiCash.pendingAccountLogin {
+        if let pendingAccountLogin = state.psiCash.pendingAccountLoginLogout {
             // Guards against another request being send whilst one is in progress.
             guard case .completed(_) = pendingAccountLogin.wrapped else {
                 return [
-                    environment.feedbackLogger.log(.warn, "another login request is in flight")
-                        .mapNever()
+                    environment.feedbackLogger.log(
+                        .warn,
+                        "another login/logout request is in flight").mapNever()
                 ]
             }
         }
@@ -264,8 +289,8 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             ]
         }
         
-        state.psiCash.pendingAccountLogin = Event(.pending,
-                                                  date: environment.getCurrentTime())
+        state.psiCash.pendingAccountLoginLogout = Event(.pending(.login),
+                                                        date: environment.getCurrentTime())
         
         return [
             environment.psiCashEffects.accountLogin(tunnelConnection, username, password)
@@ -274,15 +299,15 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
     
     case ._accountLoginResult(let result):
         guard
-            let pendingAccountLogin = state.psiCash.pendingAccountLogin,
-            case .pending = pendingAccountLogin.wrapped
+            let pendingAccountLoginLogout = state.psiCash.pendingAccountLoginLogout,
+            case .pending(.login) = pendingAccountLoginLogout.wrapped
         else {
-            environment.feedbackLogger.fatalError("expected '.pending' state")
+            environment.feedbackLogger.fatalError("expected '.pending(.login)' state")
             return []
         }
                 
-        state.psiCash.pendingAccountLogin = Event(.completed(result),
-                                                  date: environment.getCurrentTime())
+        state.psiCash.pendingAccountLoginLogout = Event(.completed(.left(result)),
+                                                        date: environment.getCurrentTime())
         
         state.psiCash.libData = environment.psiCashEffects.libData()
         
