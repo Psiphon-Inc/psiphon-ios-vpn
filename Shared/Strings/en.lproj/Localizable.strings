@@ -168,8 +168,8 @@
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
 
-/* Label visually separating Sign up section and sign in section of the app. */
-"OR_SIGNUP_SIGNIN" = "Or";
+/* Capitalize where it makes sense. Label visually separating Sign up section and sign in section of the app. */
+"OR_SIGNUP_SIGNIN" = "OR";
 
 /* Text field label where users can enter their account's password */
 "PASSWORD_TEXT_FIELD" = "Password";
