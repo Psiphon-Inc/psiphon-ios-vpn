@@ -39,9 +39,17 @@ final class PsiCashAccountViewController: ReactiveViewController {
     }
     
     /// Represents view controller presented by PsiCashAuthViewController.
-    enum PresentedScreen: Equatable {
+    enum Screen: Hashable {
         case createNewAccount
         case forgotPassword
+    }
+
+    /// Represents a screen that is presented by this view controller.
+    /// Note that presented doesn't necessarily mean that it is already displayed on the screen.
+    struct PresentedScreen: Hashable {
+        /// Represented the screen
+        let screen: Screen
+        weak var viewControllerRef: UIViewController?
     }
     
     private let store: Store<ReaderState, PsiCashAction>
@@ -405,12 +413,12 @@ final class PsiCashAccountViewController: ReactiveViewController {
     // TODO: Can this be applied more generally to other view controllers?
     /// - Implementation limitation: Note that `display(screenToPresent:)` cannot be called in a
     /// signal that also observed `self.navigation` state observable. This will cause a recursive lock crash.
-    private func display(screenToPresent: Navigation<PresentedScreen>) -> Bool {
+    private func display(screenToPresent: Navigation<Screen>) -> Bool {
         
         // Can only navigate to a new screen from the main screen,
         // otherwise what should be presented is not well-defined.
         
-        guard case .completed(let currentScreen) = self.navigation else {
+        guard case .completed(let currentlyPresented) = self.navigation else {
             // Navigation is in a pending state.
             self.feedbackLogger.immediate(.warn, """
                 requested: '\(screenToPresent)'\
@@ -419,18 +427,29 @@ final class PsiCashAccountViewController: ReactiveViewController {
             return false
         }
         
-        guard currentScreen != screenToPresent else {
-            // Already presenting `screen`.
+        guard currentlyPresented.toNavigationScreen != screenToPresent else {
+            // Already presenting `screenToPresent`.
             return true
         }
         
-        switch (currentScreen: currentScreen, screenToPresent: screenToPresent) {
-        case (currentScreen: .presented(_), screenToPresent: .mainScreen):
+        switch (currentlyPresented: currentlyPresented, screenToPresent: screenToPresent) {
+        case (currentlyPresented: .presented(let presentedScreen), screenToPresent: .mainScreen):
             
             // Dismisses the presented view controller.
             guard let presentedViewController = self.presentedViewController else {
                 // There is no presentation to dismiss.
                 return true
+            }
+            
+            // Guards that the currently presented view controller is
+            // the expected view controller represented by `self.navigation`.
+            guard
+                let presentedScreenVCRef = presentedScreen.viewControllerRef,
+                presentedScreenVCRef === presentedViewController
+            else {
+                // currently presented view controller is not represented
+                // in `self.navigation`.
+                fatalError()
             }
 
             self.navigation = .pending(.mainScreen)
@@ -441,14 +460,22 @@ final class PsiCashAccountViewController: ReactiveViewController {
 
             return true
             
-        case (currentScreen: .mainScreen, screenToPresent: .parent):
+        case (currentlyPresented: .mainScreen, screenToPresent: .parent):
+            
+            // Guards that are no view controller presented that are not represented by
+            // `self.navigation`.
+            guard self.presentedViewController == nil else {
+                // Expects current view controller to not have any view controllers represented.
+                return false
+            }
+            
             self.navigation = .pending(.parent)
             self.dismiss(animated: true) {
                 self.navigation = .completed(.parent)
             }
             return true
             
-        case (currentScreen: .mainScreen, screenToPresent: .presented(let screenToPresent)):
+        case (currentlyPresented: .mainScreen, screenToPresent: .presented(let screenToPresent)):
             // Note that presenting a view controller is only well-defined
             // if the current screen is the main screen.
             
@@ -471,14 +498,18 @@ final class PsiCashAccountViewController: ReactiveViewController {
                 }
             }
             
+            // Creates view controller based on `screenToPresent`, and presents it.
             let viewControllerToPresent = self.makeViewController(screen: screenToPresent)
+            let presentedScreen = PresentedScreen(screen: screenToPresent,
+                                                  viewControllerRef: viewControllerToPresent)
+            
             let success = self.safePresent(viewControllerToPresent, animated: true) {
                 // Finished presenting view controller.
-                self.navigation = .completed(.presented(screenToPresent))
+                self.navigation = .completed(.presented(presentedScreen))
             }
             
             if success {
-                self.navigation = .pending(.presented(screenToPresent))
+                self.navigation = .pending(.presented(presentedScreen))
                 return true
             } else {
                 return false
@@ -486,13 +517,13 @@ final class PsiCashAccountViewController: ReactiveViewController {
         
         default:
             self.feedbackLogger.immediate(.error, """
-                cannot navigate from '\(currentScreen)' to '\(screenToPresent)'
+                cannot navigate from '\(currentlyPresented)' to '\(screenToPresent)'
                 """)
             return false
         }
     }
     
-    private func makeViewController(screen: PresentedScreen) -> UIViewController {
+    private func makeViewController(screen: Screen) -> UIViewController {
         let url: URL
         switch screen {
         case .createNewAccount:
@@ -532,6 +563,21 @@ extension PsiCashAccountViewController: SFSafariViewControllerDelegate {
     
     func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
         let _ = self.display(screenToPresent: .mainScreen)
+    }
+    
+}
+
+fileprivate extension Navigation where
+    PresentedScreen == PsiCashAccountViewController.PresentedScreen {
+    
+    /// Maps `Navigation<PresentedScreen>` to type `Navigation<Screen>`.
+    var toNavigationScreen: Navigation<PsiCashAccountViewController.Screen> {
+        switch self {
+        case .mainScreen: return .mainScreen
+        case .parent: return .parent
+        case .presented(let presentedScreen):
+            return .presented(presentedScreen.screen)
+        }
     }
     
 }
