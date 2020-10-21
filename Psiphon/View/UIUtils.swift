@@ -801,7 +801,7 @@ extension UIAlertController {
     
     /// Creates a `UIAlertController` with a single "OK" button that dismisses the alert.
     static func makeSimpleAlertWithOKButton(
-        title: String, message: String, dismissed: (() -> Void)? = nil
+        title: String, message: String, onDismissed: (() -> Void)? = nil
     ) -> UIAlertController {
         let alert = UIAlertController(title: title,
                                       message: message,
@@ -809,7 +809,7 @@ extension UIAlertController {
         
         alert.addAction(
             UIAlertAction(title: UserStrings.OK_button_title(), style: .default, handler: { _ in
-                dismissed?()
+                onDismissed?()
             })
         )
         
