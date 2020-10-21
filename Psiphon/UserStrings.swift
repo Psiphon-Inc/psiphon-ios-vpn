@@ -403,8 +403,8 @@ extension UserStrings {
     
     static func Or() -> String {
         return NSLocalizedString("OR_SIGNUP_SIGNIN", tableName: nil, bundle: Bundle.main,
-                                 value: "Or",
-                                 comment: "Label visually separating Sign up section and sign in section of the app.")
+                                 value: "OR",
+                                 comment: "Capitalize where it makes sense. Label visually separating Sign up section and sign in section of the app.")
     }
     
 }
