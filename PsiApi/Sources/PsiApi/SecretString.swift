@@ -17,11 +17,20 @@
  *
  */
 
-/// Represents a secret string.
-public struct SecretString: CustomStringConvertible, CustomReflectable {
+/// Represents a secret string, that is safe for logging.
+/// Note that `SecretString` type does not provide any security guarantees,
+/// and is meant to signify to the programmer that this value contains a secret that
+/// should be handled carefully.
+public struct SecretString: CustomDebugStringConvertible,
+                            CustomStringConvertible,
+                            CustomReflectable {
     
     public var description: String {
         "[redacted]"
+    }
+    
+    public var debugDescription: String {
+        description
     }
     
     public var customMirror: Mirror {
@@ -38,7 +47,8 @@ public struct SecretString: CustomStringConvertible, CustomReflectable {
         self.storage = value
     }
     
-    public func map<B>(_ f: (String) -> B) -> B {
+    /// Divulges contained secret as a `String`.
+    public func unsafeMap<B>(_ f: (String) -> B) -> B {
         f(storage)
     }
     

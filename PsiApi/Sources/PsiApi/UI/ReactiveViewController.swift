@@ -80,7 +80,7 @@ extension ViewControllerLifeCycle {
         viewWillDisappear || viewDidDisappear
     }
     
-    /// Returns true while the view controller life cycle in somewhere between
+    /// Returns true while the view controller life cycle is somewhere between
     /// `viewDidLoad` and `viewDidAppear` (inclusive).
     public var viewDidLoadOrAppeared: Bool {
         viewDidLoad || viewWillAppear || viewDidAppear
@@ -107,8 +107,7 @@ open class ReactiveViewController: UIViewController {
     
     private let onDismiss: () -> Void
     
-    /// - Parameter onDismiss: Called once after the view controller is either dismissed
-    /// (when viewD
+    /// - Parameter onDismiss: Called once after the view controller is either dismissed.
     public init(onDismiss: @escaping () -> Void) {
         self.onDismiss = onDismiss
         

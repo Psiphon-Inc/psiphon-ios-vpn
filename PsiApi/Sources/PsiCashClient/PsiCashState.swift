@@ -74,7 +74,7 @@ extension PsiCashState {
         _ dateCompare: DateCompare
     ) -> PurchasedExpirableProduct<SpeedBoostProduct>? {
         
-        let activeSpeedBoosts = libData.activePurchases.toPairs().successes
+        let activeSpeedBoosts = libData.activePurchases.partitionResults().successes
             .compactMap(\.speedBoost)
             .filter { !$0.transaction.isExpired(dateCompare) }
         

@@ -203,7 +203,7 @@ final class PsiCash {
         return PsiCashLibError(err)
     }
     
-    /// Resets PsiCash data for the current user (Tracker or Account). This will typicallyfi
+    /// Resets PsiCash data for the current user (Tracker or Account). This will typically
     /// be called when wanting to revert to a Tracker from a previously logged in Account.
     func resetUser() -> Error? {
         PsiCashLibError(self.client.resetUser())
@@ -532,7 +532,7 @@ final class PsiCash {
         username: String, password: SecretString
     ) -> Result<AccountLoginResponse, PsiCashAccountLoginError> {
         
-        password.map { passwordValue in
+        password.unsafeMap { passwordValue in
             
             let maybeResult = Result(self.client.accountLogin(withUsername: username,
                                                               andPassword: passwordValue))

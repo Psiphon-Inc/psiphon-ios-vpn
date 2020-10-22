@@ -21,9 +21,9 @@ import Foundation
 
 public extension Collection {
     
-    /// Maps list of Results to a pair of lists, with first element being the list of successes and
+    /// Partitions list of Results to a pair of lists, with first element being the list of successes and
     /// second element being the list of failures.
-    func toPairs<A, B: Error>() -> (successes: [A], failures: [B]) where Element == Result<A, B> {
+    func partitionResults<A, B: Error>() -> (successes: [A], failures: [B]) where Element == Result<A, B> {
         reduce(into: ([], [])) { acc, result in
             switch result {
             case let .success(value):
