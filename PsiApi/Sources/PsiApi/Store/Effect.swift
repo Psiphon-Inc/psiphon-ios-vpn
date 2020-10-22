@@ -30,7 +30,7 @@ public protocol Dispatcher {
     
 }
 
-/// Represents a scheduler that performs it's work on the main dispatch queue.
+/// Represents a scheduler that performs its work on the main dispatch queue.
 public struct MainDispatcher: Dispatcher {
     
     public var rxScheduler: Scheduler? {
@@ -49,8 +49,7 @@ public struct MainDispatcher: Dispatcher {
     
 }
 
-/// Represents a scheduler that performs it's work outside the main dispatch queue.
-
+/// Represents a scheduler that performs its work outside the main dispatch queue.
 public struct GlobalDispatcher: Dispatcher {
     
     public var rxScheduler: Scheduler? {
