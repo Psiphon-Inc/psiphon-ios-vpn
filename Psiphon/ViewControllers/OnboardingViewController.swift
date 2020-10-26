@@ -146,10 +146,24 @@ fileprivate extension OnboardingScreen {
         self.currentScreenIndex = 0
         
         self.feedbackLogger = feedbackLogger
+        
+        #if targetEnvironment(simulator)
+        // Skips VPN config installation since it
+        // cannot be installed on a simulator device.
+        self.installVPNConfig = {
+            Promise { fulfill, _ in
+                fulfill(.installedSuccessfully)
+            }
+        }
+        #else
         self.installVPNConfig = installVPNConfig
+        #endif
+        
         self.onOnboardingFinished = onOnboardingFinished
         
-        super.init(nibName: nil, bundle: nil)
+        super.init(onDismiss: {
+            // No-op.
+        })
     }
     
     required init?(coder: NSCoder) {

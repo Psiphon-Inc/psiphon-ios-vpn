@@ -24,7 +24,7 @@ struct PurchasingSpeedBoostAlertViewBuilder: ViewBuilder {
 
     let message = UserStrings.Purchasing_speed_boost()
 
-    func build(_ container: UIView?) -> StrictBindableViewable<Utilities.Unit, UIView> {
+    func build(_ container: UIView?) -> ImmutableBindableViewable<Utilities.Unit, UIView> {
         let background = UIView(frame: .zero)
         let stackView = UIStackView(frame: .zero)
         stackView.axis = .vertical

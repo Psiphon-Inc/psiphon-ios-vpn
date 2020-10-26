@@ -103,6 +103,7 @@ public final class TunnelConnection: Equatable {
     
     public let connectionStatus: () -> ConnectionResourceStatus
     
+    /// `tunneled` takes `DebugFlags.ignoreTunneledChecks` into account.
     public var tunneled: TunnelConnectedStatus {
         switch self.connectionStatus() {
         case .resourceReleased:
@@ -334,7 +335,8 @@ public func loadFromPreferences<T: TunnelProviderManager>()
                 case (.some(let managers), nil):
                     fulfilled(.success(managers))
                 case (_ , .some(let error)):
-                    fulfilled(.failure(ErrorEvent(NEVPNError(_nsError: error as NSError))))
+                    fulfilled(.failure(ErrorEvent(NEVPNError(_nsError: error as NSError),
+                                                  date: Date())))
                 }
         }
     }
@@ -359,13 +361,14 @@ public func startPsiphonTunnel<T: TunnelProviderManager>(
 ) -> Effect<Result<T, ErrorEvent<StartTunnelError>>> {
             Effect { () -> Result<T, ErrorEvent<StartTunnelError>> in
                 guard internetReachability.isCurrentlyReachable else {
-                    return .failure(ErrorEvent(.internetNotReachable))
+                    return .failure(ErrorEvent(.internetNotReachable, date: Date()))
                 }
                 do {
                     try tpm.start(options: options)
                     return .success(tpm)
                 } catch {
-                    return .failure(ErrorEvent(.neVPNError(NEVPNError(_nsError: error as NSError))))
+                    return .failure(ErrorEvent(.neVPNError(NEVPNError(_nsError: error as NSError)),
+                                               date: Date()))
                 }
             }
 }
@@ -383,7 +386,7 @@ public func loadConfig<T: TunnelProviderManager>(_ tpm: T)
     Effect.deferred { fulfilled in
         tpm.load { maybeError in
             if let error = maybeError {
-                fulfilled(.failure(ErrorEvent(error)))
+                fulfilled(.failure(ErrorEvent(error, date: Date())))
             } else {
                 fulfilled(.success(tpm))
             }
@@ -397,11 +400,11 @@ public func saveAndLoadConfig<T: TunnelProviderManager>(_ tpm: T)
     Effect.deferred { fulfilled in
         tpm.save { maybeError in
             if let error = maybeError {
-                fulfilled(.failure(ErrorEvent(error)))
+                fulfilled(.failure(ErrorEvent(error, date: Date())))
             } else {
                 tpm.load { maybeError in
                     if let error = maybeError {
-                        fulfilled(.failure(ErrorEvent(error)))
+                        fulfilled(.failure(ErrorEvent(error, date: Date())))
                     } else {
                         fulfilled(.success(tpm))
                     }
@@ -417,7 +420,7 @@ public func removeFromPreferences<T: TunnelProviderManager>(_ tpm: T)
     Effect.deferred { fulfilled in
         tpm.remove { maybeError in
             if let error = maybeError {
-                fulfilled(.failure(ErrorEvent(error)))
+                fulfilled(.failure(ErrorEvent(error, date: Date())))
             } else {
                 fulfilled(.success(()))
             }
@@ -441,7 +444,8 @@ public func sendMessage<T: TunnelProviderManager>(
     Effect.deferred { fulfilled in
         let connectionStatus = tpm.connectionStatus
         guard connectionStatus.providerNotStopped else {
-            fulfilled((tpm, connectionStatus, .failure(ErrorEvent(.providerNotActive))))
+            fulfilled((tpm, connectionStatus, .failure(ErrorEvent(.providerNotActive,
+                                                                  date: Date()))))
             return
         }
         
@@ -450,7 +454,8 @@ public func sendMessage<T: TunnelProviderManager>(
                 // A response is always required from the tunnel provider.
                 guard let responseData = maybeResponseData else {
                     fulfilled(
-                        (tpm, connectionStatus, .failure(ErrorEvent(.parseError("nil response"))))
+                        (tpm, connectionStatus, .failure(ErrorEvent(.parseError("nil response"),
+                                                                    date: Date())))
                     )
                     return
                 }
@@ -458,7 +463,8 @@ public func sendMessage<T: TunnelProviderManager>(
             }
         } catch {
             let vpnError = NEVPNError(_nsError: error as NSError)
-            fulfilled((tpm, connectionStatus, .failure(ErrorEvent(.neVPNError(vpnError)))))
+            fulfilled((tpm, connectionStatus, .failure(ErrorEvent(.neVPNError(vpnError),
+                                                                  date: Date()))))
         }
     }
 }

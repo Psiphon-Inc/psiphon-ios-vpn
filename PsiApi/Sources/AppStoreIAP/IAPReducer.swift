@@ -60,12 +60,14 @@ extension TransactionUpdate {
 public struct IAPReducerState: Equatable {
     public var iap: IAPState
     public var psiCashBalance: PsiCashBalance
-    public let psiCashAuth: PsiCashAuthPackage
+    public let psiCashAccountType: PsiCashAccountType?
     
-    public init(iap: IAPState, psiCashBalance: PsiCashBalance, psiCashAuth: PsiCashAuthPackage) {
+    public init(iap: IAPState,
+                psiCashBalance: PsiCashBalance,
+                psiCashAccountType: PsiCashAccountType?) {
         self.iap = iap
         self.psiCashBalance = psiCashBalance
-        self.psiCashAuth = psiCashAuth
+        self.psiCashAccountType = psiCashAccountType
     }
     
 }
@@ -75,7 +77,7 @@ public struct IAPEnvironment {
     var tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
     var tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
     var psiCashEffects: PsiCashEffects
-    var appInfo: () -> AppInfoProvider
+    var clientMetaData: () -> ClientMetaData
     var paymentQueue: PaymentQueue
     var psiCashPersistedValues: PsiCashPersistedValues
     var isSupportedProduct: (ProductID) -> AppStoreProductType?
@@ -89,7 +91,7 @@ public struct IAPEnvironment {
         tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
         tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
         psiCashEffects: PsiCashEffects,
-        appInfo: @escaping () -> AppInfoProvider,
+        clientMetaData: @escaping () -> ClientMetaData,
         paymentQueue: PaymentQueue,
         psiCashPersistedValues: PsiCashPersistedValues,
         isSupportedProduct: @escaping (ProductID) -> AppStoreProductType?,
@@ -102,7 +104,7 @@ public struct IAPEnvironment {
         self.tunnelStatusSignal = tunnelStatusSignal
         self.tunnelConnectionRefSignal = tunnelConnectionRefSignal
         self.psiCashEffects = psiCashEffects
-        self.appInfo = appInfo
+        self.clientMetaData = clientMetaData
         self.paymentQueue = paymentQueue
         self.psiCashPersistedValues = psiCashPersistedValues
         self.isSupportedProduct = isSupportedProduct
@@ -113,9 +115,9 @@ public struct IAPEnvironment {
     }
 }
 
-public func iapReducer(
-    state: inout IAPReducerState, action: IAPAction, environment: IAPEnvironment
-) -> [Effect<IAPAction>] {
+public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
+    state, action, environment in
+    
     switch action {
     case .checkUnverifiedTransaction:
         // Checks if there is an unverified transaction.
@@ -152,7 +154,7 @@ public func iapReducer(
             }
             
             // PsiCash IAP requires presence of PsiCash spender token.
-            guard state.psiCashAuth.hasMinimalTokens else {
+            guard case .some(_) =  state.psiCashAccountType else {
                 
                 state.iap.purchasing[product.type] = IAPPurchasing(
                     productType: product.type,
@@ -256,7 +258,7 @@ public func iapReducer(
                 receipt: receiptData,
                 customData: customData
             ),
-            clientMetaData: ClientMetaData(environment.appInfo())
+            clientMetaData: environment.clientMetaData()
         )
         
         let psiCashVerifyRequest = RetriableTunneledHttpRequest(
@@ -272,7 +274,7 @@ public func iapReducer(
         }
         
         return effects + [
-            psiCashVerifyRequest.callAsFunction(
+            psiCashVerifyRequest(
                 getCurrentTime: environment.getCurrentTime,
                 tunnelStatusSignal: environment.tunnelStatusSignal,
                 tunnelConnectionRefSignal: environment.tunnelConnectionRefSignal,

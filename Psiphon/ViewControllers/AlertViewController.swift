@@ -38,7 +38,7 @@ final class AlertViewController<T: ViewBuilder>: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        let rootViewLayoutGuide = addSafeAreaLayoutGuide(to: view)
+        let rootViewLayoutGuide = makeSafeAreaLayoutGuide(addToView: view)
         self.view.backgroundColor = .black(withAlpha: 0.4)
 
         let containerView = UIView(frame: .zero)

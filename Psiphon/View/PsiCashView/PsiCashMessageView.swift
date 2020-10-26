@@ -28,14 +28,28 @@ struct PsiCashMessageView: ViewBuilder {
         case unavailableWhileConnecting
         case unavailableWhileDisconnecting
         case otherErrorTryAgain
+        case signupOrLoginToPsiCash
     }
 
-    func build(_ container: UIView?) -> MutableBindableViewable<Message, UIView> {
-        let root = UIView(frame: .zero)
+    func build(_ container: UIView?) -> ImmutableBindableViewable<Message, UIView> {
+        
+        // vStack is contained in wrapper, letting the wrapper
+        // grow beyond the vStack natural size..
+        let wrapper = UIView(frame: .zero)
+        
+        let vStack = UIStackView.make(
+            axis: .vertical,
+            distribution: .fill,
+            alignment: .fill,
+            spacing: Style.default.padding,
+            margins: (top: 5.0, bottom: Style.default.padding)
+        )
 
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
-
+        let imageView = UIImageView.make(
+            contentMode: .center,
+            easyToShrink: true
+        )
+        
         let title = UILabel.make(fontSize: .h1,
                                  alignment: .center)
 
@@ -45,29 +59,26 @@ struct PsiCashMessageView: ViewBuilder {
                                     alignment: .center)
 
         // Add subviews
-        root.addSubviews(imageView, title, subtitle)
-        container!.addSubview(root)
-
-        // Autolayout
-        root.activateConstraints {
-            $0.constraintToParent(.leading(), .trailing(),.centerX(), .centerY())
+        vStack.addArrangedSubviews(
+            imageView,
+            title,
+            subtitle
+        )
+        
+        wrapper.addSubviews(vStack)
+        
+        vStack.activateConstraints {
+            $0.constraintToParent(.centerX(), .top(Float(Style.default.largePadding)),
+                                  .leading(), .trailing())
+        }
+        
+        wrapper.activateConstraints {
+            [
+                $0.bottomAnchor.constraint(greaterThanOrEqualTo: vStack.bottomAnchor)
+            ]
         }
 
-        imageView.activateConstraints {
-            $0.constraintToParent(.top(), .centerX())
-        }
-
-        title.activateConstraints {
-            $0.constraintToParent(.leading(), .trailing()) +
-                [ $0.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20) ]
-        }
-
-        subtitle.activateConstraints {
-            $0.constraintToParent(.leading(), .trailing(), .bottom()) +
-                [ $0.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 13) ]
-        }
-
-        return .init(viewable: root) { [imageView, title, subtitle] _ -> ((PsiCashMessageView.Message) -> UIView?) in
+        return .init(viewable: wrapper) { [imageView, title, subtitle] _ -> ((PsiCashMessageView.Message) -> Void) in
             return { [imageView, title, subtitle] msg in
                 switch msg {
                 case .pendingPsiCashVerification:
@@ -99,8 +110,12 @@ struct PsiCashMessageView: ViewBuilder {
                     imageView.image =  UIImage(named: "PsiCashCoinCloud")!
                     title.text = UserStrings.PsiCash_unavailable()
                     subtitle.text = UserStrings.Please_try_again_later()
+                
+                case .signupOrLoginToPsiCash:
+                    imageView.image = UIImage(named: "PsiCashCoinCloud")!
+                    title.text = ""
+                    subtitle.text = UserStrings.Sign_up_or_login_to_psicash_account_to_continue()
                 }
-                return nil
             }
         }
     }

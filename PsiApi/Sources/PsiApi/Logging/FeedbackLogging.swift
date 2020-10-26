@@ -81,6 +81,11 @@ final class ArrayFeedbackLogHandler: FeedbackLogHandler {
         logs.append(Log(level: .nonFatal(.info), type: type, message: message, timestamp: .some(timestamp)))
     }
     
+    /// True if all recorded logs are level 'Info' and not above.
+    func allLogsLevelInfo() -> Bool {
+        logs.allSatisfy { $0.level == .nonFatal(.info) }
+    }
+    
 }
 
 public struct LogMessage: ExpressibleByStringLiteral, ExpressibleByStringInterpolation,
@@ -221,4 +226,4 @@ extension String {
 
 // MARK: Default FeedbackDescription conformances
 
-extension Optional: FeedbackDescription {}
+extension Optional: FeedbackDescription where Wrapped: FeedbackDescription {}

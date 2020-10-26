@@ -132,10 +132,11 @@ typealias ProductRequestEnvironment = (
     supportedAppStoreProducts: SupportedAppStoreProducts
 )
 
-func productRequestReducer(
-    state: inout PsiCashAppStoreProductsState, action: ProductRequestAction,
-    environment: ProductRequestEnvironment
-) -> [Effect<ProductRequestAction>] {
+let productRequestReducer = Reducer<PsiCashAppStoreProductsState
+                                    , ProductRequestAction
+                                    , ProductRequestEnvironment> {
+    state, action, environment in
+    
     switch action {
     case .getProductList:
         guard case .completed(_) = state.psiCashProducts else {
@@ -225,7 +226,8 @@ final class ProductRequestDelegate: StoreDelegate<ProductRequestAction>, SKProdu
     func request(_ request: SKRequest, didFailWithError error: Error) {
         storeSend(
             .productRequestResult(
-                request as! SKProductsRequest, .failure(SystemErrorEvent(SystemError(error)))
+                request as! SKProductsRequest, .failure(SystemErrorEvent(SystemError(error),
+                                                                         date: Date()))
             )
         )
     }

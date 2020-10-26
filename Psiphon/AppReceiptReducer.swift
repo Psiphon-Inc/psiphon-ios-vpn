@@ -30,13 +30,12 @@ typealias ReceiptReducerEnvironment = (
     subscriptionAuthStateStore: (SubscriptionAuthStateAction) -> Effect<Never>,
     receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate,
     isSupportedProduct: (ProductID) -> AppStoreProductType?,
-    getCurrentTime: () -> Date,
-    compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
+    dateCompare: DateCompare
 )
 
-func receiptReducer(
-    state: inout ReceiptState, action: ReceiptStateAction, environment: ReceiptReducerEnvironment
-) -> [Effect<ReceiptStateAction>] {
+let receiptReducer = Reducer<ReceiptState, ReceiptStateAction, ReceiptReducerEnvironment> {
+    state, action, environment in
+    
     switch action {
     case .localReceiptRefresh:
          return [
@@ -95,8 +94,8 @@ extension ReceiptData {
             ReceiptData.parseLocalReceipt(
                 appBundle: environment.appBundle,
                 isSupportedProduct: environment.isSupportedProduct,
-                getCurrentTime: environment.getCurrentTime,
-                compareDates: environment.compareDates,
+                getCurrentTime: environment.dateCompare.getCurrentTime,
+                compareDates: environment.dateCompare.compareDates,
                 feedbackLogger: environment.feedbackLogger
             )
         }
@@ -127,7 +126,8 @@ final class ReceiptRefreshRequestDelegate: StoreDelegate<ReceiptStateAction>, SK
     }
 
     func request(_ request: SKRequest, didFailWithError error: Error) {
-        storeSend(._remoteReceiptRefreshResult(.failure(ErrorEvent(SystemError(error)))))
+        storeSend(._remoteReceiptRefreshResult(.failure(ErrorEvent(SystemError(error),
+                                                                   date: Date()))))
     }
 
 }

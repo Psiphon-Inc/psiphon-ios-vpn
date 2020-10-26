@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2020, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,14 +15,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- */
+*/
 
-//
-//  PsiCashLib.h
-//  PsiCashLib
-//
-
-#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
 
 //! Project version number for PsiCashLib.
 FOUNDATION_EXPORT double PsiCashLibVersionNumber;
@@ -32,7 +27,4 @@ FOUNDATION_EXPORT const unsigned char PsiCashLibVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <PsiCashLib/PublicHeader.h>
 
-#import <PsiCashLib/PsiCash.h>
-#import <PsiCashLib/PurchasePrice.h>
-#import <PsiCashLib/Purchase.h>
-#import <PsiCashLib/PsiCashAPIModels.h>
+#import <PsiCashLib/PsiCashLibWrapper.h>

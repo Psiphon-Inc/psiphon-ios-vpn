@@ -32,6 +32,8 @@
 
 @property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *reachabilityStatus;
 
+@property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *isLoggedInToPsiCashAccount;
+
 // Private properties
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
 
@@ -62,6 +64,7 @@
         _vpnStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _vpnStartStopStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _reachabilityStatus = [RACReplaySubject replaySubjectWithCapacity:1];
+        _isLoggedInToPsiCashAccount = [RACReplaySubject replaySubjectWithCapacity:1];
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
     }
     return self;

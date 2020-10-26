@@ -32,6 +32,7 @@ struct PsiCashReducerState: Equatable {
 
 typealias PsiCashEnvironment = (
     feedbackLogger: FeedbackLogger,
+    psiCashFileStoreRoot: String?,
     psiCashEffects: PsiCashEffects,
     sharedDB: PsiphonDataSharedDB,
     psiCashPersistedValues: PsiCashPersistedValues,
@@ -40,23 +41,62 @@ typealias PsiCashEnvironment = (
     // TODO: Remove this dependency from reducer's environment. UI-related effects
     // unnecessarily complicate reducers.
     objcBridgeDelegate: ObjCBridgeDelegate?,
-    rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate
+    rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
+    metadata: () -> ClientMetaData,
+    getCurrentTime: () -> Date
 )
 
-func psiCashReducer(
-    state: inout PsiCashReducerState, action: PsiCashAction, environment: PsiCashEnvironment
-) -> [Effect<PsiCashAction>] {
+let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironment> {
+    state, action, environment in
+    
     switch action {
+    
+    case .initialize:
+        
+        guard !state.psiCash.libLoaded else {
+            environment.feedbackLogger.fatalError("PsiCash already initialized")
+            return []
+        }
+        
+        return [
+            environment.psiCashEffects.initialize(environment.psiCashFileStoreRoot)
+                .map(PsiCashAction._initialized)
+        ]
+    
+    case ._initialized(let result):
+        
+        switch result {
+        case let .success(libData):
+            state.psiCash.initialized(libData)
+            state.psiCashBalance = .fromStoredExpectedReward(
+                libData: libData, persisted: environment.psiCashPersistedValues)
+            
+            let nonSubscriptionAuths = environment.sharedDB
+                .getNonSubscriptionEncodedAuthorizations()
+            
+            return [
+                environment.psiCashEffects.removePurchasesNotIn(nonSubscriptionAuths).mapNever()
+            ]
+            
+        case let .failure(error):
+            return [
+                environment.feedbackLogger.log(.error, "failed to initialize PsiCash: \(error)")
+                    .mapNever()
+            ]
+        }
+        
+        
     case .buyPsiCashProduct(let purchasableType):
-        guard let tunnelConnection = state.tunnelConnection else {
+        
+        guard
+            state.psiCash.libLoaded,
+            let tunnelConnection = state.tunnelConnection,
+            case .notSubscribed = state.subscription.status,
+            state.psiCash.purchasing.completed
+        else {
             return []
         }
-        guard case .notSubscribed = state.subscription.status else {
-            return []
-        }
-        guard state.psiCash.purchasing.completed else {
-            return []
-        }
+        
         guard let purchasable = purchasableType.speedBoost else {
             environment.feedbackLogger.fatalError(
                 "Expected a PsiCashPurchasable in '\(purchasableType)'")
@@ -64,59 +104,74 @@ func psiCashReducer(
         }
         state.psiCash.purchasing = .speedBoost(purchasable)
         return [
-            environment.psiCashEffects.purchaseProduct(purchasableType, tunnelConnection)
-                .map(PsiCashAction.psiCashProductPurchaseResult)
+            environment.psiCashEffects.purchaseProduct(purchasableType, tunnelConnection,
+                                                       environment.metadata())
+                .map {
+                    ._psiCashProductPurchaseResult(purchasable: purchasableType,
+                                                   result: $0)
+                }
         ]
         
-    case .psiCashProductPurchaseResult(let purchaseResult):
+        
+    case let ._psiCashProductPurchaseResult(purchasable, purchaseResult):
         guard case .speedBoost(_) = state.psiCash.purchasing else {
             environment.feedbackLogger.fatalError("""
                 Expected '.speedBoost' state:'\(String(describing: state.psiCash.purchasing))'
                 """)
             return []
         }
-        guard purchaseResult.purchasable.speedBoost != nil else {
+        
+        guard purchasable.speedBoost != nil else {
             environment.feedbackLogger.fatalError("""
-                Expected '.speedBoost'; purchasable: '\(purchaseResult.purchasable)'
+                Expected '.speedBoost'; purchasable: '\(purchasable)'
                 """)
             return []
         }
         
-        state.psiCash.libData = purchaseResult.refreshedLibData
-        state.psiCashBalance = .refreshed(refreshedData: purchaseResult.refreshedLibData,
-                                          persisted: environment.psiCashPersistedValues)
-        switch purchaseResult.result {
-        case .success(let purchasedType):
-            guard case .speedBoost(let purchasedProduct) = purchasedType else {
-                environment.feedbackLogger.fatalError("Expected '.speedBoost' purchased type")
+        switch purchaseResult {
+        case let .success(newExpiringPurchaseResponse):
+            state.psiCash.libData = newExpiringPurchaseResponse.refreshedLibData
+            state.psiCashBalance = .refreshed(refreshedData: newExpiringPurchaseResponse.refreshedLibData,
+                                              persisted: environment.psiCashPersistedValues)
+            
+            switch newExpiringPurchaseResponse.purchasedType {
+            case let .success(purchasedType):
+                guard case .speedBoost(let purchasedProduct) = purchasedType else {
+                    environment.feedbackLogger.fatalError("Expected '.speedBoost' purchased type")
+                    return []
+                }
+                state.psiCash.purchasing = .none
+                return [
+                    .fireAndForget {
+                        environment.sharedDB.appendNonSubscriptionEncodedAuthorization(
+                            purchasedProduct.transaction.authorization.rawData
+                        )
+                        environment.notifier.post(NotifierUpdatedNonSubscriptionAuths)
+                    },
+                    .fireAndForget {
+                        environment.objcBridgeDelegate?.dismiss(screen: .psiCash, completion: nil)
+                    }
+                ]
+                
+            case let .failure(parseError):
+                // Programming error
+                environment.feedbackLogger.fatalError("failed to parse purchase: '\(parseError)'")
                 return []
             }
-            state.psiCash.purchasing = .none
-            return [
-                .fireAndForget {
-                    environment.sharedDB.appendNonSubscriptionEncodedAuthorization(
-                        purchasedProduct.transaction.authorization.rawData
-                    )
-                    environment.notifier.post(NotifierUpdatedNonSubscriptionAuths)
-                },
-                .fireAndForget {
-                    environment.objcBridgeDelegate?.dismiss(screen: .psiCash, completion: nil)
-                }
-            ]
             
-        case .failure(let errorEvent):
+        case let .failure(errorEvent):
             state.psiCash.purchasing = .error(errorEvent)
             return [ environment.feedbackLogger.log(.error, errorEvent).mapNever() ]
         }
         
     case .refreshPsiCashState:
-        guard let tunnelConnection = state.tunnelConnection else {
-            return []
-        }
-        guard case .notSubscribed = state.subscription.status else {
-            return []
-        }
-        guard case .completed(_) = state.psiCash.pendingPsiCashRefresh else {
+        
+        guard
+            state.psiCash.libLoaded,
+            let tunnelConnection = state.tunnelConnection,
+            case .notSubscribed = state.subscription.status,
+            case .completed(_) = state.psiCash.pendingPsiCashRefresh
+        else {
             return []
         }
         
@@ -125,33 +180,163 @@ func psiCashReducer(
         return [
             environment.feedbackLogger.log(.info, "PsiCash: refresh state started").mapNever(),
             environment.psiCashEffects
-                .refreshState(PsiCashTransactionClass.allCases, tunnelConnection)
-                .map(PsiCashAction.refreshPsiCashStateResult)
+                .refreshState(PsiCashTransactionClass.allCases, tunnelConnection,
+                              environment.metadata())
+                .map(PsiCashAction._refreshPsiCashStateResult)
         ]
         
-    case .refreshPsiCashStateResult(let result):
-        state.psiCash.pendingPsiCashRefresh = result.map { $0.map { _ in .unit } }
-
+    case ._refreshPsiCashStateResult(let result):
+        guard case .pending = state.psiCash.pendingPsiCashRefresh else {
+            environment.feedbackLogger.fatalError("unexpected state")
+            return []
+        }
+        
+        state.psiCash.pendingPsiCashRefresh = .completed(result.successToUnit().toUnit())
+        
         switch result {
-        case .completed(.success(let refreshedLibData)):
+        case .success(let refreshedLibData):
             state.psiCash.libData = refreshedLibData
             state.psiCashBalance = .refreshed(refreshedData: refreshedLibData,
                                               persisted: environment.psiCashPersistedValues)
             return [
                 environment.feedbackLogger.log(.info, "PsiCash: refresh state success").mapNever()
             ]
-        case .completed(.failure(let error)):
+            
+        case .failure(let error):
             return [
                 environment.feedbackLogger.log(
                     .warn,
                     LogMessage(stringLiteral:"PsiCash: refresh state error: " + String(describing: error))
                 ).mapNever()
             ]
-        case .pending:
+        }
+        
+    case .accountLogout:
+        
+        if let pendingAccountLogin = state.psiCash.pendingAccountLoginLogout {
+            // Guards against another request being send whilst one is in progress.
+            guard case .completed(_) = pendingAccountLogin.wrapped else {
+                return [
+                    environment.feedbackLogger.log(
+                        .warn, "another login/logout request is in flight").mapNever()
+                ]
+            }
+        }
+        
+        guard let tunnelConnection = state.tunnelConnection else {
+            return [
+                environment.feedbackLogger.log(.error, "tunnel connection is nil")
+                    .mapNever()
+            ]
+        }
+        
+        guard case .account(loggedIn: _) = state.psiCash.libData.accountType else {
+            return [
+                environment.feedbackLogger.log(.warn ,"""
+                    user is not an account: '\(String(describing: state.psiCash.libData.accountType))'
+                    """).mapNever()
+            ]
+        }
+        
+        state.psiCash.pendingAccountLoginLogout = Event(.pending(.logout),
+                                                        date: environment.getCurrentTime())
+        
+        return [
+            environment.psiCashEffects.accountLogout(tunnelConnection)
+                .map(PsiCashAction._accountLogoutResult)
+        ]
+        
+    case ._accountLogoutResult(let result):
+        guard
+            let pendingAccountLoginLogout = state.psiCash.pendingAccountLoginLogout,
+            case .pending(.logout) = pendingAccountLoginLogout.wrapped
+        else {
+            environment.feedbackLogger.fatalError("expected '.pending(.logout)' state")
             return []
+        }
+                
+        state.psiCash.pendingAccountLoginLogout = Event(.completed(.right(result)),
+                                                        date: environment.getCurrentTime())
+        
+        switch result {
+        case .success(let refreshedLibData):
+            state.psiCash.libData = refreshedLibData
+            state.psiCashBalance = .refreshed(refreshedData: refreshedLibData,
+                                              persisted: environment.psiCashPersistedValues)
+            return []
+        case .failure(let error):
+            state.psiCash.libData = environment.psiCashEffects.libData()
+            state.psiCashBalance.balanceOutOfDate(reason: .otherBalanceUpdateError)
+            return [
+                environment.feedbackLogger.log(.error, error).mapNever()
+            ]
+        }
+        
+    case let .accountLogin(username, password):
+        
+        if let pendingAccountLogin = state.psiCash.pendingAccountLoginLogout {
+            // Guards against another request being send whilst one is in progress.
+            guard case .completed(_) = pendingAccountLogin.wrapped else {
+                return [
+                    environment.feedbackLogger.log(
+                        .warn,
+                        "another login/logout request is in flight").mapNever()
+                ]
+            }
+        }
+        
+        guard let tunnelConnection = state.tunnelConnection else {
+            return [
+                environment.feedbackLogger.log(.error, "tunnel connection is nil")
+                    .mapNever()
+            ]
+        }
+        
+        state.psiCash.pendingAccountLoginLogout = Event(.pending(.login),
+                                                        date: environment.getCurrentTime())
+        
+        return [
+            environment.psiCashEffects.accountLogin(tunnelConnection, username, password)
+                .map(PsiCashAction._accountLoginResult)
+        ]
+    
+    case ._accountLoginResult(let result):
+        guard
+            let pendingAccountLoginLogout = state.psiCash.pendingAccountLoginLogout,
+            case .pending(.login) = pendingAccountLoginLogout.wrapped
+        else {
+            environment.feedbackLogger.fatalError("expected '.pending(.login)' state")
+            return []
+        }
+                
+        state.psiCash.pendingAccountLoginLogout = Event(.completed(.left(result)),
+                                                        date: environment.getCurrentTime())
+        
+        state.psiCash.libData = environment.psiCashEffects.libData()
+        
+        switch result {
+        case .success(let accountLoginResponse):
+            return [
+                // Refreshes PsiCash state immediately after successful login.
+                Effect(value: .refreshPsiCashState),
+                
+                environment.feedbackLogger.log(
+                    .info, "account login completed: '\(accountLoginResponse)'"
+                ).mapNever()
+            ]
+            
+        case .failure(let errorEvent):
+            return [
+                environment.feedbackLogger.log(.error, errorEvent).mapNever()
+            ]
         }
         
     case .showRewardedVideoAd:
+        
+        guard state.psiCash.libLoaded else {
+            return []
+        }
+        
         guard case .notSubscribed = state.subscription.status else {
             return []
         }
@@ -159,7 +344,8 @@ func psiCashReducer(
         switch state.tunnelConnection?.tunneled {
         case .connected:
             state.psiCash.rewardedVideo.combine(
-                loading: .failure(ErrorEvent(.noTunneledRewardedVideoAd))
+                loading: .failure(ErrorEvent(.noTunneledRewardedVideoAd,
+                                             date: environment.getCurrentTime()))
             )
             return []
         case .connecting, .disconnecting:
@@ -167,7 +353,8 @@ func psiCashReducer(
         case .notConnected, .none:
             guard let customData = environment.psiCashEffects.rewardedVideoCustomData() else {
                 state.psiCash.rewardedVideo.combine(
-                    loading: .failure(ErrorEvent(.customDataNotPresent)))
+                    loading: .failure(ErrorEvent(.customDataNotPresent,
+                                                 date: environment.getCurrentTime())))
                 return []
             }
             return [
@@ -189,7 +376,7 @@ func psiCashReducer(
                 reason: .watchedRewardedVideo,
                 persisted: environment.psiCashPersistedValues
             )
-            return [Effect { .refreshPsiCashState }]
+            return [Effect(value: .refreshPsiCashState)]
         } else {
             return []
         }

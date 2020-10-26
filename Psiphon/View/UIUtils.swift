@@ -18,8 +18,7 @@
  */
 
 import UIKit
-
-protocol UICases: Hashable, CaseIterable, CustomStringConvertible {}
+import class PsiApi.ReactiveViewController
 
 /// Represents global app styles.
 struct AppStyle {
@@ -28,10 +27,17 @@ struct AppStyle {
 }
 
 struct Styling {
+    
+    /// No layout should be larger in width than this constant.
+    var layoutMaxWidth: CGFloat = 700.0
+    var layoutWidthToHeightRatio: Float = 0.91
+    
     var animationDuration: TimeInterval = 0.1
     var borderWidth: CGFloat = 5.0
     var cornerRadius: CGFloat = 8.0
     var padding: CGFloat = 15.0
+    var largePadding: CGFloat = 20.0
+    var buttonHeight: CGFloat = 44.0
     var largeButtonHeight: CGFloat = 60.0
     var statusBarStyle = UIStatusBarStyle.lightContent
     var buttonContentEdgeInsets = UIEdgeInsets(top: 10.0, left: 15.0, bottom: 10.0, right: 15.0)
@@ -53,10 +59,22 @@ enum Gradients: Int {
 }
 
 enum FontSize: Float {
+    
+    /// 26-pt font size.
     case h1 = 26.0
+    
+    /// 18-pt font size.
+    case h2 = 18.0
+    
+    /// 16-pt font size.
     case h3 = 16.0
+    
+    /// 14-pt font size.
     case normal = 14.0
+    
+    /// 12-pt font size.
     case subtitle = 12.0
+    
 }
 
 enum AvenirFont: String {
@@ -79,17 +97,52 @@ enum Loading<Value: Equatable>: Equatable {
     case loaded(Value)
 }
 
+/// Applies `applyMutation` function to each of the `values` in order.
+func mutate<Ref: AnyObject>(_ values: Ref..., applyMutations: (Ref) -> Void) {
+    for value in values {
+        applyMutations(value)
+    }
+}
+
+/// Applies `applyMutation` function to each of the `values` in order.
+func mutate<Ref: AnyObject>(_ values: [Ref], applyMutations: (Ref) -> Void) {
+    for value in values {
+        applyMutations(value)
+    }
+}
+
+struct Padding: Equatable {
+    
+    let top: Float
+    let bottom: Float
+    let leading: Float
+    let trailing: Float
+    
+    init(
+        top: Float = 0,
+        bottom: Float = 0,
+        leading: Float = 0,
+        trailing: Float = 0
+    ) {
+        self.top = top
+        self.bottom = bottom
+        self.leading = leading
+        self.trailing = trailing
+    }
+    
+}
+
 extension UILabel {
 
-    static func make<Label: UILabel>(
+    static func make<LabelView: UILabel>(
         text: String = "",
         fontSize: FontSize = .normal,
         typeface: AvenirFont = .demiBold,
         color: UIColor = .white,
         numberOfLines: Int = 1,
-        alignment: NSTextAlignment = .natural) -> Label {
+        alignment: NSTextAlignment = .natural) -> LabelView {
 
-        let label = Label(frame: .zero)
+        let label = LabelView(frame: .zero)
         label.apply(text: text,
                     fontSize: fontSize,
                     typeface: typeface,
@@ -125,6 +178,40 @@ extension UILabel {
 
 }
 
+extension UIStackView {
+    
+    static func make(
+        axis: NSLayoutConstraint.Axis = .horizontal,
+        distribution: UIStackView.Distribution = .fill,
+        alignment: UIStackView.Alignment = .fill,
+        spacing: CGFloat = 0,
+        margins: (top: CGFloat, bottom: CGFloat)? = nil
+    ) -> UIStackView {
+        let v = UIStackView(frame: .zero)
+        mutate(v) {
+            $0.axis = axis
+            $0.distribution = distribution
+            $0.alignment = alignment
+            $0.spacing = spacing
+            
+            if let margins = margins {
+                $0.isLayoutMarginsRelativeArrangement = true
+                if #available(iOS 11.0, *) {
+                    $0.directionalLayoutMargins = .init(top: margins.top, leading: 0.0,
+                                                        bottom: margins.bottom, trailing: 0)
+                } else {
+                    $0.layoutMargins = .init(top: margins.top, left: 0.0,
+                                             bottom: margins.bottom, right: 0)
+                }
+            }
+            
+        }
+        return v
+    }
+    
+}
+
+
 enum EdgeInsets {
     case normal
 
@@ -158,10 +245,26 @@ extension UIButton {
 
 extension UIImageView {
 
-    static func make(image: String,
-                     contentMode: UIView.ContentMode = .scaleAspectFit) -> UIImageView {
-        let v = UIImageView(image: UIImage(named: image))
+    static func make(
+        image imageName: String? = nil,
+        contentMode: UIView.ContentMode = .scaleAspectFit,
+        easyToShrink: Bool = false
+    ) -> UIImageView {
+        let v = UIImageView(frame: .zero)
+        
+        if let imageName = imageName {
+            v.image = UIImage(named: imageName)
+        }
+        
         v.contentMode = contentMode
+        
+        if easyToShrink {
+            v.setContentCompressionResistancePriority(
+                (.defaultHigh - 1, .vertical),
+                (.defaultHigh - 1, .horizontal)
+            )
+        }
+        
         return v
     }
 
@@ -175,6 +278,16 @@ extension UITableViewCell {
     }
 }
 
+extension UIStackView {
+    
+    func addArrangedSubviews(_ subviews: UIView...) {
+        for view in subviews {
+            self.addArrangedSubview(view)
+        }
+    }
+    
+}
+
 /// Sets `translatesAutoresizingMaskIntoConstraints` to false for each child of given view.
 func setChildrenAutoresizingMaskIntoConstraintsFlagToFalse(forView view: UIView) {
     view.subviews.forEach {
@@ -184,28 +297,12 @@ func setChildrenAutoresizingMaskIntoConstraintsFlagToFalse(forView view: UIView)
 
 
 /// Backwards compatible safe area layout guide.
-func addSafeAreaLayoutGuide(to view: UIView) -> UILayoutGuide {
+func makeSafeAreaLayoutGuide(addToView view: UIView) -> UILayoutGuide {
     let layoutGuide = UILayoutGuide()
     view.addLayoutGuide(layoutGuide)
-
-    if #available(iOS 11.0, *) {
-        NSLayoutConstraint.activate([
-            layoutGuide.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            layoutGuide.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-            layoutGuide.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            layoutGuide.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-        ])
-
-    } else {
-        // Fallback on earlier versions
-        NSLayoutConstraint.activate([
-            layoutGuide.topAnchor.constraint(equalTo: view.topAnchor),
-            layoutGuide.bottomAnchor.constraint(equalTo: view.bottomAnchor),
-            layoutGuide.leadingAnchor.constraint(equalTo: view.leadingAnchor),
-            layoutGuide.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-        ])
+    layoutGuide.activateConstraints {
+        $0.constraint(to: view.safeAreaAnchors, [.top(), .bottom(), .leading(), .trailing()])
     }
-
     return layoutGuide
 }
 
@@ -223,23 +320,6 @@ func addShadow(toLayer layer: CALayer?) {
     layer.shadowOffset = CGSize(width: 0.0, height: 1.0)
     layer.shadowOpacity = 0.22
     layer.shadowRadius = 2.0
-}
-
-/// Should set frame on returned `CAGradientLayer` and set path on returned `CAShapeLayer`.
-func makeGradientBorderLayer(colors: [CGColor], width: CGFloat = 2.0)
-    -> (CAGradientLayer, CAShapeLayer) {
-    let gradient = CAGradientLayer()
-    gradient.startPoint = CGPoint(x: 0.5, y: 0.0)
-    gradient.endPoint = CGPoint(x: 0.5, y: 1.0)
-    gradient.colors = colors
-
-    let borderMask = CAShapeLayer()
-    borderMask.lineWidth = width
-    borderMask.fillColor = nil
-    borderMask.strokeColor = UIColor.black.cgColor
-    gradient.mask = borderMask
-
-    return (gradient, borderMask)
 }
 
 
@@ -261,18 +341,26 @@ func setBackgroundGradient(for view: UIView) {
 
 // MARK: AutoLayout
 
+extension UILayoutPriority {
+    
+    /// Priority value of `UILayoutPriority.requied - 1` (i.e. 999)
+    static let belowRequired = UILayoutPriority(999)
+    
+}
+
 enum Anchor {
-    case top(Float = 0)
-    case leading(Float = 0)
-    case trailing(Float = 0)
-    case bottom(Float = 0)
-    case centerX(Float = 0)
-    case centerY(Float = 0)
-    case width(const: Float = 0, multiplier: Float = 0)
-    case height(const: Float = 0, multiplier: Float = 0)
+    case top(Float = 0.0, UILayoutPriority = .required)
+    case leading(Float = 0.0, UILayoutPriority = .required)
+    case trailing(Float = 0.0, UILayoutPriority = .required)
+    case bottom(Float = 0.0, UILayoutPriority = .required)
+    case centerX(Float = 0.0, UILayoutPriority = .required)
+    case centerY(Float = 0.0, UILayoutPriority = .required)
+    case width(const: Float = 0.0, multiplier: Float = 1.0, UILayoutPriority = .required)
+    case height(const: Float = 0.0, multiplier: Float = 1.0, UILayoutPriority = .required)
 }
 
 protocol Anchorable {
+    
     var leadingAnchor: NSLayoutXAxisAnchor { get }
 
     var trailingAnchor: NSLayoutXAxisAnchor { get }
@@ -295,8 +383,45 @@ protocol Anchorable {
 
 }
 
-extension Anchorable {
+extension NSLayoutDimension {
+    
+    func constraint(default: CGFloat, max: CGFloat?) -> [NSLayoutConstraint] {
+        let defaultConstraint = self.constraint(equalToConstant: `default`)
+            .priority(.defaultHigh)
+        
+        if let max = max {
+            let maxConstraint = self.constraint(lessThanOrEqualToConstant: max)
+                .priority(.required)
+            
+            return [maxConstraint, defaultConstraint]
+            
+        } else {
+            return [defaultConstraint]
+        }
+    }
+    
+    func constraint(
+        toDimension dimension: NSLayoutDimension, ratio: Float = 1.0, max maybeMax: CGFloat? = nil
+    ) -> [NSLayoutConstraint] {
+        
+        var constraints = [
+            self.constraint(equalTo: dimension, multiplier: CGFloat(ratio))
+                .priority(.belowRequired),
+        ]
+        
+        if let max = maybeMax {
+            constraints.append(
+                self.constraint(lessThanOrEqualToConstant: max).priority(.required)
+            )
+        }
+        
+        return constraints
+    }
+    
+}
 
+extension Anchorable {
+    
     func constraint(to anchorable: Anchorable,
                     _ anchors: Anchor...) -> [NSLayoutConstraint] {
         constraint(to: anchorable, anchors)
@@ -307,40 +432,70 @@ extension Anchorable {
         var constraints = [NSLayoutConstraint]()
         for anchor in anchors {
             switch anchor {
-            case .top(let const):
+            case let .top(const, priority):
                 constraints.append(
-                    self.topAnchor.constraint(equalTo: anchorable.topAnchor,
-                                              constant: CGFloat(const)))
-            case .leading(let const):
+                    self.topAnchor.constraint(
+                        equalTo: anchorable.topAnchor,
+                        constant: CGFloat(const)
+                    ).priority(priority)
+                )
+            case let .leading(const, priority):
                 constraints.append(
-                    self.leadingAnchor.constraint(equalTo: anchorable.leadingAnchor,
-                                                  constant: CGFloat(const)))
-            case .trailing(let const):
+                    self.leadingAnchor.constraint(
+                        equalTo: anchorable.leadingAnchor,
+                        constant: CGFloat(const)
+                    ).priority(priority)
+                )
+                
+            case let .trailing(const, priority):
                 constraints.append(
-                    self.trailingAnchor.constraint(equalTo: anchorable.trailingAnchor,
-                                                   constant: CGFloat(const)))
-            case .bottom(let const):
+                    self.trailingAnchor.constraint(
+                        equalTo: anchorable.trailingAnchor,
+                        constant: CGFloat(const)
+                    ).priority(priority)
+                )
+
+            case let .bottom(const, priority):
                 constraints.append(
-                    self.bottomAnchor.constraint(equalTo: anchorable.bottomAnchor,
-                                                 constant: CGFloat(const)))
-            case .centerX(let const):
+                    self.bottomAnchor.constraint(
+                        equalTo: anchorable.bottomAnchor,
+                        constant: CGFloat(const)
+                    ).priority(priority)
+                )
+
+            case let .centerX(const, priority):
                 constraints.append(
-                    self.centerXAnchor.constraint(equalTo: anchorable.centerXAnchor,
-                                                  constant: CGFloat(const)))
-            case .centerY(let const):
+                    self.centerXAnchor.constraint(
+                        equalTo: anchorable.centerXAnchor,
+                        constant: CGFloat(const)
+                    ).priority(priority)
+                )
+                
+            case let .centerY(const, priority):
                 constraints.append(
-                    self.centerYAnchor.constraint(equalTo: anchorable.centerYAnchor,
-                                                  constant: CGFloat(const)))
-            case let .width(const: const, multiplier: multiplier):
+                    self.centerYAnchor.constraint(
+                        equalTo: anchorable.centerYAnchor,
+                        constant: CGFloat(const)
+                    ).priority(priority)
+                )
+                
+            case let .width(const: const, multiplier: multiplier, priority):
                 constraints.append(
-                    self.widthAnchor.constraint(equalTo: anchorable.widthAnchor,
-                                                multiplier: CGFloat(multiplier),
-                                                constant: CGFloat(const)))
-            case let .height(const: const, multiplier: multiplier):
+                    self.widthAnchor.constraint(
+                        equalTo: anchorable.widthAnchor,
+                        multiplier: CGFloat(multiplier),
+                        constant: CGFloat(const)
+                    ).priority(priority)
+                )
+                
+            case let .height(const: const, multiplier: multiplier, priority):
                 constraints.append(
-                    self.heightAnchor.constraint(equalTo: anchorable.heightAnchor,
-                                                 multiplier: CGFloat(multiplier),
-                                                 constant: CGFloat(const)))
+                    self.heightAnchor.constraint(
+                        equalTo: anchorable.heightAnchor,
+                        multiplier: CGFloat(multiplier),
+                        constant: CGFloat(const)
+                    ).priority(priority)
+                )
             }
         }
         return constraints
@@ -395,32 +550,30 @@ extension UIView {
                                        .trailing(trailing), .bottom(bottom))
     }
 
-    func contentHuggingPriority(lowerThan view: UIView, for axis: NSLayoutConstraint.Axis) {
+    func setContentHuggingPriority(lowerThan view: UIView, for axis: NSLayoutConstraint.Axis) {
         self.setContentHuggingPriority(view.contentHuggingPriority(for: axis) - 1, for: axis)
     }
-
-    func widthConstraint(to normal: CGFloat, withMax max: CGFloat) -> [NSLayoutConstraint] {
-        let max = self.widthAnchor.constraint(lessThanOrEqualToConstant: max)
-        max.priority = .required
-        max.isActive = true
-
-        let normal = self.widthAnchor.constraint(equalToConstant: normal)
-        normal.priority = .defaultHigh
-        normal.isActive = true
-        return [max, normal]
+    
+    func setContentHuggingPriority(higherThan view: UIView, for axis: NSLayoutConstraint.Axis) {
+        self.setContentHuggingPriority(view.contentHuggingPriority(for: axis) + 1, for: axis)
     }
-
-    func heightConstraint(to normal: CGFloat, withMax max: CGFloat) -> [NSLayoutConstraint] {
-        let max = self.heightAnchor.constraint(lessThanOrEqualToConstant: max)
-        max.priority = .required
-        max.isActive = true
-
-        let normal = self.heightAnchor.constraint(equalToConstant: normal)
-        normal.priority = .defaultHigh
-        normal.isActive = true
-        return [max, normal]
+    
+    func setContentHuggingPriority(
+        _ values: (priority: UILayoutPriority, axis: NSLayoutConstraint.Axis)...
+    ) {
+        for (priority, axis) in values {
+            self.setContentHuggingPriority(priority, for: axis)
+        }
     }
-
+    
+    open func setContentCompressionResistancePriority(
+        _ values: (priority: UILayoutPriority, axis: NSLayoutConstraint.Axis)...
+    ) {
+        for (priority, axis) in values {
+            self.setContentCompressionResistancePriority(priority, for: axis)
+        }
+    }
+    
 }
 
 extension NSLayoutConstraint {
@@ -537,9 +690,9 @@ protocol ViewBuilder {
     associatedtype BuildType: BindableViewable
 
     /// Builds a `BindableViewable`. In current implementation the `BindableViewable`
-    /// is either a `StrictBindableViewable` or a `MutableBindableViewable`.
+    /// is either a `ImmutableBindableViewable` or a `MutableBindableViewable`.
     ///
-    /// - A `StrictBindableViewable` should ignore the `container` parameter, and never rely on it.
+    /// - A `ImmutableBindableViewable` should ignore the `container` parameter, and never rely on it.
     /// This value may or may not be nil, depending on whether the `container` is being re-used.
     ///
     /// - A `MutableBindableViewable` should add it's views to the passed in `container`.
@@ -557,14 +710,15 @@ extension UIView: ViewWrapper {
     var view: UIView { self }
 }
 
-final class StrictBindableViewable<BindingType: Equatable, WrappedView: ViewWrapper>: BindableViewable {
+final class ImmutableBindableViewable<BindingType: Equatable, WrappedView: ViewWrapper>: BindableViewable {
     typealias WrappedView = WrappedView
     typealias BindingType = BindingType
 
     var view: UIView { viewable.view }
 
-    let viewable: WrappedView
-    let binding: (BindingType) -> Void
+    private var state: BindingType? = nil
+    private let viewable: WrappedView
+    private let binding: (BindingType) -> Void
 
     init(viewable: WrappedView, _ bindingWrapper: (WrappedView) -> ((BindingType) -> Void)) {
         self.viewable = viewable
@@ -572,6 +726,13 @@ final class StrictBindableViewable<BindingType: Equatable, WrappedView: ViewWrap
     }
 
     func bind(_ newValue: BindingType) {
+        // As an optimization, skips calling bind if `newValue`
+        // is not different from the current state.
+        if let current = self.state, newValue == current {
+            return
+        }
+        self.state = newValue
+        
         binding(newValue)
     }
 
@@ -580,7 +741,9 @@ final class StrictBindableViewable<BindingType: Equatable, WrappedView: ViewWrap
     static func build<Builder: ViewBuilder>(
         with builder: Builder, addTo container: UIView
     ) -> Builder.BuildType where BindingType == Builder.BuildType.BindingType {
-
+        
+        container.translatesAutoresizingMaskIntoConstraints = false
+        
         // Cleans up the container.
         container.subviews.forEach { $0.removeFromSuperview() }
 
@@ -598,6 +761,7 @@ final class MutableBindableViewable<BindingType: Equatable, WrappedView: ViewWra
 
     var view: UIView { viewable!.view }
 
+    private var state: BindingType? = nil
     private var viewable: WrappedView?
     private let bindingWrapper: (WrappedView?) -> ((BindingType) -> WrappedView?)
 
@@ -608,6 +772,13 @@ final class MutableBindableViewable<BindingType: Equatable, WrappedView: ViewWra
     }
 
     func bind(_ newValue: BindingType) {
+        // As an optimization, skips calling bind if `newValue`
+        // is not different from the current state.
+        if let current = self.state, newValue == current {
+            return
+        }
+        self.state = newValue
+        
         viewable = bindingWrapper(viewable)(newValue)
     }
 
@@ -615,6 +786,7 @@ final class MutableBindableViewable<BindingType: Equatable, WrappedView: ViewWra
     static func build<Builder: ViewBuilder>(
         with builder: Builder, addTo container: UIView
     ) -> Builder.BuildType where MutableBindableViewable == Builder.BuildType {
+        container.translatesAutoresizingMaskIntoConstraints = false
         container.subviews.forEach { $0.removeFromSuperview() }
         return builder.build(container)
     }
@@ -623,14 +795,22 @@ final class MutableBindableViewable<BindingType: Equatable, WrappedView: ViewWra
 
 extension UIAlertController {
     
+    static func makeSimpleErrorAlertWithOKButton(message: String) -> UIAlertController {
+        makeSimpleAlertWithOKButton(title: UserStrings.Error_title(), message: message)
+    }
+    
     /// Creates a `UIAlertController` with a single "OK" button that dismisses the alert.
-    static func makeSimpleAlertWithOKButton(message: String) -> UIAlertController {
-        let alert = UIAlertController(title: UserStrings.Error_title(),
+    static func makeSimpleAlertWithOKButton(
+        title: String, message: String, onDismissed: (() -> Void)? = nil
+    ) -> UIAlertController {
+        let alert = UIAlertController(title: title,
                                       message: message,
                                       preferredStyle: .alert)
         
         alert.addAction(
-            UIAlertAction(title: UserStrings.OK_button_title(), style: .default)
+            UIAlertAction(title: UserStrings.OK_button_title(), style: .default, handler: { _ in
+                onDismissed?()
+            })
         )
         
         return alert
@@ -738,6 +918,26 @@ extension UIViewController {
         // Documentation is sparse on this, and this interpretation might need to be
         // re-evaluated at some point in the future.
         return viewControllerToPresent.isBeingPresented
+    }
+    
+    /// This method is an attempt to organize dismissal of view controller's in order
+    /// to build a typed navigation hierarchy.
+    /// This method is functionally equivalent to calling dismiss on the presented view controller.
+    static func safeDismiss(
+        _ viewControllerToDismiss: UIViewController,
+        animated flag: Bool,
+        completion: (() -> Void)?
+    ) {
+        viewControllerToDismiss.dismiss(animated: flag, completion: completion)
+    }
+    
+}
+
+extension UINavigationBar {
+    
+    /// Hides iOS default 1px bottom border from navigation bar.
+    func hideSystemBottomBorder() {
+        self.setValue(true, forKey: "hidesShadow")
     }
     
 }

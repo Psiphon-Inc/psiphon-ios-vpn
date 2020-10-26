@@ -35,7 +35,7 @@ struct SpeedBoostPurchaseTable: ViewBuilder {
     let purchaseHandler: (SpeedBoostPurchasable) -> Void
 
     func build(_ container: UIView?)
-        -> StrictBindableViewable<NonEmpty<SpeedBoostPurchasableViewModel>, SpeedBoostCollection> {
+        -> ImmutableBindableViewable<NonEmpty<SpeedBoostPurchasableViewModel>, SpeedBoostCollection> {
             .init(viewable: SpeedBoostCollection(purchaseHandler: purchaseHandler))
             { table -> ((NonEmpty<SpeedBoostPurchasableViewModel>) -> Void) in
                 return {

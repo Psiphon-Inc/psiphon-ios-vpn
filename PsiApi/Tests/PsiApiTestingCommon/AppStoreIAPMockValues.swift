@@ -27,34 +27,56 @@ import Utilities
 @testable import PsiApi
 @testable import AppStoreIAP
 
+extension ReceiptData {
+    
+    static func mock(
+        subscriptionInAppPurchases: Set<SubscriptionIAPPurchase> = Set([]),
+        consumableInAppPurchases: Set<ConsumableIAPPurchase> = Set([]),
+        readDate: Date = Date()
+    ) -> ReceiptData {
+        ReceiptData(
+            filename: "receipt", // unused in tests.
+            subscriptionInAppPurchases: subscriptionInAppPurchases,
+            consumableInAppPurchases: consumableInAppPurchases,
+            data: Data(), // unused in tests.
+            readDate: readDate
+        )
+    }
+    
+}
+
 extension PsiCashEffects {
     
     static func mock(
+        initGen: Gen<Result<PsiCashLibData, ErrorRepr>>? = nil,
         libData: Gen<PsiCashLibData>? = nil,
         refreshState: Gen<PsiCashRefreshResult>? = nil,
         purchaseProduct: Gen<PsiCashPurchaseResult>? = nil,
         modifyLandingPage: Gen<URL>? = nil,
         rewardedVideoCustomData: Gen<String>? = nil
     ) -> PsiCashEffects {
-        PsiCashEffects(
-            libData: { () -> PsiCashLibData in
-                returnGeneratedOrFail(libData)
-            },
-            refreshState: { _, _ -> Effect<PsiCashRefreshResult> in
-                Effect(value: returnGeneratedOrFail(refreshState))
-            },
-            purchaseProduct: { _, _ -> Effect<PsiCashPurchaseResult> in
-                Effect(value: returnGeneratedOrFail(purchaseProduct))
-            },
-            modifyLandingPage: { _ -> Effect<URL> in
-                Effect(value: returnGeneratedOrFail(modifyLandingPage))
-            },
-            rewardedVideoCustomData: { () -> String? in
-                returnGeneratedOrFail(rewardedVideoCustomData)
-            },
-            expirePurchases: { _ -> Effect<Never> in
-                return .empty
-            })
+        
+        .init { fileStoreRoot -> Effect<Result<PsiCashLibData, ErrorRepr>> in
+            Effect(value: returnGeneratedOrFail(initGen))
+        } libData: { () -> PsiCashLibData in
+            returnGeneratedOrFail(libData)
+
+        } refreshState: { (_, _, _) -> Effect<PsiCashRefreshResult> in
+            Effect(value: returnGeneratedOrFail(refreshState))
+            
+        } purchaseProduct: { (_, _, _) -> Effect<PsiCashPurchaseResult> in
+            Effect(value: returnGeneratedOrFail(purchaseProduct))
+            
+        } modifyLandingPage: { (_) -> Effect<URL> in
+            Effect(value: returnGeneratedOrFail(modifyLandingPage))
+            
+        } rewardedVideoCustomData: { () -> String? in
+            returnGeneratedOrFail(rewardedVideoCustomData)
+            
+        } removePurchasesNotIn: { (_) -> Effect<Never> in
+            return .empty
+        }
+        
     }
     
 }

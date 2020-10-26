@@ -188,7 +188,7 @@ extension AppState {
             IAPReducerState(
                 iap: self.iapState,
                 psiCashBalance: self.psiCashBalance,
-                psiCashAuth: self.psiCash.libData.authPackage
+                psiCashAccountType: self.psiCash.libData.accountType
             )
         }
         set {
@@ -209,21 +209,6 @@ extension AppState {
         set {
             self.psiCashBalance = newValue.psiCashBalance
             self.psiCash = newValue.psiCash
-        }
-    }
-    
-    var appDelegateReducerState: AppDelegateReducerState {
-        get {
-            AppDelegateReducerState(
-                psiCashBalance: self.psiCashBalance,
-                psiCash: self.psiCash,
-                appDelegate: self.appDelegateState
-            )
-        }
-        set {
-            self.psiCashBalance = newValue.psiCashBalance
-            self.psiCash = newValue.psiCash
-            self.appDelegateState = newValue.appDelegate
         }
     }
     
@@ -251,8 +236,8 @@ extension AppState {
         }
     }
     
-    var psiCashViewController: PsiCashViewControllerState {
-        PsiCashViewControllerState(
+    var psiCashViewControllerReaderState: PsiCashViewControllerReaderState {
+        PsiCashViewControllerReaderState(
             psiCashBalanceViewModel: self.psiCashBalanceViewModel,
             psiCash: self.psiCash,
             iap: self.iapState,

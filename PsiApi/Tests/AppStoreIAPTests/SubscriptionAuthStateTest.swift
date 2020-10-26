@@ -335,7 +335,9 @@ final class SubscriptionAuthStateTest : XCTestCase {
                                                   signedAuthorization: .authorization(purchaseWithAuth.signedData))
             }
 
-            let receiptData = ReceiptData(subscriptionInAppPurchases: Set(purchasesWithAuth.map(\.purchase)),
+            let receiptData = ReceiptData(filename: "receipt" /* unused in this test */,
+                                          subscriptionInAppPurchases:
+                                            Set(purchasesWithAuth.map(\.purchase)),
                                           consumableInAppPurchases: [],
                                           data: Data() /* unused in this test */,
                                           readDate: Date() /* unused in this test */)
@@ -439,7 +441,8 @@ final class SubscriptionAuthStateTest : XCTestCase {
                                                       signedAuthorization: .notRequested)
                 ])
 
-                let receiptData = ReceiptData(subscriptionInAppPurchases: Set(arrayLiteral:purchase),
+                let receiptData = ReceiptData(filename: "receipt" /* unused in this test */,
+                                              subscriptionInAppPurchases: Set(arrayLiteral:purchase),
                                               consumableInAppPurchases: [],
                                               data: Data() /* unused in this test */,
                                               readDate: Date() /* unused in this test */)

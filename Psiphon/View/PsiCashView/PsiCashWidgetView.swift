@@ -22,7 +22,7 @@ import UIKit
 
 @objc final class PsiCashWidgetView: UIView {
 
-    @objc let balanceView = PsiCashBalanceView(frame: CGRect.zero)
+    @objc let balanceViewWrapper = PsiCashBalanceViewWrapper()
     @objc let speedBoostButton = SpeedBoostButton()
     @objc let addPsiCashButton = DuskButton()
     private let topRowLayoutGuide = UILayoutGuide()
@@ -39,30 +39,31 @@ import UIKit
 
         addLayoutGuide(topRowLayoutGuide)
         addSubview(speedBoostButton)
-        addSubview(balanceView)
+        addSubview(balanceViewWrapper.view)
         addSubview(addPsiCashButton)
         
-        topRowLayoutGuide.activateConstraints {
-            [ $0.topAnchor.constraint(equalTo: self.topAnchor),
-              $0.bottomAnchor.constraint(equalTo: balanceView.bottomAnchor),
-              $0.leadingAnchor.constraint(equalTo: balanceView.leadingAnchor),
-              $0.trailingAnchor.constraint(equalTo: addPsiCashButton.trailingAnchor),
-              $0.centerXAnchor.constraint(equalTo: self.centerXAnchor) ]
-        }
+        topRowLayoutGuide.activateConstraints {[
+            $0.topAnchor.constraint(equalTo: self.topAnchor),
+            $0.bottomAnchor.constraint(equalTo: balanceViewWrapper.view.bottomAnchor),
+            $0.leadingAnchor.constraint(equalTo: balanceViewWrapper.view.leadingAnchor),
+            $0.trailingAnchor.constraint(equalTo: addPsiCashButton.trailingAnchor),
+            $0.centerXAnchor.constraint(equalTo: self.centerXAnchor)
+        ]}
         
-        balanceView.activateConstraints {
+        balanceViewWrapper.view.activateConstraints {
             $0.constraint(to: topRowLayoutGuide, [.leading(0), .top(0)]) +
                 [ $0.centerYAnchor.constraint(equalTo: addPsiCashButton.centerYAnchor) ]
         }
         
         addPsiCashButton.activateConstraints {
-            [ $0.topAnchor.constraint(equalTo: balanceView.topAnchor),
-              $0.leadingAnchor.constraint(equalTo: balanceView.trailingAnchor, constant: 10.0) ]
+            [ $0.topAnchor.constraint(equalTo: balanceViewWrapper.view.topAnchor),
+              $0.leadingAnchor.constraint(equalTo: balanceViewWrapper.view.trailingAnchor,
+                                          constant: 10.0) ]
         }
         
         speedBoostButton.activateConstraints {
             $0.constraintToParent(.bottom(), .leading(), .trailing()) +
-                [ $0.topAnchor.constraint(equalTo: balanceView.bottomAnchor,
+                [ $0.topAnchor.constraint(equalTo: balanceViewWrapper.view.bottomAnchor,
                                           constant: Style.default.padding) ]
         }
 

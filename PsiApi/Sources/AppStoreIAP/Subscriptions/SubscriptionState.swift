@@ -45,16 +45,16 @@ extension SubscriptionAction: Equatable {}
 public typealias SubscriptionReducerEnvironment = (
     feedbackLogger: FeedbackLogger,
     appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
-    getCurrentTime: () -> Date,
-    compareDates: (Date, Date, Calendar.Component) -> ComparisonResult,
+    dateCompare: DateCompare,
     singleFireTimer:
     (_ interval: TimeInterval, _ leeway: DispatchTimeInterval) -> Effect<()>
 )
 
-public func subscriptionReducer(
-    state: inout SubscriptionState, action: SubscriptionAction,
-    environment: SubscriptionReducerEnvironment
-) -> [Effect<SubscriptionAction>] {
+public let subscriptionReducer = Reducer<SubscriptionState
+                                         , SubscriptionAction
+                                         , SubscriptionReducerEnvironment> {
+    state, action, environment in
+    
     switch action {
     case .updatedReceiptData(let receipt):
         guard let subscriptionPurchases = receipt?.subscriptionInAppPurchases else {
@@ -67,10 +67,7 @@ public func subscriptionReducer(
             return []
         }
         
-        let isExpired = purchaseWithLatestExpiry.isApproximatelyExpired(
-            getCurrentTime: environment.getCurrentTime,
-            compareDates: environment.compareDates
-        )
+        let isExpired = purchaseWithLatestExpiry.isApproximatelyExpired(environment.dateCompare)
         guard !isExpired else {
             state.status = .notSubscribed
             return []

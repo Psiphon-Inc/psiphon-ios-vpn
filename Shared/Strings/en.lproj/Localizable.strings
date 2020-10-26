@@ -54,6 +54,12 @@
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.";
 
+/* Button label that lets users create a new account. */
+"CREATE_NEW_ACCOUNT_BUTTON_TITLE" = "Create New Account";
+
+/* Title label next to a button that lets users create a PsiCash account. Do not translate or transliterate 'PsiCash' */
+"CREATE_PSICASH_YOUR_ACCOUNT" = "Create your PsiCash account";
+
 /* Decline button title */
 "DECLINE_BUTTON_TITLE" = "Decline";
 
@@ -87,11 +93,17 @@
 /* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Thank you for helping improve Psiphon!";
 
+/* Button title that lets users reset their password if they forgot their account's password. */
+"FORGOT_PASSWORD" = "Forgot Password?";
+
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "Free";
 
 /* Generic alert shown when purchase of a product fails. */
 "GENERIC_PURCHASE_FAILED" = "Purchase Failed";
+
+/* Error message when username or password entered by the user to login into their account is incorrect. */
+"INCORRECT_USERNAME_OR_PASSWORD" = "The username or password you entered is incorrect. Please try again.";
 
 /* User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
 "INSUFFICIENT_PSICASH_BALANCE" = "Insufficient PsiCash balance";
@@ -101,6 +113,15 @@
 
 /* Text displayed while app loads */
 "LOADING" = "Loading...";
+
+/* Title on a button that lets users login to their account with the username and password they have entered. */
+"LOG_IN_BUTTON_TITLE" = "Log In";
+
+/* Title of the button that lets users log out of their account */
+"LOG_OUT_BUTTON_TITLE" = "Log Out";
+
+/* Do not translate or transliterate 'PsiCash'. Settings menu logout button that lets users log out of their PsiCash account. */
+"LOG_OUT_PSICASH_ACCOUNT" = "Log out of PsiCash account";
 
 /* Button title that takes user to the next page */
 "NEXT_PAGE_BUTTON_TITLE" = "Next";
@@ -146,6 +167,12 @@
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
+
+/* Capitalize where it makes sense. Label visually separating Sign up section and sign in section of the app. */
+"OR_SIGNUP_SIGNIN" = "OR";
+
+/* Text field label where users can enter their account's password */
+"PASSWORD_TEXT_FIELD" = "Password";
 
 /* Alert dialog title indicating to the user that Psiphon needs their permission */
 "PERMISSION_REQUIRED_ALERT__TITLE" = "Permission required";
@@ -213,6 +240,15 @@
 /* Message shown when products available for purchase could not be retrieved. */
 "PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "Product list could not be retrieved";
 
+/* Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts. */
+"PSICASH_ACCOUNT" = "PsiCash Account";
+
+/* Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
+"PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "Are you sure you want to log out of your PsiCash account?";
+
+/* Do not translate or transliterate 'PsiCash'. */
+"PSICASH_ACCOUNTS_LAST_MERGE_WARNING" = "Note that this will be the last time that you can merge your PsiCash account.";
+
 /* PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
 "PSICASH_BALANCE" = "PsiCash Balance:";
 
@@ -222,8 +258,14 @@
 /* User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
 "PSICASH_BALANCE_OUT_OF_DATE_ALERT_TITLE" = "PsiCash Balance Out of Date";
 
+/* Do not translate or transliterate 'PsiCash'. Alert message when the user has been able to successfully log into their PsiCash account. */
+"PSICASH_LOGGED_IN_SUCCESSFULLY" = "You successfully logged into your PsiCash account.";
+
+/* Do not translate or transliterate 'PsiCash'. Alert message when the user has been able to successfully log out of their PsiCash account. */
+"PSICASH_LOGGED_OUT_SUCCESSFULLY" = "You successfully logged out of your PsiCash account.";
+
 /* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
-"PSICASH_PURCHASE_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon.";
+"PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon, unless you have created a PsiCash account and are logged into your PsiCash account.";
 
 /* An error that signifies a state where the user has made a 'PsiCash' purchase, but extra action is needed from the user to finish the transaction. Do not translate or transliterate 'PsiCash'. */
 "PSICASH_TRANSACTION_PENDING" = "Transaction Pending";
@@ -303,6 +345,15 @@
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";
 
+/* Title on a button that lets users sign up for an account */
+"SIGN_UP_BUTTON_TITLE" = "Sign Up";
+
+/* Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
+"SIGN_UP_LOG_IN_TO_PSICASH_ACCOUNT_TO_CONTINUE" = "Sign Up or Log In to your PsiCash account to continue";
+
+/* Message title informing the user that they must sign up for an account or log in to their account */
+"SIGN_UP_OR_LOG_IN" = "Sign Up or Log In";
+
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST" = "Speed Boost";
 
@@ -377,6 +428,9 @@
 
 /* Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
 "UPGRADE_PSIPHON" = "Upgrade Psiphon";
+
+/* Text field label where users can enter their account's username */
+"USERNAME_TEXT_FIELD" = "Username";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "An error occurred while starting Psiphon. Please try again.";

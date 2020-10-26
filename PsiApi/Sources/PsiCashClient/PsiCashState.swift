@@ -22,14 +22,33 @@ import ReactiveSwift
 import Utilities
 import PsiApi
 
-public typealias PendingPsiCashRefresh =
-    PendingResult<Utilities.Unit, ErrorEvent<PsiCashRefreshError>>
-
 public struct PsiCashState: Equatable {
+    
+    // Failure type matches PsiCashEffects.PsiCashRefreshResult.Failure
+    public typealias PendingRefresh =
+        PendingResult<Utilities.Unit,
+                      ErrorEvent<TunneledPsiCashRequestError<
+                                    PsiCashRequestError<PsiCashRefreshErrorStatus>>>>
+    
+    /// Represents whether PsiCash accounts is pending login or logout.
+    public enum LoginLogoutPendingValue: Equatable {
+        /// PsiCash accounts pending login.
+        case login
+        /// PsiCash accounts pending logout.
+        case logout
+    }
+    
+    public typealias PendingAccountLoginLogoutEvent =
+        Event<PendingValue<LoginLogoutPendingValue,
+                           Either<PsiCashEffects.PsiCashAccountLoginResult,
+                                  PsiCashEffects.PsiCashAccountLogoutResult>>>?
+    
     public var purchasing: PsiCashPurchasingState
     public var rewardedVideo: RewardedVideoState
     public var libData: PsiCashLibData
-    public var pendingPsiCashRefresh: PendingPsiCashRefresh
+    
+    public var pendingAccountLoginLogout: PendingAccountLoginLogoutEvent
+    public var pendingPsiCashRefresh: PendingRefresh
     /// True if PsiCashLibData has been loaded from persisted value.
     public var libLoaded: Bool
 }
@@ -40,20 +59,25 @@ extension PsiCashState {
         purchasing = .none
         rewardedVideo = .init()
         libData = .init()
+        pendingAccountLoginLogout = nil
         pendingPsiCashRefresh = .completed(.success(.unit))
         libLoaded = false
     }
     
-    public mutating func appDidLaunch(_ libData: PsiCashLibData) {
+    public mutating func initialized(_ libData: PsiCashLibData) {
         self.libData = libData
         self.libLoaded = true
     }
     
-    // Returns the first Speed Boost product that has not expired.
-    public var activeSpeedBoost: PurchasedExpirableProduct<SpeedBoostProduct>? {
-        let activeSpeedBoosts = libData.activePurchases.items
-            .compactMap { $0.speedBoost }
-            .filter { !$0.transaction.expired }
+    /// Returns the first Speed Boost product that has not expired.
+    public func activeSpeedBoost(
+        _ dateCompare: DateCompare
+    ) -> PurchasedExpirableProduct<SpeedBoostProduct>? {
+        
+        let activeSpeedBoosts = libData.activePurchases.partitionResults().successes
+            .compactMap(\.speedBoost)
+            .filter { !$0.transaction.isExpired(dateCompare) }
+        
         return activeSpeedBoosts[maybe: 0]
     }
 }
@@ -61,7 +85,7 @@ extension PsiCashState {
 public enum PsiCashPurchasingState: Equatable {
     case none
     case speedBoost(SpeedBoostPurchasable)
-    case error(ErrorEvent<PsiCashPurchaseResponseError>)
+    case error(PsiCashEffects.PsiCashNewExpiringPurchaseResult.Error)
     
     /// True if purchasing is completed (succeeded or failed)
     public var completed: Bool {
@@ -134,82 +158,49 @@ public struct RewardedVideoState: Equatable {
     }
 }
 
-public enum PsiCashPurchaseResponseError: HashableError {
-    case tunnelNotConnected
-    case parseError(PsiCashParseError)
-    // TODO: map Int to PsiCashStatus from PsiCashLib
-    case serverError(status: Int, shouldRetry: Bool, error: SystemError?)
-}
-
-public enum PsiCashRefreshError: HashableError {
-    /// Refresh request is rejected due to tunnel not connected.
-    case tunnelNotConnected
-    /// Server has returned 500 error response.
-    /// (PsiCash v1.3.1-0-gd1471c1) the request has already been retried internally and any further retry should not be immediate/
-    case serverError
-    /// Tokens passed in are invalid.
-    /// (PsiCash  v1.3.1-0-gd1471c1) Should never happen. The local user ID will be cleared.
-    case invalidTokens
-    /// Some other error.
-    case error(SystemError)
-}
-
-/// `PsiCashTransactionMismatchError` represents errors that are due to state mismatch between
-/// the client and the PsiCash server, ignoring programmer error.
-/// The client should probably sync its state with the server, and it probably shouldn't retry automatically.
-/// The user also probably needs to be informed for an error of this type.
-enum PsiCashTransactionMismatchError: HashableError {
-    /// Insufficient balance to make the transaction.
-    case insufficientBalance
-    /// Client has out of date purchase price.
-    case transactionAmountMismatch
-    /// Client has out of date product list.
-    case transactionTypeNotFound
-    /// There exists a transaction for the purchase class specified.
-    case existingTransaction
-}
-
-public struct PsiCashPurchaseResult: Equatable {
-    public let purchasable: PsiCashPurchasableType
-    public let refreshedLibData: PsiCashLibData
-    public let result: Result<PsiCashPurchasedType, ErrorEvent<PsiCashPurchaseResponseError>>
+public enum PsiCashRequestError<ErrorStatus>: HashableError where
+    ErrorStatus: PsiCashErrorStatusProtocol {
     
-    public init (
-        purchasable: PsiCashPurchasableType,
-        refreshedLibData: PsiCashLibData,
-        result: Result<PsiCashPurchasedType, ErrorEvent<PsiCashPurchaseResponseError>>
-    ) {
-        self.purchasable = purchasable
-        self.refreshedLibData = refreshedLibData
-        self.result = result
-    }
+    /// Request was submitted successfully, but returned an error status.
+    case errorStatus(ErrorStatus)
     
+    /// Sending the request failed utterly.
+    case requestFailed(PsiCashLibError)
 }
 
-extension PsiCashPurchaseResult {
-
-    var shouldRetry: Bool {
-        guard case let .failure(errorEvent) = self.result else {
-            return false
-        }
-        switch errorEvent.error {
-        case .tunnelNotConnected: return false
-        case .parseError(_): return false
-        case let .serverError(_, retry, _):
-            return retry
-        }
-    }
-
+/// Represents a PsiCash client library produced request error, along with the an additional
+/// `.tunnelNotConnected` error case.
+public enum TunneledPsiCashRequestError<RequestError: HashableError>: HashableError {
+    /// Request was not sent since tunnel was not connected.
+    case tunnelNotConnected
+    
+    case requestError(RequestError)
 }
+
+/// Represents error values of a PsiCash library refresh action.
+/// Errors generated by the app are not represented here e.g. a tunnel not connected error.
+public typealias PsiCashRefreshError = PsiCashRequestError<PsiCashRefreshErrorStatus>
+
+/// Represents error values of a PsiCash library new expiring purchase action.
+/// Errors generated by the app are not represented here e.g. a tunnel not connected error.
+public typealias PsiCashNewExpiringPurchaseError =
+    PsiCashRequestError<PsiCashNewExpiringPurchaseErrorStatus>
+
+/// Represents error values of a PsiCash library account login action.
+/// Errors generated by the app are not represented here e.g. a tunnel not connected error.
+public typealias PsiCashAccountLoginError =
+    PsiCashRequestError<PsiCashAccountLoginErrorStatus>
+
 
 public struct PsiCashBalance: Equatable {
 
-    public enum BalanceIncreaseExpectationReason: String, CaseIterable {
+    public enum BalanceOutOfDateReason: String, CaseIterable {
         case watchedRewardedVideo
         case purchasedPsiCash
+        case otherBalanceUpdateError
     }
     
-    public private(set) var pendingExpectedBalanceIncrease: BalanceIncreaseExpectationReason?
+    public private(set) var balanceOutOfDateReason: BalanceOutOfDateReason?
     
     /// Balance with expected reward amount added.
     /// - Note: This value is either equal to `PsiCashLibData.balance`, or higher if there is expected reward amount.
@@ -218,10 +209,10 @@ public struct PsiCashBalance: Equatable {
     /// PsiCash balance as of last PsiCash refresh state.
     public private(set) var lastRefreshBalance: PsiCashAmount
     
-    public init(pendingExpectedBalanceIncrease: BalanceIncreaseExpectationReason?,
+    public init(balanceOutOfDateReason: BalanceOutOfDateReason?,
          optimisticBalance: PsiCashAmount,
          lastRefreshBalance: PsiCashAmount) {
-        self.pendingExpectedBalanceIncrease = pendingExpectedBalanceIncrease
+        self.balanceOutOfDateReason = balanceOutOfDateReason
         self.optimisticBalance = optimisticBalance
         self.lastRefreshBalance = lastRefreshBalance
     }
@@ -231,7 +222,7 @@ public struct PsiCashBalance: Equatable {
 extension PsiCashBalance {
     
     public init() {
-        pendingExpectedBalanceIncrease = .none
+        balanceOutOfDateReason = .none
         optimisticBalance = .zero
         lastRefreshBalance = .zero
     }
@@ -241,28 +232,32 @@ extension PsiCashBalance {
 extension PsiCashBalance {
     
     public mutating func waitingForExpectedIncrease(
-        withAddedReward addedReward: PsiCashAmount, reason: BalanceIncreaseExpectationReason,
+        withAddedReward addedReward: PsiCashAmount, reason: BalanceOutOfDateReason,
         persisted: PsiCashPersistedValues
     ) {
-        pendingExpectedBalanceIncrease = reason
+        self.balanceOutOfDateReason = reason
         if addedReward > .zero {
             let totalExpectedReward = persisted.expectedPsiCashReward + addedReward
             persisted.setExpectedPsiCashReward(totalExpectedReward)
-            optimisticBalance = lastRefreshBalance + totalExpectedReward
+            self.optimisticBalance = self.lastRefreshBalance + totalExpectedReward
         }
+    }
+    
+    public mutating func balanceOutOfDate(reason: BalanceOutOfDateReason) {
+        self.balanceOutOfDateReason = reason
     }
     
     public static func fromStoredExpectedReward(
         libData: PsiCashLibData, persisted: PsiCashPersistedValues
     ) -> Self {
         let adReward = persisted.expectedPsiCashReward
-        let reason: BalanceIncreaseExpectationReason?
+        let reason: BalanceOutOfDateReason?
         if adReward.isZero {
             reason = .none
         } else {
             reason = .watchedRewardedVideo
         }
-        return .init(pendingExpectedBalanceIncrease: reason,
+        return .init(balanceOutOfDateReason: reason,
                      optimisticBalance: libData.balance + adReward,
                      lastRefreshBalance: libData.balance)
     }
@@ -271,18 +266,9 @@ extension PsiCashBalance {
         refreshedData libData: PsiCashLibData, persisted: PsiCashPersistedValues
     ) -> Self {
         persisted.setExpectedPsiCashReward(.zero)
-        return .init(pendingExpectedBalanceIncrease: .none,
+        return .init(balanceOutOfDateReason: .none,
                      optimisticBalance: libData.balance,
                      lastRefreshBalance: libData.balance)
     }
 
-}
-
-extension PsiCashAuthPackage {
-    
-    /// true if the user has minimal tokens for the PsiCash features to function.
-    public var hasMinimalTokens: Bool {
-        hasSpenderToken && hasIndicatorToken
-    }
-    
 }

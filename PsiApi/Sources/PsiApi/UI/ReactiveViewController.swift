@@ -17,7 +17,7 @@
  *
  */
 
-#if !os(macOS)
+#if os(iOS)
 
 import Foundation
 import UIKit
@@ -80,18 +80,46 @@ extension ViewControllerLifeCycle {
         viewWillDisappear || viewDidDisappear
     }
     
+    /// Returns true while the view controller life cycle is somewhere between
+    /// `viewDidLoad` and `viewDidAppear` (inclusive).
+    public var viewDidLoadOrAppeared: Bool {
+        viewDidLoad || viewWillAppear || viewDidAppear
+    }
+    
 }
 
 /// ReactiveViewController makes the values of UIViewController lifecycle calls available in a stream
 /// and also buffers the last value.
 open class ReactiveViewController: UIViewController {
     
+    /// The time at which this view controller's `viewDidLoad` got called.
+    /// Value is nil beforehand.
+    public private(set) var viewControllerDidLoadDate: Date?
+    
     /// Value of the last UIViewController lifecycle call. The property wrapper provides
     /// an interface to obtain a stream of UIViewController lifecycle call values, which starts
     /// with the current value of this variable.
     @State public private(set) var lifeCycle: ViewControllerLifeCycle = .initing
     
+    /// Set of presented error alerts.
+    /// Note: Once an error alert has been dismissed by the user, it will be removed from the set.
+    private(set) var errorAlerts = Set<ErrorEvent<ErrorRepr>>()
+    
+    private let onDismiss: () -> Void
+    
+    /// - Parameter onDismiss: Called once after the view controller is either dismissed.
+    public init(onDismiss: @escaping () -> Void) {
+        self.onDismiss = onDismiss
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     open override func viewDidLoad() {
+        self.viewControllerDidLoadDate = Date()
         super.viewDidLoad()
         lifeCycle = .viewDidLoad
     }
@@ -114,16 +142,20 @@ open class ReactiveViewController: UIViewController {
     open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         lifeCycle = .viewDidDisappear(animated: animated)
+        onDismiss()
     }
     
+    /// Presents `viewControllerToPresent` only after `viewDidAppear(_:)` has been called
+    /// on this view controller.
     public func presentOnViewDidAppear(
         _ viewControllerToPresent: UIViewController,
         animated flag: Bool,
         completion: (() -> Void)? = nil
     ) {
-        
         self.$lifeCycle.signalProducer
-            .filter{ $0.viewDidAppear }.take(first: 1).startWithValues { [weak self] _ in
+            .filter{ $0.viewDidAppear }
+            .take(first: 1)
+            .startWithValues { [weak self] _ in
                 guard let self = self else {
                     return
                 }
@@ -132,6 +164,40 @@ open class ReactiveViewController: UIViewController {
                 }
                 self.present(viewControllerToPresent, animated: flag, completion: completion)
             }
+    }
+    
+}
+
+extension ReactiveViewController {
+    
+    /// Display error alert if `errorEvent` is a unique alert not contained in `self.errorAlerts`, and
+    /// the error event `.date` is not before the init date of
+    /// the view controller `viewControllerDidLoadDate`.
+    /// Only if the error is unique `makeAlertController` is called for creating the alert controller.
+    public func display(errorEvent: ErrorEvent<ErrorRepr>,
+                        makeAlertController: @autoclosure () -> UIAlertController) {
+        
+        guard let viewDidLoadDate = self.viewControllerDidLoadDate else {
+            return
+        }
+        
+        // Displays errors that have been emitted after the init date of the view controller.
+        guard errorEvent.date > viewDidLoadDate else {
+            return
+        }
+        
+        // Inserts `errorDesc` into `errorAlerts` set.
+        // If a member of `errorAlerts` is equal to `errorDesc.event.error`, then
+        // that member is removed and `errorDesc` is inserted.
+        let inserted = self.errorAlerts.insert(orReplaceIfEqual: \.error, errorEvent)
+        
+        // Prevent display of the same error event.
+        guard inserted else {
+            return
+        }
+        
+        let alertController = makeAlertController()
+        self.presentOnViewDidAppear(alertController, animated: true, completion: nil)
     }
     
 }

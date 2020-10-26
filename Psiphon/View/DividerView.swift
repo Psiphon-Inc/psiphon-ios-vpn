@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2019, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,24 +17,21 @@
  *
  */
 
-//
-//  PurchasePrice.h
-//  PsiCashLib
-//
+import Foundation
 
-#ifndef PurchasePrice_h
-#define PurchasePrice_h
-
-#import <Foundation/Foundation.h>
-
-
-@interface PsiCashPurchasePrice : NSObject <NSCoding>
-@property NSString*_Nonnull transactionClass;
-@property NSString*_Nonnull distinguisher;
-@property NSNumber*_Nonnull price;
-
-- (NSDictionary<NSString*,NSObject*>*_Nonnull)toDictionary;
-@end
-
-
-#endif /* PurchasePrice_h */
+final class DividerView: UIView {
+    
+    init(colour: UIColor) {
+        super.init(frame: .zero)
+        backgroundColor = colour
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override var intrinsicContentSize: CGSize {
+        return CGSize(width: UIView.noIntrinsicMetric, height: 1)
+    }
+    
+}
