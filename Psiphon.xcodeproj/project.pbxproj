@@ -381,6 +381,7 @@
 		3BBB25EFC24AA94133DA2104 /* Pods-PsiApi-Utilities-UtilitiesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Utilities-UtilitiesTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Utilities-UtilitiesTests/Pods-PsiApi-Utilities-UtilitiesTests.debug.xcconfig"; sourceTree = "<group>"; };
 		3E7745DBA0A65C097BB74EB5 /* Pods-Testing.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testing.release.xcconfig"; path = "Pods/Target Support Files/Pods-Testing/Pods-Testing.release.xcconfig"; sourceTree = "<group>"; };
 		3EEE97DA12A99CDA3F3DA635 /* Pods-Psiphon-Testing.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Testing.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Testing/Pods-Psiphon-Testing.debug.xcconfig"; sourceTree = "<group>"; };
+		430CDF3D70D9DCA03387EFBE /* Pods-PsiphonVPN.devrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.devrelease.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.devrelease.xcconfig"; sourceTree = "<group>"; };
 		440D75BD1F59E041005C603B /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		4435CC251F70566000F3A809 /* SettingsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SettingsViewController.h; sourceTree = "<group>"; };
 		4435CC261F70566000F3A809 /* SettingsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SettingsViewController.m; sourceTree = "<group>"; };
@@ -450,6 +451,7 @@
 		445F24F220E1A85C00D004E9 /* IA5String.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = IA5String.c; sourceTree = "<group>"; };
 		445F24F320E1A85C00D004E9 /* UTF8String.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = UTF8String.c; sourceTree = "<group>"; };
 		445F24F420E1A85C00D004E9 /* IA5String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IA5String.h; sourceTree = "<group>"; };
+		473176E0E92FDF7B9DD30F1E /* Pods-Psiphon.devrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.devrelease.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.devrelease.xcconfig"; sourceTree = "<group>"; };
 		4969BEF6E56CA5C8402749D0 /* Pods-PsiApi-Utilities.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Utilities.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Utilities/Pods-PsiApi-Utilities.release.xcconfig"; sourceTree = "<group>"; };
 		49886790EED7F2868C4610A7 /* Pods-Psiphon-PsiApi-PsiApiTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi-PsiApiTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi-PsiApiTests/Pods-Psiphon-PsiApi-PsiApiTests.debug.xcconfig"; sourceTree = "<group>"; };
 		4E0774951F566ADA0097BC8C /* InAppSettings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = InAppSettings.bundle; sourceTree = "<group>"; };
@@ -527,6 +529,7 @@
 		52DF5E9D23D0D01F00A1B067 /* BridgingTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgingTypes.swift; sourceTree = "<group>"; };
 		548DC13880329CCB9E0CD4B2 /* libPods-PsiApi.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiApi.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
+		5A3C99559CAE18924C378029 /* Pods-PsiphonVPN.internal.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.internal.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.internal.xcconfig"; sourceTree = "<group>"; };
 		657B68F7581AB2C5DFB33758 /* Pods-PsiApi-Testing-TestingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-TestingTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-TestingTests/Pods-PsiApi-Testing-TestingTests.release.xcconfig"; sourceTree = "<group>"; };
 		65957584722BB1AA6B3B4825 /* Pods-PsiApi.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi/Pods-PsiApi.release.xcconfig"; sourceTree = "<group>"; };
 		66094F781E8067520069EC4E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
@@ -565,6 +568,7 @@
 		6651BE051F6B177000D65633 /* my */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = my; path = Strings/my.lproj/Localizable.strings; sourceTree = "<group>"; };
 		668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		672D77B7307F9CEE82EECCCC /* Pods-PsiApi.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi/Pods-PsiApi.debug.xcconfig"; sourceTree = "<group>"; };
+		680755F1F7E5C4803F90D63C /* Pods-Psiphon.internal.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.internal.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.internal.xcconfig"; sourceTree = "<group>"; };
 		6EFA35869537D7B410191321 /* libPods-Utilities.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Utilities.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7498D20B47C34B9D33BE95E4 /* Pods-PsiApi-Testing-TestingTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-TestingTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-TestingTests/Pods-PsiApi-Testing-TestingTests.debug.xcconfig"; sourceTree = "<group>"; };
 		78C6298EAA632CD41F06795D /* Pods-Utilities.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Utilities.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Utilities/Pods-Utilities.debug.xcconfig"; sourceTree = "<group>"; };
@@ -1671,6 +1675,10 @@
 				E61DE98A991FFAF35BA880D9 /* Pods-PsiApi-Testing-Utilities-UtilitiesTests.release.xcconfig */,
 				BB07747B8DB3415288C426A9 /* Pods-Psiphon-PsiphonTests.debug.xcconfig */,
 				836B78D735F8B947A373FB00 /* Pods-Psiphon-PsiphonTests.release.xcconfig */,
+				680755F1F7E5C4803F90D63C /* Pods-Psiphon.internal.xcconfig */,
+				5A3C99559CAE18924C378029 /* Pods-PsiphonVPN.internal.xcconfig */,
+				473176E0E92FDF7B9DD30F1E /* Pods-Psiphon.devrelease.xcconfig */,
+				430CDF3D70D9DCA03387EFBE /* Pods-PsiphonVPN.devrelease.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -2427,6 +2435,197 @@
 			};
 			name = Release;
 		};
+		528D83962548C48600C6C78B /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = DevRelease;
+		};
+		528D83972548C48600C6C78B /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 473176E0E92FDF7B9DD30F1E /* Pods-Psiphon.devrelease.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 190;
+				DEFINES_MODULE = NO;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"COCOAPODS=1",
+					"TARGET_IS_CONTAINER=1",
+				);
+				INFOPLIST_FILE = Psiphon/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_SWIFT_FLAGS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.Psiphon;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				STRIP_BITCODE_FROM_COPIED_FILES = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEV_RELEASE;
+				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon/Psiphon-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				USER_HEADER_SEARCH_PATHS = (
+					"\"${PROJECT_DIR}/Pods\"/**",
+					"${PROJECT_DIR}/Psiphon/asn1c",
+				);
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = DevRelease;
+		};
+		528D83982548C48600C6C78B /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 430CDF3D70D9DCA03387EFBE /* Pods-PsiphonVPN.devrelease.xcconfig */;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = PsiphonVPN/PsiphonVPN.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"COCOAPODS=1",
+					"TARGET_IS_EXTENSION=1",
+				);
+				INFOPLIST_FILE = PsiphonVPN/Info.plist;
+				LD_NO_PIE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.Psiphon.PsiphonVPN;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				STRIP_BITCODE_FROM_COPIED_FILES = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
+			};
+			name = DevRelease;
+		};
+		528D83992548C48600C6C78B /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_PREPROCESSOR_DEFINITIONS = "TARGET_IS_TEST=1";
+				INFOPLIST_FILE = PsiphonTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.PsiphonTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = DevRelease;
+		};
+		528D839A2548C48600C6C78B /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = PsiphonUITests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.PsiphonUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Psiphon;
+			};
+			name = DevRelease;
+		};
 		CE26FC9A1BBDC7B800B83375 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -2575,6 +2774,7 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRIP_BITCODE_FROM_COPIED_FILES = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon/Psiphon-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -2618,6 +2818,7 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRIP_BITCODE_FROM_COPIED_FILES = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon/Psiphon-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				USER_HEADER_SEARCH_PATHS = (
@@ -2771,6 +2972,7 @@
 			buildConfigurations = (
 				4E0D88281FA06B2400ADB61E /* Debug */,
 				4E0D88291FA06B2400ADB61E /* Release */,
+				528D839A2548C48600C6C78B /* DevRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2780,6 +2982,7 @@
 			buildConfigurations = (
 				CE26FC9A1BBDC7B800B83375 /* Debug */,
 				CE26FC9B1BBDC7B800B83375 /* Release */,
+				528D83962548C48600C6C78B /* DevRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2789,6 +2992,7 @@
 			buildConfigurations = (
 				CE26FC9D1BBDC7B800B83375 /* Debug */,
 				CE26FC9E1BBDC7B800B83375 /* Release */,
+				528D83972548C48600C6C78B /* DevRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2798,6 +3002,7 @@
 			buildConfigurations = (
 				CE26FCAE1BBDC85900B83375 /* Debug */,
 				CE26FCAF1BBDC85900B83375 /* Release */,
+				528D83982548C48600C6C78B /* DevRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2807,6 +3012,7 @@
 			buildConfigurations = (
 				CEA1B780249AA9A0006D9853 /* Debug */,
 				CEA1B781249AA9A0006D9853 /* Release */,
+				528D83992548C48600C6C78B /* DevRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
