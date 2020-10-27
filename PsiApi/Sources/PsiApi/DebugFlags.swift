@@ -34,7 +34,7 @@ public struct DebugFlags {
     
     public var printStoreLogs = false
     public var printAppState = false
-    public var printHttpRequests = true
+    public var printHttpRequests = false
     
     public static func disabled() -> Self {
         return .init(mainThreadChecks: false,
