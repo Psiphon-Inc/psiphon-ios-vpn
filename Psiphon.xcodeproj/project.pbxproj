@@ -2507,6 +2507,7 @@
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
+					"DEV_RELEASE=1",
 					"COCOAPODS=1",
 					"TARGET_IS_CONTAINER=1",
 				);
@@ -2545,6 +2546,7 @@
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
+					"DEV_RELEASE=1",
 					"COCOAPODS=1",
 					"TARGET_IS_EXTENSION=1",
 				);
