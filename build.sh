@@ -1,4 +1,5 @@
-#
+#!/bin/bash
+
 # Copyright (c) 2017, Psiphon Inc.
 # All rights reserved.
 #
@@ -15,20 +16,19 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-#!/bin/bash -u -e
+set -ue
 
 BASE_DIR=$(cd "$(dirname "$0")" ; pwd -P)
 
 usage () {
-    echo " Usage: ${0} <release|testflight|internal>"
+    echo " Usage: ${0} <release|dev-release|debug> [--dry-run]"
     echo ""
     echo " This script can be used to create various Psiphon iOS VPN builds for different distribution platforms. I.E. app store, testflight and internal testing."
     exit 1
 }
 
 setup_env () {
-    cd ${BASE_DIR}
+    cd "${BASE_DIR}"
 
     PSIPHON_IOS_VPN_XCODE_WORKSPACE="${BASE_DIR}"
 
@@ -49,13 +49,14 @@ build () {
     pod install --repo-update
 
     # Build
-    xcodebuild -workspace "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/Psiphon.xcworkspace" -scheme Psiphon -sdk iphoneos -configuration "${CONFIGURATION}" archive -archivePath "${BUILD_DIR}/Psiphon.xcarchive"
-    if [[ $? != 0 ]]; then
+    if ! xcodebuild -workspace "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/Psiphon.xcworkspace" -scheme Psiphon -sdk iphoneos -configuration "${CONFIGURATION}" archive -archivePath "${BUILD_DIR}/Psiphon.xcarchive";
+    then
         echo "xcodebuild failed. Failed to create Psiphon.xcarchive, aborting..."
         exit 1
     fi
-    xcodebuild -exportArchive -archivePath "${BUILD_DIR}/Psiphon.xcarchive" -exportOptionsPlist "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/${EXPORT_OPTIONS_PLIST}" -exportPath "${BUILD_DIR}"
-    if [[ $? != 0 ]]; then
+    
+    if ! xcodebuild -exportArchive -archivePath "${BUILD_DIR}/Psiphon.xcarchive" -exportOptionsPlist "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/${EXPORT_OPTIONS_PLIST}" -exportPath "${BUILD_DIR}";
+    then
         echo "xcodebuild failed. Failed to export Psiphon.xcarchive, aborting..."
         exit 1
     fi
@@ -64,36 +65,45 @@ build () {
     # artifact that is invalid to use in an App Store app. Instead, we will zip the
     # resulting build and use that as the artifact.
     cd "${BUILD_DIR}"
-    zip --recurse-paths --symlinks build.zip * --exclude "*.DS_Store"
+    zip --recurse-paths --symlinks build.zip ./* --exclude "*.DS_Store"
 
     echo "BUILD DONE"
 }
 
-inc_vers_and_commit () {
-    python inc_vers.py --$1
-}
-
 upload_ipa () {
     echo "Validating exported ipa..."
-    xcrun altool --validate-app -t ios -f "${BUILD_DIR}/Psiphon.ipa" -u "${ITUNES_CONNECT_USERNAME}" -p "${ITUNES_CONNECT_PASSWORD}"
-    if [[ $? != 0 ]]; then
+    if ! xcrun altool --validate-app -t ios -f "${BUILD_DIR}/Psiphon.ipa" -u "${ITUNES_CONNECT_USERNAME}" -p "${ITUNES_CONNECT_PASSWORD}";
+    then
         echo "Psiphon.ipa failed validation, aborting..."
         exit 1
     fi
 
     echo "Uploading validated ipa to TestFlight..."
-    xcrun altool --upload-app -t ios -f "${BUILD_DIR}/Psiphon.ipa" -u "${ITUNES_CONNECT_USERNAME}" -p "${ITUNES_CONNECT_PASSWORD}"
-    if [[ $? != 0 ]]; then
+    if ! xcrun altool --upload-app -t ios -f "${BUILD_DIR}/Psiphon.ipa" -u "${ITUNES_CONNECT_USERNAME}" -p "${ITUNES_CONNECT_PASSWORD}";
+    then
         echo "Failed to upload Psiphon.ipa, aborting..."
         exit 1
     fi
 }
 
-if [ $# -ne 1 ]; then
-    usage
+# If $1 is unset or null, prints usage.
+# More information on parameter expansion: https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html#tag_18_06_02
+if [ -z "${1:-}" ]; then
+    usage 
 fi
 
-TARGET_DISTRIBUTION_PLATFORM=$1
+TARGET_DISTRIBUTION_PLATFORM="$1"
+
+# if $2 is unset or null, sets DRY_RUN to false,
+# otherwise if it is set to "--dry-run", sets DRY_RUN to true,
+# otherwise it is incorrect usage.
+if [ -z "${2:-}" ]; then
+    DRY_RUN=false
+elif [ "$2" = "--dry-run" ]; then
+    DRY_RUN=true
+else
+    usage
+fi
 
 # Option parsing
 case $TARGET_DISTRIBUTION_PLATFORM in
@@ -101,19 +111,25 @@ case $TARGET_DISTRIBUTION_PLATFORM in
         CONFIGURATION="Release"
         EXPORT_OPTIONS_PLIST="exportAppStoreOptions.plist"
         setup_env
-        inc_vers_and_commit release
         build
-        upload_ipa
+
+        if [ "$DRY_RUN" = false ]; then
+            upload_ipa
+        fi
+
         ;;
-    testflight)
-        CONFIGURATION="Release"
+    dev-release)
+        CONFIGURATION="DevRelease"
         EXPORT_OPTIONS_PLIST="exportAppStoreOptions.plist"
         setup_env
-        inc_vers_and_commit testflight
         build
-        upload_ipa
+
+        if [ "$DRY_RUN" = false ]; then
+            upload_ipa
+        fi
+
         ;;
-    internal)
+    debug)
         CONFIGURATION="Debug"
         EXPORT_OPTIONS_PLIST="exportDevelopmentOptions.plist"
         setup_env
