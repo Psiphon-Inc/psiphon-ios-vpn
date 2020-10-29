@@ -20,7 +20,7 @@ set -ue
 
 
 usage () {
-    echo " Usage: ${0} <none|patch|minor|major> [upstram-branch]"
+    echo " Usage: ${0} <none|patch|minor|major> [upstream-branch]"
     echo ""
     echo " Bumps build number and version number based on bump type, commiting the changes." 
     echo " If bump type"
@@ -37,7 +37,7 @@ guard_cmd_exists() {
     fi
 }
 
-guard_main_branch_checkout_out() {
+guard_main_branch_checked_out() {
     # Guards main ("master") branch is checked out.
     ACTIVE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
     if [ "$ACTIVE_BRANCH" != "master" ];then
@@ -84,7 +84,7 @@ esac
 UPSTREAM=${2:-'@{u}'}
 
 # Ensure main branch is checked out.
-guard_main_branch_checkout_out
+guard_main_branch_checked_out
 
 # Ensure there are no uncommitted changes (excluding untracked files).
 guard_against_uncommitted_changes
