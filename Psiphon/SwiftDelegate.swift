@@ -210,6 +210,17 @@ func appDelegateReducer(
     private var psiCashLib: PsiCash!
     private var environmentCleanup: (() -> Void)?
     
+    // Should be called early in the application lifecycle.
+    @objc static func setupDebugFlags() {
+        #if DEBUG
+        Debugging = DebugFlags(buildConfig: .debug)
+        #elseif DEV_RELEASE
+        Debugging = DebugFlags(buildConfig: .devRelease)
+        #else
+        Debugging = DebugFlags.disabled(buildConfig: .release)
+        #endif
+    }
+
 }
 
 // MARK: Bridge API
@@ -333,6 +344,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         launchOptions: [UIApplication.LaunchOptionsKey : Any]?,
         objcBridge: ObjCBridgeDelegate
     ) -> Bool {
+
+        print("Build Configuration: '\(String(describing: Debugging.buildConfig))'")
+
         self.objcBridge = objcBridge
         
         // Updates appForegroundState that is shared with the extension.

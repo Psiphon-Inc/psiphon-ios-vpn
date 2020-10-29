@@ -17,33 +17,68 @@
 *
 */
 
-import Foundation
-
-#if DEBUG
-public var Debugging = DebugFlags()
-#else
-public var Debugging = DebugFlags.disabled()
-#endif
+// This is a hack.
+// SWIFT_ACTIVE_COMPILATION_CONDITIONS defined in the Xcode project
+// is only applied to the app target 'Psiphon'.
+// Compilation conditions can be defined for each target in this framework's `Package.swift`
+// file, however there seems to be no way to pass along conditions defined in
+// SWIFT_ACTIVE_COMPILATION_CONDITIONS in the xcodeproj file.
+// Another options is to explicitly pass some kind of environment variable in all places
+// where `Debugging` is used. However, the cost seems to outweight the benefits at this point.
+public var Debugging: DebugFlags! = nil
 
 public struct DebugFlags {
-    public var mainThreadChecks = true
-    public var disableURLHandler = false
-    public var devServers = true
-    public var ignoreTunneledChecks = false
-    public var disableConnectOnDemand = false
+
+    public enum BuildConfig: String {
+        case debug = "Debug"
+        case devRelease = "DevRelease"
+        case release = "Release"
+    }
+
+    public var buildConfig: BuildConfig
+    public var mainThreadChecks: Bool
+    public var disableURLHandler: Bool
+    public var devServers: Bool
+    public var ignoreTunneledChecks: Bool
+    public var disableConnectOnDemand: Bool
     
-    public var printStoreLogs = false
-    public var printAppState = false
-    public var printHttpRequests = true
+    public var printStoreLogs: Bool
+    public var printAppState: Bool
+    public var printHttpRequests: Bool
+
+    public init(
+        buildConfig: DebugFlags.BuildConfig,
+        mainThreadChecks: Bool = true,
+        disableURLHandler: Bool = false,
+        devServers: Bool = true,
+        ignoreTunneledChecks: Bool = false,
+        disableConnectOnDemand: Bool = false,
+        printStoreLogs: Bool = false,
+        printAppState: Bool = false,
+        printHttpRequests: Bool = false
+    ) {
+        self.buildConfig = buildConfig
+        self.mainThreadChecks = mainThreadChecks
+        self.disableURLHandler = disableURLHandler
+        self.devServers = devServers
+        self.ignoreTunneledChecks = ignoreTunneledChecks
+        self.disableConnectOnDemand = disableConnectOnDemand
+        self.printStoreLogs = printStoreLogs
+        self.printAppState = printAppState
+        self.printHttpRequests = printHttpRequests
+    }
     
-    public static func disabled() -> Self {
-        return .init(mainThreadChecks: false,
-                     disableURLHandler: false,
-                     devServers: false,
-                     ignoreTunneledChecks: false,
-                     disableConnectOnDemand: false,
-                     printStoreLogs: false,
-                     printAppState: false,
-                     printHttpRequests: false)
+    public static func disabled(buildConfig: BuildConfig) -> Self {
+        .init(
+            buildConfig: buildConfig,
+            mainThreadChecks: false,
+            disableURLHandler: false,
+            devServers: false,
+            ignoreTunneledChecks: false,
+            disableConnectOnDemand: false,
+            printStoreLogs: false,
+            printAppState: false,
+            printHttpRequests: false
+        )
     }
 }
