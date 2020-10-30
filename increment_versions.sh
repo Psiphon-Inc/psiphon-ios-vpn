@@ -20,12 +20,16 @@ set -ue
 
 
 usage () {
-    echo " Usage: ${0} <none|patch|minor|major> [upstream-branch]"
+    echo " Usage: ${0} <none|patch|minor|major> [--dry-run]"
     echo ""
-    echo " Bumps build number and version number based on bump type, commiting the changes." 
-    echo " If bump type"
-    echo " e.g.: '${0} none' increments build number only without changing version number."
-    echo " e.g.: '${0} minor upstream/master' increments build number and minor version number, using 'upstream/mater' as the upstream branch."
+    echo " Automatically increments build number and version number based on"
+    echo "  the lastest git tag at 'github.com/Psiphon-Inc/psiphon-ios-vpn.git.'"
+    echo "  e.g.: '${0} none' increments build number only without changing version number."
+    echo "  e.g.: '${0} minor' increments build number and minor version number."
+    echo ""
+    echo " You can  also manually set versions with:"
+    echo " '$ fastlane run increment_build_number build_number:\"<build_number>\"'"
+    echo " '$ fastlane run increment_version_number version_number:\"<version_number>\"'"
     exit 1
 }
 
@@ -33,15 +37,6 @@ guard_cmd_exists() {
     if ! command -v "$1" &> /dev/null
     then
         echo " ${1} could not be found"
-        exit 1
-    fi
-}
-
-guard_main_branch_checked_out() {
-    # Guards main ("master") branch is checked out.
-    ACTIVE_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-    if [ "$ACTIVE_BRANCH" != "master" ];then
-        echo " Script should be called from the main branch. Called on '$ACTIVE_BRANCH'."
         exit 1
     fi
 }
@@ -57,11 +52,96 @@ guard_against_uncommitted_changes() {
     fi
 }
 
+# Returns latest git tag (sorted by "creatordate") from "github.com/Psiphon-Inc/psiphon-ios-vpn.git".
+# e.g.: "refs/tags/190v1.0.53"
+get_psiphon_ios_vpn_main_repo_last_tag () {
+    # `git ls-remote` (https://git-scm.com/docs/git-ls-remote.html)
+    # lists tags present in the given repository, and sorts them by "-creatordate" (reversed order).
+    # 
+    # Output is something like:
+    #  381a4abfd0b19f3169f1ffbfed04213ebce4648c  refs/tags/190v1.0.53
+    #  2484062b691251b45081405e030bcac9dd765c08  refs/tags/189v1.0.52
+    # 
+    # `head -n1 | cut -f2` will return "refs/tags/190v1.0.53" from the output above.
+    git ls-remote --refs --sort="-creatordate" --tags "git@github.com:Psiphon-Inc/psiphon-ios-vpn.git" | 
+    head -n1 | 
+    cut -f2
+}
+
+# From: https://github.com/cloudflare/semver_bash
+semver_parse_into () {
+    local _RE='[^0-9]*\([0-9]*\)[.]\([0-9]*\)[.]\([0-9]*\)\([0-9A-Za-z-]*\)'
+    #MAJOR
+    eval "$2=$(echo "$1" | sed -e "s#$_RE#\1#")"
+    #MINOR
+    eval "$3=$(echo "$1" | sed -e "s#$_RE#\2#")"
+    #MINORs
+    eval "$4=$(echo "$1" | sed -e "s#$_RE#\3#")"
+    #SPECIAL
+    eval "$5=$(echo "$1" | sed -e "s#$_RE#\4#")"
+}
+
+# Parses build number and version of type used in psiphon-ios-vpn git tags.
+#
+# Example usage for parsing "refs/tags/190v1.0.53":
+# ```
+# BUILD_NUM=0
+# VERSION_NUM=""
+# parse_git_tag_versions_into "refs/tags/190v1.0.53" BUILD_NUM VERSION_NUM
+# ```
+parse_git_tag_versions_into () {
+    
+    # Expects $1 to be like: "refs/tags/190v1.0.53"
+    # Sets TAG to "190v1.0.53"
+    local _TAG
+    _TAG=$(echo "$1" | sed 's/^refs\/tags\///')
+
+    # Gets build number from $TAG: "190v1.0.53" -> "190"
+    local _BUILD_NUM
+    _BUILD_NUM=$(echo "$_TAG" | sed 's/^\([0-9]*\).*/\1/')
+
+    # Gets version number from $TAG: "190v1.0.53" -> "1.0.53"
+    local _VERSION_NUM
+    _VERSION_NUM=$(echo "$_TAG" | sed 's/[0-9]*v\(.*\)/\1/')
+
+    eval "$2=$_BUILD_NUM"
+    eval "$3=$_VERSION_NUM"
+}
+
+increment_version_number_into() {
+    local _MAJOR=0
+    local _MINOR=0
+    local _PATCH=0
+    local _SPECIAL=""
+
+    # Parses semver $1 into it's parts.
+    semver_parse_into "$1" _MAJOR _MINOR _PATCH _SPECIAL
+
+    case $2 in
+        patch)
+            _PATCH=$((_PATCH + 1))
+            ;;
+        minor)
+            _MINOR=$((_MINOR + 1))
+            ;;
+        major)
+            _MAJOR=$((_MAJOR + 1))
+            ;;
+        *)
+            echo "Incorrect case '${2}'"
+            usage
+            ;;
+    esac
+
+    eval "$3=${_MAJOR}.${_MINOR}.${_PATCH}${_SPECIAL}"
+}
+
 # Guards all required commands exist.
 guard_cmd_exists git
-guard_cmd_exists agvtool
 guard_cmd_exists fastlane
 
+# Parses $1 (version number bump type).
+BUMP_TYPE=""
 case "${1:-}" in
     none)
         BUMP_TYPE="none"
@@ -80,55 +160,47 @@ case "${1:-}" in
         ;;
 esac
 
-# Sets UPSTREAM to $2 if set, otherwise sets value to "@{u}".
-UPSTREAM=${2:-'@{u}'}
-
-# Ensure main branch is checked out.
-guard_main_branch_checked_out
+# if $2 is unset or null, sets DRY_RUN to false,
+# otherwise if it is set to "--dry-run", sets DRY_RUN to true,
+# otherwise it is incorrect usage.
+if [ -z "${2:-}" ]; then
+    DRY_RUN=false
+elif [ "$2" = "--dry-run" ]; then
+    DRY_RUN=true
+else
+    usage
+fi
 
 # Ensure there are no uncommitted changes (excluding untracked files).
 guard_against_uncommitted_changes
 
-# Fetches upstream
-git fetch
+# Gets latest tag. (e.g. "refs/tags/190v1.0.53").
+GIT_REF_TAG=$(get_psiphon_ios_vpn_main_repo_last_tag)
+echo " Git ref tag '${GIT_REF_TAG}'"
 
-# Checks if checked-out branch is even with the upstream branch.
-# This is to try to guarantee that local branch is even with main upstream branch.
-# Solution is inspired by this answer: https://stackoverflow.com/a/3278427
-LOCAL=$(git rev-parse @);
-REMOTE=$(git rev-parse "$UPSTREAM");
-BASE=$(git merge-base @ "$UPSTREAM");
+# Parses #GIT_REF_TAG for build number, and version number
+# and sets $BUILD_NUM and $VERSION_NUM.
+#
+BUILD_NUM=0
+VERSION_NUM=""
+parse_git_tag_versions_into "$GIT_REF_TAG" BUILD_NUM VERSION_NUM
+echo " Parsed build number: $BUILD_NUM"
+echo " Parsed version number: $VERSION_NUM"
+echo ""
 
-if [ "$LOCAL" = "$REMOTE" ]; then
-    echo " This branch is even with upstream"
+# Evalutates incremented build number.
+INCREMENTED_BUILD_NUM=$((BUILD_NUM + 1))
+echo " Incremented build number: ${INCREMENTED_BUILD_NUM}"
 
-    # Always increments build number
-    echo " Incrementing build number..."
-    fastlane run increment_build_number
+# Evalutates incremented version number, if $BUMP_TYPE is not "none".
+INCREMENTED_VERSION_NUM=$VERSION_NUM
+if [ $BUMP_TYPE != "none" ]; then
+    increment_version_number_into "$VERSION_NUM" "$1" INCREMENTED_VERSION_NUM
+    echo " Incremented ${1} version number: ${INCREMENTED_VERSION_NUM}"
+fi
 
-    # Increments version number if BUMP_TYPE is not "none".
-    if [ $BUMP_TYPE != "none" ]; then
-        echo " Incrementing @{BUMP_TYPE} version number..."
-        fastlane run increment_version_number bump_type:"patch"
-    fi
-
-    # Commits files that are changed by incrementing build/version numbers.
-    VERSION_NUMBER=$(agvtool what-marketing-version -terse1)
-    BUILD_NUMBER=$(agvtool what-version -terse)
-
-    git add Psiphon.xcodeproj/project.pbxproj
-    git add ./*/Info.plist
-    git commit -m "Build number ${BUILD_NUMBER}; Version number ${VERSION_NUMBER}"
-
-elif [ "$LOCAL" = "$BASE" ]; then
-    echo " This branch is behind upstream"
-    exit 1
-
-elif [ "$REMOTE" = "$BASE" ]; then
-    echo " This branch is ahead of upstream"
-    exit 1
-
-else
-    echo " This branch has divereged from upstream"
-    exit 1
+# If this is not a dry-run, increments build number and version number.
+if [ "$DRY_RUN" = false ]; then
+    fastlane run increment_build_number build_number:"$INCREMENTED_BUILD_NUM"
+    fastlane run increment_version_number version_number:"$INCREMENTED_VERSION_NUM"
 fi
