@@ -75,6 +75,9 @@ PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 - (instancetype)init {
     self = [super init];
     if (self) {
+        // Sets up debug flags early in the application lifecycle.
+        [SwiftDelegate setupDebugFlags];
+
         pendingStartStopSignalCompletion = FALSE;
         _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
