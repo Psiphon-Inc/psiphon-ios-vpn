@@ -112,7 +112,7 @@ public struct HashableView<Value: Hashable, Alternative: Hashable>: Hashable {
     }
     
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(value[keyPath: hashKeyPath].hashValue)
+        hasher.combine(value[keyPath: hashKeyPath])
     }
     
 }
