@@ -240,7 +240,7 @@ public enum PsiCashPurchasedType: Equatable {
 }
 
 /// Union of all types of PsiCash products.
-public enum PsiCashPurchasableType {
+public enum PsiCashPurchasableType: Equatable {
 
     case speedBoost(PsiCashPurchasable<SpeedBoostProduct>)
 

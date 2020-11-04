@@ -91,12 +91,10 @@ import PsiCashClient
                            options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool
     
     // -
+
+    @objc func presentPsiCashViewController(_ initialTab: PsiCashScreenTab)
     
     @objc func makeSubscriptionBarView() -> SubscriptionBarView
-    
-    @objc func makePsiCashViewController(
-        _ initialTab: PsiCashViewController.PsiCashViewControllerTabs
-    ) -> UIViewController
     
     /// Returns `nil` if there are no onboarding stages to complete.
     @objc func makeOnboardingViewControllerWithStagesNotCompleted(
