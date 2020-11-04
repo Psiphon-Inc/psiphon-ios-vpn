@@ -29,11 +29,12 @@ public struct DebugFlags {
     public var mainThreadChecks = true
     public var disableURLHandler = false
     public var devServers = true
+
     public var ignoreTunneledChecks = false
     public var disableConnectOnDemand = false
     
     public var printStoreLogs = false
-    public var printAppState = false
+    public var printAppState = true
     public var printHttpRequests = true
     
     public static func disabled() -> Self {

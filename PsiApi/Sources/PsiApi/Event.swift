@@ -27,4 +27,10 @@ public struct Event<Wrapped: Equatable>: Equatable {
         self.wrapped = wrapped
         self.date = date
     }
+
+    public func map<B: Equatable>(_ f:(Wrapped) -> B) -> Event<B> {
+        Event<B>(f(self.wrapped), date: self.date)
+    }
 }
+
+extension Event: Hashable where Wrapped: Hashable {}

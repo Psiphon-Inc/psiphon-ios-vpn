@@ -37,10 +37,10 @@ public struct MainDispatcher: Dispatcher {
         backingScheduler
     }
     
-    private let backingScheduler: UIScheduler
+    private let backingScheduler: QueueScheduler
     
     public init() {
-        backingScheduler = UIScheduler()
+        backingScheduler = .main
     }
     
     public func dispatch(_ action: @escaping () -> Void) {

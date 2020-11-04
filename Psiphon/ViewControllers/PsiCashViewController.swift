@@ -27,51 +27,6 @@ import Utilities
 import AppStoreIAP
 import PsiCashClient
 
-struct PsiCashViewControllerReaderState: Equatable {
-    let psiCashBalanceViewModel: PsiCashBalanceViewModel
-    let psiCash: PsiCashState
-    let iap: IAPState
-    let subscription: SubscriptionState
-    let appStorePsiCashProducts:
-        PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent>
-    let isRefreshingAppStoreReceipt: Bool
-}
-
-extension PsiCashViewControllerReaderState {
-    
-    /// Adds rewarded video product to list of `PsiCashPurchasableViewModel`  retrieved from AppStore.
-    func allProducts(
-        rewardedVideoClearedForSale: Bool,
-        rewardedVideoSubtitle: String
-    ) -> PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent> {
-        appStorePsiCashProducts.map(pending: { lastParsedList -> [PsiCashPurchasableViewModel] in
-            // Adds rewarded video ad as the first product if
-            let viewModels = lastParsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
-                parsed.viewModel
-            }
-            switch viewModels {
-            case []: return []
-            default: return [
-                psiCash.rewardedVideoProduct(
-                    clearedForSale: rewardedVideoClearedForSale, subtitle: rewardedVideoSubtitle
-                )
-            ] + viewModels
-            }
-        }, completed: { result in
-            result.map { parsedList -> [PsiCashPurchasableViewModel] in
-                // Adds rewarded video ad as the first product
-                [
-                    psiCash.rewardedVideoProduct(
-                        clearedForSale: rewardedVideoClearedForSale, subtitle: rewardedVideoSubtitle
-                    ) ] + parsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
-                        parsed.viewModel
-                    }
-            }
-        })
-    }
-    
-}
-
 final class PsiCashViewController: ReactiveViewController {
     
     typealias AddPsiCashViewType =
@@ -87,10 +42,25 @@ final class PsiCashViewController: ReactiveViewController {
                                                                     PsiCashMessageView>>>
     
     typealias ContainerViewType = EitherView<AddPsiCashViewType, SpeedBoostViewType>
+
+    struct ReaderState: Equatable {
+        let mainViewState: MainViewState
+        let psiCashBalanceViewModel: PsiCashBalanceViewModel
+        let psiCash: PsiCashState
+        let iap: IAPState
+        let subscription: SubscriptionState
+        let appStorePsiCashProducts:
+            PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent>
+        let isRefreshingAppStoreReceipt: Bool
+    }
+
+    enum ViewControllerAction: Equatable {
+        case psiCashAction(PsiCashAction)
+        case mainViewAction(MainViewAction)
+    }
     
     struct ObservedState: Equatable {
-        let readerState: PsiCashViewControllerReaderState
-        let activeTab: PsiCashViewController.PsiCashViewControllerTabs
+        let readerState: ReaderState
         let tunneled: TunnelConnectedStatus
         let lifeCycle: ViewControllerLifeCycle
     }
@@ -99,36 +69,20 @@ final class PsiCashViewController: ReactiveViewController {
         case mainScreen
         case psiCashPurchaseDialog
         case speedBoostPurchaseDialog
-        case logInScreen
     }
-    
-    @objc enum PsiCashViewControllerTabs: Int, TabControlViewTabType {
-        case addPsiCash
-        case speedBoost
-        
-        var localizedUserDescription: String {
-            switch self {
-            case .addPsiCash: return UserStrings.Add_psiCash()
-            case .speedBoost: return UserStrings.Speed_boost()
-            }
-        }
-    }
-    
+
     private let feedbackLogger: FeedbackLogger
     private let tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>
     
     private let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
     
     private let (lifetime, token) = Lifetime.make()
-    private let store: Store<PsiCashViewControllerReaderState, PsiCashAction>
+    private let store: Store<ReaderState, ViewControllerAction>
     
     private let productRequestStore: Store<Utilities.Unit, ProductRequestAction>
     
     // VC-specific UI state
     
-    /// Active view in the view controller.
-    /// - Warning: Must only be set from the main thread.
-    @State var activeTab: PsiCashViewControllerTabs
     private var navigation: Screen = .mainScreen
     
     // Views
@@ -137,7 +91,7 @@ final class PsiCashViewController: ReactiveViewController {
     
     private var hStack: UIStackView
     
-    private let tabControl = TabControlViewWrapper<PsiCashViewControllerTabs>()
+    private let tabControl = TabControlViewWrapper<PsiCashScreenTab>()
     private let logInView = PsiCashAccountLogInView()
     
     
@@ -145,17 +99,17 @@ final class PsiCashViewController: ReactiveViewController {
     private let containerView = UIView(frame: .zero)
     private let containerBindable: ContainerViewType.BuildType
     
-    init(initialTab: PsiCashViewControllerTabs,
-         store: Store<PsiCashViewControllerReaderState, PsiCashAction>,
-         iapStore: Store<Utilities.Unit, IAPAction>,
-         productRequestStore: Store<Utilities.Unit, ProductRequestAction>,
-         appStoreReceiptStore: Store<Utilities.Unit, ReceiptStateAction>,
-         tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>,
-         dateCompare: DateCompare,
-         feedbackLogger: FeedbackLogger,
-         tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
+    init(
+        store: Store<ReaderState, ViewControllerAction>,
+        iapStore: Store<Utilities.Unit, IAPAction>,
+        productRequestStore: Store<Utilities.Unit, ProductRequestAction>,
+        appStoreReceiptStore: Store<Utilities.Unit, ReceiptStateAction>,
+        tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>,
+        dateCompare: DateCompare,
+        feedbackLogger: FeedbackLogger,
+        tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
+        onDismissed: @escaping () -> Void
     ) {
-        
         self.feedbackLogger = feedbackLogger
         self.tunnelConnectedSignal = tunnelConnectedSignal
         
@@ -167,60 +121,57 @@ final class PsiCashViewController: ReactiveViewController {
             alignment: .fill,
             spacing: Style.default.padding
         )
-        
-        self.activeTab = initialTab
+
         self.store = store
         self.productRequestStore = productRequestStore
         
         self.container = .init(
             AddPsiCashViewType(
-                PsiCashCoinPurchaseTable(purchaseHandler: { [unowned store, iapStore] in
+                PsiCashCoinPurchaseTable(purchaseHandler: { [unowned store] in
                     switch $0 {
                     case .rewardedVideoAd:
-                        store.send(.showRewardedVideoAd)
+                        store.send(.psiCashAction(.showRewardedVideoAd))
                     case .product(let product):
-                        iapStore.send(.purchase(product: product))
+                        store.send(.mainViewAction(.psiCashViewAction(
+                                                    .purchaseTapped(product: product))))
                     }
                 }),
                 .init(Spinner(style: .whiteLarge),
                       .init(PsiCashMessageViewUntunneled(action: { [unowned store] in
-                        store.send(.connectToPsiphonTapped)
+                        store.send(.psiCashAction(.connectToPsiphonTapped))
                       }), .init(PsiCashMessageWithRetryView(),
                                 PsiCashMessageView())))),
             SpeedBoostViewType(
                 SpeedBoostPurchaseTable(purchaseHandler: {
-                    store.send(.buyPsiCashProduct(.speedBoost($0)))
+                    store.send(.psiCashAction(.buyPsiCashProduct(.speedBoost($0))))
                 }),
                 .init(Spinner(style: .whiteLarge),
                       .init(PsiCashMessageViewUntunneled(action: { [unowned store] in
-                        store.send(.connectToPsiphonTapped)
+                        store.send(.psiCashAction(.connectToPsiphonTapped))
                       }), PsiCashMessageView()))))
         
         self.containerBindable = self.container.build(self.containerView)
         
-        super.init(onDismiss: {
-            // No-op.
-        })
+        super.init(onDismissed: onDismissed)
         
         self.logInView.onLogInTapped { [unowned self] in
             // Last minute check for tunnel status.
             if case .success(.connected) = tunnelConnectedSignal.first() {
-                let _ = self.display(screen: .logInScreen)
-                
+                self.store.send(.mainViewAction(.psiCashViewAction(.signupOrLoginTapped)))
+
             } else {
-                let error = ErrorEventDescription(
-                    event: ErrorEvent(ErrorRepr(repr: "tunnel not connected"),
-                                      date: dateCompare.getCurrentTime()),
-                    localizedUserDescription: UserStrings.Psiphon_is_not_connected())
-                
-                self.displayBasicErrorAlert(errorDesc: error)
+                let alertEvent = AlertEvent(
+                    .psiCashAccountAlert(.tunnelNotConnectedAlert),
+                    date: dateCompare.getCurrentTime()
+                )
+
+                self.store.send(.mainViewAction(.presentAlert(alertEvent)))
             }
         }
-        
+
         // Updates UI by merging all necessary signals.
         self.lifetime += SignalProducer.combineLatest(
             store.$value.signalProducer,
-            self.$activeTab.signalProducer,
             tunnelConnectedSignal,
             self.$lifeCycle.signalProducer
         ).map(ObservedState.init)
@@ -239,16 +190,23 @@ final class PsiCashViewController: ReactiveViewController {
             guard !self.lifeCycle.viewWillOrDidDisappear else {
                 return
             }
+
+            guard let psiCashViewState = observed.readerState.mainViewState.psiCashViewState else {
+                // View controller state has been set to nil,
+                // and it will be dismissed (if not already).
+                return
+            }
             
             if case let .failure(errorEvent) = observed.readerState.psiCash.rewardedVideo.loading {
                 switch errorEvent.error {
                 case .adSDKError(_), .requestedAdFailedToLoad:
-                    let errorDesc = ErrorEventDescription(
-                        event: errorEvent.eraseToRepr(),
-                        localizedUserDescription: UserStrings.Rewarded_video_load_failed())
-                    
-                    self.displayBasicErrorAlert(errorDesc: errorDesc)
-                    
+                    let alertEvent = AlertEvent(
+                        .error(localizedMessage: UserStrings.Rewarded_video_load_failed()),
+                        date: errorEvent.date
+                    )
+
+                    self.store.send(.mainViewAction(.presentAlert(alertEvent)))
+
                 case .noTunneledRewardedVideoAd:
                     break
                     
@@ -265,7 +223,6 @@ final class PsiCashViewController: ReactiveViewController {
             
             switch purchasingNavState {
             case (.none, .none, _):
-
                 self.dismissPurchasingScreens()
                 
             case (.pending(_), _, .mainScreen):
@@ -285,28 +242,37 @@ final class PsiCashViewController: ReactiveViewController {
                     event: psiCashErrorEvent.eraseToRepr(),
                     localizedUserDescription: psiCashErrorEvent.error.localizedUserDescription
                 )
-                
+
                 self.dismissPurchasingScreens()
-                
+
                 switch psiCashErrorEvent.error {
                 case .requestError(.errorStatus(.insufficientBalance)):
-                    self.display(errorEvent: errorDesc.event,
-                                 makeAlertController:
-                                    UIAlertController.makeSimpleAlertWithDismissButton(
-                                        actionButtonTitle: UserStrings.Add_psiCash(),
-                                        message: errorDesc.localizedUserDescription,
-                                        addPsiCashHandler: { [unowned self] in
-                                            self.activeTab = .addPsiCash
-                                        }
-                                    ))
+                    let alertEvent = AlertEvent(
+                        .psiCashAlert(
+                            .insufficientBalanceErrorAlert(localizedMessage: errorDesc.localizedUserDescription)),
+                            date: psiCashErrorEvent.date)
+
+                    self.store.send(.mainViewAction(.presentAlert(alertEvent)))
+
                 default:
-                    self.displayBasicErrorAlert(errorDesc: errorDesc)
+                    let alertEvent = AlertEvent(
+                        .error(localizedMessage: errorDesc.localizedUserDescription),
+                        date: psiCashErrorEvent.date
+                    )
+
+                    self.store.send(.mainViewAction(.presentAlert(alertEvent)))
                 }
-                
+
             case (.completed(let iapErrorEvent), _, _):
                 self.dismissPurchasingScreens()
                 if let errorDesc = iapErrorEvent.localizedErrorEventDescription {
-                    self.displayBasicErrorAlert(errorDesc: errorDesc)
+
+                    let alertEvent = AlertEvent(
+                        .error(localizedMessage: errorDesc.localizedUserDescription),
+                        date: iapErrorEvent.date
+                    )
+
+                    self.store.send(.mainViewAction(.presentAlert(alertEvent)))
                 }
                 
             default:
@@ -345,6 +311,9 @@ final class PsiCashViewController: ReactiveViewController {
             case .account(loggedIn: true), .tracker:
                 break
             }
+
+            // Updates active tab UI
+            self.tabControl.bind(psiCashViewState.activeTab)
             
             switch observed.readerState.subscription.status {
             case .unknown:
@@ -370,15 +339,7 @@ final class PsiCashViewController: ReactiveViewController {
                 self.balanceViewWrapper.view.isHidden = false
                 self.tabControl.view.isHidden = false
                 self.balanceViewWrapper.bind(observed.readerState.psiCashBalanceViewModel)
-                
-                // Updates active tab UI
-                switch observed.activeTab {
-                case .addPsiCash:
-                    self.tabControl.bind(.addPsiCash)
-                case .speedBoost:
-                    self.tabControl.bind(.speedBoost)
-                }
-                
+
                 // Sets the visibility of tabControl and logInView
                 switch observed.tunneled {
                 case .connecting, .disconnecting:
@@ -397,7 +358,7 @@ final class PsiCashViewController: ReactiveViewController {
                     }
                 }
                 
-                switch (observed.tunneled, observed.activeTab) {
+                switch (observed.tunneled, psiCashViewState.activeTab) {
                 case (.connecting, _):
                     self.containerBindable.bind(
                         .left(.right(.right(.right(.right(.unavailableWhileConnecting))))))
@@ -569,7 +530,7 @@ final class PsiCashViewController: ReactiveViewController {
         setBackgroundGradient(for: view)
         
         tabControl.setTabHandler { [unowned self] tab in
-            self.activeTab = tab
+            self.store.send(.mainViewAction(.psiCashViewAction(.switchTabs(tab))))
         }
         
         closeButton.setEventHandler { [unowned self] in
@@ -648,7 +609,7 @@ extension PsiCashViewController {
     
     private func dismissPurchasingScreens() {
         switch self.navigation {
-        case .logInScreen, .mainScreen:
+        case .mainScreen:
             return
         case .psiCashPurchaseDialog, .speedBoostPurchaseDialog:
             let _ = self.display(screen: .mainScreen)
@@ -684,43 +645,26 @@ extension PsiCashViewController {
             guard case .mainScreen = self.navigation else {
                 return false
             }
-            
+
+            let alertViewBuilder: PurchasingAlertViewBuilder
             switch screen {
             case .mainScreen:
                 fatalError()
-                
             case .psiCashPurchaseDialog:
-                let purchasingViewController = AlertViewController(viewBuilder:
-                                                                    PsiCashPurchasingViewBuilder())
-                
-                self.presentOnViewDidAppear(purchasingViewController, animated: false,
-                                            completion: nil)
-                
+                alertViewBuilder = PurchasingAlertViewBuilder(alert: .psiCash)
             case .speedBoostPurchaseDialog:
-                let vc = AlertViewController(viewBuilder: PurchasingSpeedBoostAlertViewBuilder())
-                self.presentOnViewDidAppear(vc, animated: false, completion: nil)
-                
-            case .logInScreen:
-                let v = PsiCashAccountViewController(
-                    store: self.store.projection(
-                        value: {
-                            PsiCashAccountViewController.ReaderState(
-                                accountType: $0.psiCash.libData.accountType,
-                                pendingAccountLoginLogout: $0.psiCash.pendingAccountLoginLogout
-                            )
-                        },
-                        action: id
-                    ),
-                    feedbackLogger: self.feedbackLogger,
-                    tunnelConnectionRefSignal: self.tunnelConnectionRefSignal,
-                    createNewAccountURL: PsiCashHardCodedValues.devPsiCashSignUpURL,
-                    forgotPasswordURL: PsiCashHardCodedValues.devPsiCashForgotPasswordURL,
-                    onDismiss: {
-                        self.navigation = .mainScreen
-                })
-                let nav = UINavigationController(rootViewController: v)
-                self.presentOnViewDidAppear(nav, animated: true)
+                alertViewBuilder = PurchasingAlertViewBuilder(alert: .speedBoost)
             }
+            
+            let vc = ViewBuilderViewController(
+                viewBuilder: alertViewBuilder,
+                modalPresentationStyle: .overFullScreen,
+                onDismissed: {
+                    // Nop.
+                }
+            )
+
+            self.presentOnViewDidAppear(vc, animated: false, completion: nil)
             
             self.navigation = screen
             return true
@@ -820,4 +764,39 @@ fileprivate extension PsiCashCoinPurchaseTable.ViewModel {
         return .init(purchasables: purchasables, footerText: footerText)
     }
     
+}
+
+extension PsiCashViewController.ReaderState {
+
+    /// Adds rewarded video product to list of `PsiCashPurchasableViewModel`  retrieved from AppStore.
+    func allProducts(
+        rewardedVideoClearedForSale: Bool,
+        rewardedVideoSubtitle: String
+    ) -> PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent> {
+        appStorePsiCashProducts.map(pending: { lastParsedList -> [PsiCashPurchasableViewModel] in
+            // Adds rewarded video ad as the first product if
+            let viewModels = lastParsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
+                parsed.viewModel
+            }
+            switch viewModels {
+            case []: return []
+            default: return [
+                psiCash.rewardedVideoProduct(
+                    clearedForSale: rewardedVideoClearedForSale, subtitle: rewardedVideoSubtitle
+                )
+            ] + viewModels
+            }
+        }, completed: { result in
+            result.map { parsedList -> [PsiCashPurchasableViewModel] in
+                // Adds rewarded video ad as the first product
+                [
+                    psiCash.rewardedVideoProduct(
+                        clearedForSale: rewardedVideoClearedForSale, subtitle: rewardedVideoSubtitle
+                    ) ] + parsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
+                        parsed.viewModel
+                    }
+            }
+        })
+    }
+
 }

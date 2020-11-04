@@ -264,6 +264,9 @@
 /* Do not translate or transliterate 'PsiCash'. Alert message when the user has been able to successfully log out of their PsiCash account. */
 "PSICASH_LOGGED_OUT_SUCCESSFULLY" = "You successfully logged out of your PsiCash account.";
 
+/* Body text of a modal dialog shown when the user tries to use (spend, buy, etc.) PsiCash, if they not currently connected. 'Use' here means buy, spend, or otherwise interact with. 'Psiphon' must not be translated/transliterated. 'PsiCash' must not be translated/transliterated. */
+"PSICASH_MUST_BE_CONNECTED" = "In order to use PsiCash, you must be connected to the Psiphon network.";
+
 /* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
 "PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon, unless you have created a PsiCash account and are logged into your PsiCash account.";
 
@@ -284,6 +287,9 @@
 
 /* Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
 "PSICASH_WAIT_TRANSACTION_VERIFIED" = "Please wait while your transaction is being verified";
+
+/* Alert message informing user that a Psip */
+"PSIPHON_CONNECTION_REQUIRED" = "Psiphon Connection Required";
 
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon is not connected";

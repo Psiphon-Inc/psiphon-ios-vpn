@@ -294,6 +294,21 @@ extension PendingValue {
     
 }
 
+extension PendingValue where Pending == Completed {
+    public typealias WrappedValue = Pending // Or equivalently `WrappedValue = Completed`.
+
+    public var pendingOrCompletedValue: WrappedValue {
+        switch self {
+        case .pending(let value):
+            return value
+        case .completed(let value):
+            return value
+        }
+    }
+
+}
+
+
 /// Enables dictionary set/get directly with enums that their raw value type matches the dictionary key.
 extension Dictionary where Key: ExpressibleByStringLiteral {
 

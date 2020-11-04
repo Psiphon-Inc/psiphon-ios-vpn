@@ -246,9 +246,7 @@ NSString * const SettingsPsiCashAccountLogoutCellSpecifierKey = @"settingsLogOut
 #pragma mark - Callbacks
 
 - (void)openPsiCashViewController {
-    UIViewController *psiCashViewController = [SwiftDelegate.bridge
-                                               makePsiCashViewController:PsiCashViewControllerTabsAddPsiCash];
-    [self presentViewController:psiCashViewController animated:YES completion:nil];
+    [SwiftDelegate.bridge presentPsiCashViewController:PsiCashScreenTabAddPsiCash];
 }
 
 - (void)openIAPViewController {

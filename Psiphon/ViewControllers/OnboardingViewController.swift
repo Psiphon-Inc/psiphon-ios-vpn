@@ -161,7 +161,7 @@ fileprivate extension OnboardingScreen {
         
         self.onOnboardingFinished = onOnboardingFinished
         
-        super.init(onDismiss: {
+        super.init(onDismissed: {
             // No-op.
         })
     }

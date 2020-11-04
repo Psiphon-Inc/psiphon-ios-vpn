@@ -21,7 +21,7 @@
 import Foundation
 import PsiApi
 
-public enum PsiCashAction {
+public enum PsiCashAction: Equatable {
     case initialize
     case _initialized(Result<PsiCashLibData, ErrorRepr>)
     
@@ -47,7 +47,7 @@ public enum PsiCashAction {
     case dismissedAlert(PsiCashAlertDismissAction)
 }
 
-public enum PsiCashAlertDismissAction {
+public enum PsiCashAlertDismissAction: Equatable {
     case rewardedVideo
     case speedBoostAlreadyActive
 }

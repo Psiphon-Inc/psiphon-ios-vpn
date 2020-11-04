@@ -19,7 +19,7 @@
 
 import Foundation
 
-struct Navigator {
+struct DeepLinkingNavigator {
     
     private var registered: [URL: () -> Bool] = [:]
     

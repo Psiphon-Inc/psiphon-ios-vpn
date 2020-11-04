@@ -97,7 +97,7 @@ public enum PsiCashPurchasingState: Equatable {
     }
 }
 
-public enum RewardedVideoPresentation {
+public enum RewardedVideoPresentation: Equatable {
       /*! @const AdPresentationWillAppear Ad view controller will appear. This is not a terminal state. */
       case willAppear
       /*! @const AdPresentationDidAppear Ad view controller did appear. This is not a terminal state. */
@@ -123,7 +123,7 @@ public enum RewardedVideoPresentation {
       case errorCustomDataNotSet
 }
 
-public enum RewardedVideoLoadStatus {
+public enum RewardedVideoLoadStatus: Equatable {
     case none
     case inProgress
     case done

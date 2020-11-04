@@ -145,6 +145,17 @@ extension AppAction {
             self = .feedbackAction(newValue)
         }
     }
+    
+    var mainViewAction: MainViewAction? {
+        get {
+            guard case let .mainViewAction(value) = self else { return nil }
+            return value
+        }
+        set {
+            guard case .mainViewAction = self, let newValue = newValue else { return }
+            self = .mainViewAction(newValue)
+        }
+    }
 }
 
 
@@ -236,8 +247,9 @@ extension AppState {
         }
     }
     
-    var psiCashViewControllerReaderState: PsiCashViewControllerReaderState {
-        PsiCashViewControllerReaderState(
+    var psiCashViewControllerReaderState: PsiCashViewController.ReaderState {
+        PsiCashViewController.ReaderState(
+            mainViewState: self.mainView,
             psiCashBalanceViewModel: self.psiCashBalanceViewModel,
             psiCash: self.psiCash,
             iap: self.iapState,
@@ -271,4 +283,17 @@ extension AppState {
             self.queuedFeedbacks = newValue.queuedFeedbacks
         }
     }
+    
+    var mainViewReducerState: MainViewReducerState {
+        get {
+            MainViewReducerState(
+                mainView: self.mainView,
+                psiCashAccountType: self.psiCash.libData.accountType
+            )
+        }
+        set {
+            self.mainView = newValue.mainView
+        }
+    }
+    
 }
