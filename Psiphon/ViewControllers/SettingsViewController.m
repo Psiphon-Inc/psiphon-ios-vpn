@@ -256,7 +256,7 @@ NSString * const SettingsPsiCashAccountLogoutCellSpecifierKey = @"settingsLogOut
 }
 
 - (void)onResetConsent {
-    UIAlertController *options = [UIAlertController alertControllerWithTitle:nil
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil
                                                                      message:nil
                                                   preferredStyle:UIAlertControllerStyleActionSheet];
 
@@ -266,26 +266,38 @@ NSString * const SettingsPsiCashAccountLogoutCellSpecifierKey = @"settingsLogOut
           [[AdManager sharedInstance] resetUserConsent];
       }];
 
-    [options addAction:resetAction];
-    [options addCancelAction:nil];
-    [options presentFromTopController];
+    [alert addAction:resetAction];
+    [alert addCancelAction:nil];
+
+    [[alert popoverPresentationController] setSourceView:resetConsentCell];
+    [[alert popoverPresentationController] setSourceRect:CGRectMake(0,0,1,1)];
+    [[alert popoverPresentationController]
+     setPermittedArrowDirections:UIPopoverArrowDirectionDown];
+
+    [alert presentFromTopController];
 }
 
 - (void)onPsiCashAccountLogOut {
-    UIAlertController *options = [UIAlertController
-                                  alertControllerWithTitle:[UserStrings Log_out]
-                                  message:[UserStrings Are_you_sure_psicash_account_logout]
-                                  preferredStyle:UIAlertControllerStyleActionSheet];
+    UIAlertController *alert = [UIAlertController
+                                alertControllerWithTitle:[UserStrings Log_out]
+                                message:[UserStrings Are_you_sure_psicash_account_logout]
+                                preferredStyle:UIAlertControllerStyleActionSheet];
     
-    UIAlertAction *resetAction = [UIAlertAction actionWithTitle:[UserStrings Log_out]
-                                                          style:UIAlertActionStyleDestructive
-                                                        handler:^(UIAlertAction *action) {
+    UIAlertAction *logoutAction = [UIAlertAction actionWithTitle:[UserStrings Log_out]
+                                                           style:UIAlertActionStyleDestructive
+                                                         handler:^(UIAlertAction *action) {
         [SwiftDelegate.bridge logOutPsiCashAccount];
     }];
     
-    [options addAction:resetAction];
-    [options addCancelAction:nil];
-    [options presentFromTopController];
+    [alert addAction:logoutAction];
+    [alert addCancelAction:nil];
+
+    [[alert popoverPresentationController] setSourceView:psiCashAccountLogOutCell];
+    [[alert popoverPresentationController] setSourceRect:CGRectMake(0,0,1,1)];
+    [[alert popoverPresentationController]
+     setPermittedArrowDirections:UIPopoverArrowDirectionDown];
+
+    [alert presentFromTopController];
 }
 
 @end
