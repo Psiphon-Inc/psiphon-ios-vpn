@@ -138,7 +138,19 @@ open class ReactiveViewController: UIViewController {
     open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         lifeCycle = .viewDidDisappear(animated: animated)
-        onDismissed()
+
+        // Invariant to hold: onDismissed should be called only once, and only if
+        // this view controller will be removed from the view controller hierarchy.
+        //
+        // If this view controller is being removed from view controller hierarchy
+        // and it is a child of a another view controller `self.isBeingDismissed`
+        // will evaluate to false, however `self.parent?.isBeingDismissed` will evaluate to true.
+        // If however, this view controller has no parent, `self.isBeingDismissed` will
+        // evaluate to true.
+
+        if self.isBeingDismissed || (self.parent?.isBeingDismissed ?? false) {
+            onDismissed()
+        }
     }
     
     /// Presents `viewControllerToPresent` only after `viewDidAppear(_:)` has been called
