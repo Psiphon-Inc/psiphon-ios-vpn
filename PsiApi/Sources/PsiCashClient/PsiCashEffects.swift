@@ -20,20 +20,6 @@
 import Foundation
 import PsiApi
 
-/// Represents success reuslt of PsiCash client lib initialization.
-public struct PsiCashLibInitSuccess: Equatable {
-    public let libData: PsiCashLibData
-    public let requiresStateRefresh: Bool
-
-    public init(
-        libData: PsiCashLibData,
-        requiresStateRefresh: Bool
-    ) {
-        self.libData = libData
-        self.requiresStateRefresh = requiresStateRefresh
-    }
-
-}
 
 /// Container for all PsiCash effects.
 /// Instances of this type probably wrap some kind of cross-platform PsiCash client library.
@@ -41,22 +27,48 @@ public struct PsiCashEffects {
     
     public typealias PsiCashRefreshResult =
         Result<PsiCashLibData,
-               ErrorEvent<TunneledPsiCashRequestError<
-                            PsiCashRequestError<PsiCashRefreshErrorStatus>>>>
-    
-    public typealias PsiCashNewExpiringPurchaseResult =
-        Result<NewExpiringPurchaseResponse,
-               ErrorEvent<TunneledPsiCashRequestError<
-                            PsiCashRequestError<PsiCashNewExpiringPurchaseErrorStatus>>>>
+               ErrorEvent<TunneledPsiCashRequestError<PsiCashRefreshError>>>
     
     public typealias PsiCashAccountLoginResult =
         Result<AccountLoginResponse,
-               ErrorEvent<TunneledPsiCashRequestError<
-                            PsiCashRequestError<PsiCashAccountLoginErrorStatus>>>>
+               ErrorEvent<TunneledPsiCashRequestError<PsiCashAccountLoginError>>>
     
     public typealias PsiCashAccountLogoutResult =
         Result<PsiCashLibData,
                 ErrorEvent<TunneledPsiCashRequestError<PsiCashLibError>>>
+
+    /// Represents success reuslt of PsiCash client lib initialization.
+    public struct PsiCashLibInitSuccess: Equatable {
+        public let libData: PsiCashLibData
+        public let requiresStateRefresh: Bool
+
+        public init(
+            libData: PsiCashLibData,
+            requiresStateRefresh: Bool
+        ) {
+            self.libData = libData
+            self.requiresStateRefresh = requiresStateRefresh
+        }
+
+    }
+
+    public struct NewExpiringPurchaseResult: Equatable {
+
+        public typealias ErrorType =
+            ErrorEvent<TunneledPsiCashRequestError<PsiCashNewExpiringPurchaseError>>
+
+        public let refreshedLibData: PsiCashLibData
+        public let result: Result<NewExpiringPurchaseResponse, ErrorType>
+
+        public init(
+            refreshedLibData: PsiCashLibData,
+            result: Result<NewExpiringPurchaseResponse,
+                           PsiCashEffects.NewExpiringPurchaseResult.ErrorType>
+        ) {
+            self.refreshedLibData = refreshedLibData
+            self.result = result
+        }
+    }
     
     /// Initializes PsiCash client lib given path of file store root directory.
     public let initialize: (String?, UserDefaults) -> Effect<Result<PsiCashLibInitSuccess, ErrorRepr>>
@@ -64,7 +76,7 @@ public struct PsiCashEffects {
     public let refreshState: ([PsiCashTransactionClass], TunnelConnection, ClientMetaData) ->
         Effect<PsiCashRefreshResult>
     public let purchaseProduct: (PsiCashPurchasableType, TunnelConnection, ClientMetaData) ->
-        Effect<PsiCashNewExpiringPurchaseResult>
+        Effect<NewExpiringPurchaseResult>
     public let modifyLandingPage: (URL) -> Effect<URL>
     public let rewardedVideoCustomData: () -> String?
     public let removePurchasesNotIn: (Set<String>) -> Effect<Never>
@@ -78,7 +90,7 @@ public struct PsiCashEffects {
         refreshState: @escaping ([PsiCashTransactionClass], TunnelConnection, ClientMetaData) ->
             Effect<PsiCashRefreshResult>,
         purchaseProduct: @escaping (PsiCashPurchasableType, TunnelConnection, ClientMetaData) ->
-            Effect<PsiCashNewExpiringPurchaseResult>,
+            Effect<NewExpiringPurchaseResult>,
         modifyLandingPage: @escaping (URL) -> Effect<URL>,
         rewardedVideoCustomData: @escaping () -> String?,
         removePurchasesNotIn: @escaping (Set<String>) -> Effect<Never>,

@@ -142,12 +142,13 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                 """)
             return []
         }
-        
-        switch purchaseResult {
+
+        state.psiCash.libData = purchaseResult.refreshedLibData
+        state.psiCashBalance = .refreshed(refreshedData: purchaseResult.refreshedLibData,
+                                          persisted: environment.psiCashPersistedValues)
+
+        switch purchaseResult.result {
         case let .success(newExpiringPurchaseResponse):
-            state.psiCash.libData = newExpiringPurchaseResponse.refreshedLibData
-            state.psiCashBalance = .refreshed(refreshedData: newExpiringPurchaseResponse.refreshedLibData,
-                                              persisted: environment.psiCashPersistedValues)
             
             switch newExpiringPurchaseResponse.purchasedType {
             case let .success(purchasedType):

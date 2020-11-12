@@ -476,8 +476,7 @@ final class PsiCash {
                 }
                 let parsedPurchasedType = PsiCashPurchasedType.parse(purchase: purchase)
                 return .success(
-                    NewExpiringPurchaseResponse(refreshedLibData: self.dataModel,
-                                                purchasedType: parsedPurchasedType)
+                    NewExpiringPurchaseResponse(purchasedType: parsedPurchasedType)
                 )
                 
             case .failure(let errorStatus):

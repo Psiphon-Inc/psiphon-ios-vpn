@@ -85,7 +85,7 @@ extension PsiCashState {
 public enum PsiCashPurchasingState: Equatable {
     case none
     case speedBoost(SpeedBoostPurchasable)
-    case error(PsiCashEffects.PsiCashNewExpiringPurchaseResult.Error)
+    case error(PsiCashEffects.NewExpiringPurchaseResult.ErrorType)
     
     /// True if purchasing is completed (succeeded or failed)
     public var completed: Bool {

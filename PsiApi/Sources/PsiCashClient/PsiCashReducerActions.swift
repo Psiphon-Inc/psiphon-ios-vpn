@@ -26,12 +26,12 @@ public enum PsiCashAction: Equatable {
     case initialize
 
     /// Success result Bool represents whether a refresh state is required or not.
-    case _initialized(Result<PsiCashLibInitSuccess, ErrorRepr>)
+    case _initialized(Result<PsiCashEffects.PsiCashLibInitSuccess, ErrorRepr>)
     
     case buyPsiCashProduct(PsiCashPurchasableType)
     case _psiCashProductPurchaseResult(
             purchasable: PsiCashPurchasableType,
-            result: PsiCashEffects.PsiCashNewExpiringPurchaseResult
+            result: PsiCashEffects.NewExpiringPurchaseResult
          )
     
     case refreshPsiCashState
