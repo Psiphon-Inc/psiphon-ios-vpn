@@ -103,7 +103,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
 
     case let .presentAlert(alertEvent):
 
-        // This is a bounds-check and garbage collection on alertMessages set.
+        // Heuristic for bounds-check with and garbage collection on alertMessages set.
         // Removes old alert messages that have already been presented.
         // 100 is some arbitrary large number.
         if state.mainView.alertMessages.count > 100 {
@@ -124,21 +124,6 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             state.mainView.alertMessages.subtract(oldAlerts)
         }
 
-
-        // This guard ensures that alert dialog is presented successfully,
-        // given app's current lifecycle.
-        // If the app is in the background, view controllers can be presented, but
-        // not seen by the user.
-        // Also if an alert is presented while the app just launched, but before
-        // the applicationDidBecomeActive(_:) callback, safePresent(_:::) will return
-        // true, however UIKit will fail to present the view controller.
-        guard case .didBecomeActive = state.appLifecycle else {
-            state.mainView.alertMessages.update(
-                with: PresentationState(alertEvent, state: .failedToPresent(.applicationNotActive))
-            )
-            return []
-        }
-
         let maybeMatchingEvent = state.mainView.alertMessages.first {
             $0.viewModel == alertEvent
         }
@@ -149,6 +134,21 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             return []
 
         case .none, .failedToPresent(_):
+
+            // This guard ensures that alert dialog is presented successfully,
+            // given app's current lifecycle.
+            // If the app is in the background, view controllers can be presented, but
+            // not seen by the user.
+            // Also if an alert is presented while the app just launched, but before
+            // the applicationDidBecomeActive(_:) callback, safePresent(_:::) will return
+            // true, however UIKit will fail to present the view controller.
+            guard case .didBecomeActive = state.appLifecycle else {
+                state.mainView.alertMessages.update(
+                    with: PresentationState(alertEvent, state: .failedToPresent(.applicationNotActive))
+                )
+                return []
+            }
+
             // Alert is either new, or failed to present previously.
             state.mainView.alertMessages.update(
                 with: PresentationState(alertEvent, state: .notPresented)
