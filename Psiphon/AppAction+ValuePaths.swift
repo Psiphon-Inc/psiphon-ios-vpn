@@ -295,7 +295,8 @@ extension AppState {
         get {
             MainViewReducerState(
                 mainView: self.mainView,
-                psiCashAccountType: self.psiCash.libData.accountType
+                psiCashAccountType: self.psiCash.libData.accountType,
+                appLifecycle: self.appDelegateState.appLifecycle
             )
         }
         set {

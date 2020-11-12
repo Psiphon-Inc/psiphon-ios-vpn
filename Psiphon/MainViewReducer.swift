@@ -25,6 +25,9 @@ import Utilities
 import ReactiveSwift
 
 enum MainViewAction: Equatable {
+
+    case applicationDidBecomeActive
+
     // Alert message actions
     case presentAlert(AlertEvent)
 
@@ -39,6 +42,7 @@ enum MainViewAction: Equatable {
 }
 
 struct MainViewState: Equatable {
+    /// - Note: Two elements of`alertMessages` are equal if their `AlertEvent` values are equal.
     var alertMessages = Set<PresentationState<AlertEvent>>()
     var psiCashViewState: PsiCashViewState? = nil
 }
@@ -46,13 +50,14 @@ struct MainViewState: Equatable {
 struct MainViewReducerState: Equatable {
     var mainView: MainViewState
     let psiCashAccountType: PsiCashAccountType?
+    let appLifecycle: AppLifecycle
 }
 
 extension MainViewReducerState {
     var psiCashViewReducerState: PsiCashViewReducerState? {
         get {
             guard let psiCashState = self.mainView.psiCashViewState else {
-                return nil
+                return nil 
             }
             return PsiCashViewReducerState(
                 viewState: psiCashState,
@@ -79,59 +84,101 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
     
     switch action {
 
-    case let .presentAlert(alertEvent):
-
-        let pendingState = PresentationState(alertEvent, state: .notPresented)
-
-        let (inserted, _) = state.mainView.alertMessages.insert(pendingState)
-
-        guard inserted else {
-            return [
-                environment.feedbackLogger.log(.warn, "Already presented '\(alertEvent)'")
-                    .mapNever()
-            ]
+    case .applicationDidBecomeActive:
+        let failedMessages = state.mainView.alertMessages.filter {
+            if case .failedToPresent(_) = $0.state {
+                return true
+            } else {
+                return false
+            }
         }
 
-        return [
-            environment.feedbackLogger.log(.info, "Presenting alert: \(alertEvent)")
-                .mapNever(),
+        return failedMessages.map {
+            Effect(value: .presentAlert($0.viewModel))
+        }
 
-            // Creates a UIAlertController based on the given alertEvent, and presents it
-            // on top of the top most presented view controller.
-            Effect { observer, _ in
 
-                let alertController = UIAlertController
-                    .makeUIAlertController(alertEvent: alertEvent) { alertEvent, alertAction in
-                        observer.send(value: ._alertButtonTapped(alertEvent, alertAction))
+    case let .presentAlert(alertEvent):
 
-                        // Completes the signal as the UIAlertController has been dismissed.
+        // This guard ensures that alert dialog is presented successfully,
+        // given app's current lifecycle.
+        // If the app is in the background, view controllers can be presented, but
+        // not seen by the user.
+        // Also if an alert is presented while the app just launched, but before
+        // the applicationDidBecomeActive(_:) callback, safePresent(_:::) will return
+        // true, however UIKit will fail to present the view controller.
+        guard case .didBecomeActive = state.appLifecycle else {
+            state.mainView.alertMessages.update(
+                with: PresentationState(alertEvent, state: .failedToPresent(.applicationNotActive))
+            )
+            return []
+        }
+
+        let maybeMatchingEvent = state.mainView.alertMessages.first {
+            $0.viewModel == alertEvent
+        }
+
+        switch maybeMatchingEvent?.state {
+        case .notPresented, .willPresent, .didPresent:
+            // Alert was presented, or will be presented.
+            return []
+
+        case .none, .failedToPresent(_):
+            // Alert is either new, or failed to present previously.
+            state.mainView.alertMessages.update(
+                with: PresentationState(alertEvent, state: .notPresented)
+            )
+
+            return [
+                environment.feedbackLogger.log(.info, "Presenting alert: \(alertEvent)")
+                    .mapNever(),
+
+                // Creates a UIAlertController based on the given alertEvent, and presents it
+                // on top of the top most presented view controller.
+                Effect { observer, _ in
+
+                    let alertController = UIAlertController
+                        .makeUIAlertController(alertEvent: alertEvent) { alertEvent, alertAction in
+                            observer.send(value: ._alertButtonTapped(alertEvent, alertAction))
+
+                            // Completes the signal as the UIAlertController has been dismissed.
+                            observer.sendCompleted()
+                        }
+
+                    let topVC = environment.getTopPresentedViewController()
+
+                    let success = topVC.safePresent(
+                        alertController,
+                        animated: true,
+                        viewDidAppearHandler: {
+                            observer.send(value: ._presentAlertResult(
+                                            newState: PresentationState(alertEvent,
+                                                                        state: .didPresent)))
+
+                            // `onActionButtonTapped` closure of makeUIAlertController
+                            // is expected to be called after (this) `completion` closure is called.
+                        }
+                    )
+
+                    if success {
+                        observer.send(value: ._presentAlertResult(
+                                        newState: PresentationState(alertEvent,
+                                                                    state: .willPresent)))
+                        // safePresent `completion` callback is expected to be called,
+                        // after UIKit has finished presenting the alertController.
+                    } else {
+                        observer.send(
+                            value: ._presentAlertResult(
+                                newState: PresentationState(
+                                    alertEvent, state: .failedToPresent(.safePresentFailed))))
+
+                        // Completes the signal if failed to present alertController,
+                        // as there will be no more events to send on the stream.
                         observer.sendCompleted()
                     }
-
-                let success = environment.getTopPresentedViewController()
-                    .safePresent(alertController, animated: true, viewDidAppearHandler: {
-                        observer.send(value: ._presentAlertResult(
-                                        newState: PresentationState(alertEvent, state: .didPresent)))
-
-                        // `onActionButtonTapped` closure of makeUIAlertController
-                        // is expected to be called after (this) `completion` closure is called.
-                    })
-
-                if success {
-                    observer.send(value: ._presentAlertResult(
-                                    newState: PresentationState(alertEvent, state: .willPresent)))
-                    // safePresent `completion` callback is expected to be called,
-                    // after UIKit has finished presenting the alertController.
-                } else {
-                    observer.send(value: ._presentAlertResult(
-                                    newState: PresentationState(alertEvent, state: .failedToPresent)))
-
-                    // Completes the signal if failed to present alertController,
-                    // as there will be no more events to send on the stream.
-                    observer.sendCompleted()
                 }
-            }
-        ]
+            ]
+        }
 
     case let ._presentAlertResult(newState: newState):
 
@@ -158,20 +205,6 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         guard oldMember.state == expectedOldMemberState else {
             environment.feedbackLogger.fatalError("unexpected state")
             return []
-        }
-
-        // If failed to present, tries to present alertEvent after some delay if
-        if case .failedToPresent = newState.state {
-            // TODO! test this retry system.
-            return [
-                Effect(value: .presentAlert(newState.viewModel))
-                    .delay(1.0, on: environment.rxDateScheduler),
-
-                environment.feedbackLogger
-                    .log(.info,
-                         "retry in 1 second to present alert event: '\(newState.viewModel)'")
-                    .mapNever()
-            ]
         }
 
         return []
