@@ -95,14 +95,11 @@ public struct PsiCashLibError: HashableError {
 
 /// Represents a successful expiring purchase response.
 public struct NewExpiringPurchaseResponse: Equatable {
-    public let refreshedLibData: PsiCashLibData
     public let purchasedType: PsiCashParsed<PsiCashPurchasedType>
     
     public init(
-        refreshedLibData: PsiCashLibData,
         purchasedType: PsiCashParsed<PsiCashPurchasedType>
     ) {
-        self.refreshedLibData = refreshedLibData
         self.purchasedType = purchasedType
     }
 }

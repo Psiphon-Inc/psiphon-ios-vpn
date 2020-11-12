@@ -308,12 +308,15 @@ extension PsiCashEffects {
             },
             purchaseProduct: { [psiCash, feedbackLogger, getCurrentTime]
                 (purchasable, tunnelConnection, metadata) ->
-                Effect<PsiCashEffects.PsiCashNewExpiringPurchaseResult> in
+                Effect<PsiCashEffects.NewExpiringPurchaseResult> in
                 
                 Effect.deferred(dispatcher: globalDispatcher) { fulfilled in
                     guard case .connected = tunnelConnection.tunneled else {
                         fulfilled(
-                            .failure(ErrorEvent(.tunnelNotConnected, date: getCurrentTime()))
+                            PsiCashEffects.NewExpiringPurchaseResult(
+                                refreshedLibData: psiCash.dataModel,
+                                result: .failure(ErrorEvent(.tunnelNotConnected,
+                                                            date: getCurrentTime())))
                         )
                         return
                     }
@@ -332,11 +335,13 @@ extension PsiCashEffects {
                     let result = psiCash.newExpiringPurchase(purchasable: purchasable)
                     
                     fulfilled(
-                        result.mapError {
-                            return ErrorEvent(.requestError($0),
-                                              date: getCurrentTime())
-                        }
-                        
+                        PsiCashEffects.NewExpiringPurchaseResult(
+                            refreshedLibData: psiCash.dataModel,
+                            result: result.mapError {
+                                return ErrorEvent(.requestError($0),
+                                                  date: getCurrentTime())
+                            }
+                        )
                     )
                 }
             },
