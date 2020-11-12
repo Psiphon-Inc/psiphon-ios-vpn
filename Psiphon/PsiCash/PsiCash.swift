@@ -74,39 +74,6 @@ fileprivate func psiStatusToAccountLoginStatus(_ status: PSIStatus) -> Result<()
     }
 }
 
-// Should match all cases defined in PSITokenType
-extension PsiCashTokenType: RawRepresentable {
-    
-    public init?(rawValue: String) {
-        switch rawValue {
-        case PSITokenType.earnerTokenType:
-            self = .earner
-        case PSITokenType.spenderTokenType:
-            self = .spender
-        case PSITokenType.indicatorTokenType:
-            self = .indicator
-        case PSITokenType.accountTokenType:
-            self = .account
-        default:
-            return nil
-        }
-    }
-    
-    public var rawValue: String {
-        switch self {
-        case .earner:
-            return PSITokenType.earnerTokenType
-        case .spender:
-            return PSITokenType.spenderTokenType
-        case .indicator:
-            return PSITokenType.indicatorTokenType
-        case .account:
-            return PSITokenType.accountTokenType
-        }
-    }
-    
-}
-
 extension PsiCashLibError {
     
     fileprivate init?(_ error: PSIError?) {
@@ -141,36 +108,21 @@ final class PsiCash {
         self.client.initialized()
     }
     
-    var validTokenTypes: Set<PsiCashTokenType> {
-        
-        let tokenTypes = self.client.validTokenTypes().map { rawTokenType -> PsiCashTokenType in
-            guard let tokenType = PsiCashTokenType(rawValue: rawTokenType) else {
-                // Programming error.
-                fatalError()
-            }
-            return tokenType
-        }
-        
-        return Set(tokenTypes)
-    }
-    
-    var accountType: PsiCashAccountType? {
-        let tokenTypes = self.client.validTokenTypes()
-        
-        if self.client.isAccount() {
-            return .account(loggedIn: tokenTypes.count >= 3)
-        } else {
-            if tokenTypes.count == 0 {
-                return .none
-            } else {
-                return .tracker
-            }
+    var accountType: PsiCashAccountType {
+        switch (hasTokens: self.client.hasTokens(), isAccount: self.client.isAccount()) {
+        case (false, false):
+            return .none
+        case (true, false):
+            return .tracker
+        case (false, true):
+            return .account(loggedIn: false)
+        case (true, true):
+            return .account(loggedIn: true)
         }
     }
     
     var dataModel: PsiCashLibData {
         PsiCashLibData(
-            validTokens: self.validTokenTypes,
             accountType: self.accountType,
             balance: PsiCashAmount(nanoPsi: self.client.balance()),
             availableProducts: self.purchasePrices(),

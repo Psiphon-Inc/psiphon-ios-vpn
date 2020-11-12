@@ -174,17 +174,6 @@ typedef NS_ENUM(NSInteger, PSIStatus) {
 @end
 
 
-// Enumeration of possible token types.
-@interface PSITokenType : NSObject
-
-@property (class, nonatomic, readonly, nonnull) NSString *earnerTokenType;
-@property (class, nonatomic, readonly, nonnull) NSString *spenderTokenType;
-@property (class, nonatomic, readonly, nonnull) NSString *indicatorTokenType;
-@property (class, nonatomic, readonly, nonnull) NSString *accountTokenType;
-
-@end
-
-
 @interface PSIPsiCashLibWrapper : NSObject
 
 /// Must be called once, before any other methods (or behaviour is undefined).
@@ -223,9 +212,12 @@ typedef NS_ENUM(NSInteger, PSIStatus) {
 
 // MARK: Stored info accessors
 
-/// Returns the stored valid token types. Like ["spender", "indicator"].
-/// Will be empty if no tokens are available.
-- (NSArray<NSString *> *)validTokenTypes;
+/// Returns true if there are sufficient tokens for this library to function on behalf
+/// of a user. False otherwise.
+/// If this is false and `IsAccount()` is true, then the user is a logged-out account
+/// and needs to log in to continue. If this is false and `IsAccount()` is false,
+/// `RefreshState()` needs to be called to get new Tracker tokens.
+- (BOOL)hasTokens;
 
 /// Returns the stored info about whether the user is a Tracker or an Account.
 - (BOOL)isAccount;
