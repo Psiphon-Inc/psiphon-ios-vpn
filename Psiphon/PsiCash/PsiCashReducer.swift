@@ -281,7 +281,6 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             return []
         case .failure(let error):
             state.psiCash.libData = environment.psiCashEffects.libData()
-            state.psiCashBalance.balanceOutOfDate(reason: .otherBalanceUpdateError)
             return [
                 environment.feedbackLogger.log(.error, error).mapNever()
             ]
