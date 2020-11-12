@@ -660,7 +660,7 @@ extension PsiCashViewController {
                 viewBuilder: alertViewBuilder,
                 modalPresentationStyle: .overFullScreen,
                 onDismissed: {
-                    // Nop.
+                    // No-op.
                 }
             )
 
