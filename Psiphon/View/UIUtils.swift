@@ -852,14 +852,20 @@ extension UIAlertController {
 
 /// Represents the state of a view that can fail to present.
 /// This sturcture wraps the view's view model.
-/// - Note: Two  PresentationState values are equal only if their view models are equal.
 struct PresentationState<ViewModel: Hashable>: Hashable {
 
-    enum State: Equatable {
+    enum State: Hashable {
+
+        /// List of all possible reasons presentation of a view controller might fail.
+        enum FailureReason: Hashable {
+            case safePresentFailed
+            case applicationNotActive
+        }
+
         case notPresented
-        case failedToPresent
         case willPresent
         case didPresent
+        case failedToPresent(FailureReason)
     }
 
     let viewModel: ViewModel

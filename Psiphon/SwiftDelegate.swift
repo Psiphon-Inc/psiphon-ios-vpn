@@ -40,17 +40,11 @@ enum AppDelegateAction {
     case appLifecycleEvent(AppLifecycle)
     case adPresentationStatus(presenting: Bool)
     case checkForDisallowedTrafficAlertNotification
-    case _disallowedNotificationAlertPresentation(success: Bool)
 }
 
 struct AppDelegateState: Equatable {
     var appLifecycle: AppLifecycle = .inited
-    
     var adPresentationState: Bool = false
-    
-    /// Represents whether a disallowed traffic alert has been requested to be presented,
-    /// but has not yet been presented.
-    var pendingPresentingDisallowedTrafficAlert: Bool = false
 }
 
 struct AppDelegateEnvironment {
@@ -95,18 +89,7 @@ let appDelegateReducer = Reducer<AppDelegateState, AppDelegateAction, AppDelegat
         return []
         
     case .checkForDisallowedTrafficAlertNotification:
-        
-        // If the app is in the background, view controllers can be presented, but
-        // not seen by the user.
-        // This guard ensures that the user sees the alert dialog.
-        guard case .didBecomeActive = state.appLifecycle else {
-            return []
-        }
-        
-        guard !state.pendingPresentingDisallowedTrafficAlert else {
-            return []
-        }
-        
+
         let lastReadSeq = environment.sharedDB
             .getContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum()
         
@@ -117,8 +100,6 @@ let appDelegateReducer = Reducer<AppDelegateState, AppDelegateAction, AppDelegat
             return []
         }
         
-        state.pendingPresentingDisallowedTrafficAlert = true
-
         // TODO: The `date` of this event should really be the same as the last seq number read.
         // In the implementation below two AlertEvents for the same seq number, are not equal.
         let alertEvent = AlertEvent(.disallowedTrafficAlert,
@@ -128,27 +109,11 @@ let appDelegateReducer = Reducer<AppDelegateState, AppDelegateAction, AppDelegat
             environment.feedbackLogger.log(.info, "Presenting disallowed traffic alert")
                 .mapNever(),
             environment.mainViewStore(.presentAlert(alertEvent)).mapNever(),
-
-            // TODO! [disallowed-traffic, hack] this assumes the effect above has succeeded.
-            Effect(value: ._disallowedNotificationAlertPresentation(success: true)),
+            .fireAndForget {
+                environment.sharedDB.setContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum(
+                    environment.sharedDB.getDisallowedTrafficAlertWriteSequenceNum())
+            }
         ]
-        
-    case let ._disallowedNotificationAlertPresentation(success: success):
-        
-        state.pendingPresentingDisallowedTrafficAlert = false
-        
-        guard success else {
-            return [
-                environment.feedbackLogger.log(.error, "Failed to present disallowed traffic alert")
-                    .mapNever()
-            ]
-        }
-        
-        environment.sharedDB.setContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum(
-            environment.sharedDB.getDisallowedTrafficAlertWriteSequenceNum())
-        
-        return []
-
     }
     
 }
@@ -634,7 +599,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 .skipRepeats()
                 .startWithValues { appState in
                     print("*", "-----")
-                    dump(appState[keyPath: \.mainView.psiCashViewState])
+                    dump(appState[keyPath: \.mainView.alertMessages])
                     print("*", "-----")
                 }
         }
@@ -643,6 +608,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     
     @objc func applicationDidBecomeActive(_ application: UIApplication) {
         self.store.send(.appDelegateAction(.appLifecycleEvent(.didBecomeActive)))
+        self.store.send(.mainViewAction(.applicationDidBecomeActive))
     }
     
     @objc func applicationWillResignActive(_ application: UIApplication) {
