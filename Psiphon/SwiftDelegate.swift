@@ -320,6 +320,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     objcBridgeDelegate: objcBridge,
                     rewardedVideoAdBridgeDelegate: self,
                     dateCompare: self.dateCompare,
+                    addToDate: { calendarComponent, value, date -> Date? in
+                        Calendar.current.date(byAdding: calendarComponent, value: value, to: date)
+                    },
                     mainDispatcher: mainDispatcher,
                     globalDispatcher: globalDispatcher,
                     getTopPresentedViewController: {
