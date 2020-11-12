@@ -119,12 +119,12 @@ public struct HashableView<Value: Hashable, Alternative: Hashable>: Hashable {
 
 public extension Set {
 
-    /// Inserts `newMember` into the set if it is not contained in the set.
-    /// If the set contains a member with value under path `equalPath` equal to `newMember`'s value under the same
+    /// Inserts `newMember` into the set if it is not contained in the set, or if the set contains
+    /// a member with value under path `equalPath` equal to `newMember`'s value under the same
     /// key path, then the contained member is removed from the set, and `newMember` is inserted.
     /// - Returns: true if `newMember` is inserted.
-    mutating func insert<T: Hashable>(
-        orReplaceIfEqual equalPath: KeyPath<Element, T>, _ newMember: Element
+    mutating func update<T: Hashable>(
+        equalityPath: KeyPath<Element, T>, with newMember: Element
     ) -> Bool {
         guard !contains(newMember) else {
             return false
@@ -132,7 +132,7 @@ public extension Set {
         
         var equalMember: Element? = .none
         for member in self {
-            if member[keyPath: equalPath] == newMember[keyPath: equalPath] {
+            if member[keyPath: equalityPath] == newMember[keyPath: equalityPath] {
                 equalMember = member
                 break
             }
