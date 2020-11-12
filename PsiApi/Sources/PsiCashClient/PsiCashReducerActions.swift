@@ -22,8 +22,11 @@ import Foundation
 import PsiApi
 
 public enum PsiCashAction: Equatable {
+
     case initialize
-    case _initialized(Result<PsiCashLibData, ErrorRepr>)
+
+    /// Success result Bool represents whether a refresh state is required or not.
+    case _initialized(Result<PsiCashLibInitSuccess, ErrorRepr>)
     
     case buyPsiCashProduct(PsiCashPurchasableType)
     case _psiCashProductPurchaseResult(

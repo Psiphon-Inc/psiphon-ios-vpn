@@ -79,6 +79,7 @@ struct AppEnvironment {
     let appInfo: () -> AppInfoProvider
     let sharedDB: PsiphonDataSharedDB
     let userConfigs: UserDefaultsConfig
+    let standardUserDefaults: UserDefaults
     let notifier: PsiApi.Notifier
     let internetReachabilityStatusSignal: SignalProducer<ReachabilityStatus, Never>
     let tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
@@ -138,6 +139,7 @@ func makeEnvironment(
     psiCashFileStoreRoot: String?,
     supportedAppStoreProducts: SupportedAppStoreProducts,
     userDefaultsConfig: UserDefaultsConfig,
+    standardUserDeaults: UserDefaults,
     objcBridgeDelegate: ObjCBridgeDelegate,
     rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
     dateCompare: DateCompare,
@@ -181,6 +183,7 @@ func makeEnvironment(
         appInfo: { AppInfoObjC() },
         sharedDB: sharedDB,
         userConfigs: userDefaultsConfig,
+        standardUserDefaults: standardUserDeaults,
         notifier: NotifierObjC(notifier:Notifier.sharedInstance()),
         internetReachabilityStatusSignal: store.$value.signalProducer.map(\.internetReachability.networkStatus),
         tunnelStatusSignal: store.$value.signalProducer
@@ -356,7 +359,8 @@ fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment
         objcBridgeDelegate: env.objcBridgeDelegate,
         rewardedVideoAdBridgeDelegate: env.rewardedVideoAdBridgeDelegate,
         metadata: { ClientMetaData(env.appInfo()) },
-        getCurrentTime: env.dateCompare.getCurrentTime
+        getCurrentTime: env.dateCompare.getCurrentTime,
+        psiCashLegacyDataStore: env.standardUserDefaults
     )
 }
 

@@ -20,6 +20,21 @@
 import Foundation
 import PsiApi
 
+/// Represents success reuslt of PsiCash client lib initialization.
+public struct PsiCashLibInitSuccess: Equatable {
+    public let libData: PsiCashLibData
+    public let requiresStateRefresh: Bool
+
+    public init(
+        libData: PsiCashLibData,
+        requiresStateRefresh: Bool
+    ) {
+        self.libData = libData
+        self.requiresStateRefresh = requiresStateRefresh
+    }
+
+}
+
 /// Container for all PsiCash effects.
 /// Instances of this type probably wrap some kind of cross-platform PsiCash client library.
 public struct PsiCashEffects {
@@ -44,7 +59,7 @@ public struct PsiCashEffects {
                 ErrorEvent<TunneledPsiCashRequestError<PsiCashLibError>>>
     
     /// Initializes PsiCash client lib given path of file store root directory.
-    public let initialize: (String?) -> Effect<Result<PsiCashLibData, ErrorRepr>>
+    public let initialize: (String?, UserDefaults) -> Effect<Result<PsiCashLibInitSuccess, ErrorRepr>>
     public let libData: () -> PsiCashLibData
     public let refreshState: ([PsiCashTransactionClass], TunnelConnection, ClientMetaData) ->
         Effect<PsiCashRefreshResult>
@@ -57,7 +72,8 @@ public struct PsiCashEffects {
     public let accountLogin: (TunnelConnection, String, SecretString) -> Effect<PsiCashAccountLoginResult>
 
     public init(
-        initialize: @escaping (String?) -> Effect<Result<PsiCashLibData, ErrorRepr>>,
+        initialize: @escaping (String?, UserDefaults)
+            -> Effect<Result<PsiCashLibInitSuccess, ErrorRepr>>,
         libData: @escaping () -> PsiCashLibData,
         refreshState: @escaping ([PsiCashTransactionClass], TunnelConnection, ClientMetaData) ->
             Effect<PsiCashRefreshResult>,

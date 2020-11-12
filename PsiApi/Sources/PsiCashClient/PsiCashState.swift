@@ -197,6 +197,8 @@ public struct PsiCashBalance: Equatable {
     public enum BalanceOutOfDateReason: String, CaseIterable {
         case watchedRewardedVideo
         case purchasedPsiCash
+        /// Represents a state where PsiCash balance might be incorrect due to PsiCash internal data store migration.
+        case psiCashDataStoreMigration
         case otherBalanceUpdateError
     }
     

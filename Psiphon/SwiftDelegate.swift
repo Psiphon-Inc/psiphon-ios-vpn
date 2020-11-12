@@ -331,6 +331,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     psiCashFileStoreRoot: self.appSupportFileStore.psiCashFileStoreRootPath,
                     supportedAppStoreProducts: self.supportedProducts,
                     userDefaultsConfig: self.userDefaultsConfig,
+                    standardUserDeaults: UserDefaults.standard,
                     objcBridgeDelegate: objcBridge,
                     rewardedVideoAdBridgeDelegate: self,
                     dateCompare: self.dateCompare,
