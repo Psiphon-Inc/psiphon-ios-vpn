@@ -85,7 +85,7 @@ extension PsiCashState {
 public enum PsiCashPurchasingState: Equatable {
     case none
     case speedBoost(SpeedBoostPurchasable)
-    case error(PsiCashEffects.PsiCashNewExpiringPurchaseResult.Error)
+    case error(PsiCashEffects.NewExpiringPurchaseResult.ErrorType)
     
     /// True if purchasing is completed (succeeded or failed)
     public var completed: Bool {
@@ -97,7 +97,7 @@ public enum PsiCashPurchasingState: Equatable {
     }
 }
 
-public enum RewardedVideoPresentation {
+public enum RewardedVideoPresentation: Equatable {
       /*! @const AdPresentationWillAppear Ad view controller will appear. This is not a terminal state. */
       case willAppear
       /*! @const AdPresentationDidAppear Ad view controller did appear. This is not a terminal state. */
@@ -123,7 +123,7 @@ public enum RewardedVideoPresentation {
       case errorCustomDataNotSet
 }
 
-public enum RewardedVideoLoadStatus {
+public enum RewardedVideoLoadStatus: Equatable {
     case none
     case inProgress
     case done
@@ -197,6 +197,8 @@ public struct PsiCashBalance: Equatable {
     public enum BalanceOutOfDateReason: String, CaseIterable {
         case watchedRewardedVideo
         case purchasedPsiCash
+        /// Represents a state where PsiCash balance might be incorrect due to PsiCash internal data store migration.
+        case psiCashDataStoreMigration
         case otherBalanceUpdateError
     }
     

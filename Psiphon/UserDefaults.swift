@@ -48,6 +48,17 @@ final class UserDefaultsConfig: PsiCashPersistedValues {
     
     @UserDefault(.standard, "LastCFBundleVersion", defaultValue: "")
     var lastBundleVersion: String
+
+    // TODO: The value here is not accessed directly though PsiCashEffects,
+    // but rather indirectly through PsiCash class migrateTokens method.
+    /// Represents the latest PsiCash data store version that the app has migrated to.
+    ///
+    /// Versions:
+    /// 0 (default): First PsiCash client version that uses NSUserDefaults as data store.
+    /// 1: Skipped.
+    /// 2: PsiCash client based on psicash-lib-core that uses a file as data store.
+    @UserDefault(.standard, "Psiphon-PsiCash-DataStore-Migrated-Version", defaultValue: 0)
+    var psiCashDataStoreMigratedToVersion: Int
 }
 
 extension UserDefaultsConfig {

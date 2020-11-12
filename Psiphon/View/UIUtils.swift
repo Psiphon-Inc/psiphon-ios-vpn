@@ -19,6 +19,7 @@
 
 import UIKit
 import class PsiApi.ReactiveViewController
+import struct PsiApi.Event
 
 /// Represents global app styles.
 struct AppStyle {
@@ -385,7 +386,7 @@ protocol Anchorable {
 
 extension NSLayoutDimension {
     
-    func constraint(default: CGFloat, max: CGFloat?) -> [NSLayoutConstraint] {
+    func constraint(default: CGFloat, max: CGFloat? = nil) -> [NSLayoutConstraint] {
         let defaultConstraint = self.constraint(equalToConstant: `default`)
             .priority(.defaultHigh)
         
@@ -749,7 +750,12 @@ final class ImmutableBindableViewable<BindingType: Equatable, WrappedView: ViewW
 
         let bindableViewable = builder.build(nil)
         container.addSubview(bindableViewable.view)
-        bindableViewable.view.activateConstraints { $0.matchParentConstraints() }
+        bindableViewable.view.activateConstraints {
+            $0.constraintToParent(.top(0, .belowRequired),
+                                  .bottom(0, .belowRequired),
+                                  .leading(0, .belowRequired),
+                                  .trailing(0, .belowRequired))
+        }
         return bindableViewable
     }
 }
@@ -793,57 +799,91 @@ final class MutableBindableViewable<BindingType: Equatable, WrappedView: ViewWra
 
 }
 
+extension UIAlertAction {
+
+    static func defaultButton(title: String, handler: @escaping () -> Void) -> UIAlertAction {
+        .init(title: title, style: .default) { _ in
+            handler()
+        }
+    }
+
+    static func okButton(
+        style: Style = .default, _ handler: @escaping () -> Void
+    ) -> UIAlertAction {
+        .init(title: UserStrings.OK_button_title(), style: style) { _ in
+            handler()
+        }
+    }
+
+    static func dismissButton(
+        style: Style = .cancel, _ handler: @escaping () -> Void
+    ) -> UIAlertAction {
+        .init(title: UserStrings.Dismiss_button_title(), style: style) { _ in
+            handler()
+        }
+    }
+
+}
+
 extension UIAlertController {
-    
-    static func makeSimpleErrorAlertWithOKButton(message: String) -> UIAlertController {
-        makeSimpleAlertWithOKButton(title: UserStrings.Error_title(), message: message)
-    }
-    
-    /// Creates a `UIAlertController` with a single "OK" button that dismisses the alert.
-    static func makeSimpleAlertWithOKButton(
-        title: String, message: String, onDismissed: (() -> Void)? = nil
-    ) -> UIAlertController {
-        let alert = UIAlertController(title: title,
-                                      message: message,
-                                      preferredStyle: .alert)
-        
-        alert.addAction(
-            UIAlertAction(title: UserStrings.OK_button_title(), style: .default, handler: { _ in
-                onDismissed?()
-            })
-        )
-        
-        return alert
-    }
-    
-    /// Creates a `UIAlertController` with a "cancel"-style dismiss button, and a
-    /// "default"-style button with provided title.
-    static func makeSimpleAlertWithDismissButton(
-        actionButtonTitle: String,
+
+    static func makeAlert(
+        title: String,
         message: String,
-        addPsiCashHandler: @escaping () -> Void
+        actions: [UIAlertAction]
     ) -> UIAlertController {
+
         let alertController = UIAlertController(
-            title: UserStrings.Error_title(),
+            title: title,
             message: message,
             preferredStyle: .alert
         )
 
-        alertController.addAction(
-            UIAlertAction(
-                title: actionButtonTitle,
-                style: .default,
-                handler: { _ in
-                    addPsiCashHandler()
-            })
-        )
-        
-        alertController.addAction(
-            UIAlertAction(title: UserStrings.Dismiss_button_title(),
-                          style: .cancel)
-        )
+        for action in actions {
+            alertController.addAction(action)
+        }
+
         return alertController
     }
+
+}
+
+// MARK: ViewController presentation
+
+/// Represents the state of a view that can fail to present.
+/// This sturcture wraps the view's view model.
+struct PresentationState<ViewModel: Hashable>: Hashable {
+
+    enum State: Hashable {
+
+        /// List of all possible reasons presentation of a view controller might fail.
+        enum FailureReason: Hashable {
+            case safePresentFailed
+            case applicationNotActive
+        }
+
+        case notPresented
+        case willPresent
+        case didPresent
+        case failedToPresent(FailureReason)
+    }
+
+    let viewModel: ViewModel
+    var state: State
+
+    init(_ wrappedValue: ViewModel, state: State) {
+        self.viewModel = wrappedValue
+        self.state = state
+    }
+
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(viewModel)
+    }
+
+    static func == (lhs: Self, rhs: Self) -> Bool {
+        lhs.viewModel == rhs.viewModel
+    }
+
 }
 
 extension UIViewController {
@@ -904,34 +944,9 @@ extension UIViewController {
         return .none
     }
     
-    /// Presents a view controller modally, and returns `true` if operation succeeded, returns `false` otherwise.
-    func safePresent(
-        _ viewControllerToPresent: UIViewController,
-        animated flag: Bool,
-        completion: (() -> Void)? = nil
-    ) -> Bool {
-        self.present(viewControllerToPresent, animated: flag, completion: completion)
-        
-        // `isBeingPresented` value here is interpreted as meaning that
-        // the view controller will be presented soon and that the operation
-        // has not failed (e.g. if `self` is already presenting another view controller).
-        // Documentation is sparse on this, and this interpretation might need to be
-        // re-evaluated at some point in the future.
-        return viewControllerToPresent.isBeingPresented
-    }
-    
-    /// This method is an attempt to organize dismissal of view controller's in order
-    /// to build a typed navigation hierarchy.
-    /// This method is functionally equivalent to calling dismiss on the presented view controller.
-    static func safeDismiss(
-        _ viewControllerToDismiss: UIViewController,
-        animated flag: Bool,
-        completion: (() -> Void)?
-    ) {
-        viewControllerToDismiss.dismiss(animated: flag, completion: completion)
-    }
-    
 }
+
+// MARK: -
 
 extension UINavigationBar {
     

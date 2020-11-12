@@ -43,7 +43,8 @@ typealias PsiCashEnvironment = (
     objcBridgeDelegate: ObjCBridgeDelegate?,
     rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
     metadata: () -> ClientMetaData,
-    getCurrentTime: () -> Date
+    getCurrentTime: () -> Date,
+    psiCashLegacyDataStore: UserDefaults
 )
 
 let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironment> {
@@ -59,24 +60,38 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         }
         
         return [
-            environment.psiCashEffects.initialize(environment.psiCashFileStoreRoot)
-                .map(PsiCashAction._initialized)
+            environment.psiCashEffects.initialize(
+                environment.psiCashFileStoreRoot,
+                environment.psiCashLegacyDataStore
+            ).map(PsiCashAction._initialized)
         ]
     
     case ._initialized(let result):
-        
+
         switch result {
-        case let .success(libData):
-            state.psiCash.initialized(libData)
+        case let .success(libInitSuccess):
+            state.psiCash.initialized(libInitSuccess.libData)
             state.psiCashBalance = .fromStoredExpectedReward(
-                libData: libData, persisted: environment.psiCashPersistedValues)
+                libData: libInitSuccess.libData, persisted: environment.psiCashPersistedValues)
             
             let nonSubscriptionAuths = environment.sharedDB
                 .getNonSubscriptionEncodedAuthorizations()
-            
-            return [
+
+            var effects = [Effect<PsiCashAction>]()
+            effects.append(
                 environment.psiCashEffects.removePurchasesNotIn(nonSubscriptionAuths).mapNever()
-            ]
+            )
+
+            if libInitSuccess.requiresStateRefresh {
+
+                state.psiCashBalance.balanceOutOfDate(reason: .psiCashDataStoreMigration)
+
+                effects.append(
+                    Effect(value: .refreshPsiCashState)
+                )
+            }
+
+            return effects
             
         case let .failure(error):
             return [
@@ -127,12 +142,13 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                 """)
             return []
         }
-        
-        switch purchaseResult {
+
+        state.psiCash.libData = purchaseResult.refreshedLibData
+        state.psiCashBalance = .refreshed(refreshedData: purchaseResult.refreshedLibData,
+                                          persisted: environment.psiCashPersistedValues)
+
+        switch purchaseResult.result {
         case let .success(newExpiringPurchaseResponse):
-            state.psiCash.libData = newExpiringPurchaseResponse.refreshedLibData
-            state.psiCashBalance = .refreshed(refreshedData: newExpiringPurchaseResponse.refreshedLibData,
-                                              persisted: environment.psiCashPersistedValues)
             
             switch newExpiringPurchaseResponse.purchasedType {
             case let .success(purchasedType):
@@ -266,7 +282,6 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             return []
         case .failure(let error):
             state.psiCash.libData = environment.psiCashEffects.libData()
-            state.psiCashBalance.balanceOutOfDate(reason: .otherBalanceUpdateError)
             return [
                 environment.feedbackLogger.log(.error, error).mapNever()
             ]

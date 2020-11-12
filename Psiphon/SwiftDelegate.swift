@@ -40,28 +40,24 @@ enum AppDelegateAction {
     case appLifecycleEvent(AppLifecycle)
     case adPresentationStatus(presenting: Bool)
     case checkForDisallowedTrafficAlertNotification
-    case _disallowedNotificationAlertPresentation(success: Bool)
 }
 
 struct AppDelegateState: Equatable {
     var appLifecycle: AppLifecycle = .inited
-    
     var adPresentationState: Bool = false
-    
-    /// Represents whether a disallowed traffic alert has been requested to be presented,
-    /// but has not yet been presented.
-    var pendingPresentingDisallowedTrafficAlert: Bool = false
 }
 
-typealias AppDelegateEnvironment = (
-    feedbackLogger: FeedbackLogger,
-    sharedDB: PsiphonDataSharedDB,
-    psiCashEffects: PsiCashEffects,
-    paymentQueue: PaymentQueue,
-    appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
-    paymentTransactionDelegate: PaymentTransactionDelegate,
-    mainDispatcher: MainDispatcher
-)
+struct AppDelegateEnvironment {
+    let feedbackLogger: FeedbackLogger
+    let sharedDB: PsiphonDataSharedDB
+    let psiCashEffects: PsiCashEffects
+    let paymentQueue: PaymentQueue
+    let mainViewStore: (MainViewAction) -> Effect<Never>
+    let appReceiptStore: (ReceiptStateAction) -> Effect<Never>
+    let paymentTransactionDelegate: PaymentTransactionDelegate
+    let mainDispatcher: MainDispatcher
+    let getCurrentTime: () -> Date
+}
 
 let appDelegateReducer = Reducer<AppDelegateState, AppDelegateAction, AppDelegateEnvironment> {
     state, action, environment in
@@ -81,7 +77,7 @@ let appDelegateReducer = Reducer<AppDelegateState, AppDelegateAction, AppDelegat
                 
                 environment.appReceiptStore(.localReceiptRefresh).mapNever()
             ]
-        
+
         case .didBecomeActive:
             return [ Effect(value: .checkForDisallowedTrafficAlertNotification) ]
         default:
@@ -93,18 +89,7 @@ let appDelegateReducer = Reducer<AppDelegateState, AppDelegateAction, AppDelegat
         return []
         
     case .checkForDisallowedTrafficAlertNotification:
-        
-        // If the app is in the background, view controllers can be presented, but
-        // not seen by the user.
-        // This guard ensures that the user sees the alert dialog.
-        guard case .didBecomeActive = state.appLifecycle else {
-            return []
-        }
-        
-        guard !state.pendingPresentingDisallowedTrafficAlert else {
-            return []
-        }
-        
+
         let lastReadSeq = environment.sharedDB
             .getContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum()
         
@@ -115,65 +100,20 @@ let appDelegateReducer = Reducer<AppDelegateState, AppDelegateAction, AppDelegat
             return []
         }
         
-        state.pendingPresentingDisallowedTrafficAlert = true
-        
+        // TODO: The `date` of this event should really be the same as the last seq number read.
+        // In the implementation below two AlertEvents for the same seq number, are not equal.
+        let alertEvent = AlertEvent(.disallowedTrafficAlert,
+                                    date: environment.getCurrentTime())
+
         return [
             environment.feedbackLogger.log(.info, "Presenting disallowed traffic alert")
                 .mapNever(),
-            
-            .deferred { fulfill in
-                let found = AppDelegate.getTopPresentedViewController()
-                    .traversePresentingStackFor(type: RootContainerController.self)
-                
-                switch found {
-                case .notPresent:
-                   fulfill(._disallowedNotificationAlertPresentation(success: false))
-                   return
-                    
-                case .presentTopOfStack(_), .presentInStack(_):
-                
-                    // FIXME: Accessing global singleton variable
-                    let alertController = makeDisallowedTrafficAlertController(
-                        onSpeedBoostClicked: {
-                            tryPresentPsiCashViewController(
-                                tab: .speedBoost,
-                                makePsiCashViewController:
-                                    SwiftDelegate.instance.makePsiCashViewController(initialTab:),
-                                getTopMostPresentedViewController:
-                                    AppDelegate.getTopPresentedViewController
-                            )
-                        },
-                        onSubscriptionClicked: {
-                            tryPresentSubscriptionViewController(getTopMostPresentedViewController:
-                                    AppDelegate.getTopPresentedViewController)
-                        })
-                    
-                    let success = AppDelegate.getTopPresentedViewController()
-                        .safePresent(alertController, animated: true)
-                    
-                    fulfill(._disallowedNotificationAlertPresentation(success: success))
-                 
-                }
-                
+            environment.mainViewStore(.presentAlert(alertEvent)).mapNever(),
+            .fireAndForget {
+                environment.sharedDB.setContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum(
+                    environment.sharedDB.getDisallowedTrafficAlertWriteSequenceNum())
             }
         ]
-        
-    case let ._disallowedNotificationAlertPresentation(success: success):
-        
-        state.pendingPresentingDisallowedTrafficAlert = false
-        
-        guard success else {
-            return [
-                environment.feedbackLogger.log(.error, "Failed to present disallowed traffic alert")
-                    .mapNever()
-            ]
-        }
-        
-        environment.sharedDB.setContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum(
-                environment.sharedDB.getDisallowedTrafficAlertWriteSequenceNum())
-        
-        return []
-
     }
     
 }
@@ -182,8 +122,8 @@ let appDelegateReducer = Reducer<AppDelegateState, AppDelegateAction, AppDelegat
 @objc final class SwiftDelegate: NSObject {
     
     static let instance = SwiftDelegate()
-    
-    private var navigator = Navigator()
+
+    private var deepLinkingNavigator = DeepLinkingNavigator()
     private let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: PsiphonAppGroupIdentifier)
     private let feedbackLogger = FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler())
     private let supportedProducts =
@@ -198,7 +138,7 @@ let appDelegateReducer = Reducer<AppDelegateState, AppDelegateAction, AppDelegat
     private var store: Store<AppState, AppAction>!
     private var psiCashLib: PsiCash
     private var environmentCleanup: (() -> Void)?
-    
+
     private override init() {
         dateCompare = DateCompare(
             getCurrentTime: { Date () },
@@ -208,7 +148,7 @@ let appDelegateReducer = Reducer<AppDelegateState, AppDelegateAction, AppDelegat
         
         psiCashLib = PsiCash(feedbackLogger: self.feedbackLogger)
     }
-
+    
     // Should be called early in the application lifecycle.
     @objc static func setupDebugFlags() {
         #if DEBUG
@@ -219,7 +159,7 @@ let appDelegateReducer = Reducer<AppDelegateState, AppDelegateAction, AppDelegat
         Debugging = DebugFlags.disabled(buildConfig: .release)
         #endif
     }
-    
+
 }
 
 // MARK: Bridge API
@@ -227,7 +167,7 @@ let appDelegateReducer = Reducer<AppDelegateState, AppDelegateAction, AppDelegat
 extension SwiftDelegate: RewardedVideoAdBridgeDelegate {
     func adPresentationStatus(_ status: AdPresentation) {
         self.store.send(.psiCash(
-            .rewardedVideoPresentation(RewardedVideoPresentation(objcAdPresentation: status)))
+                            .rewardedVideoPresentation(RewardedVideoPresentation(objcAdPresentation: status)))
         )
     }
     
@@ -374,24 +314,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             self.feedbackLogger.immediate(.error, "\(error)")
         }
         
-        navigator.register(url: PsiphonDeepLinking.psiCashDeepLink) { [unowned self] in
-            tryPresentPsiCashViewController(
-                tab: .addPsiCash,
-                makePsiCashViewController: self.makePsiCashViewController(initialTab:),
-                getTopMostPresentedViewController: AppDelegate.getTopPresentedViewController
-            )
-            return true
-        }
-        
-        navigator.register(url: PsiphonDeepLinking.speedBoostDeepLink) { [unowned self] in
-            tryPresentPsiCashViewController(
-                tab: .speedBoost,
-                makePsiCashViewController: self.makePsiCashViewController(initialTab:),
-                getTopMostPresentedViewController: AppDelegate.getTopPresentedViewController
-            )
-            return true
-        }
-        
         let mainDispatcher = MainDispatcher()
         let globalDispatcher = GlobalDispatcher(qos: .default, name: "globalDispatcher")
         
@@ -409,19 +331,36 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     psiCashFileStoreRoot: self.appSupportFileStore.psiCashFileStoreRootPath,
                     supportedAppStoreProducts: self.supportedProducts,
                     userDefaultsConfig: self.userDefaultsConfig,
+                    standardUserDeaults: UserDefaults.standard,
                     objcBridgeDelegate: objcBridge,
                     rewardedVideoAdBridgeDelegate: self,
                     dateCompare: self.dateCompare,
+                    addToDate: { calendarComponent, value, date -> Date? in
+                        Calendar.current.date(byAdding: calendarComponent, value: value, to: date)
+                    },
                     mainDispatcher: mainDispatcher,
-                    globalDispatcher: globalDispatcher
+                    globalDispatcher: globalDispatcher,
+                    getTopPresentedViewController: {
+                        AppDelegate.getTopPresentedViewController()
+                    }
                 )
                 self.environmentCleanup = cleanup
                 return environment
-        })
+            })
         
         self.store.send(.appDelegateAction(.appLifecycleEvent(.didFinishLaunching)))
         self.store.send(vpnAction: .appLaunched)
         self.store.send(.psiCash(.initialize))
+
+        // Registers accepted deep linking URLs.
+        deepLinkingNavigator.register(url: PsiphonDeepLinking.psiCashDeepLink) { [unowned self] in
+            self.store.send(.mainViewAction(.presentPsiCashScreen(initialTab: .addPsiCash)))
+            return true
+        }
+        deepLinkingNavigator.register(url: PsiphonDeepLinking.speedBoostDeepLink) { [unowned self] in
+            self.store.send(.mainViewAction(.presentPsiCashScreen(initialTab: .speedBoost)))
+            return true
+        }
         
         // Maps connected events to refresh state messages sent to store.
         self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
@@ -437,7 +376,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .skipRepeats()
             .filter { $0 == .connected }
             .map(value: AppAction.subscriptionAuthStateAction(
-                .localDataUpdate(type: .didUpdateRejectedSubscriptionAuthIDs))
+                    .localDataUpdate(type: .didUpdateRejectedSubscriptionAuthIDs))
             )
             .send(store: self.store)
         
@@ -447,7 +386,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .skipRepeats()
             .startWithValues { [unowned objcBridge] viewModel in
                 objcBridge!.onPsiCashBalanceUpdate(.init(swiftState: viewModel))
-        }
+            }
         
         // Forwards `SubscriptionStatus` updates to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer
@@ -455,7 +394,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .skipRepeats()
             .startWithValues { [unowned objcBridge] in
                 objcBridge!.onSubscriptionStatus(BridgedUserSubscription.from(state: $0))
-        }
+            }
         
         // Forwards subscription auth status to ObjCBridgeDelegate.
         self.lifetime += SignalProducer.combineLatest(
@@ -463,17 +402,17 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             self.store.$value.signalProducer.map(\.subscription.status).skipRepeats(),
             self.store.$value.signalProducer
                 .map(\.vpnState.value.providerVPNStatus.tunneled).skipRepeats()
-            ).map {
-                SubscriptionBarView.SubscriptionBarState.make(
-                    authState: $0.0, subscriptionStatus: $0.1, tunnelStatus: $0.2
-                )
-            }
-            .skipRepeats()
-            .startWithValues { [unowned objcBridge] newValue in
-                
-                objcBridge!.onSubscriptionBarViewStatusUpdate(
-                    ObjcSubscriptionBarViewState(swiftState: newValue)
-                )
+        ).map {
+            SubscriptionBarView.SubscriptionBarState.make(
+                authState: $0.0, subscriptionStatus: $0.1, tunnelStatus: $0.2
+            )
+        }
+        .skipRepeats()
+        .startWithValues { [unowned objcBridge] newValue in
+
+            objcBridge!.onSubscriptionBarViewStatusUpdate(
+                ObjcSubscriptionBarViewState(swiftState: newValue)
+            )
         }
         
         // Forwards VPN status changes to ObjCBridgeDelegate.
@@ -497,7 +436,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 guard case .loaded(_) = vpnStateTunnelLoadStatePair.second.value else {
                     return Effect(value: .success(.unit))
                 }
-            
+
                 let compareValue = (current: vpnStateTunnelLoadStatePair.first.status.tunneled,
                                     expected: vpnStateTunnelLoadStatePair.first.intent)
                 
@@ -520,7 +459,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 }
             }
             .skipRepeats()
-        .startWithValues { [unowned self] (result: Result<Utilities.Unit, ErrorEvent<ErrorRepr>>) in
+            .startWithValues { [unowned self] (result: Result<Utilities.Unit, ErrorEvent<ErrorRepr>>) in
                 switch result {
                 case .success(.unit):
                     break
@@ -614,12 +553,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.lifetime += self.store.$value.signalProducer
             .map(\.psiCash.pendingAccountLoginLogout)
             .skipRepeats()
-            .startWithValues { maybeLoginLogoutEvent in
+            .startWithValues { [unowned store] maybeLoginLogoutEvent in
                 guard let loginLogoutEvent = maybeLoginLogoutEvent else {
                     return
                 }
-                
-                let maybeAlert: UIAlertController?
+
+                let maybeAlert: AlertType?
                 
                 switch loginLogoutEvent.wrapped {
                 case .pending(_):
@@ -629,102 +568,65 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     
                     switch completedLoginEvent {
                     case let .success(loginResponse):
-                        
-                        let message: String
-                        if loginResponse.lastTrackerMerge {
-                            message = """
-                            \(UserStrings.Psicash_logged_in_successfully())\
-                            \n
-                            \(UserStrings.Psicash_accounts_last_merge_warning())
-                        """
-                        } else {
-                            message = UserStrings.Psicash_logged_in_successfully()
-                        }
-                        
-                        maybeAlert = .makeSimpleAlertWithOKButton(
-                            title: UserStrings.Psicash_account(),
-                            message: message,
-                            onDismissed: {
-                                // Note: alertController.presentingViewController is nil
-                                //       at this point.
-                                // If presenting view controller conforms to AlertDismissProtocol,
-                                // calls the alertDismissed callback on the view controller.
-                                let topVC = AppDelegate.getTopPresentedViewController()
-                                if let alertDismissProtocol = topVC as? AlertDismissProtocol {
-                                    alertDismissProtocol.alertDismissed(
-                                        type: .psiCashAccountLoginSuccessAlert)
-                                }
-                                
-                            }
-                        )
-                        
+                        maybeAlert = .psiCashAccountAlert(
+                            .loginSuccessAlert(lastTrackerMerge:loginResponse.lastTrackerMerge))
+
                     case let .failure(errorEvent):
-                        
                         switch errorEvent.error {
                         case .tunnelNotConnected:
-                            maybeAlert = .makeSimpleAlertWithOKButton(
-                                title: UserStrings.Psicash_account(),
-                                message: UserStrings.Psiphon_is_not_connected())
-                            
+                            maybeAlert = .psiCashAccountAlert(.tunnelNotConnectedAlert)
+
                         case .requestError(.errorStatus(.invalidCredentials)):
-                            maybeAlert = .makeSimpleAlertWithOKButton(
-                                title: UserStrings.Psicash_account(),
-                                message: UserStrings.Incorrect_username_or_password())
-                            
+                            maybeAlert = .psiCashAccountAlert(.incorrectUsernameOrPasswordAlert)
+
                         case .requestError(.errorStatus(_)),
                              .requestError(.requestFailed(_)):
-                            maybeAlert = .makeSimpleAlertWithOKButton(
-                                title: UserStrings.Psicash_account(),
-                                message: UserStrings.Operation_failed_please_try_again_alert_message())
+                            maybeAlert = .psiCashAccountAlert(.operationFailedTryAgainAlert)
                         }
                     }
-                    
+
                 case let .completed(.right(completedLogoutEvent)):
                     switch completedLogoutEvent {
                     case .success(_):
-                        maybeAlert = .makeSimpleAlertWithOKButton(
-                            title: UserStrings.Psicash_account(),
-                            message: UserStrings.Psicash_logged_out_successfully())
-                        
+                        maybeAlert = .psiCashAccountAlert(.logoutSuccessAlert)
+
                     case let .failure(errorEvent):
                         switch errorEvent.error {
                         case .tunnelNotConnected:
-                            maybeAlert = .makeSimpleAlertWithOKButton(
-                                title: UserStrings.Psicash_account(),
-                                message: UserStrings.Psiphon_is_not_connected())
-                            
+                            maybeAlert = .psiCashAccountAlert(.tunnelNotConnectedAlert)
+
                         case .requestError(_):
-                            maybeAlert = .makeSimpleAlertWithOKButton(
-                                title: UserStrings.Psicash_account(),
-                                message: UserStrings.Operation_failed_please_try_again_alert_message())
+                            maybeAlert = .psiCashAccountAlert(.operationFailedTryAgainAlert)
                         }
                     }
                     
                 }
-                    
+
+                // Sends alert to store if one has been set.
                 if let alert = maybeAlert {
-                    let success = AppDelegate.getTopPresentedViewController()
-                        .safePresent(alert, animated: true)
-                    
-                    if !success {
-                        self.feedbackLogger.immediate(.error, "failed to present alert controller")
+                    let alertEvent = loginLogoutEvent.map { _ -> AlertType in
+                        alert
                     }
+                    store!.send(.mainViewAction(.presentAlert(alertEvent)))
                 }
             }
-        
-        
+
         if Debugging.printAppState {
-            self.lifetime += self.store.$value.signalProducer.startWithValues { appState in
-                print("*", "-----")
-                dump(appState[keyPath: \.subscriptionAuthState])
-                print("*", "-----")
-            }
+
+            self.lifetime += self.store.$value.signalProducer
+                .skipRepeats()
+                .startWithValues { appState in
+                    print("*", "-----")
+                    dump(appState[keyPath: \.mainView.alertMessages])
+                    print("*", "-----")
+                }
         }
 
     }
     
     @objc func applicationDidBecomeActive(_ application: UIApplication) {
         self.store.send(.appDelegateAction(.appLifecycleEvent(.didBecomeActive)))
+        self.store.send(.mainViewAction(.applicationDidBecomeActive))
     }
     
     @objc func applicationWillResignActive(_ application: UIApplication) {
@@ -754,18 +656,22 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                            open url: URL,
                            options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         
-        return navigator.handle(url: url)
+        return deepLinkingNavigator.handle(url: url)
     }
-    
+
+    @objc func presentPsiCashViewController(_ initialTab: PsiCashScreenTab) {
+        self.store.send(.mainViewAction(.presentPsiCashScreen(initialTab: initialTab)))
+    }
+
     @objc func makeSubscriptionBarView() -> SubscriptionBarView {
         SubscriptionBarView { [unowned objcBridge, store] state in
             switch state.authState {
             case .notSubscribed, .subscribedWithAuth:
                 objcBridge?.presentSubscriptionIAPViewController()
-            
+
             case .failedRetry:
                 store?.send(.appReceipt(.localReceiptRefresh))
-        
+
             case .pending:
                 if state.tunnelStatus == .notConnected {
                     objcBridge?.startStopVPNWithInterstitial()
@@ -773,13 +679,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
         }
     }
-    
-    @objc func makePsiCashViewController(
-        _ initialTab: PsiCashViewController.PsiCashViewControllerTabs
-    ) -> UIViewController {
-        self.makePsiCashViewController(initialTab: initialTab)
-    }
-    
+
     @objc func makeOnboardingViewControllerWithStagesNotCompleted(
         _ completionHandler: @escaping (OnboardingViewController) -> Void
     ) -> OnboardingViewController? {
@@ -881,7 +781,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .startWithValues { [unowned self] psiCashState in
                 // Calls completionHandler with `true` if has an active Speed Boost.
                 completionHandler(psiCashState.activeSpeedBoost(self.dateCompare) != nil)
-        }
+            }
         
     }
     
@@ -890,27 +790,27 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func switchVPNStartStopIntent()
-        -> Promise<SwitchedVPNStartStopIntent>.ObjCPromise<SwitchedVPNStartStopIntent>
+    -> Promise<SwitchedVPNStartStopIntent>.ObjCPromise<SwitchedVPNStartStopIntent>
     {
         let promise = Promise<SwitchedVPNStartStopIntent>.pending()
         
         let subscription: SignalProducer<SubscriptionStatus, Never> =
             self.store.$value.signalProducer
-                .map(\.subscription.status)
-                .filter { $0 != .unknown }
-                .take(first: 1)
+            .map(\.subscription.status)
+            .filter { $0 != .unknown }
+            .take(first: 1)
         
         let syncedVPNState: SignalProducer<VPNProviderManagerState<PsiphonTPM>, Never> =
             self.store.$value.signalProducer
-                .map(\.vpnState.value)
-                .filter { vpnProviderManagerState -> Bool in
-                    if case .completed(_) = vpnProviderManagerState.providerSyncResult {
-                        return true
-                    } else {
-                        return false
-                    }
+            .map(\.vpnState.value)
+            .filter { vpnProviderManagerState -> Bool in
+                if case .completed(_) = vpnProviderManagerState.providerSyncResult {
+                    return true
+                } else {
+                    return false
                 }
-                .take(first: 1)
+            }
+            .take(first: 1)
         
         let activeSpeedBoost: SignalProducer<PurchasedExpirableProduct<SpeedBoostProduct>?, Never> =
             self.store.$value.signalProducer
@@ -952,7 +852,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func restartVPNIfActive() {
         self.store.send(vpnAction: .tunnelStateIntent(
             intent: .start(transition: .restart), reason: .userInitiated
-            ))
+        ))
     }
     
     @objc func syncWithTunnelProvider(reason: TunnelProviderSyncReason) {
@@ -966,7 +866,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     typealias IndexedPsiphonTPMLoadState = Indexed<ProviderManagerLoadState<PsiphonTPM>.LoadState>
     
     @objc func installVPNConfigWithPromise() ->
-        Promise<VPNConfigInstallResultWrapper>.ObjCPromise<VPNConfigInstallResultWrapper>
+    Promise<VPNConfigInstallResultWrapper>.ObjCPromise<VPNConfigInstallResultWrapper>
     {
         // Maps Swift type `Promise<VPNConfigInstallResult>` to equivalent ObjC type.
         self.installVPNConfig().then { VPNConfigInstallResultWrapper($0) }.asObjCPromise()
@@ -991,117 +891,4 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                                        email: email,
                                        uploadDiagnostics: uploadDiagnostics)))
     }
-}
-
-fileprivate extension SwiftDelegate {
-    
-    func makePsiCashViewController(
-        initialTab: PsiCashViewController.PsiCashViewControllerTabs
-    ) -> PsiCashViewController {
-        PsiCashViewController(
-            initialTab: initialTab,
-            store: self.store.projection(
-                value: { $0.psiCashViewControllerReaderState },
-                action: { .psiCash($0) }),
-            iapStore: self.store.projection(
-                value: erase,
-                action: { .iap($0) }),
-            productRequestStore: self.store.projection(
-                value: erase,
-                action: { .productRequest($0) } ),
-            appStoreReceiptStore: self.store.projection(
-                value: erase,
-                action: { .appReceipt($0) } ),
-            tunnelConnectedSignal: self.store.$value.signalProducer
-                .map(\.vpnState.value.providerVPNStatus.tunneled),
-            dateCompare: self.dateCompare,
-            feedbackLogger: self.feedbackLogger,
-            tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection)
-        )
-    }
-        
-}
-
-fileprivate func tryPresentPsiCashViewController(
-    tab: PsiCashViewController.PsiCashViewControllerTabs,
-    makePsiCashViewController:
-        @escaping (PsiCashViewController.PsiCashViewControllerTabs) -> PsiCashViewController,
-    getTopMostPresentedViewController: @escaping () -> UIViewController
-) {
-    let topMostViewController = getTopMostPresentedViewController()
-    
-    let found = topMostViewController
-        .traversePresentingStackFor(type: PsiCashViewController.self)
-    
-    switch found {
-    case .presentInStack(_):
-        // NO-OP
-        break
-        
-    case .presentTopOfStack(let psiCashViewController):
-        psiCashViewController.activeTab = tab
-        
-    case .notPresent:
-        let psiCashViewController = makePsiCashViewController(tab)
-        topMostViewController.present(psiCashViewController, animated: true)
-    }
-}
-
-fileprivate func tryPresentSubscriptionViewController(
-    getTopMostPresentedViewController: @escaping () -> UIViewController
-) {
-    let topMostViewController = getTopMostPresentedViewController()
-    
-    let found = topMostViewController
-        .traversePresentingStackFor(type: IAPViewController.self, searchChildren: true)
-    
-    switch found {
-    case .presentTopOfStack(_), .presentInStack(_):
-        // NO-OP
-        break
-    case .notPresent:
-        let navCtrl = UINavigationController(rootViewController: IAPViewController())
-        topMostViewController.present(navCtrl, animated: true)
-        
-    }
-}
-    
-fileprivate func makeDisallowedTrafficAlertController(
-    onSpeedBoostClicked: @escaping () -> Void,
-    onSubscriptionClicked: @escaping () -> Void
-) -> UIAlertController {
-    
-    let alertController = UIAlertController(
-        title: UserStrings.Upgrade_psiphon(),
-        message: UserStrings.Disallowed_traffic_alert_message(),
-        preferredStyle: .alert
-    )
-    
-    alertController.addAction(
-        UIAlertAction(
-            title: UserStrings.Subscribe_action_button_title(),
-            style: .default,
-            handler: { _ in
-                onSubscriptionClicked()
-            })
-    )
-    
-    alertController.addAction(
-        UIAlertAction(
-            title: UserStrings.Speed_boost(),
-            style: .default,
-            handler: { _ in
-                onSpeedBoostClicked()
-            })
-    )
-    
-    alertController.addAction(
-        UIAlertAction(
-            title: UserStrings.Dismiss_button_title(),
-            style: .cancel,
-            handler: nil
-        )
-    )
-    
-    return alertController
 }

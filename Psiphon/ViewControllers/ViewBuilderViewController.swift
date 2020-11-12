@@ -18,17 +18,23 @@
  */
 
 import UIKit
+import PsiApi
 
-final class AlertViewController<T: ViewBuilder>: UIViewController {
+/// A view controller that is only initialized with a  view builder.
+final class ViewBuilderViewController<T: ViewBuilder>: ReactiveViewController {
 
     private let viewBuilder: T
     var bindable: T.BuildType?
 
-    init(viewBuilder: T) {
+    init(
+        viewBuilder: T,
+        modalPresentationStyle: UIModalPresentationStyle,
+        onDismissed: @escaping () -> Void
+    ) {
         self.viewBuilder = viewBuilder
-        super.init(nibName: nil, bundle: nil)
+        super.init(onDismissed: onDismissed)
 
-        self.modalPresentationStyle = .overFullScreen
+        self.modalPresentationStyle = modalPresentationStyle
     }
 
     required init?(coder: NSCoder) {
@@ -51,16 +57,15 @@ final class AlertViewController<T: ViewBuilder>: UIViewController {
         view.addSubview(containerView)
 
         containerView.activateConstraints {
-            [
-                $0.centerXAnchor.constraint(equalTo: rootViewLayoutGuide.centerXAnchor),
-                $0.centerYAnchor.constraint(equalTo: rootViewLayoutGuide.centerYAnchor),
-                $0.widthAnchor.constraint(lessThanOrEqualTo: rootViewLayoutGuide.widthAnchor,
-                                          multiplier: 0.7),
-                $0.heightAnchor.constraint(lessThanOrEqualTo: rootViewLayoutGuide.widthAnchor,
-                                           multiplier: 0.8)
-            ]
+            $0.constraint(to: rootViewLayoutGuide, .centerX(), .centerY()) +
+                $0.widthAnchor.constraint(toDimension: rootViewLayoutGuide.widthAnchor,
+                                          ratio: 0.8,
+                                          max: 400) +
+                [
+                    $0.heightAnchor.constraint(lessThanOrEqualTo: rootViewLayoutGuide.heightAnchor,
+                                               multiplier: 0.8)
+                ]
         }
-
 
         self.bindable = T.BuildType.build(with: viewBuilder, addTo: containerView)
     }

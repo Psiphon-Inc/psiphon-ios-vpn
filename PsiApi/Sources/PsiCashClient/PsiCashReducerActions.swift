@@ -21,14 +21,17 @@
 import Foundation
 import PsiApi
 
-public enum PsiCashAction {
+public enum PsiCashAction: Equatable {
+
     case initialize
-    case _initialized(Result<PsiCashLibData, ErrorRepr>)
+
+    /// Success result Bool represents whether a refresh state is required or not.
+    case _initialized(Result<PsiCashEffects.PsiCashLibInitSuccess, ErrorRepr>)
     
     case buyPsiCashProduct(PsiCashPurchasableType)
     case _psiCashProductPurchaseResult(
             purchasable: PsiCashPurchasableType,
-            result: PsiCashEffects.PsiCashNewExpiringPurchaseResult
+            result: PsiCashEffects.NewExpiringPurchaseResult
          )
     
     case refreshPsiCashState
@@ -47,7 +50,7 @@ public enum PsiCashAction {
     case dismissedAlert(PsiCashAlertDismissAction)
 }
 
-public enum PsiCashAlertDismissAction {
+public enum PsiCashAlertDismissAction: Equatable {
     case rewardedVideo
     case speedBoostAlreadyActive
 }

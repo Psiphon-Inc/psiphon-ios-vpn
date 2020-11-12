@@ -21,7 +21,8 @@
 /// Note that `SecretString` type does not provide any security guarantees,
 /// and is meant to signify to the programmer that this value contains a secret that
 /// should be handled carefully.
-public struct SecretString: CustomDebugStringConvertible,
+public struct SecretString: Equatable,
+                            CustomDebugStringConvertible,
                             CustomStringConvertible,
                             CustomReflectable {
     
