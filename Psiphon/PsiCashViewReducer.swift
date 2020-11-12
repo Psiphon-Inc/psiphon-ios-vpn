@@ -184,7 +184,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
 
                 switch searchResult {
                 case .notPresent:
-                    // Nop.
+                    // No-op.
                     break
                 case .presentInStack(let viewController):
                     viewController.dismiss(animated: false, completion: nil)
@@ -210,7 +210,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
 
                     switch searchResult {
                     case .notPresent:
-                        // Nop.
+                        // No-op.
                         observer.sendCompleted()
                         return
 
@@ -257,7 +257,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
 
                 case .presentInStack(_),
                      .presentTopOfStack(_):
-                    // Nop.
+                    // No-op.
                     return
                 }
             }
@@ -309,7 +309,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
 
                 switch searchResult {
                 case .notPresent:
-                    // Nop.
+                    // No-op.
                     return
 
                 case .presentInStack(let viewController):

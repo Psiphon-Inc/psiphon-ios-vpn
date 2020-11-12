@@ -105,7 +105,7 @@ struct AppEnvironment {
     let subscriptionAuthStateStore: (SubscriptionAuthStateAction) -> Effect<Never>
     let mainViewStore: (MainViewAction) -> Effect<Never>
 
-    /// `vpnStartCondition` returns true whenever the app is in such a state as to to allo
+    /// `vpnStartCondition` returns true whenever the app is in such a state as to to allow
     /// the VPN to be started. If false is returned the VPN should not be started
     let vpnStartCondition: () -> Bool
     let dateCompare: DateCompare

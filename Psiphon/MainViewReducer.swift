@@ -114,7 +114,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             }
 
             let oldAlerts = state.mainView.alertMessages.filter {
-                // Retruns true for any alert event that has already been presentd,
+                // Retruns true for any alert event that has already been presented,
                 // and is older than anHourAgo.
                 $0.state == .didPresent &&
                     environment.dateCompare.compareDates($0.viewModel.date, anHourAgo, .minute) ==
@@ -260,7 +260,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
 
                         switch searchResult {
                         case .notPresent:
-                            // Nop.
+                            // No-op.
                             return
                         case .presentInStack(let viewController),
                              .presentTopOfStack(let viewController):
@@ -331,7 +331,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
 
                 case .presentInStack(_),
                      .presentTopOfStack(_):
-                    // Nop.
+                    // No-op.
                     break
                 }
             }
