@@ -28,8 +28,13 @@ import ReactiveSwift
 final class PsiCashAccountViewController: ReactiveViewController {
     
     struct ReaderState: Equatable {
-        let accountType: PsiCashAccountType?
+        let accountType: PsiCashAccountType
         let pendingAccountLoginLogout: PsiCashState.PendingAccountLoginLogoutEvent
+    }
+
+    enum ViewControllerAction: Equatable {
+        case psiCashAction(PsiCashAction)
+        case mainViewAction(MainViewAction)
     }
     
     private struct ObservedState: Equatable {
@@ -52,7 +57,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
         weak var viewControllerRef: UIViewController?
     }
     
-    private let store: Store<ReaderState, PsiCashAction>
+    private let store: Store<ReaderState, ViewControllerAction>
     
     private let feedbackLogger: FeedbackLogger
     private let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
@@ -78,13 +83,13 @@ final class PsiCashAccountViewController: ReactiveViewController {
     
 
     init(
-        store: Store<ReaderState, PsiCashAction>,
+        store: Store<ReaderState, ViewControllerAction>,
         feedbackLogger: FeedbackLogger,
         tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
         createNewAccountURL: URL,
         forgotPasswordURL: URL,
         loginOnly: Bool = false,
-        onDismiss: @escaping () -> Void
+        onDismissed: @escaping () -> Void
     ) {
         self.store = store
         
@@ -100,7 +105,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
         
         self.tunnelConnectionRefSignal = tunnelConnectionRefSignal
         
-        super.init(onDismiss: onDismiss)
+        super.init(onDismissed: onDismissed)
         
         self.lifetime += SignalProducer.combineLatest(
             store.$value.signalProducer,
@@ -278,12 +283,11 @@ final class PsiCashAccountViewController: ReactiveViewController {
         )
         
         mutate(createNewAccountButton) {
-            $0.setTitleColor(.darkBlue(), for: .normal)
-            
             $0.titleLabel!.apply(fontSize: .h3,
-                                 typeface: .demiBold,
-                                 color: .darkBlue())
+                                 typeface: .demiBold)
             
+            $0.setTitleColor(.darkBlue(), for: .normal)
+
             $0.setTitle(UserStrings.Create_new_account_button_title(), for: .normal)
             
             $0.contentEdgeInsets = Style.default.buttonMinimumContentEdgeInsets
@@ -412,7 +416,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
         }
         
         self.store.send(
-            .accountLogin(username: username, password: password))
+            .psiCashAction(.accountLogin(username: username, password: password)))
     }
     
     @objc func onForgotPassword() {
@@ -494,14 +498,10 @@ final class PsiCashAccountViewController: ReactiveViewController {
                     case .success(let tunnelConnection) = self.tunnelConnectionRefSignal.first(),
                     case .connected = tunnelConnection?.tunneled
                 else {
-                    // TODO: Alerts are not represented in the navigation state.
-                    //       is there a way to combine error alerts like this?
-                    self.displayBasicErrorAlert(
-                        errorDesc: ErrorEventDescription<ErrorRepr>(
-                            event: .init(ErrorRepr(repr: "tunnel not connected"), date: Date()),
-                            localizedUserDescription: UserStrings.Psiphon_is_not_connected()))
+                    let alertEvent = AlertEvent(.psiCashAccountAlert(.tunnelNotConnectedAlert),
+                                                date: Date())
+                    self.store.send(.mainViewAction(.presentAlert(alertEvent)))
                     
-                    self.feedbackLogger.immediate(.warn, "tunnel not connected")
                     return false
                 }
             }
@@ -544,17 +544,6 @@ final class PsiCashAccountViewController: ReactiveViewController {
         safari.delegate = self
         
         return safari
-    }
-    
-}
-
-extension PsiCashAccountViewController: AlertDismissProtocol {
-    
-    func alertDismissed(type: AlertType) {
-        // Dismisses self if a PsiCash account login success alert is displayed to the user.
-        if case .psiCashAccountLoginSuccessAlert = type {
-            let _  = self.display(screenToPresent: .parent)
-        }
     }
     
 }

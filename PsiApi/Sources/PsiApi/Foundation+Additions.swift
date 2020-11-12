@@ -112,19 +112,19 @@ public struct HashableView<Value: Hashable, Alternative: Hashable>: Hashable {
     }
     
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(value[keyPath: hashKeyPath].hashValue)
+        hasher.combine(value[keyPath: hashKeyPath])
     }
     
 }
 
 public extension Set {
 
-    /// Inserts `newMember` into the set if it is not contained in the set.
-    /// If the set contains a member with value under path `equalPath` equal to `newMember`'s value under the same
+    /// Inserts `newMember` into the set if it is not contained in the set, or if the set contains
+    /// a member with value under path `equalPath` equal to `newMember`'s value under the same
     /// key path, then the contained member is removed from the set, and `newMember` is inserted.
     /// - Returns: true if `newMember` is inserted.
-    mutating func insert<T: Hashable>(
-        orReplaceIfEqual equalPath: KeyPath<Element, T>, _ newMember: Element
+    mutating func update<T: Hashable>(
+        equalityPath: KeyPath<Element, T>, with newMember: Element
     ) -> Bool {
         guard !contains(newMember) else {
             return false
@@ -132,7 +132,7 @@ public extension Set {
         
         var equalMember: Element? = .none
         for member in self {
-            if member[keyPath: equalPath] == newMember[keyPath: equalPath] {
+            if member[keyPath: equalityPath] == newMember[keyPath: equalityPath] {
                 equalMember = member
                 break
             }
@@ -294,6 +294,21 @@ extension PendingValue {
     
 }
 
+extension PendingValue where Pending == Completed {
+    public typealias WrappedValue = Pending // Or equivalently `WrappedValue = Completed`.
+
+    public var pendingOrCompletedValue: WrappedValue {
+        switch self {
+        case .pending(let value):
+            return value
+        case .completed(let value):
+            return value
+        }
+    }
+
+}
+
+
 /// Enables dictionary set/get directly with enums that their raw value type matches the dictionary key.
 extension Dictionary where Key: ExpressibleByStringLiteral {
 
@@ -348,6 +363,11 @@ extension NSDate: UserDefaultsPropertyListType {}
 extension NSArray: UserDefaultsPropertyListType {}
 extension NSDictionary: UserDefaultsPropertyListType {}
 
+extension Bool: UserDefaultsPropertyListType {}
+extension Int: UserDefaultsPropertyListType {}
+extension Float: UserDefaultsPropertyListType {}
+extension Double: UserDefaultsPropertyListType {}
+extension URL: UserDefaultsPropertyListType {}
 extension Data: UserDefaultsPropertyListType {}
 extension String: UserDefaultsPropertyListType {}
 extension Date: UserDefaultsPropertyListType {}

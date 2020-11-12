@@ -74,39 +74,6 @@ fileprivate func psiStatusToAccountLoginStatus(_ status: PSIStatus) -> Result<()
     }
 }
 
-// Should match all cases defined in PSITokenType
-extension PsiCashTokenType: RawRepresentable {
-    
-    public init?(rawValue: String) {
-        switch rawValue {
-        case PSITokenType.earnerTokenType:
-            self = .earner
-        case PSITokenType.spenderTokenType:
-            self = .spender
-        case PSITokenType.indicatorTokenType:
-            self = .indicator
-        case PSITokenType.accountTokenType:
-            self = .account
-        default:
-            return nil
-        }
-    }
-    
-    public var rawValue: String {
-        switch self {
-        case .earner:
-            return PSITokenType.earnerTokenType
-        case .spender:
-            return PSITokenType.spenderTokenType
-        case .indicator:
-            return PSITokenType.indicatorTokenType
-        case .account:
-            return PSITokenType.accountTokenType
-        }
-    }
-    
-}
-
 extension PsiCashLibError {
     
     fileprivate init?(_ error: PSIError?) {
@@ -141,36 +108,21 @@ final class PsiCash {
         self.client.initialized()
     }
     
-    var validTokenTypes: Set<PsiCashTokenType> {
-        
-        let tokenTypes = self.client.validTokenTypes().map { rawTokenType -> PsiCashTokenType in
-            guard let tokenType = PsiCashTokenType(rawValue: rawTokenType) else {
-                // Programming error.
-                fatalError()
-            }
-            return tokenType
-        }
-        
-        return Set(tokenTypes)
-    }
-    
-    var accountType: PsiCashAccountType? {
-        let tokenTypes = self.client.validTokenTypes()
-        
-        if self.client.isAccount() {
-            return .account(loggedIn: tokenTypes.count >= 3)
-        } else {
-            if tokenTypes.count == 0 {
-                return .none
-            } else {
-                return .tracker
-            }
+    var accountType: PsiCashAccountType {
+        switch (hasTokens: self.client.hasTokens(), isAccount: self.client.isAccount()) {
+        case (false, false):
+            return .none
+        case (true, false):
+            return .tracker
+        case (false, true):
+            return .account(loggedIn: false)
+        case (true, true):
+            return .account(loggedIn: true)
         }
     }
     
     var dataModel: PsiCashLibData {
         PsiCashLibData(
-            validTokens: self.validTokenTypes,
             accountType: self.accountType,
             balance: PsiCashAmount(nanoPsi: self.client.balance()),
             availableProducts: self.purchasePrices(),
@@ -191,16 +143,26 @@ final class PsiCash {
     func initialize(
         userAgent: String,
         fileStoreRoot: String,
+        psiCashLegacyDataStore: UserDefaults,
         httpRequestFunc: @escaping (PSIHttpRequest) -> PSIHttpResult,
         forceReset: Bool = false,
         test: Bool = false
-    ) -> PsiCashLibError? {
-        let err = self.client.initialize(withUserAgent: userAgent,
-                                          fileStoreRoot: fileStoreRoot,
-                                          httpRequestFunc: httpRequestFunc,
-                                          forceReset: forceReset,
-                                          test: test)
-        return PsiCashLibError(err)
+    ) -> Result<Bool, PsiCashLibError> {
+        let maybeError = PsiCashLibError(
+            self.client.initialize(
+                withUserAgent: userAgent,
+                fileStoreRoot: fileStoreRoot,
+                httpRequestFunc: httpRequestFunc,
+                forceReset: forceReset,
+                test: test
+            )
+        )
+
+        if let error = maybeError {
+            return .failure(error)
+        }
+
+        return self.migrateTokens(legacyDataStore: psiCashLegacyDataStore)
     }
     
     /// Resets PsiCash data for the current user (Tracker or Account). This will typically
@@ -212,8 +174,50 @@ final class PsiCash {
     /// Forces the given tokens and account status to be set in the datastore. Must be
     /// called after Init(). RefreshState() must be called after method (and shouldn't be
     /// be called before this method, although behaviour will be okay).
-    func migrateTokens(_ tokens: [String: String], isAccount: Bool) -> PsiCashLibError? {
-        PsiCashLibError(self.client.migrateTokens(tokens, isAccount: isAccount))
+    ///
+    /// - Returns: Bool if refresh state is required after a successful migration, otherwise returns error due to token migration.
+    private func migrateTokens(legacyDataStore: UserDefaults) -> Result<Bool, PsiCashLibError> {
+
+        let psiCashDataStoreMigratedToVersionKey = "Psiphon-PsiCash-DataStore-Migrated-Version"
+
+        let migrationVersion = legacyDataStore.integer(forKey: psiCashDataStoreMigratedToVersionKey)
+
+        switch migrationVersion {
+        case 0:
+            // First PsiCash client lib used NSUserDefaults with the two legacy keys
+            // below to store PsiCash tokens and account information.
+
+            // Legacy keys
+            let TOKENS_DEFAULTS_KEY = "Psiphon-PsiCash-UserInfo-Tokens"
+            let ISACCOUNT_DEFAULTS_KEY = "Psiphon-PsiCash-UserInfo-IsAccount"
+
+            guard
+                let untypedTokens = legacyDataStore.dictionary(forKey: TOKENS_DEFAULTS_KEY),
+                let tokens = untypedTokens as? [String: String]
+            else {
+                // No legacy tokens found to migrate.
+                return .success(false)
+            }
+
+            let isAccount = legacyDataStore.bool(forKey: ISACCOUNT_DEFAULTS_KEY)
+
+            let maybeError = PsiCashLibError(self.client.migrateTokens(tokens, isAccount: isAccount))
+
+            if let error = maybeError {
+                // Token migration failed.
+                return .failure(error)
+            }
+
+            legacyDataStore.set(2, forKey: psiCashDataStoreMigratedToVersionKey)
+            return .success(true)
+
+        case 2:
+            // Has already migrated successfully.
+            return .success(false)
+
+        default:
+            fatalError()
+        }
     }
     
     func setRequestMetadata(_ metadata: ClientMetaData) -> PsiCashLibError? {
@@ -472,8 +476,7 @@ final class PsiCash {
                 }
                 let parsedPurchasedType = PsiCashPurchasedType.parse(purchase: purchase)
                 return .success(
-                    NewExpiringPurchaseResponse(refreshedLibData: self.dataModel,
-                                                purchasedType: parsedPurchasedType)
+                    NewExpiringPurchaseResponse(purchasedType: parsedPurchasedType)
                 )
                 
             case .failure(let errorStatus):

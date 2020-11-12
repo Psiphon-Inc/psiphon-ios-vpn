@@ -1036,18 +1036,12 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 
 #pragma mark - PsiCash UI
 
-- (void)presentPsiCashViewController:(PsiCashViewControllerTabs)tab {
-    UIViewController *psiCashViewController = [SwiftDelegate.bridge
-                                               makePsiCashViewController:tab];
-    [self presentViewController:psiCashViewController animated:YES completion:nil];
-}
-
 - (void)addPsiCashButtonTapped {
-    [self presentPsiCashViewController:PsiCashViewControllerTabsAddPsiCash];
+    [SwiftDelegate.bridge presentPsiCashViewController:PsiCashScreenTabAddPsiCash];
 }
 
 - (void)speedBoostButtonTapped {
-    [self presentPsiCashViewController:PsiCashViewControllerTabsSpeedBoost];
+    [SwiftDelegate.bridge presentPsiCashViewController:PsiCashScreenTabSpeedBoost];
 }
 
 - (void)setupPsiphonLogoView {

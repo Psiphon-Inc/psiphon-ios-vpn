@@ -167,6 +167,18 @@ import Foundation
                                  comment: "Button title that lets the user to connect to the Psiphon network. Do not translate or transliterate 'Psiphon'")
     }
 
+    static func Psiphon_connection_required() -> String {
+        return NSLocalizedString("PSIPHON_CONNECTION_REQUIRED", tableName: nil, bundle: Bundle.main,
+                                 value: "Psiphon Connection Required",
+                                 comment: "Alert message informing user that a Psip")
+    }
+
+    static func In_order_to_use_PsiCash_you_must_be_connected() -> String {
+        return NSLocalizedString("PSICASH_MUST_BE_CONNECTED", tableName: nil, bundle: Bundle.main,
+                                 value: "In order to use PsiCash, you must be connected to the Psiphon network.",
+                                 comment: "Body text of a modal dialog shown when the user tries to use (spend, buy, etc.) PsiCash, if they not currently connected. 'Use' here means buy, spend, or otherwise interact with. 'Psiphon' must not be translated/transliterated. 'PsiCash' must not be translated/transliterated.")
+    }
+
     static func Psiphon_is_not_connected() -> String {
         return NSLocalizedString("PSIPHON_IS_NOT_CONNECTED", tableName: nil, bundle: Bundle.main,
                                  value: "Psiphon is not connected",
@@ -304,6 +316,21 @@ import Foundation
         return NSLocalizedString("PSICASH_LOGGED_OUT_SUCCESSFULLY", tableName: nil, bundle: Bundle.main,
                                  value: "You successfully logged out of your PsiCash account.",
                                  comment: "Do not translate or transliterate 'PsiCash'. Alert message when the user has been able to successfully log out of their PsiCash account.")
+    }
+
+    static func Encourage_psicash_account_creation() -> String {
+        // TODO: Localize
+        return "We strongly encourage you to make a PsiCash account. Having an account allows you to share your balance between devices and protect your purchases."
+    }
+
+    static func Continue_without_an_account() -> String {
+        // TODO: Localize
+        return "Continue without an account"
+    }
+
+    static func Create_account() -> String {
+        // TODO: Localize
+        return "Create account"
     }
 
 }

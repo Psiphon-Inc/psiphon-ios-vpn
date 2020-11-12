@@ -62,9 +62,9 @@ If you get a `SIGSEGV` error when hitting a breakpoint in JNI code: Yeah, beats 
          +                                   |
          v                             +-----+------------------------+
 +--------+--------+    token expiry    |                              |
-|                 +------------------->+ IsAccount() &&               |
-|  Account tokens |                    | ValidTokenTypes().size() < 3 |
-|                 +------------------->+       "logged out"           |
+|                 +------------------->+  IsAccount() && HasTokens()  |
+|  Account tokens |                    |                              |
+|                 +------------------->+        "logged out"          |
 +--------------+--+   AccountLogout()  |                              |
                ^                       +--+---------------------------+
                |                          |

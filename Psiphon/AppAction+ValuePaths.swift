@@ -145,6 +145,17 @@ extension AppAction {
             self = .feedbackAction(newValue)
         }
     }
+    
+    var mainViewAction: MainViewAction? {
+        get {
+            guard case let .mainViewAction(value) = self else { return nil }
+            return value
+        }
+        set {
+            guard case .mainViewAction = self, let newValue = newValue else { return }
+            self = .mainViewAction(newValue)
+        }
+    }
 }
 
 
@@ -154,10 +165,17 @@ extension AppState {
     ///  TunnelProviderManager reference if it exists.
     var tunnelConnection: TunnelConnection? {
         get {
+            // Workaround, since VPN config cannot be installed on a simulator.
+            #if targetEnvironment(simulator)
+            return TunnelConnection { () -> TunnelConnection.ConnectionResourceStatus in
+                return .connection(.connected)
+            }
+            #else
             guard case let .loaded(tpm) = self.vpnState.value.loadState.value else {
                 return nil
             }
             return tpm.connection
+            #endif
         }
     }
     
@@ -236,8 +254,9 @@ extension AppState {
         }
     }
     
-    var psiCashViewControllerReaderState: PsiCashViewControllerReaderState {
-        PsiCashViewControllerReaderState(
+    var psiCashViewControllerReaderState: PsiCashViewController.ReaderState {
+        PsiCashViewController.ReaderState(
+            mainViewState: self.mainView,
             psiCashBalanceViewModel: self.psiCashBalanceViewModel,
             psiCash: self.psiCash,
             iap: self.iapState,
@@ -271,4 +290,18 @@ extension AppState {
             self.queuedFeedbacks = newValue.queuedFeedbacks
         }
     }
+    
+    var mainViewReducerState: MainViewReducerState {
+        get {
+            MainViewReducerState(
+                mainView: self.mainView,
+                psiCashAccountType: self.psiCash.libData.accountType,
+                appLifecycle: self.appDelegateState.appLifecycle
+            )
+        }
+        set {
+            self.mainView = newValue.mainView
+        }
+    }
+    
 }

@@ -42,28 +42,25 @@ public typealias PsiCashParsed<Value: Equatable> = Result<Value, PsiCashParseErr
 /// Note that a user that has upgraded from tracker to account,
 /// cannot go back to being a tracker only.
 public enum PsiCashAccountType: Equatable {
+    case none
     case account(loggedIn: Bool)
     case tracker
 }
 
 // MARK: PsiCash data model
 public struct PsiCashLibData: Equatable {
-    
-    /// Stored valid token types. Will be empty if no tokens are available.
-    public let validTokens: Set<PsiCashTokenType>
-    public let accountType: PsiCashAccountType?
+
+    public let accountType: PsiCashAccountType
     public let balance: PsiCashAmount
     public let purchasePrices: [PsiCashParsed<PsiCashPurchasableType>]
     public let activePurchases: [PsiCashParsed<PsiCashPurchasedType>]
     
     public init(
-        validTokens: Set<PsiCashTokenType>,
-        accountType: PsiCashAccountType?,
+        accountType: PsiCashAccountType,
         balance: PsiCashAmount,
         availableProducts: [PsiCashParsed<PsiCashPurchasableType>],
         activePurchases: [PsiCashParsed<PsiCashPurchasedType>]
     ) {
-        self.validTokens = validTokens
         self.accountType = accountType
         self.balance = balance
         self.purchasePrices = availableProducts
@@ -75,7 +72,6 @@ public struct PsiCashLibData: Equatable {
 extension PsiCashLibData {
     
     public init() {
-        validTokens = Set()
         accountType = .none
         balance = .zero
         purchasePrices = []
@@ -99,14 +95,11 @@ public struct PsiCashLibError: HashableError {
 
 /// Represents a successful expiring purchase response.
 public struct NewExpiringPurchaseResponse: Equatable {
-    public let refreshedLibData: PsiCashLibData
     public let purchasedType: PsiCashParsed<PsiCashPurchasedType>
     
     public init(
-        refreshedLibData: PsiCashLibData,
         purchasedType: PsiCashParsed<PsiCashPurchasedType>
     ) {
-        self.refreshedLibData = refreshedLibData
         self.purchasedType = purchasedType
     }
 }
@@ -141,14 +134,6 @@ public struct PsiCashAmount: Comparable, Hashable, Codable {
 
 public func + (lhs: PsiCashAmount, rhs: PsiCashAmount) -> PsiCashAmount {
     return PsiCashAmount(nanoPsi: lhs.inNanoPsi + rhs.inNanoPsi)
-}
-
-/// Represents stored valid token types.
-public enum PsiCashTokenType: Hashable {
-    case earner
-    case spender
-    case indicator
-    case account
 }
 
 // MARK: PsiCash products
@@ -240,7 +225,7 @@ public enum PsiCashPurchasedType: Equatable {
 }
 
 /// Union of all types of PsiCash products.
-public enum PsiCashPurchasableType {
+public enum PsiCashPurchasableType: Equatable {
 
     case speedBoost(PsiCashPurchasable<SpeedBoostProduct>)
 
