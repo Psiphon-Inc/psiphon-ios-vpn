@@ -89,8 +89,6 @@ import PsiCashClient
     @objc func application(_ app: UIApplication,
                            open url: URL,
                            options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool
-    
-    // -
 
     @objc func presentPsiCashViewController(_ initialTab: PsiCashScreenTab)
     
