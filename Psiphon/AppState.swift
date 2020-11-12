@@ -82,7 +82,7 @@ struct AppEnvironment {
     let notifier: PsiApi.Notifier
     let internetReachabilityStatusSignal: SignalProducer<ReachabilityStatus, Never>
     let tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
-    let psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType?, Never>
+    let psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType, Never>
     let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
     let subscriptionStatusSignal: SignalProducer<AppStoreIAP.SubscriptionStatus, Never>
     let urlHandler: URLHandler

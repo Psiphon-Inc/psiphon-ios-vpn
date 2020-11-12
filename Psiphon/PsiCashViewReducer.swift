@@ -77,7 +77,7 @@ struct PsiCashViewState: Equatable {
 
 struct PsiCashViewReducerState: Equatable {
     var viewState: PsiCashViewState
-    let psiCashAccountType: PsiCashAccountType?
+    let psiCashAccountType: PsiCashAccountType
 }
 
 struct PsiCashViewEnvironment {
@@ -111,17 +111,20 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
             return []
         }
 
-        guard
-            case .some(let accountType) = state.psiCashAccountType,
-            case .psiCash = product.type
-        else {
+        guard case .psiCash = product.type else {
             return []
         }
         
         // If not logged into a PsiCash account, the user is first asked
         // to confirm whether they would like to make an account,
         // or continue the purchase without an account.
-        switch accountType {
+        switch state.psiCashAccountType {
+        case .none:
+            return [
+                environment.feedbackLogger.log(
+                    .error, "not allowed to make a purchase without PsiCash tokens").mapNever()
+            ]
+
         case .account(loggedIn: true):
             state.viewState.psiCashIAPPurchaseRequestState = .none
             return [
@@ -273,7 +276,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
         // Otherwise, resets `viewState.psiCashIAPPurchasingState`.
         if case .confirmAccountLogin(let product) = state.viewState.psiCashIAPPurchaseRequestState {
 
-            if case .some(.account(loggedIn: true)) = state.psiCashAccountType {
+            if case .account(loggedIn: true) = state.psiCashAccountType {
                 state.viewState.psiCashIAPPurchaseRequestState = .none
                 return [
                     environment.iapStore(.purchase(product: product, resultPromise: nil)).mapNever()

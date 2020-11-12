@@ -60,11 +60,11 @@ extension TransactionUpdate {
 public struct IAPReducerState: Equatable {
     public var iap: IAPState
     public var psiCashBalance: PsiCashBalance
-    public let psiCashAccountType: PsiCashAccountType?
+    public let psiCashAccountType: PsiCashAccountType
     
     public init(iap: IAPState,
                 psiCashBalance: PsiCashBalance,
-                psiCashAccountType: PsiCashAccountType?) {
+                psiCashAccountType: PsiCashAccountType) {
         self.iap = iap
         self.psiCashBalance = psiCashBalance
         self.psiCashAccountType = psiCashAccountType
@@ -154,7 +154,7 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
             }
             
             // PsiCash IAP requires presence of PsiCash spender token.
-            guard case .some(_) =  state.psiCashAccountType else {
+            guard state.psiCashAccountType != .none else {
                 
                 state.iap.purchasing[product.type] = IAPPurchasing(
                     productType: product.type,

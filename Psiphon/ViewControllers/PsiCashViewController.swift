@@ -753,7 +753,7 @@ extension ErrorEvent where E == IAPError {
 fileprivate extension PsiCashCoinPurchaseTable.ViewModel {
     
     static func makeViewModel(
-        purchasables: [PsiCashPurchasableViewModel], accountType: PsiCashAccountType?
+        purchasables: [PsiCashPurchasableViewModel], accountType: PsiCashAccountType
     ) -> Self {
         let footerText: String?
         if case .tracker = accountType {
