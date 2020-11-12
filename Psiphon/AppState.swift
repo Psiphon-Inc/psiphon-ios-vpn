@@ -108,6 +108,7 @@ struct AppEnvironment {
     /// the VPN to be started. If false is returned the VPN should not be started
     let vpnStartCondition: () -> Bool
     let dateCompare: DateCompare
+    let addToDate: (Calendar.Component, Int, Date) -> Date?
     let rxDateScheduler: QueueScheduler
     let mainDispatcher: MainDispatcher
     let globalDispatcher: GlobalDispatcher
@@ -140,6 +141,7 @@ func makeEnvironment(
     objcBridgeDelegate: ObjCBridgeDelegate,
     rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
     dateCompare: DateCompare,
+    addToDate: @escaping (Calendar.Component, Int, Date) -> Date?,
     mainDispatcher: MainDispatcher,
     globalDispatcher: GlobalDispatcher,
     getTopPresentedViewController: @escaping () -> UIViewController
@@ -253,6 +255,7 @@ func makeEnvironment(
             return !store.value.appDelegateState.adPresentationState
         },
         dateCompare: dateCompare,
+        addToDate: addToDate,
         rxDateScheduler: QueueScheduler.main,
         mainDispatcher: mainDispatcher,
         globalDispatcher: globalDispatcher,
@@ -500,7 +503,9 @@ fileprivate func toMainViewReducerEnvironment(env: AppEnvironment) -> MainViewEn
         feedbackLogger: env.feedbackLogger,
         rxDateScheduler: env.rxDateScheduler,
         makePsiCashViewController: env.makePsiCashViewController,
-        makeSubscriptionViewController: env.makeSubscriptionViewController
+        makeSubscriptionViewController: env.makeSubscriptionViewController,
+        dateCompare: env.dateCompare,
+        addToDate: env.addToDate
     )
 }
 

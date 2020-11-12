@@ -42,6 +42,7 @@ enum MainViewAction: Equatable {
 }
 
 struct MainViewState: Equatable {
+    /// Set of alert messages presented, or to be presented (including failed ones).
     /// - Note: Two elements of`alertMessages` are equal if their `AlertEvent` values are equal.
     var alertMessages = Set<PresentationState<AlertEvent>>()
     var psiCashViewState: PsiCashViewState? = nil
@@ -77,6 +78,8 @@ struct MainViewEnvironment {
     let rxDateScheduler: DateScheduler
     let makePsiCashViewController: () -> PsiCashViewController
     let makeSubscriptionViewController: () -> UIViewController
+    let dateCompare: DateCompare
+    let addToDate: (Calendar.Component, Int, Date) -> Date?
 }
 
 let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvironment> {
@@ -99,6 +102,28 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
 
 
     case let .presentAlert(alertEvent):
+
+        // This is a bounds-check and garbage collection on alertMessages set.
+        // Removes old alert messages that have already been presented.
+        // 100 is some arbitrary large number.
+        if state.mainView.alertMessages.count > 100 {
+            let currentDate = environment.dateCompare.getCurrentTime()
+            guard let anHourAgo = environment.addToDate(.hour, -1, currentDate) else {
+                environment.feedbackLogger.fatalError("unexpected value")
+                return []
+            }
+
+            let oldAlerts = state.mainView.alertMessages.filter {
+                // Retruns true for any alert event that has already been presentd,
+                // and is older than anHourAgo.
+                $0.state == .didPresent &&
+                    environment.dateCompare.compareDates($0.viewModel.date, anHourAgo, .minute) ==
+                    .orderedAscending
+            }
+
+            state.mainView.alertMessages.subtract(oldAlerts)
+        }
+
 
         // This guard ensures that alert dialog is presented successfully,
         // given app's current lifecycle.
