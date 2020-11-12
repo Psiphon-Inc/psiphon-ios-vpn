@@ -164,7 +164,8 @@ struct PsiCashBalanceViewModel: Equatable {
              (.completed(_), .watchedRewardedVideo):
             iconValue = .left(.unit)  // Coin icon
         
-        case (_, .otherBalanceUpdateError):
+        case (_, .otherBalanceUpdateError),
+             (_, .psiCashDataStoreMigration):
             iconValue = .right(.right(.unit))  // Red "i" info button
         }
         

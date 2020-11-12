@@ -43,7 +43,8 @@ typealias PsiCashEnvironment = (
     objcBridgeDelegate: ObjCBridgeDelegate?,
     rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
     metadata: () -> ClientMetaData,
-    getCurrentTime: () -> Date
+    getCurrentTime: () -> Date,
+    psiCashLegacyDataStore: UserDefaults
 )
 
 let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironment> {
@@ -59,24 +60,38 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         }
         
         return [
-            environment.psiCashEffects.initialize(environment.psiCashFileStoreRoot)
-                .map(PsiCashAction._initialized)
+            environment.psiCashEffects.initialize(
+                environment.psiCashFileStoreRoot,
+                environment.psiCashLegacyDataStore
+            ).map(PsiCashAction._initialized)
         ]
     
     case ._initialized(let result):
-        
+
         switch result {
-        case let .success(libData):
-            state.psiCash.initialized(libData)
+        case let .success(libInitSuccess):
+            state.psiCash.initialized(libInitSuccess.libData)
             state.psiCashBalance = .fromStoredExpectedReward(
-                libData: libData, persisted: environment.psiCashPersistedValues)
+                libData: libInitSuccess.libData, persisted: environment.psiCashPersistedValues)
             
             let nonSubscriptionAuths = environment.sharedDB
                 .getNonSubscriptionEncodedAuthorizations()
-            
-            return [
+
+            var effects = [Effect<PsiCashAction>]()
+            effects.append(
                 environment.psiCashEffects.removePurchasesNotIn(nonSubscriptionAuths).mapNever()
-            ]
+            )
+
+            if libInitSuccess.requiresStateRefresh {
+
+                state.psiCashBalance.balanceOutOfDate(reason: .psiCashDataStoreMigration)
+
+                effects.append(
+                    Effect(value: .refreshPsiCashState)
+                )
+            }
+
+            return effects
             
         case let .failure(error):
             return [

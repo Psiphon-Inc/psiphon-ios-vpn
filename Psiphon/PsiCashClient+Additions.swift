@@ -204,17 +204,18 @@ extension PsiCashEffects {
         feedbackLogger: FeedbackLogger
     ) -> PsiCashEffects {
         PsiCashEffects(
-            initialize: { [psiCash] (fileStoreRoot: String?)
-                -> Effect<Result<PsiCashLibData, ErrorRepr>> in
-                Effect { () -> Result<PsiCashLibData, ErrorRepr> in
+            initialize: { [psiCash] (fileStoreRoot: String?, psiCashLegacyDataStore: UserDefaults)
+                -> Effect<Result<PsiCashLibInitSuccess, ErrorRepr>> in
+                Effect { () -> Result<PsiCashLibInitSuccess, ErrorRepr> in
 
                     guard let fileStoreRoot = fileStoreRoot else {
                         return .failure(ErrorRepr(repr: "nil psicash file store root"))
                     }
                     
-                    let maybeError = psiCash.initialize(
+                    let initResult = psiCash.initialize(
                         userAgent: PsiCashClientHardCodedValues.userAgent,
                         fileStoreRoot: fileStoreRoot,
+                        psiCashLegacyDataStore: psiCashLegacyDataStore,
                         httpRequestFunc: { (request: PSIHttpRequest) -> PSIHttpResult in
                             
                             // Maps [PSIPair<NSString>] to Swift type `[(String, String)]`.
@@ -258,10 +259,15 @@ extension PsiCashEffects {
                         },
                         test: Debugging.devServers)
                     
-                    switch maybeError {
-                    case .none:
-                        return .success(psiCash.dataModel)
-                    case .some(let error):
+                    switch initResult {
+                    case .success(let requiredStateRefresh):
+                        return .success(
+                            PsiCashLibInitSuccess(
+                                libData: psiCash.dataModel,
+                                requiresStateRefresh: requiredStateRefresh
+                            )
+                        )
+                    case .failure(let error):
                         return .failure(ErrorRepr(repr: String(describing: error)))
                     }
                 }
