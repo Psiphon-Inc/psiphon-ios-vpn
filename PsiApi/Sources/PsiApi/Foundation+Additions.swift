@@ -363,6 +363,11 @@ extension NSDate: UserDefaultsPropertyListType {}
 extension NSArray: UserDefaultsPropertyListType {}
 extension NSDictionary: UserDefaultsPropertyListType {}
 
+extension Bool: UserDefaultsPropertyListType {}
+extension Int: UserDefaultsPropertyListType {}
+extension Float: UserDefaultsPropertyListType {}
+extension Double: UserDefaultsPropertyListType {}
+extension URL: UserDefaultsPropertyListType {}
 extension Data: UserDefaultsPropertyListType {}
 extension String: UserDefaultsPropertyListType {}
 extension Date: UserDefaultsPropertyListType {}
