@@ -47,6 +47,11 @@ struct AppDelegateState: Equatable {
     var adPresentationState: Bool = false
 }
 
+struct AppDelegateReducerState: Equatable {
+    var appDelegateState: AppDelegateState
+    let subscriptionState: SubscriptionState
+}
+
 struct AppDelegateEnvironment {
     let feedbackLogger: FeedbackLogger
     let sharedDB: PsiphonDataSharedDB
@@ -59,14 +64,16 @@ struct AppDelegateEnvironment {
     let getCurrentTime: () -> Date
 }
 
-let appDelegateReducer = Reducer<AppDelegateState, AppDelegateAction, AppDelegateEnvironment> {
+let appDelegateReducer = Reducer<AppDelegateReducerState,
+                                 AppDelegateAction,
+                                 AppDelegateEnvironment> {
     state, action, environment in
     
     switch action {
     
     case .appLifecycleEvent(let lifecycle):
         
-        state.appLifecycle = lifecycle
+        state.appDelegateState.appLifecycle = lifecycle
         
         switch lifecycle {
         case .didFinishLaunching:
@@ -85,7 +92,7 @@ let appDelegateReducer = Reducer<AppDelegateState, AppDelegateAction, AppDelegat
         }
         
     case .adPresentationStatus(presenting: let presenting):
-        state.adPresentationState = presenting
+        state.appDelegateState.adPresentationState = presenting
         return []
         
     case .checkForDisallowedTrafficAlertNotification:
@@ -105,15 +112,31 @@ let appDelegateReducer = Reducer<AppDelegateState, AppDelegateAction, AppDelegat
         let alertEvent = AlertEvent(.disallowedTrafficAlert,
                                     date: environment.getCurrentTime())
 
-        return [
-            environment.feedbackLogger.log(.info, "Presenting disallowed traffic alert")
-                .mapNever(),
-            environment.mainViewStore(.presentAlert(alertEvent)).mapNever(),
+        var effects = [Effect<AppDelegateAction>]()
+
+        effects.append(
+            // Updates disallowed traffic alert read seq number.
             .fireAndForget {
                 environment.sharedDB.setContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum(
                     environment.sharedDB.getDisallowedTrafficAlertWriteSequenceNum())
             }
-        ]
+        )
+
+        // Presents disallowed traffic alert only if the user is not subscribed.
+        if case .subscribed(_) = state.subscriptionState.status {
+            effects.append(
+                environment.feedbackLogger.log(.info, "Disallowed traffic alert not presented.")
+                    .mapNever()
+            )
+        } else {
+            effects.append(contentsOf: [
+                environment.feedbackLogger.log(.info, "Presenting disallowed traffic alert")
+                    .mapNever(),
+                environment.mainViewStore(.presentAlert(alertEvent)).mapNever(),
+            ])
+        }
+
+        return effects
     }
     
 }
@@ -514,6 +537,20 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     objcBridge!.onPsiCashAccountStatusDidChange(true)
                 } else {
                     objcBridge!.onPsiCashAccountStatusDidChange(false)
+                }
+            }
+
+        // Updates PsiphonDateSharedDB `ContainerAppReceiptLatestSubscriptionExpiryDate`
+        // based on the app's receipt's latest subscription state.
+        self.lifetime += self.store.$value.signalProducer
+            .map(\.subscription.status)
+            .skipRepeats()
+            .startWithValues { [unowned sharedDB] subscriptionStatus in
+                switch subscriptionStatus {
+                case .notSubscribed, .unknown:
+                    sharedDB.setAppReceiptLatestSubscriptionExpiryDate(nil)
+                case let .subscribed(purchase):
+                    sharedDB.setAppReceiptLatestSubscriptionExpiryDate(purchase.expires)
                 }
             }
         

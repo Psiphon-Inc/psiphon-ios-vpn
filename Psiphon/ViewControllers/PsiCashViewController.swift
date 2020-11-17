@@ -282,35 +282,6 @@ final class PsiCashViewController: ReactiveViewController {
                         """)
                 return
             }
-            
-            // PsiCash account type
-            switch observed.readerState.psiCash.libData.accountType {
-            case .none:
-                self.balanceViewWrapper.view.isHidden = true
-                self.tabControl.view.isHidden = true
-                self.logInView.isHidden = true
-                self.containerBindable.bind(
-                    .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
-                )
-                return
-            
-            case .account(loggedIn: false):
-                // User was previously logged in, and now they are logged out.
-                
-                self.balanceViewWrapper.view.isHidden = true
-                self.tabControl.view.isHidden = true
-                
-                self.logInView.isHidden = false
-                self.logInView.bind(.signUpOrLogIn)
-                
-                self.containerBindable.bind(
-                    .left(.right(.right(.right(.right(.signupOrLoginToPsiCash)))))
-                )
-                return
-            
-            case .account(loggedIn: true), .tracker:
-                break
-            }
 
             // Updates active tab UI
             self.tabControl.bind(psiCashViewState.activeTab)
@@ -324,6 +295,7 @@ final class PsiCashViewController: ReactiveViewController {
                 self.containerBindable.bind(
                     .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
                 )
+                return
                 
             case .subscribed(_):
                 // User is subscribed. Only shows the PsiCash balance.
@@ -334,8 +306,40 @@ final class PsiCashViewController: ReactiveViewController {
                 self.containerBindable.bind(
                     .left(.right(.right(.right(.right(.userSubscribed)))))
                 )
+                return
                 
             case .notSubscribed:
+
+                // PsiCash account type
+                switch observed.readerState.psiCash.libData.accountType {
+                case .none:
+                    self.balanceViewWrapper.view.isHidden = true
+                    self.tabControl.view.isHidden = true
+                    self.logInView.isHidden = true
+                    self.containerBindable.bind(
+                        .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
+                    )
+                    return
+
+                case .account(loggedIn: false):
+                    // User was previously logged in, and now they are logged out.
+
+                    self.balanceViewWrapper.view.isHidden = true
+                    self.tabControl.view.isHidden = true
+
+                    self.logInView.isHidden = false
+                    self.logInView.bind(.signUpOrLogIn)
+
+                    self.containerBindable.bind(
+                        .left(.right(.right(.right(.right(.signupOrLoginToPsiCash)))))
+                    )
+                    return
+
+                case .account(loggedIn: true), .tracker:
+                    break
+                }
+
+
                 self.balanceViewWrapper.view.isHidden = false
                 self.tabControl.view.isHidden = false
                 self.balanceViewWrapper.bind(observed.readerState.psiCashBalanceViewModel)

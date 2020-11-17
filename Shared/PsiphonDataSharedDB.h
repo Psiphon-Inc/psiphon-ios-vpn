@@ -130,6 +130,18 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Container Data (Data originating in the container)
 
+/**
+ Returns the latest subscription expiry date present in the app receipt, set by `-setAppReceiptLatestSubscriptionExpiryDate:`.
+ */
+- (NSDate *_Nullable)getAppReceiptLatestSubscriptionExpiryDate;
+
+#if !(TARGET_IS_EXTENSION)
+/**
+ Sets the app receipts latest subscription expiry date. Value can be nil if state is unknown, or already expired.
+ */
+- (void)setAppReceiptLatestSubscriptionExpiryDate:(NSDate *_Nullable)date;
+#endif
+
 /** Returns last foreground state value written by the container.
  * - Note: The value is not ground truth and might be stale if e.g. the container crashes.
  */

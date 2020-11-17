@@ -94,7 +94,15 @@ setActiveAuthorizationIDs:(NSArray<NSString *> *_Nonnull)authorizationIds;
 - (BOOL)hasSubscriptionAuth;
 
 // Returns TRUE if the latest stored auths contain a speed-boost or subscription auth.
-- (BOOL)hasActiveSpeedBoostOrSubscription;
+- (BOOL)hasActiveSpeedBoostOrSubscriptionAuth;
+
+// Convenience function for determinig if a disallowed traffic alert
+// can be displayed or not.
+
+// Returns ture if the user does not have an active
+// subscription or speed-boost authorization, and
+// there is no non-expired subscription in the app receipt.
+- (BOOL)canDisplayDisallowedTrafficAlert;
 
 @end
 
