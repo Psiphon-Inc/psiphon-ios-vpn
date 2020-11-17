@@ -848,9 +848,13 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 return;
                 
             case ActiveAuthorizationResultInactiveSubscription: {
-                // Displays an alert to the user for the expired subscription.
-                [strongSelf displayMessageOnce:VPNStrings.subscriptionExpiredAlertMessage
-                                    identifier:AlertIdSubscriptionExpired];
+
+                // Displays an alert to the user for the expired subscription,
+                // only if the container is in background.
+                if ([self.sharedDB getAppForegroundState] == FALSE) {
+                    [strongSelf displayMessageOnce:VPNStrings.subscriptionExpiredAlertMessage
+                                        identifier:AlertIdSubscriptionExpired];
+                }
                 break;
             }
         }
