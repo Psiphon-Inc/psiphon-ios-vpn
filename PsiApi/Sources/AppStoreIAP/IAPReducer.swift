@@ -355,7 +355,7 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
                 // Finishes the transaction, and refreshes PsiCash state for the latest balance.
                 return [
                     environment.paymentQueue.finishTransaction(requestTransaction).mapNever(),
-                    environment.psiCashStore(.refreshPsiCashState).mapNever(),
+                    environment.psiCashStore(.refreshPsiCashState()).mapNever(),
                     environment.feedbackLogger.log(.info, "verified consumable transaction: '\(requestTransaction)'")
                     .mapNever()
                 ]

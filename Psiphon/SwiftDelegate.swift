@@ -389,7 +389,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
             .skipRepeats()
             .filter { $0 == .connected }
-            .map(value: AppAction.psiCash(.refreshPsiCashState))
+            .map(value: AppAction.psiCash(.refreshPsiCashState()))
             .send(store: self.store)
         
         // Maps connected events to rejected authorization ID data update.
@@ -677,7 +677,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         
         self.store.send(.appDelegateAction(.appLifecycleEvent(.willEnterForeground)))
         self.store.send(vpnAction: .syncWithProvider(reason: .appEnteredForeground))
-        self.store.send(.psiCash(.refreshPsiCashState))
+        self.store.send(.psiCash(.refreshPsiCashState()))
     }
     
     @objc func applicationDidEnterBackground(_ application: UIApplication) {
