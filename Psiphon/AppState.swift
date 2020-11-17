@@ -554,7 +554,7 @@ func makeAppReducer(
                  action: \.productRequest,
                  environment: toRequestDelegateReducerEnvironment(env:)),
         appDelegateReducer.pullback(
-                 value: \.appDelegateState,
+                 value: \.appDelegateReducerState,
                  action: \.appDelegateAction,
                  environment: toAppDelegateReducerEnvironment(env:)),
         feedbackReducer.pullback(

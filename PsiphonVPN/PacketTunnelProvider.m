@@ -848,9 +848,13 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 return;
                 
             case ActiveAuthorizationResultInactiveSubscription: {
-                // Displays an alert to the user for the expired subscription.
-                [strongSelf displayMessageOnce:VPNStrings.subscriptionExpiredAlertMessage
-                                    identifier:AlertIdSubscriptionExpired];
+
+                // Displays an alert to the user for the expired subscription,
+                // only if the container is in background.
+                if ([self.sharedDB getAppForegroundState] == FALSE) {
+                    [strongSelf displayMessageOnce:VPNStrings.subscriptionExpiredAlertMessage
+                                        identifier:AlertIdSubscriptionExpired];
+                }
                 break;
             }
         }
@@ -884,17 +888,15 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 - (void)onServerAlert:(NSString *)reason :(NSString *)subject {
     dispatch_async(self->workQueue, ^{
         if ([reason isEqualToString:@"disallowed-traffic"] && [subject isEqualToString:@""]) {
-            
-            BOOL hasActiveSpeedBoostOrSubscription = [self->sessionConfigValues
-                                                      hasActiveSpeedBoostOrSubscription];
-            
+
+            BOOL canDisplayAlert = [self->sessionConfigValues canDisplayDisallowedTrafficAlert];
+
             [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
                                      format:@"disallowed-traffic server alert: notify user: %@",
-             NSStringFromBOOL(!hasActiveSpeedBoostOrSubscription)];
+             NSStringFromBOOL(canDisplayAlert)];
             
             // Determines if the user is subscribed or speed-boosted.
-            if (hasActiveSpeedBoostOrSubscription == FALSE) {
-                
+            if (canDisplayAlert == TRUE) {
                 // Notifies the extension of the server alert.
                 [self.sharedDB incrementDisallowedTrafficAlertWriteSequenceNum];
                 [[Notifier sharedInstance] post:NotifierDisallowedTrafficAlert];

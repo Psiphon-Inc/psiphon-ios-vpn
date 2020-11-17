@@ -303,5 +303,17 @@ extension AppState {
             self.mainView = newValue.mainView
         }
     }
+
+    var appDelegateReducerState: AppDelegateReducerState {
+        get {
+            AppDelegateReducerState(
+                appDelegateState: self.appDelegateState,
+                subscriptionState: self.subscription
+            )
+        }
+        set {
+            self.appDelegateState = newValue.appDelegateState
+        }
+    }
     
 }
