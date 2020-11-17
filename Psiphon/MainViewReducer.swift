@@ -50,6 +50,7 @@ struct MainViewState: Equatable {
 
 struct MainViewReducerState: Equatable {
     var mainView: MainViewState
+    let subscriptionState: SubscriptionState
     let psiCashAccountType: PsiCashAccountType
     let appLifecycle: AppLifecycle
 }
@@ -72,6 +73,7 @@ extension MainViewReducerState {
 }
 
 struct MainViewEnvironment {
+    let psiCashStore: (PsiCashAction) -> Effect<Never>
     let psiCashViewEnvironment: PsiCashViewEnvironment
     let getTopPresentedViewController: () -> UIViewController
     let feedbackLogger: FeedbackLogger
@@ -316,7 +318,20 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             isPsiCashAccountScreenShown: false
         )
 
-        return [
+        var effects = [Effect<MainViewAction>]()
+
+        // If the user is subscribed and the PsiCash screen is opened,
+        // forces a PsiCash refresh state.
+        // This is useful not show latest PsiCash state, since
+        // for a subscribed user the PsiCash balance will not get updatd otherwise.
+        if case .subscribed(_) = state.subscriptionState.status {
+            effects.append(
+                environment.psiCashStore(.refreshPsiCashState(ignoreSubscriptionState: true))
+                    .mapNever()
+            )
+        }
+
+        effects.append(
             .fireAndForget {
                 let topVC = environment.getTopPresentedViewController()
                 let searchResult = topVC.traversePresentingStackFor(type: PsiCashViewController.self)
@@ -335,7 +350,9 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                     break
                 }
             }
-        ]
+        )
+
+        return effects
 
     case .dismissedPsiCashScreen:
         // If psiCashViewState is nil, it implies the PsiCashViewController not presented.

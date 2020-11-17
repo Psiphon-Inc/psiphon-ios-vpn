@@ -87,7 +87,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                 state.psiCashBalance.balanceOutOfDate(reason: .psiCashDataStoreMigration)
 
                 effects.append(
-                    Effect(value: .refreshPsiCashState)
+                    Effect(value: .refreshPsiCashState())
                 )
             }
 
@@ -180,15 +180,20 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             return [ environment.feedbackLogger.log(.error, errorEvent).mapNever() ]
         }
         
-    case .refreshPsiCashState:
+    case .refreshPsiCashState(let ignoreSubscriptionState):
         
         guard
             state.psiCash.libLoaded,
             let tunnelConnection = state.tunnelConnection,
-            case .notSubscribed = state.subscription.status,
             case .completed(_) = state.psiCash.pendingPsiCashRefresh
         else {
             return []
+        }
+
+        if !ignoreSubscriptionState {
+            guard case .notSubscribed = state.subscription.status else {
+                return []
+            }
         }
         
         state.psiCash.pendingPsiCashRefresh = .pending
@@ -333,7 +338,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         case .success(let accountLoginResponse):
             return [
                 // Refreshes PsiCash state immediately after successful login.
-                Effect(value: .refreshPsiCashState),
+                Effect(value: .refreshPsiCashState()),
                 
                 environment.feedbackLogger.log(
                     .info, "account login completed: '\(accountLoginResponse)'"
@@ -391,7 +396,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                 reason: .watchedRewardedVideo,
                 persisted: environment.psiCashPersistedValues
             )
-            return [Effect(value: .refreshPsiCashState)]
+            return [Effect(value: .refreshPsiCashState())]
         } else {
             return []
         }
