@@ -219,4 +219,28 @@ setActiveAuthorizationIDs:(NSArray<NSString *> *_Nonnull)authorizationIds {
     return FALSE;
 }
 
+- (BOOL)canDisplayDisallowedTrafficAlert {
+
+    // hasActiveSpeedBoostOrSubscriptionAuth value is true
+    // if the user has an active subscription or speed boost authorization.
+    // Note that this value is false while a new authorization is being
+    // retrieved for a new or renewed subscription.
+    BOOL hasActiveSpeedBoostOrSubscriptionAuth = [self hasActiveSpeedBoostOrSubscriptionAuth];
+
+
+    // localSubscriptionActive is true if the app's receipt has a non-expired
+    // subscription according to the system clock.
+    BOOL localSubscriptionActive = FALSE;
+
+    NSDate *_Nullable latestReceiptExpiry = [self->sharedDB
+                                             getAppReceiptLatestSubscriptionExpiryDate];
+
+    if (latestReceiptExpiry != nil &&
+        ([[NSDate date] compare:latestReceiptExpiry] == NSOrderedAscending)) {
+        localSubscriptionActive = TRUE;
+    }
+
+    return !(hasActiveSpeedBoostOrSubscriptionAuth || localSubscriptionActive);
+}
+
 @end
