@@ -203,7 +203,7 @@ setActiveAuthorizationIDs:(NSArray<NSString *> *_Nonnull)authorizationIds {
     return (latestAuths.subscriptionAuth != nil);
 }
 
-- (BOOL)hasActiveSpeedBoostOrSubscription {
+- (BOOL)hasActiveSpeedBoostOrSubscriptionAuth {
     
     if (latestAuths.subscriptionAuth != nil) {
         return TRUE;
