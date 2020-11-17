@@ -70,6 +70,9 @@ UserDefaultsKey const ExtensionDisallowedTrafficAlertWriteSeqIntKey =
 UserDefaultsKey const ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey =
 @"container_disallowed_traffic_alert_read_at_least_up_to_seq_int";
 
+UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate =
+@"Container-Latest-Subscription-Expiry-Date";
+
 /**
  * Key for boolean value that when TRUE indicates that the extension crashed before stop was called.
  * This value is only valid if the extension is not currently running.
@@ -324,6 +327,16 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 #endif
 
 #pragma mark - Container Data (Data originating in the container)
+
+- (NSDate *_Nullable)getAppReceiptLatestSubscriptionExpiryDate {
+    return (NSDate *)[sharedDefaults objectForKey:ContainerAppReceiptLatestSubscriptionExpiryDate];
+}
+
+#if !(TARGET_IS_EXTENSION)
+- (void)setAppReceiptLatestSubscriptionExpiryDate:(NSDate *_Nullable)date {
+    [sharedDefaults setObject:date forKey:ContainerAppReceiptLatestSubscriptionExpiryDate];
+}
+#endif
 
 - (BOOL)getAppForegroundState {
     return [sharedDefaults boolForKey:ContainerForegroundStateBoolKey];
