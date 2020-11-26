@@ -89,7 +89,7 @@ extension Array where Element == ParsedPsiCashAppStorePurchasable {
                 return false
             case let (.localizedPrice(price: price1, priceLocale: priceLocale1),
                       .localizedPrice(price: price2, priceLocale: priceLocale2)):
-                switch priceLocale1.currencyCode!.compare(priceLocale2.currencyCode!) {
+                switch priceLocale1.currencyCode.compare(priceLocale2.currencyCode) {
                 case .orderedSame:
                     return price1 < price2
                 case .orderedAscending:

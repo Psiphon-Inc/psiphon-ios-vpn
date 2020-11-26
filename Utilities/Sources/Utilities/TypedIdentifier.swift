@@ -24,7 +24,7 @@ CustomStringConvertible where RawValue == String {
 extension TypedIdentifier {
      
     public var description: String {
-        self.rawValue
+        "\"\(self.rawValue)\""
     }
     
 }
