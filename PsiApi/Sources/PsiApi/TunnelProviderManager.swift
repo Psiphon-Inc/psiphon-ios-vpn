@@ -523,11 +523,16 @@ extension PsiphonTPM: CustomStringFeedbackDescription {
         // providerBundleIdentifier = ca.psiphon.Psiphon.PsiphonVPN }
         // onDemandEnabled = NO
         // onDemandRules = ( { action = connect interfaceTypeMatch = any }, ) }"
-        
-        String(describing: self.wrappedManager)
+
+        let simplified = String(describing: self.wrappedManager)
             .components(separatedBy: "\n")
             .map { $0.trimmingCharacters(in: .whitespaces) }
             .joined(separator: " ")
+
+        // Value is quoted since it does not follow the same CustomStringConvertible
+        // format as regular Swift types.
+        // This allows easier parsing of description values logged in the feedback.
+        return "PsiphonTPM(\"\(simplified)\")"
     }
 
 }
