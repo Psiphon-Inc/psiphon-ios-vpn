@@ -7,6 +7,12 @@
 _obj
 _test
 
+# Swift build folder
+.build
+
+# Dev Swift projects
+AppStateParser.xcodeproj
+
 # Architecture specific extensions/prefixes
 *.[568vq]
 [568vq].out
