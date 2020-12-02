@@ -148,7 +148,7 @@
 		8D9D9BCC247C6A9D0093220E /* PsiphonRotatingFileFeedbackLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789CF2474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift */; };
 		8D9D9BD0247C6B910093220E /* HardCodedValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9D9BCF247C6B910093220E /* HardCodedValues.swift */; };
 		8D9E602A24364ED2003A46D8 /* VPNStateReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */; };
-		8D9E603524366D71003A46D8 /* FeedbackDescriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */; };
+		8D9E603524366D71003A46D8 /* Types+FeedbackDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E603424366D71003A46D8 /* Types+FeedbackDescription.swift */; };
 		8DB6C6362429080C005E2F4C /* PsiCashMessageWithRetryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */; };
 		8DB6C638242A4D06005E2F4C /* DuskButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB6C637242A4D06005E2F4C /* DuskButton.swift */; };
 		8DCA6864247C7CF8001D026E /* Bindable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DCA6863247C7CF8001D026E /* Bindable.swift */; };
@@ -640,7 +640,7 @@
 		8D9D9BCF247C6B910093220E /* HardCodedValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardCodedValues.swift; sourceTree = "<group>"; };
 		8D9D9C29247C77AB0093220E /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNStateReducer.swift; sourceTree = "<group>"; };
-		8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackDescriptions.swift; sourceTree = "<group>"; };
+		8D9E603424366D71003A46D8 /* Types+FeedbackDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Types+FeedbackDescription.swift"; sourceTree = "<group>"; };
 		8DB0F5A624EC830F0051AF44 /* sw */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sw; path = Strings/sw.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageWithRetryView.swift; sourceTree = "<group>"; };
 		8DB6C637242A4D06005E2F4C /* DuskButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuskButton.swift; sourceTree = "<group>"; };
@@ -1375,7 +1375,7 @@
 				8D417EB024147C6D00FEE587 /* LandingPage.swift */,
 				8D417EB224148C1E00FEE587 /* URLHandler.swift */,
 				8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */,
-				8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */,
+				8D9E603424366D71003A46D8 /* Types+FeedbackDescription.swift */,
 				8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */,
 				8D7789BC247493300038BFDA /* VPNState.swift */,
 				8D7789C9247499110038BFDA /* Reachability+Additions.swift */,
@@ -2212,7 +2212,7 @@
 				A84082260CE7662A93697CFF /* LoadingCircleLayer.m in Sources */,
 				A8408AACE30F860F2C961A04 /* WhiteSkyButton.m in Sources */,
 				A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */,
-				8D9E603524366D71003A46D8 /* FeedbackDescriptions.swift in Sources */,
+				8D9E603524366D71003A46D8 /* Types+FeedbackDescription.swift in Sources */,
 				8D26455F24D4842E000F46C0 /* DeepLinkingNavigator.swift in Sources */,
 				CE58B642251A31370081C73C /* AppState+Feedback.swift in Sources */,
 				CED6791B24A4F88D00C4CA81 /* JSONCodable.m in Sources */,
@@ -2550,7 +2550,7 @@
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 194;
+				CURRENT_PROJECT_VERSION = 195;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = Q6HLNEX92A;
 				ENABLE_BITCODE = NO;
@@ -2803,7 +2803,7 @@
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 194;
+				CURRENT_PROJECT_VERSION = 195;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = Q6HLNEX92A;
@@ -2849,7 +2849,7 @@
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 194;
+				CURRENT_PROJECT_VERSION = 195;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
