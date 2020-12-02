@@ -321,7 +321,7 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
         case .free:
             button.setTitle(UserStrings.Free(), for: .normal)
         case let .localizedPrice(price: price, priceLocale: priceLocale):
-            priceFormatter.locale = priceLocale
+            priceFormatter.locale = priceLocale.locale
             button.setTitle(priceFormatter.string(from: price), for: .normal)
         }
 

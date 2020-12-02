@@ -47,7 +47,7 @@ public enum AppStoreProductType: String, CaseIterable {
 
 public enum LocalizedPrice: Hashable {
     case free
-    case localizedPrice(price: Double, priceLocale: Locale)
+    case localizedPrice(price: Double, priceLocale: PriceLocale)
 }
 
 extension LocalizedPrice {
@@ -57,7 +57,7 @@ extension LocalizedPrice {
             fatalError("SKProduct cannot have value 0")
         }
         return .localizedPrice(price: skProduct.price.doubleValue,
-                               priceLocale: skProduct.priceLocale)
+                               priceLocale: PriceLocale(skProduct.priceLocale))
     }
     
 }
@@ -104,7 +104,7 @@ public struct Payment: Hashable {
 }
 
 /// Wraps SKProduct.
-public struct AppStoreProduct: Hashable, FeedbackDescription {
+public struct AppStoreProduct: Hashable, CustomStringFeedbackDescription {
     
     public let type: AppStoreProductType
     public let productID: ProductID
@@ -113,6 +113,16 @@ public struct AppStoreProduct: Hashable, FeedbackDescription {
     
     // Underlying SKProduct object
     public let skProductRef: SKProduct?
+
+    public var description: String {
+        // Excludes NSObject `skProductRef`.
+        """
+        AppStoreProduct(type: \(type), \
+        productID: \(productID), \
+        localizedDescription: \"\(localizedDescription)\", \
+        price: \(price))
+        """
+    }
     
     public init(
         type: AppStoreProductType,
