@@ -210,6 +210,7 @@ fileprivate func normalizeFeedbackDescriptionTypes(_ value: String) -> String {
         .replacingOccurrences(of: "PsiApi.", with: "")
         .replacingOccurrences(of: "AppStoreIAP.", with: "")
         .replacingOccurrences(of: "Utilities.", with: "")
+        .replacingOccurrences(of: "PsiCashClient.", with: "")
 }
 
 extension String {

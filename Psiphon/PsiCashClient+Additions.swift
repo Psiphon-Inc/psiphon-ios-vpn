@@ -132,7 +132,7 @@ extension PsiCashNewExpiringPurchaseErrorStatus {
 extension PsiCashAmount: CustomStringFeedbackDescription {
     
     public var description: String {
-        "PsiCash(inPsi %.2f: \(String(format: "%.2f", self.inPsi)))"
+        "PsiCash(inPsi: \(String(format: "%.2f", self.inPsi)))"
     }
     
 }
