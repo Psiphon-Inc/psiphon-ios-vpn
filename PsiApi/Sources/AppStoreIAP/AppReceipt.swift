@@ -32,7 +32,7 @@ public enum ReceiptReadReason: Equatable, CaseIterable {
 public struct ReceiptState: Equatable {
     
     public typealias ReceiptRefreshState = PendingValue<SKReceiptRefreshRequest,
-                                                        Result<Utilities.Unit, SystemErrorEvent>>
+                                                        Result<Utilities.Unit, SystemErrorEvent<Int>>>
     
     public var receiptData: ReceiptData?
     
@@ -40,7 +40,7 @@ public struct ReceiptState: Equatable {
     // object while the request is in progress.
     public var remoteReceiptRefreshState: ReceiptRefreshState
     
-    public var remoteRefreshAppReceiptPromises: [Promise<Result<Utilities.Unit, SystemErrorEvent>>]
+    public var remoteRefreshAppReceiptPromises: [Promise<Result<Utilities.Unit, SystemErrorEvent<Int>>>]
 }
 
 // Convenience properties.
@@ -64,7 +64,7 @@ extension ReceiptState {
     }
     
     public mutating func fulfillRefreshPromises(
-        _ value: Result<Utilities.Unit, SystemErrorEvent>
+        _ value: Result<Utilities.Unit, SystemErrorEvent<Int>>
     ) -> Effect<Never> {
         let refreshPromises = self.remoteRefreshAppReceiptPromises
         self.remoteRefreshAppReceiptPromises = []
@@ -78,6 +78,6 @@ public enum ReceiptStateAction: Equatable {
     case localReceiptRefresh
     case _localReceiptDidRefresh(refreshedData: ReceiptData?)
     /// A remote receipt refresh can open a dialog box to
-    case remoteReceiptRefresh(optionalPromise: Promise<Result<Utilities.Unit, SystemErrorEvent>>?)
-    case _remoteReceiptRefreshResult(Result<Utilities.Unit, SystemErrorEvent>)
+    case remoteReceiptRefresh(optionalPromise: Promise<Result<Utilities.Unit, SystemErrorEvent<Int>>>?)
+    case _remoteReceiptRefreshResult(Result<Utilities.Unit, SystemErrorEvent<Int>>)
 }

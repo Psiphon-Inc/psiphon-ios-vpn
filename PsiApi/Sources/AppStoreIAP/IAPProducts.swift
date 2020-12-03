@@ -213,7 +213,7 @@ public struct PaymentTransaction: Equatable {
             /// This might indicate that the device is jailbroken.
             case invalidTransaction
             /// Represents an error emitted by `StoreKit` processing an in-app purchase.
-            case error(Either<SystemError, SKError>)
+            case error(Either<SystemError<Int>, SystemError<SKError.Code>>)
         }
         
         case pending(PendingTransactionState)
