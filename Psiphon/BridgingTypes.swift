@@ -242,7 +242,7 @@ import PsiCashClient
                 return .startFinished
             case .completed(.failure(let errorEvent)):
                 switch errorEvent.error {
-                case .neVPNError(let neVPNError):
+                case .systemVPNError(let neVPNError):
                     if neVPNError.configurationReadWriteFailedPermissionDenied {
                         return .failedUserPermissionDenied
                     } else {

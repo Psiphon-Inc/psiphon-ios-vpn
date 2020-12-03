@@ -72,7 +72,7 @@ public enum SubscriptionAuthStateAction {
     case localDataUpdate(type: StoredDataUpdateType)
     
     case _didLoadStoredPurchaseAuthState(
-        loadResult: Result<SubscriptionAuthState.PurchaseAuthStateDict, SystemErrorEvent>,
+        loadResult: Result<SubscriptionAuthState.PurchaseAuthStateDict, SystemErrorEvent<Int>>,
         replayDataUpdate: StoredDataUpdateType?
     )
     
@@ -782,8 +782,8 @@ fileprivate enum StoredSubscriptionPurchasesAuthState {
     /// If there is no stored data, returns an empty dictionary.
     static func getValue(
         sharedDB: SharedDBContainer
-    ) -> Effect<Result<StoredDataType, SystemErrorEvent>> {
-        Effect { () -> Result<StoredDataType, SystemErrorEvent> in
+    ) -> Effect<Result<StoredDataType, SystemErrorEvent<Int>>> {
+        Effect { () -> Result<StoredDataType, SystemErrorEvent<Int>> in
             guard let data = sharedDB.getSubscriptionAuths() else {
                 return .success([:])
             }
@@ -792,7 +792,7 @@ fileprivate enum StoredSubscriptionPurchasesAuthState {
                     .decode(StoredDataType.self, from: data)
                 return .success(decoded)
             } catch {
-                return .failure(SystemErrorEvent(SystemError(error)))
+                return .failure(SystemErrorEvent(SystemError<Int>.make(error as NSError)))
             }
         }
     }
@@ -800,8 +800,8 @@ fileprivate enum StoredSubscriptionPurchasesAuthState {
     /// Encodes `value` and stores the `Data` in `sharedDB`.
     static func setValue(
         sharedDB: SharedDBContainer, value: StoredDataType
-    ) -> Effect<Result<(), SystemErrorEvent>> {
-        Effect { () -> Result<(), SystemErrorEvent> in
+    ) -> Effect<Result<(), SystemErrorEvent<Int>>> {
+        Effect { () -> Result<(), SystemErrorEvent<Int>> in
             do {
                 guard !value.isEmpty else {
                     sharedDB.setSubscriptionAuths(nil)
@@ -811,7 +811,7 @@ fileprivate enum StoredSubscriptionPurchasesAuthState {
                 sharedDB.setSubscriptionAuths(data)
                 return .success(())
             } catch {
-                return .failure(SystemErrorEvent(SystemError(error)))
+                return .failure(SystemErrorEvent(SystemError<Int>.make(error as NSError)))
             }
         }
     }

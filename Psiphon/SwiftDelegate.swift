@@ -238,7 +238,7 @@ extension SwiftDelegate: RewardedVideoAdBridgeDelegate {
             // Note that error event is created here as opposed to the origin
             // of where the error occurred. However this is acceptable as long as
             // this function is called once for each error that happened almost immediately.
-            loadResult = .failure(ErrorEvent(.adSDKError(SystemError(error))))
+            loadResult = .failure(ErrorEvent(.adSDKError(SystemError<Int>.make(error))))
         } else {
             if case .error = status {
                 loadResult = .failure(ErrorEvent(.requestedAdFailedToLoad))
@@ -707,7 +707,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError> {
-        let promise = Promise<Result<Utilities.Unit, SystemErrorEvent>>.pending()
+        let promise = Promise<Result<Utilities.Unit, SystemErrorEvent<Int>>>.pending()
         let objcPromise = promise.then { result -> Error? in
             return result.projectError()?.error
         }
