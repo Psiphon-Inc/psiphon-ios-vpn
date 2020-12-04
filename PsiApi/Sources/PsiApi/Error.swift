@@ -102,9 +102,15 @@ public enum SystemError<Code: Hashable>: HashableError {
 
     /// Wraps values from an `NSError` object that we care about.
     public struct ErrorInfo: HashableError {
+        /// Error domain.
         public let domain: String
+        /// Typed error code for the given domain.
         public let code: Code
+        /// Integral error code for the given domain.
+        public let errorCode: Int
+        /// Localized description of an `NSError`.
         public let localizedDescription: String?
+        /// Localized failure reason of an `NSError`.
         public let localizedFailureReason: String?
     }
 
@@ -132,6 +138,7 @@ public extension SystemError {
         let errorInfo = SystemError<Int>.ErrorInfo(
             domain: nsError.domain,
             code: nsError.code,
+            errorCode: nsError.code,
             localizedDescription: nsError.localizedDescription,
             localizedFailureReason: nsError.localizedFailureReason
         )
@@ -151,6 +158,7 @@ public extension SystemError {
         let errorInfo = SystemError<NEVPNError.Code>.ErrorInfo(
             domain: NEVPNError.errorDomain,
             code: nsError.code,
+            errorCode: nsError.errorCode,
             localizedDescription: nsError.localizedDescription,
             localizedFailureReason: nil
         )
@@ -170,6 +178,7 @@ public extension SystemError {
         let errorInfo = SystemError<SKError.Code>.ErrorInfo(
             domain: SKError.errorDomain,
             code: nsError.code,
+            errorCode: nsError.errorCode,
             localizedDescription: nsError.localizedDescription,
             localizedFailureReason: nil
         )
