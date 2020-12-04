@@ -92,6 +92,15 @@ public struct ErrorEvent<E: HashableError>: HashableError, FeedbackDescription {
 extension ErrorEvent: Codable where E: Codable {}
 
 /// Represents an `NSError`.
+///
+/// `Code` in practice should either be an `Int` or a `RawRepresentable` type with `RawValue == Int`.
+///
+/// Additionally, in the current implementation of `SystemError`,
+/// the underlying type has `Code == Int`.
+/// 
+/// A more complete description of `SystemError` would require it to be some kind of a
+/// recursive type, so far however this level of type information has not been needed.
+///
 public enum SystemError<Code: Hashable>: HashableError {
 
     /// Represents root error cause of an error condition.
