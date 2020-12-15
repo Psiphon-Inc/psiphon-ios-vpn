@@ -38,7 +38,7 @@ swift run parser "A(pendingPsiCashRefresh: Pending<Result<Unit, Error>>.complete
 
 # Installation
 
-You can also build and install the tool with the following commands:
+You can also build and install the tool with the following commands (or simply run `install.sh` from this directory):
 ```
 # Build the project under .build/release/
 swift build -c release

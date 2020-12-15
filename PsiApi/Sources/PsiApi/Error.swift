@@ -20,6 +20,8 @@
 
 import Foundation
 import Utilities
+import struct NetworkExtension.NEVPNError
+import struct StoreKit.SKError
 
 public typealias HashableError = Error & Hashable
 
@@ -33,15 +35,17 @@ public struct FatalError: HashableError {
 
 /// String representation of a type-erased error.
 public struct ErrorRepr: HashableError, Codable {
+
     let repr: String
 
     public init(repr: String) {
         self.repr = repr
     }
     
-    public static func systemError(_ systemError: SystemError) -> Self {
+    public static func systemError<Code>(_ systemError: SystemError<Code>) -> Self {
         return .init(repr: String(describing: systemError))
     }
+
 }
 
 /// Wraps an error event with a localized user description of the error.
@@ -65,16 +69,8 @@ public struct ErrorEventDescription<E: HashableError>: HashableError {
     }
 }
 
-extension ErrorEventDescription where E == SystemError {
-
-    public init(_ event: ErrorEvent<E>) {
-        self.event = event
-        self.localizedUserDescription = event.error.localizedDescription
-    }
-
-}
-
 public struct ErrorEvent<E: HashableError>: HashableError, FeedbackDescription {
+
     public let error: E
     public let date: Date
 
@@ -95,24 +91,120 @@ public struct ErrorEvent<E: HashableError>: HashableError, FeedbackDescription {
 
 extension ErrorEvent: Codable where E: Codable {}
 
-/// `SystemError` represents an error that originates from Apple frameworks (i.e. constructed from NSError).
-public struct SystemError: HashableError {
-    let domain: String
-    let code: Int
-    
-    public init(_ nsError: NSError) {
-        self.domain = nsError.domain
-        self.code = nsError.code
+/// Represents an `NSError`.
+///
+/// `Code` in practice should either be an `Int` or a `RawRepresentable` type with `RawValue == Int`.
+///
+/// Additionally, in the current implementation of `SystemError`,
+/// the underlying type has `Code == Int`.
+/// 
+/// A more complete description of `SystemError` would require it to be some kind of a
+/// recursive type, so far however this level of type information has not been needed.
+///
+public enum SystemError<Code: Hashable>: HashableError {
+
+    /// Represents root error cause of an error condition.
+    case rootError(ErrorInfo)
+
+    /// Represents an error condition with an underlying error.
+    indirect case error(ErrorInfo, underlyingError: SystemError<Int>)
+
+    /// Wraps values from an `NSError` object that we care about.
+    public struct ErrorInfo: HashableError {
+        /// Error domain.
+        public let domain: String
+        /// Typed error code for the given domain.
+        public let code: Code
+        /// Integral error code for the given domain.
+        public let errorCode: Int
+        /// Localized description of an `NSError`.
+        public let localizedDescription: String?
+        /// Localized failure reason of an `NSError`.
+        public let localizedFailureReason: String?
     }
-    
-    public init(_ error: Error) {
-        let nsError = error as NSError
-        self.domain = nsError.domain
-        self.code = nsError.code
+
+    /// Returns `ErrorInfo` object of the top error.
+    public var errorInfo: ErrorInfo {
+
+        switch self {
+
+        case .rootError(let errorInfo):
+            return errorInfo
+
+        case .error(let errorInfo, underlyingError: _):
+            return errorInfo
+
+        }
+
     }
+
 }
 
-public typealias SystemErrorEvent = ErrorEvent<SystemError>
+public extension SystemError {
+
+    static func make(_ nsError: NSError) -> SystemError<Int> {
+
+        let errorInfo = SystemError<Int>.ErrorInfo(
+            domain: nsError.domain,
+            code: nsError.code,
+            errorCode: nsError.code,
+            localizedDescription: nsError.localizedDescription,
+            localizedFailureReason: nsError.localizedFailureReason
+        )
+
+        let maybeUnderlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError
+
+        if let underlyingError = maybeUnderlyingError {
+            return .error(errorInfo, underlyingError: .make(underlyingError))
+        } else {
+            return .rootError(errorInfo)
+        }
+
+    }
+
+    static func make(_ nsError: NEVPNError) -> SystemError<NEVPNError.Code> {
+
+        let errorInfo = SystemError<NEVPNError.Code>.ErrorInfo(
+            domain: NEVPNError.errorDomain,
+            code: nsError.code,
+            errorCode: nsError.errorCode,
+            localizedDescription: nsError.localizedDescription,
+            localizedFailureReason: nil
+        )
+
+        let maybeUnderlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError
+
+        if let underlyingError = maybeUnderlyingError {
+            return .error(errorInfo, underlyingError: .make(underlyingError))
+        } else {
+            return .rootError(errorInfo)
+        }
+
+    }
+
+    static func make(_ nsError: SKError) -> SystemError<SKError.Code> {
+
+        let errorInfo = SystemError<SKError.Code>.ErrorInfo(
+            domain: SKError.errorDomain,
+            code: nsError.code,
+            errorCode: nsError.errorCode,
+            localizedDescription: nsError.localizedDescription,
+            localizedFailureReason: nil
+        )
+
+        let maybeUnderlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError
+
+        if let underlyingError = maybeUnderlyingError {
+            return .error(errorInfo, underlyingError: .make(underlyingError))
+        } else {
+            return .rootError(errorInfo)
+        }
+
+    }
+
+}
+
+public typealias SystemErrorEvent<Code: Hashable> = ErrorEvent<SystemError<Code>>
 
 extension Either: Error where A: Error, B: Error {
     public var localizedDescription: String {

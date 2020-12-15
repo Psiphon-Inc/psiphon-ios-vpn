@@ -141,7 +141,7 @@ public struct HTTPRequestError: Error {
     /// completes successfully or fails, the response parameter contains that information.
     /// From: https://developer.apple.com/documentation/foundation/urlsession/1410330-datatask
     public let partialResponseMetadata: HTTPResponseMetadata?
-    public let errorEvent: ErrorEvent<SystemError>
+    public let errorEvent: ErrorEvent<SystemError<Int>>
 }
 
 extension URL {
@@ -227,7 +227,7 @@ extension HTTPClient {
                         HTTPRequestError(
                             partialResponseMetadata: (response as? HTTPURLResponse)
                                 .map(HTTPResponseMetadata.init),
-                            errorEvent: ErrorEvent(SystemError(error), date: getCurrentTime())
+                            errorEvent: ErrorEvent(SystemError<Int>.make(error as NSError), date: getCurrentTime())
                         )
                     )
                 } else {

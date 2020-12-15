@@ -33,7 +33,7 @@ struct PsiCashViewControllerState: Equatable {
     let iap: IAPState
     let subscription: SubscriptionState
     let appStorePsiCashProducts:
-        PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent>
+        PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent<Int>>
     let isRefreshingAppStoreReceipt: Bool
 }
 
@@ -43,7 +43,7 @@ extension PsiCashViewControllerState {
     func allProducts(
         rewardedVideoClearedForSale: Bool,
         rewardedVideoSubtitle: String
-    ) -> PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent> {
+    ) -> PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent<Int>> {
         appStorePsiCashProducts.map(pending: { lastParsedList -> [PsiCashPurchasableViewModel] in
             // Adds rewarded video ad as the first product if
             let viewModels = lastParsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
@@ -669,7 +669,7 @@ extension ErrorEvent where E == IAPError {
             case let .error(skEmittedError):
                 // Payment cancelled errors are ignored.
                 if case let .right(skError) = skEmittedError,
-                   case .paymentCancelled = skError.code {
+                   case .paymentCancelled = skError.errorInfo.code {
                     optionalDescription = .none
                 } else {
                     optionalDescription = """
