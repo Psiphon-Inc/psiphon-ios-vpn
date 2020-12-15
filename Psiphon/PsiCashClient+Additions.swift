@@ -148,7 +148,9 @@ extension PsiCashEffects {
                         case (.invalidTokens, nil):
                             result = .failure(ErrorEvent(.invalidTokens))
                         case (_, .some(let error)):
-                            result = .failure(ErrorEvent(.error(SystemError(error))))
+                            result = .failure(
+                                ErrorEvent(.error(SystemError<Int>.make(error as NSError)))
+                            )
                         case (_, .none):
                             fatalError("unknown PsiCash status '\(psiCashStatus)'")
                         }
@@ -195,7 +197,9 @@ extension PsiCashEffects {
                                 result: .failure(ErrorEvent(
                                     .serverError(status: status.rawValue,
                                                  shouldRetry: status.shouldRetry,
-                                                 error: error.map(SystemError.init))
+                                                 error: error.map {
+                                                    SystemError<Int>.make($0 as NSError)
+                                                 })
                                 ))
                             )
                         }

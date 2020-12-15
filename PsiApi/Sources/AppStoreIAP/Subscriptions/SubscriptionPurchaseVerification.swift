@@ -51,10 +51,10 @@ public struct SubscriptionValidationRequest: Codable {
 public struct SubscriptionValidationResponse: RetriableHTTPResponse {
     
     public enum ResponseError: HashableError {
-        case failedRequest(SystemError)
+        case failedRequest(SystemError<Int>)
         case badRequest
         case otherErrorStatusCode(HTTPStatusCode)
-        case responseParseError(SystemError)
+        case responseParseError(SystemError<Int>)
     }
     
     // 200 OK response type
@@ -141,7 +141,8 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
                     let decodedBody = try decoder.decode(SuccessResult.self, from: r.data)
                     self.result = .success(decodedBody)
                 } catch {
-                    self.result = .failure(ErrorEvent(.responseParseError(SystemError(error))))
+                    self.result = .failure(ErrorEvent(
+                                            .responseParseError(SystemError<Int>.make(error as NSError))))
                 }
             case .badRequest:
                 self.result = .failure(ErrorEvent(.badRequest))
