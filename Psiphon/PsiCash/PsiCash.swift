@@ -162,7 +162,7 @@ final class PsiCash {
             return .failure(error)
         }
 
-        return self.migrateTokens(legacyDataStore: psiCashLegacyDataStore)
+        return self.migrateTrackerTokens(legacyDataStore: psiCashLegacyDataStore)
     }
     
     /// Resets PsiCash data for the current user (Tracker or Account). This will typically
@@ -176,7 +176,7 @@ final class PsiCash {
     /// be called before this method, although behaviour will be okay).
     ///
     /// - Returns: Bool if refresh state is required after a successful migration, otherwise returns error due to token migration.
-    private func migrateTokens(legacyDataStore: UserDefaults) -> Result<Bool, PsiCashLibError> {
+    private func migrateTrackerTokens(legacyDataStore: UserDefaults) -> Result<Bool, PsiCashLibError> {
 
         let psiCashDataStoreMigratedToVersionKey = "Psiphon-PsiCash-DataStore-Migrated-Version"
 
@@ -184,12 +184,15 @@ final class PsiCash {
 
         switch migrationVersion {
         case 0:
-            // First PsiCash client lib used NSUserDefaults with the two legacy keys
-            // below to store PsiCash tokens and account information.
+            // Objective-C based PsiCash client lib used NSUserDefaults with the two legacy keys
+            // "Psiphon-PsiCash-UserInfo-Tokens" to store PsiCash tokens.
+            // An entry in NSUserDefaults with key "Psiphon-PsiCash-UserInfo-IsAccount" was
+            // also created, but never used.
+            // PsiCash accounts was introduced in the C++ version of the PsiCash client lib,
+            // which deprecated the Objective-C based PsiCash client lib.
 
-            // Legacy keys
+            // Tracker tokens legacy key
             let TOKENS_DEFAULTS_KEY = "Psiphon-PsiCash-UserInfo-Tokens"
-            let ISACCOUNT_DEFAULTS_KEY = "Psiphon-PsiCash-UserInfo-IsAccount"
 
             guard
                 let untypedTokens = legacyDataStore.dictionary(forKey: TOKENS_DEFAULTS_KEY),
@@ -199,9 +202,7 @@ final class PsiCash {
                 return .success(false)
             }
 
-            let isAccount = legacyDataStore.bool(forKey: ISACCOUNT_DEFAULTS_KEY)
-
-            let maybeError = PsiCashLibError(self.client.migrateTokens(tokens, isAccount: isAccount))
+            let maybeError = PsiCashLibError(self.client.migrateTrackerTokens(tokens))
 
             if let error = maybeError {
                 // Token migration failed.
