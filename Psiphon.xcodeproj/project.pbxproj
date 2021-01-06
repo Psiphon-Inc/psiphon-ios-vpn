@@ -205,7 +205,6 @@
 		A8408F5F45CDBDF42701063E /* Strings.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083974C8CF9DDFE7A341D /* Strings.m */; };
 		A8408FA13890CD67154033C6 /* RegionSelectionButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408C84138113DE79F0DCD0 /* RegionSelectionButton.m */; };
 		A8408FF45D08D31E102FA41F /* ContainerDB.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086716D701D0F5B48E4C0 /* ContainerDB.m */; };
-		CB0CFCFF11CEECCAA1A2C8BF /* libPods-PsiphonVPN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A44F0D2E7AB9F499D75A1AC4 /* libPods-PsiphonVPN.a */; };
 		CE234A7424F439CB0007709A /* FeedbackReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE234A7324F439CB0007709A /* FeedbackReducer.swift */; };
 		CE234A7624F46AEC0007709A /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE234A7524F46AEC0007709A /* Feedback.swift */; };
 		CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC941BBDC7B800B83375 /* Assets.xcassets */; };
@@ -923,7 +922,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				668AF9BF1E92CBD3008CAAAA /* NetworkExtension.framework in Frameworks */,
-				CB0CFCFF11CEECCAA1A2C8BF /* libPods-PsiphonVPN.a in Frameworks */,
 				52D5F572259DAE150071888D /* PsiphonTunnel.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
