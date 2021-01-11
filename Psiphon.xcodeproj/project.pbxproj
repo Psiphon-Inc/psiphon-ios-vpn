@@ -77,6 +77,9 @@
 		524B4E6B2316F0E3004E9891 /* BorderedSubtitleButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6A2316F0E3004E9891 /* BorderedSubtitleButton.m */; };
 		524B4E6E2316F27F004E9891 /* AnimatedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6D2316F27F004E9891 /* AnimatedControl.m */; };
 		528D81332384823F00AA2D77 /* PsiCashMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D81322384823F00AA2D77 /* PsiCashMessageView.swift */; };
+		529DE74825AD039200F82936 /* PsiphonTunnel.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */; };
+		529DE74925AD039200F82936 /* PsiphonTunnel.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		529DE74A25AD039C00F82936 /* PsiphonTunnel.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */; };
 		52A24659238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */; };
 		52A2465E239081C100A01FF1 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465D239081C100A01FF1 /* AppState.swift */; };
 		52A24662239B07E000A01FF1 /* psiCashProductIds.plist in Resources */ = {isa = PBXBuildFile; fileRef = 52A24661239B07E000A01FF1 /* psiCashProductIds.plist */; };
@@ -97,7 +100,6 @@
 		52DF5E9823CE5A8300A1B067 /* AppAction+ValuePaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9723CE5A8300A1B067 /* AppAction+ValuePaths.swift */; };
 		52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9923CE835100A1B067 /* UserStrings.swift */; };
 		52DF5E9E23D0D01F00A1B067 /* BridgingTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9D23D0D01F00A1B067 /* BridgingTypes.swift */; };
-		66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; };
 		6615A5EA1F58A95500026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		668AF9BF1E92CBD3008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
@@ -105,8 +107,8 @@
 		8D0017D724DB233200EC3409 /* VPNStrings.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D0017D624DB233200EC3409 /* VPNStrings.m */; };
 		8D0017D924DB4B1200EC3409 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0017D824DB4B1200EC3409 /* OnboardingViewController.swift */; };
 		8D0017DB24DDD99A00EC3409 /* AppUpgrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0017DA24DDD99A00EC3409 /* AppUpgrade.swift */; };
-		8D1F62BA247DBB0D0028AFAF /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62B9247DBB0D0028AFAF /* SwiftPackageProductDependency */; };
-		8D1F62BC247DBB130028AFAF /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62BB247DBB130028AFAF /* SwiftPackageProductDependency */; };
+		8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62B9247DBB0D0028AFAF /* Utilities */; };
+		8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62BB247DBB130028AFAF /* PsiApi */; };
 		8D1F62BE247DC1690028AFAF /* Receipt+AppStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62BD247DC1690028AFAF /* Receipt+AppStore.swift */; };
 		8D1F62C0247DC3350028AFAF /* Authorization+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */; };
 		8D1F62C2247DC4840028AFAF /* PsiCashClient+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */; };
@@ -197,7 +199,6 @@
 		CE551C6A24FBFB8E00011C51 /* PsiphonFeedback+FeedbackUploadProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE551C6924FBFB8E00011C51 /* PsiphonFeedback+FeedbackUploadProvider.swift */; };
 		CE58B642251A31370081C73C /* AppState+Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE58B641251A31370081C73C /* AppState+Feedback.swift */; };
 		CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */; };
-		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		CE8420472522823D00796032 /* DebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE84203D2522823D00796032 /* DebugViewController.m */; };
 		CE8420482522823D00796032 /* DebugToolboxViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE84203F2522823D00796032 /* DebugToolboxViewController.m */; };
 		CE8420492522823D00796032 /* DebugTextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8420432522823D00796032 /* DebugTextViewController.m */; };
@@ -357,7 +358,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				4E30745F2097922C00B6D2A3 /* PsiCashLib.framework in CopyFiles */,
-				CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */,
+				529DE74925AD039200F82936 /* PsiphonTunnel.xcframework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -501,6 +502,7 @@
 		524B4E6C2316F27F004E9891 /* AnimatedControl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnimatedControl.h; sourceTree = "<group>"; };
 		524B4E6D2316F27F004E9891 /* AnimatedControl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AnimatedControl.m; sourceTree = "<group>"; };
 		528D81322384823F00AA2D77 /* PsiCashMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageView.swift; sourceTree = "<group>"; };
+		529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = PsiphonTunnel.xcframework; sourceTree = "<group>"; };
 		52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedBoostPurchaseTable.swift; sourceTree = "<group>"; };
 		52A2465D239081C100A01FF1 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		52A24661239B07E000A01FF1 /* psiCashProductIds.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = psiCashProductIds.plist; sourceTree = "<group>"; };
@@ -528,7 +530,6 @@
 		5A3C99559CAE18924C378029 /* Pods-PsiphonVPN.internal.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.internal.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.internal.xcconfig"; sourceTree = "<group>"; };
 		657B68F7581AB2C5DFB33758 /* Pods-PsiApi-Testing-TestingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-TestingTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-TestingTests/Pods-PsiApi-Testing-TestingTests.release.xcconfig"; sourceTree = "<group>"; };
 		65957584722BB1AA6B3B4825 /* Pods-PsiApi.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi/Pods-PsiApi.release.xcconfig"; sourceTree = "<group>"; };
-		66094F781E8067520069EC4E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
 		6615A5E91F58A95500026C98 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Strings/en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6615A5EC1F58A95E00026C98 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = Strings/fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		661DA4B91F68391E00BB4B93 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = Strings/ar.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -876,10 +877,11 @@
 				8D497A2A247CEF50009CEBA8 /* GoogleMobileAds.framework in Frameworks */,
 				8D497A2E247CEF50009CEBA8 /* nanopb.xcframework in Frameworks */,
 				8D497A28247CEF50009CEBA8 /* GoogleAppMeasurement.framework in Frameworks */,
-				8D1F62BC247DBB130028AFAF /* BuildFile in Frameworks */,
+				8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */,
 				8D497A2C247CEF50009CEBA8 /* GoogleUtilities.xcframework in Frameworks */,
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
-				8D1F62BA247DBB0D0028AFAF /* BuildFile in Frameworks */,
+				8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */,
+				529DE74825AD039200F82936 /* PsiphonTunnel.xcframework in Frameworks */,
 				440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */,
 				474C2778BC8FAFDB749E5DC3 /* libPods-Psiphon.a in Frameworks */,
 			);
@@ -890,7 +892,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				668AF9BF1E92CBD3008CAAAA /* NetworkExtension.framework in Frameworks */,
-				66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */,
+				529DE74A25AD039C00F82936 /* PsiphonTunnel.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1179,6 +1181,7 @@
 		668AF9B81E92CB60008CAAAA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */,
 				8D497A24247CEF4F009CEBA8 /* GoogleAppMeasurement.framework */,
 				8D497A25247CEF4F009CEBA8 /* GoogleMobileAds.framework */,
 				8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */,
@@ -1267,7 +1270,6 @@
 				8D5F08A6247DB23A00F51A42 /* Utilities */,
 				8D5F08A5247DB21700F51A42 /* Testing */,
 				4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */,
-				66094F781E8067520069EC4E /* PsiphonTunnel.framework */,
 				4E0DCB101F28458100495781 /* Shared */,
 				CE26FC8C1BBDC7B800B83375 /* Psiphon */,
 				CE26FCA41BBDC85900B83375 /* PsiphonVPN */,
@@ -1714,8 +1716,8 @@
 			);
 			name = Psiphon;
 			packageProductDependencies = (
-				8D1F62B9247DBB0D0028AFAF /* SwiftPackageProductDependency */,
-				8D1F62BB247DBB130028AFAF /* SwiftPackageProductDependency */,
+				8D1F62B9247DBB0D0028AFAF /* Utilities */,
+				8D1F62BB247DBB130028AFAF /* PsiApi */,
 			);
 			productName = Psiphon;
 			productReference = CE26FC8A1BBDC7B800B83375 /* Psiphon.app */;
@@ -1970,7 +1972,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/PsiphonTunnel.framework/strip-frameworks.sh\"\n\n/usr/bin/env python \"./genstrings.py\"\nif [ $? != 0 ] ; then\n    exit 1\nfi\n";
+			shellScript = "/usr/bin/env python \"./genstrings.py\"\nif [ $? != 0 ] ; then\n    exit 1\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2993,11 +2995,11 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		8D1F62B9247DBB0D0028AFAF /* SwiftPackageProductDependency */ = {
+		8D1F62B9247DBB0D0028AFAF /* Utilities */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Utilities;
 		};
-		8D1F62BB247DBB130028AFAF /* SwiftPackageProductDependency */ = {
+		8D1F62BB247DBB130028AFAF /* PsiApi */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PsiApi;
 		};
