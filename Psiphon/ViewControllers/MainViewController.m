@@ -863,10 +863,10 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     CGFloat padding = 10.0f;
     
     versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [versionLabel setTitle:[NSString stringWithFormat:@"V.%@",
-                            [[NSBundle mainBundle]
-                             objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]
+
+    [versionLabel setTitle:[SwiftDelegate.bridge versionLabelText]
                   forState:UIControlStateNormal];
+
     [versionLabel setTitleColor:UIColor.nepalGreyBlueColor forState:UIControlStateNormal];
     versionLabel.titleLabel.adjustsFontSizeToFitWidth = YES;
     versionLabel.titleLabel.font = [UIFont avenirNextBold:12.f];
