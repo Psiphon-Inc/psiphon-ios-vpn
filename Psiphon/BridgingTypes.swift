@@ -139,6 +139,10 @@ import PsiCashClient
                                      comments: String,
                                      email: String,
                                      uploadDiagnostics: Bool)
+
+    // Version string to be displayed by the user-interface.
+    @objc func versionLabelText() -> String
+    
 }
 
 // MARK: Bridged Types
