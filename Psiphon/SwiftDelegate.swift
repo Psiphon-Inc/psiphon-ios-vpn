@@ -862,6 +862,39 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                                        email: email,
                                        uploadDiagnostics: uploadDiagnostics)))
     }
+
+    @objc func versionLabelText() -> String {
+
+        let shortVersionString: String = Bundle.main.object(
+            forInfoDictionaryKey: "CFBundleShortVersionString"
+        ) as? String ?? "(nil)"
+
+        // If this build is not a release build, additional
+        // build metadata can be displayed alongside the version label.
+
+        let postfix: String
+
+        switch Debugging.buildConfig {
+
+        case .debug:
+            postfix = "-debug"
+
+        case .devRelease:
+
+            let bundleVersion: String = Bundle.main.object(  
+                forInfoDictionaryKey: "CFBundleVersion"
+            ) as? String ?? "(nil)"
+
+            postfix = "-(\(bundleVersion))-dev-release"
+
+        case .release:
+            postfix = ""
+
+        }
+
+        return "V.\(shortVersionString)\(postfix)"
+    }
+
 }
 
 fileprivate extension SwiftDelegate {
