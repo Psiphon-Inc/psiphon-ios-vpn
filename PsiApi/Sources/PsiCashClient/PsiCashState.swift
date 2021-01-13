@@ -137,7 +137,7 @@ public enum RewardedVideoAdLoadError: HashableError {
     case customDataNotPresent
     case noTunneledRewardedVideoAd
     case requestedAdFailedToLoad
-    case adSDKError(SystemError)
+    case adSDKError(SystemError<Int>)
 }
 
 public struct RewardedVideoState: Equatable {

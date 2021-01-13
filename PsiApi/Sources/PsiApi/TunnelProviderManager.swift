@@ -69,10 +69,10 @@ extension TunnelProviderVPNStatus {
     
 }
 
-extension NEVPNError {
+extension SystemError where Code == NEVPNError.Code {
     
     public var configurationReadWriteFailedPermissionDenied: Bool {
-        return self.code == .configurationReadWriteFailed &&
+        return self.errorInfo.code == .configurationReadWriteFailed &&
             self.localizedDescription == "permission denied"
     }
     
@@ -144,15 +144,15 @@ public protocol TunnelProviderManager: ClassBound, Equatable {
     
     var connection: TunnelConnection { get }
     
-    static func loadAll(completionHandler: @escaping ([Self]?, NEVPNError?) -> Void)
+    static func loadAll(completionHandler: @escaping ([Self]?, SystemError<NEVPNError.Code>?) -> Void)
     
     static func make() -> Self
     
-    func save(completionHandler: @escaping (NEVPNError?) -> Void)
+    func save(completionHandler: @escaping (SystemError<NEVPNError.Code>?) -> Void)
     
-    func load(completionHandler: @escaping (NEVPNError?) -> Void)
+    func load(completionHandler: @escaping (SystemError<NEVPNError.Code>?) -> Void)
     
-    func remove(completionHandler: @escaping (NEVPNError?) -> Void)
+    func remove(completionHandler: @escaping (SystemError<NEVPNError.Code>?) -> Void)
     
     func start(options: [String: Any]?) throws
     
@@ -188,9 +188,10 @@ public final class PsiphonTPM: TunnelProviderManager {
         self.wrappedManager = manager
     }
     
-    private static func VPNError(from maybeError: Error?) -> NEVPNError? {
+    private static func VPNError(from maybeError: Error?) -> SystemError<NEVPNError.Code>? {
         if let error = maybeError {
-            return NEVPNError(_nsError: error as NSError)
+            let vpnError = NEVPNError(_nsError: error as NSError)
+            return SystemError<NEVPNError.Code>.make(vpnError)
         } else {
             return nil
         }
@@ -206,20 +207,20 @@ public final class PsiphonTPM: TunnelProviderManager {
     }
     
     public static func loadAll(
-        completionHandler: @escaping ([PsiphonTPM]?, NEVPNError?) -> Void
+        completionHandler: @escaping ([PsiphonTPM]?, SystemError<NEVPNError.Code>?) -> Void
     ) {
         return NETunnelProviderManager.loadAllFromPreferences { (maybeManagers, maybeError) in
             completionHandler(maybeManagers?.map(PsiphonTPM.init), Self.VPNError(from: maybeError))
         }
     }
     
-    public func save(completionHandler: @escaping (NEVPNError?) -> Void) {
+    public func save(completionHandler: @escaping (SystemError<NEVPNError.Code>?) -> Void) {
         self.wrappedManager.saveToPreferences { maybeError in
             completionHandler(Self.VPNError(from: maybeError))
         }
     }
     
-    public func load(completionHandler: @escaping (NEVPNError?) -> Void) {
+    public func load(completionHandler: @escaping (SystemError<NEVPNError.Code>?) -> Void) {
         self.wrappedManager.loadFromPreferences { maybeError in
             completionHandler(Self.VPNError(from: maybeError))
         }
@@ -230,7 +231,7 @@ public final class PsiphonTPM: TunnelProviderManager {
     /// After the configuration is removed from the preferences the NEVPNManager object will still
     /// contain the configuration parameters. Calling `loadFromPreferences(completionHandler:):`
     /// will clear out the configuration parameters from the NEVPNManager object.
-    public func remove(completionHandler: @escaping (NEVPNError?) -> Void) {
+    public func remove(completionHandler: @escaping (SystemError<NEVPNError.Code>?) -> Void) {
         self.wrappedManager.removeFromPreferences { maybeError in
             completionHandler(Self.VPNError(from: maybeError))
         }
@@ -325,21 +326,41 @@ public final class PsiphonTPM: TunnelProviderManager {
 }
 
 public func loadFromPreferences<T: TunnelProviderManager>()
-    -> Effect<Result<[T], ErrorEvent<NEVPNError>>>
+-> Effect<Result<[T], ErrorEvent<SystemError<NEVPNError.Code>>>>
 {
     Effect.deferred { fulfilled in
+
         T.loadAll { (maybeManagers: [T]?, maybeError: Error?) in
+
                 switch (maybeManagers, maybeError) {
+
                 case (nil, nil):
+
                     fulfilled(.success([]))
+
                 case (.some(let managers), nil):
+
                     fulfilled(.success(managers))
+
                 case (_ , .some(let error)):
-                    fulfilled(.failure(ErrorEvent(NEVPNError(_nsError: error as NSError),
-                                                  date: Date())))
+
+                    fulfilled(
+                        .failure(
+                            ErrorEvent(
+                                SystemError<NEVPNError.Code>.make(
+                                        NEVPNError(_nsError: error as NSError)
+                                ),
+                                date: Date()
+                            )
+                        )
+                    )
+
                 }
+
         }
+
     }
+
 }
 
 public func updateConfig<T: TunnelProviderManager>(
@@ -352,7 +373,7 @@ public func updateConfig<T: TunnelProviderManager>(
 }
 
 public enum StartTunnelError: HashableError {
-    case neVPNError(NEVPNError)
+    case systemVPNError(SystemError<NEVPNError.Code>)
     case internetNotReachable
 }
 
@@ -367,8 +388,8 @@ public func startPsiphonTunnel<T: TunnelProviderManager>(
                     try tpm.start(options: options)
                     return .success(tpm)
                 } catch {
-                    return .failure(ErrorEvent(.neVPNError(NEVPNError(_nsError: error as NSError)),
-                                               date: Date()))
+                    let error = SystemError<NEVPNError.Code>.make(NEVPNError(_nsError: error as NSError))
+                    return .failure(ErrorEvent(.systemVPNError(error), date: Date()))
                 }
             }
 }
@@ -381,7 +402,7 @@ public func stopVPN<T: TunnelProviderManager>(_ tpm: T) -> Effect<()> {
 }
 
 public func loadConfig<T: TunnelProviderManager>(_ tpm: T)
-    -> Effect<Result<T, ErrorEvent<NEVPNError>>>
+    -> Effect<Result<T, ErrorEvent<SystemError<NEVPNError.Code>>>>
 {
     Effect.deferred { fulfilled in
         tpm.load { maybeError in
@@ -395,7 +416,7 @@ public func loadConfig<T: TunnelProviderManager>(_ tpm: T)
 }
 
 public func saveAndLoadConfig<T: TunnelProviderManager>(_ tpm: T)
-    -> Effect<Result<T, ErrorEvent<NEVPNError>>>
+    -> Effect<Result<T, ErrorEvent<SystemError<NEVPNError.Code>>>>
 {
     Effect.deferred { fulfilled in
         tpm.save { maybeError in
@@ -415,7 +436,7 @@ public func saveAndLoadConfig<T: TunnelProviderManager>(_ tpm: T)
 }
 
 public func removeFromPreferences<T: TunnelProviderManager>(_ tpm: T)
-    -> Effect<Result<(), ErrorEvent<NEVPNError>>>
+-> Effect<Result<(), ErrorEvent<SystemError<NEVPNError.Code>>>>
 {
     Effect.deferred { fulfilled in
         tpm.remove { maybeError in
