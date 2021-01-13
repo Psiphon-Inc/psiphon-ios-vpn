@@ -200,7 +200,7 @@ extension SwiftDelegate: RewardedVideoAdBridgeDelegate {
             // Note that error event is created here as opposed to the origin
             // of where the error occurred. However this is acceptable as long as
             // this function is called once for each error that happened almost immediately.
-            loadResult = .failure(ErrorEvent(.adSDKError(SystemError(error)), date: Date()))
+            loadResult = .failure(ErrorEvent(.adSDKError(SystemError<Int>.make(error)), date: Date()))
         } else {
             if case .error = status {
                 loadResult = .failure(ErrorEvent(.requestedAdFailedToLoad, date: Date()))
@@ -767,7 +767,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError> {
-        let promise = Promise<Result<Utilities.Unit, SystemErrorEvent>>.pending()
+        let promise = Promise<Result<Utilities.Unit, SystemErrorEvent<Int>>>.pending()
         let objcPromise = promise.then { result -> Error? in
             return result.failureToOptional()?.error
         }
@@ -928,4 +928,37 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                                        email: email,
                                        uploadDiagnostics: uploadDiagnostics)))
     }
+
+    @objc func versionLabelText() -> String {
+
+        let shortVersionString: String = Bundle.main.object(
+            forInfoDictionaryKey: "CFBundleShortVersionString"
+        ) as? String ?? "(nil)"
+
+        // If this build is not a release build, additional
+        // build metadata can be displayed alongside the version label.
+
+        let postfix: String
+
+        switch Debugging.buildConfig {
+
+        case .debug:
+            postfix = "-debug"
+
+        case .devRelease:
+
+            let bundleVersion: String = Bundle.main.object(  
+                forInfoDictionaryKey: "CFBundleVersion"
+            ) as? String ?? "(nil)"
+
+            postfix = "-(\(bundleVersion))-dev-release"
+
+        case .release:
+            postfix = ""
+
+        }
+
+        return "V.\(shortVersionString)\(postfix)"
+    }
+
 }

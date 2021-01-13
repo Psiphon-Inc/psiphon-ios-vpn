@@ -140,6 +140,10 @@ import PsiCashClient
                                      comments: String,
                                      email: String,
                                      uploadDiagnostics: Bool)
+
+    // Version string to be displayed by the user-interface.
+    @objc func versionLabelText() -> String
+    
 }
 
 // MARK: Bridged Types
@@ -243,7 +247,7 @@ import PsiCashClient
                 return .startFinished
             case .completed(.failure(let errorEvent)):
                 switch errorEvent.error {
-                case .neVPNError(let neVPNError):
+                case .systemVPNError(let neVPNError):
                     if neVPNError.configurationReadWriteFailedPermissionDenied {
                         return .failedUserPermissionDenied
                     } else {

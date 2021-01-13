@@ -19,8 +19,6 @@
 
 
 #import "PsiphonConfigUserDefaults.h"
-#import "PsiphonSettingsViewController.h"
-#import "UpstreamProxySettings.h"
 #import "SharedConstants.h"
 
 NSString* _Nonnull const PsiphonConfigEgressRegion = @"EgressRegion";

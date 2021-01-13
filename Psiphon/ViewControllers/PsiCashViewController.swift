@@ -734,7 +734,7 @@ extension ErrorEvent where E == IAPError {
             case let .error(skEmittedError):
                 // Payment cancelled errors are ignored.
                 if case let .right(skError) = skEmittedError,
-                   case .paymentCancelled = skError.code {
+                   case .paymentCancelled = skError.errorInfo.code {
                     optionalDescription = .none
                 } else {
                     optionalDescription = """

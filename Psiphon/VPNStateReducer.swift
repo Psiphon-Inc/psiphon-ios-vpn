@@ -689,7 +689,7 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
             updateConfig($0, for: .startVPN)
         }
         .flatMap(.latest, saveAndLoadConfig)
-        .flatMap(.latest) { (saveLoadConfigResult: Result<T, ErrorEvent<NEVPNError>>)
+        .flatMap(.latest) { (saveLoadConfigResult: Result<T, ErrorEvent<SystemError<NEVPNError.Code>>>)
             -> Effect<TPMEffectResultWrapper<T>> in
             switch saveLoadConfigResult {
             case .success(let tpm):
@@ -700,7 +700,9 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
                         switch startResult {
                         case .success(let tpm):
                             return saveAndLoadConfig(tpm)
-                                .map { .configUpdated(.fromConfigSaveAndLoad($0)) }
+                                .map {
+                                    .configUpdated(.fromConfigSaveAndLoad($0))
+                                }
                             .prefix(value:
                                 .startTunnelResult(startResult.successToUnit().toUnit())
                             )
@@ -712,7 +714,7 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
                     }
             case .failure(let errorEvent):
                 return Effect(value:
-                    .startTunnelResult(.failure(errorEvent.map(StartTunnelError.neVPNError)))
+                    .startTunnelResult(.failure(errorEvent.map(StartTunnelError.systemVPNError)))
                 ).prefix(value:
                     .configUpdated(.failure(errorEvent.map { .failedConfigLoadSave($0) }))
                 )
@@ -872,7 +874,7 @@ extension VPNProviderManagerState {
 extension ConfigUpdatedResult {
     
     fileprivate static func fromConfigSaveAndLoad<T: TunnelProviderManager>(
-        _ result: Result<T, ErrorEvent<NEVPNError>>
+        _ result: Result<T, ErrorEvent<SystemError<NEVPNError.Code>>>
     ) -> Result<T?, ErrorEvent<ProviderManagerLoadState<T>.TPMError>> {
         result.map { .some($0) }
             .mapError { neVPNErrorEvent in
@@ -933,7 +935,7 @@ fileprivate func installNewVPNConfig<T: TunnelProviderManager>()
 
 fileprivate func loadAllConfigs<T: TunnelProviderManager>() -> Effect<ConfigUpdatedResult<T>> {
     loadFromPreferences()
-        .flatMap(.latest) { (result: Result<[T], ErrorEvent<NEVPNError>>)
+        .flatMap(.latest) { (result: Result<[T], ErrorEvent<SystemError<NEVPNError.Code>>>)
             -> Effect<ConfigUpdatedResult<T>> in
             switch result {
             case .success(let tpms):
