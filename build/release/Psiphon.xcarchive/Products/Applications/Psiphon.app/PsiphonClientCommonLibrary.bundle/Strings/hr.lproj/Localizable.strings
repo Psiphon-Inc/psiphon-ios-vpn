@@ -1,0 +1,147 @@
+/* External link to the about page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/about.html for french. */
+"ABOUT_PAGE_URL" = "https://psiphon.ca/hr/about.html";
+
+/* Cancel action */
+"CANCEL_ACTION" = "Poništi";
+
+/* Title of the button that dismisses the settings menu (InAppSettingsKit) */
+"DONE_ACTION" = "Gotovo";
+
+/* FAQ link text */
+"FAQ_LINK_TEXT" = "Često postavljena pitanja";
+
+/* External link to the FAQ page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/faq.html for french. */
+"FAQ_URL" = "https://psiphon.ca/hr/faq.html";
+
+/* Comments section placeholder text */
+"FEEDBACK_COMMENTS_PLACEHOLDER" = "Što Vam je na umu? Ostavite svoje povratne informacije";
+
+/* Text referring user to frequently asked questions. %@ is where the separate translation for the phrase 'Frequently Asked Questions' will be placed. */
+"FEEDBACK_FAQ_DIRECTION" = "Možete naći rješenja na mnoge učestale probleme u našoj %@.";
+
+/* Feedback footer text referring users to privacy policy. %@ is where the separate translation for the phrase 'Privacy Policy' will be placed. */
+"FEEDBACK_FOOTER_DATA_COLLECTION" = "Saznajte više o podatcima koje skupljamo u %@";
+
+/* Feedback footer text. DO NOT translate the word 'Psiphon'. */
+"FEEDBACK_FOOTER_DIAGNOSTIC" = "Imajte na umu da Vas ovaj dijagnostički alat ne identificira, a nama pomaže da Psiphon nastavi raditi glatko.";
+
+/* Feedback footer text referring users to feedback email. %@ is where the separate translation for the email will be placed. */
+"FEEDBACK_FOOTER_EMAIL" = "Ako gornji obrazac ne radi ili želite poslati slike, pošaljite nam mail na %@";
+
+/* Introduction text at top of feedback form. DO NOT translate the word 'Psiphon'. */
+"FEEDBACK_INTRODUCTION" = "Vaše povratne informacije čine Psiphon boljim!";
+
+/* Text of button to send feedback */
+"FEEDBACK_SEND_BUTTON" = "Pošalji";
+
+/* Text explaining thumbs down choice in feedback. DO NOT translate the word 'Psiphon'. */
+"FEEDBACK_THUMBS_DOWN_TEXT" = "Psiphon se često\nne uspije spojiti ili\nne radi dovoljno\ndobro.";
+
+/* Text explaining thumbs up choice in feedback. DO NOT translate the word 'Psiphon'. */
+"FEEDBACK_THUMBS_UP_TEXT" = "Psiphon se spaja\ni radi onako\nkako to želim.";
+
+/* External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
+"LICENSE_PAGE_URL" = "https://psiphon.ca/hr/license.html";
+
+/* Title of screen that displays logs */
+"LOGS_TITLE" = "Zapisi";
+
+/* Shown when the device is not configured for sending email. (InAppSettingsKit) */
+"MAIL_NOT_CONFIGURED" = "Mail nije konfiguriran";
+
+/* Description for the 'Mail not configured' message. (InAppSettingsKit) */
+"MAIL_NOT_CONFIGURED_DESC" = "Ovaj uređaj nije konfiguriran za slanje maila. Molimo konfigurirajte postavke maila u aplikaciji za postavke.";
+
+/*[UNTRANSLATED] Alert OK Button. (InAppSettingsKit) */
+"OK_BUTTON" = "OK";
+
+/* Privacy Policy link text */
+"PRIVACY_POLICY_LINK_TEXT" = "Izjava o privatnosti";
+
+/* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
+"PRIVACY_POLICY_URL" = "https://psiphon.ca/hr/privacy.html";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_AT" = "Austrija";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_AU" = "Australija";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_BE" = "Belgija";
+
+/* The name of the pseudo-region a user can select if they want to use a Psiphon server with the best performance -- speed, latency, etc., rather than specify a particular region/country. This appears in a combo box and should be kept short. */
+"SERVER_REGION_BEST_PERFORMANCE" = "Najbolje performanse";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_BG" = "Bugarska";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_CA" = "Kanada";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_CH" = "Švicarska";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_CZ" = "Češka Republika";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_DE" = "Njemačka";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_DK" = "Danska";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_ES" = "Španjolska";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_FR" = "Francuska";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_GB" = "Ujedinjeno Kraljevstvo";
+
+/*[UNTRANSLATED] Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_HK" = "Hong Kong";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_HU" = "Mađarska";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_IN" = "Indija";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_IT" = "Italija";
+
+/*[UNTRANSLATED] Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_JP" = "Japan";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_NL" = "Nizozemska";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_NO" = "Norveška";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_PL" = "Poljska";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_RO" = "Rumunjska";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_RS" = "Srbija";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_SE" = "Švedska";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_SG" = "Singapur";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_SK" = "Slovačka";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_US" = "Sjedinjene Američke Države";
+
+/* Title of the settings (aka preferences) view (InAppSettingsKit) */
+"SETTINGS_TITLE" = "Postavke";
+

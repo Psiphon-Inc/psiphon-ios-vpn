@@ -1,0 +1,147 @@
+/*[UNTRANSLATED] External link to the about page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/about.html for french. */
+"ABOUT_PAGE_URL" = "https://psiphon.ca/en/about.html";
+
+/* Cancel action */
+"CANCEL_ACTION" = "ရပ်ဆိုင်းရန်";
+
+/* Title of the button that dismisses the settings menu (InAppSettingsKit) */
+"DONE_ACTION" = "ပြီးသွားပြီ";
+
+/* FAQ link text */
+"FAQ_LINK_TEXT" = "မကြာခဏမေးလေ့ရှိသော မေးခွန်းများ";
+
+/*[UNTRANSLATED] External link to the FAQ page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/faq.html for french. */
+"FAQ_URL" = "https://psiphon.ca/en/faq.html";
+
+/* Comments section placeholder text */
+"FEEDBACK_COMMENTS_PLACEHOLDER" = "သင်ဘယ်လိုထင်ပါသလဲ။ ကျေးဇူးပြု၍ သင်၏အကြံပြုတုံ့ပြန်ချက် ပေးပို့ပါ။";
+
+/* Text referring user to frequently asked questions. %@ is where the separate translation for the phrase 'Frequently Asked Questions' will be placed. */
+"FEEDBACK_FAQ_DIRECTION" = "ကြုံရလေ့ရှိသောပြဿနာများအတွက် ဖြေရှင်းနည်းများကို %@ တွင်တွေ့နိုင်ပါသည်။";
+
+/* Feedback footer text referring users to privacy policy. %@ is where the separate translation for the phrase 'Privacy Policy' will be placed. */
+"FEEDBACK_FOOTER_DATA_COLLECTION" = "ကျွနု်ပ်တို့ကောက်ယူသော အချက်အလက်များနှင့်ပတ်သတ်၍ ပိုမိုသိရှိနုင်ရန် ဤ %@ တွင် လေ့လာပါ။";
+
+/* Feedback footer text. DO NOT translate the word 'Psiphon'. */
+"FEEDBACK_FOOTER_DIAGNOSTIC" = "စစ်ဆေးထားသော အချက်အလက်များသည် သင်မည်သူမည်ဝါဖြစ်ကြောင်းမဖေါ်ပြနိုင်ပါ။ ထိုအရာသည် Psiphon ကို အဆင်ပြေချောမွေ့စွာ လည်ပတ်နိုင်ရန်အတွက် ကူညီပေးသည်။";
+
+/* Feedback footer text referring users to feedback email. %@ is where the separate translation for the email will be placed. */
+"FEEDBACK_FOOTER_EMAIL" = "အထက်ဖော်ပြပါပုံစံသည် သင့်အတွက်အဆင်မပြေပါက သို့မဟုတ် သင်သည် screenshot များပေးပို့လိုပါက ကျွနု်ပ်တို့ထံ အီးမေးလ်ပို့ပါ%@";
+
+/* Introduction text at top of feedback form. DO NOT translate the word 'Psiphon'. */
+"FEEDBACK_INTRODUCTION" = "သင့်၏ အကြံပြုတုံ့ပြန်မှုက Psiphon ကိုပို၍ကောင်းမွန်စေပါသည်။";
+
+/* Text of button to send feedback */
+"FEEDBACK_SEND_BUTTON" = "ပေးပို့ရန်";
+
+/* Text explaining thumbs down choice in feedback. DO NOT translate the word 'Psiphon'. */
+"FEEDBACK_THUMBS_DOWN_TEXT" = "Psiphon သည်မကြာခဏဆိုသလို\nချိတ်ဆက်ခြင်းမပြုနိုင်ပါ သို့မဟုတ်\nကောင်းမွန်စွာ\nလုပ်ဆောင်နိုင်ခြင်းမရှိပါ။";
+
+/* Text explaining thumbs up choice in feedback. DO NOT translate the word 'Psiphon'. */
+"FEEDBACK_THUMBS_UP_TEXT" = "Psiphon သည် ချိတ်ဆက်ပြီး\nကျွနု်ပ်လုပ်ဆောင်စေလိုသည့်အတိုင်း\nလုပ်ဆောင်နေပါသည်။";
+
+/*[UNTRANSLATED] External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
+"LICENSE_PAGE_URL" = "https://psiphon.ca/en/license.html";
+
+/* Title of screen that displays logs */
+"LOGS_TITLE" = "မှတ်တမ်းများ";
+
+/* Shown when the device is not configured for sending email. (InAppSettingsKit) */
+"MAIL_NOT_CONFIGURED" = "စာကိုအတည်ပြုသတ်မှတ်ထားခြင်းမရှိပါ";
+
+/* Description for the 'Mail not configured' message. (InAppSettingsKit) */
+"MAIL_NOT_CONFIGURED_DESC" = "ဤစက်တွင် အီးမေးလ်ပို့ခြင်းများအတွက် ချိန်ညှိပြင်ဆင်ထားခြင်းမရှိပါ။ ကျေးဇူးပြု၍ app၏ အပြင်အဆင်တွင်းတွင်ရှိသော မေးလ်အပြင်အဆင်သို့ဝင်ရောက်၍ ချိန်ညှိပြင်ဆင်ပါ။";
+
+/* Alert OK Button. (InAppSettingsKit) */
+"OK_BUTTON" = "ကောင်းပြီ";
+
+/* Privacy Policy link text */
+"PRIVACY_POLICY_LINK_TEXT" = "ကိုယ်ရေးကိုယ်တာအချက်အလက်လုံခြုံမှုဆိုင်ရာမူဝါဒ";
+
+/*[UNTRANSLATED] External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
+"PRIVACY_POLICY_URL" = "https://psiphon.ca/en/privacy.html";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_AT" = "သြစတြီးယား";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_AU" = "သြစတြေးလျ";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_BE" = "ဘယ်လ်ဂျီယမ်";
+
+/* The name of the pseudo-region a user can select if they want to use a Psiphon server with the best performance -- speed, latency, etc., rather than specify a particular region/country. This appears in a combo box and should be kept short. */
+"SERVER_REGION_BEST_PERFORMANCE" = "အကောင်းဆုံးလုပ်ဆောင်မှု";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_BG" = "ဘူလ်ဂေးရီးယား";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_CA" = "ကနေဒါ";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_CH" = "ဆွစ်ဇာလန်";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_CZ" = "ချက်ဗ်";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_DE" = "ဂျာမဏီ";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_DK" = "ဒိန်းမတ်";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_ES" = "စပိန်";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_FR" = "ပြင်သစ်";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_GB" = "ယူကေ";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_HK" = "ဟောင်ကောင်";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_HU" = "ဟန်ဂေရီ";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_IN" = "အိန္ဒိယ";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_IT" = "အီတလီ";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_JP" = "ဂျပန်";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_NL" = "နယ်သာလန်";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_NO" = "နော်ဝေ";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_PL" = "ပိုလန်";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_RO" = "ရိုမေးနီးယား";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_RS" = "ဆားဘီးယား";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_SE" = "ဆွီဒင်";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_SG" = "စင်္ကာပူ";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_SK" = "ဆလိုဗာကီးယား";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_US" = "အမေရိကန်ပြည်ထောင်စု";
+
+/* Title of the settings (aka preferences) view (InAppSettingsKit) */
+"SETTINGS_TITLE" = "အပြင်အဆင်များ";
+

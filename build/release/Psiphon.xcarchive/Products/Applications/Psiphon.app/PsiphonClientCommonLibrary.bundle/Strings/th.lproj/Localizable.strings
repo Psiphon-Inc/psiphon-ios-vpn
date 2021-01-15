@@ -1,0 +1,147 @@
+/* External link to the about page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/about.html for french. */
+"ABOUT_PAGE_URL" = "https://psiphon.ca/th/about.html";
+
+/* Cancel action */
+"CANCEL_ACTION" = "ยกเลิก";
+
+/* Title of the button that dismisses the settings menu (InAppSettingsKit) */
+"DONE_ACTION" = "เสร็จสิ้น";
+
+/*[UNTRANSLATED] FAQ link text */
+"FAQ_LINK_TEXT" = "Frequently Asked Questions";
+
+/* External link to the FAQ page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/faq.html for french. */
+"FAQ_URL" = "https://psiphon.ca/th/faq.html";
+
+/*[UNTRANSLATED] Comments section placeholder text */
+"FEEDBACK_COMMENTS_PLACEHOLDER" = "What's on your mind? Please leave us your feedback";
+
+/*[UNTRANSLATED] Text referring user to frequently asked questions. %@ is where the separate translation for the phrase 'Frequently Asked Questions' will be placed. */
+"FEEDBACK_FAQ_DIRECTION" = "You can find solutions to many common problems in our %@.";
+
+/*[UNTRANSLATED] Feedback footer text referring users to privacy policy. %@ is where the separate translation for the phrase 'Privacy Policy' will be placed. */
+"FEEDBACK_FOOTER_DATA_COLLECTION" = "Learn more about the data we collect in our %@";
+
+/*[UNTRANSLATED] Feedback footer text. DO NOT translate the word 'Psiphon'. */
+"FEEDBACK_FOOTER_DIAGNOSTIC" = "Please note that this diagnostic data does not identify you, and it helps us keep Psiphon running smoothly.";
+
+/*[UNTRANSLATED] Feedback footer text referring users to feedback email. %@ is where the separate translation for the email will be placed. */
+"FEEDBACK_FOOTER_EMAIL" = "If the above form is not working or you would like to send screenshots, please email us at %@";
+
+/*[UNTRANSLATED] Introduction text at top of feedback form. DO NOT translate the word 'Psiphon'. */
+"FEEDBACK_INTRODUCTION" = "Your feedback makes Psiphon better!";
+
+/* Text of button to send feedback */
+"FEEDBACK_SEND_BUTTON" = "ส่ง";
+
+/*[UNTRANSLATED] Text explaining thumbs down choice in feedback. DO NOT translate the word 'Psiphon'. */
+"FEEDBACK_THUMBS_DOWN_TEXT" = "Psiphon often fails\nto connect or\ndoesn't perform well\nenough.";
+
+/*[UNTRANSLATED] Text explaining thumbs up choice in feedback. DO NOT translate the word 'Psiphon'. */
+"FEEDBACK_THUMBS_UP_TEXT" = "Psiphon connects\nand performs the\nway I want it to.";
+
+/* External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
+"LICENSE_PAGE_URL" = "https://psiphon.ca/th/license.html";
+
+/* Title of screen that displays logs */
+"LOGS_TITLE" = "ปูม";
+
+/*[UNTRANSLATED] Shown when the device is not configured for sending email. (InAppSettingsKit) */
+"MAIL_NOT_CONFIGURED" = "Mail not configured";
+
+/*[UNTRANSLATED] Description for the 'Mail not configured' message. (InAppSettingsKit) */
+"MAIL_NOT_CONFIGURED_DESC" = "This device is not configured for sending Email. Please configure the Mail settings in the Settings app.";
+
+/* Alert OK Button. (InAppSettingsKit) */
+"OK_BUTTON" = "ตกลง";
+
+/*[UNTRANSLATED] Privacy Policy link text */
+"PRIVACY_POLICY_LINK_TEXT" = "Privacy Policy";
+
+/* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
+"PRIVACY_POLICY_URL" = "https://psiphon.ca/th/privacy.html";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_AT" = "ออสเตรีย";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_AU" = "ออสเตรเลีย";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_BE" = "เบลเยี่ยม";
+
+/*[UNTRANSLATED] The name of the pseudo-region a user can select if they want to use a Psiphon server with the best performance -- speed, latency, etc., rather than specify a particular region/country. This appears in a combo box and should be kept short. */
+"SERVER_REGION_BEST_PERFORMANCE" = "Best performance";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_BG" = "บัลแกเรีย";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_CA" = "แคนาดา";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_CH" = "สวิตเซอร์แลนด์";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_CZ" = "สาธารณรัฐเช็ก";
+
+/*[UNTRANSLATED] Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_DE" = "Germany";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_DK" = "เดนมาร์ก";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_ES" = "สเปน";
+
+/*[UNTRANSLATED] Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_FR" = "France";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_GB" = "สหราชอาณาจักร";
+
+/*[UNTRANSLATED] Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_HK" = "Hong Kong";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_HU" = "ฮังการี";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_IN" = "อินเดีย";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_IT" = "อิตาลี";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_JP" = "ญี่ปุ่น";
+
+/*[UNTRANSLATED] Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_NL" = "Netherlands";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_NO" = "นอร์เวย์";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_PL" = "โปแลนด์";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_RO" = "โรมาเนีย";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_RS" = "เซอร์เบีย";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_SE" = "สวีเดน";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_SG" = "สิงคโปร์";
+
+/*[UNTRANSLATED] Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_SK" = "Slovakia";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_US" = "สหรัฐอเมริกา";
+
+/* Title of the settings (aka preferences) view (InAppSettingsKit) */
+"SETTINGS_TITLE" = "การตั้งค่า";
+

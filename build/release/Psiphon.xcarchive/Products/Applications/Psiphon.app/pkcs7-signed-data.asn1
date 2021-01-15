@@ -1,0 +1,85 @@
+Simplified-PKCS7 DEFINITIONS EXPLICIT TAGS ::= BEGIN 
+
+SignedData ::= SEQUENCE {
+    contentType OBJECT IDENTIFIER,
+    content [0] SEQUENCE {
+        version INTEGER,
+        digestAlgorithms    DigestAlgorithmIdentifiers,
+        contentInfo SEQUENCE {
+            contentType OBJECT IDENTIFIER,
+            contentData [0] OCTET STRING
+        },
+        certificates [0] ANY OPTIONAL,
+        crls [1] ANY OPTIONAL,
+        signerInfos SignerInfos
+    }
+}
+
+
+ReceiptAttribute ::= SEQUENCE {
+    type    INTEGER,
+    version INTEGER,
+    value   OCTET STRING
+}
+ 
+ReceiptAttributes ::= SET OF ReceiptAttribute
+
+   SignerInfo ::= SEQUENCE {
+     version INTEGER,
+     issuerAndSerialNumber IssuerAndSerialNumber,
+     digestAlgorithm DigestAlgorithmIdentifier,
+     authenticatedAttributes
+       [0] IMPLICIT Attributes OPTIONAL,
+     digestEncryptionAlgorithm
+       DigestEncryptionAlgorithmIdentifier,
+     encryptedDigest EncryptedDigest,
+     unauthenticatedAttributes
+       [1] IMPLICIT Attributes OPTIONAL }
+
+   EncryptedDigest ::= OCTET STRING
+
+   SignerInfos ::= SET OF SignerInfo
+
+DigestAlgorithmIdentifiers ::= SET OF DigestAlgorithmIdentifier
+
+DigestAlgorithmIdentifier ::= AlgorithmIdentifier
+
+DigestEncryptionAlgorithmIdentifier ::= DigestAlgorithmIdentifier
+
+Attributes ::= SET OF AttributeTypeAndValue
+
+AlgorithmIdentifier ::= SEQUENCE {
+      algorithm       OBJECT IDENTIFIER,
+      parameters      ANY OPTIONAL
+}
+
+
+   Name ::= CHOICE {
+     rdnSequence RDNSequence }
+
+   RDNSequence ::= SEQUENCE OF RelativeDistinguishedName
+
+   RelativeDistinguishedName ::=
+     SET OF AttributeTypeAndValue
+
+   Attribute ::= SEQUENCE {
+     type     AttributeType,
+     values   SET OF AttributeValue }
+
+   AttributeType ::= OBJECT IDENTIFIER
+
+   AttributeValue ::= ANY
+
+   AttributeTypeAndValue ::= SEQUENCE {
+     type     AttributeType,
+     value    AttributeValue }
+
+IssuerAndSerialNumber ::= SEQUENCE {
+     issuer Name,
+     serialNumber INTEGER }
+
+ReceiptString ::= CHOICE {
+	utf8String UTF8String,
+	ia5String IA5String }
+
+END

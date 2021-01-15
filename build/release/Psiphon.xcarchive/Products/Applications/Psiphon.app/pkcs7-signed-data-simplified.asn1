@@ -1,0 +1,24 @@
+Simplified-PKCS7 DEFINITIONS EXPLICIT TAGS ::= BEGIN 
+
+SignedData ::= SEQUENCE {
+    contentType OBJECT IDENTIFIER,
+    content [0] SEQUENCE {
+        version INTEGER,
+        digestAlgorithms ANY,
+        contentInfo SEQUENCE {
+            contentType OBJECT IDENTIFIER,
+            contentData [0] OCTET STRING
+        },
+	...
+    }
+}
+
+
+ReceiptAttribute ::= SEQUENCE {
+    type    INTEGER,
+    version INTEGER,
+    value   OCTET STRING }
+ 
+ReceiptAttributes ::= SET OF ReceiptAttribute
+
+END

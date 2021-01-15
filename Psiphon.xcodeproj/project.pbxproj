@@ -76,10 +76,11 @@
 		5248B4CE23203781008C00D4 /* SwiftObjCBridges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5248B4CD23203781008C00D4 /* SwiftObjCBridges.swift */; };
 		524B4E6B2316F0E3004E9891 /* BorderedSubtitleButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6A2316F0E3004E9891 /* BorderedSubtitleButton.m */; };
 		524B4E6E2316F27F004E9891 /* AnimatedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6D2316F27F004E9891 /* AnimatedControl.m */; };
+		5272CC3025B235A200F54A0E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5272CC2F25B235A200F54A0E /* PsiphonTunnel.framework */; };
+		5272CC3125B235A200F54A0E /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5272CC2F25B235A200F54A0E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		5272CC3625B235C000F54A0E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5272CC3525B235C000F54A0E /* PsiphonTunnel.framework */; };
+		5272CC3725B235C000F54A0E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5272CC3525B235C000F54A0E /* PsiphonTunnel.framework */; };
 		528D81332384823F00AA2D77 /* PsiCashMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D81322384823F00AA2D77 /* PsiCashMessageView.swift */; };
-		529DE74825AD039200F82936 /* PsiphonTunnel.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */; };
-		529DE74925AD039200F82936 /* PsiphonTunnel.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		529DE74A25AD039C00F82936 /* PsiphonTunnel.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */; };
 		52A24659238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */; };
 		52A2465E239081C100A01FF1 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465D239081C100A01FF1 /* AppState.swift */; };
 		52A24662239B07E000A01FF1 /* psiCashProductIds.plist in Resources */ = {isa = PBXBuildFile; fileRef = 52A24661239B07E000A01FF1 /* psiCashProductIds.plist */; };
@@ -357,8 +358,8 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				5272CC3125B235A200F54A0E /* PsiphonTunnel.framework in CopyFiles */,
 				4E30745F2097922C00B6D2A3 /* PsiCashLib.framework in CopyFiles */,
-				529DE74925AD039200F82936 /* PsiphonTunnel.xcframework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -501,6 +502,8 @@
 		524B4E6A2316F0E3004E9891 /* BorderedSubtitleButton.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BorderedSubtitleButton.m; sourceTree = "<group>"; };
 		524B4E6C2316F27F004E9891 /* AnimatedControl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnimatedControl.h; sourceTree = "<group>"; };
 		524B4E6D2316F27F004E9891 /* AnimatedControl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AnimatedControl.m; sourceTree = "<group>"; };
+		5272CC2F25B235A200F54A0E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
+		5272CC3525B235C000F54A0E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
 		528D81322384823F00AA2D77 /* PsiCashMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageView.swift; sourceTree = "<group>"; };
 		529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = PsiphonTunnel.xcframework; sourceTree = "<group>"; };
 		52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedBoostPurchaseTable.swift; sourceTree = "<group>"; };
@@ -874,14 +877,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5272CC3025B235A200F54A0E /* PsiphonTunnel.framework in Frameworks */,
 				8D497A2A247CEF50009CEBA8 /* GoogleMobileAds.framework in Frameworks */,
 				8D497A2E247CEF50009CEBA8 /* nanopb.xcframework in Frameworks */,
 				8D497A28247CEF50009CEBA8 /* GoogleAppMeasurement.framework in Frameworks */,
 				8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */,
 				8D497A2C247CEF50009CEBA8 /* GoogleUtilities.xcframework in Frameworks */,
+				5272CC3625B235C000F54A0E /* PsiphonTunnel.framework in Frameworks */,
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
 				8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */,
-				529DE74825AD039200F82936 /* PsiphonTunnel.xcframework in Frameworks */,
 				440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */,
 				474C2778BC8FAFDB749E5DC3 /* libPods-Psiphon.a in Frameworks */,
 			);
@@ -891,8 +895,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5272CC3725B235C000F54A0E /* PsiphonTunnel.framework in Frameworks */,
 				668AF9BF1E92CBD3008CAAAA /* NetworkExtension.framework in Frameworks */,
-				529DE74A25AD039C00F82936 /* PsiphonTunnel.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1181,6 +1185,7 @@
 		668AF9B81E92CB60008CAAAA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				5272CC2F25B235A200F54A0E /* PsiphonTunnel.framework */,
 				529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */,
 				8D497A24247CEF4F009CEBA8 /* GoogleAppMeasurement.framework */,
 				8D497A25247CEF4F009CEBA8 /* GoogleMobileAds.framework */,
@@ -1270,6 +1275,7 @@
 				8D5F08A6247DB23A00F51A42 /* Utilities */,
 				8D5F08A5247DB21700F51A42 /* Testing */,
 				4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */,
+				5272CC3525B235C000F54A0E /* PsiphonTunnel.framework */,
 				4E0DCB101F28458100495781 /* Shared */,
 				CE26FC8C1BBDC7B800B83375 /* Psiphon */,
 				CE26FCA41BBDC85900B83375 /* PsiphonVPN */,
