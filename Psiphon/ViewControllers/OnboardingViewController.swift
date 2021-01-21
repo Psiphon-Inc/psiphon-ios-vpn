@@ -418,8 +418,8 @@ fileprivate func makeLanguageSelectionOnboardingView(
     
     return OnboardingView(
         image: UIImage(named: "OnboardingStairs")!,
-        withTitle: Strings.onboardingBeyondBordersHeaderText(),
-        withBody: Strings.onboardingBeyondBordersBodyText(),
+        withTitle: UserStrings.Psiphon(),
+        withBody: "",
         withAccessoryView: selectLangButton
     )
 }
