@@ -33,7 +33,7 @@
 #import "Notifier.h"
 #import "AppDelegate.h"
 #import "PsiFeedbackLogger.h"
-#import <PsiphonTunnel/Reachability.h>
+#import <PsiphonTunnel/PsiphonTunnel.h>
 
 // UI
 #import "UIColor+Additions.h"
