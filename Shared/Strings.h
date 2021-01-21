@@ -63,10 +63,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)onboardingSelectLanguageButtonTitle;
 
-+ (NSString *)onboardingBeyondBordersHeaderText;
-
-+ (NSString *)onboardingBeyondBordersBodyText;
-
 + (NSString *)onboardingGettingStartedHeaderText;
 
 + (NSString *)onboardingGettingStartedBodyText;
