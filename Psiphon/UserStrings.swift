@@ -28,6 +28,11 @@ import Foundation
 
 @objc final class UserStrings: NSObject {
 
+    @objc static func Psiphon() -> String {
+        // Psiphon is not translated or transliterated.
+        return "Psiphon"
+    }
+
     @objc static func PsiCash() -> String {
         // PsiCash is not translated or transliterated.
         return "PsiCash"
