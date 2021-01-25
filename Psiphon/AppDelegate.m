@@ -194,6 +194,14 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
                 if (showAd == FALSE) {
                     [newIntent forceNoAds];
                 }
+
+                // Forces no-ads if it is iOS app running on Mac.
+                if (@available(iOS 14.0, *)) {
+                    if ([[NSProcessInfo processInfo] isiOSAppOnMac] == TRUE) {
+                        [newIntent forceNoAds];
+                    }
+                }
+
             }
             
             [subscriber sendNext:newIntent];
