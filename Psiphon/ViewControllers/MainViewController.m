@@ -325,10 +325,14 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
         }
     }
     
-    // Initializes AdManager.
+    // Initializes AdManager for iOS only.
     {
-        [[AdManager sharedInstance] initializeAdManager];
-        [[AdManager sharedInstance] initializeRewardedVideos];
+        if (@available(iOS 14.0, *)) {
+            if ([[NSProcessInfo processInfo] isiOSAppOnMac] == FALSE) {
+                [[AdManager sharedInstance] initializeAdManager];
+                [[AdManager sharedInstance] initializeRewardedVideos];
+            }
+        }
     }
 }
 

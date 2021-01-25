@@ -41,33 +41,56 @@ extension PsiCashViewControllerState {
     
     /// Adds rewarded video product to list of `PsiCashPurchasableViewModel`  retrieved from AppStore.
     func allProducts(
+        platform: Platform,
         rewardedVideoClearedForSale: Bool,
         rewardedVideoSubtitle: String
     ) -> PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent<Int>> {
-        appStorePsiCashProducts.map(pending: { lastParsedList -> [PsiCashPurchasableViewModel] in
-            // Adds rewarded video ad as the first product if
-            let viewModels = lastParsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
-                parsed.viewModel
-            }
-            switch viewModels {
-            case []: return []
-            default: return [
-                psiCash.rewardedVideoProduct(
-                    clearedForSale: rewardedVideoClearedForSale, subtitle: rewardedVideoSubtitle
-                )
-            ] + viewModels
-            }
-        }, completed: { result in
-            result.map { parsedList -> [PsiCashPurchasableViewModel] in
-                // Adds rewarded video ad as the first product
-                [
+
+        switch platform.current {
+
+        case .iOSAppOnMac:
+
+            return appStorePsiCashProducts.map(
+                pending: { $0.compactMap { $0.viewModel } },
+                completed: { $0.map { $0.compactMap { $0.viewModel } } }
+            )
+
+        case .iOS:
+
+            // Adds rewarded video ad as the first product if running device is iOS.
+
+            return appStorePsiCashProducts.map(pending: { lastParsedList -> [PsiCashPurchasableViewModel] in
+
+                let viewModels = lastParsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
+                    parsed.viewModel
+                }
+
+                switch viewModels {
+                case []: return []
+                default: return [
                     psiCash.rewardedVideoProduct(
-                        clearedForSale: rewardedVideoClearedForSale, subtitle: rewardedVideoSubtitle
-                    ) ] + parsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
+                        clearedForSale: rewardedVideoClearedForSale,
+                        subtitle: rewardedVideoSubtitle
+                    )
+                ] + viewModels
+                }
+
+            }, completed: { result in
+                result.map { parsedList -> [PsiCashPurchasableViewModel] in
+
+                    return [
+                        psiCash.rewardedVideoProduct(
+                            clearedForSale: rewardedVideoClearedForSale,
+                            subtitle: rewardedVideoSubtitle
+                        )
+                    ] + parsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
                         parsed.viewModel
                     }
-            }
-        })
+                }
+            })
+
+        }
+
     }
     
 }
@@ -111,6 +134,8 @@ final class PsiCashViewController: ReactiveViewController {
     }
     
     private let viewControllerInitTime = Date()
+
+    private let platform: Platform
     
     private let (lifetime, token) = Lifetime.make()
     private let store: Store<PsiCashViewControllerState, PsiCashAction>
@@ -136,15 +161,17 @@ final class PsiCashViewController: ReactiveViewController {
     private let containerView = UIView(frame: .zero)
     private let containerBindable: EitherView<AddPsiCashViewType, SpeedBoostViewType>.BuildType
     
-    init(initialTab: PsiCashViewControllerTabs,
-         store: Store<PsiCashViewControllerState, PsiCashAction>,
-         iapStore: Store<Utilities.Unit, IAPAction>,
-         productRequestStore: Store<Utilities.Unit, ProductRequestAction>,
-         appStoreReceiptStore: Store<Utilities.Unit, ReceiptStateAction>,
-         tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>,
-         feedbackLogger: FeedbackLogger
+    init(
+        platform: Platform,
+        initialTab: PsiCashViewControllerTabs,
+        store: Store<PsiCashViewControllerState, PsiCashAction>,
+        iapStore: Store<Utilities.Unit, IAPAction>,
+        productRequestStore: Store<Utilities.Unit, ProductRequestAction>,
+        appStoreReceiptStore: Store<Utilities.Unit, ReceiptStateAction>,
+        tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>,
+        feedbackLogger: FeedbackLogger
     ) {
-        
+        self.platform = platform
         self.activeTab = initialTab
         self.store = store
         self.productRequestStore = productRequestStore
@@ -386,6 +413,7 @@ final class PsiCashViewController: ReactiveViewController {
                             }
                             
                             let allProducts = observed.state.allProducts(
+                                platform: platform,
                                 rewardedVideoClearedForSale: rewardedVideoClearedForSale,
                                 rewardedVideoSubtitle: rewardedVideoSubtitle
                             )

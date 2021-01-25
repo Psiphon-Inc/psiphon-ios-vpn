@@ -69,6 +69,7 @@ enum AppAction {
 // MARK: Environment
 
 typealias AppEnvironment = (
+    platform: Platform,
     appBundle: PsiphonBundle,
     feedbackLogger: FeedbackLogger,
     httpClient: HTTPClient,
@@ -113,6 +114,7 @@ typealias AppEnvironment = (
 /// - Returns: Tuple (environment, cleanup). `cleanup` should be called
 /// in `applicationWillTerminate(:_)` delegate callback.
 func makeEnvironment(
+    platform: Platform,
     store: Store<AppState, AppAction>,
     feedbackLogger: FeedbackLogger,
     sharedDB: PsiphonDataSharedDB,
@@ -144,6 +146,7 @@ func makeEnvironment(
     let reachabilityForInternetConnection = Reachability.forInternetConnection()!
     
     let environment = AppEnvironment(
+        platform: platform,
         appBundle: PsiphonBundle.from(bundle: Bundle.main),
         feedbackLogger: feedbackLogger,
         httpClient: HTTPClient.default(urlSession: urlSession),
@@ -248,6 +251,7 @@ func makeEnvironment(
 
 fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment {
     PsiCashEnvironment(
+        platform: env.platform,
         feedbackLogger: env.feedbackLogger,
         psiCashEffects: env.psiCashEffects,
         sharedDB: env.sharedDB,
@@ -356,6 +360,7 @@ fileprivate func toRequestDelegateReducerEnvironment(
 
 fileprivate func toAppDelegateReducerEnvironment(env: AppEnvironment) -> AppDelegateEnvironment {
     AppDelegateEnvironment(
+        platform: env.platform,
         feedbackLogger: env.feedbackLogger,
         psiCashPersistedValues: env.userConfigs,
         sharedDB: env.sharedDB,
