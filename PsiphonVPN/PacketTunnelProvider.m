@@ -801,6 +801,15 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // Store current sponsor ID used for use by container.
     [self.sharedDB setCurrentSponsorId:mutableConfigCopy[@"SponsorId"]];
 
+    if (@available(iOS 14.0, *)) {
+        // Specific config changes for iOS VPN app on Mac.
+        if ([[NSProcessInfo processInfo] isiOSAppOnMac] == TRUE) {
+            [mutableConfigCopy removeObjectForKey:@"LimitIntensiveConnectionWorkers"];
+            [mutableConfigCopy removeObjectForKey:@"LimitMeekBufferSizes"];
+            [mutableConfigCopy removeObjectForKey:@"StaggerConnectionWorkersMilliseconds"];
+        }
+    }
+
     return mutableConfigCopy;
 }
 
