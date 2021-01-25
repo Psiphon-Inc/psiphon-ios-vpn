@@ -61,6 +61,7 @@ struct AppDelegateState: Equatable {
 }
 
 typealias AppDelegateEnvironment = (
+    platform: Platform,
     feedbackLogger: FeedbackLogger,
     psiCashPersistedValues: PsiCashPersistedValues,
     sharedDB: PsiphonDataSharedDB,
@@ -149,9 +150,10 @@ func appDelegateReducer(
                     let alertController = makeDisallowedTrafficAlertController(
                         onSpeedBoostClicked: {
                             tryPresentPsiCashViewController(
+                                platform: environment.platform,
                                 tab: .speedBoost,
                                 makePsiCashViewController:
-                                    SwiftDelegate.instance.makePsiCashViewController(initialTab:),
+                                    SwiftDelegate.instance.makePsiCashViewController(platform:initialTab:),
                                 getTopMostPresentedViewController:
                                     AppDelegate.getTopPresentedViewController
                             )
@@ -195,7 +197,8 @@ func appDelegateReducer(
 @objc final class SwiftDelegate: NSObject {
     
     static let instance = SwiftDelegate()
-    
+
+    private var platform: Platform!
     private var navigator = Navigator()
     private let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: PsiphonAppGroupIdentifier)
     private let feedbackLogger = FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler())
@@ -209,7 +212,11 @@ func appDelegateReducer(
     private var store: Store<AppState, AppAction>!
     private var psiCashLib: PsiCash!
     private var environmentCleanup: (() -> Void)?
-    
+
+    override init() {
+        platform = Platform(ProcessInfo.processInfo)
+    }
+
     // Should be called early in the application lifecycle.
     @objc static func setupDebugFlags() {
         #if DEBUG
@@ -372,8 +379,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         
         navigator.register(url: PsiphonDeepLinking.psiCashDeepLink) { [unowned self] in
             tryPresentPsiCashViewController(
+                platform: platform,
                 tab: .addPsiCash,
-                makePsiCashViewController: self.makePsiCashViewController(initialTab:),
+                makePsiCashViewController: self.makePsiCashViewController(platform:initialTab:),
                 getTopMostPresentedViewController: AppDelegate.getTopPresentedViewController
             )
             return true
@@ -381,8 +389,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         
         navigator.register(url: PsiphonDeepLinking.speedBoostDeepLink) { [unowned self] in
             tryPresentPsiCashViewController(
+                platform: platform,
                 tab: .speedBoost,
-                makePsiCashViewController: self.makePsiCashViewController(initialTab:),
+                makePsiCashViewController: self.makePsiCashViewController(platform:initialTab:),
                 getTopMostPresentedViewController: AppDelegate.getTopPresentedViewController
             )
             return true
@@ -396,6 +405,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             feedbackLogger: self.feedbackLogger,
             environment: { [unowned self] store in
                 let (environment, cleanup) = makeEnvironment(
+                    platform: platform,
                     store: store,
                     feedbackLogger: self.feedbackLogger,
                     sharedDB: self.sharedDB,
@@ -651,7 +661,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func makePsiCashViewController(
         _ initialTab: PsiCashViewController.PsiCashViewControllerTabs
     ) -> UIViewController {
-        self.makePsiCashViewController(initialTab: initialTab)
+
+        return self.makePsiCashViewController(platform: platform, initialTab: initialTab)
+
     }
     
     @objc func makeOnboardingViewControllerWithStagesNotCompleted(
@@ -900,9 +912,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
 fileprivate extension SwiftDelegate {
     
     func makePsiCashViewController(
+        platform: Platform,
         initialTab: PsiCashViewController.PsiCashViewControllerTabs
     ) -> PsiCashViewController {
         PsiCashViewController(
+            platform: platform,
             initialTab: initialTab,
             store: self.store.projection(
                 value: { $0.psiCashViewController },
@@ -925,9 +939,10 @@ fileprivate extension SwiftDelegate {
 }
 
 fileprivate func tryPresentPsiCashViewController(
+    platform: Platform,
     tab: PsiCashViewController.PsiCashViewControllerTabs,
     makePsiCashViewController:
-        @escaping (PsiCashViewController.PsiCashViewControllerTabs) -> PsiCashViewController,
+        @escaping (Platform, PsiCashViewController.PsiCashViewControllerTabs) -> PsiCashViewController,
     getTopMostPresentedViewController: @escaping () -> UIViewController
 ) {
     let topMostViewController = getTopMostPresentedViewController()
@@ -944,7 +959,7 @@ fileprivate func tryPresentPsiCashViewController(
         psiCashViewController.activeTab = tab
         
     case .notPresent:
-        let psiCashViewController = makePsiCashViewController(tab)
+        let psiCashViewController = makePsiCashViewController(platform, tab)
         topMostViewController.present(psiCashViewController, animated: true)
     }
 }

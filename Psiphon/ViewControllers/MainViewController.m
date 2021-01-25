@@ -325,10 +325,16 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
         }
     }
     
-    // Initializes AdManager.
+    // Initializes AdManager for iOS only.
     {
-        [[AdManager sharedInstance] initializeAdManager];
-        [[AdManager sharedInstance] initializeRewardedVideos];
+        if (@available(iOS 14.0, *)) {
+            if ([[NSProcessInfo processInfo] isiOSAppOnMac] == FALSE) {
+                [[AdManager sharedInstance] initializeAdManager];
+                [[AdManager sharedInstance] initializeRewardedVideos];
+            } else {
+                LOG_DEBUG(@"Skipping AdManager initialization since running on Mac.");
+            }
+        }
     }
 }
 
@@ -388,15 +394,21 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
         return [RACSignal return:RACUnit.defaultUnit];
     }
     
-    // unsubscribedAdLoadingSignal if tunneled emits unit value when
-    // untunneled interstitial ad had loaded or when MaxAdLoadingTime has passed,
-    // otherwise, emits unit value immediately.
+    // unsubscribedAdLoadingSignal -
+    // If iOS app is running on Mac or if device is tunneled it emits unit value immediately,
+    // else, when untunneled emits unit value after interstitial ad has loaded
+    // or when MaxAdLoadingTime has passed, otherwise, emits unit value immediately.
     RACSignal<RACUnit *> *unsubscribedAdLoadingSignal = [[[AppObservables.shared.vpnStatus
       map:^RACSignal * _Nullable(NSNumber * _Nullable value) {
         VPNStatus s = (VPNStatus) value.integerValue;
         
+        if (@available(iOS 14.0, *)) {
+            if ([[NSProcessInfo processInfo] isiOSAppOnMac] == TRUE) {
+                return [RACSignal return:RACUnit.defaultUnit];
+            }
+        }
+        
         if (s == VPNStatusDisconnected || s == VPNStatusInvalid) {
-            
             
             return [[[[[AdManager.sharedInstance.adSDKStarted
                         catch:^RACSignal * _Nonnull(NSError * _Nonnull error) {
