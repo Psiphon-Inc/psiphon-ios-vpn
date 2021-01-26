@@ -120,6 +120,20 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
 
+    // Sets strict window size for iOS app on Mac.
+    if (@available(iOS 14.0, *)) {
+        if ([[NSProcessInfo processInfo] isiOSAppOnMac] == TRUE) {
+            if (self.window.windowScene.sizeRestrictions == nil) {
+                @throw [NSException exceptionWithName:@"Invalid State"
+                                               reason:@"windowScence.sizeRestrictions is nil"
+                                             userInfo:nil];
+            }
+            UISceneSizeRestrictions *sizeRestrictions = self.window.windowScene.sizeRestrictions;
+            sizeRestrictions.maximumSize = CGSizeMake(414, 736);
+            sizeRestrictions.minimumSize = CGSizeMake(414, 736);
+        }
+    }
+
     rootContainerController = [[RootContainerController alloc] init];
     self.window.rootViewController = rootContainerController;
 
