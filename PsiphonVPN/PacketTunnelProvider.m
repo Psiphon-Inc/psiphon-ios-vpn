@@ -637,9 +637,11 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             // If the authorization has not been given for user notifications, or if
             // the app is not backgrounded (in which case user notifications won't be shown),
             // then displays simple alert using NEProvider `displayMessage::` method.
+            // On Mac the user notifications will also be skipped for now.
             // Otherwise, schedules user notification.
             if (settings.authorizationStatus != UNAuthorizationStatusAuthorized ||
-                [self.sharedDB getAppForegroundState] == TRUE) {
+                [self.sharedDB getAppForegroundState] == TRUE ||
+                [AppInfo isiOSAppOnMac] == TRUE) {
                 
                 [self displayMessageOnce:VPNStrings.disallowedTrafficAlertMessage
                               identifier:AlertIdDisallowedTraffic];
