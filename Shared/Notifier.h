@@ -35,12 +35,14 @@ extern NotifierMessage const NotifierNetworkConnectivityFailed;
 /** Emitted only if network connectivity failed was previously posted. */
 extern NotifierMessage const NotifierNetworkConnectivityResolved;
 extern NotifierMessage const NotifierDisallowedTrafficAlert;
+extern NotifierMessage const NotifierIsHostAppProcessRunning;
 
 // Messages sent by the container.
 extern NotifierMessage const NotifierStartVPN;
 extern NotifierMessage const NotifierAppEnteredBackground;
 extern NotifierMessage const NotifierUpdatedNonSubscriptionAuths;
 extern NotifierMessage const NotifierUpdatedSubscriptionAuths;
+extern NotifierMessage const NotifierHostAppProcessRunning;
 
 // Messages allowed only in debug build.
 #if DEBUG

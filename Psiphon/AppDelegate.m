@@ -291,10 +291,12 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     LOG_DEBUG(@"Received notification: '%@'", message);
     
     if ([NotifierTunnelConnected isEqualToString:message]) {
+        
         [SwiftDelegate.bridge syncWithTunnelProviderWithReason:
          TunnelProviderSyncReasonProviderNotificationPsiphonTunnelConnected];
 
     } else if ([NotifierAvailableEgressRegions isEqualToString:message]) {
+        
         // Update available regions
         __weak AppDelegate *weakSelf = self;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -306,7 +308,14 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
         // TODO: fix
         
     } else if ([NotifierDisallowedTrafficAlert isEqualToString:message]) {
+        
         [SwiftDelegate.bridge disallowedTrafficAlertNotification];
+        
+    } else if ([NotifierIsHostAppProcessRunning isEqualToString:message]) {
+        
+        // Sends notification back to the network extension indicating the host process is running.
+        [[Notifier sharedInstance] post:NotifierHostAppProcessRunning];
+        
     }
 }
 
