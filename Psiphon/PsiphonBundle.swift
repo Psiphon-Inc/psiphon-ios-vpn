@@ -27,8 +27,26 @@ struct PsiphonBundle {
     /// Validates app's environment give the assumptions made in the app for certain invariants to hold true.
     /// - Note: Stops program execution if any of the validations fail.
     static func from(bundle: Bundle) -> PsiphonBundle {
+        
+        #if DEBUG
+        
+        // TODO: remove after being fixed by Apple.
+        // iOS app on Mac currently returns path to the production receipt file.
+        // This is a temporary workaround while waiting for a fix by Apple.
+        
+        var receipt = bundle.appStoreReceiptURL!
+        receipt = receipt.deletingLastPathComponent()
+        receipt = receipt.appendingPathComponent("sandboxReceipt")
+        return PsiphonBundle(bundleIdentifier: bundle.bundleIdentifier!,
+                             appStoreReceiptURL: receipt)
+        
+        #else
+        
         return PsiphonBundle(bundleIdentifier: bundle.bundleIdentifier!,
                              appStoreReceiptURL: bundle.appStoreReceiptURL!)
+        
+        #endif
+        
     }
 }
 
