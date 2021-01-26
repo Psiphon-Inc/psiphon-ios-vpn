@@ -69,6 +69,20 @@ UserDefaultsKey const AppInfoFastLaneSnapShotBoolKey = @"FASTLANE_SNAPSHOT";
     return [PsiphonClientPlatform getClientPlatform];
 }
 
++ (BOOL)isiOSAppOnMac {
+    
+    BOOL isiOSAppOnMac = FALSE;
+    
+    if (@available(iOS 14.0, *)) {
+        if ([[NSProcessInfo processInfo] isiOSAppOnMac] == TRUE) {
+            isiOSAppOnMac = TRUE;
+        }
+    }
+    
+    return isiOSAppOnMac;
+    
+}
+
 + (BOOL)runningUITest {
 #if DEBUG
     static BOOL runningUITest;
