@@ -251,6 +251,8 @@ func appDelegateReducer(
         self.store.send(.appDelegateAction(.appLifecycleEvent(.didEnterBackground)))
         self.sharedDB.setAppForegroundState(false)
         
+        Notifier.sharedInstance().post(NotifierAppEnteredBackground)
+        
     }
     
     func applicationWillResignActive() {

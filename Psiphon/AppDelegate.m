@@ -173,7 +173,6 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
     [[UIApplication sharedApplication] ignoreSnapshotOnNextApplicationLaunch];
     [SwiftDelegate.bridge applicationDidEnterBackground:application];
-    [[Notifier sharedInstance] post:NotifierAppEnteredBackground];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
