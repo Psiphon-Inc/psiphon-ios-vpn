@@ -327,13 +327,11 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     
     // Initializes AdManager for iOS only.
     {
-        if (@available(iOS 14.0, *)) {
-            if ([[NSProcessInfo processInfo] isiOSAppOnMac] == FALSE) {
-                [[AdManager sharedInstance] initializeAdManager];
-                [[AdManager sharedInstance] initializeRewardedVideos];
-            } else {
-                LOG_DEBUG(@"Skipping AdManager initialization since running on Mac.");
-            }
+        if ([AppInfo isiOSAppOnMac] == FALSE) {
+            [[AdManager sharedInstance] initializeAdManager];
+            [[AdManager sharedInstance] initializeRewardedVideos];
+        } else {
+            LOG_DEBUG(@"Skipping AdManager initialization since running on Mac.");
         }
     }
 }
@@ -402,10 +400,8 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
       map:^RACSignal * _Nullable(NSNumber * _Nullable value) {
         VPNStatus s = (VPNStatus) value.integerValue;
         
-        if (@available(iOS 14.0, *)) {
-            if ([[NSProcessInfo processInfo] isiOSAppOnMac] == TRUE) {
-                return [RACSignal return:RACUnit.defaultUnit];
-            }
+        if ([AppInfo isiOSAppOnMac] == TRUE) {
+            return [RACSignal return:RACUnit.defaultUnit];
         }
         
         if (s == VPNStatusDisconnected || s == VPNStatusInvalid) {

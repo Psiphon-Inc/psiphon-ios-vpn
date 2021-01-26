@@ -121,17 +121,22 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
 
     // Sets strict window size for iOS app on Mac.
-    if (@available(iOS 14.0, *)) {
-        if ([[NSProcessInfo processInfo] isiOSAppOnMac] == TRUE) {
+    if ([AppInfo isiOSAppOnMac] == TRUE) {
+        
+        if (@available(iOS 13.0, *)) {
+            
             if (self.window.windowScene.sizeRestrictions == nil) {
                 @throw [NSException exceptionWithName:@"Invalid State"
                                                reason:@"windowScence.sizeRestrictions is nil"
                                              userInfo:nil];
             }
+            
             UISceneSizeRestrictions *sizeRestrictions = self.window.windowScene.sizeRestrictions;
             sizeRestrictions.maximumSize = CGSizeMake(414, 736);
             sizeRestrictions.minimumSize = CGSizeMake(414, 736);
+            
         }
+
     }
 
     rootContainerController = [[RootContainerController alloc] init];
@@ -210,10 +215,8 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
                 }
 
                 // Forces no-ads if it is iOS app running on Mac.
-                if (@available(iOS 14.0, *)) {
-                    if ([[NSProcessInfo processInfo] isiOSAppOnMac] == TRUE) {
-                        [newIntent forceNoAds];
-                    }
+                if ([AppInfo isiOSAppOnMac] == TRUE) {
+                    [newIntent forceNoAds];
                 }
 
             }
