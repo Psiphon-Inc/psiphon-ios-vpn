@@ -76,7 +76,7 @@
         int requestNumber = self.hostAppRunningRequestNumber;
         if (self.pendingHostAppRunningAckMessage == FALSE) {
             // If there are no pending requests, a new request with incremented request
-            // number will be mad.e
+            // number will be made.
             requestNumber += 1;
         }
         
@@ -95,7 +95,6 @@
         }];
                               
         [self.callbacks addObject:callback];
-        
         
         // Guards against sending another request if one is already pending.
         if (self.pendingHostAppRunningAckMessage == TRUE) {
