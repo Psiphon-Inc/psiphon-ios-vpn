@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Privacy Policy.png",
+      "filename" : "MacOS Permission.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Privacy Policy@2x.png",
+      "filename" : "MacOS Permission@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Privacy Policy@3x.png",
+      "filename" : "MacOS Permission@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
