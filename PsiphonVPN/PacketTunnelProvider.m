@@ -273,7 +273,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // In prod starts app profiling.
     [self updateAppProfiling];
 
-    [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
+    [[Notifier sharedInstance] registerObserver:self callbackQueue:workQueue];
 
     [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
                                json:@{
@@ -415,6 +415,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 #pragma mark - Notifier callback
 
+// Expected to be called on the workQueue only.
 - (void)onMessageReceived:(NotifierMessage)message {
 
     if ([NotifierStartVPN isEqualToString:message]) {
