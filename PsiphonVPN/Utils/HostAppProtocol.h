@@ -22,7 +22,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-// HostAppProtocol defines a communications protocol between the networke extension
+// HostAppProtocol defines a communications protocol between the network extension
 // and the host app based on Darwin notification message.
 //
 // - Note: This object does some book-keeping and only once instance should be created.

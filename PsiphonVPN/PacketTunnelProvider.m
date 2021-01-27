@@ -598,9 +598,13 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 // Starts VPN if `self.waitForContainerStartVPNCommand` is FALSE.
 - (BOOL)tryStartVPN {
 
+    // If `waitForContainerStartVPNCommand` is TRUE, network extension
+    // waits until `NotifierStartVPN` message is recieved from the host app (container).
     if (self.waitForContainerStartVPNCommand == TRUE) {
         
         // App liveness check.
+        // If the host app (container) is not running, only a one-time alert
+        // is presented by the network extension.
         [self.hostAppProtocol isHostAppProcessRunning:^(BOOL isProcessRunning) {
             
             if (isProcessRunning == FALSE) {
