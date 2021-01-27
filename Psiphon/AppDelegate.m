@@ -121,17 +121,22 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
 
     // Sets strict window size for iOS app on Mac.
-    if (@available(iOS 14.0, *)) {
-        if ([[NSProcessInfo processInfo] isiOSAppOnMac] == TRUE) {
+    if ([AppInfo isiOSAppOnMac] == TRUE) {
+        
+        if (@available(iOS 13.0, *)) {
+            
             if (self.window.windowScene.sizeRestrictions == nil) {
                 @throw [NSException exceptionWithName:@"Invalid State"
                                                reason:@"windowScence.sizeRestrictions is nil"
                                              userInfo:nil];
             }
+            
             UISceneSizeRestrictions *sizeRestrictions = self.window.windowScene.sizeRestrictions;
             sizeRestrictions.maximumSize = CGSizeMake(414, 736);
             sizeRestrictions.minimumSize = CGSizeMake(414, 736);
+            
         }
+
     }
 
     rootContainerController = [[RootContainerController alloc] init];
@@ -168,7 +173,6 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
     [[UIApplication sharedApplication] ignoreSnapshotOnNextApplicationLaunch];
     [SwiftDelegate.bridge applicationDidEnterBackground:application];
-    [[Notifier sharedInstance] post:NotifierAppEnteredBackground];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
@@ -210,10 +214,8 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
                 }
 
                 // Forces no-ads if it is iOS app running on Mac.
-                if (@available(iOS 14.0, *)) {
-                    if ([[NSProcessInfo processInfo] isiOSAppOnMac] == TRUE) {
-                        [newIntent forceNoAds];
-                    }
+                if ([AppInfo isiOSAppOnMac] == TRUE) {
+                    [newIntent forceNoAds];
                 }
 
             }
@@ -289,10 +291,12 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     LOG_DEBUG(@"Received notification: '%@'", message);
     
     if ([NotifierTunnelConnected isEqualToString:message]) {
+        
         [SwiftDelegate.bridge syncWithTunnelProviderWithReason:
          TunnelProviderSyncReasonProviderNotificationPsiphonTunnelConnected];
 
     } else if ([NotifierAvailableEgressRegions isEqualToString:message]) {
+        
         // Update available regions
         __weak AppDelegate *weakSelf = self;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -304,7 +308,14 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
         // TODO: fix
         
     } else if ([NotifierDisallowedTrafficAlert isEqualToString:message]) {
+        
         [SwiftDelegate.bridge disallowedTrafficAlertNotification];
+        
+    } else if ([NotifierIsHostAppProcessRunning isEqualToString:message]) {
+        
+        // Sends notification back to the network extension indicating the host process is running.
+        [[Notifier sharedInstance] post:NotifierHostAppProcessRunning];
+        
     }
 }
 

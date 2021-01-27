@@ -26,18 +26,11 @@ import UIKit
         case active(Date)
     }
 
-    // Tick frequency when time to expiry is *less* than `LowToHighFreqThreshold`.
-    static let HighTickFrequency = TimeInterval(1.0)
-    // Tick frequency when time to expiry is *greater* than `LowToHighFreqThreshold`.
-    static let LowTickFrequency = TimeInterval(60.0)
+    // Timer tick frequency.
+    static let TickFrequency = TimeInterval(1.0)
 
     // UI starts showing the 'seconds' counter when expiry is less than or equal to `ShowSecondsAt`.
     static let ShowSecondsAt = TimeInterval(5 * 60)
-
-    // If time to expiry is less than `LowToHighFreqThreshold`, then timer
-    // should tick with `HighTickFrequency`,
-    // otherwise it should tick with `LowTickFrequency`.
-    static let LowToHighFreqThreshold = ShowSecondsAt + LowTickFrequency
 
     let formatter: DateComponentsFormatter
     let activeTint = UIColor.weirdGreen()
@@ -134,7 +127,7 @@ import UIKit
         // Updates title text.
         updateTitle(expiry: expiry)
 
-        self.timer = Timer.scheduledTimer(withTimeInterval: tickFreq(expiry: expiry), repeats: true)
+        self.timer = Timer.scheduledTimer(withTimeInterval: Self.TickFrequency, repeats: true)
         { [weak self] timer in
             guard let self = self else {
                 timer.invalidate()
@@ -152,31 +145,14 @@ import UIKit
                 return
             }
 
-            // If time to expiry is less than or equal to `LowToHighFreqThreshold`,
-            // makes sure that time is firing with `HighTickFrequency`.
-            let newTickFreq = self.tickFreq(expiry: expiry)
-            if newTickFreq != timer.timeInterval {
-                self.timer = nil
-                self.scheduleTimer(expiry: expiry)
-            }
-
-            // Updates title text.
+            // Updates UI.
             self.updateTitle(expiry: expiry)
-        }
-    }
-
-    /// Returns tick frequency based on given expiry.
-    private func tickFreq(expiry: Date) -> TimeInterval {
-        if expiry.timeIntervalSinceNow > Self.LowToHighFreqThreshold {
-            return Self.LowTickFrequency
-        } else {
-            return Self.HighTickFrequency
         }
     }
 
     // MARK: UI Update methods
     private func updateTitle(expiry: Date) {
-        if expiry.timeIntervalSinceNow <= Self.LowToHighFreqThreshold {
+        if expiry.timeIntervalSinceNow <= Self.ShowSecondsAt {
             self.formatter.allowedUnits = [.minute, .second]
         } else {
             self.formatter.allowedUnits = [.hour, .minute]
