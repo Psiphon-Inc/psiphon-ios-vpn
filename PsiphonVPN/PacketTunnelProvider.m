@@ -50,6 +50,7 @@
 #import "VPNStrings.h"
 #import "NSUserDefaults+KeyedDataStore.h"
 #import "ExtensionDataStore.h"
+#import "HostAppProtocol.h"
 
 NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
 
@@ -107,6 +108,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 @property (atomic) BOOL startWithSubscriptionCheckSponsorID;
 
+@property (nonatomic) HostAppProtocol *hostAppProtocol;
+
 @end
 
 @implementation PacketTunnelProvider {
@@ -142,6 +145,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         
         localDataStore = [[ExtensionDataStore alloc]
                           initWithDataStore:[NSUserDefaults standardUserDefaults]];
+        
+        _hostAppProtocol = [[HostAppProtocol alloc] init];
     }
     return self;
 }
@@ -268,7 +273,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // In prod starts app profiling.
     [self updateAppProfiling];
 
-    [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
+    [[Notifier sharedInstance] registerObserver:self callbackQueue:workQueue];
 
     [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
                                json:@{
@@ -300,9 +305,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
         [self.sharedDB setExtensionIsZombie:FALSE];
 
-        if ([sessionConfigValues hasSubscriptionAuth] == FALSE &&
-            self.extensionStartMethod == ExtensionStartMethodFromContainer) {
-            self.waitForContainerStartVPNCommand = TRUE;
+        // Sets values of waitForContainerStartVPNCommand.
+        {
+            if ([sessionConfigValues hasSubscriptionAuth] == FALSE &&
+                self.extensionStartMethod == ExtensionStartMethodFromContainer) {
+                self.waitForContainerStartVPNCommand = TRUE;
+            }
         }
 
         [self setTunnelNetworkSettings:[self getTunnelSettings] completionHandler:^(NSError *_Nullable error) {
@@ -407,13 +415,14 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 #pragma mark - Notifier callback
 
+// Expected to be called on the workQueue only.
 - (void)onMessageReceived:(NotifierMessage)message {
 
     if ([NotifierStartVPN isEqualToString:message]) {
 
         LOG_DEBUG(@"container signaled VPN to start");
 
-        if ([self.sharedDB getAppForegroundState] == TRUE) {
+        if ([self.sharedDB getAppForegroundState] == TRUE || [AppInfo isiOSAppOnMac] == TRUE) {
             self.waitForContainerStartVPNCommand = FALSE;
             [self tryStartVPN];
         }
@@ -422,16 +431,20 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
         LOG_DEBUG(@"container entered background");
         
-        // TunnelStartStopIntent integer codes are defined in VPNState.swift.
-        NSInteger tunnelIntent = [self.sharedDB getContainerTunnelIntentStatus];
-        
+        // Only on iOS mobile devices:
         // If the container StartVPN command has not been received from the container,
         // and the container goes to the background, then alert the user to open the app.
-        if (self.waitForContainerStartVPNCommand) {
+        
+        if (self.waitForContainerStartVPNCommand && [AppInfo isiOSAppOnMac] == FALSE) {
+            
+            // TunnelStartStopIntent integer codes are defined in VPNState.swift.
+            NSInteger tunnelIntent = [self.sharedDB getContainerTunnelIntentStatus];
+            
             if (tunnelIntent == TUNNEL_INTENT_START || tunnelIntent == TUNNEL_INTENT_RESTART) {
                 [self displayMessageOnce:VPNStrings.openPsiphonAppToFinishConnecting
                               identifier:AlertIdOpenContainerToFinishConnecting];
             }
+            
         }
 
     } else if ([NotifierUpdatedNonSubscriptionAuths isEqualToString:message]) {
@@ -441,10 +454,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         [self checkAuthorizationsChangeAndReconnectIfNeeded];
 
     } else if ([NotifierUpdatedSubscriptionAuths isEqualToString:message]) {
+        
         // Checks for updated subscription authorizations.
         // Reconnects the tunnel if there is a new authorization to be used,
         // or if the currently used authorization is no longer available.
         [self checkAuthorizationsChangeAndReconnectIfNeeded];
+        
     }
 
 #if DEBUG
@@ -581,11 +596,25 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     return newSettings;
 }
 
-// Starts VPN and notifies the container of homepages (if any)
-// when `self.waitForContainerStartVPNCommand` is FALSE.
+// Starts VPN if `self.waitForContainerStartVPNCommand` is FALSE.
 - (BOOL)tryStartVPN {
 
-    if (self.waitForContainerStartVPNCommand) {
+    // If `waitForContainerStartVPNCommand` is TRUE, network extension
+    // waits until `NotifierStartVPN` message is recieved from the host app (container).
+    if (self.waitForContainerStartVPNCommand == TRUE) {
+        
+        // App liveness check.
+        // If the host app (container) is not running, only a one-time alert
+        // is presented by the network extension.
+        [self.hostAppProtocol isHostAppProcessRunning:^(BOOL isProcessRunning) {
+            
+            if (isProcessRunning == FALSE) {
+                [self displayMessageOnce:VPNStrings.openPsiphonAppToFinishConnecting
+                              identifier:AlertIdOpenContainerToFinishConnecting];
+            }
+            
+        }];
+        
         return FALSE;
     }
 
@@ -637,9 +666,11 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             // If the authorization has not been given for user notifications, or if
             // the app is not backgrounded (in which case user notifications won't be shown),
             // then displays simple alert using NEProvider `displayMessage::` method.
+            // On Mac the user notifications will also be skipped for now.
             // Otherwise, schedules user notification.
             if (settings.authorizationStatus != UNAuthorizationStatusAuthorized ||
-                [self.sharedDB getAppForegroundState] == TRUE) {
+                [self.sharedDB getAppForegroundState] == TRUE ||
+                [AppInfo isiOSAppOnMac] == TRUE) {
                 
                 [self displayMessageOnce:VPNStrings.disallowedTrafficAlertMessage
                               identifier:AlertIdDisallowedTraffic];
@@ -800,6 +831,13 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     // Store current sponsor ID used for use by container.
     [self.sharedDB setCurrentSponsorId:mutableConfigCopy[@"SponsorId"]];
+
+    // Specific config changes for iOS VPN app on Mac.
+    if ([AppInfo isiOSAppOnMac] == TRUE) {
+        [mutableConfigCopy removeObjectForKey:@"LimitIntensiveConnectionWorkers"];
+        [mutableConfigCopy removeObjectForKey:@"LimitMeekBufferSizes"];
+        [mutableConfigCopy removeObjectForKey:@"StaggerConnectionWorkersMilliseconds"];
+    }
 
     return mutableConfigCopy;
 }

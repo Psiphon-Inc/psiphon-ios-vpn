@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2021, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,22 +17,28 @@
  *
  */
 
-#import <Foundation/Foundation.h>
+import Foundation
 
-@interface AppInfo : NSObject
+/// Represents the current and supported platforms.
+public struct Platform {
 
-+ (NSString*_Nonnull)appVersion;
+    public enum SupportedPlatform: Equatable {
+        case iOS
+        case iOSAppOnMac
+    }
 
-+ (NSString*_Nullable)clientRegion;
+    public let current: SupportedPlatform
 
-+ (NSString*_Nullable)propagationChannelId;
+    public init(_ processInfo: ProcessInfo) {
+        if #available(iOS 14.0, *) {
+            if processInfo.isiOSAppOnMac {
+                self.current = .iOSAppOnMac
+            } else {
+                self.current = .iOS
+            }
+        } else {
+            self.current = .iOS
+        }
+    }
 
-+ (NSString*_Nullable)sponsorId;
-
-+ (NSString *_Nonnull)clientPlatform;
-
-+ (BOOL)isiOSAppOnMac;
-
-+ (BOOL)runningUITest;
-
-@end
+}

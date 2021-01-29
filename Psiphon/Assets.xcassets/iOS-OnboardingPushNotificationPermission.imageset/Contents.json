@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "Privacy Policy.png",
+      "filename" : "iOS Notification Permission.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "Privacy Policy@2x.png",
+      "filename" : "iOS Notification Permission@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "Privacy Policy@3x.png",
+      "filename" : "iOS Notification Permission@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
