@@ -90,15 +90,14 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
          // Sets the crash flag. This flag is reset when `stopTunnelWithReason:completionHandler:` is called.
         [self.sharedDB setExtensionJetsammedBeforeStopFlag:TRUE];
 
-        ExtensionDataStore *dataStore = [[ExtensionDataStore alloc]
-                                         initWithDataStore:[NSUserDefaults standardUserDefaults]];
+        ExtensionDataStore *extensionDataStore = [ExtensionDataStore standard];
         
         if (previouslyJetsammed == TRUE) {
 
-            NSDate *previousStartTime = [dataStore extensionStartTime];
+            NSDate *previousStartTime = [extensionDataStore extensionStartTime];
             if (previousStartTime != nil) {
 
-                NSDate *lastTickerTime = [dataStore tickerTime];
+                NSDate *lastTickerTime = [extensionDataStore tickerTime];
                 if (lastTickerTime == nil) {
                     // No previous ticker time. Set to now.
                     lastTickerTime = NSDate.date;
@@ -133,7 +132,7 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
             }
         }
         
-        [dataStore setExtensionStartTimeToNow];
+        [extensionDataStore setExtensionStartTimeToNow];
 
         // Start timer which tracks extension uptime.
 
@@ -148,7 +147,7 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
                                       5 * NSEC_PER_SEC);
 
             dispatch_source_set_event_handler(self->tickerDispatch, ^{
-                [dataStore setTickerTimeToNow];
+                [extensionDataStore setTickerTimeToNow];
             });
 
             dispatch_resume(self->tickerDispatch);
