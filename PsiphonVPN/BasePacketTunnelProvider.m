@@ -90,9 +90,10 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
          // Sets the crash flag. This flag is reset when `stopTunnelWithReason:completionHandler:` is called.
         [self.sharedDB setExtensionJetsammedBeforeStopFlag:TRUE];
 
-        if (previouslyJetsammed) {
-            ExtensionDataStore *dataStore = [[ExtensionDataStore alloc]
-                                             initWithDataStore:[NSUserDefaults standardUserDefaults]];
+        ExtensionDataStore *dataStore = [[ExtensionDataStore alloc]
+                                         initWithDataStore:[NSUserDefaults standardUserDefaults]];
+        
+        if (previouslyJetsammed == TRUE) {
 
             NSDate *previousStartTime = [dataStore extensionStartTime];
             if (previousStartTime != nil) {
@@ -131,9 +132,7 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
                 // Do not log Jetsam event since the previous start time cannot be determined.
             }
         }
-
-        ExtensionDataStore *dataStore = [[ExtensionDataStore alloc]
-                                         initWithDataStore:[NSUserDefaults standardUserDefaults]];
+        
         [dataStore setExtensionStartTimeToNow];
 
         // Start timer which tracks extension uptime.
@@ -174,7 +173,7 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
 
         // Set file protection of all files needed by the extension and Psiphon tunnel framework to NSFileProtectionNone.
         // This is required in order for "Connect On Demand" to work.
-        if (![FileUtils downgradeFileProtectionToNone:paths withExceptions:@[ [self getBootTestFilePath] ]]) {
+        if ([FileUtils downgradeFileProtectionToNone:paths withExceptions:@[ [self getBootTestFilePath] ]] == FALSE) {
             // Undefined behaviour wrt. Connect On Demand. Fail fast.
             [PsiFeedbackLogger error:@"Failed to set file protection."];
         }
