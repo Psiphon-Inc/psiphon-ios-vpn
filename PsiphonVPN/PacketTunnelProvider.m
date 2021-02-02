@@ -300,6 +300,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
 
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
+        self.extensionStartMethod == ExtensionStartMethodFromBoot ||
         self.extensionStartMethod == ExtensionStartMethodFromCrash ||
         [sessionConfigValues hasSubscriptionAuth] == TRUE) {
 
