@@ -164,8 +164,6 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
 
         // List of paths to downgrade file protection to NSFileProtectionNone. The list could contain files or directories.
         NSArray<NSString *> *paths = @[
-          // Note that this directory is not accessible in the container.
-          [[[[NSFileManager defaultManager] URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask] lastObject] path],
           // Shared container, containing logs and other data.
           [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:PsiphonAppGroupIdentifier] path],
         ];
@@ -179,7 +177,6 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
 
     #if DEBUG
         [FileUtils listDirectory:paths[0] resource:@"Library" recursively:YES];
-        [FileUtils listDirectory:paths[1] resource:@"Shared container" recursively:YES];
     #endif
 
         BOOL tunnelStartedFromContainerRecently = FALSE;
