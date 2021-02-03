@@ -143,8 +143,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         
         sessionConfigValues = [[SessionConfigValues alloc] initWithSharedDB:self.sharedDB];
         
-        localDataStore = [[ExtensionDataStore alloc]
-                          initWithDataStore:[NSUserDefaults standardUserDefaults]];
+        localDataStore = [ExtensionDataStore standard];
         
         _hostAppProtocol = [[HostAppProtocol alloc] init];
     }
@@ -300,6 +299,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
 
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
+        self.extensionStartMethod == ExtensionStartMethodFromBoot ||
         self.extensionStartMethod == ExtensionStartMethodFromCrash ||
         [sessionConfigValues hasSubscriptionAuth] == TRUE) {
 
