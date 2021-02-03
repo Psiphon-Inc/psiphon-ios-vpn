@@ -19,6 +19,7 @@
 
 #import "DelimitedFile.h"
 #import "NSError+Convenience.h"
+#import "PsiFeedbackLogger.h"
 
 #pragma mark - NSError key
 
@@ -59,14 +60,14 @@ NSErrorDomain _Nonnull const DelimitedFileErrorDomain = @"DelimitedFileErrorDoma
         if (![fileManager fileExistsAtPath:filepath]) {
             *outError = [NSError errorWithDomain:DelimitedFileErrorDomain
                                             code:DelimitedFileErrorFileDoesNotExist
-                         andLocalizedDescription:[NSString stringWithFormat:@"File not found: %@", filepath]];
+                         andLocalizedDescription:[NSString stringWithFormat:@"File not found: %@", [RedactionUtils filepath:filepath]]];
             return nil;
         }
         self.fileHandle = [NSFileHandle fileHandleForReadingAtPath:filepath];
         if (self.fileHandle == nil) {
             *outError = [NSError errorWithDomain:DelimitedFileErrorDomain
                                             code:DelimitedFileErrorGetFileHandleFailed
-                         andLocalizedDescription:[NSString stringWithFormat:@"Failed to get file handle for file: %@", filepath]];
+                         andLocalizedDescription:[NSString stringWithFormat:@"Failed to get file handle for file: %@", [RedactionUtils filepath:filepath]]];
             return nil;
         }
         self->chunkSize = chunkSize;

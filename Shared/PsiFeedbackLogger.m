@@ -475,3 +475,48 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 }
 
 @end
+
+#pragma mark - RedactionUtils
+
+@implementation RedactionUtils
+
++ (NSString *)filepath:(NSString *)filepath {
+
+#if DEBUG || DEV_RELEASE
+    return filepath;
+#else
+    return @"[redacted]";
+#endif
+
+}
+
++ (NSString *)error:(NSError *)error {
+
+#if DEBUG || DEV_RELEASE
+
+    return [error description];
+
+#else
+
+    NSError *_Nullable underlyingError = error.userInfo[NSUnderlyingErrorKey];
+
+    if (underlyingError != nil) {
+
+        return [NSString stringWithFormat:@"NSError(domain:%@, code:%ld, underlyingError:%@)",
+                error.domain,
+                (long)error.code,
+                [RedactionUtils error:underlyingError]];
+
+    } else {
+
+        return [NSString stringWithFormat:@"NSError(domain:%@, code:%ld)",
+                error.domain,
+                (long)error.code];
+
+    }
+
+#endif
+
+}
+
+@end
