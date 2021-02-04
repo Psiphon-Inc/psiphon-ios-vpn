@@ -24,6 +24,11 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface ExtensionDataStore : NSObject
 
+/// Initializes ExtensionDataStore with the default production NSUserDefaults object.
+/// Note that in the current implementation the standard extension data store shares
+/// the same NSUserDefaults as PsiphonDataSharedDB.
++ (instancetype)standard;
+
 - (instancetype)init NS_UNAVAILABLE;
 
 /// Initialize the metadata store with the given datastore.

@@ -31,6 +31,8 @@
 
 + (NSString *_Nonnull)clientPlatform;
 
++ (BOOL)isiOSAppOnMac;
+
 + (BOOL)runningUITest;
 
 @end

@@ -17,6 +17,8 @@
  *
  */
 
+import enum Utilities.Either
+
 /// A type that has a localized user-facing description.
 public protocol LocalizedUserDescription {
     

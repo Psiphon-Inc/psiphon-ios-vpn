@@ -120,11 +120,13 @@ fileprivate extension OnboardingScreen {
     private let progressView = UIProgressView(progressViewStyle: .bar)
     private let nextButton = SwiftUIButton(type: .system)
     
+    private let platform: Platform
     private let feedbackLogger: FeedbackLogger
     private let installVPNConfig: () -> Promise<VPNConfigInstallResult>
     private let onOnboardingFinished: (OnboardingViewController) -> Void
 
     init(
+        platform: Platform,
         userDefaultsConfig: UserDefaultsConfig,
         mainBundle: Bundle,
         onboardingStages: OrderedSet<OnboardingStage>,
@@ -145,6 +147,7 @@ fileprivate extension OnboardingScreen {
         self.screens = OrderedSet(onboardingStages.flatMap { $0.screens })
         self.currentScreenIndex = 0
         
+        self.platform = platform
         self.feedbackLogger = feedbackLogger
         
         #if targetEnvironment(simulator)
@@ -291,19 +294,37 @@ fileprivate extension OnboardingScreen {
             )
 
         case (.vpnConfigPermission, 0):
+            
+            let image: UIImage
+            switch platform.current {
+            case .iOS:
+                image = UIImage(named: "iOS-OnboardingVPNPermission")!
+            case .iOSAppOnMac:
+                image = UIImage(named: "macOS-OnboardingVPNPermission")!
+            }
+            
             onboardingView = OnboardingView(
-                image: UIImage(named: "OnboardingVPNPermission")!,
+                image: image,
                 withTitle: Strings.onboardingGettingStartedHeaderText(),
                 withBody: Strings.onboardingGettingStartedBodyText(),
                 withAccessoryView: nil
             )
             
         case (.vpnConfigPermission, 1):
-            onboardingView = makeVPNConfigPermissionGuideOnboardingView()
+            onboardingView = makeVPNConfigPermissionGuideOnboardingView(platform: platform)
             
         case (.userNotificationPermission, _):
+            
+            let image: UIImage
+            switch platform.current {
+            case .iOS:
+                image = UIImage(named: "iOS-OnboardingPushNotificationPermission")!
+            case .iOSAppOnMac:
+                image = UIImage(named: "macOS-OnboardingPushNotificationPermission")!
+            }
+            
             onboardingView = OnboardingView(
-                image: UIImage(named: "OnboardingPushNotificationPermission")!,
+                image: image,
                 withTitle: UserStrings.Onboarding_user_notification_permission_title(),
                 withBody: UserStrings.Onboarding_user_notification_permission_body(),
                 withAccessoryView: nil
@@ -431,9 +452,9 @@ fileprivate func makeLanguageSelectionOnboardingView(
     selectLangButton.setEventHandler(onLanguageSelected)
     
     return OnboardingView(
-        image: UIImage(named: "OnboardingStairs")!,
-        withTitle: Strings.onboardingBeyondBordersHeaderText(),
-        withBody: Strings.onboardingBeyondBordersBodyText(),
+        image: UIImage(named: "OnboardingLanguageSelect")!,
+        withTitle: UserStrings.Psiphon(),
+        withBody: "",
         withAccessoryView: selectLangButton
     )
 }
@@ -477,7 +498,7 @@ fileprivate func makePrivacyPolicyDeclinedAlert() -> UIAlertController {
 
 /// Creates view with an arrow pointing to "Allow" button of permission dialog.
 /// The X and Y centre of the returned view is expected to match the X and Y centre of the screen.
-fileprivate func makeVPNConfigPermissionGuideOnboardingView() -> UIView {
+fileprivate func makeVPNConfigPermissionGuideOnboardingView(platform: Platform) -> UIView {
     let view = UIView()
     let arrowImage = UIImage(named: "PermissionArrow")!
     let arrowView = UIImageView(image: arrowImage)
@@ -488,19 +509,32 @@ fileprivate func makeVPNConfigPermissionGuideOnboardingView() -> UIView {
                              numberOfLines: 0,
                              alignment: .center)
     
-    view.addSubviews(arrowView, label)
+    switch platform.current {
     
-    let aspectRatio = arrowImage.size.width / arrowImage.size.height
-    
-    arrowView.activateConstraints {
-        $0.constraint(to: view, .centerX(-60.0), .centerY(160.0)) +
-            [ $0.heightAnchor.constraint(equalToConstant: 84.0),
-              $0.widthAnchor.constraint(equalTo: $0.heightAnchor, multiplier: aspectRatio) ]
-    }
-    
-    label.activateConstraints {
-        $0.constraint(to: view, .centerX(0), .leading(0), .trailing(0)) +
-            [ $0.topAnchor.constraint(equalTo: arrowView.bottomAnchor, constant: 10.0) ]
+    case .iOS:
+        
+        view.addSubviews(arrowView, label)
+        
+        let aspectRatio = arrowImage.size.width / arrowImage.size.height
+        arrowView.activateConstraints {
+            $0.constraint(to: view, .centerX(-60.0), .centerY(160.0)) +
+                [ $0.heightAnchor.constraint(equalToConstant: 84.0),
+                  $0.widthAnchor.constraint(equalTo: $0.heightAnchor, multiplier: aspectRatio) ]
+        }
+        
+        label.activateConstraints {
+            $0.constraint(to: view, .centerX(0), .leading(0), .trailing(0)) +
+                [ $0.topAnchor.constraint(equalTo: arrowView.bottomAnchor, constant: 10.0) ]
+        }
+        
+    case .iOSAppOnMac:
+        
+        view.addSubviews(label)
+        
+        label.activateConstraints {
+            $0.constraint(to: view, .centerX(0), .bottom(-100), .leading(0), .trailing(0))
+        }
+        
     }
     
     return view
