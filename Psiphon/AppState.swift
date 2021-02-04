@@ -71,7 +71,8 @@ enum AppAction {
 // MARK: Environment
 
 struct AppEnvironment {
-   let appBundle: PsiphonBundle
+    let platform: Platform
+    let appBundle: PsiphonBundle
     let feedbackLogger: FeedbackLogger
     let httpClient: HTTPClient
     let psiCashEffects: PsiCashEffects
@@ -132,6 +133,7 @@ struct AppEnvironment {
 /// - Returns: Tuple (environment, cleanup). `cleanup` should be called
 /// in `applicationWillTerminate(:_)` delegate callback.
 func makeEnvironment(
+    platform: Platform,
     store: Store<AppState, AppAction>,
     feedbackLogger: FeedbackLogger,
     sharedDB: PsiphonDataSharedDB,
@@ -171,6 +173,7 @@ func makeEnvironment(
     let httpClient = HTTPClient.default(urlSession: urlSession)
     
     let environment = AppEnvironment(
+        platform: platform,
         appBundle: PsiphonBundle.from(bundle: Bundle.main),
         feedbackLogger: feedbackLogger,
         httpClient: httpClient,
@@ -277,6 +280,7 @@ func makeEnvironment(
         getTopPresentedViewController: getTopPresentedViewController,
         makePsiCashViewController: { [unowned store] in
             PsiCashViewController(
+                platform: platform,
                 store: store.projection(
                     value: { $0.psiCashViewControllerReaderState },
                     action: {
@@ -349,6 +353,7 @@ func makeEnvironment(
 
 fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment {
     return PsiCashEnvironment(
+        platform: env.platform,
         feedbackLogger: env.feedbackLogger,
         psiCashFileStoreRoot: env.psiCashFileStoreRoot,
         psiCashEffects: env.psiCashEffects,
@@ -457,6 +462,7 @@ fileprivate func toRequestDelegateReducerEnvironment(
 
 fileprivate func toAppDelegateReducerEnvironment(env: AppEnvironment) -> AppDelegateEnvironment {
     AppDelegateEnvironment(
+        platform: env.platform,
         feedbackLogger: env.feedbackLogger,
         sharedDB: env.sharedDB,
         psiCashEffects: env.psiCashEffects,

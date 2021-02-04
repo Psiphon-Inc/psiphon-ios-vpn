@@ -166,7 +166,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
 
     private override init() {
 
-        private var deepLinkingNavigator = DeepLinkingNavigator()
+        deepLinkingNavigator = DeepLinkingNavigator()
 
         dateCompare = DateCompare(
             getCurrentTime: { Date () },
@@ -203,7 +203,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
         
         self.store.send(.appDelegateAction(.appLifecycleEvent(.willEnterForeground)))
         self.store.send(vpnAction: .syncWithProvider(reason: .appEnteredForeground))
-        self.store.send(.psiCash(.refreshPsiCashState))
+        self.store.send(.psiCash(.refreshPsiCashState()))
         
     }
     
