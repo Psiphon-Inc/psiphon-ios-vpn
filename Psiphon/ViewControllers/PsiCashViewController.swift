@@ -50,7 +50,7 @@ final class PsiCashViewController: ReactiveViewController {
         let iap: IAPState
         let subscription: SubscriptionState
         let appStorePsiCashProducts:
-            PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent>
+            PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent<Int>>
         let isRefreshingAppStoreReceipt: Bool
     }
 
@@ -732,15 +732,28 @@ extension ErrorEvent where E == IAPError {
                 optionalDescription = "App Store failed to record the purchase"
                 
             case let .error(skEmittedError):
+
                 // Payment cancelled errors are ignored.
                 if case let .right(skError) = skEmittedError,
                    case .paymentCancelled = skError.errorInfo.code {
+
                     optionalDescription = .none
+
                 } else {
+
+                    let desc: String
+                    switch skEmittedError {
+                    case .left(let error):
+                        desc = error.errorInfo.localizedDescription
+                    case .right(let error):
+                        desc = error.errorInfo.localizedDescription
+                    }
+
                     optionalDescription = """
                         \(UserStrings.Purchase_failed())
-                        (\(skEmittedError.localizedUserDescription))
+                        (\(desc))
                         """
+
                 }
             }
         }
@@ -776,7 +789,7 @@ extension PsiCashViewController.ReaderState {
     func allProducts(
         rewardedVideoClearedForSale: Bool,
         rewardedVideoSubtitle: String
-    ) -> PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent> {
+    ) -> PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent<Int>> {
         appStorePsiCashProducts.map(pending: { lastParsedList -> [PsiCashPurchasableViewModel] in
             // Adds rewarded video ad as the first product if
             let viewModels = lastParsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in

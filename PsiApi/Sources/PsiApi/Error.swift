@@ -206,20 +206,6 @@ public extension SystemError {
 
 public typealias SystemErrorEvent<Code: Hashable> = ErrorEvent<SystemError<Code>>
 
-extension Either: Error, LocalizedUserDescription where
-    A: Error & LocalizedUserDescription,
-    B: Error & LocalizedUserDescription {
-    
-    public var localizedUserDescription: String {
-        switch self {
-        case let .left(error):
-            return error.localizedUserDescription
-        case let .right(error):
-            return error.localizedUserDescription
-        }
-    }
-}
-
 public typealias CodableError = Codable & Error
 
 public struct ScopedError<T: Error>: Error {

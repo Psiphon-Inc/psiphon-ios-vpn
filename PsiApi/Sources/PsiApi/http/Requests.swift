@@ -189,7 +189,7 @@ public struct HTTPRequestError: HashableError {
     /// completes successfully or fails, the response parameter contains that information.
     /// From: https://developer.apple.com/documentation/foundation/urlsession/1410330-datatask
     public let partialResponseMetadata: HTTPResponseMetadata?
-    public let errorEvent: ErrorEvent<SystemError<Int>>
+    public let error: SystemError<Int>
 }
 
 extension URL {
