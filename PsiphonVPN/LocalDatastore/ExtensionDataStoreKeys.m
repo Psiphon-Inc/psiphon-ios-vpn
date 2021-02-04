@@ -21,6 +21,6 @@
 
 // See comments in header.
 
-KeyedDataStoreKey const ExtensionStartTimeKey = @"PersistentJetsamData.ExtensionStartTimeNSDateKey";
-KeyedDataStoreKey const TickerTimeKey = @"PersistentJetsamData.TickerTimeNSDateKey";
-KeyedDataStoreKey const SessionAlertsKey = @"SessionAlertsKey";
+KeyedDataStoreKey const ExtensionStartTimeKey = @"ExtensionDataStore.PersistentJetsamData.ExtensionStartTimeNSDateKey";
+KeyedDataStoreKey const TickerTimeKey = @"ExtensionDataStore.PersistentJetsamData.TickerTimeNSDateKey";
+KeyedDataStoreKey const SessionAlertsKey = @"ExtensionDataStore.SessionAlertsKey";

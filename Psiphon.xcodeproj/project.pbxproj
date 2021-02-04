@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		29FE979125C0C1CA00D9C09F /* HostAppProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 29FE979025C0C1CA00D9C09F /* HostAppProtocol.m */; };
 		440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 440D75BD1F59E041005C603B /* StoreKit.framework */; };
 		4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4435CC261F70566000F3A809 /* SettingsViewController.m */; };
 		445F239620E1817C00D004E9 /* AppStoreParsedReceiptData.m in Sources */ = {isa = PBXBuildFile; fileRef = 445F239520E1817C00D004E9 /* AppStoreParsedReceiptData.m */; };
@@ -385,6 +386,8 @@
 		1787CA7A8FA75358E02689FB /* Pods-Psiphon-PsiApi-PsiApiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi-PsiApiTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi-PsiApiTests/Pods-Psiphon-PsiApi-PsiApiTests.release.xcconfig"; sourceTree = "<group>"; };
 		1CF6F36D51088259B2AC450E /* Pods-PsiApi-Testing.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing/Pods-PsiApi-Testing.release.xcconfig"; sourceTree = "<group>"; };
 		1FE4700126FC2AD287FCB45B /* Pods-PsiphonTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonTests/Pods-PsiphonTests.release.xcconfig"; sourceTree = "<group>"; };
+		29FE978F25C0C1CA00D9C09F /* HostAppProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HostAppProtocol.h; sourceTree = "<group>"; };
+		29FE979025C0C1CA00D9C09F /* HostAppProtocol.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HostAppProtocol.m; sourceTree = "<group>"; };
 		2D1DAF6C9CAF197D05CDCFCF /* Pods-Testing-TestingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testing-TestingTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Testing-TestingTests/Pods-Testing-TestingTests.release.xcconfig"; sourceTree = "<group>"; };
 		2EAE1D54BEBC6BF081A5B8D3 /* Pods-Testing-TestingTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testing-TestingTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Testing-TestingTests/Pods-Testing-TestingTests.debug.xcconfig"; sourceTree = "<group>"; };
 		364EDFAD32DACAD0E8259C6E /* Pods-Psiphon-PsiApi.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi/Pods-Psiphon-PsiApi.debug.xcconfig"; sourceTree = "<group>"; };
@@ -1483,6 +1486,8 @@
 				CED6796F24A4FAF400C4CA81 /* NSUserDefaults+KeyedDataStore.h */,
 				8D90FD5524C748E000E11C66 /* FeedbackUtils.h */,
 				8D90FD5624C748E000E11C66 /* FeedbackUtils.m */,
+				29FE978F25C0C1CA00D9C09F /* HostAppProtocol.h */,
+				29FE979025C0C1CA00D9C09F /* HostAppProtocol.m */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -2282,6 +2287,7 @@
 				9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */,
 				CED6796224A4FA6D00C4CA81 /* ExtensionContainerFile.m in Sources */,
 				521FD0FE219E0E1900F748EC /* AppProfiler.m in Sources */,
+				29FE979125C0C1CA00D9C09F /* HostAppProtocol.m in Sources */,
 				EF90D7B4204F234100228A63 /* NSDate+Comparator.m in Sources */,
 				9BFECEA225F023F895CC8DA1 /* Authorization.m in Sources */,
 				9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */,
@@ -2526,7 +2532,7 @@
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 200;
+				CURRENT_PROJECT_VERSION = 206;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = Q6HLNEX92A;
 				ENABLE_BITCODE = NO;
@@ -2778,7 +2784,7 @@
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 200;
+				CURRENT_PROJECT_VERSION = 206;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = Q6HLNEX92A;
@@ -2824,7 +2830,7 @@
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 200;
+				CURRENT_PROJECT_VERSION = 206;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;

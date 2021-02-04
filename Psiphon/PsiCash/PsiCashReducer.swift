@@ -31,6 +31,7 @@ struct PsiCashReducerState: Equatable {
 }
 
 typealias PsiCashEnvironment = (
+    platform: Platform,
     feedbackLogger: FeedbackLogger,
     psiCashFileStoreRoot: String?,
     psiCashEffects: PsiCashEffects,
@@ -352,11 +353,17 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         }
         
     case .showRewardedVideoAd:
-        
+
+        guard case .iOS = environment.platform.current else {
+            return [
+                environment.feedbackLogger.log(.warn, "Ads can only be shown on iOS devices").mapNever()
+            ]
+        }
+
         guard state.psiCash.libLoaded else {
             return []
         }
-        
+
         guard case .notSubscribed = state.subscription.status else {
             return []
         }
