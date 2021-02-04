@@ -81,4 +81,19 @@ typedef NSString * PsiFeedbackLogType;
 
 @end
 
+#pragma mark - RedactionUtils
+
+/// RedactionUtils provides utilities to easily redact data that might contain
+/// PII from being included in feedbacks.
+@interface RedactionUtils : NSObject
+
+/// Redacts full file path in production.
++ (NSString *)filepath:(NSString *)filepath;
+
+/// In production returns a formatted string containing the error's domain, code
+/// and underlying errors (by going through them recursively) if any.
++ (NSString *)error:(NSError *)error;
+
+@end
+
 NS_ASSUME_NONNULL_END
