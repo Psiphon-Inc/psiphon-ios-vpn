@@ -96,6 +96,8 @@
 		52D363CB230DEBED002C2221 /* CloseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CA230DEBED002C2221 /* CloseButton.swift */; };
 		52D363CD230EEBAC002C2221 /* AnimatedUIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CC230EEBAC002C2221 /* AnimatedUIButton.swift */; };
 		52D363CF230F112E002C2221 /* TabControlViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CE230F112E002C2221 /* TabControlViewWrapper.swift */; };
+		52D5F509259D0F0A0071888D /* PsiCashLib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52D5F508259D0F0A0071888D /* PsiCashLib.xcframework */; };
+		52D5F50A259D0F0A0071888D /* PsiCashLib.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 52D5F508259D0F0A0071888D /* PsiCashLib.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		52DF5E9223C675EC00A1B067 /* ViewController+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9123C675EC00A1B067 /* ViewController+Additions.swift */; };
 		52DF5E9823CE5A8300A1B067 /* AppAction+ValuePaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9723CE5A8300A1B067 /* AppAction+ValuePaths.swift */; };
 		52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9923CE835100A1B067 /* UserStrings.swift */; };
@@ -532,6 +534,7 @@
 		52D363CA230DEBED002C2221 /* CloseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseButton.swift; sourceTree = "<group>"; };
 		52D363CC230EEBAC002C2221 /* AnimatedUIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedUIButton.swift; sourceTree = "<group>"; };
 		52D363CE230F112E002C2221 /* TabControlViewWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabControlViewWrapper.swift; sourceTree = "<group>"; };
+		52D5F508259D0F0A0071888D /* PsiCashLib.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = PsiCashLib.xcframework; sourceTree = "<group>"; };
 		52DF5E9123C675EC00A1B067 /* ViewController+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ViewController+Additions.swift"; sourceTree = "<group>"; };
 		52DF5E9723CE5A8300A1B067 /* AppAction+ValuePaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppAction+ValuePaths.swift"; sourceTree = "<group>"; };
 		52DF5E9923CE835100A1B067 /* UserStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStrings.swift; sourceTree = "<group>"; };
@@ -901,6 +904,7 @@
 				8D497A2A247CEF50009CEBA8 /* GoogleMobileAds.framework in Frameworks */,
 				8D497A2E247CEF50009CEBA8 /* nanopb.xcframework in Frameworks */,
 				8D497A28247CEF50009CEBA8 /* GoogleAppMeasurement.framework in Frameworks */,
+				52D5F509259D0F0A0071888D /* PsiCashLib.xcframework in Frameworks */,
 				8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */,
 				8D497A2C247CEF50009CEBA8 /* GoogleUtilities.xcframework in Frameworks */,
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
