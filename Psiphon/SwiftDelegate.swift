@@ -53,6 +53,7 @@ struct AppDelegateReducerState: Equatable {
 }
 
 struct AppDelegateEnvironment {
+    let platform: Platform
     let feedbackLogger: FeedbackLogger
     let sharedDB: PsiphonDataSharedDB
     let psiCashEffects: PsiCashEffects
@@ -146,6 +147,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
     
     static let instance = SwiftDelegate()
 
+    private var platform: Platform!
     private var deepLinkingNavigator = DeepLinkingNavigator()
     private let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: PsiphonAppGroupIdentifier)
     private let feedbackLogger = FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler())
@@ -163,6 +165,9 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
     private var environmentCleanup: (() -> Void)?
 
     private override init() {
+
+        private var deepLinkingNavigator = DeepLinkingNavigator()
+
         dateCompare = DateCompare(
             getCurrentTime: { Date () },
             compareDates: { Calendar.current.compare($0, to: $1, toGranularity: $2) })
@@ -181,6 +186,40 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
         #else
         Debugging = DebugFlags.disabled(buildConfig: .release)
         #endif
+    }
+    
+    func applicationDidBecomeActive() {
+        
+        self.store.send(.appDelegateAction(.appLifecycleEvent(.didBecomeActive)))
+        self.store.send(.mainViewAction(.applicationDidBecomeActive))
+        
+    }
+    
+    func applicationWillEnterForeground() {
+                
+        // Updates appForegroundState shared with the extension before
+        // syncing with it through the `.syncWithProvider` message.
+        self.sharedDB.setAppForegroundState(true)
+        
+        self.store.send(.appDelegateAction(.appLifecycleEvent(.willEnterForeground)))
+        self.store.send(vpnAction: .syncWithProvider(reason: .appEnteredForeground))
+        self.store.send(.psiCash(.refreshPsiCashState))
+        
+    }
+    
+    func applicationDidEnterBackground() {
+        
+        self.store.send(.appDelegateAction(.appLifecycleEvent(.didEnterBackground)))
+        self.sharedDB.setAppForegroundState(false)
+        
+        Notifier.sharedInstance().post(NotifierAppEnteredBackground)
+        
+    }
+    
+    func applicationWillResignActive() {
+        
+        self.store.send(.appDelegateAction(.appLifecycleEvent(.willResignActive)))
+        
     }
 
 }
@@ -340,6 +379,32 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         let mainDispatcher = MainDispatcher()
         let globalDispatcher = GlobalDispatcher(qos: .default, name: "globalDispatcher")
         
+        // On Mac the iOS AppDelegate callbacks are not called when the app's window
+        // loses focus. Once the app is opened "applicationDidBecomeActive" is called once,
+        // unless the application is hidden and reopened again.
+        //
+        // The current strategy is to call "applicationWillEnterForeground", "applicationDidBecomeActive",
+        // "applicationWillResignActive", "applicationDidEnterBackground" only based on
+        // "NSWindowDidBecomeMainNotification" and "NSWindowDidResignMainNotification" notifications.
+        
+        if case .iOSAppOnMac = platform.current {
+            
+            NotificationCenter.default.addObserver(forName: .init("NSWindowDidBecomeMainNotification"), object: nil, queue: nil) { notification in
+                
+                self.applicationWillEnterForeground()
+                self.applicationDidBecomeActive()
+                
+            }
+            
+            NotificationCenter.default.addObserver(forName: .init("NSWindowDidResignMainNotification"), object: nil, queue: nil) { notification in
+                
+                self.applicationWillResignActive()
+                self.applicationDidEnterBackground()
+                
+            }
+            
+        }
+
         self.store = Store(
             initialValue: AppState(),
             reducer: makeAppReducer(feedbackLogger: self.feedbackLogger),
@@ -347,6 +412,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             feedbackLogger: self.feedbackLogger,
             environment: { [unowned self] store in
                 let (environment, cleanup) = makeEnvironment(
+                    platform: platform,
                     store: store,
                     feedbackLogger: self.feedbackLogger,
                     sharedDB: self.sharedDB,
@@ -662,27 +728,39 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func applicationDidBecomeActive(_ application: UIApplication) {
-        self.store.send(.appDelegateAction(.appLifecycleEvent(.didBecomeActive)))
-        self.store.send(.mainViewAction(.applicationDidBecomeActive))
+        
+        guard case .iOS = platform.current else {
+            return
+        }
+        
+        applicationDidBecomeActive()
     }
     
     @objc func applicationWillResignActive(_ application: UIApplication) {
-        self.store.send(.appDelegateAction(.appLifecycleEvent(.willResignActive)))
+        
+        guard case .iOS = platform.current else {
+            return
+        }
+        
+        applicationWillResignActive()
     }
     
     @objc func applicationWillEnterForeground(_ application: UIApplication) {
-        // Updates appForegroundState shared with the extension before
-        // syncing with it through the `.syncWithProvider` message.
-        self.sharedDB.setAppForegroundState(true)
         
-        self.store.send(.appDelegateAction(.appLifecycleEvent(.willEnterForeground)))
-        self.store.send(vpnAction: .syncWithProvider(reason: .appEnteredForeground))
-        self.store.send(.psiCash(.refreshPsiCashState()))
+        guard case .iOS = platform.current else {
+            return
+        }
+        
+        applicationWillEnterForeground()
     }
     
     @objc func applicationDidEnterBackground(_ application: UIApplication) {
-        self.store.send(.appDelegateAction(.appLifecycleEvent(.didEnterBackground)))
-        self.sharedDB.setAppForegroundState(false)
+        
+        guard case .iOS = platform.current else {
+            return
+        }
+        
+        applicationDidEnterBackground()
     }
     
     @objc func applicationWillTerminate(_ application: UIApplication) {
@@ -716,7 +794,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
         }
     }
-
     @objc func makeOnboardingViewControllerWithStagesNotCompleted(
         _ completionHandler: @escaping (OnboardingViewController) -> Void
     ) -> OnboardingViewController? {
@@ -731,6 +808,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         }
         
         return OnboardingViewController(
+            platform: platform,
             userDefaultsConfig: self.userDefaultsConfig,
             mainBundle: .main,
             onboardingStages: stagesNotCompleted,

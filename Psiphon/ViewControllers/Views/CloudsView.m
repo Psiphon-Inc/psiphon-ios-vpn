@@ -39,12 +39,20 @@ CGFloat const LargeCloudMult = 0.1f;
     if (self) {
         dynamicConstraints = [NSMutableArray arrayWithCapacity:9];
 
-        UIImage *cloud = [UIImage imageNamed:@"cloud"];
-        cloudTopLeft = [[UIImageView alloc] initWithImage:cloud];
-        cloudTopRight= [[UIImageView alloc] initWithImage:cloud];
-        cloudMiddleLeft = [[UIImageView alloc] initWithImage:cloud];
-        cloudBottomLeft = [[UIImageView alloc] initWithImage:cloud];
-        cloudBottomRight = [[UIImageView alloc] initWithImage:cloud];
+        UIImage *largeCloud = [UIImage imageNamed:@"LargeCloud"];
+        UIImage *smallCloud = [UIImage imageNamed:@"SmallCloud"];
+        UIImage *largeCloudMirrored = [UIImage imageWithCGImage:largeCloud.CGImage
+                                                          scale:largeCloud.scale
+                                              orientation:UIImageOrientationUpMirrored];
+        UIImage *smallCloudMirrored = [UIImage imageWithCGImage:smallCloud.CGImage
+                                                          scale:smallCloud.scale
+                                              orientation:UIImageOrientationUpMirrored];
+        
+        cloudTopLeft = [[UIImageView alloc] initWithImage:largeCloudMirrored];
+        cloudTopRight= [[UIImageView alloc] initWithImage:largeCloudMirrored];
+        cloudMiddleLeft = [[UIImageView alloc] initWithImage:smallCloudMirrored];
+        cloudBottomLeft = [[UIImageView alloc] initWithImage:smallCloud];
+        cloudBottomRight = [[UIImageView alloc] initWithImage:largeCloud];
 
         self.translatesAutoresizingMaskIntoConstraints = FALSE;
         [self autoLayoutSetupViews];
@@ -62,23 +70,20 @@ CGFloat const LargeCloudMult = 0.1f;
 
     // Calculating layout constraint constants based on parent's view new width and height.
     // Check autoLayoutAddSubviews to see which index corresponds to which layout constraint.
-    dynamicConstraints[0].constant = 0.038f * height;
-    dynamicConstraints[1].constant = 0.041f * height;
-    dynamicConstraints[2].constant = 0.785f * width;
+    dynamicConstraints[0].constant = 0.f;
+    dynamicConstraints[1].constant = 0.f;
+    dynamicConstraints[2].constant = 0.55f * width;
     dynamicConstraints[3].constant = 0.421f * height;
-    dynamicConstraints[4].constant = -0.8f * width;
+    dynamicConstraints[4].constant = -0.79f * width;
     dynamicConstraints[5].constant = 0.867f * height;
-    dynamicConstraints[6].constant = 0.092f * width;
+    dynamicConstraints[6].constant = 0.05f * width;
     dynamicConstraints[7].constant = 0.78f * height;
-    dynamicConstraints[8].constant = 0.68f * width;
+    dynamicConstraints[8].constant = 0.58f * width;
 }
 
 #pragma mark - AutoLayoutProtocol
 
-- (void)autoLayoutSetupViews {
-    cloudTopLeft.alpha = 0.4f;
-    cloudBottomLeft.alpha = 0.4f;
-}
+- (void)autoLayoutSetupViews {}
 
 - (void)autoLayoutAddSubviews {
     [self addSubview:cloudTopLeft];
@@ -97,11 +102,11 @@ CGFloat const LargeCloudMult = 0.1f;
 
     [NSLayoutConstraint activateConstraints:@[
       [cloudTopLeft.heightAnchor constraintEqualToAnchor:self.heightAnchor
-                                              multiplier:SmallCloudMult],
+                                              multiplier:LargeCloudMult],
 
       [cloudTopLeft constraintWidthToImageRatio],
 
-      [cloudTopLeft.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:-5.f]
+      [cloudTopLeft.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:-170.f]
     ]];
 
     // Top Right Cloud
