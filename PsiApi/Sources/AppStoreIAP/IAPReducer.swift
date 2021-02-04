@@ -38,7 +38,7 @@ public enum IAPAction: Equatable {
 /// StoreKit transaction observer
 public enum TransactionUpdate: Equatable {
     case updatedTransactions([PaymentTransaction])
-    case restoredCompletedTransactions(error: SystemError?)
+    case restoredCompletedTransactions(error: SystemError<Int>?)
 }
 
 extension TransactionUpdate {
@@ -49,7 +49,7 @@ extension TransactionUpdate {
         return value
     }
     
-    var restoredCompletedTransactions: SystemError?? {
+    var restoredCompletedTransactions: SystemError<Int>?? {
         guard case let .restoredCompletedTransactions(error: error) = self else {
             return nil
         }

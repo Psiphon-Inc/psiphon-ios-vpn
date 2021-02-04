@@ -65,7 +65,17 @@ public let typeParser: GenericParser<String, (), String> = .recursive { rec in
         }
     }
 
-    return nominalType.attempt <|> unitType
+    let cSynthDecl: GenericParser<String, (), String> =
+        (symbol("__C_Synthesized.related decl 'e' for") *> rec).map {
+            "__C_Synthesized.related decl 'e' for \($0)"
+        }
+
+    return
+        cSynthDecl.attempt
+        <|>
+        nominalType.attempt
+        <|>
+        unitType
 
 }
 

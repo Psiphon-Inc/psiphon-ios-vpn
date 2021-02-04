@@ -127,14 +127,6 @@
     return  NSLocalizedStringWithDefaultValue(@"SELECT_LANG_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Select Language", @"Select language button title.");
 }
 
-+ (NSString *)onboardingBeyondBordersHeaderText {
-    return  NSLocalizedStringWithDefaultValue(@"ONBOARDING_BEYOND_BORDERS_HEADER", nil, [NSBundle mainBundle], @"Beyond Borders", @"Beyond Borders title");
-}
-
-+ (NSString *)onboardingBeyondBordersBodyText {
-    return  NSLocalizedStringWithDefaultValue(@"ONBOARDING_BEYOND_BORDERS_BODY_2", nil, [NSBundle mainBundle], @"Psiphon connects you to the content you want, no matter where you are.", @"Onboarding screen text. (Do not translate 'Psiphon').");
-}
-
 + (NSString *)onboardingGettingStartedHeaderText {
     return  NSLocalizedStringWithDefaultValue(@"ONBOARDING_GETTING_STARTED_HEADER", nil, [NSBundle mainBundle], @"Getting Started", @"Onboarding header");
 }

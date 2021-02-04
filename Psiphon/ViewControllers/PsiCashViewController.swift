@@ -50,7 +50,7 @@ final class PsiCashViewController: ReactiveViewController {
         let iap: IAPState
         let subscription: SubscriptionState
         let appStorePsiCashProducts:
-            PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent>
+            PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent<Int>>
         let isRefreshingAppStoreReceipt: Bool
     }
 
@@ -71,6 +71,7 @@ final class PsiCashViewController: ReactiveViewController {
         case speedBoostPurchaseDialog
     }
 
+    private let platform: Platform
     private let feedbackLogger: FeedbackLogger
     private let tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>
     
@@ -100,6 +101,7 @@ final class PsiCashViewController: ReactiveViewController {
     private let containerBindable: ContainerViewType.BuildType
     
     init(
+        platform: Platform,
         store: Store<ReaderState, ViewControllerAction>,
         iapStore: Store<Utilities.Unit, IAPAction>,
         productRequestStore: Store<Utilities.Unit, ProductRequestAction>,
@@ -110,6 +112,7 @@ final class PsiCashViewController: ReactiveViewController {
         tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
         onDismissed: @escaping () -> Void
     ) {
+        self.platform = platform
         self.feedbackLogger = feedbackLogger
         self.tunnelConnectedSignal = tunnelConnectedSignal
         
@@ -434,6 +437,7 @@ final class PsiCashViewController: ReactiveViewController {
                         }
                         
                         let allProducts = observed.readerState.allProducts(
+                            platform: platform,
                             rewardedVideoClearedForSale: rewardedVideoClearedForSale,
                             rewardedVideoSubtitle: rewardedVideoSubtitle
                         )
@@ -732,15 +736,28 @@ extension ErrorEvent where E == IAPError {
                 optionalDescription = "App Store failed to record the purchase"
                 
             case let .error(skEmittedError):
+
                 // Payment cancelled errors are ignored.
                 if case let .right(skError) = skEmittedError,
-                   case .paymentCancelled = skError.code {
+                   case .paymentCancelled = skError.errorInfo.code {
+
                     optionalDescription = .none
+
                 } else {
+
+                    let desc: String
+                    switch skEmittedError {
+                    case .left(let error):
+                        desc = error.errorInfo.localizedDescription
+                    case .right(let error):
+                        desc = error.errorInfo.localizedDescription
+                    }
+
                     optionalDescription = """
                         \(UserStrings.Purchase_failed())
-                        (\(skEmittedError.localizedUserDescription))
+                        (\(desc))
                         """
+
                 }
             }
         }
@@ -774,33 +791,55 @@ extension PsiCashViewController.ReaderState {
 
     /// Adds rewarded video product to list of `PsiCashPurchasableViewModel`  retrieved from AppStore.
     func allProducts(
+        platform: Platform,
         rewardedVideoClearedForSale: Bool,
         rewardedVideoSubtitle: String
-    ) -> PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent> {
-        appStorePsiCashProducts.map(pending: { lastParsedList -> [PsiCashPurchasableViewModel] in
-            // Adds rewarded video ad as the first product if
-            let viewModels = lastParsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
-                parsed.viewModel
-            }
-            switch viewModels {
-            case []: return []
-            default: return [
-                psiCash.rewardedVideoProduct(
-                    clearedForSale: rewardedVideoClearedForSale, subtitle: rewardedVideoSubtitle
-                )
-            ] + viewModels
-            }
-        }, completed: { result in
-            result.map { parsedList -> [PsiCashPurchasableViewModel] in
-                // Adds rewarded video ad as the first product
-                [
+    ) -> PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent<Int>> {
+
+        switch platform.current {
+
+        case .iOSAppOnMac:
+
+            return appStorePsiCashProducts.map(
+                pending: { $0.compactMap { $0.viewModel } },
+                completed: { $0.map { $0.compactMap { $0.viewModel } } }
+            )
+
+        case .iOS:
+
+            // Adds rewarded video ad as the first product if running device is iOS.
+            return appStorePsiCashProducts.map(pending: { lastParsedList -> [PsiCashPurchasableViewModel] in
+
+                let viewModels = lastParsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
+                    parsed.viewModel
+                }
+
+                switch viewModels {
+                case []: return []
+                default: return [
                     psiCash.rewardedVideoProduct(
-                        clearedForSale: rewardedVideoClearedForSale, subtitle: rewardedVideoSubtitle
-                    ) ] + parsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
+                        clearedForSale: rewardedVideoClearedForSale,
+                        subtitle: rewardedVideoSubtitle
+                    )
+                ] + viewModels
+                }
+
+            }, completed: { result in
+                result.map { parsedList -> [PsiCashPurchasableViewModel] in
+
+                    return [
+                        psiCash.rewardedVideoProduct(
+                            clearedForSale: rewardedVideoClearedForSale,
+                            subtitle: rewardedVideoSubtitle
+                        )
+                    ] + parsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
                         parsed.viewModel
                     }
-            }
-        })
+                }
+            })
+
+        }
+
     }
 
 }

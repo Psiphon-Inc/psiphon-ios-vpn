@@ -308,6 +308,13 @@ func feedbackJSON(userFeedback: UserFeedback,
 
     diagnosticEntries.append(appStateFeedbackEntry)
 
+    var clientPlatform = "ios-vpn"
+    if #available(iOS 14.0, *) {
+        if ProcessInfo().isiOSAppOnMac {
+            clientPlatform = "ios-vpn-on-mac"
+        }
+    }
+
     do {
         let jsonBlob =
             try Feedback.generateJSON(
@@ -318,7 +325,7 @@ func feedbackJSON(userFeedback: UserFeedback,
                 sendDiagnosticInfo: userFeedback.uploadDiagnostics,
                 feedbackId: userFeedback.feedbackId,
                 psiphonConfig: psiphonConfig,
-                clientPlatform: "ios-vpn",
+                clientPlatform: clientPlatform,
                 connectionType: reachabilityStatus.connectionTypeForFeedback,
                 isJailbroken: JailbreakCheck.isDeviceJailbroken(),
                 diagnosticEntries: diagnosticEntries,
