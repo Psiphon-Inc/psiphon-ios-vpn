@@ -21,10 +21,23 @@ import Foundation
 import Utilities
 import ReactiveSwift
 
-@objc public  enum ReachabilityStatus: Int {
+@objc public enum ReachabilityStatus: Int, CustomStringFeedbackDescription {
+
     case notReachable
     case viaWiFi
     case viaWWAN
+
+    public var description: String {
+        switch self {
+        case .notReachable:
+            return "ReachabilityStatus.notReachable"
+        case .viaWiFi:
+            return "ReachabilityStatus.viaWiFi"
+        case .viaWWAN:
+            return "ReachabilityStatus.viaWWAN"
+        }
+    }
+
 }
 
 /// Represents reachability status flags coded into a string.

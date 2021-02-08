@@ -38,7 +38,8 @@ final class UserDefaultsConfig: PsiCashPersistedValues {
         self.expectedPsiCashReward = value
     }
     
-    @UserDefault(.standard, "appLanguage", defaultValue: "")
+    /// App language code.
+    @UserDefault(.standard, "appLanguage", defaultValue: Language.defaultLanguageCode)
     var appLanguage: String
     
     /// Set of onboardings that have been completed by the user.
@@ -59,10 +60,11 @@ extension UserDefaultsConfig {
     
     /// Returns Locale object for user-selected app language.
     /// - Note: that this can be different from device locale value `Locale.current`.
+    // TODO: Needs a check if the stored user default app language may have been removed.
     var localeForAppLanguage: Locale {
         let langIdentifier = self.appLanguage
         switch langIdentifier {
-        case "":
+        case Language.defaultLanguageCode:
             return Locale.current
         default:
             return Locale(identifier: langIdentifier)

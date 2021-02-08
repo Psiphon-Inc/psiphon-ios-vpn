@@ -89,7 +89,7 @@ extension Array where Element == ParsedPsiCashAppStorePurchasable {
                 return false
             case let (.localizedPrice(price: price1, priceLocale: priceLocale1),
                       .localizedPrice(price: price2, priceLocale: priceLocale2)):
-                switch priceLocale1.currencyCode!.compare(priceLocale2.currencyCode!) {
+                switch priceLocale1.currencyCode.compare(priceLocale2.currencyCode) {
                 case .orderedSame:
                     return price1 < price2
                 case .orderedAscending:
@@ -107,7 +107,7 @@ extension Array where Element == ParsedPsiCashAppStorePurchasable {
 struct PsiCashAppStoreProductsState: Equatable {
     
     var psiCashProducts:
-        PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent>
+        PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent<Int>>
     
     /// Strong reference to request object.
     /// - Reference: https://developer.apple.com/documentation/storekit/skproductsrequest
@@ -123,7 +123,7 @@ extension PsiCashAppStoreProductsState {
 
 enum ProductRequestAction {
     case getProductList
-    case productRequestResult(SKProductsRequest, Result<SKProductsResponse, SystemErrorEvent>)
+    case productRequestResult(SKProductsRequest, Result<SKProductsResponse, SystemErrorEvent<Int>>)
 }
 
 typealias ProductRequestEnvironment = (
@@ -225,7 +225,8 @@ final class ProductRequestDelegate: StoreDelegate<ProductRequestAction>, SKProdu
     func request(_ request: SKRequest, didFailWithError error: Error) {
         storeSend(
             .productRequestResult(
-                request as! SKProductsRequest, .failure(SystemErrorEvent(SystemError(error)))
+                request as! SKProductsRequest,
+                .failure(SystemErrorEvent(SystemError<Int>.make(error as NSError)))
             )
         )
     }

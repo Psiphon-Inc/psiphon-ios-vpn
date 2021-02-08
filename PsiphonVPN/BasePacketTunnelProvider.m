@@ -64,7 +64,7 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
         [PsiFeedbackLogger infoWithType:BasePacketTunnelProviderLogType json:@{@"Event": @"Init",
                                                                                @"PID":@(pid)}];
 
-       _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+       _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
     }
     return self;
 }
@@ -90,14 +90,14 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
          // Sets the crash flag. This flag is reset when `stopTunnelWithReason:completionHandler:` is called.
         [self.sharedDB setExtensionJetsammedBeforeStopFlag:TRUE];
 
-        if (previouslyJetsammed) {
-            ExtensionDataStore *dataStore = [[ExtensionDataStore alloc]
-                                             initWithDataStore:[NSUserDefaults standardUserDefaults]];
+        ExtensionDataStore *extensionDataStore = [ExtensionDataStore standard];
+        
+        if (previouslyJetsammed == TRUE) {
 
-            NSDate *previousStartTime = [dataStore extensionStartTime];
+            NSDate *previousStartTime = [extensionDataStore extensionStartTime];
             if (previousStartTime != nil) {
 
-                NSDate *lastTickerTime = [dataStore tickerTime];
+                NSDate *lastTickerTime = [extensionDataStore tickerTime];
                 if (lastTickerTime == nil) {
                     // No previous ticker time. Set to now.
                     lastTickerTime = NSDate.date;
@@ -131,10 +131,8 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
                 // Do not log Jetsam event since the previous start time cannot be determined.
             }
         }
-
-        ExtensionDataStore *dataStore = [[ExtensionDataStore alloc]
-                                         initWithDataStore:[NSUserDefaults standardUserDefaults]];
-        [dataStore setExtensionStartTimeToNow];
+        
+        [extensionDataStore setExtensionStartTimeToNow];
 
         // Start timer which tracks extension uptime.
 
@@ -149,7 +147,7 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
                                       5 * NSEC_PER_SEC);
 
             dispatch_source_set_event_handler(self->tickerDispatch, ^{
-                [dataStore setTickerTimeToNow];
+                [extensionDataStore setTickerTimeToNow];
             });
 
             dispatch_resume(self->tickerDispatch);
@@ -166,22 +164,19 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
 
         // List of paths to downgrade file protection to NSFileProtectionNone. The list could contain files or directories.
         NSArray<NSString *> *paths = @[
-          // Note that this directory is not accessible in the container.
-          [[[[NSFileManager defaultManager] URLsForDirectory:NSLibraryDirectory inDomains:NSUserDomainMask] lastObject] path],
           // Shared container, containing logs and other data.
-          [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path],
+          [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:PsiphonAppGroupIdentifier] path],
         ];
 
         // Set file protection of all files needed by the extension and Psiphon tunnel framework to NSFileProtectionNone.
         // This is required in order for "Connect On Demand" to work.
-        if (![FileUtils downgradeFileProtectionToNone:paths withExceptions:@[ [self getBootTestFilePath] ]]) {
+        if ([FileUtils downgradeFileProtectionToNone:paths withExceptions:@[ [self getBootTestFilePath] ]] == FALSE) {
             // Undefined behaviour wrt. Connect On Demand. Fail fast.
             [PsiFeedbackLogger error:@"Failed to set file protection."];
         }
 
     #if DEBUG
         [FileUtils listDirectory:paths[0] resource:@"Library" recursively:YES];
-        [FileUtils listDirectory:paths[1] resource:@"Shared container" recursively:YES];
     #endif
 
         BOOL tunnelStartedFromContainerRecently = FALSE;
@@ -317,7 +312,7 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
 #pragma mark - Boot test
 
 - (NSString *)getBootTestFilePath {
-    return [[[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path]
+    return [[[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:PsiphonAppGroupIdentifier] path]
       stringByAppendingPathComponent:BOOT_TEST_FILE_NAME];
 }
 

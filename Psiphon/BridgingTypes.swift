@@ -115,7 +115,6 @@ import PsiCashClient
     ) -> Promise<ObjCIAPResult>.ObjCPromise<ObjCIAPResult>
     @objc func onAdPresentationStatusChange(_ presenting: Bool)
     @objc func getAppStoreSubscriptionProductIDs() -> Set<String>
-    @objc func getAppStateFeedbackEntry(completionHandler: @escaping (String) -> Void)
     @objc func isCurrentlySpeedBoosted(completionHandler: @escaping (Bool) -> Void)
     @objc func disallowedTrafficAlertNotification()
     
@@ -135,6 +134,15 @@ import PsiCashClient
     // Returns Locale for currently selected app language.
     // Note that this can be different from device Locale value `Locale.current`.
     @objc func getLocaleForCurrentAppLanguage() -> NSLocale
+
+    @objc func userSubmittedFeedback(selectedThumbIndex: Int,
+                                     comments: String,
+                                     email: String,
+                                     uploadDiagnostics: Bool)
+
+    // Version string to be displayed by the user-interface.
+    @objc func versionLabelText() -> String
+    
 }
 
 // MARK: Bridged Types
@@ -238,7 +246,7 @@ import PsiCashClient
                 return .startFinished
             case .completed(.failure(let errorEvent)):
                 switch errorEvent.error {
-                case .neVPNError(let neVPNError):
+                case .systemVPNError(let neVPNError):
                     if neVPNError.configurationReadWriteFailedPermissionDenied {
                         return .failedUserPermissionDenied
                     } else {

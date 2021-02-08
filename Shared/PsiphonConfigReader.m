@@ -41,7 +41,7 @@ PsiFeedbackLogType const PsiphonConfigLogType = @"PsiphonConfigReader";
 
 @interface PsiphonConfigReader ()
 
-@property (nonatomic, readwrite) NSDictionary *configs;
+@property (nonatomic, readwrite) NSDictionary *config;
 @property (nonatomic, readwrite) PsiphonConfigSponsorIds *sponsorIds;
 
 @end
@@ -72,9 +72,9 @@ PsiFeedbackLogType const PsiphonConfigLogType = @"PsiphonConfigReader";
     // Read in psiphon_config JSON
     NSData *jsonData = [fileManager contentsAtPath:bundledConfigPath];
     NSError *err = nil;
-    instance.configs = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
+    instance.config = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:&err];
 
-    if (err) {
+    if (err != nil) {
         [PsiFeedbackLogger errorWithType:PsiphonConfigLogType message:@"parse failed" object:err];
         return nil;
     }
@@ -82,8 +82,8 @@ PsiFeedbackLogType const PsiphonConfigLogType = @"PsiphonConfigReader";
     // Reads sponsor ids.
     instance.sponsorIds = [[PsiphonConfigSponsorIds alloc] init];
 
-    instance.sponsorIds.defaultSponsorId = instance.configs[@"SponsorId"];
-    NSDictionary *subscriptionConfig = instance.configs[@"subscriptionConfig"];
+    instance.sponsorIds.defaultSponsorId = instance.config[@"SponsorId"];
+    NSDictionary *subscriptionConfig = instance.config[@"subscriptionConfig"];
     instance.sponsorIds.subscriptionSponsorId = subscriptionConfig[@"SponsorId"];
     instance.sponsorIds.checkSubscriptionSponsorId = subscriptionConfig[@"checkSponsorId"];
 

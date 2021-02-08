@@ -28,6 +28,11 @@ import Foundation
 
 @objc final class UserStrings: NSObject {
 
+    @objc static func Psiphon() -> String {
+        // Psiphon is not translated or transliterated.
+        return "Psiphon"
+    }
+
     @objc static func PsiCash() -> String {
         // PsiCash is not translated or transliterated.
         return "PsiCash"
@@ -232,6 +237,12 @@ import Foundation
         return NSLocalizedString("ONBOARDING_NOTIFICATION_PERMISSION_BODY", tableName: nil, bundle: Bundle.main,
                                  value: "Allow Psiphon to send notifications so that you can be notified of important network events.",
                                  comment: "Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app.")
+    }
+    
+    static func Select_language() -> String {
+        return NSLocalizedString("SELECT_LANG", tableName: nil, bundle: Bundle.main,
+                                 value: "SELECT LANGUAGE",
+                                 comment: "Title for screen that allows user to select language. Use all capital letters in the translation only if it makes sense.")
     }
     
 }
@@ -533,5 +544,14 @@ extension UserStrings {
         return NSLocalizedString("DISALLOWED_TRAFFIC_ALERT_MESSAGE", tableName: nil, bundle: Bundle.main,
                                  value: "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.",
                                  comment: "Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request.")
+    }
+}
+
+// MARK: Feedback upload
+extension UserStrings {
+    static func Submitted_feedback() -> String {
+        return NSLocalizedString("FEEDBACK_UPLOAD_SUCCESSFUL_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Thank you for helping improve Psiphon!",
+                                 comment: "Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback.")
     }
 }

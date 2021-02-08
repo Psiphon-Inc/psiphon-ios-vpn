@@ -119,24 +119,12 @@
     return  NSLocalizedStringWithDefaultValue(@"SELECT_SERVER_REGION", nil, [NSBundle mainBundle], @"Select server region", @"Title for screen that allows user to select their desired server region.");
 }
 
-+ (NSString *)selectLanguageTitle {
-    return  NSLocalizedStringWithDefaultValue(@"SELECT_LANG", nil, [NSBundle mainBundle], @"SELECT LANGUAGE", @"Title for screen that allows user to select language. Use all capital letters in the translation only if it makes sense.");
-}
-
 + (NSString *)resetConsentButtonTitle {
     return  NSLocalizedStringWithDefaultValue(@"RESET_IDENTIFIER_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Reset Consent", @"Title for a confirmation button that resets a user's previous consent.");
 }
 
 + (NSString *)onboardingSelectLanguageButtonTitle {
     return  NSLocalizedStringWithDefaultValue(@"SELECT_LANG_BUTTON_TITLE", nil, [NSBundle mainBundle], @"Select Language", @"Select language button title.");
-}
-
-+ (NSString *)onboardingBeyondBordersHeaderText {
-    return  NSLocalizedStringWithDefaultValue(@"ONBOARDING_BEYOND_BORDERS_HEADER", nil, [NSBundle mainBundle], @"Beyond Borders", @"Beyond Borders title");
-}
-
-+ (NSString *)onboardingBeyondBordersBodyText {
-    return  NSLocalizedStringWithDefaultValue(@"ONBOARDING_BEYOND_BORDERS_BODY_2", nil, [NSBundle mainBundle], @"Psiphon connects you to the content you want, no matter where you are.", @"Onboarding screen text. (Do not translate 'Psiphon').");
 }
 
 + (NSString *)onboardingGettingStartedHeaderText {

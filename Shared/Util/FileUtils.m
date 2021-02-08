@@ -54,14 +54,21 @@
     if ([fm fileExistsAtPath:path isDirectory:&isDirectory] && ![exceptions containsObject:path]) {
         NSDictionary *attrs = [fm attributesOfItemAtPath:path error:&err];
         if (err) {
-            [PsiFeedbackLogger error:@"Failed to get file attributes for path (%@) (%@)", path, err];
+
+            [PsiFeedbackLogger error:@"Failed to get file attributes for path (%@) (%@)",
+             [RedactionUtils filepath:path],
+             [RedactionUtils error:err]];
+
             return FALSE;
         }
 
         if (![attrs[NSFileProtectionKey] isEqualToString:NSFileProtectionNone]) {
             [fm setAttributes:@{NSFileProtectionKey: NSFileProtectionNone} ofItemAtPath:path error:&err];
             if (err) {
-                [PsiFeedbackLogger error:@"Failed to set the protection level of dir(%@)", path];
+
+                [PsiFeedbackLogger error:@"Failed to set the protection level of dir(%@)",
+                 [RedactionUtils filepath:path]];
+
                 return FALSE;
             }
         }
@@ -69,7 +76,11 @@
         if (isDirectory) {
             NSArray<NSString *> *contents = [fm contentsOfDirectoryAtPath:path error:&err];
             if (err) {
-                [PsiFeedbackLogger error:@"Failed to get contents of directory (%@) (%@)", path, err];
+
+                [PsiFeedbackLogger error:@"Failed to get contents of directory (%@) (%@)",
+                 [RedactionUtils filepath:path],
+                 [RedactionUtils error:err]];
+
             }
 
             for (NSString * item in contents) {

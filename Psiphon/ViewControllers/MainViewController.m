@@ -25,7 +25,6 @@
 #import "Asserts.h"
 #import "AvailableServerRegions.h"
 #import "DispatchUtils.h"
-#import "FeedbackManager.h"
 #import "IAPViewController.h"
 #import "Logging.h"
 #import "DebugViewController.h"
@@ -51,6 +50,7 @@
 #import "Strings.h"
 #import "SkyRegionSelectionViewController.h"
 #import "UIView+Additions.h"
+#import "CloudsView.h"
 #import "AppObservables.h"
 #import "Psiphon-Swift.h"
 
@@ -95,8 +95,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     PsiphonSettingsViewController *appSettingsViewController;
     AnimatedUIButton *settingsButton;
 
-    FeedbackManager *feedbackManager;
-
     // Psiphon Logo
     // Replaces the PsiCash UI when the user is subscribed
     UIImageView *psiphonLargeLogo;
@@ -107,14 +105,8 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     PsiCashWidgetView *psiCashWidget;
 
     // Clouds
-    UIImageView *cloudMiddleLeft;
-    UIImageView *cloudMiddleRight;
-    UIImageView *cloudTopRight;
-    UIImageView *cloudBottomRight;
-    NSLayoutConstraint *cloudMiddleLeftHorizontalConstraint;
-    NSLayoutConstraint *cloudMiddleRightHorizontalConstraint;
-    NSLayoutConstraint *cloudTopRightHorizontalConstraint;
-    NSLayoutConstraint *cloudBottomRightHorizontalConstraint;
+    CloudsView* cloudBackgroundView;
+
 }
 
 // Force portrait orientation
@@ -133,9 +125,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
         
         _adManager = [AdManager sharedInstance];
 
-        feedbackManager = [[FeedbackManager alloc] init];
-
-        // TODO: remove persistance form init function.
+        // TODO: remove persistance from init function.
         [self persistSettingsToSharedUserDefaults];
         
         _openSettingImmediatelyOnViewDidAppear = FALSE;
@@ -166,7 +156,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self setNeedsStatusBarAppearanceUpdate];
     [self setupWidthLayoutGuide];
     [self addViews];
-    [self setupClouds];
+    [self setupCloudsView];
     [self setupVersionLabel];
     [self setupPsiphonLogoView];
     [self setupPsiphonTitle];
@@ -329,10 +319,14 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
         }
     }
     
-    // Initializes AdManager.
+    // Initializes AdManager for iOS only.
     {
-        [[AdManager sharedInstance] initializeAdManager];
-        [[AdManager sharedInstance] initializeRewardedVideos];
+        if ([AppInfo isiOSAppOnMac] == FALSE) {
+            [[AdManager sharedInstance] initializeAdManager];
+            [[AdManager sharedInstance] initializeRewardedVideos];
+        } else {
+            LOG_DEBUG(@"Skipping AdManager initialization since running on Mac.");
+        }
     }
 }
 
@@ -392,15 +386,19 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
         return [RACSignal return:RACUnit.defaultUnit];
     }
     
-    // unsubscribedAdLoadingSignal if tunneled emits unit value when
-    // untunneled interstitial ad had loaded or when MaxAdLoadingTime has passed,
-    // otherwise, emits unit value immediately.
+    // unsubscribedAdLoadingSignal -
+    // If iOS app is running on Mac or if device is tunneled it emits unit value immediately,
+    // else, when untunneled emits unit value after interstitial ad has loaded
+    // or when MaxAdLoadingTime has passed, otherwise, emits unit value immediately.
     RACSignal<RACUnit *> *unsubscribedAdLoadingSignal = [[[AppObservables.shared.vpnStatus
       map:^RACSignal * _Nullable(NSNumber * _Nullable value) {
         VPNStatus s = (VPNStatus) value.integerValue;
         
+        if ([AppInfo isiOSAppOnMac] == TRUE) {
+            return [RACSignal return:RACUnit.defaultUnit];
+        }
+        
         if (s == VPNStatusDisconnected || s == VPNStatusInvalid) {
-            
             
             return [[[[[AdManager.sharedInstance.adSDKStarted
                         catch:^RACSignal * _Nonnull(NSError * _Nonnull error) {
@@ -511,7 +509,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 
 #if DEBUG
 - (void)onVersionLabelTap:(UIButton *)sender {
-    DebugViewController *viewController = [[DebugViewController alloc] initWithCoder:nil];
+    DebugViewController *viewController = [[DebugViewController alloc] init];
     [self presentViewController:viewController animated:YES completion:nil];
 }
 #endif
@@ -552,8 +550,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 }
 
 - (void)updateUIConnectionState:(VPNStatus)s {
-    [self positionClouds:s];
-
     [startAndStopButton setHighlighted:FALSE];
     
     if ([VPNStateCompat providerNotStoppedWithVpnStatus:s] && s != VPNStatusConnected) {
@@ -596,11 +592,8 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 // Add all views at the same time so there are no crashes while
 // adding and activating autolayout constraints.
 - (void)addViews {
-    UIImage *cloud = [UIImage imageNamed:@"cloud"];
-    cloudMiddleLeft = [[UIImageView alloc] initWithImage:cloud];
-    cloudMiddleRight = [[UIImageView alloc] initWithImage:cloud];
-    cloudTopRight = [[UIImageView alloc] initWithImage:cloud];
-    cloudBottomRight = [[UIImageView alloc] initWithImage:cloud];
+    
+    cloudBackgroundView = [[CloudsView alloc] initForAutoLayout];
     versionLabel = [[UIButton alloc] init];
     settingsButton = [[AnimatedUIButton alloc] init];
     psiphonLargeLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogoWhite"]];
@@ -616,10 +609,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 
     // NOTE: some views overlap so the order they are added
     //       is important for user interaction.
-    [self.view addSubview:cloudMiddleLeft];
-    [self.view addSubview:cloudMiddleRight];
-    [self.view addSubview:cloudTopRight];
-    [self.view addSubview:cloudBottomRight];
+    [self.view addSubview:cloudBackgroundView];
     [self.view addSubview:psiphonLargeLogo];
     [self.view addSubview:psiphonTitle];
     [self.view addSubview:psiCashWidget];
@@ -631,160 +621,16 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     [self.view addSubview:bottomBarBackground];
     [self.view addSubview:subscriptionBarView];
     [self.view addSubview:noConnectionBannerView];
+    
 }
 
-- (void)setupClouds {
-
-    UIImage *cloud = [UIImage imageNamed:@"cloud"];
-
-    cloudMiddleLeft.translatesAutoresizingMaskIntoConstraints = NO;
-    [cloudMiddleLeft.centerYAnchor constraintEqualToAnchor:self.view.centerYAnchor].active = YES;
-    [cloudMiddleLeft.heightAnchor constraintEqualToConstant:cloud.size.height].active = YES;
-    [cloudMiddleLeft.widthAnchor constraintEqualToConstant:cloud.size.width].active = YES;
-
-    cloudMiddleRight.translatesAutoresizingMaskIntoConstraints = NO;
-    [cloudMiddleRight.centerYAnchor constraintEqualToAnchor:cloudMiddleLeft.centerYAnchor].active = YES;
-    [cloudMiddleRight.heightAnchor constraintEqualToConstant:cloud.size.height].active = YES;
-    [cloudMiddleRight.widthAnchor constraintEqualToConstant:cloud.size.width].active = YES;
-
-    cloudTopRight.translatesAutoresizingMaskIntoConstraints = NO;
-    [cloudTopRight.topAnchor constraintEqualToAnchor:psiCashWidget.bottomAnchor constant:-20].active = YES;
-    [cloudTopRight.heightAnchor constraintEqualToConstant:cloud.size.height].active = YES;
-    [cloudTopRight.widthAnchor constraintEqualToConstant:cloud.size.width].active = YES;
-
-    cloudBottomRight.translatesAutoresizingMaskIntoConstraints = NO;
-    [cloudBottomRight.centerYAnchor constraintEqualToAnchor:regionSelectionButton.topAnchor constant:-24].active = YES;
-    [cloudBottomRight.heightAnchor constraintEqualToConstant:cloud.size.height].active = YES;
-    [cloudBottomRight.widthAnchor constraintEqualToConstant:cloud.size.width].active = YES;
-
-    // Default horizontal positioning for clouds
-    cloudMiddleLeftHorizontalConstraint = [cloudMiddleLeft.centerXAnchor constraintEqualToAnchor:self.view.leftAnchor constant:0];
-    cloudMiddleRightHorizontalConstraint = [cloudMiddleRight.centerXAnchor constraintEqualToAnchor:self.view.rightAnchor constant:0]; // hide at first
-    cloudTopRightHorizontalConstraint = [cloudTopRight.centerXAnchor constraintEqualToAnchor:self.view.rightAnchor constant:0];
-    cloudBottomRightHorizontalConstraint = [cloudBottomRight.centerXAnchor constraintEqualToAnchor:self.view.rightAnchor constant:0];
-
-    cloudMiddleLeftHorizontalConstraint.active = YES;
-    cloudMiddleRightHorizontalConstraint.active = YES;
-    cloudTopRightHorizontalConstraint.active = YES;
-    cloudBottomRightHorizontalConstraint.active = YES;
-}
-
-- (void)positionClouds:(VPNStatus)s {
-
-    // DEBUG: use to debug animations in slow motion (e.g. 20)
-    CGFloat animationTimeStretchFactor = 1;
-
-    static VPNStatus previousState = VPNStatusInvalid;
-
-    CGFloat cloudWidth = [UIImage imageNamed:@"cloud"].size.width;
-
-    // All clouds are centered on their respective side.
-    // Use these variables to make slight adjustments to
-    // each cloud's position.
-    CGFloat cloudMiddleLeftOffset = 0;
-    CGFloat cloudTopRightOffset = 0;
-    CGFloat cloudBottomRightOffset = 15;
-
-    // Remove all on-going cloud animations
-    void (^removeAllCloudAnimations)(void) = ^void(void) {
-        [self->cloudMiddleLeft.layer removeAllAnimations];
-        [self->cloudMiddleRight.layer removeAllAnimations];
-        [self->cloudTopRight.layer removeAllAnimations];
-        [self->cloudBottomRight.layer removeAllAnimations];
-    };
-
-    // Position clouds in their default positions
-    void (^disconnectedAndConnectedLayout)(void) = ^void(void) {
-        self->cloudMiddleLeftHorizontalConstraint.constant = cloudMiddleLeftOffset;
-        self->cloudMiddleRightHorizontalConstraint.constant = cloudWidth/2; // hidden
-        self->cloudTopRightHorizontalConstraint.constant = cloudTopRightOffset;
-        self->cloudBottomRightHorizontalConstraint.constant = cloudBottomRightOffset;
-        [self.view layoutIfNeeded];
-    };
-
-    if ([VPNStateCompat providerNotStoppedWithVpnStatus:s] && s != VPNStatusConnected
-        && s != VPNStatusRestarting) {
-        // Connecting
-
-        CGFloat cloudMiddleLeftHorizontalTranslation = -cloudWidth; // hidden
-        CGFloat cloudMiddleRightHorizontalTranslation = -1.f/6 * cloudWidth + cloudMiddleLeftOffset;
-        CGFloat cloudTopRightHorizontalTranslation = -3.f/4 * self.view.frame.size.width + cloudTopRightOffset;
-        CGFloat cloudBottomRightHorizontalTranslation = -3.f/4 * self.view.frame.size.width + cloudBottomRightOffset;
-
-        CGFloat maxTranslation = MAX(ABS(cloudMiddleLeftHorizontalTranslation), ABS(cloudMiddleRightHorizontalTranslation));
-        maxTranslation = MAX(maxTranslation, MAX(ABS(cloudTopRightHorizontalTranslation),ABS(cloudBottomRightHorizontalTranslation)));
-
-        void (^connectingLayout)(void) = ^void(void) {
-            self->cloudMiddleLeftHorizontalConstraint.constant = cloudMiddleLeftHorizontalTranslation;
-            self->cloudMiddleRightHorizontalConstraint.constant = cloudMiddleRightHorizontalTranslation;
-            self->cloudTopRightHorizontalConstraint.constant = cloudTopRightHorizontalTranslation;
-            self->cloudBottomRightHorizontalConstraint.constant = cloudBottomRightHorizontalTranslation;
-            [self.view layoutIfNeeded];
-        };
-
-        cloudMiddleRightHorizontalConstraint.constant = maxTranslation - cloudWidth/2;
-        [self.view layoutIfNeeded];
-
-        if (!([VPNStateCompat providerNotStoppedWithVpnStatus:previousState]
-              && previousState != VPNStatusConnected)
-              && previousState != VPNStatusInvalid /* don't animate if the app was just opened */ ) {
-
-            removeAllCloudAnimations();
-
-            [UIView animateWithDuration:0.5 * animationTimeStretchFactor delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-                connectingLayout();
-            } completion:nil];
-        } else {
-            connectingLayout();
-        }
-    }
-    else if (s == VPNStatusConnected) {
-
-        if (previousState != VPNStatusConnected
-            && previousState != VPNStatusInvalid /* don't animate if the app was just opened */ ) {
-
-            // Connected
-
-            removeAllCloudAnimations();
-
-            [UIView animateWithDuration:0.25 * animationTimeStretchFactor delay:0 options:UIViewAnimationOptionCurveEaseInOut animations:^{
-
-                self->cloudMiddleLeftHorizontalConstraint.constant = -cloudWidth; // hidden
-                self->cloudMiddleRightHorizontalConstraint.constant = cloudWidth/2 + cloudMiddleLeftOffset;
-                self->cloudTopRightHorizontalConstraint.constant = -self.view.frame.size.width - cloudWidth/2 + cloudTopRightOffset;
-                self->cloudBottomRightHorizontalConstraint.constant = -self.view.frame.size.width - cloudWidth/2 + cloudBottomRightOffset;
-                [self.view layoutIfNeeded];
-
-            } completion:^(BOOL finished) {
-
-                if (finished) {
-                    // We want all the clouds to animate at the same speed so we put them all at the
-                    // same distance from their final point.
-                    CGFloat maxOffset = MAX(MAX(ABS(cloudMiddleLeftOffset), ABS(cloudTopRightOffset)), ABS(cloudBottomRightOffset));
-                    self->cloudMiddleLeftHorizontalConstraint.constant = -cloudWidth/2 - (maxOffset + cloudMiddleLeftOffset);
-                    self->cloudMiddleRightHorizontalConstraint.constant = cloudWidth/2 - (maxOffset + cloudMiddleLeftOffset);
-                    self->cloudTopRightHorizontalConstraint.constant = cloudWidth/2 + (maxOffset + cloudTopRightOffset);
-                    self->cloudBottomRightHorizontalConstraint.constant = cloudWidth/2 + (maxOffset + cloudBottomRightOffset);
-                    [self.view layoutIfNeeded];
-
-                    [UIView animateWithDuration:0.25 * animationTimeStretchFactor delay:0 options:UIViewAnimationOptionCurveEaseOut animations:^{
-                        disconnectedAndConnectedLayout();
-                    } completion:nil];
-                }
-            }];
-        } else {
-            disconnectedAndConnectedLayout();
-        }
-    }
-    else {
-        // Disconnected
-
-        removeAllCloudAnimations();
-
-        disconnectedAndConnectedLayout();
-    }
-
-    previousState = s;
+- (void)setupCloudsView {
+    [NSLayoutConstraint activateConstraints:@[
+        [cloudBackgroundView.topAnchor constraintEqualToAnchor:self.view.safeTopAnchor],
+        [cloudBackgroundView.bottomAnchor constraintEqualToAnchor:subscriptionBarView.topAnchor],
+        [cloudBackgroundView.leadingAnchor constraintEqualToAnchor:self.view.safeLeadingAnchor],
+        [cloudBackgroundView.trailingAnchor constraintEqualToAnchor:self.view.safeTrailingAnchor],
+    ]];
 }
 
 - (void)setupStartAndStopButton {
@@ -867,10 +713,10 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     CGFloat padding = 10.0f;
     
     versionLabel.translatesAutoresizingMaskIntoConstraints = NO;
-    [versionLabel setTitle:[NSString stringWithFormat:@"V.%@",
-                            [[NSBundle mainBundle]
-                             objectForInfoDictionaryKey:@"CFBundleShortVersionString"]]
+
+    [versionLabel setTitle:[SwiftDelegate.bridge versionLabelText]
                   forState:UIControlStateNormal];
+
     [versionLabel setTitleColor:UIColor.nepalGreyBlueColor forState:UIControlStateNormal];
     versionLabel.titleLabel.adjustsFontSizeToFitWidth = YES;
     versionLabel.titleLabel.font = [UIFont avenirNextBold:12.f];
@@ -936,15 +782,18 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 
 #pragma mark - FeedbackViewControllerDelegate methods and helpers
 
-- (void)userSubmittedFeedback:(NSUInteger)selectedThumbIndex
+- (void)userSubmittedFeedback:(NSInteger)selectedThumbIndex
                      comments:(NSString *)comments
                         email:(NSString *)email
             uploadDiagnostics:(BOOL)uploadDiagnostics {
 
-    [feedbackManager userSubmittedFeedback:selectedThumbIndex
-                                  comments:comments
-                                     email:email
-                         uploadDiagnostics:uploadDiagnostics];
+    // Ensure any settings changes are persisted. E.g. upstream proxy configuration. 
+    [self persistSettingsToSharedUserDefaults];
+
+    [SwiftDelegate.bridge userSubmittedFeedbackWithSelectedThumbIndex:selectedThumbIndex
+                                                             comments:comments
+                                                                email:email
+                                                    uploadDiagnostics:uploadDiagnostics];
 }
 
 - (void)userPressedURL:(NSURL *)URL {
@@ -981,7 +830,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 
 - (void)persistDisableTimeouts {
     NSUserDefaults *containerUserDefaults = [NSUserDefaults standardUserDefaults];
-    NSUserDefaults *sharedUserDefaults = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
+    NSUserDefaults *sharedUserDefaults = [[NSUserDefaults alloc] initWithSuiteName:PsiphonAppGroupIdentifier];
     [sharedUserDefaults setObject:@([containerUserDefaults boolForKey:kDisableTimeouts]) forKey:kDisableTimeouts];
 }
 
@@ -990,11 +839,11 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 }
 
 - (void)persistUpstreamProxySettings {
-    NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:APP_GROUP_IDENTIFIER];
+    NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:PsiphonAppGroupIdentifier];
     NSString *upstreamProxyUrl = [[UpstreamProxySettings sharedInstance] getUpstreamProxyUrl];
-    [userDefaults setObject:upstreamProxyUrl forKey:PSIPHON_CONFIG_UPSTREAM_PROXY_URL];
+    [userDefaults setObject:upstreamProxyUrl forKey:PsiphonConfigUpstreamProxyURL];
     NSDictionary *upstreamProxyCustomHeaders = [[UpstreamProxySettings sharedInstance] getUpstreamProxyCustomHeaders];
-    [userDefaults setObject:upstreamProxyCustomHeaders forKey:PSIPHON_CONFIG_UPSTREAM_PROXY_CUSTOM_HEADERS];
+    [userDefaults setObject:upstreamProxyCustomHeaders forKey:PsiphonConfigCustomHeaders];
 }
 
 - (BOOL)shouldEnableSettingsLinks {

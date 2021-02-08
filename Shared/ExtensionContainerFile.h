@@ -50,7 +50,7 @@ typedef NS_ERROR_ENUM(ContainerReaderRotatedFileErrorDomain, ContainerReaderRota
 /// @param olderFilepath Location of rotated file.
 /// @param registryFilepath Filepath at which to store the registry file (which is used to track file reads).
 /// @param readChunkSize Number of bytes to read at a time.
-/// @param outError  If non-nill on return, then initializing the reader failed with the provided error.
+/// @param outError  If non-nil on return, then initializing the reader failed with the provided error.
 /// @return Returns nil when `outError` is non-nil.
 - (nullable instancetype)initWithFilepath:(NSString*)filepath
                             olderFilepath:(NSString*)olderFilepath
@@ -59,12 +59,12 @@ typedef NS_ERROR_ENUM(ContainerReaderRotatedFileErrorDomain, ContainerReaderRota
                                     error:(NSError * _Nullable *)outError;
 
 /// Read the next line. Lines are read back in the other in which they were written.
-/// @param outError If non-nill on return, then reading failed with the provided error.
+/// @param outError If non-nil on return, then reading failed with the provided error.
 /// @returns nil if there is no more data to read.
 - (NSString*_Nullable)readLineWithError:(NSError * _Nullable *)outError;
 
 /// Persist the registry to disk.
-/// @param outError If non-nill on return, then persisting the registry failed with the provided error.
+/// @param outError If non-nil on return, then persisting the registry failed with the provided error.
 - (void)persistRegistry:(NSError * _Nullable *)outError;
 
 @end
@@ -87,7 +87,7 @@ typedef NS_ERROR_ENUM(ExtensionWriterRotatedFileErrorDomain, ExtensionWriterRota
 /// @param filepath Filepath where the file should be created or appended to if it already exists.
 /// @param olderFilepath Filepath where the file should be rotated when it exceeds the configured max filesize.
 /// @param maxFileSizeBytes Configured max filesize.
-/// @param outError If non-nill on return, then initializing the writer failed with the provided error.
+/// @param outError If non-nil on return, then initializing the writer failed with the provided error.
 /// @return Returns nil when `outError` is non-nil.
 - (nullable instancetype)initWithFilepath:(NSString*)filepath
                             olderFilepath:(NSString*)olderFilepath
@@ -96,7 +96,7 @@ typedef NS_ERROR_ENUM(ExtensionWriterRotatedFileErrorDomain, ExtensionWriterRota
 
 /// Write data to the rotated file. The file will be rotated before writing if its size has exceeded the configured max filesize.
 /// @param data Data to write.
-/// @param outError If non-nill on return, then writing data failed with the provided error.
+/// @param outError If non-nil on return, then writing data failed with the provided error.
 - (void)writeData:(NSData*)data error:(NSError * _Nullable *)outError;
 
 @end

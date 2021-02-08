@@ -68,12 +68,16 @@ typedef NS_ENUM(NSInteger, AuthorizationUpdateResult) {
 // to `-newSessionEncodedAuthsWithSponsorID:` for the first time.
 - (AuthorizationUpdateResult)updateStoredAuthorizations;
 
+// Explicitly indicates that a new tunnel session is about to be started.
+- (void)explicitlySetNewSession;
+
 // Indicates start of a new tunnel session.
 //
 // Returns array of authorizations to be passed to tunnel-core, and populates `sponsorID`
 // with the appropriate value depending on the authorizations present.
 //
-// - Important: Throws an exception if this function is called more than once, unless
+// - Important: Throws an exception if this function is called more than once at the start
+// of a tunnel session, unless `newSession` is called beforehand or
 // call to `updateStoredAuthorizations` returns AuthorizationUpdateResultNewAuthsAvailable.
 - (NSArray<NSString *> *)
 newSessionEncodedAuthsWithSponsorID:(NSString *_Nonnull *_Nullable)sponsorID;

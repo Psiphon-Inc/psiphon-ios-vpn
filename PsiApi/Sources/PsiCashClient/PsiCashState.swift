@@ -113,7 +113,7 @@ public enum RewardedVideoAdLoadError: HashableError {
     case customDataNotPresent
     case noTunneledRewardedVideoAd
     case requestedAdFailedToLoad
-    case adSDKError(SystemError)
+    case adSDKError(SystemError<Int>)
 }
 
 public struct RewardedVideoState: Equatable {
@@ -138,7 +138,7 @@ public enum PsiCashPurchaseResponseError: HashableError {
     case tunnelNotConnected
     case parseError(PsiCashParseError)
     // TODO: map Int to PsiCashStatus from PsiCashLib
-    case serverError(status: Int, shouldRetry: Bool, error: SystemError?)
+    case serverError(status: Int, shouldRetry: Bool, error: SystemError<Int>?)
 }
 
 public enum PsiCashRefreshError: HashableError {
@@ -151,7 +151,7 @@ public enum PsiCashRefreshError: HashableError {
     /// (PsiCash  v1.3.1-0-gd1471c1) Should never happen. The local user ID will be cleared.
     case invalidTokens
     /// Some other error.
-    case error(SystemError)
+    case error(SystemError<Int>)
 }
 
 /// `PsiCashTransactionMismatchError` represents errors that are due to state mismatch between

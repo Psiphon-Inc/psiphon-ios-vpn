@@ -11,18 +11,13 @@ target 'Psiphon' do
   pod "InAppSettingsKit", :git => "https://github.com/Psiphon-Inc/InAppSettingsKit.git", :commit => '8bd203c'
   #pod "InAppSettingsKit", :path => "../InAppSettingsKit"
   #pod "PsiphonClientCommonLibrary", :path => "../psiphon-ios-client-common-library"
-  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => 'ce74ccf'
-  
-  pod 'GoogleUserMessagingPlatform', '~> 1.1.0'
+  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => '8f38d25'
 
   # Swift dependencies
   pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
   pod 'MBProgressHUD', '~> 1.1.0'
   pod 'SVProgressHUD', '~> 2.2.5'
   pod 'EFCountingLabel', '~> 5.1.1'
-end
-
-target 'PsiphonVPN' do
 end
 
 post_install do |installer|

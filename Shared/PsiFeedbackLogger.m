@@ -99,7 +99,7 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 
 + (NSString *)containerRotatingLogNoticesPath {
     return [[[[NSFileManager defaultManager]
-      containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path]
+      containerURLForSecurityApplicationGroupIdentifier:PsiphonAppGroupIdentifier] path]
       stringByAppendingPathComponent:@NOTICE_FILENAME_CONTAINER];
 }
 
@@ -109,7 +109,7 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 
 + (NSString *)extensionRotatingLogNoticesPath {
     return [[[[NSFileManager defaultManager]
-      containerURLForSecurityApplicationGroupIdentifier:APP_GROUP_IDENTIFIER] path]
+      containerURLForSecurityApplicationGroupIdentifier:PsiphonAppGroupIdentifier] path]
       stringByAppendingPathComponent:@NOTICE_FILENAME_EXTENSION];
 }
 
@@ -312,7 +312,12 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
 }
 
 + (void)logNoticeWithType:(NSString *)noticeType message:(NSString *)message timestamp:(NSString *)timestamp {
-    [[PsiFeedbackLogger sharedInstance] writeData:@{@"message": message} noticeType:noticeType timestamp:timestamp];
+    NSDictionary *data = @{@"message": message};
+    [[PsiFeedbackLogger sharedInstance] writeData:data noticeType:noticeType timestamp:timestamp];
+
+#if DEBUG
+    NSLog(@"<INFO> %@", data);
+#endif
 }
 
 # pragma mark - Private methods
@@ -467,6 +472,51 @@ PsiFeedbackLogType const FeedbackInternalLogType = @"FeedbackLoggerInternal";
         return [value RFC3339String];
     }
     return value;
+}
+
+@end
+
+#pragma mark - RedactionUtils
+
+@implementation RedactionUtils
+
++ (NSString *)filepath:(NSString *)filepath {
+
+#if DEBUG || DEV_RELEASE
+    return filepath;
+#else
+    return @"[redacted]";
+#endif
+
+}
+
++ (NSString *)error:(NSError *)error {
+
+#if DEBUG || DEV_RELEASE
+
+    return [error description];
+
+#else
+
+    NSError *_Nullable underlyingError = error.userInfo[NSUnderlyingErrorKey];
+
+    if (underlyingError != nil) {
+
+        return [NSString stringWithFormat:@"NSError(domain:%@, code:%ld, underlyingError:%@)",
+                error.domain,
+                (long)error.code,
+                [RedactionUtils error:underlyingError]];
+
+    } else {
+
+        return [NSString stringWithFormat:@"NSError(domain:%@, code:%ld)",
+                error.domain,
+                (long)error.code];
+
+    }
+
+#endif
+
 }
 
 @end

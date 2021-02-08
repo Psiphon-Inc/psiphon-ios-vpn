@@ -75,8 +75,11 @@ PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 - (instancetype)init {
     self = [super init];
     if (self) {
+        // Sets up debug flags early in the application lifecycle.
+        [SwiftDelegate setupDebugFlags];
+
         pendingStartStopSignalCompletion = FALSE;
-        _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+        _sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
     }
     return self;
@@ -117,6 +120,25 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
 
+    // Sets strict window size for iOS app on Mac.
+    if ([AppInfo isiOSAppOnMac] == TRUE) {
+        
+        if (@available(iOS 13.0, *)) {
+            
+            if (self.window.windowScene.sizeRestrictions == nil) {
+                @throw [NSException exceptionWithName:@"Invalid State"
+                                               reason:@"windowScence.sizeRestrictions is nil"
+                                             userInfo:nil];
+            }
+            
+            UISceneSizeRestrictions *sizeRestrictions = self.window.windowScene.sizeRestrictions;
+            sizeRestrictions.maximumSize = CGSizeMake(414, 736);
+            sizeRestrictions.minimumSize = CGSizeMake(414, 736);
+            
+        }
+
+    }
+
     rootContainerController = [[RootContainerController alloc] init];
     self.window.rootViewController = rootContainerController;
 
@@ -151,7 +173,6 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
     [[UIApplication sharedApplication] ignoreSnapshotOnNextApplicationLaunch];
     [SwiftDelegate.bridge applicationDidEnterBackground:application];
-    [[Notifier sharedInstance] post:NotifierAppEnteredBackground];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
@@ -191,6 +212,12 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
                 if (showAd == FALSE) {
                     [newIntent forceNoAds];
                 }
+
+                // Forces no-ads if it is iOS app running on Mac.
+                if ([AppInfo isiOSAppOnMac] == TRUE) {
+                    [newIntent forceNoAds];
+                }
+
             }
             
             [subscriber sendNext:newIntent];
@@ -258,44 +285,18 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [rootContainerController reloadOnboardingViewController];
 }
 
-#pragma mark - Embedded Server Entries
-
-/*!
- * @brief Updates available egress regions from embedded server entries.
- *
- * This function should only be called once per app version on first launch.
- */
-- (void)updateAvailableEgressRegionsOnFirstRunOfAppVersion {
-    NSString *embeddedServerEntriesPath = PsiphonConfigReader.embeddedServerEntriesPath;
-    NSError *e;
-    NSSet<NSString*> *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:embeddedServerEntriesPath
-                                                                                     error:&e];
-
-    // Note: server entries may have been decoded before the error occurred and
-    // they will be present in the result.
-    if (e != nil) {
-        [PsiFeedbackLogger error:e message:@"Error decoding embedded server entries"];
-    }
-
-    if (embeddedEgressRegions != nil && [embeddedEgressRegions count] > 0) {
-        LOG_DEBUG("Available embedded egress regions: %@.", embeddedEgressRegions);
-        ContainerDB *containerDB = [[ContainerDB alloc] init];
-        [containerDB setEmbeddedEgressRegions:[NSArray arrayWithArray:[embeddedEgressRegions allObjects]]];
-    } else {
-        [PsiFeedbackLogger error:@"Error no egress regions found in %@.", embeddedServerEntriesPath];
-    }
-}
-
 #pragma mark - Notifier callback
 
 - (void)onMessageReceived:(NotifierMessage)message {
     LOG_DEBUG(@"Received notification: '%@'", message);
     
     if ([NotifierTunnelConnected isEqualToString:message]) {
+        
         [SwiftDelegate.bridge syncWithTunnelProviderWithReason:
          TunnelProviderSyncReasonProviderNotificationPsiphonTunnelConnected];
 
     } else if ([NotifierAvailableEgressRegions isEqualToString:message]) {
+        
         // Update available regions
         __weak AppDelegate *weakSelf = self;
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
@@ -307,7 +308,14 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
         // TODO: fix
         
     } else if ([NotifierDisallowedTrafficAlert isEqualToString:message]) {
+        
         [SwiftDelegate.bridge disallowedTrafficAlertNotification];
+        
+    } else if ([NotifierIsHostAppProcessRunning isEqualToString:message]) {
+        
+        // Sends notification back to the network extension indicating the host process is running.
+        [[Notifier sharedInstance] post:NotifierHostAppProcessRunning];
+        
     }
 }
 
@@ -563,6 +571,32 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [[AppDelegate getTopPresentedViewController] presentViewController:navCtrl
                                                          animated:TRUE
                                                        completion:nil];
+}
+
+/*!
+ * @brief Updates available egress regions from embedded server entries.
+ *
+ * This function should only be called once per app version on first launch.
+ */
+- (void)updateAvailableEgressRegionsOnFirstRunOfAppVersion {
+    NSString *embeddedServerEntriesPath = PsiphonConfigReader.embeddedServerEntriesPath;
+    NSError *e;
+    NSSet<NSString*> *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:embeddedServerEntriesPath
+                                                                                     error:&e];
+
+    // Note: server entries may have been decoded before the error occurred and
+    // they will be present in the result.
+    if (e != nil) {
+        [PsiFeedbackLogger error:e message:@"Error decoding embedded server entries"];
+    }
+
+    if (embeddedEgressRegions != nil && [embeddedEgressRegions count] > 0) {
+        LOG_DEBUG("Available embedded egress regions: %@.", embeddedEgressRegions);
+        ContainerDB *containerDB = [[ContainerDB alloc] init];
+        [containerDB setEmbeddedEgressRegions:[NSArray arrayWithArray:[embeddedEgressRegions allObjects]]];
+    } else {
+        [PsiFeedbackLogger error:@"Error no egress regions found in %@.", embeddedServerEntriesPath];
+    }
 }
 
 @end
