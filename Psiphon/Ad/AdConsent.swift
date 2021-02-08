@@ -22,11 +22,11 @@ import UserMessagingPlatform
 import PsiApi
 import GoogleMobileAds
 
-extension AdNetworkGeographicDebugging {
-    
+extension DebugFlags.AdNetworkGeographicDebugging {
+
+    /// Direct mapping between PsiApi defined AdNetworkGeographicDebugging enum and
+    /// AdMob SDK UMPDebugGeography enum.
     var toUMPDebugGeography: UMPDebugGeography {
-        // Direct mapping between PsiApi defined AdNetworkGeographicDebugging enum and
-        // AdMob SDK UMPDebugGeography enum.
         switch self {
         case .disabled: return .disabled
         case .EEA: return .EEA
