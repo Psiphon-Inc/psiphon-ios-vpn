@@ -35,6 +35,15 @@ public struct DebugFlags {
         case release = "Release"
     }
 
+    public enum AdNetworkGeographicDebugging: Equatable {
+        /// Geographic debugging is disabled.
+        case disabled
+        /// Geography appears as in EEA for debug devices that are set.
+        case EEA
+        /// Geography appears as not in EEA for debug devices that are set.
+        case notEEA
+    }
+
     public var buildConfig: BuildConfig
     public var mainThreadChecks: Bool
     public var disableURLHandler: Bool
@@ -55,7 +64,7 @@ public struct DebugFlags {
         devServers: Bool = true,
         ignoreTunneledChecks: Bool = false,
         disableConnectOnDemand: Bool = false,
-        adNetworkGeographicDebugging: .disabled,
+        adNetworkGeographicDebugging: AdNetworkGeographicDebugging = .disabled,
         printStoreLogs: Bool = false,
         printAppState: Bool = false,
         printHttpRequests: Bool = false
@@ -66,7 +75,7 @@ public struct DebugFlags {
         self.devServers = devServers
         self.ignoreTunneledChecks = ignoreTunneledChecks
         self.disableConnectOnDemand = disableConnectOnDemand
-        self.adNetworkGeographicDebugging = adNetworkGeographicDebugging,
+        self.adNetworkGeographicDebugging = adNetworkGeographicDebugging
         self.printStoreLogs = printStoreLogs
         self.printAppState = printAppState
         self.printHttpRequests = printHttpRequests
@@ -85,13 +94,4 @@ public struct DebugFlags {
             printHttpRequests: false
         )
     }
-}
-
-public enum AdNetworkGeographicDebugging: Equatable {
-    /// Geographic debugging is disabled.
-    case disabled
-    /// Geography appears as in EEA for debug devices that are set.
-    case EEA
-    /// Geography appears as not in EEA for debug devices that are set.
-    case notEEA
 }
