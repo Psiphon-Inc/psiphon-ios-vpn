@@ -63,6 +63,11 @@
 		5202011D2360D34000D00C8E /* EitherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5202011C2360D34000D00C8E /* EitherView.swift */; };
 		52055D04230C823100244F9E /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D03230C823100244F9E /* GradientButton.swift */; };
 		52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D05230C833700244F9E /* SpeedBoostButton.swift */; };
+		521BD22D25D1BC4F006944D9 /* GoogleAppMeasurement.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 521BD22825D1BC4F006944D9 /* GoogleAppMeasurement.xcframework */; };
+		521BD22F25D1BC4F006944D9 /* nanopb.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 521BD22925D1BC4F006944D9 /* nanopb.xcframework */; };
+		521BD23125D1BC4F006944D9 /* GoogleMobileAds.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 521BD22A25D1BC4F006944D9 /* GoogleMobileAds.xcframework */; };
+		521BD23325D1BC4F006944D9 /* UserMessagingPlatform.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 521BD22B25D1BC4F006944D9 /* UserMessagingPlatform.xcframework */; };
+		521BD23525D1BC50006944D9 /* GoogleUtilities.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 521BD22C25D1BC4F006944D9 /* GoogleUtilities.xcframework */; };
 		521FD0F9219E0DDF00F748EC /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F6219E0DDF00F748EC /* AppStats.m */; };
 		521FD0FA219E0DDF00F748EC /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F8219E0DDF00F748EC /* AppProfiler.m */; };
 		521FD0FD219E0E0F00F748EC /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0FB219E0E0E00F748EC /* DebugUtils.m */; };
@@ -108,8 +113,8 @@
 		8D0017D724DB233200EC3409 /* VPNStrings.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D0017D624DB233200EC3409 /* VPNStrings.m */; };
 		8D0017D924DB4B1200EC3409 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0017D824DB4B1200EC3409 /* OnboardingViewController.swift */; };
 		8D0017DB24DDD99A00EC3409 /* AppUpgrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0017DA24DDD99A00EC3409 /* AppUpgrade.swift */; };
-		8D1F62BA247DBB0D0028AFAF /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62B9247DBB0D0028AFAF /* SwiftPackageProductDependency */; };
-		8D1F62BC247DBB130028AFAF /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62BB247DBB130028AFAF /* SwiftPackageProductDependency */; };
+		8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62B9247DBB0D0028AFAF /* Utilities */; };
+		8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62BB247DBB130028AFAF /* PsiApi */; };
 		8D1F62BE247DC1690028AFAF /* Receipt+AppStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62BD247DC1690028AFAF /* Receipt+AppStore.swift */; };
 		8D1F62C0247DC3350028AFAF /* Authorization+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */; };
 		8D1F62C2247DC4840028AFAF /* PsiCashClient+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */; };
@@ -146,11 +151,6 @@
 		8DE4E6D2244E97D000275362 /* Result+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DE4E6D1244E97D000275362 /* Result+Codable.swift */; };
 		8DEEE12F252F757600B0A9EC /* SupportedLocalizations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DEEE12E252F757600B0A9EC /* SupportedLocalizations.swift */; };
 		8DEEE137252FB4C900B0A9EC /* LanguageSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DEEE136252FB4C900B0A9EC /* LanguageSelectionViewController.swift */; };
-		8DF8056825016B2A003A6223 /* GoogleAppMeasurement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DF8056725016B2A003A6223 /* GoogleAppMeasurement.framework */; };
-		8DF8056B25016B3A003A6223 /* GoogleMobileAds.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DF8056A25016B3A003A6223 /* GoogleMobileAds.framework */; };
-		8DF8056E25016BAA003A6223 /* GoogleUtilities.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DF8056D25016BAA003A6223 /* GoogleUtilities.xcframework */; };
-		8DF8057125016BB9003A6223 /* nanopb.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DF8057025016BB8003A6223 /* nanopb.xcframework */; };
-		8DF8057425016BC8003A6223 /* UserMessagingPlatform.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DF8057325016BC8003A6223 /* UserMessagingPlatform.framework */; };
 		8DF805772501726B003A6223 /* AdConsent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF805762501726B003A6223 /* AdConsent.swift */; };
 		9BFEC2458D1346F537E9089E /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
 		9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */; };
@@ -488,6 +488,11 @@
 		5202011C2360D34000D00C8E /* EitherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EitherView.swift; sourceTree = "<group>"; };
 		52055D03230C823100244F9E /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
 		52055D05230C833700244F9E /* SpeedBoostButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedBoostButton.swift; sourceTree = "<group>"; };
+		521BD22825D1BC4F006944D9 /* GoogleAppMeasurement.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = GoogleAppMeasurement.xcframework; path = "Frameworks/GoogleMobileAdsSdkiOS-8.0.0/GoogleAppMeasurement.xcframework"; sourceTree = "<group>"; };
+		521BD22925D1BC4F006944D9 /* nanopb.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = nanopb.xcframework; path = "Frameworks/GoogleMobileAdsSdkiOS-8.0.0/nanopb.xcframework"; sourceTree = "<group>"; };
+		521BD22A25D1BC4F006944D9 /* GoogleMobileAds.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = GoogleMobileAds.xcframework; path = "Frameworks/GoogleMobileAdsSdkiOS-8.0.0/GoogleMobileAds.xcframework"; sourceTree = "<group>"; };
+		521BD22B25D1BC4F006944D9 /* UserMessagingPlatform.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = UserMessagingPlatform.xcframework; path = "Frameworks/GoogleMobileAdsSdkiOS-8.0.0/UserMessagingPlatform.xcframework"; sourceTree = "<group>"; };
+		521BD22C25D1BC4F006944D9 /* GoogleUtilities.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = GoogleUtilities.xcframework; path = "Frameworks/GoogleMobileAdsSdkiOS-8.0.0/GoogleUtilities.xcframework"; sourceTree = "<group>"; };
 		521FD0F5219E0DDF00F748EC /* AppProfiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppProfiler.h; path = Shared/Profiling/AppProfiler.h; sourceTree = SOURCE_ROOT; };
 		521FD0F6219E0DDF00F748EC /* AppStats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppStats.m; path = Shared/Profiling/AppStats.m; sourceTree = SOURCE_ROOT; };
 		521FD0F7219E0DDF00F748EC /* AppStats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppStats.h; path = Shared/Profiling/AppStats.h; sourceTree = SOURCE_ROOT; };
@@ -885,17 +890,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8D1F62BC247DBB130028AFAF /* BuildFile in Frameworks */,
+				521BD22D25D1BC4F006944D9 /* GoogleAppMeasurement.xcframework in Frameworks */,
+				8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */,
+				521BD23325D1BC4F006944D9 /* UserMessagingPlatform.xcframework in Frameworks */,
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
-				8DF8056825016B2A003A6223 /* GoogleAppMeasurement.framework in Frameworks */,
-				8DF8056E25016BAA003A6223 /* GoogleUtilities.xcframework in Frameworks */,
-				8D1F62BA247DBB0D0028AFAF /* BuildFile in Frameworks */,
+				521BD23525D1BC50006944D9 /* GoogleUtilities.xcframework in Frameworks */,
+				8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */,
 				529DE74825AD039200F82936 /* PsiphonTunnel.xcframework in Frameworks */,
 				440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */,
-				8DF8057125016BB9003A6223 /* nanopb.xcframework in Frameworks */,
-				8DF8057425016BC8003A6223 /* UserMessagingPlatform.framework in Frameworks */,
-				8DF8056B25016B3A003A6223 /* GoogleMobileAds.framework in Frameworks */,
 				474C2778BC8FAFDB749E5DC3 /* libPods-Psiphon.a in Frameworks */,
+				521BD23125D1BC4F006944D9 /* GoogleMobileAds.xcframework in Frameworks */,
+				521BD22F25D1BC4F006944D9 /* nanopb.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1193,6 +1198,11 @@
 		668AF9B81E92CB60008CAAAA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				521BD22825D1BC4F006944D9 /* GoogleAppMeasurement.xcframework */,
+				521BD22A25D1BC4F006944D9 /* GoogleMobileAds.xcframework */,
+				521BD22C25D1BC4F006944D9 /* GoogleUtilities.xcframework */,
+				521BD22925D1BC4F006944D9 /* nanopb.xcframework */,
+				521BD22B25D1BC4F006944D9 /* UserMessagingPlatform.xcframework */,
 				529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */,
 				8DF8057325016BC8003A6223 /* UserMessagingPlatform.framework */,
 				8DF8057025016BB8003A6223 /* nanopb.xcframework */,
@@ -1736,8 +1746,8 @@
 			);
 			name = Psiphon;
 			packageProductDependencies = (
-				8D1F62B9247DBB0D0028AFAF /* SwiftPackageProductDependency */,
-				8D1F62BB247DBB130028AFAF /* SwiftPackageProductDependency */,
+				8D1F62B9247DBB0D0028AFAF /* Utilities */,
+				8D1F62BB247DBB130028AFAF /* PsiApi */,
 			);
 			productName = Psiphon;
 			productReference = CE26FC8A1BBDC7B800B83375 /* Psiphon.app */;
@@ -3021,11 +3031,11 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		8D1F62B9247DBB0D0028AFAF /* SwiftPackageProductDependency */ = {
+		8D1F62B9247DBB0D0028AFAF /* Utilities */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Utilities;
 		};
-		8D1F62BB247DBB130028AFAF /* SwiftPackageProductDependency */ = {
+		8D1F62BB247DBB130028AFAF /* PsiApi */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PsiApi;
 		};
