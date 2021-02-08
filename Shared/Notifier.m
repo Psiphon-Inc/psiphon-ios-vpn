@@ -39,12 +39,14 @@ NotifierMessage const NotifierAvailableEgressRegions = PSIPHON_VPN_GROUP @".Avai
 NotifierMessage const NotifierNetworkConnectivityFailed = PSIPHON_VPN_GROUP @".NetworkConnectivityFailed";
 NotifierMessage const NotifierNetworkConnectivityResolved = PSIPHON_VPN_GROUP @".NetworkConnectivityResolved";
 NotifierMessage const NotifierDisallowedTrafficAlert = PSIPHON_VPN_GROUP @".DisallowedTrafficAlert";
+NotifierMessage const NotifierIsHostAppProcessRunning = PSIPHON_VPN_GROUP @".IsHostAppProcessRunning";
 
 // Messages sent by the container.
 NotifierMessage const NotifierStartVPN               = PSIPHON_GROUP @".StartVPN";
 NotifierMessage const NotifierAppEnteredBackground   = PSIPHON_GROUP @".AppEnteredBackground";
 NotifierMessage const NotifierUpdatedNonSubscriptionAuths  = PSIPHON_GROUP @".UpdatedNonSubscriptionAuths";
 NotifierMessage const NotifierUpdatedSubscriptionAuths  = PSIPHON_GROUP @".UpdatedSubscriptionAuths";
+NotifierMessage const NotifierHostAppProcessRunning  = PSIPHON_GROUP @".HostAppProcessRunning";
 
 #if DEBUG
 NotifierMessage const NotifierDebugCustomFunction    = PSIPHON_GROUP @".DebugCustomFunction";
@@ -117,6 +119,7 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAppEnteredBackground);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierUpdatedNonSubscriptionAuths);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierUpdatedSubscriptionAuths);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierHostAppProcessRunning);
 
 #if DEBUG
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDebugCustomFunction);
@@ -132,6 +135,7 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierNetworkConnectivityFailed);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierNetworkConnectivityResolved);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDisallowedTrafficAlert);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierIsHostAppProcessRunning);
 
 #if DEBUG
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDebugPsiphonTunnelState);
@@ -206,7 +210,7 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
     // thread to send the message to `messageSubject`.
 #if !(TARGET_IS_EXTENSION)
     dispatch_async_global(^{
-        [messagesSubject sendNext:message];
+        [self->messagesSubject sendNext:message];
     });
 #endif
 

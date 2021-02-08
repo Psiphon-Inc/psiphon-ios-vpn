@@ -25,7 +25,7 @@
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "UserDefaults.h"
-#import <PsiphonTunnel/JailbreakCheck.h>
+#import <PsiphonTunnel/PsiphonClientPlatform.h>
 
 PsiFeedbackLogType const AppInfoLogType = @"AppInfo";
 
@@ -42,17 +42,17 @@ UserDefaultsKey const AppInfoFastLaneSnapShotBoolKey = @"FASTLANE_SNAPSHOT";
 }
 
 + (NSString*)clientRegion {
-    PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+    PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
     return [sharedDB emittedClientRegion];
 }
 
 + (NSString*)propagationChannelId {
-    NSDictionary *configs = [PsiphonConfigReader fromConfigFile].configs;
-    if (!configs) {
+    NSDictionary *config = [PsiphonConfigReader fromConfigFile].config;
+    if (!config) {
         // PsiphonConfigReader has logged an error
         return nil;
     }
-    id propChanId = [configs objectForKey:@"PropagationChannelId"];
+    id propChanId = [config objectForKey:@"PropagationChannelId"];
     if (![propChanId isKindOfClass:[NSString class]]) {
         [PsiFeedbackLogger errorWithType:AppInfoLogType format:@"PropagationChannelId invalid type %@", NSStringFromClass([propChanId class])];
     }
@@ -61,44 +61,26 @@ UserDefaultsKey const AppInfoFastLaneSnapShotBoolKey = @"FASTLANE_SNAPSHOT";
 }
 
 + (NSString*)sponsorId {
-    PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:APP_GROUP_IDENTIFIER];
+    PsiphonDataSharedDB *sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
     return [sharedDB getCurrentSponsorId];
 }
 
-// Code is borrowed from: https://github.com/Psiphon-Labs/psiphon-tunnel-core/blob/master/MobileLibrary/iOS/PsiphonTunnel/PsiphonTunnel/PsiphonTunnel.m
 + (NSString *)clientPlatform {
-    // ClientPlatform must not contain:
-    //   - underscores, which are used by us to separate the constituent parts
-    //   - spaces, which are considered invalid by the server
-    // Like "iOS". Older iOS reports "iPhone OS", which we will convert.
-    NSString *systemName = [[UIDevice currentDevice] systemName];
-    if ([systemName isEqual: @"iPhone OS"]) {
-        systemName = @"iOS";
-    }
-    systemName = [[systemName
-                   stringByReplacingOccurrencesOfString:@"_" withString:@"-"]
-                  stringByReplacingOccurrencesOfString:@" " withString:@"-"];
-    // Like "10.2.1"
-    NSString *systemVersion = [[[[UIDevice currentDevice]systemVersion]
-                                stringByReplacingOccurrencesOfString:@"_" withString:@"-"]
-                               stringByReplacingOccurrencesOfString:@" " withString:@"-"];
+    return [PsiphonClientPlatform getClientPlatform];
+}
 
-    // "unjailbroken"/"jailbroken"
-    NSString *jailbroken = @"unjailbroken";
-    if ([JailbreakCheck isDeviceJailbroken]) {
-        jailbroken = @"jailbroken";
++ (BOOL)isiOSAppOnMac {
+    
+    BOOL isiOSAppOnMac = FALSE;
+    
+    if (@available(iOS 14.0, *)) {
+        if ([[NSProcessInfo processInfo] isiOSAppOnMac] == TRUE) {
+            isiOSAppOnMac = TRUE;
+        }
     }
-    // Like "com.psiphon3.browser"
-    NSString *bundleIdentifier = [[[[NSBundle mainBundle] bundleIdentifier]
-                                   stringByReplacingOccurrencesOfString:@"_" withString:@"-"]
-                                  stringByReplacingOccurrencesOfString:@" " withString:@"-"];
-
-    NSString *clientPlatform = [NSString stringWithFormat:@"%@_%@_%@_%@",
-                                systemName,
-                                systemVersion,
-                                jailbroken,
-                                bundleIdentifier];
-    return clientPlatform;
+    
+    return isiOSAppOnMac;
+    
 }
 
 + (BOOL)runningUITest {

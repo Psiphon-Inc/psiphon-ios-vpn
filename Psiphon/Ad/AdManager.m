@@ -440,13 +440,12 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
     // "Trigger" signals.
     NSString * const TriggerPresentedAdDismissed = @"TriggerPresentedAdDismissed";
     NSString * const TriggerAppEvent = @"TriggerAppEvent";
-    NSString * const TriggerPsiCashRewardedActivityDataUpdated = @"TriggerPsiCashRewardedActivityDataUpdated";
     NSString * const TriggerForceRewardedVideoLoad = @"TriggerForceRewardedVideoLoad";
 
     RACSignal<NSString *> *triggers;
 
     // Max number of ad load retries.
-    NSInteger adLoadMaxRetries = 0;
+    int adLoadMaxRetries = 0;
 
     if (AdFormatRewardedVideo == adController.adFormat) {
         adLoadMaxRetries = 0;

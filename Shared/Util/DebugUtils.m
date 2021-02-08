@@ -19,12 +19,20 @@
 
 #import "DebugUtils.h"
 #import "AppStats.h"
+#import "Asserts.h"
+#import "Logging.h"
 
 
 @implementation DebugUtils
 
 + (NSTimer *)jetsamWithAllocationInterval:(NSTimeInterval)allocationInterval withNumberOfPages:(unsigned int)pageNum {
-    vm_size_t pageSize = [AppStats pageSize:nil];
+
+    NSError *err;
+    vm_size_t pageSize = [AppStats pageSize:&err];
+    if (err != nil) {
+        LOG_DEBUG(@"Failed to get page size: %@", err);
+        PSIAssert(FALSE);
+    }
 
     NSTimer *t = [NSTimer timerWithTimeInterval:allocationInterval repeats:TRUE block:^(NSTimer *timer) {
         char * array = (char *) malloc(sizeof(char) * pageSize * pageNum);

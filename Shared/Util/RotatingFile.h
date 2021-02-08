@@ -32,7 +32,7 @@ FOUNDATION_EXPORT NSErrorDomain const RotatingFileErrorDomain;
 /// @param filepath Path of file which will be written.
 /// @param olderFilepath Path where `filepath` will be moved once it exceeds `maxFileSizeBytes`.
 /// @param maxFileSizeBytes Maximum number of bytes that will be stored in the rotated file.
-/// @param outError If non-nill on return, then initialization failed with the provided error.
+/// @param outError If non-nil on return, then initialization failed with the provided error.
 /// @return Returns nil when `outError` is non-nil.
 - (nullable instancetype)initWithFilepath:(NSString *)filepath
                             olderFilepath:(NSString *)olderFilepath
@@ -44,7 +44,7 @@ FOUNDATION_EXPORT NSErrorDomain const RotatingFileErrorDomain;
 /// then the file will first be rotated (to `olderFilepath`) and then a new file will be created with
 /// the provided data (at `filepath`).
 /// @param data Data to be written.
-/// @param outError If non-nill on return, then writing data failed with the provided error.
+/// @param outError If non-nil on return, then writing data failed with the provided error.
 - (void)writeData:(NSData *)data error:(NSError * _Nullable *)outError;
 
 @end

@@ -47,7 +47,7 @@ public struct PsiCashValidationRequest: Encodable {
 
 public struct PsiCashValidationResponse: RetriableHTTPResponse {
     public enum ResponseError: HashableError {
-        case failedRequest(SystemError)
+        case failedRequest(SystemError<Int>)
         case errorStatusCode(HTTPResponseMetadata)
     }
 

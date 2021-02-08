@@ -24,8 +24,8 @@ import PsiApi
 struct ProviderManagerLoadState<T: TunnelProviderManager>: Equatable {
     
     enum TPMError: HashableError {
-        case failedRemovingConfigs([NEVPNError])
-        case failedConfigLoadSave(NEVPNError)
+        case failedRemovingConfigs([SystemError<NEVPNError.Code>])
+        case failedConfigLoadSave(SystemError<NEVPNError.Code>)
     }
     
     enum LoadState: Equatable {

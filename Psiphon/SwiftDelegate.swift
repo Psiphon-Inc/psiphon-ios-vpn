@@ -61,6 +61,7 @@ struct AppDelegateState: Equatable {
 }
 
 typealias AppDelegateEnvironment = (
+    platform: Platform,
     feedbackLogger: FeedbackLogger,
     psiCashPersistedValues: PsiCashPersistedValues,
     sharedDB: PsiphonDataSharedDB,
@@ -149,9 +150,10 @@ func appDelegateReducer(
                     let alertController = makeDisallowedTrafficAlertController(
                         onSpeedBoostClicked: {
                             tryPresentPsiCashViewController(
+                                platform: environment.platform,
                                 tab: .speedBoost,
                                 makePsiCashViewController:
-                                    SwiftDelegate.instance.makePsiCashViewController(initialTab:),
+                                    SwiftDelegate.instance.makePsiCashViewController(platform:initialTab:),
                                 getTopMostPresentedViewController:
                                     AppDelegate.getTopPresentedViewController
                             )
@@ -195,9 +197,10 @@ func appDelegateReducer(
 @objc final class SwiftDelegate: NSObject {
     
     static let instance = SwiftDelegate()
-    
+
+    private var platform: Platform!
     private var navigator = Navigator()
-    private let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: APP_GROUP_IDENTIFIER)
+    private let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: PsiphonAppGroupIdentifier)
     private let feedbackLogger = FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler())
     private let supportedProducts =
         SupportedAppStoreProducts.fromPlists(types: [.subscription, .psiCash])
@@ -209,7 +212,55 @@ func appDelegateReducer(
     private var store: Store<AppState, AppAction>!
     private var psiCashLib: PsiCash!
     private var environmentCleanup: (() -> Void)?
+
+    override init() {
+        platform = Platform(ProcessInfo.processInfo)
+    }
+
+    // Should be called early in the application lifecycle.
+    @objc static func setupDebugFlags() {
+        #if DEBUG
+        Debugging = DebugFlags(buildConfig: .debug)
+        #elseif DEV_RELEASE
+        Debugging = DebugFlags(buildConfig: .devRelease)
+        #else
+        Debugging = DebugFlags.disabled(buildConfig: .release)
+        #endif
+    }
     
+    func applicationDidBecomeActive() {
+        
+        self.store.send(.appDelegateAction(.appLifecycleEvent(.didBecomeActive)))
+        
+    }
+    
+    func applicationWillEnterForeground() {
+                
+        // Updates appForegroundState shared with the extension before
+        // syncing with it through the `.syncWithProvider` message.
+        self.sharedDB.setAppForegroundState(true)
+        
+        self.store.send(.appDelegateAction(.appLifecycleEvent(.willEnterForeground)))
+        self.store.send(vpnAction: .syncWithProvider(reason: .appEnteredForeground))
+        self.store.send(.psiCash(.refreshPsiCashState))
+        
+    }
+    
+    func applicationDidEnterBackground() {
+        
+        self.store.send(.appDelegateAction(.appLifecycleEvent(.didEnterBackground)))
+        self.sharedDB.setAppForegroundState(false)
+        
+        Notifier.sharedInstance().post(NotifierAppEnteredBackground)
+        
+    }
+    
+    func applicationWillResignActive() {
+        
+        self.store.send(.appDelegateAction(.appLifecycleEvent(.willResignActive)))
+        
+    }
+
 }
 
 // MARK: Bridge API
@@ -227,7 +278,7 @@ extension SwiftDelegate: RewardedVideoAdBridgeDelegate {
             // Note that error event is created here as opposed to the origin
             // of where the error occurred. However this is acceptable as long as
             // this function is called once for each error that happened almost immediately.
-            loadResult = .failure(ErrorEvent(.adSDKError(SystemError(error))))
+            loadResult = .failure(ErrorEvent(.adSDKError(SystemError<Int>.make(error))))
         } else {
             if case .error = status {
                 loadResult = .failure(ErrorEvent(.requestedAdFailedToLoad))
@@ -333,6 +384,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         launchOptions: [UIApplication.LaunchOptionsKey : Any]?,
         objcBridge: ObjCBridgeDelegate
     ) -> Bool {
+
+        print("Build Configuration: '\(String(describing: Debugging.buildConfig))'")
+
         self.objcBridge = objcBridge
         
         // Updates appForegroundState that is shared with the extension.
@@ -356,10 +410,37 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     ) {
         self.feedbackLogger.immediate(.info, "applicationDidFinishLaunching")
         
+        // On Mac the iOS AppDelegate callbacks are not called when the app's window
+        // loses focus. Once the app is opened "applicationDidBecomeActive" is called once,
+        // unless the application is hidden and reopened again.
+        //
+        // The current strategy is to call "applicationWillEnterForeground", "applicationDidBecomeActive",
+        // "applicationWillResignActive", "applicationDidEnterBackground" only based on
+        // "NSWindowDidBecomeMainNotification" and "NSWindowDidResignMainNotification" notifications.
+        
+        if case .iOSAppOnMac = platform.current {
+            
+            NotificationCenter.default.addObserver(forName: .init("NSWindowDidBecomeMainNotification"), object: nil, queue: nil) { notification in
+                
+                self.applicationWillEnterForeground()
+                self.applicationDidBecomeActive()
+                
+            }
+            
+            NotificationCenter.default.addObserver(forName: .init("NSWindowDidResignMainNotification"), object: nil, queue: nil) { notification in
+                
+                self.applicationWillResignActive()
+                self.applicationDidEnterBackground()
+                
+            }
+            
+        }
+        
         navigator.register(url: PsiphonDeepLinking.psiCashDeepLink) { [unowned self] in
             tryPresentPsiCashViewController(
+                platform: platform,
                 tab: .addPsiCash,
-                makePsiCashViewController: self.makePsiCashViewController(initialTab:),
+                makePsiCashViewController: self.makePsiCashViewController(platform:initialTab:),
                 getTopMostPresentedViewController: AppDelegate.getTopPresentedViewController
             )
             return true
@@ -367,8 +448,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         
         navigator.register(url: PsiphonDeepLinking.speedBoostDeepLink) { [unowned self] in
             tryPresentPsiCashViewController(
+                platform: platform,
                 tab: .speedBoost,
-                makePsiCashViewController: self.makePsiCashViewController(initialTab:),
+                makePsiCashViewController: self.makePsiCashViewController(platform:initialTab:),
                 getTopMostPresentedViewController: AppDelegate.getTopPresentedViewController
             )
             return true
@@ -382,6 +464,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             feedbackLogger: self.feedbackLogger,
             environment: { [unowned self] store in
                 let (environment, cleanup) = makeEnvironment(
+                    platform: platform,
                     store: store,
                     feedbackLogger: self.feedbackLogger,
                     sharedDB: self.sharedDB,
@@ -584,26 +667,39 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func applicationDidBecomeActive(_ application: UIApplication) {
-        self.store.send(.appDelegateAction(.appLifecycleEvent(.didBecomeActive)))
+        
+        guard case .iOS = platform.current else {
+            return
+        }
+        
+        applicationDidBecomeActive()
     }
     
     @objc func applicationWillResignActive(_ application: UIApplication) {
-        self.store.send(.appDelegateAction(.appLifecycleEvent(.willResignActive)))
+        
+        guard case .iOS = platform.current else {
+            return
+        }
+        
+        applicationWillResignActive()
     }
     
     @objc func applicationWillEnterForeground(_ application: UIApplication) {
-        // Updates appForegroundState shared with the extension before
-        // syncing with it through the `.syncWithProvider` message.
-        self.sharedDB.setAppForegroundState(true)
         
-        self.store.send(.appDelegateAction(.appLifecycleEvent(.willEnterForeground)))
-        self.store.send(vpnAction: .syncWithProvider(reason: .appEnteredForeground))
-        self.store.send(.psiCash(.refreshPsiCashState))
+        guard case .iOS = platform.current else {
+            return
+        }
+        
+        applicationWillEnterForeground()
     }
     
     @objc func applicationDidEnterBackground(_ application: UIApplication) {
-        self.store.send(.appDelegateAction(.appLifecycleEvent(.didEnterBackground)))
-        self.sharedDB.setAppForegroundState(false)
+        
+        guard case .iOS = platform.current else {
+            return
+        }
+        
+        applicationDidEnterBackground()
     }
     
     @objc func applicationWillTerminate(_ application: UIApplication) {
@@ -637,7 +733,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func makePsiCashViewController(
         _ initialTab: PsiCashViewController.PsiCashViewControllerTabs
     ) -> UIViewController {
-        self.makePsiCashViewController(initialTab: initialTab)
+
+        return self.makePsiCashViewController(platform: platform, initialTab: initialTab)
+
     }
     
     @objc func makeOnboardingViewControllerWithStagesNotCompleted(
@@ -654,6 +752,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         }
         
         return OnboardingViewController(
+            platform: platform,
+            userDefaultsConfig: self.userDefaultsConfig,
+            mainBundle: .main,
             onboardingStages: stagesNotCompleted,
             feedbackLogger: self.feedbackLogger,
             installVPNConfig: self.installVPNConfig,
@@ -691,7 +792,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError> {
-        let promise = Promise<Result<Utilities.Unit, SystemErrorEvent>>.pending()
+        let promise = Promise<Result<Utilities.Unit, SystemErrorEvent<Int>>>.pending()
         let objcPromise = promise.then { result -> Error? in
             return result.projectError()?.error
         }
@@ -731,22 +832,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func getAppStoreSubscriptionProductIDs() -> Set<String> {
         return self.supportedProducts.supported[.subscription]!.rawValues
     }
-    
-    @objc func getAppStateFeedbackEntry(completionHandler: @escaping (String) -> Void) {
-        self.store.$value.signalProducer
-            .take(first: 1)
-            .startWithValues { [unowned self] appState in
-                completionHandler("""
-                    ContainerInfo: {
-                    \"AppState\":\"\(makeFeedbackEntry(appState))\",
-                    \"UserDefaultsConfig\":\"\(makeFeedbackEntry(UserDefaultsConfig()))\",
-                    \"PsiphonDataSharedDB\": \"\(makeFeedbackEntry(self.sharedDB))\",
-                    \"OutstandingEffectCount\": \(self.store.outstandingEffectCount)
-                    }
-                    """)
-        }
-    }
-    
+
     @objc func isCurrentlySpeedBoosted(completionHandler: @escaping (Bool) -> Void) {
         self.store.$value.signalProducer
             .map(\.psiCash)
@@ -849,14 +935,61 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     @objc func getLocaleForCurrentAppLanguage() -> NSLocale {
         return self.userDefaultsConfig.localeForAppLanguage as NSLocale
     }
+
+    @objc func userSubmittedFeedback(selectedThumbIndex: Int,
+                                     comments: String,
+                                     email: String,
+                                     uploadDiagnostics: Bool) {
+        self.store.send(
+            .feedbackAction(
+                .userSubmittedFeedback(selectedThumbIndex: selectedThumbIndex,
+                                       comments: comments,
+                                       email: email,
+                                       uploadDiagnostics: uploadDiagnostics)))
+    }
+
+    @objc func versionLabelText() -> String {
+
+        let shortVersionString: String = Bundle.main.object(
+            forInfoDictionaryKey: "CFBundleShortVersionString"
+        ) as? String ?? "(nil)"
+
+        // If this build is not a release build, additional
+        // build metadata can be displayed alongside the version label.
+
+        let postfix: String
+
+        switch Debugging.buildConfig {
+
+        case .debug:
+            postfix = "-debug"
+
+        case .devRelease:
+
+            let bundleVersion: String = Bundle.main.object(  
+                forInfoDictionaryKey: "CFBundleVersion"
+            ) as? String ?? "(nil)"
+
+            postfix = "-(\(bundleVersion))-dev-release"
+
+        case .release:
+            postfix = ""
+
+        }
+
+        return "V.\(shortVersionString)\(postfix)"
+    }
+
 }
 
 fileprivate extension SwiftDelegate {
     
     func makePsiCashViewController(
+        platform: Platform,
         initialTab: PsiCashViewController.PsiCashViewControllerTabs
     ) -> PsiCashViewController {
         PsiCashViewController(
+            platform: platform,
             initialTab: initialTab,
             store: self.store.projection(
                 value: { $0.psiCashViewController },
@@ -879,9 +1012,10 @@ fileprivate extension SwiftDelegate {
 }
 
 fileprivate func tryPresentPsiCashViewController(
+    platform: Platform,
     tab: PsiCashViewController.PsiCashViewControllerTabs,
     makePsiCashViewController:
-        @escaping (PsiCashViewController.PsiCashViewControllerTabs) -> PsiCashViewController,
+        @escaping (Platform, PsiCashViewController.PsiCashViewControllerTabs) -> PsiCashViewController,
     getTopMostPresentedViewController: @escaping () -> UIViewController
 ) {
     let topMostViewController = getTopMostPresentedViewController()
@@ -898,7 +1032,7 @@ fileprivate func tryPresentPsiCashViewController(
         psiCashViewController.activeTab = tab
         
     case .notPresent:
-        let psiCashViewController = makePsiCashViewController(tab)
+        let psiCashViewController = makePsiCashViewController(platform, tab)
         topMostViewController.present(psiCashViewController, animated: true)
     }
 }

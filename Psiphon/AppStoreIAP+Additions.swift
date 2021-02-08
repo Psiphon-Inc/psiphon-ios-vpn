@@ -196,12 +196,21 @@ extension PaymentTransaction {
                 case .failed:
                     // Error is non-null when state is failed.
                     let someError = skPaymentTransaction.error!
+
                     if let skError = someError as? SKError {
-                        return .completed(.failure(.error(.right(skError))))
+
+                        return .completed(
+                            .failure(.error(.right(SystemError<SKError.Code>.make(skError))))
+                        )
+
                     } else {
-                        return .completed(.failure(.error(.left(SystemError(someError)))))
+
+                        return .completed(
+                            .failure(.error(.left(SystemError<Int>.make(someError as NSError))))
+                        )
+
                     }
-                    
+
                 @unknown default:
                     fatalError("""
                         unknown transaction state \(skPaymentTransaction.transactionState)
@@ -238,7 +247,7 @@ SKPaymentTransactionObserver {
     // from the user's purchase history back to the queue.
     func paymentQueue(_ queue: SKPaymentQueue,
                       restoreCompletedTransactionsFailedWithError error: Error) {
-        storeSend(.restoredCompletedTransactions(error: SystemError(error)))
+        storeSend(.restoredCompletedTransactions(error: SystemError<Int>.make(error as NSError)))
     }
     
     // Sent when all transactions from the user's purchase history have

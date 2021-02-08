@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		29FE979125C0C1CA00D9C09F /* HostAppProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 29FE979025C0C1CA00D9C09F /* HostAppProtocol.m */; };
 		440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 440D75BD1F59E041005C603B /* StoreKit.framework */; };
 		4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4435CC261F70566000F3A809 /* SettingsViewController.m */; };
 		445F239620E1817C00D004E9 /* AppStoreParsedReceiptData.m in Sources */ = {isa = PBXBuildFile; fileRef = 445F239520E1817C00D004E9 /* AppStoreParsedReceiptData.m */; };
@@ -55,7 +56,6 @@
 		4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */; };
 		4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */; };
 		4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263CA2072984D0021FEF5 /* IAPViewController.m */; };
-		4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5BD4F42061982300AD4724 /* FeedbackManager.m */; };
 		4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */; };
 		4EB846422151830600687344 /* AvailableServerRegions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EB846412151830600687344 /* AvailableServerRegions.m */; };
 		4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526220AB8DBE000B4BEA /* Pastel.m */; };
@@ -63,11 +63,6 @@
 		5202011D2360D34000D00C8E /* EitherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5202011C2360D34000D00C8E /* EitherView.swift */; };
 		52055D04230C823100244F9E /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D03230C823100244F9E /* GradientButton.swift */; };
 		52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D05230C833700244F9E /* SpeedBoostButton.swift */; };
-		521FD0EF219E0D5600F748EC /* DebugDirectoryViewerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E5219E0D5500F748EC /* DebugDirectoryViewerViewController.m */; };
-		521FD0F0219E0D5600F748EC /* DebugLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E6219E0D5500F748EC /* DebugLogViewController.m */; };
-		521FD0F1219E0D5600F748EC /* DebugToolboxViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0E7219E0D5600F748EC /* DebugToolboxViewController.m */; };
-		521FD0F2219E0D5600F748EC /* DebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0EA219E0D5600F748EC /* DebugViewController.m */; };
-		521FD0F3219E0D5600F748EC /* DebugTextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0EC219E0D5600F748EC /* DebugTextViewController.m */; };
 		521FD0F9219E0DDF00F748EC /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F6219E0DDF00F748EC /* AppStats.m */; };
 		521FD0FA219E0DDF00F748EC /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F8219E0DDF00F748EC /* AppProfiler.m */; };
 		521FD0FD219E0E0F00F748EC /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0FB219E0E0E00F748EC /* DebugUtils.m */; };
@@ -83,6 +78,9 @@
 		524B4E6B2316F0E3004E9891 /* BorderedSubtitleButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6A2316F0E3004E9891 /* BorderedSubtitleButton.m */; };
 		524B4E6E2316F27F004E9891 /* AnimatedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6D2316F27F004E9891 /* AnimatedControl.m */; };
 		528D81332384823F00AA2D77 /* PsiCashMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D81322384823F00AA2D77 /* PsiCashMessageView.swift */; };
+		529DE74825AD039200F82936 /* PsiphonTunnel.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */; };
+		529DE74925AD039200F82936 /* PsiphonTunnel.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		529DE74A25AD039C00F82936 /* PsiphonTunnel.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */; };
 		52A24659238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */; };
 		52A2465E239081C100A01FF1 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465D239081C100A01FF1 /* AppState.swift */; };
 		52A24662239B07E000A01FF1 /* psiCashProductIds.plist in Resources */ = {isa = PBXBuildFile; fileRef = 52A24661239B07E000A01FF1 /* psiCashProductIds.plist */; };
@@ -103,7 +101,6 @@
 		52DF5E9823CE5A8300A1B067 /* AppAction+ValuePaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9723CE5A8300A1B067 /* AppAction+ValuePaths.swift */; };
 		52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9923CE835100A1B067 /* UserStrings.swift */; };
 		52DF5E9E23D0D01F00A1B067 /* BridgingTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9D23D0D01F00A1B067 /* BridgingTypes.swift */; };
-		66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; };
 		6615A5EA1F58A95500026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 6615A5E81F58A95500026C98 /* Localizable.strings */; };
 		668AF9BF1E92CBD3008CAAAA /* NetworkExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */; };
@@ -111,8 +108,8 @@
 		8D0017D724DB233200EC3409 /* VPNStrings.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D0017D624DB233200EC3409 /* VPNStrings.m */; };
 		8D0017D924DB4B1200EC3409 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0017D824DB4B1200EC3409 /* OnboardingViewController.swift */; };
 		8D0017DB24DDD99A00EC3409 /* AppUpgrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0017DA24DDD99A00EC3409 /* AppUpgrade.swift */; };
-		8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62B9247DBB0D0028AFAF /* Utilities */; };
-		8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62BB247DBB130028AFAF /* PsiApi */; };
+		8D1F62BA247DBB0D0028AFAF /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62B9247DBB0D0028AFAF /* SwiftPackageProductDependency */; };
+		8D1F62BC247DBB130028AFAF /* BuildFile in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62BB247DBB130028AFAF /* SwiftPackageProductDependency */; };
 		8D1F62BE247DC1690028AFAF /* Receipt+AppStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62BD247DC1690028AFAF /* Receipt+AppStore.swift */; };
 		8D1F62C0247DC3350028AFAF /* Authorization+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */; };
 		8D1F62C2247DC4840028AFAF /* PsiCashClient+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */; };
@@ -138,7 +135,7 @@
 		8D9D9BCC247C6A9D0093220E /* PsiphonRotatingFileFeedbackLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789CF2474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift */; };
 		8D9D9BD0247C6B910093220E /* HardCodedValues.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9D9BCF247C6B910093220E /* HardCodedValues.swift */; };
 		8D9E602A24364ED2003A46D8 /* VPNStateReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */; };
-		8D9E603524366D71003A46D8 /* FeedbackDescriptions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */; };
+		8D9E603524366D71003A46D8 /* Types+FeedbackDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D9E603424366D71003A46D8 /* Types+FeedbackDescription.swift */; };
 		8DB6C6362429080C005E2F4C /* PsiCashMessageWithRetryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */; };
 		8DB6C638242A4D06005E2F4C /* DuskButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB6C637242A4D06005E2F4C /* DuskButton.swift */; };
 		8DCA6864247C7CF8001D026E /* Bindable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DCA6863247C7CF8001D026E /* Bindable.swift */; };
@@ -147,6 +144,8 @@
 		8DD6E7E82459C83B0041DAC5 /* StoredAuthorizations.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DD6E7E72459C83B0041DAC5 /* StoredAuthorizations.m */; };
 		8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDA60282425BB4800DBA8EC /* DebugStrings.swift */; };
 		8DE4E6D2244E97D000275362 /* Result+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DE4E6D1244E97D000275362 /* Result+Codable.swift */; };
+		8DEEE12F252F757600B0A9EC /* SupportedLocalizations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DEEE12E252F757600B0A9EC /* SupportedLocalizations.swift */; };
+		8DEEE137252FB4C900B0A9EC /* LanguageSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DEEE136252FB4C900B0A9EC /* LanguageSelectionViewController.swift */; };
 		8DF8056825016B2A003A6223 /* GoogleAppMeasurement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DF8056725016B2A003A6223 /* GoogleAppMeasurement.framework */; };
 		8DF8056B25016B3A003A6223 /* GoogleMobileAds.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DF8056A25016B3A003A6223 /* GoogleMobileAds.framework */; };
 		8DF8056E25016BAA003A6223 /* GoogleUtilities.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DF8056D25016BAA003A6223 /* GoogleUtilities.xcframework */; };
@@ -164,7 +163,6 @@
 		9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */; };
 		9BFECEA225F023F895CC8DA1 /* Authorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */; };
 		9BFECF61970F215F32E76280 /* AdMobInterstitialAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC4F42A7FC2F11FF43636 /* AdMobInterstitialAdControllerWrapper.m */; };
-		9BFECF65871BB6B522C33F1E /* UserDefaults.h in Resources */ = {isa = PBXBuildFile; fileRef = 9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */; };
 		9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
 		9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
@@ -185,7 +183,6 @@
 		A840875B190F7666A1BD98E5 /* UIView+AutoLayoutViewGroup.m in Sources */ = {isa = PBXBuildFile; fileRef = A840867F8062E477F0B355DD /* UIView+AutoLayoutViewGroup.m */; };
 		A84087AFA5806D689C3BF6D2 /* PickerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408390A766C7C2C246797C /* PickerViewController.m */; };
 		A84088BD3CFC8C511F22182C /* RoyalSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408F08BFF80A05CF46C00A /* RoyalSkyButton.m */; };
-		A84088D3FD4B01A7D14CCC53 /* SupportedLanguages.m in Sources */ = {isa = PBXBuildFile; fileRef = A84080B68F307C79F3BCCC59 /* SupportedLanguages.m */; };
 		A8408A3A478ECD6E3562CDF4 /* CloudsView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84081E39C751846A6009BEC /* CloudsView.m */; };
 		A8408AACE30F860F2C961A04 /* WhiteSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408FA077C517546DF6033C /* WhiteSkyButton.m */; };
 		A8408B83167EBE21E215C471 /* OnboardingView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84088889983161FB859D8A9 /* OnboardingView.m */; };
@@ -196,16 +193,22 @@
 		A8408EB13777DDCBEF7DE3C0 /* SwoopView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408B9A66413A25FC1A2BE1 /* SwoopView.m */; };
 		A8408EB1E9DABE35016580A7 /* ImageUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408A0C4220563DA1FE3048 /* ImageUtils.m */; };
 		A8408F5F45CDBDF42701063E /* Strings.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083974C8CF9DDFE7A341D /* Strings.m */; };
-		A8408F99941C9664E3E7C48A /* LanguageSelectionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A840896A2A9959280DAE2DA1 /* LanguageSelectionViewController.m */; };
 		A8408FA13890CD67154033C6 /* RegionSelectionButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408C84138113DE79F0DCD0 /* RegionSelectionButton.m */; };
 		A8408FF45D08D31E102FA41F /* ContainerDB.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086716D701D0F5B48E4C0 /* ContainerDB.m */; };
-		CB0CFCFF11CEECCAA1A2C8BF /* libPods-PsiphonVPN.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A44F0D2E7AB9F499D75A1AC4 /* libPods-PsiphonVPN.a */; };
+		CE234A7424F439CB0007709A /* FeedbackReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE234A7324F439CB0007709A /* FeedbackReducer.swift */; };
+		CE234A7624F46AEC0007709A /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE234A7524F46AEC0007709A /* Feedback.swift */; };
 		CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC941BBDC7B800B83375 /* Assets.xcassets */; };
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */; };
-		CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */ = {isa = PBXBuildFile; fileRef = CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */; };
+		CE551C6A24FBFB8E00011C51 /* PsiphonFeedback+FeedbackUploadProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE551C6924FBFB8E00011C51 /* PsiphonFeedback+FeedbackUploadProvider.swift */; };
+		CE58B642251A31370081C73C /* AppState+Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE58B641251A31370081C73C /* AppState+Feedback.swift */; };
 		CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */; };
-		CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 66094F781E8067520069EC4E /* PsiphonTunnel.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CE8420472522823D00796032 /* DebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE84203D2522823D00796032 /* DebugViewController.m */; };
+		CE8420482522823D00796032 /* DebugToolboxViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE84203F2522823D00796032 /* DebugToolboxViewController.m */; };
+		CE8420492522823D00796032 /* DebugTextViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8420432522823D00796032 /* DebugTextViewController.m */; };
+		CE84204A2522823D00796032 /* DebugDirectoryViewerViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8420452522823D00796032 /* DebugDirectoryViewerViewController.m */; };
+		CE84204B2522823D00796032 /* DebugLogViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE8420462522823D00796032 /* DebugLogViewController.m */; };
+		CE93EE5524F55B92001F4EC9 /* SharedConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = CE93EE5424F55B92001F4EC9 /* SharedConstants.m */; };
+		CE93EE5624F55B92001F4EC9 /* SharedConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = CE93EE5424F55B92001F4EC9 /* SharedConstants.m */; };
 		CEA1B787249AAA13006D9853 /* EmbeddedServerEntriesTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CEA1B786249AAA13006D9853 /* EmbeddedServerEntriesTest.m */; };
 		CEA1B788249AB144006D9853 /* EmbeddedServerEntries.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */; };
 		CEA1B789249AB229006D9853 /* EmbeddedServerEntriesHelpers.c in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */; };
@@ -358,7 +361,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				4E30745F2097922C00B6D2A3 /* PsiCashLib.framework in CopyFiles */,
-				CE7B76431F54881F00EA44BD /* PsiphonTunnel.framework in CopyFiles */,
+				529DE74925AD039200F82936 /* PsiphonTunnel.xcframework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -368,11 +371,11 @@
 		015255F2FAC67FC9CE25D8EC /* Pods-PsiApi-PsiApiTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-PsiApiTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-PsiApiTests/Pods-PsiApi-PsiApiTests.debug.xcconfig"; sourceTree = "<group>"; };
 		0241C17D583A4905634E85AA /* libPods-Testing.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Testing.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0285C1D0D4B4D2A707D6FDEF /* libPods-Utilities-UtilitiesTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Utilities-UtilitiesTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		04965F4B8ED97E34A3E4E661 /* Pods-PsiphonVPN.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.debug.xcconfig"; sourceTree = "<group>"; };
-		139D1D60EFF73A79ECF31F19 /* Pods-PsiphonVPN.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.release.xcconfig"; sourceTree = "<group>"; };
 		1787CA7A8FA75358E02689FB /* Pods-Psiphon-PsiApi-PsiApiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi-PsiApiTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi-PsiApiTests/Pods-Psiphon-PsiApi-PsiApiTests.release.xcconfig"; sourceTree = "<group>"; };
 		1CF6F36D51088259B2AC450E /* Pods-PsiApi-Testing.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing/Pods-PsiApi-Testing.release.xcconfig"; sourceTree = "<group>"; };
 		1FE4700126FC2AD287FCB45B /* Pods-PsiphonTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonTests/Pods-PsiphonTests.release.xcconfig"; sourceTree = "<group>"; };
+		29FE978F25C0C1CA00D9C09F /* HostAppProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HostAppProtocol.h; sourceTree = "<group>"; };
+		29FE979025C0C1CA00D9C09F /* HostAppProtocol.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HostAppProtocol.m; sourceTree = "<group>"; };
 		2D1DAF6C9CAF197D05CDCFCF /* Pods-Testing-TestingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testing-TestingTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Testing-TestingTests/Pods-Testing-TestingTests.release.xcconfig"; sourceTree = "<group>"; };
 		2EAE1D54BEBC6BF081A5B8D3 /* Pods-Testing-TestingTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testing-TestingTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Testing-TestingTests/Pods-Testing-TestingTests.debug.xcconfig"; sourceTree = "<group>"; };
 		364EDFAD32DACAD0E8259C6E /* Pods-Psiphon-PsiApi.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi/Pods-Psiphon-PsiApi.debug.xcconfig"; sourceTree = "<group>"; };
@@ -450,6 +453,7 @@
 		445F24F220E1A85C00D004E9 /* IA5String.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = IA5String.c; sourceTree = "<group>"; };
 		445F24F320E1A85C00D004E9 /* UTF8String.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = UTF8String.c; sourceTree = "<group>"; };
 		445F24F420E1A85C00D004E9 /* IA5String.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IA5String.h; sourceTree = "<group>"; };
+		473176E0E92FDF7B9DD30F1E /* Pods-Psiphon.devrelease.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.devrelease.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.devrelease.xcconfig"; sourceTree = "<group>"; };
 		4969BEF6E56CA5C8402749D0 /* Pods-PsiApi-Utilities.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Utilities.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Utilities/Pods-PsiApi-Utilities.release.xcconfig"; sourceTree = "<group>"; };
 		49886790EED7F2868C4610A7 /* Pods-Psiphon-PsiApi-PsiApiTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi-PsiApiTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi-PsiApiTests/Pods-Psiphon-PsiApi-PsiApiTests.debug.xcconfig"; sourceTree = "<group>"; };
 		4E0774951F566ADA0097BC8C /* InAppSettings.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = InAppSettings.bundle; sourceTree = "<group>"; };
@@ -472,8 +476,6 @@
 		4E5263C6207294550021FEF5 /* EmbeddedServerEntries.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EmbeddedServerEntries.h; sourceTree = "<group>"; };
 		4E5263CA2072984D0021FEF5 /* IAPViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPViewController.m; sourceTree = "<group>"; };
 		4E5263CB2072984D0021FEF5 /* IAPViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPViewController.h; sourceTree = "<group>"; };
-		4E5BD4F32061982300AD4724 /* FeedbackManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FeedbackManager.h; sourceTree = "<group>"; };
-		4E5BD4F42061982300AD4724 /* FeedbackManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FeedbackManager.m; sourceTree = "<group>"; };
 		4E5DAE6320A942A300E06342 /* UILabel+GetLabelHeight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UILabel+GetLabelHeight.h"; sourceTree = "<group>"; };
 		4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UILabel+GetLabelHeight.m"; sourceTree = "<group>"; };
 		4EB846402151830600687344 /* AvailableServerRegions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AvailableServerRegions.h; sourceTree = "<group>"; };
@@ -486,16 +488,6 @@
 		5202011C2360D34000D00C8E /* EitherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EitherView.swift; sourceTree = "<group>"; };
 		52055D03230C823100244F9E /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
 		52055D05230C833700244F9E /* SpeedBoostButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedBoostButton.swift; sourceTree = "<group>"; };
-		521FD0E5219E0D5500F748EC /* DebugDirectoryViewerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugDirectoryViewerViewController.m; path = Psiphon/Debug/DebugDirectoryViewerViewController.m; sourceTree = SOURCE_ROOT; };
-		521FD0E6219E0D5500F748EC /* DebugLogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugLogViewController.m; path = Psiphon/Debug/DebugLogViewController.m; sourceTree = SOURCE_ROOT; };
-		521FD0E7219E0D5600F748EC /* DebugToolboxViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugToolboxViewController.m; path = Psiphon/Debug/DebugToolboxViewController.m; sourceTree = SOURCE_ROOT; };
-		521FD0E8219E0D5600F748EC /* DebugToolboxViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugToolboxViewController.h; path = Psiphon/Debug/DebugToolboxViewController.h; sourceTree = SOURCE_ROOT; };
-		521FD0E9219E0D5600F748EC /* DebugTextViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugTextViewController.h; path = Psiphon/Debug/DebugTextViewController.h; sourceTree = SOURCE_ROOT; };
-		521FD0EA219E0D5600F748EC /* DebugViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugViewController.m; path = Psiphon/Debug/DebugViewController.m; sourceTree = SOURCE_ROOT; };
-		521FD0EB219E0D5600F748EC /* DebugDirectoryViewerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugDirectoryViewerViewController.h; path = Psiphon/Debug/DebugDirectoryViewerViewController.h; sourceTree = SOURCE_ROOT; };
-		521FD0EC219E0D5600F748EC /* DebugTextViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DebugTextViewController.m; path = Psiphon/Debug/DebugTextViewController.m; sourceTree = SOURCE_ROOT; };
-		521FD0ED219E0D5600F748EC /* DebugViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugViewController.h; path = Psiphon/Debug/DebugViewController.h; sourceTree = SOURCE_ROOT; };
-		521FD0EE219E0D5600F748EC /* DebugLogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DebugLogViewController.h; path = Psiphon/Debug/DebugLogViewController.h; sourceTree = SOURCE_ROOT; };
 		521FD0F5219E0DDF00F748EC /* AppProfiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppProfiler.h; path = Shared/Profiling/AppProfiler.h; sourceTree = SOURCE_ROOT; };
 		521FD0F6219E0DDF00F748EC /* AppStats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppStats.m; path = Shared/Profiling/AppStats.m; sourceTree = SOURCE_ROOT; };
 		521FD0F7219E0DDF00F748EC /* AppStats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppStats.h; path = Shared/Profiling/AppStats.h; sourceTree = SOURCE_ROOT; };
@@ -515,6 +507,7 @@
 		524B4E6C2316F27F004E9891 /* AnimatedControl.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AnimatedControl.h; sourceTree = "<group>"; };
 		524B4E6D2316F27F004E9891 /* AnimatedControl.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AnimatedControl.m; sourceTree = "<group>"; };
 		528D81322384823F00AA2D77 /* PsiCashMessageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageView.swift; sourceTree = "<group>"; };
+		529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = PsiphonTunnel.xcframework; sourceTree = "<group>"; };
 		52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedBoostPurchaseTable.swift; sourceTree = "<group>"; };
 		52A2465D239081C100A01FF1 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		52A24661239B07E000A01FF1 /* psiCashProductIds.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = psiCashProductIds.plist; sourceTree = "<group>"; };
@@ -539,9 +532,9 @@
 		52DF5E9D23D0D01F00A1B067 /* BridgingTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgingTypes.swift; sourceTree = "<group>"; };
 		548DC13880329CCB9E0CD4B2 /* libPods-PsiApi.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiApi.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.release.xcconfig"; sourceTree = "<group>"; };
+		5A3C99559CAE18924C378029 /* Pods-PsiphonVPN.internal.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonVPN.internal.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonVPN/Pods-PsiphonVPN.internal.xcconfig"; sourceTree = "<group>"; };
 		657B68F7581AB2C5DFB33758 /* Pods-PsiApi-Testing-TestingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-TestingTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-TestingTests/Pods-PsiApi-Testing-TestingTests.release.xcconfig"; sourceTree = "<group>"; };
 		65957584722BB1AA6B3B4825 /* Pods-PsiApi.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi/Pods-PsiApi.release.xcconfig"; sourceTree = "<group>"; };
-		66094F781E8067520069EC4E /* PsiphonTunnel.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = PsiphonTunnel.framework; sourceTree = "<group>"; };
 		6615A5E91F58A95500026C98 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = Strings/en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6615A5EC1F58A95E00026C98 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = Strings/fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		661DA4B91F68391E00BB4B93 /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = Strings/ar.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -577,6 +570,7 @@
 		6651BE051F6B177000D65633 /* my */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = my; path = Strings/my.lproj/Localizable.strings; sourceTree = "<group>"; };
 		668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NetworkExtension.framework; path = System/Library/Frameworks/NetworkExtension.framework; sourceTree = SDKROOT; };
 		672D77B7307F9CEE82EECCCC /* Pods-PsiApi.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi/Pods-PsiApi.debug.xcconfig"; sourceTree = "<group>"; };
+		680755F1F7E5C4803F90D63C /* Pods-Psiphon.internal.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon.internal.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon/Pods-Psiphon.internal.xcconfig"; sourceTree = "<group>"; };
 		6EFA35869537D7B410191321 /* libPods-Utilities.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Utilities.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		7498D20B47C34B9D33BE95E4 /* Pods-PsiApi-Testing-TestingTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-TestingTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-TestingTests/Pods-PsiApi-Testing-TestingTests.debug.xcconfig"; sourceTree = "<group>"; };
 		78C6298EAA632CD41F06795D /* Pods-Utilities.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Utilities.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Utilities/Pods-Utilities.debug.xcconfig"; sourceTree = "<group>"; };
@@ -624,7 +618,7 @@
 		8D9D9BCF247C6B910093220E /* HardCodedValues.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HardCodedValues.swift; sourceTree = "<group>"; };
 		8D9D9C29247C77AB0093220E /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/iPhoneOS.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNStateReducer.swift; sourceTree = "<group>"; };
-		8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackDescriptions.swift; sourceTree = "<group>"; };
+		8D9E603424366D71003A46D8 /* Types+FeedbackDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Types+FeedbackDescription.swift"; sourceTree = "<group>"; };
 		8DB0F5A624EC830F0051AF44 /* sw */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sw; path = Strings/sw.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageWithRetryView.swift; sourceTree = "<group>"; };
 		8DB6C637242A4D06005E2F4C /* DuskButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DuskButton.swift; sourceTree = "<group>"; };
@@ -637,6 +631,8 @@
 		8DD6E7E72459C83B0041DAC5 /* StoredAuthorizations.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StoredAuthorizations.m; sourceTree = "<group>"; };
 		8DDA60282425BB4800DBA8EC /* DebugStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugStrings.swift; sourceTree = "<group>"; };
 		8DE4E6D1244E97D000275362 /* Result+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Codable.swift"; sourceTree = "<group>"; };
+		8DEEE12E252F757600B0A9EC /* SupportedLocalizations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedLocalizations.swift; sourceTree = "<group>"; };
+		8DEEE136252FB4C900B0A9EC /* LanguageSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageSelectionViewController.swift; sourceTree = "<group>"; };
 		8DF8056625016B0F003A6223 /* GoogleMobileAdsSdkiOS-7.65.0 */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "GoogleMobileAdsSdkiOS-7.65.0"; sourceTree = "<group>"; };
 		8DF8056725016B2A003A6223 /* GoogleAppMeasurement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GoogleAppMeasurement.framework; path = "GoogleMobileAdsSdkiOS-7.65.0/GoogleAppMeasurement.framework"; sourceTree = "<group>"; };
 		8DF8056A25016B3A003A6223 /* GoogleMobileAds.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GoogleMobileAds.framework; path = "GoogleMobileAdsSdkiOS-7.65.0/GoogleMobileAds.framework"; sourceTree = "<group>"; };
@@ -673,10 +669,8 @@
 		9BFECEEB971749A4E9705B15 /* Nullity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Nullity.h; sourceTree = "<group>"; };
 		9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdMobRewardedAdControllerWrapper.m; sourceTree = "<group>"; };
 		A13608CD23499831149566BA /* Pods-Psiphon-Testing-TestingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Testing-TestingTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Testing-TestingTests/Pods-Psiphon-Testing-TestingTests.release.xcconfig"; sourceTree = "<group>"; };
-		A44F0D2E7AB9F499D75A1AC4 /* libPods-PsiphonVPN.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-PsiphonVPN.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A840802C7AEFA7F375205DCB /* VPNStartAndStopButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPNStartAndStopButton.h; sourceTree = "<group>"; };
 		A8408058458E7BFC4C3DFDDE /* AppEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppEvent.m; sourceTree = "<group>"; };
-		A84080B68F307C79F3BCCC59 /* SupportedLanguages.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SupportedLanguages.m; sourceTree = "<group>"; };
 		A84080E2A20C786DDAD17D48 /* RoyalSkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RoyalSkyButton.h; sourceTree = "<group>"; };
 		A840816C0C9B0658776A8B91 /* RegionSelectionButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegionSelectionButton.h; sourceTree = "<group>"; };
 		A84081B66B02DF8283448409 /* AutoLayoutProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoLayoutProtocol.h; sourceTree = "<group>"; };
@@ -707,10 +701,8 @@
 		A84087D31D8D9A1FD30337E4 /* SubscriptionStatusView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionStatusView.h; sourceTree = "<group>"; };
 		A84087FA4B1BC2C725D900D9 /* PsiphonProgressView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonProgressView.m; sourceTree = "<group>"; };
 		A840886E2E6D8EA82B0EC427 /* UIImageView+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+Additions.m"; sourceTree = "<group>"; };
-		A84088779C0DA0B8A46BCC1A /* LanguageSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LanguageSelectionViewController.h; sourceTree = "<group>"; };
 		A84088889983161FB859D8A9 /* OnboardingView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingView.m; sourceTree = "<group>"; };
 		A8408902709B9D562B559532 /* CloudsView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CloudsView.h; sourceTree = "<group>"; };
-		A840896A2A9959280DAE2DA1 /* LanguageSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LanguageSelectionViewController.m; sourceTree = "<group>"; };
 		A8408A0C4220563DA1FE3048 /* ImageUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ImageUtils.m; sourceTree = "<group>"; };
 		A8408AAD421C096147E3FC8B /* Strings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Strings.h; sourceTree = "<group>"; };
 		A8408ABFCA9BBDD281E8A4FD /* SkyRegionSelectionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyRegionSelectionViewController.h; sourceTree = "<group>"; };
@@ -721,7 +713,6 @@
 		A8408BA05DC0D983E6740558 /* SubscriptionStatusView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionStatusView.m; sourceTree = "<group>"; };
 		A8408BAC196A108FFE3A5957 /* AlertDialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AlertDialogs.h; sourceTree = "<group>"; };
 		A8408C3C21E6934EAE9C0977 /* RelaySubject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RelaySubject.h; sourceTree = "<group>"; };
-		A8408C79DD812741E678AB94 /* SupportedLanguages.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SupportedLanguages.h; sourceTree = "<group>"; };
 		A8408C84138113DE79F0DCD0 /* RegionSelectionButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegionSelectionButton.m; sourceTree = "<group>"; };
 		A8408C8A7CA3C009F01FDA3B /* SkyRegionSelectionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SkyRegionSelectionViewController.m; sourceTree = "<group>"; };
 		A8408CEB0E34BC897F3FA7D6 /* OnboardingScrollableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OnboardingScrollableView.m; sourceTree = "<group>"; };
@@ -746,6 +737,8 @@
 		BE85E028F71260A6BD3E48A0 /* Pods-Psiphon-Utilities-UtilitiesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Utilities-UtilitiesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Utilities-UtilitiesTests/Pods-Psiphon-Utilities-UtilitiesTests.release.xcconfig"; sourceTree = "<group>"; };
 		C9BDA0C779D86E722D8B8DB2 /* Pods-Utilities-UtilitiesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Utilities-UtilitiesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Utilities-UtilitiesTests/Pods-Utilities-UtilitiesTests.release.xcconfig"; sourceTree = "<group>"; };
 		CA0750CFBD1D93988672EBF5 /* libPods-Psiphon.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Psiphon.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE234A7324F439CB0007709A /* FeedbackReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeedbackReducer.swift; sourceTree = "<group>"; };
+		CE234A7524F46AEC0007709A /* Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Feedback.swift; sourceTree = "<group>"; };
 		CE26FC8A1BBDC7B800B83375 /* Psiphon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Psiphon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE26FC941BBDC7B800B83375 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CE26FC991BBDC7B800B83375 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -755,8 +748,22 @@
 		CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = PsiphonVPN.entitlements; sourceTree = "<group>"; };
 		CE50A256246997250047D3FE /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = Strings/he.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE50A25724699CD80047D3FE /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = Strings/it.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CE551C6924FBFB8E00011C51 /* PsiphonFeedback+FeedbackUploadProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PsiphonFeedback+FeedbackUploadProvider.swift"; sourceTree = "<group>"; };
+		CE58B641251A31370081C73C /* AppState+Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppState+Feedback.swift"; sourceTree = "<group>"; };
 		CE6C3F6824366AE1007A17F0 /* ClientMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ClientMetadata.h; sourceTree = "<group>"; };
 		CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ClientMetadata.m; sourceTree = "<group>"; };
+		CE84203D2522823D00796032 /* DebugViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugViewController.m; sourceTree = "<group>"; };
+		CE84203E2522823D00796032 /* DebugTextViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugTextViewController.h; sourceTree = "<group>"; };
+		CE84203F2522823D00796032 /* DebugToolboxViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugToolboxViewController.m; sourceTree = "<group>"; };
+		CE8420402522823D00796032 /* DebugLogViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugLogViewController.h; sourceTree = "<group>"; };
+		CE8420412522823D00796032 /* DebugDirectoryViewerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugDirectoryViewerViewController.h; sourceTree = "<group>"; };
+		CE8420422522823D00796032 /* DebugToolboxViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugToolboxViewController.h; sourceTree = "<group>"; };
+		CE8420432522823D00796032 /* DebugTextViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugTextViewController.m; sourceTree = "<group>"; };
+		CE8420442522823D00796032 /* DebugViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugViewController.h; sourceTree = "<group>"; };
+		CE8420452522823D00796032 /* DebugDirectoryViewerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugDirectoryViewerViewController.m; sourceTree = "<group>"; };
+		CE8420462522823D00796032 /* DebugLogViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugLogViewController.m; sourceTree = "<group>"; };
+		CE8723EF252E54140016AF57 /* ti */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ti; path = Strings/ti.lproj/Localizable.strings; sourceTree = "<group>"; };
+		CE93EE5424F55B92001F4EC9 /* SharedConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SharedConstants.m; sourceTree = "<group>"; };
 		CEA1B778249AA9A0006D9853 /* PsiphonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsiphonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEA1B786249AAA13006D9853 /* EmbeddedServerEntriesTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EmbeddedServerEntriesTest.m; sourceTree = "<group>"; };
 		CEBA9C102481A5C80097D700 /* Notifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifier.swift; sourceTree = "<group>"; };
@@ -878,11 +885,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */,
+				8D1F62BC247DBB130028AFAF /* BuildFile in Frameworks */,
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
 				8DF8056825016B2A003A6223 /* GoogleAppMeasurement.framework in Frameworks */,
 				8DF8056E25016BAA003A6223 /* GoogleUtilities.xcframework in Frameworks */,
-				8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */,
+				8D1F62BA247DBB0D0028AFAF /* BuildFile in Frameworks */,
+				529DE74825AD039200F82936 /* PsiphonTunnel.xcframework in Frameworks */,
 				440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */,
 				8DF8057125016BB9003A6223 /* nanopb.xcframework in Frameworks */,
 				8DF8057425016BC8003A6223 /* UserMessagingPlatform.framework in Frameworks */,
@@ -896,8 +904,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				668AF9BF1E92CBD3008CAAAA /* NetworkExtension.framework in Frameworks */,
-				66094F7A1E8067520069EC4E /* PsiphonTunnel.framework in Frameworks */,
-				CB0CFCFF11CEECCAA1A2C8BF /* libPods-PsiphonVPN.a in Frameworks */,
+				529DE74A25AD039C00F82936 /* PsiphonTunnel.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1042,6 +1049,7 @@
 				4E0DCB181F28481E00495781 /* PsiphonDataSharedDB.h */,
 				4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */,
 				EF652CDB1F365B8C002AFB48 /* SharedConstants.h */,
+				CE93EE5424F55B92001F4EC9 /* SharedConstants.m */,
 				CEBA9C122481AA9F0097D700 /* SharedDB.swift */,
 				9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */,
 				A84083974C8CF9DDFE7A341D /* Strings.m */,
@@ -1053,8 +1061,9 @@
 		4E5BD4F62061982C00AD4724 /* Feedback */ = {
 			isa = PBXGroup;
 			children = (
-				4E5BD4F32061982300AD4724 /* FeedbackManager.h */,
-				4E5BD4F42061982300AD4724 /* FeedbackManager.m */,
+				CE234A7524F46AEC0007709A /* Feedback.swift */,
+				CE234A7324F439CB0007709A /* FeedbackReducer.swift */,
+				CE551C6924FBFB8E00011C51 /* PsiphonFeedback+FeedbackUploadProvider.swift */,
 			);
 			name = Feedback;
 			sourceTree = "<group>";
@@ -1090,11 +1099,10 @@
 				A840864BAA38AA3E4620EC35 /* PickerViewController.h */,
 				A8408C8A7CA3C009F01FDA3B /* SkyRegionSelectionViewController.m */,
 				A8408ABFCA9BBDD281E8A4FD /* SkyRegionSelectionViewController.h */,
-				A840896A2A9959280DAE2DA1 /* LanguageSelectionViewController.m */,
-				A84088779C0DA0B8A46BCC1A /* LanguageSelectionViewController.h */,
 				52D363C8230DE215002C2221 /* PsiCashViewController.swift */,
 				52A2466C23A172A800A01FF1 /* AlertViewController.swift */,
 				8D0017D824DB4B1200EC3409 /* OnboardingViewController.swift */,
+				8DEEE136252FB4C900B0A9EC /* LanguageSelectionViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -1153,24 +1161,6 @@
 			path = View;
 			sourceTree = "<group>";
 		};
-		521FD0E4219E0D4500F748EC /* Debug */ = {
-			isa = PBXGroup;
-			children = (
-				521FD0EB219E0D5600F748EC /* DebugDirectoryViewerViewController.h */,
-				521FD0E5219E0D5500F748EC /* DebugDirectoryViewerViewController.m */,
-				521FD0EE219E0D5600F748EC /* DebugLogViewController.h */,
-				521FD0E6219E0D5500F748EC /* DebugLogViewController.m */,
-				521FD0E9219E0D5600F748EC /* DebugTextViewController.h */,
-				521FD0EC219E0D5600F748EC /* DebugTextViewController.m */,
-				521FD0E8219E0D5600F748EC /* DebugToolboxViewController.h */,
-				521FD0E7219E0D5600F748EC /* DebugToolboxViewController.m */,
-				521FD0ED219E0D5600F748EC /* DebugViewController.h */,
-				521FD0EA219E0D5600F748EC /* DebugViewController.m */,
-			);
-			name = Debug;
-			path = "New Group";
-			sourceTree = "<group>";
-		};
 		521FD0F4219E0DC300F748EC /* Profiling */ = {
 			isa = PBXGroup;
 			children = (
@@ -1203,6 +1193,7 @@
 		668AF9B81E92CB60008CAAAA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */,
 				8DF8057325016BC8003A6223 /* UserMessagingPlatform.framework */,
 				8DF8057025016BB8003A6223 /* nanopb.xcframework */,
 				8DF8056D25016BAA003A6223 /* GoogleUtilities.xcframework */,
@@ -1218,7 +1209,6 @@
 				8D9D9C29247C77AB0093220E /* XCTest.framework */,
 				440D75BD1F59E041005C603B /* StoreKit.framework */,
 				668AF9BE1E92CBD3008CAAAA /* NetworkExtension.framework */,
-				A44F0D2E7AB9F499D75A1AC4 /* libPods-PsiphonVPN.a */,
 				548DC13880329CCB9E0CD4B2 /* libPods-PsiApi.a */,
 				8422B782F6ACED7897FCAC25 /* libPods-PsiApi-PsiApiTests.a */,
 				CA0750CFBD1D93988672EBF5 /* libPods-Psiphon.a */,
@@ -1298,7 +1288,6 @@
 				8D5F08A6247DB23A00F51A42 /* Utilities */,
 				8D5F08A5247DB21700F51A42 /* Testing */,
 				4E30745D2097921B00B6D2A3 /* PsiCashLib.framework */,
-				66094F781E8067520069EC4E /* PsiphonTunnel.framework */,
 				4E0DCB101F28458100495781 /* Shared */,
 				CE26FC8C1BBDC7B800B83375 /* Psiphon */,
 				CE26FCA41BBDC85900B83375 /* PsiphonVPN */,
@@ -1326,7 +1315,7 @@
 			children = (
 				EF90D79E204F22C900228A63 /* ReactiveExtensions */,
 				52055D02230C821200244F9E /* View */,
-				521FD0E4219E0D4500F748EC /* Debug */,
+				CE84203C2522823D00796032 /* Debug */,
 				CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */,
 				CE26FC991BBDC7B800B83375 /* Info.plist */,
 				4E0774951F566ADA0097BC8C /* InAppSettings.bundle */,
@@ -1349,14 +1338,13 @@
 				4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */,
 				A84086716D701D0F5B48E4C0 /* ContainerDB.m */,
 				A8408319CD72511CABBE4CD4 /* ContainerDB.h */,
-				A84080B68F307C79F3BCCC59 /* SupportedLanguages.m */,
-				A8408C79DD812741E678AB94 /* SupportedLanguages.h */,
 				A8408058458E7BFC4C3DFDDE /* AppEvent.m */,
 				A8408710CC81EFA1CB22CAEC /* AppEvent.h */,
 				52D2581022BADE1900CA956A /* SwiftDelegate.swift */,
 				52D2580F22BADE1900CA956A /* Psiphon-Bridging-Header.h */,
 				5245C5C82342A6840033EE13 /* UserDefaults.swift */,
 				52A2465D239081C100A01FF1 /* AppState.swift */,
+				CE58B641251A31370081C73C /* AppState+Feedback.swift */,
 				52DF5E9723CE5A8300A1B067 /* AppAction+ValuePaths.swift */,
 				52DF5E9923CE835100A1B067 /* UserStrings.swift */,
 				52DF5E9D23D0D01F00A1B067 /* BridgingTypes.swift */,
@@ -1365,7 +1353,7 @@
 				8D417EB024147C6D00FEE587 /* LandingPage.swift */,
 				8D417EB224148C1E00FEE587 /* URLHandler.swift */,
 				8D9E602924364ED2003A46D8 /* VPNStateReducer.swift */,
-				8D9E603424366D71003A46D8 /* FeedbackDescriptions.swift */,
+				8D9E603424366D71003A46D8 /* Types+FeedbackDescription.swift */,
 				8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */,
 				8D7789BC247493300038BFDA /* VPNState.swift */,
 				8D7789C9247499110038BFDA /* Reachability+Additions.swift */,
@@ -1376,6 +1364,7 @@
 				8D1F62C1247DC4840028AFAF /* PsiCashClient+Additions.swift */,
 				8D26455E24D4842E000F46C0 /* Navigator.swift */,
 				8D0017DA24DDD99A00EC3409 /* AppUpgrade.swift */,
+				8DEEE12E252F757600B0A9EC /* SupportedLocalizations.swift */,
 				8D6BD9282507E54600D03EBB /* Debugging.swift */,
 			);
 			path = Psiphon;
@@ -1402,6 +1391,23 @@
 				8D0017D624DB233200EC3409 /* VPNStrings.m */,
 			);
 			path = PsiphonVPN;
+			sourceTree = "<group>";
+		};
+		CE84203C2522823D00796032 /* Debug */ = {
+			isa = PBXGroup;
+			children = (
+				CE84203D2522823D00796032 /* DebugViewController.m */,
+				CE84203E2522823D00796032 /* DebugTextViewController.h */,
+				CE84203F2522823D00796032 /* DebugToolboxViewController.m */,
+				CE8420402522823D00796032 /* DebugLogViewController.h */,
+				CE8420412522823D00796032 /* DebugDirectoryViewerViewController.h */,
+				CE8420422522823D00796032 /* DebugToolboxViewController.h */,
+				CE8420432522823D00796032 /* DebugTextViewController.m */,
+				CE8420442522823D00796032 /* DebugViewController.h */,
+				CE8420452522823D00796032 /* DebugDirectoryViewerViewController.m */,
+				CE8420462522823D00796032 /* DebugLogViewController.m */,
+			);
+			path = Debug;
 			sourceTree = "<group>";
 		};
 		CED6791824A4F82A00C4CA81 /* JetsamMetrics */ = {
@@ -1457,6 +1463,8 @@
 				CED6796F24A4FAF400C4CA81 /* NSUserDefaults+KeyedDataStore.h */,
 				8D90FD5524C748E000E11C66 /* FeedbackUtils.h */,
 				8D90FD5624C748E000E11C66 /* FeedbackUtils.m */,
+				29FE978F25C0C1CA00D9C09F /* HostAppProtocol.h */,
+				29FE979025C0C1CA00D9C09F /* HostAppProtocol.m */,
 			);
 			path = Utils;
 			sourceTree = "<group>";
@@ -1638,8 +1646,6 @@
 			children = (
 				EDB109A2FBFB32D821FF121D /* Pods-Psiphon.debug.xcconfig */,
 				571DC9418AF936E60179F07C /* Pods-Psiphon.release.xcconfig */,
-				04965F4B8ED97E34A3E4E661 /* Pods-PsiphonVPN.debug.xcconfig */,
-				139D1D60EFF73A79ECF31F19 /* Pods-PsiphonVPN.release.xcconfig */,
 				F8FCDC22ED21515D276CE274 /* Pods-PsiphonTests.debug.xcconfig */,
 				1FE4700126FC2AD287FCB45B /* Pods-PsiphonTests.release.xcconfig */,
 				672D77B7307F9CEE82EECCCC /* Pods-PsiApi.debug.xcconfig */,
@@ -1682,6 +1688,9 @@
 				E61DE98A991FFAF35BA880D9 /* Pods-PsiApi-Testing-Utilities-UtilitiesTests.release.xcconfig */,
 				BB07747B8DB3415288C426A9 /* Pods-Psiphon-PsiphonTests.debug.xcconfig */,
 				836B78D735F8B947A373FB00 /* Pods-Psiphon-PsiphonTests.release.xcconfig */,
+				680755F1F7E5C4803F90D63C /* Pods-Psiphon.internal.xcconfig */,
+				5A3C99559CAE18924C378029 /* Pods-PsiphonVPN.internal.xcconfig */,
+				473176E0E92FDF7B9DD30F1E /* Pods-Psiphon.devrelease.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -1727,8 +1736,8 @@
 			);
 			name = Psiphon;
 			packageProductDependencies = (
-				8D1F62B9247DBB0D0028AFAF /* Utilities */,
-				8D1F62BB247DBB130028AFAF /* PsiApi */,
+				8D1F62B9247DBB0D0028AFAF /* SwiftPackageProductDependency */,
+				8D1F62BB247DBB130028AFAF /* SwiftPackageProductDependency */,
 			);
 			productName = Psiphon;
 			productReference = CE26FC8A1BBDC7B800B83375 /* Psiphon.app */;
@@ -1738,7 +1747,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = CE26FCAD1BBDC85900B83375 /* Build configuration list for PBXNativeTarget "PsiphonVPN" */;
 			buildPhases = (
-				C2C27D850413C8FCDF0DBF29 /* [CP] Check Pods Manifest.lock */,
 				CE26FC9F1BBDC85900B83375 /* Sources */,
 				CE26FCA01BBDC85900B83375 /* Frameworks */,
 				CE26FCA11BBDC85900B83375 /* Resources */,
@@ -1869,6 +1877,7 @@
 				he,
 				it,
 				sw,
+				ti,
 			);
 			mainGroup = CE26FC811BBDC7B700B83375;
 			productRefGroup = CE26FC8B1BBDC7B800B83375 /* Products */;
@@ -1903,7 +1912,6 @@
 				CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */,
 				445F24E720E1A5BA00D004E9 /* pkcs7-signed-data.asn1 in Resources */,
 				F136C2951F62E3E1000D3EAB /* LaunchScreen.xib in Resources */,
-				CE4E9BC01BBEECF30060FF8B /* Psiphon.entitlements in Resources */,
 				445F24DE20E1A5BA00D004E9 /* pkcs7-signed-data-simplified.asn1 in Resources */,
 				EF743FCA1F99549000AC89A2 /* subscriptionProductIds.plist in Resources */,
 			);
@@ -1914,11 +1922,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				EF6C1F551F59E46500709554 /* psiphon_config in Resources */,
-				CE4E9BC21BBEECFC0060FF8B /* PsiphonVPN.entitlements in Resources */,
 				6615A5EB1F58A95B00026C98 /* Localizable.strings in Resources */,
 				EF6C1F531F59E46500709554 /* embedded_server_entries in Resources */,
 				EF743FCB1F99549000AC89A2 /* subscriptionProductIds.plist in Resources */,
-				9BFECF65871BB6B522C33F1E /* UserDefaults.h in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1938,12 +1944,17 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Psiphon/Pods-Psiphon-resources-${CONFIGURATION}-input-files.xcfilelist",
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Psiphon/Pods-Psiphon-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/InAppSettingsKit/InAppSettingsKit.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/PsiphonClientCommonLibrary/PsiphonClientCommonLibrary.bundle",
+				"${PODS_ROOT}/SVProgressHUD/SVProgressHUD/SVProgressHUD.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-Psiphon/Pods-Psiphon-resources-${CONFIGURATION}-output-files.xcfilelist",
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/InAppSettingsKit.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PsiphonClientCommonLibrary.bundle",
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SVProgressHUD.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -1968,28 +1979,6 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C2C27D850413C8FCDF0DBF29 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-PsiphonVPN-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
 		CE7B76441F54882300EA44BD /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -2001,7 +1990,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "bash \"${BUILT_PRODUCTS_DIR}/${FRAMEWORKS_FOLDER_PATH}/PsiphonTunnel.framework/strip-frameworks.sh\"\n\n/usr/bin/env python \"./genstrings.py\"\nif [ $? != 0 ] ; then\n    exit 1\nfi\n";
+			shellScript = "/usr/bin/env python \"./genstrings.py\"\nif [ $? != 0 ] ; then\n    exit 1\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2047,7 +2036,6 @@
 				CED6791224A4F82400C4CA81 /* JetsamMetrics.m in Sources */,
 				445F24E220E1A5BA00D004E9 /* der_encoder.c in Sources */,
 				445F24DC20E1A5BA00D004E9 /* NativeInteger.c in Sources */,
-				521FD0F3219E0D5600F748EC /* DebugTextViewController.m in Sources */,
 				8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */,
 				EF90D7A9204F22C900228A63 /* FileUtils.m in Sources */,
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
@@ -2062,6 +2050,7 @@
 				4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */,
 				EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */,
 				EF90D7A7204F22C900228A63 /* NSDate+PSIDateExtension.m in Sources */,
+				CE8420482522823D00796032 /* DebugToolboxViewController.m in Sources */,
 				8DCA6864247C7CF8001D026E /* Bindable.swift in Sources */,
 				CED6795D24A4FA3200C4CA81 /* RotatingFile.m in Sources */,
 				445F239620E1817C00D004E9 /* AppStoreParsedReceiptData.m in Sources */,
@@ -2070,7 +2059,9 @@
 				CEBA9C132481AA9F0097D700 /* SharedDB.swift in Sources */,
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
 				EFC2F5C720226782007B52F9 /* UIAlertController+Additions.m in Sources */,
+				8DEEE137252FB4C900B0A9EC /* LanguageSelectionViewController.swift in Sources */,
 				4E0A366C21666B99008A3D7B /* NSString+Additions.m in Sources */,
+				CE84204B2522823D00796032 /* DebugLogViewController.m in Sources */,
 				EF639C2F1F8FCE37009D6B42 /* PsiFeedbackLogger.m in Sources */,
 				445F24DA20E1A5BA00D004E9 /* constr_SET_OF.c in Sources */,
 				8D417EB124147C6D00FEE587 /* LandingPage.swift in Sources */,
@@ -2086,7 +2077,7 @@
 				445F24D720E1A5BA00D004E9 /* per_support.c in Sources */,
 				EF90D7AA204F22C900228A63 /* NSError+Convenience.m in Sources */,
 				52DF5E9823CE5A8300A1B067 /* AppAction+ValuePaths.swift in Sources */,
-				4E5BD4F52061982300AD4724 /* FeedbackManager.m in Sources */,
+				CE234A7424F439CB0007709A /* FeedbackReducer.swift in Sources */,
 				4E0A3669215AB7EE008A3D7B /* UIFont+Additions.m in Sources */,
 				5246800722D51AA3009AEC6E /* PsiCashWidgetView.swift in Sources */,
 				52D363C9230DE215002C2221 /* PsiCashViewController.swift in Sources */,
@@ -2095,11 +2086,13 @@
 				445F24D820E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c in Sources */,
 				445F24D920E1A5BA00D004E9 /* BIT_STRING.c in Sources */,
 				445F24E820E1A5BA00D004E9 /* NativeEnumerated.c in Sources */,
+				CE8420492522823D00796032 /* DebugTextViewController.m in Sources */,
 				8D417EB324148C1E00FEE587 /* URLHandler.swift in Sources */,
 				445F24E320E1A5BA00D004E9 /* OCTET_STRING.c in Sources */,
 				445F24E120E1A5BA00D004E9 /* ReceiptAttribute.c in Sources */,
 				EF90D7A2204F22C900228A63 /* timestamp_compare.c in Sources */,
 				52A24659238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift in Sources */,
+				CE234A7624F46AEC0007709A /* Feedback.swift in Sources */,
 				8D9E602A24364ED2003A46D8 /* VPNStateReducer.swift in Sources */,
 				EF90D7A3204F22C900228A63 /* timestamp_tm.c in Sources */,
 				52D363CD230EEBAC002C2221 /* AnimatedUIButton.swift in Sources */,
@@ -2111,11 +2104,10 @@
 				CED6796124A4FA6D00C4CA81 /* ExtensionContainerFile.m in Sources */,
 				52C8F0AB237CA26200E5F9C0 /* ImageViewBuilder.swift in Sources */,
 				445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */,
-				521FD0F0219E0D5600F748EC /* DebugLogViewController.m in Sources */,
-				521FD0F1219E0D5600F748EC /* DebugToolboxViewController.m in Sources */,
 				445F24ED20E1A5BA00D004E9 /* ber_tlv_tag.c in Sources */,
 				4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */,
 				8D7789C5247496F60038BFDA /* PsiCashLib+Additions.swift in Sources */,
+				CE84204A2522823D00796032 /* DebugDirectoryViewerViewController.m in Sources */,
 				4E10920820F3DA190033114B /* AppInfo.m in Sources */,
 				445F24EE20E1A5BA00D004E9 /* asn_codecs_prim.c in Sources */,
 				521FD0FA219E0DDF00F748EC /* AppProfiler.m in Sources */,
@@ -2137,10 +2129,10 @@
 				9BFECD174E254989EC97A437 /* IAPHelpViewController.m in Sources */,
 				52055D04230C823100244F9E /* GradientButton.swift in Sources */,
 				8D9D9BCC247C6A9D0093220E /* PsiphonRotatingFileFeedbackLogger.swift in Sources */,
-				521FD0F2219E0D5600F748EC /* DebugViewController.m in Sources */,
 				52CAC4312385D06600A92842 /* Spinner.swift in Sources */,
 				445F24EF20E1A5BA00D004E9 /* constraints.c in Sources */,
 				CED6794224A4F95D00C4CA81 /* RunningStdev.m in Sources */,
+				CE8420472522823D00796032 /* DebugViewController.m in Sources */,
 				5248B4CE23203781008C00D4 /* SwiftObjCBridges.swift in Sources */,
 				52D363CB230DEBED002C2221 /* CloseButton.swift in Sources */,
 				445F24DB20E1A5BA00D004E9 /* ber_decoder.c in Sources */,
@@ -2155,7 +2147,6 @@
 				52C8F0AD237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift in Sources */,
 				8DE4E6D2244E97D000275362 /* Result+Codable.swift in Sources */,
 				8D92A33124928E4900F75254 /* SubscriptionBarView.swift in Sources */,
-				521FD0EF219E0D5600F748EC /* DebugDirectoryViewerViewController.m in Sources */,
 				9BFECF61970F215F32E76280 /* AdMobInterstitialAdControllerWrapper.m in Sources */,
 				52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */,
 				9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */,
@@ -2163,14 +2154,16 @@
 				521FD0FD219E0E0F00F748EC /* DebugUtils.m in Sources */,
 				524B4E6B2316F0E3004E9891 /* BorderedSubtitleButton.m in Sources */,
 				9BFEC8A2F99380655E853F81 /* AdControllerWrapper.m in Sources */,
+				CE93EE5524F55B92001F4EC9 /* SharedConstants.m in Sources */,
 				A8408E281270691F61F9C20C /* AppVersionNumberView.m in Sources */,
 				A8408C424E64BF3D70273464 /* ConnectionStatusView.m in Sources */,
 				8D4ACD32247E3626008E404C /* AppStoreIAP+Additions.swift in Sources */,
 				A84082260CE7662A93697CFF /* LoadingCircleLayer.m in Sources */,
 				A8408AACE30F860F2C961A04 /* WhiteSkyButton.m in Sources */,
 				A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */,
-				8D9E603524366D71003A46D8 /* FeedbackDescriptions.swift in Sources */,
+				8D9E603524366D71003A46D8 /* Types+FeedbackDescription.swift in Sources */,
 				8D26455F24D4842E000F46C0 /* Navigator.swift in Sources */,
+				CE58B642251A31370081C73C /* AppState+Feedback.swift in Sources */,
 				CED6791B24A4F88D00C4CA81 /* JSONCodable.m in Sources */,
 				A8408FA13890CD67154033C6 /* RegionSelectionButton.m in Sources */,
 				A8408E611665FC60D5DFF339 /* SubscriptionStatusView.m in Sources */,
@@ -2178,6 +2171,7 @@
 				8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */,
 				CED6794424A4F95D00C4CA81 /* RunningStat.m in Sources */,
 				8D1F62C0247DC3350028AFAF /* Authorization+Additions.swift in Sources */,
+				8DEEE12F252F757600B0A9EC /* SupportedLocalizations.swift in Sources */,
 				A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */,
 				8D417ED9241844FA00FEE587 /* FloatingPoint+Additions.swift in Sources */,
 				A840875B190F7666A1BD98E5 /* UIView+AutoLayoutViewGroup.m in Sources */,
@@ -2201,10 +2195,9 @@
 				52A2467123A176BA00A01FF1 /* PsiCashPurchasingAlertViewBuilder.swift in Sources */,
 				A8408EB1E9DABE35016580A7 /* ImageUtils.m in Sources */,
 				A8408BC29B903A6C0A32F32C /* SkyRegionSelectionViewController.m in Sources */,
-				A84088D3FD4B01A7D14CCC53 /* SupportedLanguages.m in Sources */,
-				A8408F99941C9664E3E7C48A /* LanguageSelectionViewController.m in Sources */,
 				A8408A3A478ECD6E3562CDF4 /* CloudsView.m in Sources */,
 				A84081194DA12328ABB5A43E /* UIImageView+Additions.m in Sources */,
+				CE551C6A24FBFB8E00011C51 /* PsiphonFeedback+FeedbackUploadProvider.swift in Sources */,
 				A840849074861D633B3EB4D1 /* AppEvent.m in Sources */,
 				A84080E9FC63E29F71A79A63 /* RelaySubject.m in Sources */,
 				CED6794F24A4F9D400C4CA81 /* DelimitedFile.m in Sources */,
@@ -2218,6 +2211,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE93EE5624F55B92001F4EC9 /* SharedConstants.m in Sources */,
 				EFC2F5CC20226835007B52F9 /* PsiphonConfigReader.m in Sources */,
 				CED6794524A4F95D00C4CA81 /* RunningStat.m in Sources */,
 				CED6795224A4F9D400C4CA81 /* DiskBackedFile.m in Sources */,
@@ -2257,6 +2251,7 @@
 				9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */,
 				CED6796224A4FA6D00C4CA81 /* ExtensionContainerFile.m in Sources */,
 				521FD0FE219E0E1900F748EC /* AppProfiler.m in Sources */,
+				29FE979125C0C1CA00D9C09F /* HostAppProtocol.m in Sources */,
 				EF90D7B4204F234100228A63 /* NSDate+Comparator.m in Sources */,
 				9BFECEA225F023F895CC8DA1 /* Authorization.m in Sources */,
 				9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */,
@@ -2367,6 +2362,7 @@
 				CE50A256246997250047D3FE /* he */,
 				CE50A25724699CD80047D3FE /* it */,
 				8DB0F5A624EC830F0051AF44 /* sw */,
+				CE8723EF252E54140016AF57 /* ti */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -2434,6 +2430,198 @@
 				TEST_TARGET_NAME = Psiphon;
 			};
 			name = Release;
+		};
+		528D83962548C48600C6C78B /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = DevRelease;
+		};
+		528D83972548C48600C6C78B /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 473176E0E92FDF7B9DD30F1E /* Pods-Psiphon.devrelease.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CURRENT_PROJECT_VERSION = 207;
+				DEFINES_MODULE = NO;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEV_RELEASE=1",
+					"COCOAPODS=1",
+					"TARGET_IS_CONTAINER=1",
+				);
+				INFOPLIST_FILE = Psiphon/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
+				OTHER_SWIFT_FLAGS = "$(inherited)";
+				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.Psiphon;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				STRIP_BITCODE_FROM_COPIED_FILES = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEV_RELEASE;
+				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon/Psiphon-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+				USER_HEADER_SEARCH_PATHS = (
+					"\"${PROJECT_DIR}/Pods\"/**",
+					"${PROJECT_DIR}/Psiphon/asn1c",
+				);
+				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = DevRelease;
+		};
+		528D83982548C48600C6C78B /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = YES;
+				CODE_SIGN_ENTITLEMENTS = PsiphonVPN/PsiphonVPN.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_BITCODE = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEV_RELEASE=1",
+					"COCOAPODS=1",
+					"TARGET_IS_EXTENSION=1",
+				);
+				INFOPLIST_FILE = PsiphonVPN/Info.plist;
+				LD_NO_PIE = YES;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.Psiphon.PsiphonVPN;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SKIP_INSTALL = YES;
+				STRIP_BITCODE_FROM_COPIED_FILES = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon-Bridging-Header.h";
+				SWIFT_VERSION = 3.0;
+			};
+			name = DevRelease;
+		};
+		528D83992548C48600C6C78B /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_PREPROCESSOR_DEFINITIONS = "TARGET_IS_TEST=1";
+				INFOPLIST_FILE = PsiphonTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = ca.psiphon.PsiphonTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = DevRelease;
+		};
+		528D839A2548C48600C6C78B /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				INFOPLIST_FILE = PsiphonUITests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.1;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@loader_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.psiphon.PsiphonUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Psiphon;
+			};
+			name = DevRelease;
 		};
 		CE26FC9A1BBDC7B800B83375 /* Debug */ = {
 			isa = XCBuildConfiguration;
@@ -2560,7 +2748,7 @@
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 150;
+				CURRENT_PROJECT_VERSION = 207;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = Q6HLNEX92A;
@@ -2586,6 +2774,7 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRIP_BITCODE_FROM_COPIED_FILES = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon/Psiphon-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -2607,9 +2796,9 @@
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 148;
+				CURRENT_PROJECT_VERSION = 207;
 				DEFINES_MODULE = NO;
-				DEVELOPMENT_TEAM = Q6HLNEX92A;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2632,6 +2821,7 @@
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				STRIP_BITCODE_FROM_COPIED_FILES = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon/Psiphon-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				USER_HEADER_SEARCH_PATHS = (
@@ -2644,7 +2834,6 @@
 		};
 		CE26FCAE1BBDC85900B83375 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 04965F4B8ED97E34A3E4E661 /* Pods-PsiphonVPN.debug.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = PsiphonVPN/PsiphonVPN.entitlements;
@@ -2678,7 +2867,6 @@
 		};
 		CE26FCAF1BBDC85900B83375 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 139D1D60EFF73A79ECF31F19 /* Pods-PsiphonVPN.release.xcconfig */;
 			buildSettings = {
 				APPLICATION_EXTENSION_API_ONLY = YES;
 				CODE_SIGN_ENTITLEMENTS = PsiphonVPN/PsiphonVPN.entitlements;
@@ -2785,6 +2973,7 @@
 			buildConfigurations = (
 				4E0D88281FA06B2400ADB61E /* Debug */,
 				4E0D88291FA06B2400ADB61E /* Release */,
+				528D839A2548C48600C6C78B /* DevRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2794,6 +2983,7 @@
 			buildConfigurations = (
 				CE26FC9A1BBDC7B800B83375 /* Debug */,
 				CE26FC9B1BBDC7B800B83375 /* Release */,
+				528D83962548C48600C6C78B /* DevRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2803,6 +2993,7 @@
 			buildConfigurations = (
 				CE26FC9D1BBDC7B800B83375 /* Debug */,
 				CE26FC9E1BBDC7B800B83375 /* Release */,
+				528D83972548C48600C6C78B /* DevRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2812,6 +3003,7 @@
 			buildConfigurations = (
 				CE26FCAE1BBDC85900B83375 /* Debug */,
 				CE26FCAF1BBDC85900B83375 /* Release */,
+				528D83982548C48600C6C78B /* DevRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2821,6 +3013,7 @@
 			buildConfigurations = (
 				CEA1B780249AA9A0006D9853 /* Debug */,
 				CEA1B781249AA9A0006D9853 /* Release */,
+				528D83992548C48600C6C78B /* DevRelease */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -2828,11 +3021,11 @@
 /* End XCConfigurationList section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		8D1F62B9247DBB0D0028AFAF /* Utilities */ = {
+		8D1F62B9247DBB0D0028AFAF /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Utilities;
 		};
-		8D1F62BB247DBB130028AFAF /* PsiApi */ = {
+		8D1F62BB247DBB130028AFAF /* SwiftPackageProductDependency */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PsiApi;
 		};

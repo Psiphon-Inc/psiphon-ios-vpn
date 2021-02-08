@@ -69,7 +69,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /// Directory under which PsiphonTunnel is configured to store all of its files.
 /// This directory must be created prior to starting PsiphonTunnel.
-+ (NSURL *)dataRootDirectory;
++ (NSURL *_Nullable)dataRootDirectory;
 
 /// Path for PsiphonTunnel to write homepage notices.
 /// Deprecated:
@@ -78,7 +78,7 @@ NS_ASSUME_NONNULL_BEGIN
 /// PsiphonTunnel must be given a config with the `MigrateHomepageNoticesFilename`
 /// field set to this path to ensure that the homepage file at the old path is migrated to
 /// the new location used by PsiphonTunnel.
-- (NSString *)oldHomepageNoticesPath;
+- (NSString *_Nullable)oldHomepageNoticesPath;
 
 
 /// Path for PsiphonTunnel to write log notices.
@@ -88,16 +88,16 @@ NS_ASSUME_NONNULL_BEGIN
 /// PsiphonTunnel must be given a config with the `MigrateRotatingNoticesFilename`
 /// field set to this path to ensure that the log notices file at the old path is migrated
 /// to the new location used by PsiphonTunnel.
-- (NSString *)oldRotatingLogNoticesPath;
+- (NSString *_Nullable)oldRotatingLogNoticesPath;
 
 /// Path at which PsiphonTunnel to writes homepage notices.
-- (NSString *)homepageNoticesPath;
+- (NSString *_Nullable)homepageNoticesPath;
 
 /// Path at which PsiphonTunnel to writes log notices.
-- (NSString *)rotatingLogNoticesPath;
+- (NSString *_Nullable)rotatingLogNoticesPath;
 
 /// Path at which PsiphonTunnel will rotate log notices to.
-- (NSString *)rotatingOlderLogNoticesPath;
+- (NSString *_Nullable)rotatingOlderLogNoticesPath;
 
 #if !(TARGET_IS_EXTENSION)
 

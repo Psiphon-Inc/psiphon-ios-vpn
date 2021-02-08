@@ -19,6 +19,7 @@
 
 #import "ExtensionDataStore.h"
 #import "ExtensionDataStoreKeys.h"
+#import "SharedConstants.h"
 
 @interface ExtensionDataStore ()
 
@@ -27,6 +28,12 @@
 @end
 
 @implementation ExtensionDataStore
+
++ (instancetype)standard {
+    id<KeyedDataStore> keyedDataStore = (id<KeyedDataStore>)[[NSUserDefaults alloc] initWithSuiteName:PsiphonAppGroupIdentifier];
+    ExtensionDataStore *obj = [[ExtensionDataStore alloc] initWithDataStore:keyedDataStore];
+    return obj;
+}
 
 - (instancetype)initWithDataStore:(id<KeyedDataStore>)dataStore {
     self = [super init];

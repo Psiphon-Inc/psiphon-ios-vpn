@@ -19,10 +19,20 @@
 
 #import <Foundation/Foundation.h>
 
+#pragma mark - Keys from PsiphonClientCommonLibrary
+
+// This header is shared by Psiphon and PsiphonVPN targets.
+// Since PsiphonClientCommonLibrary is not included in the PsiphonVPN target,
+// the constants defined by PsiphonClientCommonLibrary are redefined here.
+#define kDisableTimeouts               @"disableTimeouts"
+#define kPsiphonRegionBestPerformance  @""
+
+#pragma mark -
+
 // Psiphon config keys
-#define PSIPHON_CONFIG_EGRESS_REGION @"EgressRegion"
-#define PSIPHON_CONFIG_UPSTREAM_PROXY_URL @"UpstreamProxyUrl"
-#define PSIPHON_CONFIG_UPSTREAM_PROXY_CUSTOM_HEADERS @"CustomHeaders"
+FOUNDATION_EXPORT NSString* const PsiphonConfigEgressRegion;
+FOUNDATION_EXPORT NSString* const PsiphonConfigUpstreamProxyURL;
+FOUNDATION_EXPORT NSString* const PsiphonConfigCustomHeaders;
 
 @interface PsiphonConfigUserDefaults : NSObject
 
