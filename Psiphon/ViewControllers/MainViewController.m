@@ -52,7 +52,6 @@
 #import "UIView+Additions.h"
 #import "CloudsView.h"
 #import "AppObservables.h"
-#import <PersonalizedAdConsent/PersonalizedAdConsent.h>
 #import "Psiphon-Swift.h"
 
 PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";

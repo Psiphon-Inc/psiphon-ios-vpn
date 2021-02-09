@@ -26,13 +26,14 @@
 #import "Nullity.h"
 #import "NSError+Convenience.h"
 #import "Asserts.h"
-#import "AdMobConsent.h"
 #import "RelaySubject.h"
 #import "Psiphon-Swift.h"
 
+@import GoogleMobileAds;
+
 PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobRewardedAdControllerWrapper";
 
-@interface AdMobRewardedAdControllerWrapper () <GADRewardedAdDelegate>
+@interface AdMobRewardedAdControllerWrapper () <GADFullScreenContentDelegate>
 
 @property (nonatomic, readwrite, nonnull) BehaviorRelay<NSNumber *> *adLoadStatus;
 
@@ -49,6 +50,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
 @property (nonatomic, readonly) NSString *adUnitID;
 
+// When not nil, an ad is already loaded and is ready to be presented.
 @property (nonatomic, readwrite, nullable) GADRewardedAd* rewardedAd;
 
 @end
@@ -74,19 +76,32 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
 - (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)loadAd {
 
-    AdMobRewardedAdControllerWrapper *__weak weakSelf = self;
-
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        RACCompoundDisposable *compoundDisposable = [[RACCompoundDisposable alloc] init];
+        if ([NSThread isMainThread] == FALSE) {
+            @throw [NSException exceptionWithName:@"NotOnMainThread"
+                                           reason:@"Expected the call to be on the main thread"
+                                         userInfo:nil];
+        }
+
+        RACDisposable *disposable = [self.loadStatusRelay subscribe:subscriber];
+
+        // If an ad is already loaded, re-emits ad load status done message.
+        if (self.rewardedAd != nil) {
+            // Relays that the ad was loaded successfully.
+            [self.adLoadStatus accept:@(AdLoadStatusDone)];
+            [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :nil]];
+            return disposable;
+        }
 
         [SwiftDelegate.bridge getCustomRewardData:^(NSString * _Nullable customData) {
-            
-            AdMobRewardedAdControllerWrapper *__strong strongSelf = weakSelf;
-            if (strongSelf == nil) {
-                return;
+
+            if ([NSThread isMainThread] == FALSE) {
+                @throw [NSException exceptionWithName:@"NotOnMainThread"
+                                               reason:@"Expected the call to be on the main thread"
+                                             userInfo:nil];
             }
-            
+
             if ([Nullity isEmpty:customData]) {
                 NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
                                                  code:AdControllerWrapperErrorCustomDataNotSet];
@@ -94,90 +109,101 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
                 return;
             }
 
-            // Subscribe to load status before loading an ad to prevent
-            // race-condition with ad"adDidLoad" delegate callback.
-            [compoundDisposable addDisposable:[weakSelf.loadStatusRelay subscribe:subscriber]];
+            [self.adLoadStatus accept:@(AdLoadStatusInProgress)];
 
-            // Create ad request only if one is not ready.
-            if (strongSelf.rewardedAd != nil && strongSelf.rewardedAd.isReady) {
-                [strongSelf handleAdLoadedSuccessfully];
+            GADRequest *request = [AdConsent.sharedInstance makeGADRequestWithNPA];
 
-            } else {
-                [self.adLoadStatus accept:@(AdLoadStatusInProgress)];
-                
-                strongSelf.rewardedAd = [[GADRewardedAd alloc]
-                                         initWithAdUnitID:strongSelf.adUnitID];
-                
-                GADRequest *request = [AdMobConsent createGADRequestWithUserConsentStatus];
-                
+            // The load method gets called when ad loading succeeds or fails.
+            [GADRewardedAd loadWithAdUnitID:self.adUnitID
+                                    request:request
+                          completionHandler:^(GADRewardedAd * _Nullable rewardedAd, NSError * _Nullable error) {
+
+                if (error != nil) {
+
+                    // Ad failed to load.
+                    [self.adLoadStatus accept:@(AdLoadStatusError)];
+                    NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
+                                                     code:AdControllerWrapperErrorAdFailedToLoad
+                                      withUnderlyingError:error];
+                    [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :e]];
+
+                    return;
+
+                }
+
+                self.rewardedAd = rewardedAd;
+                self.rewardedAd.fullScreenContentDelegate = self;
+
+                // Sets server-side verification options.
                 GADServerSideVerificationOptions *ssvOptions = [[GADServerSideVerificationOptions alloc] init];
                 ssvOptions.customRewardString = customData;
-                [strongSelf.rewardedAd setServerSideVerificationOptions:ssvOptions];
-                
-                [strongSelf.rewardedAd loadRequest:request completionHandler:^(GADRequestError * _Nullable error) {
-                    AdMobRewardedAdControllerWrapper *__strong strongSelf = weakSelf;
-                    if (strongSelf == nil) {
-                        return;
-                    }
-                    
-                    if (error == nil) {
-                        // Ad loaded successfully.
-                        [strongSelf handleAdLoadedSuccessfully];
-                        
-                    } else {
-                        // Ad failed to load.
-                        [strongSelf.adLoadStatus accept:@(AdLoadStatusError)];
-                        NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
-                                                         code:AdControllerWrapperErrorAdFailedToLoad
-                                          withUnderlyingError:error];
-                        [strongSelf.loadStatusRelay accept:[RACTwoTuple pack:self.tag :e]];
-                    }
-                    
-                    
-                }];
-            }
+                [self.rewardedAd setServerSideVerificationOptions:ssvOptions];
+
+                // Relays that the ad was loaded successfully.
+                [self.adLoadStatus accept:@(AdLoadStatusDone)];
+                [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :nil]];
+
+            }];
+
         }];
 
-        return compoundDisposable;
+        return disposable;
     }];
+
 }
 
 - (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)unloadAd {
 
-    AdMobRewardedAdControllerWrapper *__weak weakSelf = self;
-
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        [weakSelf.adLoadStatus accept:@(AdLoadStatusNone)];
+        if ([NSThread isMainThread] == FALSE) {
+            @throw [NSException exceptionWithName:@"NotOnMainThread"
+                                           reason:@"Expected the call to be on the main thread"
+                                         userInfo:nil];
+        }
 
-        [subscriber sendNext:[RACTwoTuple pack:weakSelf.tag :nil]];
+        self.rewardedAd = nil;
+
+        [self.adLoadStatus accept:@(AdLoadStatusNone)];
+
+        [subscriber sendNext:[RACTwoTuple pack:self.tag :nil]];
         [subscriber sendCompleted];
         return nil;
+
     }];
+
 }
 
 - (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController {
 
-    AdMobRewardedAdControllerWrapper *__weak weakSelf = self;
-
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
-        
-        AdMobRewardedAdControllerWrapper *__strong strongSelf = weakSelf;
-        if (strongSelf == nil) {
+
+        if ([NSThread isMainThread] == FALSE) {
+            @throw [NSException exceptionWithName:@"NotOnMainThread"
+                                           reason:@"Expected the call to be on the main thread"
+                                         userInfo:nil];
+        }
+
+        if (self.rewardedAd == nil) {
+            [subscriber sendNext:@(AdPresentationErrorNoAdsLoaded)];
+            [subscriber sendCompleted];
             return nil;
         }
 
-        if (!(strongSelf.rewardedAd != nil && strongSelf.rewardedAd.isReady) ||
-            viewController.beingDismissed
-        ){
-            [subscriber sendNext:@(AdPresentationErrorNoAdsLoaded)];
+        NSError *error = nil;
+        BOOL canPresent = [self.rewardedAd
+                           canPresentFromRootViewController:viewController
+                           error:&error];
+
+        if (canPresent == FALSE) {
+            [subscriber sendNext:@(AdPresentationErrorFailedToPlay)];
             [subscriber sendCompleted];
             return nil;
         }
 
         // Check if viewController passed in is being dismissed before
         // presenting the ad.
-        // This check should be done regardless of the SDK.
+        // This check should be done regardless of the implementation details of the Ad SDK.
         if (viewController.beingDismissed) {
             [subscriber sendNext:@(AdPresentationErrorFailedToPlay)];
             [subscriber sendCompleted];
@@ -186,49 +212,78 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
         // Subscribe to presentationStatus before presenting the ad.
         RACDisposable *disposable = [[AdControllerWrapperHelper
-          transformAdPresentationToTerminatingSignal:weakSelf.presentationStatus
-                         allowOutOfOrderRewardStatus:TRUE]
-          subscribe:subscriber];
-        
-        [strongSelf.rewardedAd presentFromRootViewController:viewController
-                                                    delegate:strongSelf];
+                                      transformAdPresentationToTerminatingSignal:self.presentationStatus]
+                                     subscribe:subscriber];
+
+        [self.rewardedAd presentFromRootViewController:viewController
+                              userDidEarnRewardHandler:^{
+
+            LOG_DEBUG(@"User rewarded for ad unit (%@)", self.adUnitID);
+            [self.presentationStatus sendNext:@(AdPresentationDidRewardUser)];
+
+        }];
 
         return disposable;
+
     }];
+
 }
 
-- (void)handleAdLoadedSuccessfully {
-    [self.adLoadStatus accept:@(AdLoadStatusDone)];
-    [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :nil]];
+#pragma mark - <GADFullScreenContentDelegate> status relay
+
+/// Tells the delegate that an impression has been recorded for the ad.
+- (void)adDidRecordImpression:(nonnull id<GADFullScreenPresentingAd>)ad {
+    // No-op.
 }
 
-#pragma mark - <GADRewardBasedVideoAdDelegate> status relay
+/// Tells the delegate that the ad failed to present full screen content.
+- (void)ad:(nonnull id<GADFullScreenPresentingAd>)ad
+didFailToPresentFullScreenContentWithError:(nonnull NSError *)error {
 
-- (void)rewardedAd:(GADRewardedAd *)rewardedAd userDidEarnReward:(GADAdReward *)reward {
-    LOG_DEBUG(@"User rewarded for ad unit (%@)", self.adUnitID);
-    [self.presentationStatus sendNext:@(AdPresentationDidRewardUser)];
-}
+    // Ad is consumed.
+    // If the reference to GADRewardedAd object is set to nil at any point,
+    // before this callback, the object is deallocated and this callback is not called.
+    self.rewardedAd = nil;
 
-- (void)rewardedAdDidPresent:(GADRewardedAd *)rewardedAd {
-    [self.adLoadStatus accept:@(AdLoadStatusNone)];
+    [PsiFeedbackLogger errorWithType:AdMobRewardedAdControllerWrapperLogType
+                             message:@"AdMob didFailToPresentFullScreenContentWithError"
+                              object:error];
 
-    [self.presentationStatus sendNext:@(AdPresentationWillAppear)];
-    [self.presentationStatus sendNext:@(AdPresentationDidAppear)];
-}
-
-- (void)rewardedAd:(GADRewardedAd *)rewardedAd didFailToPresentWithError:(NSError *)error {
     [self.adLoadStatus accept:@(AdLoadStatusNone)];
     [self.presentationStatus sendNext:@(AdPresentationErrorFailedToPlay)];
+
 }
 
-- (void)rewardedAdDidDismiss:(GADRewardedAd *)rewardedAd {
+/// Tells the delegate that the ad presented full screen content.
+- (void)adDidPresentFullScreenContent:(nonnull id<GADFullScreenPresentingAd>)ad {
+
+    [self.adLoadStatus accept:@(AdLoadStatusNone)];
+
+    // AdMob no longer provides an "willPresent/willAppear" callbacks.
+    // For consistency WillAppear and DidAppear messages are sent.
+    [self.presentationStatus sendNext:@(AdPresentationWillAppear)];
+    [self.presentationStatus sendNext:@(AdPresentationDidAppear)];
+
+}
+
+/// Tells the delegate that the ad dismissed full screen content.
+- (void)adDidDismissFullScreenContent:(nonnull id<GADFullScreenPresentingAd>)ad {
+
+    // Ad is consumed.
+    // If the reference to GADRewardedAd object is set to nil at any point,
+    // before this callback, the object is deallocated and this callback is not called.
+    self.rewardedAd = nil;
+
+    // AdMob no longer provides an "willDismiss/willDisappear" callbacks.
+    // For consistency WillDisappear and DidDisappear messages are sent.
     [self.presentationStatus sendNext:@(AdPresentationWillDisappear)];
     [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
 
     [self.presentedAdDismissed sendNext:RACUnit.defaultUnit];
 
     [PsiFeedbackLogger infoWithType:AdMobRewardedAdControllerWrapperLogType json:
-      @{@"event": @"adDidDisappear", @"tag": self.tag}];
+     @{@"event": @"adDidDisappear", @"tag": self.tag}];
+
 }
 
 @end
