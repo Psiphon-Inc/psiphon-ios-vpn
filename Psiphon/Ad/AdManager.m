@@ -510,8 +510,14 @@ typedef NS_ENUM(NSInteger, AdLoadAction) {
                   // Decide action for interstitial ad.
                   if (adController.adFormat == AdFormatInterstitial) {
 
-                      if (event.source == SourceEventStarted) {
+                      if (event.source == SourceEventStarted && [triggerSignalName isEqualToString:TriggerAppEvent]) {
+
                           // The app has just been launched, don't delay the ad load.
+
+                          // SourceEventStarted combined with "TriggerAppEvent" trigger,
+                          // indicate an app launch.
+                          // Note that this function is called for every new trigger.
+
                           sa.action = AdLoadActionImmediate;
 
                       } else if ([TriggerForceRewardedVideoLoad isEqualToString:triggerSignalName]) {
