@@ -45,7 +45,7 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
 
 // Private properties
 
-// When not nil, and ad is already loaded and is ready to be presented.
+// When not nil, an ad is already loaded and is ready to be presented.
 @property (nonatomic, readwrite, nullable) GADInterstitialAd *interstitialAd;
 
 /** loadStatus is hot relay subject - emits the wrapper tag when the ad has been loaded. */

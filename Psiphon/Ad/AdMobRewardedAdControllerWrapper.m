@@ -50,7 +50,7 @@ PsiFeedbackLogType const AdMobRewardedAdControllerWrapperLogType = @"AdMobReward
 
 @property (nonatomic, readonly) NSString *adUnitID;
 
-// When not nil, and ad is already loaded and is ready to be presented.
+// When not nil, an ad is already loaded and is ready to be presented.
 @property (nonatomic, readwrite, nullable) GADRewardedAd* rewardedAd;
 
 @end
