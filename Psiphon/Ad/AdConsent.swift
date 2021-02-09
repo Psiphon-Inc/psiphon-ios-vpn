@@ -58,6 +58,8 @@ extension UMPConsentType {
     private var form: UMPConsentForm?
     
     /// This will determine whether or not user needs to provide consent.
+    /// AppTrackingTransparency is introduced in iOS 14.5, and prior to that consent form will not be displayed.
+    ///
     /// - Note: `consentInfoUpdate` should be called on every app launch.
     ///
     /// - Parameter completionHandler: Called after request for consent information update completes.
