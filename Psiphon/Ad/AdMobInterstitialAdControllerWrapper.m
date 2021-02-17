@@ -26,14 +26,14 @@
 #import "RACUnit.h"
 #import "Logging.h"
 #import "Asserts.h"
-#import "AdMobConsent.h"
-#import <GoogleMobileAds/GADInterstitialDelegate.h>
 #import "RACTuple.h"
 #import "RelaySubject.h"
+#import "Psiphon-Swift.h"
+@import GoogleMobileAds;
 
 PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobInterstitialAdControllerWrapper";
 
-@interface AdMobInterstitialAdControllerWrapper () <GADInterstitialDelegate>
+@interface AdMobInterstitialAdControllerWrapper () <GADFullScreenContentDelegate>
 
 @property (nonatomic, readwrite, nonnull) BehaviorRelay<NSNumber *> *adLoadStatus;
 
@@ -45,17 +45,13 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
 
 // Private properties
 
-// GADInterstitial is a single use object per interstitial shown.
-@property (nonatomic, readwrite, nullable) GADInterstitial *interstitial;
+// When not nil, an ad is already loaded and is ready to be presented.
+@property (nonatomic, readwrite, nullable) GADInterstitialAd *interstitialAd;
 
 /** loadStatus is hot relay subject - emits the wrapper tag when the ad has been loaded. */
 @property (nonatomic, readwrite, nonnull) RelaySubject<RACTwoTuple <AdControllerTag, NSError *> *> *loadStatusRelay;
 
 @property (nonatomic, readonly) NSString *adUnitID;
-
-// Set whenever the interstitial failed to load.
-// Value is set to nil immediately before submitting a new ad request.
-@property (nonatomic, readwrite, nullable) NSError *lastError;
 
 @end
 
@@ -79,64 +75,108 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
 
 - (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)loadAd {
 
-    AdMobInterstitialAdControllerWrapper *__weak weakSelf = self;
-
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        // Subscribe to load status before loading an ad to prevent race-condition with "adDidLoad" delegate callback.
-        RACDisposable *disposable = [weakSelf.loadStatusRelay subscribe:subscriber];
-
-        // If interstitial is not initialized, or ad has already been displayed, or last load request failed,
-        // initialize interstitial and start loading ad.
-        if (!weakSelf.interstitial || weakSelf.interstitial.hasBeenUsed || weakSelf.lastError) {
-
-            [self.adLoadStatus accept:@(AdLoadStatusInProgress)];
-
-            // Reset last error status.
-            weakSelf.lastError = nil;
-
-            weakSelf.interstitial = [[GADInterstitial alloc] initWithAdUnitID:self.adUnitID];
-
-            if (!weakSelf.interstitial.delegate) {
-                weakSelf.interstitial.delegate = weakSelf;
-            }
-
-            GADRequest *request = [AdMobConsent createGADRequestWithUserConsentStatus];
-
-            [weakSelf.interstitial loadRequest:request];
-
-        } else if (weakSelf.interstitial.isReady) {
-
-            // Manually call the delegate method to re-execute the logic for when an ad is loaded.
-            [weakSelf interstitialDidReceiveAd:weakSelf.interstitial];
+        if ([NSThread isMainThread] == FALSE) {
+            @throw [NSException exceptionWithName:@"NotOnMainThread"
+                                           reason:@"Expected the call to be on the main thread"
+                                         userInfo:nil];
         }
 
+        RACDisposable *disposable = [self.loadStatusRelay subscribe:subscriber];
+
+        // If an ad is already loaded, re-emits ad load status done message.
+        if (self.interstitialAd != nil) {
+
+            [self.adLoadStatus accept:@(AdLoadStatusDone)];
+            [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :nil]];
+
+            return disposable;
+
+        }
+
+        [self.adLoadStatus accept:@(AdLoadStatusInProgress)];
+
+        GADRequest *request = [AdConsent.sharedInstance makeGADRequestWithNPA];
+
+        // The load method gets called when ad loading succeeds or fails.
+        [GADInterstitialAd loadWithAdUnitID:self.adUnitID
+                                    request:request
+                          completionHandler:^(GADInterstitialAd * _Nullable interstitialAd, NSError * _Nullable error) {
+
+            if (error != nil) {
+
+                NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
+                                                 code:AdControllerWrapperErrorAdFailedToLoad
+                                  withUnderlyingError:error];
+
+                [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :e]];
+                [self.adLoadStatus accept:@(AdLoadStatusError)];
+
+                return;
+
+            }
+
+            self.interstitialAd = interstitialAd;
+            self.interstitialAd.fullScreenContentDelegate = self;
+
+            // Relays that the ad was loaded successfully.
+            [self.adLoadStatus accept:@(AdLoadStatusDone)];
+            [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :nil]];
+
+        }];
+
         return disposable;
+
     }];
+
 }
 
 - (RACSignal<RACTwoTuple<AdControllerTag, NSError *> *> *)unloadAd {
 
-    AdMobInterstitialAdControllerWrapper *__weak weakSelf = self;
-
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        [weakSelf.adLoadStatus accept:@(AdLoadStatusNone)];
+        if ([NSThread isMainThread] == FALSE) {
+            @throw [NSException exceptionWithName:@"NotOnMainThread"
+                                           reason:@"Expected the call to be on the main thread"
+                                         userInfo:nil];
+        }
 
-        [subscriber sendNext:[RACTwoTuple pack:weakSelf.tag :nil]];
+        self.interstitialAd = nil;
+
+        [self.adLoadStatus accept:@(AdLoadStatusNone)];
+
+        [subscriber sendNext:[RACTwoTuple pack:self.tag :nil]];
         [subscriber sendCompleted];
 
         return nil;
+
     }];
+
 }
 
 - (RACSignal<NSNumber *> *)presentAdFromViewController:(UIViewController *)viewController {
 
-    AdMobInterstitialAdControllerWrapper *__weak weakSelf = self;
-
     return [RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
 
-        if (!weakSelf.interstitial.isReady) {
+        if ([NSThread isMainThread] == FALSE) {
+            @throw [NSException exceptionWithName:@"NotOnMainThread"
+                                           reason:@"Expected the call to be on the main thread"
+                                         userInfo:nil];
+        }
+
+        if (self.interstitialAd == nil) {
+            [subscriber sendNext:@(AdPresentationErrorNoAdsLoaded)];
+            [subscriber sendCompleted];
+            return nil;
+        }
+
+        NSError *error = nil;
+        BOOL canPresent = [self.interstitialAd
+                           canPresentFromRootViewController:viewController
+                           error:&error];
+
+        if (canPresent == FALSE) {
             [subscriber sendNext:@(AdPresentationErrorNoAdsLoaded)];
             [subscriber sendCompleted];
             return nil;
@@ -144,57 +184,72 @@ PsiFeedbackLogType const AdMobInterstitialAdControllerWrapperLogType = @"AdMobIn
 
         // Subscribe to presentationStatus before presenting the ad.
         RACDisposable *disposable = [[AdControllerWrapperHelper
-          transformAdPresentationToTerminatingSignal:weakSelf.presentationStatus]
+          transformAdPresentationToTerminatingSignal:self.presentationStatus]
           subscribe:subscriber];
 
-        [weakSelf.interstitial presentFromRootViewController:viewController];
+        [self.interstitialAd presentFromRootViewController:viewController];
 
         return disposable;
+
     }];
+
 }
 
-#pragma mark - <GADInterstitialDelegate> status relay
+#pragma mark - <GADFullScreenContentDelegate> status relay
 
-- (void)interstitialDidReceiveAd:(GADInterstitial *)ad {
-    [self.adLoadStatus accept:@(AdLoadStatusDone)];
-    [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :nil]];
+/// Tells the delegate that an impression has been recorded for the ad.
+- (void)adDidRecordImpression:(nonnull id<GADFullScreenPresentingAd>)ad {
+    // No-op.
 }
 
-- (void)interstitial:(GADInterstitial *)ad didFailToReceiveAdWithError:(GADRequestError *)error {
-    [self.adLoadStatus accept:@(AdLoadStatusError)];
+/// Tells the delegate that the ad failed to present full screen content.
+- (void)ad:(nonnull id<GADFullScreenPresentingAd>)ad
+didFailToPresentFullScreenContentWithError:(nonnull NSError *)error {
 
-    self.lastError = error;
-    NSError *e = [NSError errorWithDomain:AdControllerWrapperErrorDomain
-                                     code:AdControllerWrapperErrorAdFailedToLoad
-                      withUnderlyingError:error];
+    // Ad is consumed.
+    // If the reference to GADInterstitialAd object is set to nil at any point,
+    // before this callback, the object is deallocated and this callback is not called.
+    self.interstitialAd = nil;
 
-    [self.loadStatusRelay accept:[RACTwoTuple pack:self.tag :e]];
-}
+    [PsiFeedbackLogger errorWithType:AdMobInterstitialAdControllerWrapperLogType
+                             message:@"AdMob didFailToPresentFullScreenContentWithError"
+                              object:error];
 
-- (void)interstitialWillPresentScreen:(GADInterstitial *)ad {
-    [self.adLoadStatus accept:@(AdLoadStatusNone)];
-    [self.presentationStatus sendNext:@(AdPresentationWillAppear)];
-}
-
-- (void)interstitialDidFailToPresentScreen:(GADInterstitial *)ad {
     [self.adLoadStatus accept:@(AdLoadStatusNone)];
     [self.presentationStatus sendNext:@(AdPresentationErrorFailedToPlay)];
+
 }
 
-- (void)interstitialWillDismissScreen:(GADInterstitial *)ad {
+/// Tells the delegate that the ad presented full screen content.
+- (void)adDidPresentFullScreenContent:(nonnull id<GADFullScreenPresentingAd>)ad {
+
+    [self.adLoadStatus accept:@(AdLoadStatusNone)];
+
+    // AdMob no longer provides an "willPresent/willAppear" callbacks.
+    // For consistency WillAppear and DidAppear messages are sent.
+    [self.presentationStatus sendNext:@(AdPresentationWillAppear)];
+    [self.presentationStatus sendNext:@(AdPresentationDidAppear)];
+
+}
+
+/// Tells the delegate that the ad dismissed full screen content.
+- (void)adDidDismissFullScreenContent:(nonnull id<GADFullScreenPresentingAd>)ad {
+
+    // Ad is consumed.
+    // If the reference to GADInterstitialAd object is set to nil at any point,
+    // before this callback, the object is deallocated and this callback is not called.
+    self.interstitialAd = nil;
+
+    // AdMob no longer provides an "willDismiss/willDisappear" callbacks.
+    // For consistency WillDisappear and DidDisappear messages are sent.
     [self.presentationStatus sendNext:@(AdPresentationWillDisappear)];
-}
-
-- (void)interstitialDidDismissScreen:(GADInterstitial *)ad {
     [self.presentationStatus sendNext:@(AdPresentationDidDisappear)];
+
     [self.presentedAdDismissed sendNext:RACUnit.defaultUnit];
 
     [PsiFeedbackLogger infoWithType:AdMobInterstitialAdControllerWrapperLogType json:
-      @{@"event": @"adDidDisappear", @"tag": self.tag}];
-}
+     @{@"event": @"adDidDisappear", @"tag": self.tag}];
 
-- (void)interstitialWillLeaveApplication:(GADInterstitial *)ad {
-  // Do nothing.
 }
 
 @end
