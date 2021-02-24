@@ -140,6 +140,14 @@ public enum SystemError<Code: Hashable>: HashableError {
 
 }
 
+public extension Optional where Wrapped == SystemError<Int> {
+    
+    static func make(_ nsError: NSError?) -> SystemError<Int>? {
+        nsError.map { SystemError<Int>.make($0) }
+    }
+    
+}
+
 public extension SystemError {
 
     static func make(_ nsError: NSError) -> SystemError<Int> {
