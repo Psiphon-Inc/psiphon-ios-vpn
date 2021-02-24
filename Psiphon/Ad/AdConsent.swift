@@ -51,9 +51,7 @@ extension UMPConsentType {
     
 }
 
-@objc final class AdConsent: NSObject {
-    
-    @objc static let sharedInstance = AdConsent()
+final class AdConsent {
     
     private var form: UMPConsentForm?
     
@@ -140,7 +138,7 @@ extension UMPConsentType {
     /// - Parameter presentingViewController: Called when presenting consent form to get the top view controller.
     /// - Parameter completionHandler: Called after consent is collected, or called immediately if consent is already
     /// obtained or not required.
-    @objc func presentConsentFormIfNeeded(
+    func presentConsentFormIfNeeded(
         fromViewController presentingViewController: @escaping () -> UIViewController,
         completionHandler: @escaping (Error?, UMPConsentStatus) -> Void
     ) {
@@ -180,12 +178,12 @@ extension UMPConsentType {
         }
     }
     
-    @objc func resetConsent() {
+    func resetConsent() {
         // Should be called if UMP SDK is to be completed removed from the project.
         UMPConsentInformation.sharedInstance.reset()
     }
     
-    @objc func makeGADRequestWithNPA() -> GADRequest {
+    func makeGADRequestWithNPA() -> GADRequest {
         if #available(iOS 14.0, *) {
             let request = GADRequest()
             return request

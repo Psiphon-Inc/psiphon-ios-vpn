@@ -41,39 +41,6 @@ extension PsiCashStatus: CustomDebugStringConvertible {
     
 }
 
-extension AdLoadStatus: CustomDebugStringConvertible {
-    
-    public var debugDescription: String {
-        switch self {
-        case .done: return "done"
-        case .error: return "error"
-        case .inProgress: return "inProgress"
-        case .none: return "none"
-        @unknown default: return "unknown(\(self.rawValue))"
-        }
-    }
-    
-}
-
-extension AdPresentation: CustomDebugStringConvertible {
-    
-    public var debugDescription: String {
-        switch self {
-        case .willAppear: return "willAppear"
-        case .didAppear: return "didAppear"
-        case .willDisappear: return "willDisappear"
-        case .didDisappear: return "didDisappear"
-        case .didRewardUser: return "didRewardUser"
-        case .errorInappropriateState: return "errorInappropriateState"
-        case .errorNoAdsLoaded: return "errorNoAdsLoaded"
-        case .errorFailedToPlay: return "errorFailedToPlay"
-        case .errorCustomDataNotSet: return "errorCustomDataNotSet"
-        @unknown default: return "unknown(\(self.rawValue))"
-        }
-    }
-    
-}
-
 extension SKProduct {
     
     public override var debugDescription: String {

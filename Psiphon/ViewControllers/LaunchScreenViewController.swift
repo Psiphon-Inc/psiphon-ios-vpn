@@ -30,10 +30,7 @@ import Foundation
         
         self.view.backgroundColor = .darkBlue()
         
-        // TODO! why is index 0 used?
         let launchScreenView = Bundle.main.loadNibNamed("LaunchScreen", owner: self, options: nil)![0] as! UIView
-        
-
         
         // Loading label
         let loadingLabel = UILabel.make(text: UserStrings.Loading(),
@@ -59,7 +56,6 @@ import Foundation
             $0.constraint(to: rootViewLayoutGuide, .centerX(0), .bottom(-50))
         }
         
-        // TODO! is this actually needed?!
         self.setNeedsStatusBarAppearanceUpdate()
         
     }

@@ -27,7 +27,6 @@ public typealias PendingPsiCashRefresh =
 
 public struct PsiCashState: Equatable {
     public var purchasing: PsiCashPurchasingState
-    public var rewardedVideo: RewardedVideoState
     public var libData: PsiCashLibData
     public var pendingPsiCashRefresh: PendingPsiCashRefresh
     /// True if PsiCashLibData has been loaded from persisted value.
@@ -38,7 +37,6 @@ extension PsiCashState {
     
     public init() {
         purchasing = .none
-        rewardedVideo = .init()
         libData = .init()
         pendingPsiCashRefresh = .completed(.success(.unit))
         libLoaded = false
@@ -73,65 +71,11 @@ public enum PsiCashPurchasingState: Equatable {
     }
 }
 
-public enum RewardedVideoPresentation {
-      /*! @const AdPresentationWillAppear Ad view controller will appear. This is not a terminal state. */
-      case willAppear
-      /*! @const AdPresentationDidAppear Ad view controller did appear. This is not a terminal state. */
-      case didAppear
-      /*! @const AdPresentationWillDisappear Ad view controller will disappear. This is not a terminal state. */
-      case willDisappear
-      /*! @const AdPresentationDidDisappear Ad view controller did disappear. This <b>can</b> be a terminal state. */
-      case didDisappear
-      /*! @const AdPresentationDidRewardUser For rewarded video ads only. Emitted once the user has been rewarded.
-       * This <b>can</b> be a terminal state. */
-      case didRewardUser
-
-      // Ad presentation error states:
-      /*! @const AdPresentationErrorInappropriateState The app is not in the appropriate state to present
-       * a particular ad. This is a terminal state.*/
-      case errorInappropriateState
-      /*! @const AdPresentationErrorNoAdsLoaded No ads are loaded. This is a terminal state. */
-      case errorNoAdsLoaded
-      /*! @const AdPresentationErrorFailedToPlay Ad failed to play or show. This is a terminal state. */
-      case errorFailedToPlay
-      /*! @const AdPresentationErrorCustomDataNotSet Rewarded video ad custom data not set. This is a terminal state.
-       *  This is to be emitted by rewarded video ads that set custom data during presentation.*/
-      case errorCustomDataNotSet
-}
-
 public enum RewardedVideoLoadStatus {
     case none
     case inProgress
     case done
     case error
-}
-
-public typealias RewardedVideoLoad =
-    Result<RewardedVideoLoadStatus, ErrorEvent<RewardedVideoAdLoadError>>
-
-public enum RewardedVideoAdLoadError: HashableError {
-    case customDataNotPresent
-    case noTunneledRewardedVideoAd
-    case requestedAdFailedToLoad
-    case adSDKError(SystemError<Int>)
-}
-
-public struct RewardedVideoState: Equatable {
-    public var loading: RewardedVideoLoad = .success(.none)
-    public var presentation: RewardedVideoPresentation = .didDisappear
-    public var dismissed: Bool = false
-    public var rewarded: Bool = false
-
-    public var isLoading: Bool {
-        switch loading {
-        case .success(.inProgress): return true
-        default: return false
-        }
-    }
-
-    public var rewardedAndDismissed: Bool {
-        dismissed && rewarded
-    }
 }
 
 public enum PsiCashPurchaseResponseError: HashableError {
