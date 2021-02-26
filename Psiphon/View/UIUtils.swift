@@ -54,6 +54,7 @@ enum Gradients: Int {
 
 enum FontSize: Float {
     case h1 = 26.0
+    case h2 = 20.0
     case h3 = 16.0
     case normal = 14.0
     case subtitle = 12.0

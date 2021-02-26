@@ -39,7 +39,6 @@
 #import "Logging.h"
 #import "NSDate+Comparator.h"
 #import "RACCompoundDisposable.h"
-#import "LaunchScreenViewController.h"
 #import "MainViewController.h"
 #import "Psiphon-Swift.h"
 
