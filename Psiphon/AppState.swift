@@ -133,7 +133,7 @@ typealias AppEnvironment = (
     subscriptionAuthStateStore: (SubscriptionAuthStateAction) -> Effect<Never>,
     adStore: (AdAction) -> Effect<Never>,
     /// `vpnStartCondition` returns true whenever the app is in such a state as to to allow
-    /// the VPN to be started. If false is returned the VPN should not be started.`
+    /// the VPN to be started. If false is returned the VPN should not be started.
     vpnStartCondition: () -> Bool,
     /// `adLoadCondition` returns true if the app is in a state where ads can be loaded.
     adLoadCondition: () -> Bool,

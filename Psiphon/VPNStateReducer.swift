@@ -660,7 +660,7 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
     let tpmDeferred: Effect<T>
     switch state.vpnState.loadState.value {
     case .nonLoaded:
-        environment.feedbackLogger.fatalError("Tunnel provider manager no loaded")
+        environment.feedbackLogger.fatalError("Tunnel provider manager not loaded")
         return []
     case .noneStored, .error(_):
         tpmDeferred = Effect(value: T.make())
