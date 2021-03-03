@@ -1036,65 +1036,41 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     
     @objc func presentInterstitial(_ completionHandler: @escaping () -> Void) {
         
-        // Note: This method assumes that the `.presentInterstitial` action
-        // will be handled successfully and interstitial ad will be displayed
-        // if one is available.
-        // It is up to the caller to ensure all the guards of the
-        // `.presentInterstitial` action are satisfied before calling this method.
-        
-        self.store.$value.signalProducer
-            .map(\.adState.interstitialAdControllerStatus)
-            .skipRepeats()
-            .filter { adStatus in
-                switch adStatus {
-                case .noAdsLoaded:
-                    return true
-                case .loading:
-                    return true
-                case .loadFailed(_):
-                    return true
-                case .loadSucceeded(let presentation):
-                    
-                    switch presentation {
-                    
-                    case .notPresented:
+        // An interstitial is ready, and pending presentation.
+        self.store.send(.adAction(.presentInterstitial(willPresent: { willPresentAd in
+            
+            if willPresentAd {
+                
+                self.store.$value.signalProducer
+                    .map(\.adState.interstitialAdControllerStatus)
+                    .skipRepeats()
+                    .filter { adStatus in
+                        switch adStatus {
+                        case .loadSucceeded(.notPresented),
+                             .loadSucceeded(.presenting):
+                            return false
                         
-                        // We're expecting a state change to
-                        // .presenting or .failedToPresent soon.
-                        return false
-                    
-                    case .presenting:
-                        return false
-                    
-                    case .failedToPresent(_):
-                        return true
-                   
-                    case .dismissed:
-                        return true
+                        default:
+                            return true
+                        }
                     }
-                }
-            }
-            .take(first: 1)
-            .map(value: Pending.completed(()))
-            .prefix(value: .pending)
-            .startWithValues {
+                    .take(first: 1)
+                    .startWithValues { _ in
+                        // Ad either failed to present, or was presented
+                        // successfully and is dismissed.
+                        completionHandler()
+                    }
                 
-                switch $0 {
+            } else {
                 
-                case .pending:
-                    // An interstitial is ready, and pending presentation.
-                    self.store.send(.adAction(.presentInterstitial))
-                    
-                case .completed(()):
-                    // Interstitial ad is either presented, or was presented and is dismissed.
-                    completionHandler()
-                    
-                }
+                // Ad will not be presented.
+                completionHandler()
                 
             }
+            
+        })))
         
     }
-    
     
     @objc func restartVPNIfActive() {
         self.store.send(vpnAction: .tunnelStateIntent(
