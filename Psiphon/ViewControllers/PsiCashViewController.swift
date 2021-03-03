@@ -182,7 +182,7 @@ final class PsiCashViewController: ReactiveViewController {
         
         self.container = .init(
             AddPsiCashViewType(
-                PsiCashCoinPurchaseTable(purchaseHandler: { [unowned adStore, iapStore] in
+                PsiCashCoinPurchaseTable(purchaseHandler: {
                     switch $0 {
                     case .rewardedVideoAd:
                         adStore.send(.loadRewardedVideo(presentAfterLoad: true))
@@ -191,7 +191,7 @@ final class PsiCashViewController: ReactiveViewController {
                     }
                 }),
                 .init(Spinner(style: .whiteLarge),
-                      .init(PsiCashMessageViewUntunneled(action: { [unowned store] in
+                      .init(PsiCashMessageViewUntunneled(action: {
                         store.send(.connectToPsiphonTapped)
                       }), .init(PsiCashMessageWithRetryView(),
                                 PsiCashMessageView())))),
@@ -200,7 +200,7 @@ final class PsiCashViewController: ReactiveViewController {
                     store.send(.buyPsiCashProduct(.speedBoost($0)))
                 }),
                 .init(Spinner(style: .whiteLarge),
-                      .init(PsiCashMessageViewUntunneled(action: { [unowned store] in
+                      .init(PsiCashMessageViewUntunneled(action: {
                         store.send(.connectToPsiphonTapped)
                       }), PsiCashMessageView()))))
         
