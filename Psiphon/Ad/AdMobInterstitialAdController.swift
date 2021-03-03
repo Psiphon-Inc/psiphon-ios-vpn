@@ -24,7 +24,7 @@ import GoogleMobileAds
 
 final class AdMobInterstitialAdController: StoreDelegate<AdAction> {
     
-    typealias Status = AdControllerStatus<LoadError>
+    typealias Status = AdControllerStatus<LoadError, SystemError<Int>>
     
     /// Represents different failure types of AdMobInterstitialAdController ad controller.
     enum LoadError: HashableError {

@@ -24,12 +24,19 @@ import GoogleMobileAds
 
 final class AdMobRewardedVideoAdController: StoreDelegate<AdAction> {
     
-    typealias Status = AdControllerStatus<LoadError>
+    typealias Status = AdControllerStatus<LoadError, PresentationError>
     
     /// Represents different failure types of AdMobRewardedVideoAdController ad controller.
     enum LoadError: HashableError {
         case deviceNotUntunneled
         case nilRewardData
+        case adMobSDKError(SystemError<Int>)
+    }
+    
+    enum PresentationError: HashableError {
+        /// Rewarded video ad failed to present, since the presenting view controller is being dismissed.
+        case presentingViewControllerBeingDismissed
+        /// AdMob SDK error.
         case adMobSDKError(SystemError<Int>)
     }
     
@@ -88,7 +95,7 @@ final class AdMobRewardedVideoAdController: StoreDelegate<AdAction> {
                 self.status = .loadSucceeded(.notPresented)
                 
             }
-                        
+            
         }
         
     }
@@ -100,11 +107,19 @@ final class AdMobRewardedVideoAdController: StoreDelegate<AdAction> {
         guard let rewardedVideo = self.rewardedVideo else {
             return
         }
-                
+        
         do {
             try rewardedVideo.canPresent(fromRootViewController: viewController)
         } catch {
-            self.status = .loadSucceeded(.failedToPresent(.make(error as NSError)))
+            self.status = .loadSucceeded(.failedToPresent(.adMobSDKError(.make(error as NSError))))
+            return
+        }
+        
+        // Check if viewController passed in is being dismissed before
+        // presenting the ad.
+        // This check should be done regardless of the implementation details of the Ad SDK.
+        guard !viewController.isBeingDismissed else {
+            self.status = .loadSucceeded(.failedToPresent(.presentingViewControllerBeingDismissed))
             return
         }
         
@@ -123,7 +138,7 @@ extension AdMobRewardedVideoAdController: GADFullScreenContentDelegate {
         didFailToPresentFullScreenContentWithError error: Error
     ) {
         
-        self.status = .loadSucceeded(.failedToPresent(SystemError<Int>.make(error as NSError)))
+        self.status = .loadSucceeded(.failedToPresent(.adMobSDKError(.make(error as NSError))))
         
         // AdMob API or documentation does not specify all the reasons that
         // presentation of ad might fail.
