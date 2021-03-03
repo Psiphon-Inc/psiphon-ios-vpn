@@ -322,7 +322,7 @@ func makeEnvironment(
             store.$value.signalProducer
             .take(first: 1)
             .map { appState -> DiagnosticEntry in
-                return appState.feedbackEntry(userDefaultsConfig: UserDefaultsConfig(),
+                return appState.feedbackEntry(userDefaultsConfig: userDefaultsConfig,
                                               sharedDB: sharedDB,
                                               store: store)
             },
