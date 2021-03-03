@@ -42,8 +42,8 @@ struct ProviderManagerLoadState<T: TunnelProviderManager>: Equatable {
 /// Psiphon tunnel is either in a connecting or connected state when the tunnel provider
 /// is not in a zombie state.
 enum PsiphonTunnelState: Equatable {
-    case connected
-    case connecting
+    case psiphonTunnelConnected
+    case psiphonTunnelConecting
     case networkNotReachable
 }
 
