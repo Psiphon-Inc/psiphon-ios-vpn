@@ -139,7 +139,7 @@ public final class TunnelConnection: Equatable {
 
 public protocol TunnelProviderManager: ClassBound, Equatable {
 
-    var connectionStatus: TunnelProviderVPNStatus { get }
+    var vpnStatus: TunnelProviderVPNStatus { get }
     
     var connection: TunnelConnection { get }
     
@@ -170,7 +170,7 @@ public protocol TunnelProviderManager: ClassBound, Equatable {
 /// Wrapper around `NETunnelProviderManager` that adheres to TunnelProviderManager protocol.
 public final class PsiphonTPM: TunnelProviderManager {
     
-    public var connectionStatus: TunnelProviderVPNStatus {
+    public var vpnStatus: TunnelProviderVPNStatus {
         wrappedManager.connection.status
     }
 
@@ -461,9 +461,9 @@ public func sendMessage<T: TunnelProviderManager>(
     toProvider tpm: T, data: Data
 ) -> Effect<(T, TunnelProviderVPNStatus, Result<Data, ErrorEvent<ProviderMessageSendError>>)> {
     Effect.deferred { fulfilled in
-        let connectionStatus = tpm.connectionStatus
-        guard connectionStatus.providerNotStopped else {
-            fulfilled((tpm, connectionStatus, .failure(ErrorEvent(.providerNotActive))))
+        let vpnStatus = tpm.vpnStatus
+        guard vpnStatus.providerNotStopped else {
+            fulfilled((tpm, vpnStatus, .failure(ErrorEvent(.providerNotActive))))
             return
         }
         
@@ -472,15 +472,15 @@ public func sendMessage<T: TunnelProviderManager>(
                 // A response is always required from the tunnel provider.
                 guard let responseData = maybeResponseData else {
                     fulfilled(
-                        (tpm, connectionStatus, .failure(ErrorEvent(.parseError("nil response"))))
+                        (tpm, vpnStatus, .failure(ErrorEvent(.parseError("nil response"))))
                     )
                     return
                 }
-                fulfilled((tpm, connectionStatus, .success(responseData)))
+                fulfilled((tpm, vpnStatus, .success(responseData)))
             }
         } catch {
             let vpnError = NEVPNError(_nsError: error as NSError)
-            fulfilled((tpm, connectionStatus, .failure(ErrorEvent(.neVPNError(vpnError)))))
+            fulfilled((tpm, vpnStatus, .failure(ErrorEvent(.neVPNError(vpnError)))))
         }
     }
 }
@@ -515,7 +515,7 @@ public final class PsiphonTPMConnectionObserver: VPNConnectionObserver<PsiphonTP
             storeSend(.invalid)
             return
         }
-        storeSend(manager.connectionStatus as TunnelProviderVPNStatus)
+        storeSend(manager.vpnStatus as TunnelProviderVPNStatus)
     }
     
 }

@@ -80,7 +80,7 @@ extension ProviderManagerLoadState {
         guard case let .loaded(tpm) = self.value else {
             return .invalid
         }
-        return tpm.connectionStatus
+        return tpm.vpnStatus
     }
     
     var vpnConfigurationInstalled: Bool {
