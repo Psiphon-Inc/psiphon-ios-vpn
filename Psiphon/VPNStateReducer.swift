@@ -502,12 +502,28 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
                     ]
                 }
                 
-                // Sends start vpn notification to the tunnel provider
+                // Sends start VPN notification to the tunnel provider
                 // if vpnStartCondition passes.
-                guard state.loadState.connectionStatus == .connecting,
-                      environment.vpnStartCondition() else {
-                    return firstEffects
+                
+                let vpnStatus = state.loadState.connectionStatus
+                let vpnStartCondition = environment.vpnStartCondition()
+                
+                guard
+                    vpnStatus == .connecting,
+                    vpnStartCondition
+                else {
+                    
+                    return firstEffects + [
+                        environment.feedbackLogger
+                            .log(.warn, """
+                                VPN start request ignored: vpnStatus:'\(vpnStatus)', \
+                                vpnStartCondition: '\(vpnStartCondition)'
+                                """)
+                            .mapNever()
+                    ]
+                    
                 }
+                
                 return firstEffects + [ notifyStartVPN().mapNever() ]
                 
             } else {
