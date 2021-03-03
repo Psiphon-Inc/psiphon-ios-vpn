@@ -762,7 +762,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         return navigator.handle(url: url)
     }
     
-    // debug remove: emits true if it's time for launch screen to be dismissed.
     @objc func loadingScreenDismissSignal(_ completionHandler: @escaping () -> Void) {
                 
         self.store.$value.signalProducer
@@ -837,9 +836,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 //
                 // In this case, if called with dismiss being true, and previously the timer signal
                 // was emitted, the timer signal will be disposed.
-                
-                // TODO!test this should fire an event when the app is launched,
-                // no matter the ad loading status.
                 
                 if dismiss {
                     return SignalProducer(value: true)
