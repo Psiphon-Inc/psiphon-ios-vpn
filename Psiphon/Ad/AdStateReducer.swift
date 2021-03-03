@@ -70,7 +70,7 @@ struct AdState: Equatable {
     
 }
 
-enum AdAction: Equatable {
+enum AdAction {
     
     /// Set of reasons for an interstitial load action.
     enum InterstitialLoadReason: Equatable {
@@ -96,7 +96,11 @@ enum AdAction: Equatable {
     /// Collects consent and inits Ad SDK if not done already.
     case loadInterstitial(reason: InterstitialLoadReason)
     
-    case presentInterstitial
+    /// Presents an interstitial if untunneled, and one has already been loaded successfully.
+    /// - `willPresent` is called with `true` if the interstitial will be presented,
+    ///  otherwise, `false` is passed.
+    case presentInterstitial(willPresent: ((Bool) -> ())?)
+    
     case interstitialAdUpdate(AdMobInterstitialAdController.Status,
                               AdMobInterstitialAdController)
     
@@ -271,27 +275,43 @@ func adStateReducer(
             
         }
         
-    case .presentInterstitial:
+    case .presentInterstitial(willPresent: let willPresentCallback):
         
         guard case .notConnected = state.tunnelConnection?.tunneled else {
-            return []
+            return [
+                .fireAndForget {
+                    willPresentCallback?(false)
+                }
+            ]
         }
         
         guard
             case .loadSucceeded(.notPresented) = state.adState.interstitialAdControllerStatus
         else {
             return [
-                environment.feedbackLogger.log(.warn, "No interstitial ad loaded").mapNever()
+                
+                environment.feedbackLogger.log(.warn, "No interstitial ad loaded").mapNever(),
+                
+                .fireAndForget {
+                    willPresentCallback?(false)
+                }
+                
             ]
         }
         
         // Presents the loaded interstitial ad.
         return [
+            
+            .fireAndForget {
+                willPresentCallback?(true)
+            },
+            
             .fireAndForget {
                 environment.adMobInterstitialAdController.present(
                     fromRootViewController: environment.topMostViewController()
                 )
             }
+            
         ]
         
     case .interstitialAdUpdate(let status, _):
