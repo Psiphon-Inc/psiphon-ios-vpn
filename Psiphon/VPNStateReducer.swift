@@ -485,7 +485,7 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
                 environment.feedbackLogger.log(.info, tag: vpnProviderSyncTag, "zombie provider").mapNever()
             ]
             
-        case .active(.connected):
+        case .active(.psiphonTunnelConnected):
             
             // Verifies that tunnel intent matches expected tunnel provider state.
             if case .start(transition: .none) = state.tunnelIntent {
@@ -536,7 +536,7 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
                 }
             ]
             
-        case .active(.connecting):
+        case .active(.psiphonTunnelConecting):
             return firstEffects
             
         case .active(.networkNotReachable):
@@ -1021,9 +1021,9 @@ extension TunnelProviderSyncedState {
                 // but will eventually sync.
                 return .active(.networkNotReachable)
             case (zombie: false, connected: false, reachable: true):
-                return .active(.connecting)
+                return .active(.psiphonTunnelConecting)
             case (zombie: false, connected: true, reachable: true):
-                return .active(.connected)
+                return .active(.psiphonTunnelConnected)
             case (zombie: true, connected: true, reachable: _):
                 feedbackLogger.fatalError(
                     "unexpected tunnel provider state '\(response)'")
