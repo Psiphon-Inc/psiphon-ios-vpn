@@ -21,7 +21,7 @@ import Foundation
 import PsiApi
 import Utilities
 
-enum AdControllerStatus<LoadError: HashableError, PresentationError: HashableError>: Equatable {
+enum AdControllerStatus<LoadError: HashableError>: Equatable {
     
     enum PresentationStatus: Equatable {
         
@@ -31,8 +31,8 @@ enum AdControllerStatus<LoadError: HashableError, PresentationError: HashableErr
         /// Ad is currently presenting.
         case presenting
         
-        /// Ad failed to present.
-        case failedToPresent(PresentationError)
+        /// Ad failed to present. Presenting this ad should not be retried.
+        case fatalPresentationError(SystemError<Int>)
        
         /// Ad was presented and dismissed.
         case dismissed

@@ -24,19 +24,12 @@ import GoogleMobileAds
 
 final class AdMobRewardedVideoAdController: StoreDelegate<AdAction> {
     
-    typealias Status = AdControllerStatus<LoadError, PresentationError>
+    typealias Status = AdControllerStatus<LoadError>
     
     /// Represents different failure types of AdMobRewardedVideoAdController ad controller.
     enum LoadError: HashableError {
-        case deviceNotUntunneled
+        case notUntunneled
         case nilRewardData
-        case adMobSDKError(SystemError<Int>)
-    }
-    
-    enum PresentationError: HashableError {
-        /// Rewarded video ad failed to present, since the presenting view controller is being dismissed.
-        case presentingViewControllerBeingDismissed
-        /// AdMob SDK error.
         case adMobSDKError(SystemError<Int>)
     }
     
@@ -100,32 +93,36 @@ final class AdMobRewardedVideoAdController: StoreDelegate<AdAction> {
         
     }
     
-    func present(fromRootViewController viewController: UIViewController) {
+    /// Returns `.none` if full-screen ad can be presented, otherwise returns an error message.
+    func present(fromRootViewController viewController: UIViewController) -> ErrorMessage? {
         
         precondition(Thread.isMainThread, "present(fromRootViewController:) must be called on the main thread")
         
         guard let rewardedVideo = self.rewardedVideo else {
-            return
+            return ErrorMessage("no rewarded video loaded")
+        }
+        
+        // Checks if viewController passed in is being dismissed before
+        // presenting the ad.
+        // This check should be done regardless of the implementation details of the Ad SDK,
+        // since in our experience that ad can fail to present due to this reason,
+        // with no error reported back by the Ad SDK.
+        guard !viewController.isBeingDismissed else {
+            return ErrorMessage("presenting view controller being dismissed")
         }
         
         do {
             try rewardedVideo.canPresent(fromRootViewController: viewController)
         } catch {
-            self.status = .loadSucceeded(.failedToPresent(.adMobSDKError(.make(error as NSError))))
-            return
-        }
-        
-        // Check if viewController passed in is being dismissed before
-        // presenting the ad.
-        // This check should be done regardless of the implementation details of the Ad SDK.
-        guard !viewController.isBeingDismissed else {
-            self.status = .loadSucceeded(.failedToPresent(.presentingViewControllerBeingDismissed))
-            return
+            self.status = .loadSucceeded(.fatalPresentationError(.make(error as NSError)))
+            return ErrorMessage("AdMob SDK cannot present rewarded video ad")
         }
         
         rewardedVideo.present(fromRootViewController: viewController) { [unowned self] in
             self.storeSend(.rewardedVideoAdUserEarnedReward)
         }
+        
+        return .none
         
     }
     
@@ -138,7 +135,7 @@ extension AdMobRewardedVideoAdController: GADFullScreenContentDelegate {
         didFailToPresentFullScreenContentWithError error: Error
     ) {
         
-        self.status = .loadSucceeded(.failedToPresent(.adMobSDKError(.make(error as NSError))))
+        self.status = .loadSucceeded(.fatalPresentationError(.make(error as NSError)))
         
         // AdMob API or documentation does not specify all the reasons that
         // presentation of ad might fail.
