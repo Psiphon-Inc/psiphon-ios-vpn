@@ -135,8 +135,8 @@ typealias AppEnvironment = (
     /// `vpnStartCondition` returns true whenever the app is in such a state as to to allow
     /// the VPN to be started. If false is returned the VPN should not be started.
     vpnStartCondition: () -> Bool,
-    /// `adLoadCondition` returns true if the app is in a state where ads can be loaded.
-    adLoadCondition: () -> Bool,
+    /// `adLoadCondition` returns `nil` if the app is in a state where ads can be loaded.
+    adLoadCondition: () -> ErrorMessage?,
     getCurrentTime: () -> Date,
     compareDates: (Date, Date, Calendar.Component) -> ComparisonResult,
     getPsiphonConfig: () -> [AnyHashable: Any]?,
@@ -283,30 +283,32 @@ func makeEnvironment(
             // VPN can be started if an ad is not being presented.
             return !store.value.adState.isPresentingAd
         },
-        adLoadCondition: { [unowned store] () -> Bool in
+        adLoadCondition: { [unowned store] () -> ErrorMessage? in
             
             // Ads are restricted to iOS platform.
             guard case .iOS = platform.current else {
-                return false
+                return ErrorMessage("current platform is '\(platform.current)'")
             }
             
             // Ads are restricted to non-subscribed users.
             guard case .notSubscribed = store.value.subscription.status else {
-                return false
+                return ErrorMessage("subscription status is '\(store.value.subscription.status)'")
             }
             
             // Ads and Ad SDKs should not be initialized until the user
             // has finished onboarding.
             guard store.value.appDelegateState.onboardingCompleted ?? false else {
-                return false
+                return ErrorMessage("onboarding not completed")
             }
             
             // Ads should not be loaded unless the app is in the foreground.
             guard store.value.appDelegateState.appLifecycle.isAppForegrounded else {
-                return false
+                return ErrorMessage("""
+                    app is not foregrounded: '\(store.value.appDelegateState.appLifecycle)'
+                    """)
             }
             
-            return true
+            return .none
             
         },
         getCurrentTime: { () -> Date in

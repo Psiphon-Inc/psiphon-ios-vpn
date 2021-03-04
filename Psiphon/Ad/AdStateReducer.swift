@@ -133,7 +133,7 @@ typealias AdStateEnvironment = (
     tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
     adMobInterstitialAdController: AdMobInterstitialAdController,
     adMobRewardedVideoAdController: AdMobRewardedVideoAdController,
-    adLoadCondition: () -> Bool,
+    adLoadCondition: () -> ErrorMessage?,
     // TODO: Direct access to UI. This should be wrapped in an effect.
     topMostViewController: () -> UIViewController
 )
@@ -146,8 +146,12 @@ func adStateReducer(
     
     case .collectConsentAndInitAdSdk:
         
-        guard environment.adLoadCondition() else {
-            return []
+        if let error = environment.adLoadCondition() {
+            return [
+                environment.feedbackLogger
+                    .log(.warn, "failed to collect consent: '\(error.description)'")
+                    .mapNever()
+            ]
         }
         
         // There is already a pending request.
@@ -196,8 +200,12 @@ func adStateReducer(
                 
     case .loadInterstitial(reason: let reason):
         
-         guard environment.adLoadCondition() else {
-            return []
+        if let error = environment.adLoadCondition() {
+            return [
+                environment.feedbackLogger
+                    .log(.warn, "failed to load interstitial ad: '\(error.description)'")
+                    .mapNever()
+            ]
         }
         
         guard case .completed(.success(.unit)) = state.adState.appTrackingTransparencyPermission
@@ -354,8 +362,12 @@ func adStateReducer(
          
     case .loadRewardedVideo(let presentAfterLoad):
         
-        guard environment.adLoadCondition() else {
-            return []
+        if let error = environment.adLoadCondition() {
+            return [
+                environment.feedbackLogger
+                    .log(.warn, "failed to load rewarded video ad: '\(error.description)'")
+                    .mapNever()
+            ]
         }
         
         guard case .completed(.success(.unit)) = state.adState.appTrackingTransparencyPermission
@@ -464,7 +476,10 @@ func adStateReducer(
             case .loadSucceeded(.notPresented) = state.adState.rewardedVideoAdControllerStatus
         else {
             return [
-                environment.feedbackLogger.log(.warn, "No rewarded video ad loaded").mapNever()
+                environment.feedbackLogger.log(.warn, """
+                    no rewarded video ad ready: '\(state.adState.rewardedVideoAdControllerStatus)'
+                    """)
+                    .mapNever()
             ]
         }
         
