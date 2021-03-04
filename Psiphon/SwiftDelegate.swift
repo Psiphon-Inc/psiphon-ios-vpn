@@ -507,7 +507,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.store.send(.appDelegateAction(.appDidLaunch(psiCashData: self.psiCashLib.dataModel())))
         
         // Sends interstitial ad load signal when unknownValuesInitialized property
-        // of AppState for when it becomes true.
+        // of AppState becomes true.
         self.lifetime += self.store.$value.signalProducer
             .map(\.unknownValuesInitialized)
             .filter { $0 == true }
@@ -770,7 +770,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 // Filters out AppState's where values are not known yet.
                 //
                 // The app is expected to display the loading screen,
-                // while values of subscription status and VPN status
+                // while values of subscription status, VPN status, ...
                 // are being initialized.
                 
                 return appState.unknownValuesInitialized
@@ -788,13 +788,13 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 
                 if appState.appDelegateState.onboardingCompleted == false {
                     // If onboarding is not competed, dismiss loading screen.
-                    // Note: Loading screen is not expected to be displayed,
-                    // if onboarding the user hasn't finished onboarding yet.
+                    // Note: Loading screen should not be displayed,
+                    // if user onboarding has not been completed.
                     return true
                 }
                 
                 if appState.vpnState.value.loadState.connectionStatus.tunneled != .notConnected {
-                    // If tunnel status is not connected, dismiss loading screen.
+                    // If tunnel status is not "notConnected", dismiss loading screen.
                     return true
                 }
                 
