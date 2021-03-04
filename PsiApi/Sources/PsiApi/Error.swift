@@ -33,6 +33,21 @@ public struct FatalError: HashableError {
     }
 }
 
+/// A simple error type that only carries the description of an error.
+public struct ErrorMessage: HashableError, CustomStringConvertible {
+    
+    public let message: String
+    
+    public init(_ message: String) {
+        self.message = message
+    }
+    
+    public var description: String {
+        self.message
+    }
+    
+}
+
 /// String representation of a type-erased error.
 public struct ErrorRepr: HashableError, Codable {
 
