@@ -267,7 +267,7 @@ func adStateReducer(
             
             return [
                 environment.feedbackLogger.log(.warn, """
-                    Interestitial load request rejected: \
+                    Interstitial load request rejected: \
                     '\(state.adState.interstitialAdControllerStatus)'
                     """)
                     .mapNever()
