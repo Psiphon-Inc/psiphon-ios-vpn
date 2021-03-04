@@ -101,6 +101,8 @@ enum AdAction {
     ///  otherwise, `false` is passed.
     case presentInterstitial(willPresent: ((Bool) -> ())?)
     
+    case _presentInterstitialResult(ErrorMessage?)
+    
     case interstitialAdUpdate(AdMobInterstitialAdController.Status,
                               AdMobInterstitialAdController)
     
@@ -109,6 +111,8 @@ enum AdAction {
     case loadRewardedVideo(presentAfterLoad: Bool)
     
     case presentRewardedVideo
+    
+    case _presentRewardedVideoResult(ErrorMessage?)
     
     case rewardedVideoAdUpdate(AdMobRewardedVideoAdController.Status,
                                AdMobRewardedVideoAdController)
@@ -247,7 +251,7 @@ func adStateReducer(
         
         case .noAdsLoaded,
              .loadFailed(_),
-             .loadSucceeded(.failedToPresent(_)),
+             .loadSucceeded(.fatalPresentationError(_)),
              .loadSucceeded(.dismissed):
             
             return [
@@ -290,7 +294,10 @@ func adStateReducer(
         else {
             return [
                 
-                environment.feedbackLogger.log(.warn, "No interstitial ad loaded").mapNever(),
+                environment.feedbackLogger.log(.warn, """
+                    no interstitial ad ready: '\(state.adState.interstitialAdControllerStatus)'
+                    """)
+                    .mapNever(),
                 
                 .fireAndForget {
                     willPresentCallback?(false)
@@ -306,13 +313,34 @@ func adStateReducer(
                 willPresentCallback?(true)
             },
             
-            .fireAndForget {
-                environment.adMobInterstitialAdController.present(
+            Effect.deferred {
+                let maybeError = environment.adMobInterstitialAdController.present(
                     fromRootViewController: environment.topMostViewController()
                 )
+                return AdAction._presentInterstitialResult(maybeError)
             }
             
         ]
+        
+    case ._presentInterstitialResult(let maybeError):
+        
+        if let error = maybeError {
+            
+            return [
+                environment.feedbackLogger
+                    .log(.error, "failed to present interstitial: \(error.description)")
+                    .mapNever()
+            ]
+            
+        } else {
+            
+            return [
+                environment.feedbackLogger
+                    .log(.info, "will present interstitial ad")
+                    .mapNever()
+            ]
+            
+        }
         
     case .interstitialAdUpdate(let status, _):
         
@@ -386,7 +414,7 @@ func adStateReducer(
         
         case .noAdsLoaded,
              .loadFailed(_),
-             .loadSucceeded(.failedToPresent(_)),
+             .loadSucceeded(.fatalPresentationError(_)),
              .loadSucceeded(.dismissed):
             
             return [
@@ -442,12 +470,35 @@ func adStateReducer(
         
         // Presents the loaded rewarded video ad.
         return [
-            .fireAndForget {
-                environment.adMobRewardedVideoAdController.present(
+            
+            Effect.deferred {
+                let maybeError = environment.adMobRewardedVideoAdController.present(
                     fromRootViewController: environment.topMostViewController()
                 )
+                return AdAction._presentRewardedVideoResult(maybeError)
             }
+
         ]
+        
+    case ._presentRewardedVideoResult(let maybeError):
+        
+        if let error = maybeError {
+            
+            return [
+                environment.feedbackLogger
+                    .log(.error, "failed to present rewarded video ad: \(error.description)")
+                    .mapNever()
+            ]
+            
+        } else {
+            
+            return [
+                environment.feedbackLogger
+                    .log(.info, "will present rewarded video ad")
+                    .mapNever()
+            ]
+            
+        }
                 
     case .rewardedVideoAdUpdate(let status, _):
         

@@ -24,7 +24,7 @@ import GoogleMobileAds
 
 final class AdMobInterstitialAdController: StoreDelegate<AdAction> {
     
-    typealias Status = AdControllerStatus<LoadError, SystemError<Int>>
+    typealias Status = AdControllerStatus<LoadError>
     
     /// Represents different failure types of AdMobInterstitialAdController ad controller.
     enum LoadError: HashableError {
@@ -81,22 +81,36 @@ final class AdMobInterstitialAdController: StoreDelegate<AdAction> {
         
     }
     
-    func present(fromRootViewController viewController: UIViewController) {
+    /// Returns `.none` if full-screen ad can be presented, otherwise returns an error message.
+    func present(fromRootViewController viewController: UIViewController) -> ErrorMessage? {
         
         precondition(Thread.isMainThread, "present(fromRootViewController:) must be called on the main thread")
         
         guard let interstitial = self.interstitial else {
-            return
+            return ErrorMessage("no rewarded video loaded")
+        }
+        
+        // Checks if viewController passed in is being dismissed before
+        // presenting the ad.
+        // This check should be done regardless of the implementation details of the Ad SDK,
+        // since in our experience that ad can fail to present due to this reason,
+        // with no error reported back by the Ad SDK.
+        guard !viewController.isBeingDismissed else {
+            return ErrorMessage("presenting view controller being dismissed")
         }
                 
         do {
             try interstitial.canPresent(fromRootViewController: viewController)
         } catch {
-            self.status = .loadSucceeded(.failedToPresent(.make(error as NSError)))
-            return
+            // AdMob error value is not explained.
+            // We will consider this presentation error as a fatal error.
+            self.status = .loadSucceeded(.fatalPresentationError(.make(error as NSError)))
+            return ErrorMessage("AdMob SDK cannot present interstitial ad")
         }
         
         interstitial.present(fromRootViewController: viewController)
+        
+        return .none
         
     }
     
@@ -109,7 +123,7 @@ extension AdMobInterstitialAdController: GADFullScreenContentDelegate {
         didFailToPresentFullScreenContentWithError error: Error
     ) {
         
-        self.status = .loadSucceeded(.failedToPresent(SystemError<Int>.make(error as NSError)))
+        self.status = .loadSucceeded(.fatalPresentationError(SystemError<Int>.make(error as NSError)))
         
         // AdMob API or documentation does not specify all the reasons that
         // presentation of ad might fail.
