@@ -23,20 +23,6 @@ import AppStoreIAP
 
 extension AppState: FeedbackDescription {}
 
-extension AdLoadStatus: CustomStringFeedbackDescription {
-    
-    public var description: String {
-        switch self {
-        case .none: return "none"
-        case .inProgress: return "inProgress"
-        case .done: return "done"
-        case .error: return "error"
-        @unknown default: return "unknown(\(self.rawValue)"
-        }
-    }
-    
-}
-
 extension TunnelProviderVPNStatus: CustomStringFeedbackDescription {
     
     public var description: String {

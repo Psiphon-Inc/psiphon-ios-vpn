@@ -22,56 +22,6 @@ import PsiApi
 import PsiCashClient
 
 
-extension RewardedVideoPresentation {
-    
-    init(objcAdPresentation: AdPresentation) {
-        switch objcAdPresentation {
-        case .willAppear:
-            self = .willAppear
-        case .didAppear:
-            self = .didAppear
-        case .willDisappear:
-            self = .willDisappear
-        case .didDisappear:
-            self = .didDisappear
-        case .didRewardUser:
-            self = .didRewardUser
-        case .errorInappropriateState:
-            self = .errorInappropriateState
-        case .errorNoAdsLoaded:
-            self = .errorNoAdsLoaded
-        case .errorFailedToPlay:
-            self = .errorFailedToPlay
-        case .errorCustomDataNotSet:
-            self = .errorCustomDataNotSet
-        @unknown default:
-            fatalError("Unknown AdPresentation value: '\(objcAdPresentation)'")
-        }
-    }
-    
-}
-
-
-extension RewardedVideoLoadStatus {
-    
-    init(objcAdLoadStatus: AdLoadStatus) {
-        switch objcAdLoadStatus {
-        case .none:
-            self = .none
-        case .inProgress:
-            self = .inProgress
-        case .done:
-            self = .done
-        case .error:
-            self = .error
-        @unknown default:
-            fatalError("Unknown AdLoadStatus value: '\(objcAdLoadStatus)'")
-        }
-    }
-    
-}
-
-
 extension PsiCashPurchaseResponseError: ErrorUserDescription {
     
     public var userDescription: String {

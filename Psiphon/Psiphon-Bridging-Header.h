@@ -51,9 +51,6 @@
 #import "RootContainerController.h"
 #import "IAPViewController.h"
 
-// Ads
-#import "AdControllerWrapper.h"
-
 // Data stores
 #import "PsiphonConfigReader.h"
 #import "PsiphonDataSharedDB.h"

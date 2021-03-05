@@ -39,7 +39,6 @@
 #import "Logging.h"
 #import "NSDate+Comparator.h"
 #import "RACCompoundDisposable.h"
-#import "LaunchScreenViewController.h"
 #import "MainViewController.h"
 #import "Psiphon-Swift.h"
 
@@ -115,24 +114,23 @@
     MainViewController *mainViewController = [[MainViewController alloc]
       initWithStartingVPN:startVPN];
     [self addAndDisplayChildVC:mainViewController];
+    
+    // Skips displaying loading screen if startVPN is true.
+    if (startVPN == FALSE) {
+        
+        LaunchScreenViewController *loadingViewController = [[LaunchScreenViewController alloc] init];
+        [self addAndDisplayChildVC:loadingViewController];
 
-    LaunchScreenViewController *loadingViewController = [[LaunchScreenViewController alloc] init];
-    [self addAndDisplayChildVC:loadingViewController];
-
-    // Subscribes to the MainViewController's loading signal, to remove the launch screen
-    // once the loading is done.
-    __block RACDisposable *disposable = [mainViewController.activeStateLoadingSignal
-      subscribeNext:^(RACUnit *x) {
-          [PsiFeedbackLogger info:@"dismiss loading screen"];
-          [weakSelf removeLaunchScreen];
-      } error:^(NSError *error) {
-          [NSException raise:@"Unexpected signal error termination"
-                      format:@"activeStateLoadingSignal terminated in an error"];
-      } completed:^{
-          [weakSelf.compoundDisposable removeDisposable:disposable];
-      }];
-
-    [self.compoundDisposable addDisposable:disposable];
+        // Calls completion handler if the launch screen should be dismissed.
+        [SwiftDelegate.bridge loadingScreenDismissSignal:^{
+            
+            [PsiFeedbackLogger info:@"dismiss loading screen"];
+            [weakSelf removeLaunchScreen];
+            
+        }];
+        
+    }
+    
 }
 
 - (void)removeLaunchScreen {

@@ -18,7 +18,6 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "AppEvent.h"
 #import "Psiphon-Swift.h"
 
 @class RACReplaySubject<ValueType>;
@@ -28,9 +27,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface AppObservables: NSObject
-
-// appEvents is hot infinite multicasted signal with underlying replay subject.
-@property (nonatomic, nullable, readonly) RACMulticastConnection<AppEvent *> *appEvents;
 
 /**
  * subscriptionStatus emits an item of type `UserSubscriptionStatus` wrapped in NSNumber.

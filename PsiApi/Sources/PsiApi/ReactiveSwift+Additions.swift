@@ -113,6 +113,47 @@ extension SignalProducer {
         }
     }
     
+    /// A safer work-around for `SignalProducer.init(_ startHandler:)`.
+    /// The async work is only given access to the `fulfill(value:)` function of the `Signal.Observer`,
+    /// and hence the returned Effect is completed as long as the `fulfill(value:)` function is called.
+    public static func async(
+        work: @escaping (@escaping (Result<Value, Error>) -> Void) -> Void
+    ) -> SignalProducer<Value, Error> {
+        
+        SignalProducer { (observer: Signal<Value, Error>.Observer, _) in
+            
+            work({ (result: Result<Value, Error>) in
+                
+                switch result {
+                case let .success(value):
+                    observer.send(value: value)
+                    observer.sendCompleted()
+                    
+                case let .failure(failure):
+                    observer.send(error: failure)
+                }
+                
+            })
+            
+        }
+        
+    }
+    
+    /// Maps a `SignalProducer<Value, Error>` to `SignalProducer<U,  Never>`,
+    /// using provided transform function `Result<Value, Error> -> U`.
+    /// `U` is typically a `Result` value, but could be anything.
+    public func mapBothAsResult<U>(
+        _ transform: @escaping (Result<Value, Error>) -> U
+    ) -> SignalProducer<U, Never> {
+        
+        self.map {
+            transform(.success($0))
+        }.flatMapError {
+            .init(value: transform(.failure($0)))
+        }
+        
+    }
+    
 }
 
 extension SignalProducer where Value == Bool, Error == Never {

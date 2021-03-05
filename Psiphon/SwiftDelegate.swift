@@ -36,12 +36,26 @@ enum AppLifecycle: Equatable {
     case willEnterForeground
 }
 
+extension AppLifecycle {
+    
+    /// Returns true if the app is foregrounded, or will be foregrounded soon.
+    var isAppForegrounded: Bool {
+        switch self {
+        case .inited, .didFinishLaunching, .didBecomeActive, .willEnterForeground:
+            return true
+        case .willResignActive, .didEnterBackground:
+            return false
+        }
+    }
+    
+}
+
 enum AppDelegateAction {
     case appLifecycleEvent(AppLifecycle)
     case appDidLaunch(psiCashData: PsiCashLibData)
-    case adPresentationStatus(presenting: Bool)
     case checkForDisallowedTrafficAlertNotification
     case _disallowedNotificationAlertPresentation(success: Bool)
+    case onboardingCompleted
 }
 
 struct AppDelegateReducerState: Equatable {
@@ -51,13 +65,17 @@ struct AppDelegateReducerState: Equatable {
 }
 
 struct AppDelegateState: Equatable {
+    
     var appLifecycle: AppLifecycle = .inited
-    
-    var adPresentationState: Bool = false
-    
+        
     /// Represents whether a disallowed traffic alert has been requested to be presented,
     /// but has not yet been presented.
     var pendingPresentingDisallowedTrafficAlert: Bool = false
+    
+    /// Represents whether or not the user has completed the onboarding.
+    /// `nil` is the case where the onboarding status is not known yet.
+    var onboardingCompleted: Bool? = .none
+    
 }
 
 typealias AppDelegateEnvironment = (
@@ -69,7 +87,9 @@ typealias AppDelegateEnvironment = (
     paymentQueue: PaymentQueue,
     appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
     psiCashStore: (PsiCashAction) -> Effect<Never>,
-    paymentTransactionDelegate: PaymentTransactionDelegate
+    adStore: (AdAction) -> Effect<Never>,
+    paymentTransactionDelegate: PaymentTransactionDelegate,
+    userDefaultsConfig: UserDefaultsConfig
 )
 
 func appDelegateReducer(
@@ -81,10 +101,21 @@ func appDelegateReducer(
         state.appDelegate.appLifecycle = lifecycle
         
         switch lifecycle {
+        
         case .didBecomeActive:
-            return [ Effect(value: .checkForDisallowedTrafficAlertNotification) ]
+            return [
+                Effect(value: .checkForDisallowedTrafficAlertNotification)
+            ]
+            
+        case .willEnterForeground:
+            // Loads interstitial ad on subsequent app foreground events.
+             return [
+                environment.adStore(.loadInterstitial(reason: .appForegrounded)).mapNever()
+             ]
+            
         default:
             return []
+            
         }
         
     case .appDidLaunch(psiCashData: let libData):
@@ -94,6 +125,12 @@ func appDelegateReducer(
             persisted: environment.psiCashPersistedValues
         )
         
+        // Determines whether onboarding is complete.
+        let stagesNotCompleted = OnboardingStage.findStagesNotCompleted(
+            completedStages: environment.userDefaultsConfig.onboardingStagesCompletedTyped)
+        
+        state.appDelegate.onboardingCompleted = stagesNotCompleted.isEmpty
+        
         let nonSubscriptionAuths = environment.sharedDB.getNonSubscriptionEncodedAuthorizations()
         
         return [
@@ -101,10 +138,6 @@ func appDelegateReducer(
             environment.paymentQueue.addObserver(environment.paymentTransactionDelegate).mapNever(),
             environment.appReceiptStore(.localReceiptRefresh).mapNever()
         ]
-        
-    case .adPresentationStatus(presenting: let presenting):
-        state.appDelegate.adPresentationState = presenting
-        return []
         
     case .checkForDisallowedTrafficAlertNotification:
         
@@ -188,7 +221,18 @@ func appDelegateReducer(
                 environment.sharedDB.getDisallowedTrafficAlertWriteSequenceNum())
         
         return []
+        
+    case .onboardingCompleted:
+        
+        state.appDelegate.onboardingCompleted = true
 
+        return [
+            .fireAndForget {
+                environment.userDefaultsConfig.onboardingStagesCompleted =
+                    OnboardingStage.stagesToComplete.map(\.rawValue)
+            }
+        ]
+        
     }
     
 }
@@ -265,29 +309,7 @@ func appDelegateReducer(
 
 // MARK: Bridge API
 
-extension SwiftDelegate: RewardedVideoAdBridgeDelegate {
-    func adPresentationStatus(_ status: AdPresentation) {
-        self.store.send(.psiCash(
-            .rewardedVideoPresentation(RewardedVideoPresentation(objcAdPresentation: status)))
-        )
-    }
-    
-    func adLoadStatus(_ status: AdLoadStatus, error: NSError?) {
-        let loadResult: RewardedVideoLoad
-        if let error = error {
-            // Note that error event is created here as opposed to the origin
-            // of where the error occurred. However this is acceptable as long as
-            // this function is called once for each error that happened almost immediately.
-            loadResult = .failure(ErrorEvent(.adSDKError(SystemError<Int>.make(error))))
-        } else {
-            if case .error = status {
-                loadResult = .failure(ErrorEvent(.requestedAdFailedToLoad))
-            } else {
-                loadResult = .success(RewardedVideoLoadStatus(objcAdLoadStatus: status))
-            }
-        }
-        self.store.send(.psiCash(.rewardedVideoLoad(loadResult)))
-    }
+extension SwiftDelegate {
     
     func installVPNConfig() -> Promise<VPNConfigInstallResult> {
         let promise = Promise<VPNConfigInstallResult>.pending()
@@ -472,8 +494,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     supportedAppStoreProducts: self.supportedProducts,
                     userDefaultsConfig: self.userDefaultsConfig,
                     objcBridgeDelegate: objcBridge,
-                    rewardedVideoAdBridgeDelegate: self,
-                    calendar: Calendar.current
+                    calendar: Calendar.current,
+                    adConsent: AdConsent(),
+                    topMostViewController: AppDelegate.getTopPresentedViewController
                 )
                 self.environmentCleanup = cleanup
                 return environment
@@ -482,6 +505,32 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.store.send(.appDelegateAction(.appLifecycleEvent(.didFinishLaunching)))
         self.store.send(vpnAction: .appLaunched)
         self.store.send(.appDelegateAction(.appDidLaunch(psiCashData: self.psiCashLib.dataModel())))
+        
+        // Sends interstitial ad load signal when unknownValuesInitialized property
+        // of AppState becomes true.
+        self.lifetime += self.store.$value.signalProducer
+            .map(\.unknownValuesInitialized)
+            .filter { $0 == true }
+            .take(first: 1)
+            .map(value: AppAction.adAction(.loadInterstitial(reason: .appInitialized)))
+            .send(store: self.store)
+        
+        // Attempts to load an interstitial whenever the tunnel goes into a disconnected state,
+        // but only after `InterstitialDelayAfterDisconnection` seconds from when
+        // the state changed to disconnected.
+        self.lifetime += self.store.$value.signalProducer
+            .map(\.vpnState.value.providerVPNStatus)
+            .skipRepeats()
+            .combinePrevious(.invalid)
+            .filter {
+                // If the transition has been from disconnecting to disconnected,
+                // load an ad after some delay.
+                $0.0 == .disconnecting && $0.1 == .disconnected
+            }
+            .map(value: AppAction.adAction(.loadInterstitial(reason: .tunnelDisconnected)))
+            // Delays action by `InterstitialDelayAfterDisconnection` seconds.
+            .delay(InterstitialDelayAfterDisconnection, on: QueueScheduler.main)
+            .send(store: self.store)
         
         // Maps connected events to refresh state messages sent to store.
         self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
@@ -713,6 +762,97 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         return navigator.handle(url: url)
     }
     
+    @objc func loadingScreenDismissSignal(_ completionHandler: @escaping () -> Void) {
+                
+        self.store.$value.signalProducer
+            .filter { appState in
+                
+                // Filters out AppState's where values are not known yet.
+                //
+                // The app is expected to display the loading screen,
+                // while values of subscription status, VPN status, ...
+                // are being initialized.
+                
+                return appState.unknownValuesInitialized
+                
+            }
+            .map { (appState: AppState) -> Bool in
+                
+                // Returns true if loading screen can be dismissed given
+                // the current AppState, otherwise false.
+                
+                if case .iOSAppOnMac = self.platform.current {
+                    // No loading screen is necessary currently on Mac.
+                    return true
+                }
+                
+                if appState.appDelegateState.onboardingCompleted == false {
+                    // If onboarding is not competed, dismiss loading screen.
+                    // Note: Loading screen should not be displayed,
+                    // if user onboarding has not been completed.
+                    return true
+                }
+                
+                if appState.vpnState.value.loadState.connectionStatus.tunneled != .notConnected {
+                    // If tunnel status is not "notConnected", dismiss loading screen.
+                    return true
+                }
+                
+                if case .subscribed(_) = appState.subscription.status {
+                    // If user is subscribed, dismiss loading screen.
+                    return true
+                }
+                
+                if case .some(_) = appState.psiCash.activeSpeedBoost {
+                    // If user has an active Speed Boost, dismiss loading screen.
+                    return true
+                }
+                
+                if case .completed(.failure(_)) = appState.adState.appTrackingTransparencyPermission {
+                    // If ad SDK initialization failed, dismiss loading screen.
+                    return true
+                }
+                
+                switch appState.adState.interstitialAdControllerStatus {
+                
+                case .loadSucceeded(_), .loadFailed(_):
+                    // If interstitial either succeeded to failed to load, dismiss loading screen.
+                    return true
+                    
+                default:
+                    // If interstitial is not loaded yet, or is being loaded,
+                    // display loading screen.
+                    return false
+                    
+                }
+                                
+            }
+            .skipRepeats()
+            .flatMap(.race) { dismiss -> SignalProducer<Bool, Never> in
+                
+                // Forward only events from the first inner stream that sends an event.
+                // Any other in-flight inner streams is disposed of when the winning
+                // inner stream is determined.
+                //
+                // In this case, if called with dismiss being true, and previously the timer signal
+                // was emitted, the timer signal will be disposed.
+                
+                if dismiss {
+                    return SignalProducer(value: true)
+                } else {
+                    return SignalProducer.timer(interval: .seconds(10), on: QueueScheduler.main)
+                        .map(value: true)
+                }
+                
+            }
+            .take(first: 1) // Upstream value is assumed to always be true.
+            .startWithValues { _ in
+                // Upstream value is assumed to always be true.
+                completionHandler()
+            }
+        
+    }
+    
     @objc func makeSubscriptionBarView() -> SubscriptionBarView {
         SubscriptionBarView { [unowned objcBridge, store] state in
             switch state.authState {
@@ -759,12 +899,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             feedbackLogger: self.feedbackLogger,
             installVPNConfig: self.installVPNConfig,
             onOnboardingFinished: { [unowned self] onboardingViewController in
-                // Updates `userDefaultsConfig` with the latest
-                // onboarding stages that are completed.
-                self.userDefaultsConfig.onboardingStagesCompleted =
-                    OnboardingStage.stagesToComplete.map(\.rawValue)
+                
+                self.store.send(.appDelegateAction(.onboardingCompleted))
                 
                 completionHandler(onboardingViewController)
+                
             }
         )
     }
@@ -825,26 +964,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         return promise.asObjCPromise()
     }
     
-    @objc func onAdPresentationStatusChange(_ presenting: Bool) {
-        self.store.send(.appDelegateAction(.adPresentationStatus(presenting: presenting)))
-    }
-    
     @objc func getAppStoreSubscriptionProductIDs() -> Set<String> {
         return self.supportedProducts.supported[.subscription]!.rawValues
-    }
-
-    @objc func isCurrentlySpeedBoosted(completionHandler: @escaping (Bool) -> Void) {
-        self.store.$value.signalProducer
-            .map(\.psiCash)
-            .filter{ psiCashState in
-                psiCashState.libLoaded
-            }
-            .take(first: 1)
-            .startWithValues { psiCashState in
-                // Calls completionHandler with `true` if has an active Speed Boost.
-                completionHandler(psiCashState.activeSpeedBoost != nil)
-        }
-        
     }
     
     @objc func disallowedTrafficAlertNotification() {
@@ -907,6 +1028,48 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             self.feedbackLogger.fatalError("Unexpected state '\(value.switchedIntent)'")
             return
         }
+    }
+    
+    @objc func resetAdConsent() {
+        self.store.send(.adAction(.resetUserConsent))
+    }
+    
+    @objc func presentInterstitial(_ completionHandler: @escaping () -> Void) {
+        
+        // An interstitial is ready, and pending presentation.
+        self.store.send(.adAction(.presentInterstitial(willPresent: { willPresentAd in
+            
+            if willPresentAd {
+                
+                self.store.$value.signalProducer
+                    .map(\.adState.interstitialAdControllerStatus)
+                    .skipRepeats()
+                    .filter { adStatus in
+                        switch adStatus {
+                        case .loadSucceeded(.notPresented),
+                             .loadSucceeded(.presenting):
+                            return false
+                        
+                        default:
+                            return true
+                        }
+                    }
+                    .take(first: 1)
+                    .startWithValues { _ in
+                        // Ad either failed to present, or was presented
+                        // successfully and is dismissed.
+                        completionHandler()
+                    }
+                
+            } else {
+                
+                // Ad will not be presented.
+                completionHandler()
+                
+            }
+            
+        })))
+        
     }
     
     @objc func restartVPNIfActive() {
@@ -994,6 +1157,10 @@ fileprivate extension SwiftDelegate {
             store: self.store.projection(
                 value: { $0.psiCashViewController },
                 action: { .psiCash($0) }),
+            adStore: self.store.projection(
+                value: erase,
+                action: { .adAction($0) }
+            ),
             iapStore: self.store.projection(
                 value: erase,
                 action: { .iap($0) }),
