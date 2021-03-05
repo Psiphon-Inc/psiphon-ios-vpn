@@ -27,14 +27,12 @@ public enum PsiCashAction {
     case refreshPsiCashState
     case refreshPsiCashStateResult(PsiCashRefreshResult)
     
-    case showRewardedVideoAd
-    case rewardedVideoPresentation(RewardedVideoPresentation)
-    case rewardedVideoLoad(RewardedVideoLoad)
+    case userDidEarnReward(PsiCashAmount, PsiCashBalance.BalanceIncreaseExpectationReason)
+    
     case connectToPsiphonTapped
     case dismissedAlert(PsiCashAlertDismissAction)
 }
 
 public enum PsiCashAlertDismissAction {
-    case rewardedVideo
     case speedBoostAlreadyActive
 }

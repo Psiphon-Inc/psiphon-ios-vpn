@@ -40,8 +40,7 @@ typealias PsiCashEnvironment = (
     vpnActionStore: (VPNPublicAction) -> Effect<Never>,
     // TODO: Remove this dependency from reducer's environment. UI-related effects
     // unnecessarily complicate reducers.
-    objcBridgeDelegate: ObjCBridgeDelegate?,
-    rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate
+    objcBridgeDelegate: ObjCBridgeDelegate?
 )
 
 func psiCashReducer(
@@ -152,69 +151,21 @@ func psiCashReducer(
             return []
         }
         
-    case .showRewardedVideoAd:
-
-        guard case .iOS = environment.platform.current else {
-            return [
-                environment.feedbackLogger.log(.warn, "Ads can only be shown on iOS devices").mapNever()
-            ]
-        }
-
-        guard case .notSubscribed = state.subscription.status else {
-            return []
-        }
-        
-        switch state.tunnelConnection?.tunneled {
-        case .connected:
-            state.psiCash.rewardedVideo.combine(
-                loading: .failure(ErrorEvent(.noTunneledRewardedVideoAd))
-            )
-            return []
-        case .connecting, .disconnecting:
-            return []
-        case .notConnected, .none:
-            guard let customData = environment.psiCashEffects.rewardedVideoCustomData() else {
-                state.psiCash.rewardedVideo.combine(
-                    loading: .failure(ErrorEvent(.customDataNotPresent)))
-                return []
-            }
-            return [
-                .fireAndForget {
-                    environment.objcBridgeDelegate?.presentUntunneledRewardedVideoAd(
-                        customData: customData,
-                        delegate: environment.rewardedVideoAdBridgeDelegate)
-                }
-            ]
-        }
-        
-    case .rewardedVideoPresentation(let presentation):
-        state.psiCash.rewardedVideo.combine(presentation: presentation)
-        
-        if state.psiCash.rewardedVideo.rewardedAndDismissed {
-            let rewardAmount = PsiCashHardCodedValues.videoAdRewardAmount
-            state.psiCashBalance.waitingForExpectedIncrease(
-                withAddedReward: rewardAmount,
-                reason: .watchedRewardedVideo,
-                persisted: environment.psiCashPersistedValues
-            )
-            return [Effect { .refreshPsiCashState }]
-        } else {
-            return []
-        }
-        
-    case .rewardedVideoLoad(let loadStatus):
-        state.psiCash.rewardedVideo.combine(loading: loadStatus)
-        return []
-        
     case .dismissedAlert(let dismissed):
         switch dismissed {
         case .speedBoostAlreadyActive:
             state.psiCash.purchasing = .none
             return []
-        case .rewardedVideo:
-            state.psiCash.rewardedVideo.combineWithErrorDismissed()
-            return []
         }
+        
+    case let .userDidEarnReward(rewardAmount, reason):
+        
+        state.psiCashBalance.waitingForExpectedIncrease(
+            withAddedReward: rewardAmount,
+            reason: reason,
+            persisted: environment.psiCashPersistedValues)
+        
+        return []
         
     case .connectToPsiphonTapped:
         return [

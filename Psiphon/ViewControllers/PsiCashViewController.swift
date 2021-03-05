@@ -32,6 +32,7 @@ struct PsiCashViewControllerState: Equatable {
     let psiCash: PsiCashState
     let iap: IAPState
     let subscription: SubscriptionState
+    let adState: AdState
     let appStorePsiCashProducts:
         PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent<Int>>
     let isRefreshingAppStoreReceipt: Bool
@@ -68,9 +69,10 @@ extension PsiCashViewControllerState {
                 switch viewModels {
                 case []: return []
                 default: return [
-                    psiCash.rewardedVideoProduct(
+                    .rewardedVideoProduct(
                         clearedForSale: rewardedVideoClearedForSale,
-                        subtitle: rewardedVideoSubtitle
+                        subtitle: rewardedVideoSubtitle,
+                        adState: self.adState
                     )
                 ] + viewModels
                 }
@@ -79,9 +81,10 @@ extension PsiCashViewControllerState {
                 result.map { parsedList -> [PsiCashPurchasableViewModel] in
 
                     return [
-                        psiCash.rewardedVideoProduct(
+                        .rewardedVideoProduct(
                             clearedForSale: rewardedVideoClearedForSale,
-                            subtitle: rewardedVideoSubtitle
+                            subtitle: rewardedVideoSubtitle,
+                            adState: self.adState
                         )
                     ] + parsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
                         parsed.viewModel
@@ -165,6 +168,7 @@ final class PsiCashViewController: ReactiveViewController {
         platform: Platform,
         initialTab: PsiCashViewControllerTabs,
         store: Store<PsiCashViewControllerState, PsiCashAction>,
+        adStore: Store<Utilities.Unit, AdAction>,
         iapStore: Store<Utilities.Unit, IAPAction>,
         productRequestStore: Store<Utilities.Unit, ProductRequestAction>,
         appStoreReceiptStore: Store<Utilities.Unit, ReceiptStateAction>,
@@ -178,16 +182,16 @@ final class PsiCashViewController: ReactiveViewController {
         
         self.container = .init(
             AddPsiCashViewType(
-                PsiCashCoinPurchaseTable(purchaseHandler: { [unowned store, iapStore] in
+                PsiCashCoinPurchaseTable(purchaseHandler: {
                     switch $0 {
                     case .rewardedVideoAd:
-                        store.send(.showRewardedVideoAd)
+                        adStore.send(.loadRewardedVideo(presentAfterLoad: true))
                     case .product(let product):
                         iapStore.send(.purchase(product: product))
                     }
                 }),
                 .init(Spinner(style: .whiteLarge),
-                      .init(PsiCashMessageViewUntunneled(action: { [unowned store] in
+                      .init(PsiCashMessageViewUntunneled(action: {
                         store.send(.connectToPsiphonTapped)
                       }), .init(PsiCashMessageWithRetryView(),
                                 PsiCashMessageView())))),
@@ -196,7 +200,7 @@ final class PsiCashViewController: ReactiveViewController {
                     store.send(.buyPsiCashProduct(.speedBoost($0)))
                 }),
                 .init(Spinner(style: .whiteLarge),
-                      .init(PsiCashMessageViewUntunneled(action: { [unowned store] in
+                      .init(PsiCashMessageViewUntunneled(action: {
                         store.send(.connectToPsiphonTapped)
                       }), PsiCashMessageView()))))
         
@@ -227,23 +231,18 @@ final class PsiCashViewController: ReactiveViewController {
                     return
                 }
                 
-                if case let .failure(errorEvent) = observed.state.psiCash.rewardedVideo.loading {
-                    switch errorEvent.error {
-                    case .adSDKError(_), .requestedAdFailedToLoad:
-                        let errorDesc = ErrorEventDescription(
-                            event: errorEvent.eraseToRepr(),
-                            localizedUserDescription: UserStrings.Rewarded_video_load_failed())
-                        
-                        self.displayBasicAlert(errorDesc: errorDesc)
-                        
-                    case .noTunneledRewardedVideoAd:
-                        break
-                        
-                    case .customDataNotPresent:
-                        feedbackLogger.fatalError("Custom data not present")
-                        return
-                    }
+                // Presents alert if rewarded video load failed.
+                if case .loadFailed(let rewardedVideoLoadFailure) =
+                    observed.state.adState.rewardedVideoAdControllerStatus {
+                    
+                    let errorDesc = ErrorEventDescription(
+                        event: rewardedVideoLoadFailure.eraseToRepr(),
+                        localizedUserDescription: UserStrings.Rewarded_video_load_failed())
+                    
+                    self.displayBasicAlert(errorDesc: errorDesc)
+                    
                 }
+                
                 
                 let psiCashIAPPurchase = observed.state.iap.purchasing[.psiCash] ?? nil
                 let purchasingNavState = (psiCashIAPPurchase?.purchasingState,
@@ -638,43 +637,6 @@ extension PsiCashViewController {
         }
     }
     
-}
-
-// MARK: Extensions
-
-extension RewardedVideoState {
-    mutating func combineWithErrorDismissed() {
-        guard case .failure(_) = self.loading else {
-            return
-        }
-        self.loading = .success(.none)
-    }
-    
-    mutating func combine(loading: RewardedVideoLoad) {
-        self.loading = loading
-    }
-    
-    mutating func combine(presentation: RewardedVideoPresentation) {
-        self.presentation = presentation
-        switch presentation {
-        case .didDisappear:
-            dismissed = true
-        case .didRewardUser:
-            rewarded = true
-        case .willDisappear:
-            return
-        case .willAppear,
-             .didAppear,
-             .errorNoAdsLoaded,
-             .errorFailedToPlay,
-             .errorCustomDataNotSet,
-             .errorInappropriateState:
-            fallthrough
-        @unknown default:
-            dismissed = false
-            rewarded = false
-        }
-    }
 }
 
 extension ErrorEvent where E == IAPError {

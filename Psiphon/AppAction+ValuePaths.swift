@@ -145,6 +145,18 @@ extension AppAction {
             self = .feedbackAction(newValue)
         }
     }
+    
+    var adAction: AdAction? {
+        get {
+            guard case let .adAction(value) = self else { return nil }
+            return value
+        }
+        set {
+            guard case .adAction = self, let newValue = newValue else { return }
+            self = .adAction(newValue)
+        }
+    }
+    
 }
 
 
@@ -257,6 +269,7 @@ extension AppState {
             psiCash: self.psiCash,
             iap: self.iapState,
             subscription: self.subscription,
+            adState: self.adState,
             appStorePsiCashProducts: self.products.psiCashProducts,
             isRefreshingAppStoreReceipt: self.appReceipt.isRefreshingReceipt
         )
@@ -286,4 +299,17 @@ extension AppState {
             self.queuedFeedbacks = newValue.queuedFeedbacks
         }
     }
+    
+    var adReducerState: AdReducerState {
+        get {
+            AdReducerState(
+                adState: self.adState,
+                tunnelConnection: self.tunnelConnection
+            )
+        }
+        set {
+            self.adState = newValue.adState
+        }
+    }
+    
 }

@@ -43,6 +43,37 @@ struct AppState: Equatable {
     var internetReachability = ReachabilityState()
     var appDelegateState = AppDelegateState()
     var queuedFeedbacks: [UserFeedback] = []
+    var adState = AdState()
+}
+
+extension AppState {
+    
+    /// True if unknown values of `AppState` have been initialized.
+    var unknownValuesInitialized: Bool {
+        
+        // VPN Status.
+        guard vpnState.value.loadState.value != .nonLoaded else {
+            return false
+        }
+        
+        // Subscription status.
+        guard subscription.status != .unknown else {
+            return false
+        }
+        
+        // PsiCash lib load.
+        guard psiCash.libLoaded else {
+            return false
+        }
+        
+        // Onboarding value.
+        guard appDelegateState.onboardingCompleted != nil else {
+            return false
+        }
+        
+        return true
+    }
+    
 }
 
 struct BalanceState: Equatable {
@@ -64,6 +95,7 @@ enum AppAction {
     case productRequest(ProductRequestAction)
     case reachabilityAction(ReachabilityAction)
     case feedbackAction(FeedbackAction)
+    case adAction(AdAction)
 }
 
 // MARK: Environment
@@ -89,7 +121,6 @@ typealias AppEnvironment = (
     objcBridgeDelegate: ObjCBridgeDelegate,
     receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate,
     paymentTransactionDelegate: PaymentTransactionDelegate,
-    rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
     productRequestDelegate: ProductRequestDelegate,
     internetReachability: InternetReachability,
     internetReachabilityDelegate: StoreDelegate<ReachabilityAction>,
@@ -100,14 +131,21 @@ typealias AppEnvironment = (
     iapStore: (IAPAction) -> Effect<Never>,
     subscriptionStore: (SubscriptionAction) -> Effect<Never>,
     subscriptionAuthStateStore: (SubscriptionAuthStateAction) -> Effect<Never>,
+    adStore: (AdAction) -> Effect<Never>,
     /// `vpnStartCondition` returns true whenever the app is in such a state as to to allow
     /// the VPN to be started. If false is returned the VPN should not be started.
     vpnStartCondition: () -> Bool,
+    /// `adLoadCondition` returns `nil` if the app is in a state where ads can be loaded.
+    adLoadCondition: () -> ErrorMessage?,
     getCurrentTime: () -> Date,
     compareDates: (Date, Date, Calendar.Component) -> ComparisonResult,
     getPsiphonConfig: () -> [AnyHashable: Any]?,
     getAppStateFeedbackEntry: SignalProducer<DiagnosticEntry, Never>,
-    getFeedbackUpload: () -> FeedbackUploadProvider
+    getFeedbackUpload: () -> FeedbackUploadProvider,
+    adConsent: AdConsent,
+    adMobInterstitialAdController: AdMobInterstitialAdController,
+    adMobRewardedVideoAdController: AdMobRewardedVideoAdController,
+    topMostViewController: () -> UIViewController
 )
 
 /// Creates required environment for store `Store<AppState, AppAction>`.
@@ -122,8 +160,9 @@ func makeEnvironment(
     supportedAppStoreProducts: SupportedAppStoreProducts,
     userDefaultsConfig: UserDefaultsConfig,
     objcBridgeDelegate: ObjCBridgeDelegate,
-    rewardedVideoAdBridgeDelegate: RewardedVideoAdBridgeDelegate,
-    calendar: Calendar
+    calendar: Calendar,
+    adConsent: AdConsent,
+    topMostViewController: @escaping () -> UIViewController
 ) -> (environment: AppEnvironment, cleanup: () -> Void) {
     
     let urlSessionConfig = URLSessionConfiguration.default
@@ -142,6 +181,22 @@ func makeEnvironment(
             action: { .iap(.transactionUpdate($0)) })
     )
     SKPaymentQueue.default().add(paymentTransactionDelegate)
+    
+    let adMobInterstitialAdController = AdMobInterstitialAdController(
+        adUnitID: AdMobAdUnitIDs.UntunneledAdMobInterstitialAdUnitID,
+        store: store.projection(
+            value: erase,
+            action: { .adAction($0) }
+        )
+    )
+    
+    let adMobRewardedVideoAdController = AdMobRewardedVideoAdController(
+        adUnitID: AdMobAdUnitIDs.UntunneledAdMobRewardedVideoAdUnitID,
+        store: store.projection(
+            value: erase,
+            action: { .adAction($0) }
+        )
+    )
     
     let reachabilityForInternetConnection = Reachability.forInternetConnection()!
     
@@ -171,7 +226,6 @@ func makeEnvironment(
                 action: { .appReceipt($0) })
         ),
         paymentTransactionDelegate: paymentTransactionDelegate,
-        rewardedVideoAdBridgeDelegate: rewardedVideoAdBridgeDelegate,
         productRequestDelegate: ProductRequestDelegate(store:
             store.projection(
                 value: erase,
@@ -219,8 +273,43 @@ func makeEnvironment(
                 store.send(.subscriptionAuthStateAction(action))
             }
         },
+        adStore: { [unowned store] (action: AdAction)
+            -> Effect<Never> in
+            .fireAndForget {
+                store.send(.adAction(action))
+            }
+        },
         vpnStartCondition: { [unowned store] () -> Bool in
-            return !store.value.appDelegateState.adPresentationState
+            // VPN can be started if an ad is not being presented.
+            return !store.value.adState.isPresentingAd
+        },
+        adLoadCondition: { [unowned store] () -> ErrorMessage? in
+            
+            // Ads are restricted to iOS platform.
+            guard case .iOS = platform.current else {
+                return ErrorMessage("current platform is '\(platform.current)'")
+            }
+            
+            // Ads are restricted to non-subscribed users.
+            guard case .notSubscribed = store.value.subscription.status else {
+                return ErrorMessage("subscription status is '\(store.value.subscription.status)'")
+            }
+            
+            // Ads and Ad SDKs should not be initialized until the user
+            // has finished onboarding.
+            guard store.value.appDelegateState.onboardingCompleted ?? false else {
+                return ErrorMessage("onboarding not completed")
+            }
+            
+            // Ads should not be loaded unless the app is in the foreground.
+            guard store.value.appDelegateState.appLifecycle.isAppForegrounded else {
+                return ErrorMessage("""
+                    app is not foregrounded: '\(store.value.appDelegateState.appLifecycle)'
+                    """)
+            }
+            
+            return .none
+            
         },
         getCurrentTime: { () -> Date in
             return Date()
@@ -235,11 +324,15 @@ func makeEnvironment(
             store.$value.signalProducer
             .take(first: 1)
             .map { appState -> DiagnosticEntry in
-                return appState.feedbackEntry(userDefaultsConfig: UserDefaultsConfig(),
+                return appState.feedbackEntry(userDefaultsConfig: userDefaultsConfig,
                                               sharedDB: sharedDB,
                                               store: store)
             },
-        getFeedbackUpload: {PsiphonTunnelFeedback()}
+        getFeedbackUpload: {PsiphonTunnelFeedback()},
+        adConsent: adConsent,
+        adMobInterstitialAdController: adMobInterstitialAdController,
+        adMobRewardedVideoAdController: adMobRewardedVideoAdController,
+        topMostViewController: topMostViewController
     )
     
     let cleanup = { [paymentTransactionDelegate] in
@@ -258,8 +351,7 @@ fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment
         psiCashPersistedValues: env.userConfigs,
         notifier: env.notifier,
         vpnActionStore: env.vpnActionStore,
-        objcBridgeDelegate: env.objcBridgeDelegate,
-        rewardedVideoAdBridgeDelegate: env.rewardedVideoAdBridgeDelegate
+        objcBridgeDelegate: env.objcBridgeDelegate
     )
 }
 
@@ -368,7 +460,9 @@ fileprivate func toAppDelegateReducerEnvironment(env: AppEnvironment) -> AppDele
         paymentQueue: env.paymentQueue,
         appReceiptStore: env.appReceiptStore,
         psiCashStore: env.psiCashStore,
-        paymentTransactionDelegate: env.paymentTransactionDelegate
+        adStore: env.adStore,
+        paymentTransactionDelegate: env.paymentTransactionDelegate,
+        userDefaultsConfig: env.userConfigs
     )
 }
 
@@ -395,6 +489,21 @@ fileprivate func toVPNReducerEnvironment(env: AppEnvironment) -> VPNReducerEnvir
         vpnStartCondition: env.vpnStartCondition,
         vpnConnectionObserver: env.vpnConnectionObserver,
         internetReachability: env.internetReachability
+    )
+}
+
+fileprivate func toAdStateEnvironment(env: AppEnvironment) -> AdStateEnvironment {
+    AdStateEnvironment(
+        platform: env.platform,
+        feedbackLogger: env.feedbackLogger,
+        adConsent: env.adConsent,
+        psiCashLib: env.psiCashEffects,
+        psiCashStore: env.psiCashStore,
+        tunnelStatusSignal: env.tunnelStatusSignal,
+        adMobInterstitialAdController: env.adMobInterstitialAdController,
+        adMobRewardedVideoAdController: env.adMobRewardedVideoAdController,
+        adLoadCondition: env.adLoadCondition,
+        topMostViewController: env.topMostViewController
     )
 }
 
@@ -445,7 +554,11 @@ func makeAppReducer(
         pullback(feedbackReducer,
                  value: \.feedbackReducerState,
                  action: \.feedbackAction,
-                 environment: toFeedbackReducerEnvironment(env:))
+                 environment: toFeedbackReducerEnvironment(env:)),
+        pullback(adStateReducer,
+                 value: \.adReducerState,
+                 action: \.adAction,
+                 environment: toAdStateEnvironment(env:))
     )
 }
 
