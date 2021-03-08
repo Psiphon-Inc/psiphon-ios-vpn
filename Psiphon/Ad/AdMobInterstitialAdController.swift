@@ -108,6 +108,9 @@ final class AdMobInterstitialAdController: StoreDelegate<AdAction> {
             return ErrorMessage("AdMob SDK cannot present interstitial ad")
         }
         
+        // Ad is expected to be presented successfully.
+        self.status = .loadSucceeded(.willPresent)
+        
         interstitial.present(fromRootViewController: viewController)
         
         return .none
@@ -133,7 +136,7 @@ extension AdMobInterstitialAdController: GADFullScreenContentDelegate {
     }
     
     func adDidPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
-        self.status = .loadSucceeded(.presenting)
+        self.status = .loadSucceeded(.didPresent)
     }
     
     func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {

@@ -1052,7 +1052,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     .filter { adStatus in
                         switch adStatus {
                         case .loadSucceeded(.notPresented),
-                             .loadSucceeded(.presenting):
+                             .loadSucceeded(.willPresent),
+                             .loadSucceeded(.didPresent):
                             return false
                         
                         default:

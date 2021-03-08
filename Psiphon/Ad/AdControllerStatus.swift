@@ -28,8 +28,11 @@ enum AdControllerStatus<LoadError: HashableError>: Equatable {
         /// Ad has been successfully loaded, but not presented yet.
         case notPresented
         
-        /// Ad is currently presenting.
-        case presenting
+        /// Ad will be presented.
+        case willPresent
+        
+        /// Ad is has been presented.
+        case didPresent
         
         /// Ad failed to present. Presenting this ad should not be retried.
         case fatalPresentationError(SystemError<Int>)
@@ -50,5 +53,23 @@ enum AdControllerStatus<LoadError: HashableError>: Equatable {
     
     /// An ad has been successfully loaded.
     case loadSucceeded(PresentationStatus)
+    
+}
+
+extension AdControllerStatus {
+    
+    /// True if ad did or will be presented.
+    var isPresentingAd: Bool {
+        
+        switch self {
+        case .loadSucceeded(.willPresent),
+             .loadSucceeded(.didPresent):
+            return true
+        
+        default:
+            return false
+        }
+        
+    }
     
 }
