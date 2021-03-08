@@ -171,11 +171,3 @@ extension UserFeedback: CustomFieldFeedbackDescription {
     }
 
 }
-
-extension Locale: CustomStringConvertible {
-
-    var description: String {
-        return self.currencyCode!
-    }
-
-}

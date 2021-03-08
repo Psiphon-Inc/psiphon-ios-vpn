@@ -38,7 +38,7 @@ import UIKit
 }
 
 /// Enables sharing implementation of `setEventHandler(for::)` between different subclasses of UIControl.
-protocol UIControlEventHandler: class {
+protocol UIControlEventHandler: AnyObject {
     
     var eventHandler: EventHandler? { get set }
     
