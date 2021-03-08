@@ -118,6 +118,9 @@ final class AdMobRewardedVideoAdController: StoreDelegate<AdAction> {
             return ErrorMessage("AdMob SDK cannot present rewarded video ad")
         }
         
+        // Ad is expected to be presented successfully.
+        self.status = .loadSucceeded(.willPresent)
+        
         rewardedVideo.present(fromRootViewController: viewController) { [unowned self] in
             self.storeSend(.rewardedVideoAdUserEarnedReward)
         }
@@ -145,7 +148,7 @@ extension AdMobRewardedVideoAdController: GADFullScreenContentDelegate {
     }
     
     func adDidPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
-        self.status = .loadSucceeded(.presenting)
+        self.status = .loadSucceeded(.didPresent)
     }
     
     func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
