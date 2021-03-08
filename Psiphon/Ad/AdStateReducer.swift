@@ -191,10 +191,20 @@ func adStateReducer(
             
             state.adState.appTrackingTransparencyPermission = .completed(.failure(error))
             
-            // Logs Ad SDK init error.
-            return [
-                environment.feedbackLogger.log(.error, "AdMob failed to init: \(error)").mapNever()
-            ]
+            switch error {
+            case .adConsentError(.notUntunneled):
+                // Logs untunneled error as an info
+                return [
+                    environment.feedbackLogger.log(.info, "AdMob failed to init: \(error)")
+                        .mapNever()
+                ]
+            default:
+                // Logs untunneled error as an info
+                return [
+                    environment.feedbackLogger.log(.error, "AdMob failed to init: \(error)")
+                        .mapNever()
+                ]
+            }
             
         }
                 
