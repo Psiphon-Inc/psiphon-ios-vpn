@@ -90,6 +90,10 @@ final class AdMobInterstitialAdController: StoreDelegate<AdAction> {
             return ErrorMessage("no rewarded video loaded")
         }
         
+        guard !self.status.isPresentingAd else {
+            return ErrorMessage("ad is already presenting")
+        }
+        
         // Checks if viewController passed in is being dismissed before
         // presenting the ad.
         // This check should be done regardless of the implementation details of the Ad SDK,
