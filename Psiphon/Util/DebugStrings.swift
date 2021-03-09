@@ -34,6 +34,8 @@ extension PSIStatus: CustomDebugStringConvertible {
         case .transactionAmountMismatch: return "transactionAmountMismatch"
         case .transactionTypeNotFound: return "transactionTypeNotFound"
         case .invalidTokens: return "invalidTokens"
+        case .invalidCredentials: return "invalidCredentials"
+        case .badRequest: return "badRequest"
         case .serverError: return "serverError"
         @unknown default: return "unknown(\(self.rawValue))"
         }

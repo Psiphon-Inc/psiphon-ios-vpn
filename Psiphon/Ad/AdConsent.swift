@@ -75,7 +75,7 @@ final class AdConsent {
         
         if Debugging.adNetworkGeographicDebugging != .disabled {
             let debugSettings = UMPDebugSettings()
-            debugSettings.testDeviceIdentifiers = adMobTestDeviceIdentifiers
+            debugSettings.testDeviceIdentifiers = []
             debugSettings.geography = Debugging.adNetworkGeographicDebugging.toUMPDebugGeography
             params.debugSettings = debugSettings
         }

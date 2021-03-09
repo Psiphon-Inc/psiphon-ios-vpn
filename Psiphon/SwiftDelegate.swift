@@ -224,6 +224,9 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
         appSupportFileStore = ApplicationSupportFileStore(fileManager: FileManager.default)
         
         psiCashLib = PsiCash(feedbackLogger: self.feedbackLogger)
+        
+        platform = Platform(ProcessInfo.processInfo)
+        
     }
     
     // Should be called early in the application lifecycle.
