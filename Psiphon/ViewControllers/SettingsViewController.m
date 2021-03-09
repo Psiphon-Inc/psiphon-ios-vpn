@@ -24,7 +24,6 @@
 #import "RACCompoundDisposable.h"
 #import "RACReplaySubject.h"
 #import "Asserts.h"
-#import "AdManager.h"
 #import "Strings.h"
 #import "UIAlertController+Additions.h"
 #import "AppObservables.h"
@@ -263,7 +262,7 @@ NSString * const SettingsPsiCashAccountLogoutCellSpecifierKey = @"settingsLogOut
     UIAlertAction *resetAction = [UIAlertAction actionWithTitle:[Strings resetConsentButtonTitle]
         style:UIAlertActionStyleDestructive
       handler:^(UIAlertAction *action) {
-          [[AdManager sharedInstance] resetUserConsent];
+          [SwiftDelegate.bridge resetAdConsent];
       }];
 
     [alert addAction:resetAction];

@@ -338,6 +338,12 @@ import Foundation
         return "Create account"
     }
 
+    static func Loading() -> String {
+        return NSLocalizedString("LOADING", tableName: nil, bundle: Bundle.main,
+                                 value: "Loading...",
+                                 comment: "Text displayed while app loads")
+    }
+
 }
 
 // MARK: Internet reachability

@@ -198,6 +198,20 @@ public extension Optional where Wrapped == Bool {
 
 }
 
+public extension Optional where Wrapped: Error {
+    
+    /// If self is none, produce given success value, otherwise produces wrapped error as failure.
+    func maybeToRight<A>(_ a: A) -> Result<A, Wrapped> {
+        switch self {
+        case .none:
+            return .success(a)
+        case .some(let error):
+            return .failure(error)
+        }
+    }
+    
+}
+
 public typealias PendingResult<Success: Equatable, Failure: Error & Equatable> = Pending<Result<Success, Failure>>
 
 /// A type that is isomorphic to Optional type, intended to represent computations that are "pending" before finishing.
