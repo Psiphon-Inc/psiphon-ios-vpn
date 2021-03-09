@@ -281,7 +281,7 @@ func makeEnvironment(
         },
         vpnStartCondition: { [unowned store] () -> Bool in
             // VPN can be started if an ad is not being presented.
-            return !store.value.adState.isPresentingAd
+            return !store.value.adState.isPresentingAnyAd
         },
         adLoadCondition: { [unowned store] () -> ErrorMessage? in
             
