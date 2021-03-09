@@ -192,10 +192,20 @@ let adStateReducer = Reducer<AdReducerState
             
             state.adState.appTrackingTransparencyPermission = .completed(.failure(error))
             
-            // Logs Ad SDK init error.
-            return [
-                environment.feedbackLogger.log(.error, "AdMob failed to init: \(error)").mapNever()
-            ]
+            switch error {
+            case .adConsentError(.notUntunneled):
+                // Logs untunneled error as an info
+                return [
+                    environment.feedbackLogger.log(.info, "AdMob failed to init: \(error)")
+                        .mapNever()
+                ]
+            default:
+                // Logs untunneled error as an info
+                return [
+                    environment.feedbackLogger.log(.error, "AdMob failed to init: \(error)")
+                        .mapNever()
+                ]
+            }
             
         }
                 
@@ -700,18 +710,11 @@ fileprivate extension GADInitializationStatus {
 
 extension AdState {
     
-    /// True if any ad is currently presented.
-    var isPresentingAd: Bool {
+    /// True if any ad will or did present.
+    var isPresentingAnyAd: Bool {
         
-        if case .loadSucceeded(.presenting) = self.interstitialAdControllerStatus {
-            return true
-        }
-        
-        if case .loadSucceeded(.presenting) = self.rewardedVideoAdControllerStatus {
-            return true
-        }
-        
-        return false
+        self.interstitialAdControllerStatus.isPresentingAd ||
+            self.rewardedVideoAdControllerStatus.isPresentingAd
         
     }
     

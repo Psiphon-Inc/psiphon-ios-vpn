@@ -138,7 +138,7 @@ public final class TunnelConnection: Equatable {
     
 }
 
-public protocol TunnelProviderManager: ClassBound, Equatable {
+public protocol TunnelProviderManager: AnyObject, Equatable {
 
     var vpnStatus: TunnelProviderVPNStatus { get }
     
