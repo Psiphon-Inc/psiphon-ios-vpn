@@ -102,6 +102,10 @@ final class AdMobRewardedVideoAdController: StoreDelegate<AdAction> {
             return ErrorMessage("no rewarded video loaded")
         }
         
+        guard !self.status.isPresentingAd else {
+            return ErrorMessage("ad is already presenting")
+        }
+        
         // Checks if viewController passed in is being dismissed before
         // presenting the ad.
         // This check should be done regardless of the implementation details of the Ad SDK,
@@ -117,6 +121,9 @@ final class AdMobRewardedVideoAdController: StoreDelegate<AdAction> {
             self.status = .loadSucceeded(.fatalPresentationError(.make(error as NSError)))
             return ErrorMessage("AdMob SDK cannot present rewarded video ad")
         }
+        
+        // Ad is expected to be presented successfully.
+        self.status = .loadSucceeded(.willPresent)
         
         rewardedVideo.present(fromRootViewController: viewController) { [unowned self] in
             self.storeSend(.rewardedVideoAdUserEarnedReward)
@@ -145,7 +152,7 @@ extension AdMobRewardedVideoAdController: GADFullScreenContentDelegate {
     }
     
     func adDidPresentFullScreenContent(_ ad: GADFullScreenPresentingAd) {
-        self.status = .loadSucceeded(.presenting)
+        self.status = .loadSucceeded(.didPresent)
     }
     
     func adDidDismissFullScreenContent(_ ad: GADFullScreenPresentingAd) {
