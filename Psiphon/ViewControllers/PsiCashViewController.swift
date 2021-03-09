@@ -49,6 +49,7 @@ final class PsiCashViewController: ReactiveViewController {
         let psiCash: PsiCashState
         let iap: IAPState
         let subscription: SubscriptionState
+        let adState: AdState
         let appStorePsiCashProducts:
             PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent<Int>>
         let isRefreshingAppStoreReceipt: Bool
@@ -103,6 +104,7 @@ final class PsiCashViewController: ReactiveViewController {
     init(
         platform: Platform,
         store: Store<ReaderState, ViewControllerAction>,
+        adStore: Store<Utilities.Unit, AdAction>,
         iapStore: Store<Utilities.Unit, IAPAction>,
         productRequestStore: Store<Utilities.Unit, ProductRequestAction>,
         appStoreReceiptStore: Store<Utilities.Unit, ReceiptStateAction>,
@@ -130,18 +132,18 @@ final class PsiCashViewController: ReactiveViewController {
         
         self.container = .init(
             AddPsiCashViewType(
-                PsiCashCoinPurchaseTable(purchaseHandler: { [unowned store] in
+                PsiCashCoinPurchaseTable(purchaseHandler: {
                     switch $0 {
                     case .rewardedVideoAd:
-                        store.send(.psiCashAction(.showRewardedVideoAd))
+                        adStore.send(.loadRewardedVideo(presentAfterLoad: true))
                     case .product(let product):
                         store.send(.mainViewAction(.psiCashViewAction(
                                                     .purchaseTapped(product: product))))
                     }
                 }),
                 .init(Spinner(style: .whiteLarge),
-                      .init(PsiCashMessageViewUntunneled(action: { [unowned store] in
-                        store.send(.psiCashAction(.connectToPsiphonTapped))
+                      .init(PsiCashMessageViewUntunneled(action: {
+                      store.send(.psiCashAction(.connectToPsiphonTapped))
                       }), .init(PsiCashMessageWithRetryView(),
                                 PsiCashMessageView())))),
             SpeedBoostViewType(
@@ -149,8 +151,8 @@ final class PsiCashViewController: ReactiveViewController {
                     store.send(.psiCashAction(.buyPsiCashProduct(.speedBoost($0))))
                 }),
                 .init(Spinner(style: .whiteLarge),
-                      .init(PsiCashMessageViewUntunneled(action: { [unowned store] in
-                        store.send(.psiCashAction(.connectToPsiphonTapped))
+                      .init(PsiCashMessageViewUntunneled(action: {
+                      store.send(.psiCashAction(.connectToPsiphonTapped))
                       }), PsiCashMessageView()))))
         
         self.containerBindable = self.container.build(self.containerView)
@@ -200,23 +202,17 @@ final class PsiCashViewController: ReactiveViewController {
                 return
             }
             
-            if case let .failure(errorEvent) = observed.readerState.psiCash.rewardedVideo.loading {
-                switch errorEvent.error {
-                case .adSDKError(_), .requestedAdFailedToLoad:
-                    let alertEvent = AlertEvent(
-                        .error(localizedMessage: UserStrings.Rewarded_video_load_failed()),
-                        date: errorEvent.date
-                    )
+            // Presents alert if rewarded video load failed.
+            if case .loadFailed(let rewardedVideoLoadFailure) =
+                observed.readerState.adState.rewardedVideoAdControllerStatus {
+                
+                let alertEvent = AlertEvent(
+                    .error(localizedMessage: UserStrings.Rewarded_video_load_failed()),
+                    date: rewardedVideoLoadFailure.date
+                )
+                
+                self.store.send(.mainViewAction(.presentAlert(alertEvent)))
 
-                    self.store.send(.mainViewAction(.presentAlert(alertEvent)))
-
-                case .noTunneledRewardedVideoAd:
-                    break
-                    
-                case .customDataNotPresent:
-                    feedbackLogger.fatalError("Custom data not present")
-                    return
-                }
             }
             
             let psiCashIAPPurchase = observed.readerState.iap.purchasing[.psiCash] ?? nil
@@ -681,43 +677,6 @@ extension PsiCashViewController {
     
 }
 
-// MARK: Extensions
-
-extension RewardedVideoState {
-    mutating func combineWithErrorDismissed() {
-        guard case .failure(_) = self.loading else {
-            return
-        }
-        self.loading = .success(.none)
-    }
-    
-    mutating func combine(loading: RewardedVideoLoad) {
-        self.loading = loading
-    }
-    
-    mutating func combine(presentation: RewardedVideoPresentation) {
-        self.presentation = presentation
-        switch presentation {
-        case .didDisappear:
-            dismissed = true
-        case .didRewardUser:
-            rewarded = true
-        case .willDisappear:
-            return
-        case .willAppear,
-             .didAppear,
-             .errorNoAdsLoaded,
-             .errorFailedToPlay,
-             .errorCustomDataNotSet,
-             .errorInappropriateState:
-            fallthrough
-        @unknown default:
-            dismissed = false
-            rewarded = false
-        }
-    }
-}
-
 extension ErrorEvent where E == IAPError {
     
     /// Returns an `ErrorEventDescription` if the error represents a user-facing error, otherwise returns `nil`.
@@ -817,9 +776,10 @@ extension PsiCashViewController.ReaderState {
                 switch viewModels {
                 case []: return []
                 default: return [
-                    psiCash.rewardedVideoProduct(
+                    .rewardedVideoProduct(
                         clearedForSale: rewardedVideoClearedForSale,
-                        subtitle: rewardedVideoSubtitle
+                        subtitle: rewardedVideoSubtitle,
+                        adState: self.adState
                     )
                 ] + viewModels
                 }
@@ -828,9 +788,10 @@ extension PsiCashViewController.ReaderState {
                 result.map { parsedList -> [PsiCashPurchasableViewModel] in
 
                     return [
-                        psiCash.rewardedVideoProduct(
+                        .rewardedVideoProduct(
                             clearedForSale: rewardedVideoClearedForSale,
-                            subtitle: rewardedVideoSubtitle
+                            subtitle: rewardedVideoSubtitle,
+                            adState: self.adState
                         )
                     ] + parsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
                         parsed.viewModel

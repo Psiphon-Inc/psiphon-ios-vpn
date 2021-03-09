@@ -19,7 +19,6 @@
 
 #import <Foundation/Foundation.h>
 #import "MainViewController.h"
-#import "AdManager.h"
 #import "AppInfo.h"
 #import "AppDelegate.h"
 #import "Asserts.h"
@@ -51,7 +50,6 @@
 #import "UIView+Additions.h"
 #import "CloudsView.h"
 #import "AppObservables.h"
-#import <PersonalizedAdConsent/PersonalizedAdConsent.h>
 #import "Psiphon-Swift.h"
 
 PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
@@ -65,7 +63,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 @interface MainViewController ()
 
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
-@property (nonatomic) AdManager *adManager;
 
 @property (nonatomic, readonly) BOOL startVPNOnFirstLoad;
 
@@ -123,8 +120,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
         
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
         
-        _adManager = [AdManager sharedInstance];
-
         // TODO: remove persistance from init function.
         [self persistSettingsToSharedUserDefaults];
         
@@ -318,16 +313,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
             [AppDelegate.sharedAppDelegate startStopVPNWithAd:FALSE];
         }
     }
-    
-    // Initializes AdManager for iOS only.
-    {
-        if ([AppInfo isiOSAppOnMac] == FALSE) {
-            [[AdManager sharedInstance] initializeAdManager];
-            [[AdManager sharedInstance] initializeRewardedVideos];
-        } else {
-            LOG_DEBUG(@"Skipping AdManager initialization since running on Mac.");
-        }
-    }
+  
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -375,94 +361,6 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
     bottomBarBackgroundGradient.frame = bottomBarBackground.bounds;
-}
-
-#pragma mark - Public properties
-
-- (RACSignal<RACUnit *> *)activeStateLoadingSignal {
-    
-    // If MainViewController is started from onboarding, dismisses launch screen.
-    if (self.startVPNOnFirstLoad == TRUE) {
-        return [RACSignal return:RACUnit.defaultUnit];
-    }
-    
-    // unsubscribedAdLoadingSignal -
-    // If iOS app is running on Mac or if device is tunneled it emits unit value immediately,
-    // else, when untunneled emits unit value after interstitial ad has loaded
-    // or when MaxAdLoadingTime has passed, otherwise, emits unit value immediately.
-    RACSignal<RACUnit *> *unsubscribedAdLoadingSignal = [[[AppObservables.shared.vpnStatus
-      map:^RACSignal * _Nullable(NSNumber * _Nullable value) {
-        VPNStatus s = (VPNStatus) value.integerValue;
-        
-        if ([AppInfo isiOSAppOnMac] == TRUE) {
-            return [RACSignal return:RACUnit.defaultUnit];
-        }
-        
-        if (s == VPNStatusDisconnected || s == VPNStatusInvalid) {
-            
-            return [[[[[AdManager.sharedInstance.adSDKStarted
-                        catch:^RACSignal * _Nonnull(NSError * _Nonnull error) {
-                
-                // Ad SDK failed to initialize.
-                // Returns unit value to indicate that we're done with ad initialization.
-                
-                [PsiFeedbackLogger errorWithType:MainViewControllerLogType
-                                         message:@"Ad SDK failed to initialize"
-                                          object:error];
-                
-                return [RACSignal return:RACUnit.defaultUnit];
-                
-            }] flattenMap:^__kindof RACSignal * _Nullable(RACUnit * _Nullable value) {
-                
-                // Ad SDK has loaded and consent collected.
-                return [AdManager.sharedInstance.untunneledInterstitialLoadStatus
-                        filter:^BOOL(NSNumber *loadStatus) {
-                    AdLoadStatus status = (AdLoadStatus) [loadStatus integerValue];
-                    return status == AdLoadStatusDone;
-                }];
-            }] merge:[RACSignal timer:MaxAdLoadingTime]]
-                     take:1]
-                    mapReplace:RACUnit.defaultUnit];
-            
-        } else {
-            return [RACSignal return:RACUnit.defaultUnit];
-        }
-    }] switchToLatest] take:1];
-
-    // subscriptionLoadingSignal emits a value when the user subscription status becomes known.
-    RACSignal *subscriptionLoadingSignal = [[AppObservables.shared.subscriptionStatus
-      filter:^BOOL(BridgedUserSubscription *status) {
-        return status.state != BridgedSubscriptionStateUnknown;
-      }]
-      take:1];
-    
-    RACSignal<NSNumber *> *isCurrentlySpeedBoosted = [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSubscriber>  _Nonnull subscriber) {
-        [SwiftDelegate.bridge isCurrentlySpeedBoostedWithCompletionHandler:^(BOOL activeSpeedBoost) {
-            [subscriber sendNext: [NSNumber numberWithBool:activeSpeedBoost]];
-            [subscriber sendCompleted];
-        }];
-        return nil;
-    }];
-
-    // Returned signal emits RACUnit and completes immediately after all loading operations
-    // are done.
-    return [[subscriptionLoadingSignal zipWith:isCurrentlySpeedBoosted]
-            flattenMap:^RACSignal *(NSArray *value) {
-        
-        BridgedUserSubscription *status = (BridgedUserSubscription *)value[0];
-        BOOL currentlySpeedBoosted = [((NSNumber *)value[1]) boolValue];
-        
-        BOOL subscribed = (status.state == BridgedSubscriptionStateActive);
-
-        if (subscribed || currentlySpeedBoosted) {
-            // User is subscribed or is has an active Speed Boost,
-            // dismisses the loading screen immediately.
-            return [RACSignal return:RACUnit.defaultUnit];
-        } else {
-            // User is not subscribed, wait for the adsLoadingSignal.
-            return unsubscribedAdLoadingSignal;
-        }
-    }];
 }
 
 #pragma mark - UI callbacks

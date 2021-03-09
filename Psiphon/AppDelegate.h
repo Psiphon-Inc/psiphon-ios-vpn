@@ -18,7 +18,6 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "AppEvent.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

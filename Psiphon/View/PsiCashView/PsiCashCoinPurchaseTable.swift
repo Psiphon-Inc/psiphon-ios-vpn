@@ -35,20 +35,21 @@ struct PsiCashPurchasableViewModel: Equatable {
     let clearedForSale: Bool
 }
 
-extension PsiCashState {
-    
-    func rewardedVideoProduct(
-        clearedForSale: Bool, subtitle: String
+extension PsiCashPurchasableViewModel {
+
+    static func rewardedVideoProduct(
+        clearedForSale: Bool, subtitle: String, adState: AdState
     ) -> PsiCashPurchasableViewModel {
         PsiCashPurchasableViewModel(
-            product: .rewardedVideoAd(loading: self.rewardedVideo.isLoading),
+            product: .rewardedVideoAd(
+                loading: adState.rewardedVideoAdControllerStatus == .loading),
             title: PsiCashHardCodedValues.videoAdRewardTitle,
             subtitle: subtitle,
             localizedPrice: .free,
             clearedForSale: clearedForSale
         )
     }
-    
+
 }
 
 struct PsiCashCoinPurchaseTable: ViewBuilder {

@@ -43,14 +43,12 @@ public enum PsiCashAction: Equatable {
     case accountLogin(username: String, password: SecretString)
     case _accountLoginResult(PsiCashEffects.PsiCashAccountLoginResult)
     
-    case showRewardedVideoAd
-    case rewardedVideoPresentation(RewardedVideoPresentation)
-    case rewardedVideoLoad(RewardedVideoLoad)
+    case userDidEarnReward(PsiCashAmount, PsiCashBalance.BalanceOutOfDateReason)
+    
     case connectToPsiphonTapped
     case dismissedAlert(PsiCashAlertDismissAction)
 }
 
 public enum PsiCashAlertDismissAction: Equatable {
-    case rewardedVideo
     case speedBoostAlreadyActive
 }
