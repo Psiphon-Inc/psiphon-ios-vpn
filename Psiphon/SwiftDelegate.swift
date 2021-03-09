@@ -1041,13 +1041,19 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             
             if willPresentAd {
                 
+                // An interstitial ad is expected to be presented at this point.
+                // In order call `completionHandler` when the ad is dismissed,
+                // adState.interstitialAdControllerStatus is observed for a change
+                // in state from "not presented" or "is currently presented" to
+                // any other state.
                 self.store.$value.signalProducer
                     .map(\.adState.interstitialAdControllerStatus)
                     .skipRepeats()
                     .filter { adStatus in
                         switch adStatus {
                         case .loadSucceeded(.notPresented),
-                             .loadSucceeded(.presenting):
+                             .loadSucceeded(.willPresent),
+                             .loadSucceeded(.didPresent):
                             return false
                         
                         default:

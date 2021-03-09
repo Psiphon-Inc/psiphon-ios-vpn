@@ -527,7 +527,7 @@ extension UIColor {
 
 // MARK: Composable views
 
-protocol BindableViewable: class, Bindable, ViewWrapper {
+protocol BindableViewable: AnyObject, Bindable, ViewWrapper {
     associatedtype WrappedView: ViewWrapper
 
     static func build<Builder>(with builder: Builder, addTo container: UIView) -> Builder.BuildType where Builder: ViewBuilder, Builder.BuildType == Self

@@ -443,13 +443,9 @@ public extension URLRequest {
 
 // MARK: Reference management
 
-/// A protocol that is class-bound.
-/// - Discussion: This enables `where` clause to match protocol that are class-bound.
-public protocol ClassBound: class {}
-
 /// `WeakRef` holds a weak reference to the underlying type.
 /// - Discussion: This type is useful to provide access to resource that might other be leaked.
-public final class WeakRef<Wrapped: ClassBound> {
+public final class WeakRef<Wrapped: AnyObject> {
     
     public weak var weakRef: Wrapped?
     
