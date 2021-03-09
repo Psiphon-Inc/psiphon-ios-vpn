@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2913641F25DF06C800C79880 /* AdMobInterstitialAdController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2913641E25DF06C800C79880 /* AdMobInterstitialAdController.swift */; };
+		2913642125DF1E5700C79880 /* AdControllerStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2913642025DF1E5700C79880 /* AdControllerStatus.swift */; };
+		296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296622B425E8A554004635A1 /* LaunchScreenViewController.swift */; };
+		2968042225F2D3FF00D04B7F /* PsiCashLib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5265B00125AFBD53006BD58C /* PsiCashLib.xcframework */; };
+		2968042325F2D3FF00D04B7F /* PsiCashLib.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5265B00125AFBD53006BD58C /* PsiCashLib.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		296E800225D47A6300574A74 /* AdStateReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296E800125D47A6300574A74 /* AdStateReducer.swift */; };
+		29B59CE725E48F4E0051C213 /* AdMobRewardedVideoAdController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B59CE625E48F4E0051C213 /* AdMobRewardedVideoAdController.swift */; };
 		29FE979125C0C1CA00D9C09F /* HostAppProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 29FE979025C0C1CA00D9C09F /* HostAppProtocol.m */; };
 		440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 440D75BD1F59E041005C603B /* StoreKit.framework */; };
 		4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4435CC261F70566000F3A809 /* SettingsViewController.m */; };
@@ -62,6 +69,11 @@
 		5202011D2360D34000D00C8E /* EitherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5202011C2360D34000D00C8E /* EitherView.swift */; };
 		52055D04230C823100244F9E /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D03230C823100244F9E /* GradientButton.swift */; };
 		52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D05230C833700244F9E /* SpeedBoostButton.swift */; };
+		521BD22D25D1BC4F006944D9 /* GoogleAppMeasurement.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 521BD22825D1BC4F006944D9 /* GoogleAppMeasurement.xcframework */; };
+		521BD22F25D1BC4F006944D9 /* nanopb.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 521BD22925D1BC4F006944D9 /* nanopb.xcframework */; };
+		521BD23125D1BC4F006944D9 /* GoogleMobileAds.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 521BD22A25D1BC4F006944D9 /* GoogleMobileAds.xcframework */; };
+		521BD23325D1BC4F006944D9 /* UserMessagingPlatform.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 521BD22B25D1BC4F006944D9 /* UserMessagingPlatform.xcframework */; };
+		521BD23525D1BC50006944D9 /* GoogleUtilities.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 521BD22C25D1BC4F006944D9 /* GoogleUtilities.xcframework */; };
 		521FD0F9219E0DDF00F748EC /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F6219E0DDF00F748EC /* AppStats.m */; };
 		521FD0FA219E0DDF00F748EC /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F8219E0DDF00F748EC /* AppProfiler.m */; };
 		521FD0FD219E0E0F00F748EC /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0FB219E0E0E00F748EC /* DebugUtils.m */; };
@@ -75,8 +87,6 @@
 		5248B4CE23203781008C00D4 /* SwiftObjCBridges.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5248B4CD23203781008C00D4 /* SwiftObjCBridges.swift */; };
 		524B4E6B2316F0E3004E9891 /* BorderedSubtitleButton.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6A2316F0E3004E9891 /* BorderedSubtitleButton.m */; };
 		524B4E6E2316F27F004E9891 /* AnimatedControl.m in Sources */ = {isa = PBXBuildFile; fileRef = 524B4E6D2316F27F004E9891 /* AnimatedControl.m */; };
-		5265B00225AFBD53006BD58C /* PsiCashLib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5265B00125AFBD53006BD58C /* PsiCashLib.xcframework */; };
-		5265B00325AFBD53006BD58C /* PsiCashLib.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5265B00125AFBD53006BD58C /* PsiCashLib.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		528D81332384823F00AA2D77 /* PsiCashMessageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 528D81322384823F00AA2D77 /* PsiCashMessageView.swift */; };
 		529DE74825AD039200F82936 /* PsiphonTunnel.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */; };
 		529DE74925AD039200F82936 /* PsiphonTunnel.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -97,8 +107,6 @@
 		52D363CB230DEBED002C2221 /* CloseButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CA230DEBED002C2221 /* CloseButton.swift */; };
 		52D363CD230EEBAC002C2221 /* AnimatedUIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CC230EEBAC002C2221 /* AnimatedUIButton.swift */; };
 		52D363CF230F112E002C2221 /* TabControlViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52D363CE230F112E002C2221 /* TabControlViewWrapper.swift */; };
-		52D5F509259D0F0A0071888D /* PsiCashLib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 52D5F508259D0F0A0071888D /* PsiCashLib.xcframework */; };
-		52D5F50A259D0F0A0071888D /* PsiCashLib.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 52D5F508259D0F0A0071888D /* PsiCashLib.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		52DF5E9223C675EC00A1B067 /* ViewController+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9123C675EC00A1B067 /* ViewController+Additions.swift */; };
 		52DF5E9823CE5A8300A1B067 /* AppAction+ValuePaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9723CE5A8300A1B067 /* AppAction+ValuePaths.swift */; };
 		52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52DF5E9923CE835100A1B067 /* UserStrings.swift */; };
@@ -127,10 +135,6 @@
 		8D417EB324148C1E00FEE587 /* URLHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EB224148C1E00FEE587 /* URLHandler.swift */; };
 		8D417ED9241844FA00FEE587 /* FloatingPoint+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417ED8241844FA00FEE587 /* FloatingPoint+Additions.swift */; };
 		8D417EDD2419DBA100FEE587 /* ProductRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDC2419DBA100FEE587 /* ProductRequest.swift */; };
-		8D497A28247CEF50009CEBA8 /* GoogleAppMeasurement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A24247CEF4F009CEBA8 /* GoogleAppMeasurement.framework */; };
-		8D497A2A247CEF50009CEBA8 /* GoogleMobileAds.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A25247CEF4F009CEBA8 /* GoogleMobileAds.framework */; };
-		8D497A2C247CEF50009CEBA8 /* GoogleUtilities.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */; };
-		8D497A2E247CEF50009CEBA8 /* nanopb.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8D497A27247CEF4F009CEBA8 /* nanopb.xcframework */; };
 		8D4ACD32247E3626008E404C /* AppStoreIAP+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */; };
 		8D4EEA9624F761630057E32D /* ApplicationSupportFileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4EEA9524F761620057E32D /* ApplicationSupportFileStore.swift */; };
 		8D53C6A824C5EED8001E4E2D /* SessionConfigValues.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D53C6A724C5EED8001E4E2D /* SessionConfigValues.m */; };
@@ -163,18 +167,14 @@
 		8DE4E6D2244E97D000275362 /* Result+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DE4E6D1244E97D000275362 /* Result+Codable.swift */; };
 		8DEEE12F252F757600B0A9EC /* SupportedLocalizations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DEEE12E252F757600B0A9EC /* SupportedLocalizations.swift */; };
 		8DEEE137252FB4C900B0A9EC /* LanguageSelectionViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DEEE136252FB4C900B0A9EC /* LanguageSelectionViewController.swift */; };
+		8DF805772501726B003A6223 /* AdConsent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DF805762501726B003A6223 /* AdConsent.swift */; };
 		9BFEC2458D1346F537E9089E /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
-		9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC5F8D8BB828703CCCC2F /* AdMobConsent.m */; };
-		9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */; };
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
-		9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC3CE64925E5984AAA9BE /* AdManager.m */; };
-		9BFEC8A2F99380655E853F81 /* AdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC460CD29B3A0667FE9A2 /* AdControllerWrapper.m */; };
 		9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */; };
 		9BFECD174E254989EC97A437 /* IAPHelpViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */; };
 		9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */; };
 		9BFECEA225F023F895CC8DA1 /* Authorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */; };
-		9BFECF61970F215F32E76280 /* AdMobInterstitialAdControllerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC4F42A7FC2F11FF43636 /* AdMobInterstitialAdControllerWrapper.m */; };
 		9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
 		9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
@@ -187,7 +187,6 @@
 		A84082260CE7662A93697CFF /* LoadingCircleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A840845849B24AAA0E714664 /* LoadingCircleLayer.m */; };
 		A840835FAC7F18A6A7021415 /* RingSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086B04CBC1A6A5481EDD4 /* RingSkyButton.m */; };
 		A84083E76E518050B65E523A /* SkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408672FB2E1CD144A2BE7C /* SkyButton.m */; };
-		A840849074861D633B3EB4D1 /* AppEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408058458E7BFC4C3DFDDE /* AppEvent.m */; };
 		A84084C8B5C16F0EB80364FA /* Strings.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083974C8CF9DDFE7A341D /* Strings.m */; };
 		A840854A7ACA14A7D891EC16 /* OnboardingScrollableView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408CEB0E34BC897F3FA7D6 /* OnboardingScrollableView.m */; };
 		A8408692D005E8599267522E /* UIView+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = A84084C5C538AC8171021D2C /* UIView+Additions.m */; };
@@ -326,7 +325,6 @@
 		EFC2F5C720226782007B52F9 /* UIAlertController+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5C020226782007B52F9 /* UIAlertController+Additions.m */; };
 		EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5CA202267B0007B52F9 /* PsiphonConfigReader.m */; };
 		EFC2F5CC20226835007B52F9 /* PsiphonConfigReader.m in Sources */ = {isa = PBXBuildFile; fileRef = EFC2F5CA202267B0007B52F9 /* PsiphonConfigReader.m */; };
-		F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */; };
 		F136C2951F62E3E1000D3EAB /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */; };
 /* End PBXBuildFile section */
 
@@ -373,7 +371,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				529DE74925AD039200F82936 /* PsiphonTunnel.xcframework in CopyFiles */,
-				5265B00325AFBD53006BD58C /* PsiCashLib.xcframework in CopyFiles */,
+				2968042325F2D3FF00D04B7F /* PsiCashLib.xcframework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -386,6 +384,11 @@
 		1787CA7A8FA75358E02689FB /* Pods-Psiphon-PsiApi-PsiApiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-PsiApi-PsiApiTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-PsiApi-PsiApiTests/Pods-Psiphon-PsiApi-PsiApiTests.release.xcconfig"; sourceTree = "<group>"; };
 		1CF6F36D51088259B2AC450E /* Pods-PsiApi-Testing.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing/Pods-PsiApi-Testing.release.xcconfig"; sourceTree = "<group>"; };
 		1FE4700126FC2AD287FCB45B /* Pods-PsiphonTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonTests/Pods-PsiphonTests.release.xcconfig"; sourceTree = "<group>"; };
+		2913641E25DF06C800C79880 /* AdMobInterstitialAdController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdMobInterstitialAdController.swift; sourceTree = "<group>"; };
+		2913642025DF1E5700C79880 /* AdControllerStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdControllerStatus.swift; sourceTree = "<group>"; };
+		296622B425E8A554004635A1 /* LaunchScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenViewController.swift; sourceTree = "<group>"; };
+		296E800125D47A6300574A74 /* AdStateReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdStateReducer.swift; sourceTree = "<group>"; };
+		29B59CE625E48F4E0051C213 /* AdMobRewardedVideoAdController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdMobRewardedVideoAdController.swift; sourceTree = "<group>"; };
 		29FE978F25C0C1CA00D9C09F /* HostAppProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HostAppProtocol.h; sourceTree = "<group>"; };
 		29FE979025C0C1CA00D9C09F /* HostAppProtocol.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HostAppProtocol.m; sourceTree = "<group>"; };
 		2D1DAF6C9CAF197D05CDCFCF /* Pods-Testing-TestingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testing-TestingTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Testing-TestingTests/Pods-Testing-TestingTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -499,6 +502,11 @@
 		5202011C2360D34000D00C8E /* EitherView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EitherView.swift; sourceTree = "<group>"; };
 		52055D03230C823100244F9E /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
 		52055D05230C833700244F9E /* SpeedBoostButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedBoostButton.swift; sourceTree = "<group>"; };
+		521BD22825D1BC4F006944D9 /* GoogleAppMeasurement.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = GoogleAppMeasurement.xcframework; path = "Frameworks/GoogleMobileAdsSdkiOS-8.0.0/GoogleAppMeasurement.xcframework"; sourceTree = "<group>"; };
+		521BD22925D1BC4F006944D9 /* nanopb.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = nanopb.xcframework; path = "Frameworks/GoogleMobileAdsSdkiOS-8.0.0/nanopb.xcframework"; sourceTree = "<group>"; };
+		521BD22A25D1BC4F006944D9 /* GoogleMobileAds.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = GoogleMobileAds.xcframework; path = "Frameworks/GoogleMobileAdsSdkiOS-8.0.0/GoogleMobileAds.xcframework"; sourceTree = "<group>"; };
+		521BD22B25D1BC4F006944D9 /* UserMessagingPlatform.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = UserMessagingPlatform.xcframework; path = "Frameworks/GoogleMobileAdsSdkiOS-8.0.0/UserMessagingPlatform.xcframework"; sourceTree = "<group>"; };
+		521BD22C25D1BC4F006944D9 /* GoogleUtilities.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = GoogleUtilities.xcframework; path = "Frameworks/GoogleMobileAdsSdkiOS-8.0.0/GoogleUtilities.xcframework"; sourceTree = "<group>"; };
 		521FD0F5219E0DDF00F748EC /* AppProfiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppProfiler.h; path = Shared/Profiling/AppProfiler.h; sourceTree = SOURCE_ROOT; };
 		521FD0F6219E0DDF00F748EC /* AppStats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppStats.m; path = Shared/Profiling/AppStats.m; sourceTree = SOURCE_ROOT; };
 		521FD0F7219E0DDF00F748EC /* AppStats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppStats.h; path = Shared/Profiling/AppStats.h; sourceTree = SOURCE_ROOT; };
@@ -537,7 +545,6 @@
 		52D363CA230DEBED002C2221 /* CloseButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloseButton.swift; sourceTree = "<group>"; };
 		52D363CC230EEBAC002C2221 /* AnimatedUIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedUIButton.swift; sourceTree = "<group>"; };
 		52D363CE230F112E002C2221 /* TabControlViewWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabControlViewWrapper.swift; sourceTree = "<group>"; };
-		52D5F508259D0F0A0071888D /* PsiCashLib.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = PsiCashLib.xcframework; sourceTree = "<group>"; };
 		52DF5E9123C675EC00A1B067 /* ViewController+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ViewController+Additions.swift"; sourceTree = "<group>"; };
 		52DF5E9723CE5A8300A1B067 /* AppAction+ValuePaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppAction+ValuePaths.swift"; sourceTree = "<group>"; };
 		52DF5E9923CE835100A1B067 /* UserStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserStrings.swift; sourceTree = "<group>"; };
@@ -610,10 +617,6 @@
 		8D417EB224148C1E00FEE587 /* URLHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLHandler.swift; sourceTree = "<group>"; };
 		8D417ED8241844FA00FEE587 /* FloatingPoint+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "FloatingPoint+Additions.swift"; sourceTree = "<group>"; };
 		8D417EDC2419DBA100FEE587 /* ProductRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductRequest.swift; sourceTree = "<group>"; };
-		8D497A24247CEF4F009CEBA8 /* GoogleAppMeasurement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GoogleAppMeasurement.framework; sourceTree = "<group>"; };
-		8D497A25247CEF4F009CEBA8 /* GoogleMobileAds.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GoogleMobileAds.framework; sourceTree = "<group>"; };
-		8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = GoogleUtilities.xcframework; sourceTree = "<group>"; };
-		8D497A27247CEF4F009CEBA8 /* nanopb.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; path = nanopb.xcframework; sourceTree = "<group>"; };
 		8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppStoreIAP+Additions.swift"; sourceTree = "<group>"; };
 		8D4EEA9524F761620057E32D /* ApplicationSupportFileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationSupportFileStore.swift; sourceTree = "<group>"; };
 		8D53C6A624C5EED8001E4E2D /* SessionConfigValues.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SessionConfigValues.h; sourceTree = "<group>"; };
@@ -656,6 +659,7 @@
 		8DE4E6D1244E97D000275362 /* Result+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Codable.swift"; sourceTree = "<group>"; };
 		8DEEE12E252F757600B0A9EC /* SupportedLocalizations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedLocalizations.swift; sourceTree = "<group>"; };
 		8DEEE136252FB4C900B0A9EC /* LanguageSelectionViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageSelectionViewController.swift; sourceTree = "<group>"; };
+		8DF805762501726B003A6223 /* AdConsent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdConsent.swift; sourceTree = "<group>"; };
 		9433F6FADEFD218CED8B343A /* Pods-PsiApi-PsiApiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-PsiApiTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-PsiApiTests/Pods-PsiApi-PsiApiTests.release.xcconfig"; sourceTree = "<group>"; };
 		9876294EDE951EF39C9F97BE /* Pods-PsiApi-Testing-Utilities.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-Utilities.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-Utilities/Pods-PsiApi-Testing-Utilities.release.xcconfig"; sourceTree = "<group>"; };
 		9A06EEF4B515E4AE40E5CA93 /* Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Utilities-UtilitiesTests/Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -664,17 +668,9 @@
 		9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPHelpViewController.m; sourceTree = "<group>"; };
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Authorization.m; sourceTree = "<group>"; };
-		9BFEC356373DB0938069FBA8 /* AdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdControllerWrapper.h; sourceTree = "<group>"; };
-		9BFEC365D314919C8FA4C1DE /* AdMobInterstitialAdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdMobInterstitialAdControllerWrapper.h; sourceTree = "<group>"; };
-		9BFEC3CE64925E5984AAA9BE /* AdManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdManager.m; sourceTree = "<group>"; };
-		9BFEC460CD29B3A0667FE9A2 /* AdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdControllerWrapper.m; sourceTree = "<group>"; };
 		9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Asserts.h; sourceTree = "<group>"; };
-		9BFEC4F42A7FC2F11FF43636 /* AdMobInterstitialAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdMobInterstitialAdControllerWrapper.m; sourceTree = "<group>"; };
-		9BFEC5603ADEFD6BA23F8F74 /* AdMobRewardedAdControllerWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdMobRewardedAdControllerWrapper.h; sourceTree = "<group>"; };
 		9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigUserDefaults.m; sourceTree = "<group>"; };
-		9BFEC5F8D8BB828703CCCC2F /* AdMobConsent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdMobConsent.m; sourceTree = "<group>"; };
 		9BFEC673CE5EA236279F07BD /* Authorization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Authorization.h; sourceTree = "<group>"; };
-		9BFEC717F36D5A071D14AFFA /* AdManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdManager.h; sourceTree = "<group>"; };
 		9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Additions.m"; sourceTree = "<group>"; };
 		9BFEC8783D4222F2272E50E7 /* BasePacketTunnelProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasePacketTunnelProvider.h; sourceTree = "<group>"; };
 		9BFEC91ED4A1C511520E9948 /* Notifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Notifier.m; sourceTree = "<group>"; };
@@ -684,11 +680,8 @@
 		9BFECCCF429898FD903B69A6 /* Nullity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Nullity.m; sourceTree = "<group>"; };
 		9BFECE69F71F11C7B3A2D67E /* UIColor+Additions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor+Additions.h"; sourceTree = "<group>"; };
 		9BFECEEB971749A4E9705B15 /* Nullity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Nullity.h; sourceTree = "<group>"; };
-		9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AdMobRewardedAdControllerWrapper.m; sourceTree = "<group>"; };
-		9BFECF74881B6C4227813A63 /* AdMobConsent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AdMobConsent.h; sourceTree = "<group>"; };
 		A13608CD23499831149566BA /* Pods-Psiphon-Testing-TestingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Testing-TestingTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Testing-TestingTests/Pods-Psiphon-Testing-TestingTests.release.xcconfig"; sourceTree = "<group>"; };
 		A840802C7AEFA7F375205DCB /* VPNStartAndStopButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPNStartAndStopButton.h; sourceTree = "<group>"; };
-		A8408058458E7BFC4C3DFDDE /* AppEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppEvent.m; sourceTree = "<group>"; };
 		A84080E2A20C786DDAD17D48 /* RoyalSkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RoyalSkyButton.h; sourceTree = "<group>"; };
 		A840816C0C9B0658776A8B91 /* RegionSelectionButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegionSelectionButton.h; sourceTree = "<group>"; };
 		A84081B66B02DF8283448409 /* AutoLayoutProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoLayoutProtocol.h; sourceTree = "<group>"; };
@@ -712,7 +705,6 @@
 		A84086A9E122059FADA6F411 /* RingSkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RingSkyButton.h; sourceTree = "<group>"; };
 		A84086B04CBC1A6A5481EDD4 /* RingSkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RingSkyButton.m; sourceTree = "<group>"; };
 		A84086DF1DDA5CC90C437009 /* RelaySubject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RelaySubject.m; sourceTree = "<group>"; };
-		A8408710CC81EFA1CB22CAEC /* AppEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AppEvent.h; sourceTree = "<group>"; };
 		A84087B4F756C5DA76723EFC /* LoadingCircleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoadingCircleLayer.h; sourceTree = "<group>"; };
 		A84087C37CFC6977102EB09D /* AppVersionNumberView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AppVersionNumberView.m; sourceTree = "<group>"; };
 		A84087C82AF3A54E6695EE60 /* UIView+AutoLayoutViewGroup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+AutoLayoutViewGroup.h"; sourceTree = "<group>"; };
@@ -884,8 +876,6 @@
 		EFC2F5C9202267B0007B52F9 /* PsiphonConfigReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigReader.h; sourceTree = "<group>"; };
 		EFC2F5CA202267B0007B52F9 /* PsiphonConfigReader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigReader.m; sourceTree = "<group>"; };
 		EFF94F005129FBF0532001B5 /* Pods-Utilities-UtilitiesTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Utilities-UtilitiesTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Utilities-UtilitiesTests/Pods-Utilities-UtilitiesTests.debug.xcconfig"; sourceTree = "<group>"; };
-		F132D7DE1F5739A800AF7F91 /* LaunchScreenViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LaunchScreenViewController.h; sourceTree = "<group>"; };
-		F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LaunchScreenViewController.m; sourceTree = "<group>"; };
 		F136C2941F62E3E1000D3EAB /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = "<group>"; };
 		F4C4D7C3B9D998539C1D57FE /* Pods-Psiphon-Utilities.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Psiphon-Utilities.debug.xcconfig"; path = "Pods/Target Support Files/Pods-Psiphon-Utilities/Pods-Psiphon-Utilities.debug.xcconfig"; sourceTree = "<group>"; };
 		F8FCDC22ED21515D276CE274 /* Pods-PsiphonTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonTests.debug.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonTests/Pods-PsiphonTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -903,18 +893,18 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5265B00225AFBD53006BD58C /* PsiCashLib.xcframework in Frameworks */,
-				8D497A2A247CEF50009CEBA8 /* GoogleMobileAds.framework in Frameworks */,
-				8D497A2E247CEF50009CEBA8 /* nanopb.xcframework in Frameworks */,
-				8D497A28247CEF50009CEBA8 /* GoogleAppMeasurement.framework in Frameworks */,
-				52D5F509259D0F0A0071888D /* PsiCashLib.xcframework in Frameworks */,
+				521BD22D25D1BC4F006944D9 /* GoogleAppMeasurement.xcframework in Frameworks */,
 				8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */,
-				8D497A2C247CEF50009CEBA8 /* GoogleUtilities.xcframework in Frameworks */,
+				521BD23325D1BC4F006944D9 /* UserMessagingPlatform.xcframework in Frameworks */,
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
+				521BD23525D1BC50006944D9 /* GoogleUtilities.xcframework in Frameworks */,
 				8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */,
 				529DE74825AD039200F82936 /* PsiphonTunnel.xcframework in Frameworks */,
+				2968042225F2D3FF00D04B7F /* PsiCashLib.xcframework in Frameworks */,
 				440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */,
 				474C2778BC8FAFDB749E5DC3 /* libPods-Psiphon.a in Frameworks */,
+				521BD23125D1BC4F006944D9 /* GoogleMobileAds.xcframework in Frameworks */,
+				521BD22F25D1BC4F006944D9 /* nanopb.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -937,6 +927,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2968042125F2D3A200D04B7F /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				5265B00125AFBD53006BD58C /* PsiCashLib.xcframework */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		445F249720E1A5BA00D004E9 /* asn1c */ = {
 			isa = PBXGroup;
 			children = (
@@ -1101,8 +1099,6 @@
 		4ED48C05215056E800B1A9A5 /* ViewControllers */ = {
 			isa = PBXGroup;
 			children = (
-				F132D7DE1F5739A800AF7F91 /* LaunchScreenViewController.h */,
-				F132D7DF1F5739A800AF7F91 /* LaunchScreenViewController.m */,
 				EF652CD41F35224C002AFB48 /* MainViewController.h */,
 				EF652CD51F35224C002AFB48 /* MainViewController.m */,
 				EFC2F5C120226782007B52F9 /* RootContainerController.h */,
@@ -1123,6 +1119,7 @@
 				8D0017D824DB4B1200EC3409 /* OnboardingViewController.swift */,
 				8D335A56251A9B1D005F62CA /* PsiCashAccountViewController.swift */,
 				8DEEE136252FB4C900B0A9EC /* LanguageSelectionViewController.swift */,
+				296622B425E8A554004635A1 /* LaunchScreenViewController.swift */,
 				8D2CBAF42540D67C006822A2 /* AlertTypes.swift */,
 			);
 			path = ViewControllers;
@@ -1220,12 +1217,12 @@
 		668AF9B81E92CB60008CAAAA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				5265B00125AFBD53006BD58C /* PsiCashLib.xcframework */,
+				521BD22825D1BC4F006944D9 /* GoogleAppMeasurement.xcframework */,
+				521BD22A25D1BC4F006944D9 /* GoogleMobileAds.xcframework */,
+				521BD22C25D1BC4F006944D9 /* GoogleUtilities.xcframework */,
+				521BD22925D1BC4F006944D9 /* nanopb.xcframework */,
+				521BD22B25D1BC4F006944D9 /* UserMessagingPlatform.xcframework */,
 				529DE74725AD039200F82936 /* PsiphonTunnel.xcframework */,
-				8D497A24247CEF4F009CEBA8 /* GoogleAppMeasurement.framework */,
-				8D497A25247CEF4F009CEBA8 /* GoogleMobileAds.framework */,
-				8D497A26247CEF4F009CEBA8 /* GoogleUtilities.xcframework */,
-				8D497A27247CEF4F009CEBA8 /* nanopb.xcframework */,
 				8D5D8494247CE6420018A35B /* libPromisesObjC.a */,
 				8DCA686B247CC383001D026E /* libReactiveSwift.a */,
 				8D9D9C29247C77AB0093220E /* XCTest.framework */,
@@ -1317,6 +1314,7 @@
 				CE26FC8B1BBDC7B800B83375 /* Products */,
 				668AF9B81E92CB60008CAAAA /* Frameworks */,
 				FF0DC6191C07A3FC5D6EE10A /* Pods */,
+				2968042125F2D3A200D04B7F /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1359,8 +1357,6 @@
 				4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */,
 				A84086716D701D0F5B48E4C0 /* ContainerDB.m */,
 				A8408319CD72511CABBE4CD4 /* ContainerDB.h */,
-				A8408058458E7BFC4C3DFDDE /* AppEvent.m */,
-				A8408710CC81EFA1CB22CAEC /* AppEvent.h */,
 				52D2581022BADE1900CA956A /* SwiftDelegate.swift */,
 				52D2580F22BADE1900CA956A /* Psiphon-Bridging-Header.h */,
 				5245C5C82342A6840033EE13 /* UserDefaults.swift */,
@@ -1642,16 +1638,11 @@
 		EFFA4AB620F68CE100E35E8E /* Ad */ = {
 			isa = PBXGroup;
 			children = (
-				9BFEC717F36D5A071D14AFFA /* AdManager.h */,
-				9BFEC3CE64925E5984AAA9BE /* AdManager.m */,
-				9BFEC5F8D8BB828703CCCC2F /* AdMobConsent.m */,
-				9BFECF74881B6C4227813A63 /* AdMobConsent.h */,
-				9BFEC4F42A7FC2F11FF43636 /* AdMobInterstitialAdControllerWrapper.m */,
-				9BFEC365D314919C8FA4C1DE /* AdMobInterstitialAdControllerWrapper.h */,
-				9BFECF6BF16767758F28D1A0 /* AdMobRewardedAdControllerWrapper.m */,
-				9BFEC5603ADEFD6BA23F8F74 /* AdMobRewardedAdControllerWrapper.h */,
-				9BFEC460CD29B3A0667FE9A2 /* AdControllerWrapper.m */,
-				9BFEC356373DB0938069FBA8 /* AdControllerWrapper.h */,
+				8DF805762501726B003A6223 /* AdConsent.swift */,
+				296E800125D47A6300574A74 /* AdStateReducer.swift */,
+				2913641E25DF06C800C79880 /* AdMobInterstitialAdController.swift */,
+				2913642025DF1E5700C79880 /* AdControllerStatus.swift */,
+				29B59CE625E48F4E0051C213 /* AdMobRewardedVideoAdController.swift */,
 			);
 			path = Ad;
 			sourceTree = "<group>";
@@ -1971,14 +1962,12 @@
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Psiphon/Pods-Psiphon-resources.sh",
 				"${PODS_CONFIGURATION_BUILD_DIR}/InAppSettingsKit/InAppSettingsKit.bundle",
-				"${PODS_CONFIGURATION_BUILD_DIR}/PersonalizedAdConsent/PersonalizedAdConsent.bundle",
 				"${PODS_CONFIGURATION_BUILD_DIR}/PsiphonClientCommonLibrary/PsiphonClientCommonLibrary.bundle",
 				"${PODS_ROOT}/SVProgressHUD/SVProgressHUD/SVProgressHUD.bundle",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/InAppSettingsKit.bundle",
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PersonalizedAdConsent.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/PsiphonClientCommonLibrary.bundle",
 				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/SVProgressHUD.bundle",
 			);
@@ -2044,13 +2033,14 @@
 				5246800922D51CE4009AEC6E /* PsiCashBalanceViewWrapper.swift in Sources */,
 				8DD642C1248AAD8A006C94D2 /* Utils.swift in Sources */,
 				52D363CF230F112E002C2221 /* TabControlViewWrapper.swift in Sources */,
+				8DF805772501726B003A6223 /* AdConsent.swift in Sources */,
 				445F24D620E1A5BA00D004E9 /* xer_decoder.c in Sources */,
 				EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */,
 				EF90D7A4204F22C900228A63 /* timestamp_format.c in Sources */,
 				8D1F62C2247DC4840028AFAF /* PsiCashClient+Additions.swift in Sources */,
 				CEBA9C112481A5C80097D700 /* Notifier.swift in Sources */,
-				F132D7E01F5739A800AF7F91 /* LaunchScreenViewController.m in Sources */,
 				445F24E920E1A5BA00D004E9 /* ber_tlv_length.c in Sources */,
+				296E800225D47A6300574A74 /* AdStateReducer.swift in Sources */,
 				CEED7835247703DD002D9D55 /* AppReceiptReducer.swift in Sources */,
 				4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */,
 				4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */,
@@ -2063,7 +2053,9 @@
 				8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */,
 				EF90D7A9204F22C900228A63 /* FileUtils.m in Sources */,
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
+				2913641F25DF06C800C79880 /* AdMobInterstitialAdController.swift in Sources */,
 				445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */,
+				296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */,
 				52A2466F23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift in Sources */,
 				8D0017D924DB4B1200EC3409 /* OnboardingViewController.swift in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
@@ -2091,6 +2083,7 @@
 				445F24DA20E1A5BA00D004E9 /* constr_SET_OF.c in Sources */,
 				8D417EB124147C6D00FEE587 /* LandingPage.swift in Sources */,
 				445F24E520E1A5BA00D004E9 /* asn_SET_OF.c in Sources */,
+				2913642125DF1E5700C79880 /* AdControllerStatus.swift in Sources */,
 				9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */,
 				4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */,
 				4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */,
@@ -2128,6 +2121,7 @@
 				8DB6C638242A4D06005E2F4C /* DuskButton.swift in Sources */,
 				4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */,
 				52DF5E9223C675EC00A1B067 /* ViewController+Additions.swift in Sources */,
+				29B59CE725E48F4E0051C213 /* AdMobRewardedVideoAdController.swift in Sources */,
 				8D2CBAF52540D67C006822A2 /* AlertTypes.swift in Sources */,
 				CED6796124A4FA6D00C4CA81 /* ExtensionContainerFile.m in Sources */,
 				52C8F0AB237CA26200E5F9C0 /* ImageViewBuilder.swift in Sources */,
@@ -2171,8 +2165,6 @@
 				CED6790E24A4F82400C4CA81 /* JetsamTracking.m in Sources */,
 				52D2581122BADE1900CA956A /* SwiftDelegate.swift in Sources */,
 				5202011D2360D34000D00C8E /* EitherView.swift in Sources */,
-				9BFEC8058885B68B2822E2B8 /* AdManager.m in Sources */,
-				9BFEC3D66910918A0C8954E1 /* AdMobConsent.m in Sources */,
 				52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */,
 				CED6791624A4F82400C4CA81 /* JetsamMetrics+Feedback.m in Sources */,
 				CED6795124A4F9D400C4CA81 /* DiskBackedFile.m in Sources */,
@@ -2180,13 +2172,10 @@
 				52C8F0AD237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift in Sources */,
 				8DE4E6D2244E97D000275362 /* Result+Codable.swift in Sources */,
 				8D92A33124928E4900F75254 /* SubscriptionBarView.swift in Sources */,
-				9BFECF61970F215F32E76280 /* AdMobInterstitialAdControllerWrapper.m in Sources */,
 				52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */,
-				9BFEC459666697D89B09A492 /* AdMobRewardedAdControllerWrapper.m in Sources */,
 				CED6791024A4F82400C4CA81 /* JetsamEvent.m in Sources */,
 				521FD0FD219E0E0F00F748EC /* DebugUtils.m in Sources */,
 				524B4E6B2316F0E3004E9891 /* BorderedSubtitleButton.m in Sources */,
-				9BFEC8A2F99380655E853F81 /* AdControllerWrapper.m in Sources */,
 				CE93EE5524F55B92001F4EC9 /* SharedConstants.m in Sources */,
 				A8408E281270691F61F9C20C /* AppVersionNumberView.m in Sources */,
 				A8408C424E64BF3D70273464 /* ConnectionStatusView.m in Sources */,
@@ -2234,7 +2223,6 @@
 				A84081194DA12328ABB5A43E /* UIImageView+Additions.m in Sources */,
 				8D13232F25310661005F83C8 /* SecretValueTextField.swift in Sources */,
 				CE551C6A24FBFB8E00011C51 /* PsiphonFeedback+FeedbackUploadProvider.swift in Sources */,
-				A840849074861D633B3EB4D1 /* AppEvent.m in Sources */,
 				A84080E9FC63E29F71A79A63 /* RelaySubject.m in Sources */,
 				CED6794F24A4F9D400C4CA81 /* DelimitedFile.m in Sources */,
 				CED6795524A4F9F100C4CA81 /* Archiver.m in Sources */,
@@ -2532,7 +2520,7 @@
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 206;
+				CURRENT_PROJECT_VERSION = 210;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = Q6HLNEX92A;
 				ENABLE_BITCODE = NO;
@@ -2784,12 +2772,15 @@
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 206;
+				CURRENT_PROJECT_VERSION = 210;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = Q6HLNEX92A;
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/GoogleMobileAdsSdkiOS-7.65.0",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"COCOAPODS=1",
@@ -2830,11 +2821,14 @@
 				CODE_SIGN_ENTITLEMENTS = Psiphon/Psiphon.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CURRENT_PROJECT_VERSION = 206;
+				CURRENT_PROJECT_VERSION = 210;
 				DEFINES_MODULE = NO;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/GoogleMobileAdsSdkiOS-7.65.0",
+				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
 					"COCOAPODS=1",

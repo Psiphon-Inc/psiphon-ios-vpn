@@ -198,6 +198,20 @@ public extension Optional where Wrapped == Bool {
 
 }
 
+public extension Optional where Wrapped: Error {
+    
+    /// If self is none, produce given success value, otherwise produces wrapped error as failure.
+    func maybeToRight<A>(_ a: A) -> Result<A, Wrapped> {
+        switch self {
+        case .none:
+            return .success(a)
+        case .some(let error):
+            return .failure(error)
+        }
+    }
+    
+}
+
 public typealias PendingResult<Success: Equatable, Failure: Error & Equatable> = Pending<Result<Success, Failure>>
 
 /// A type that is isomorphic to Optional type, intended to represent computations that are "pending" before finishing.
@@ -461,13 +475,9 @@ public extension URLRequest {
 
 // MARK: Reference management
 
-/// A protocol that is class-bound.
-/// - Discussion: This enables `where` clause to match protocol that are class-bound.
-public protocol ClassBound: class {}
-
 /// `WeakRef` holds a weak reference to the underlying type.
 /// - Discussion: This type is useful to provide access to resource that might other be leaked.
-public final class WeakRef<Wrapped: ClassBound> {
+public final class WeakRef<Wrapped: AnyObject> {
     
     public weak var weakRef: Wrapped?
     

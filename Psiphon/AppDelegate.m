@@ -24,7 +24,6 @@
 #import <ReactiveObjC/NSNotificationCenter+RACSupport.h>
 #import <stdatomic.h>
 #import "AppDelegate.h"
-#import "AdManager.h"
 #import "AppInfo.h"
 #import "EmbeddedServerEntries.h"
 #import "IAPViewController.h"
@@ -36,13 +35,11 @@
 #import "RootContainerController.h"
 #import "SharedConstants.h"
 #import "UIAlertController+Additions.h"
-#import "AdManager.h"
 #import "Logging.h"
 #import "NEBridge.h"
 #import "DispatchUtils.h"
 #import "PsiFeedbackLogger.h"
 #import "RACMulticastConnection.h"
-#import "AppEvent.h"
 #import "RACSignal.h"
 #import "RACSignal+Operations2.h"
 #import "NSError+Convenience.h"
@@ -51,7 +48,6 @@
 #import "RACReplaySubject.h"
 #import "Asserts.h"
 #import "ContainerDB.h"
-#import "AppEvent.h"
 #import "AppObservables.h"
 #import <PsiphonTunnel/PsiphonTunnel.h>
 #import "RegionAdapter.h"
@@ -146,11 +142,6 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // to return before making the window visible on the screen.
     [self.window makeKeyAndVisible];
     
-    // Forwards AdManager `adIsShowing` events to SwiftDelegate.
-    [self.compoundDisposable addDisposable:[[AdManager sharedInstance].adIsShowing subscribeNext:^(NSNumber * _Nullable adisShowingObj) {
-        [SwiftDelegate.bridge onAdPresentationStatusChange: [adisShowingObj boolValue]];
-    }]];
-    
     return YES;
 }
 
@@ -227,18 +218,28 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
         
         return nil;
     }] flattenMap:^RACSignal<SwitchedVPNStartStopIntent *> *(SwitchedVPNStartStopIntent *value) {
+        
         if (value.startButtonAction == StartButtonActionStartTunnelWithAds) {
+            
             // Start tunnel after ad presentation signal completes.
             // We always want to start the tunnel after the presentation signal
             // is completed, no matter if it presented an ad or it failed.
-            return [[AdManager.sharedInstance
-                     presentInterstitialOnViewController:[AppDelegate getTopPresentedViewController]]
-                    then:^RACSignal * {
-                return [RACSignal return:value];
+            
+            return [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSubscriber>  _Nonnull subscriber) {
+                
+                [SwiftDelegate.bridge presentInterstitial:^{
+                    [subscriber sendNext:value];
+                    [subscriber sendCompleted];
+                }];
+                
+                return nil;
+                
             }];
+            
         } else {
             return [RACSignal return:value];
         }
+        
     }] doNext:^(SwitchedVPNStartStopIntent *value) {
         dispatch_async_main(^{
             [SwiftDelegate.bridge sendNewVPNIntent:value];
@@ -430,139 +431,6 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
                                                            completion:completion];
             break;
     }
-}
-
-- (void)presentUntunneledRewardedVideoAdWithCustomData:(NSString *)customData
-                                              delegate:(id<RewardedVideoAdBridgeDelegate>)delegate {
-    // No-op if there's an active subscription for displaying rewarded videos.
-    if (self->rewardedVideoAdDisposable) {
-        return;
-    }
-
-    AppDelegate *__weak weakSelf = self;
-
-    // If the current view controller at the time of this call is not present,
-    // we will not display the ad.
-    // This is to guarantee to a degree that current VC that was the origin of this
-    // function call is still present by the time the ad is loaded and ready to be presented.
-    // Note that the guarantee is strong only if `weakTopMostVC.beingDismissed` flag is checked
-    // immediately before presenting.
-    UIViewController *__weak weakTopMostVC = [AppDelegate getTopPresentedViewController];
-
-    LOG_DEBUG(@"rewarded video started");
-
-    self->rewardedVideoAdDisposable =
-    [[[[[[[[[[[AdManager sharedInstance].rewardedVideoLoadStatus
-             scanWithStart:nil reduce:^id(NSNumber *_Nullable running, NSNumber *next) {
-
-        // If the observable chain starts with an error, force load an ad.
-        // Pretend the load status is `AdLoadStatusInProgress` after force loading an ad.
-        if (!running) {
-            dispatch_async_main(^{
-                [[AdManager sharedInstance].forceRewardedVideoLoad sendNext:RACUnit.defaultUnit];
-            });
-            return @(AdLoadStatusInProgress);
-        }
-        return next;
-    }] doNext:^(NSNumber *adLoadStatusObj) {
-        AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
-        [delegate adLoadStatus:s error:nil];
-    }] filter:^BOOL(NSNumber *adLoadStatusObj) {
-        AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
-        // Filter terminating states.
-        return (AdLoadStatusDone == s) || (AdLoadStatusError == s) || (AdLoadStatusNone == s);
-    }] take:1]
-          flattenMap:^RACSignal *(NSNumber *adLoadStatusObj) {
-        UIViewController *__strong topMostVC = weakTopMostVC;
-        AdLoadStatus s = (AdLoadStatus) [adLoadStatusObj integerValue];
-
-        if (topMostVC && !topMostVC.beingDismissed && AdLoadStatusDone == s) {
-            return [[AdManager sharedInstance] presentRewardedVideoOnViewController:topMostVC withCustomData:customData];
-        } else {
-            return [RACSignal empty];
-        }
-    }] doNext:^(NSNumber *adPresentationEnum) {
-        // Logs current AdPresentation enum value.
-        AdPresentation ap = (AdPresentation) [adPresentationEnum integerValue];
-        [delegate adPresentationStatus:ap];
-        switch (ap) {
-            case AdPresentationWillAppear:
-                [PsiFeedbackLogger infoWithType:RewardedVideoLogType format:@"AdPresentationWillAppear"];
-                LOG_DEBUG(@"rewarded video AdPresentationWillAppear");
-                break;
-            case AdPresentationDidAppear:
-                LOG_DEBUG(@"rewarded video AdPresentationDidAppear");
-                break;
-            case AdPresentationWillDisappear:
-                LOG_DEBUG(@"rewarded video AdPresentationWillDisappear");
-                break;
-            case AdPresentationDidDisappear:
-                LOG_DEBUG(@"rewarded video AdPresentationDidDisappear");
-                break;
-            case AdPresentationDidRewardUser:
-                LOG_DEBUG(@"rewarded video AdPresentationDidRewardUser");
-                break;
-            case AdPresentationErrorCustomDataNotSet:
-                LOG_DEBUG(@"rewarded video AdPresentationErrorCustomDataNotSet");
-                [PsiFeedbackLogger errorWithType:RewardedVideoLogType
-                                         format:@"AdPresentationErrorCustomDataNotSet"];
-                break;
-            case AdPresentationErrorInappropriateState:
-                LOG_DEBUG(@"rewarded video AdPresentationErrorInappropriateState");
-                [PsiFeedbackLogger errorWithType:RewardedVideoLogType
-                                         format:@"AdPresentationErrorInappropriateState"];
-                break;
-            case AdPresentationErrorNoAdsLoaded:
-                LOG_DEBUG(@"rewarded video AdPresentationErrorNoAdsLoaded");
-                [PsiFeedbackLogger errorWithType:RewardedVideoLogType
-                                         format:@"AdPresentationErrorNoAdsLoaded"];
-                break;
-            case AdPresentationErrorFailedToPlay:
-                LOG_DEBUG(@"rewarded video AdPresentationErrorFailedToPlay");
-                [PsiFeedbackLogger errorWithType:RewardedVideoLogType
-                                         format:@"AdPresentationErrorFailedToPlay"];
-                break;
-        }
-    }] scanWithStart:[RACTwoTuple pack:@(FALSE) :@(FALSE)]
-        reduce:^RACTwoTuple<NSNumber *, NSNumber *> *(RACTwoTuple *running,
-                                                      NSNumber *adPresentationEnum) {
-
-        // Scan operator's `running` value is a 2-tuple of booleans. First element represents when
-        // AdPresentationDidRewardUser is emitted upstream, and the second element represents when
-        // AdPresentationDidDisappear is emitted upstream.
-        // Note that we don't want to make any assumptions about the order of these two events.
-        if ([adPresentationEnum integerValue] == AdPresentationDidRewardUser) {
-            return [RACTwoTuple pack:@(TRUE) :running.second];
-        } else if ([adPresentationEnum integerValue] == AdPresentationDidDisappear) {
-            return [RACTwoTuple pack:running.first :@(TRUE)];
-        }
-        return running;
-    }] filter:^BOOL(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
-        // We will always end the stream if ad did disappear.
-        // TODO: This assumes that didReward event is sent before didDisappear.
-        BOOL didDisappear = [tuple.second boolValue];
-        return didDisappear;
-    }] take:1]
-     subscribeNext:^(RACTwoTuple<NSNumber *, NSNumber *> *tuple) {
-        // No-op.
-    } error:^(NSError *error) {
-        AppDelegate *strongSelf = weakSelf;
-        if (strongSelf) {
-            [delegate adLoadStatus:AdLoadStatusError error:error];
-            [PsiFeedbackLogger errorWithType:RewardedVideoLogType message:@"Error with rewarded video"
-                                      object:error];
-            [strongSelf->rewardedVideoAdDisposable dispose];
-            strongSelf->rewardedVideoAdDisposable = nil;
-        }
-    } completed:^{
-        AppDelegate *strongSelf = weakSelf;
-        if (strongSelf) {
-            LOG_DEBUG(@"rewarded video completed");
-            [PsiFeedbackLogger infoWithType:RewardedVideoLogType format:@"completed"];
-            [strongSelf->rewardedVideoAdDisposable dispose];
-            strongSelf->rewardedVideoAdDisposable = nil;
-        }
-    }];
 }
 
 - (void)presentSubscriptionIAPViewController {

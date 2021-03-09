@@ -25,12 +25,6 @@ import PsiCashClient
 
 // MARK: Bridge Protocols
 
-/// Interface for AppDelegate functionality implemented in Swift and called from ObjC.
-@objc protocol RewardedVideoAdBridgeDelegate {
-    func adPresentationStatus(_ status: AdPresentation)
-    func adLoadStatus(_ status: AdLoadStatus, error: NSError?)
-}
-
 /// ObjC-Swift interface. Functionality implemented in ObjC and called from Swift.
 /// All Delegate functions are called on the main thread.
 @objc protocol ObjCBridgeDelegate {
@@ -61,11 +55,9 @@ import PsiCashClient
     @objc func onPsiCashAccountStatusDidChange(_ isLoggedIn: Bool)
 
     @objc func dismiss(screen: DismissibleScreen, completion: (() -> Void)?)
-
-    @objc func presentUntunneledRewardedVideoAd(customData: CustomData,
-                                                delegate: RewardedVideoAdBridgeDelegate)
     
     @objc func presentSubscriptionIAPViewController()
+    
 }
 
 /// Interface for AppDelegate functionality implemented in Swift and called from ObjC.
@@ -92,6 +84,8 @@ import PsiCashClient
 
     @objc func presentPsiCashViewController(_ initialTab: PsiCashScreenTab)
     
+    @objc func loadingScreenDismissSignal(_ completionHandler: @escaping () -> Void)
+    
     @objc func makeSubscriptionBarView() -> SubscriptionBarView
     
     /// Returns `nil` if there are no onboarding stages to complete.
@@ -106,14 +100,11 @@ import PsiCashClient
     /// - Important: It's a fatal error of this method is called before AppUpgrade is checked.
     @objc func isNewInstallation() -> Bool
     
-    @objc func getCustomRewardData(_ callback: @escaping (String?) -> Void)
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError>
     @objc func buyAppStoreSubscriptionProduct(
         _ skProduct: SKProduct
     ) -> Promise<ObjCIAPResult>.ObjCPromise<ObjCIAPResult>
-    @objc func onAdPresentationStatusChange(_ presenting: Bool)
     @objc func getAppStoreSubscriptionProductIDs() -> Set<String>
-    @objc func isCurrentlySpeedBoosted(completionHandler: @escaping (Bool) -> Void)
     @objc func disallowedTrafficAlertNotification()
     
     // VPN
@@ -121,6 +112,13 @@ import PsiCashClient
     @objc func switchVPNStartStopIntent()
         -> Promise<SwitchedVPNStartStopIntent>.ObjCPromise<SwitchedVPNStartStopIntent>
     @objc func sendNewVPNIntent(_ value: SwitchedVPNStartStopIntent)
+    
+    // Ad
+    
+    @objc func resetAdConsent()
+    
+    @objc func presentInterstitial(_ completionHandler: @escaping () -> Void)
+    
     @objc func restartVPNIfActive()
     @objc func syncWithTunnelProvider(reason: TunnelProviderSyncReason)
     @objc func reinstallVPNConfig()
