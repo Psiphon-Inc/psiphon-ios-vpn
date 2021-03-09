@@ -190,7 +190,7 @@ func vpnStateReducer<T: TunnelProviderManager>(
             }
             
             guard case .loaded(let tpm) = state.vpnState.loadState.value,
-                  tpm.connectionStatus.providerNotStopped else {
+                  tpm.vpnStatus.providerNotStopped else {
                 return []
             }
             
@@ -342,7 +342,7 @@ func vpnStateReducer<T: TunnelProviderManager>(
                 case .start(transition: .restart):
                     // Restarts tunnel provider if not stopped.
                     guard case let .loaded(tpm) = state.vpnState.loadState.value,
-                          tpm.connectionStatus.providerNotStopped else {
+                          tpm.vpnStatus.providerNotStopped else {
                         return effects
                     }
                     
@@ -350,7 +350,7 @@ func vpnStateReducer<T: TunnelProviderManager>(
                         newValue: .start(transition: .restart),
                         sharedDB: environment.sharedDB
                     )
-                    
+
                     return [
                         intentUpdateEffect.mapNever(),
                         Effect(value: .stopVPN)
@@ -489,7 +489,7 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
                 environment.feedbackLogger.log(.info, tag: vpnProviderSyncTag, "zombie provider").mapNever()
             ]
             
-        case .active(.connected):
+        case .active(.psiphonTunnelConnected):
             
             // Verifies that tunnel intent matches expected tunnel provider state.
             if case .start(transition: .none) = state.tunnelIntent {
@@ -506,12 +506,28 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
                     ]
                 }
                 
-                // Sends start vpn notification to the tunnel provider
+                // Sends start VPN notification to the tunnel provider
                 // if vpnStartCondition passes.
-                guard state.loadState.connectionStatus == .connecting,
-                      environment.vpnStartCondition() else {
-                    return firstEffects
+                
+                let vpnStatus = state.loadState.connectionStatus
+                let vpnStartCondition = environment.vpnStartCondition()
+                
+                guard
+                    vpnStatus == .connecting,
+                    vpnStartCondition
+                else {
+                    
+                    return firstEffects + [
+                        environment.feedbackLogger
+                            .log(.warn, """
+                                VPN start request ignored: vpnStatus:'\(vpnStatus)', \
+                                vpnStartCondition: '\(vpnStartCondition)'
+                                """)
+                            .mapNever()
+                    ]
+                    
                 }
+                
                 return firstEffects + [ notifyStartVPN().mapNever() ]
                 
             } else {
@@ -540,7 +556,7 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
                 }
             ]
             
-        case .active(.connecting):
+        case .active(.psiphonTunnelConnecting):
             return firstEffects
             
         case .active(.networkNotReachable):
@@ -549,7 +565,7 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
         case .inactive:
             // Fixes "inactive" sync result and vpn status mismatch.
             if case let .loaded(tpm) = state.loadState.value {
-                switch tpm.connectionStatus {
+                switch tpm.vpnStatus {
                 case .reasserting, .connecting, .connected:
                     // Tunnel provider is expected to be inactive!
                     firstEffects.append(
@@ -564,7 +580,7 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
                     return firstEffects
 
                 @unknown default:
-                    environment.feedbackLogger.fatalError("Unknown connection status '\(tpm.connectionStatus)'")
+                    environment.feedbackLogger.fatalError("Unknown connection status '\(tpm.vpnStatus)'")
                 }
             }
             
@@ -664,7 +680,7 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
     let tpmDeferred: Effect<T>
     switch state.vpnState.loadState.value {
     case .nonLoaded:
-        environment.feedbackLogger.fatalError("Tunnel provider manager no loaded")
+        environment.feedbackLogger.fatalError("Tunnel provider manager not loaded")
         return []
     case .noneStored, .error(_):
         tpmDeferred = Effect(value: T.make())
@@ -1026,9 +1042,9 @@ extension TunnelProviderSyncedState {
                 // but will eventually sync.
                 return .active(.networkNotReachable)
             case (zombie: false, connected: false, reachable: true):
-                return .active(.connecting)
+                return .active(.psiphonTunnelConnecting)
             case (zombie: false, connected: true, reachable: true):
-                return .active(.connected)
+                return .active(.psiphonTunnelConnected)
             case (zombie: true, connected: true, reachable: _):
                 feedbackLogger.fatalError(
                     "unexpected tunnel provider state '\(response)'")
@@ -1082,24 +1098,25 @@ typealias ShouldStopProviderResult<T: TunnelProviderManager> = (
 fileprivate func sendProviderStateQuery<T: TunnelProviderManager>(
     _ tpm: T
 ) -> Effect<(T, TunnelProviderVPNStatus, ProviderStateQueryResult)> {
+    
     let queryData = EXTENSION_QUERY_TUNNEL_PROVIDER_STATE.data(using: .utf8)!
     let timeoutInterval = VPNHardCodedValues.providerMessageSendTimeout
     
-    return sendMessage(toProvider: tpm, data: queryData).map { tpm, connectionStatus, result in
+    return sendMessage(toProvider: tpm, data: queryData).map { tpm, vpnStatus, result in
         switch result {
         case let .success(responseData):
             do {
                 let providerState = try JSONDecoder()
                     .decode(ProviderStateQueryResponseValue.self, from: responseData)
-                return (tpm, connectionStatus, .success(providerState))
+                return (tpm, vpnStatus, .success(providerState))
             } catch {
                 return (tpm,
-                        connectionStatus,
+                        vpnStatus,
                         .failure(ErrorEvent(.parseError(String(describing: error)), date: Date())))
             }
             
         case .failure(let errorEvent):
-            return (tpm, connectionStatus, .failure(errorEvent))
+            return (tpm, vpnStatus, .failure(errorEvent))
         }
     }
     .promoteError(ProviderMessageSendError.self)
@@ -1107,7 +1124,7 @@ fileprivate func sendProviderStateQuery<T: TunnelProviderManager>(
              raising: ProviderMessageSendError.timedout(timeoutInterval),
              on: QueueScheduler.main)
     .flatMapError { [tpm] error -> Effect<(T, TunnelProviderVPNStatus, ProviderStateQueryResult)> in
-        return Effect(value: (tpm, tpm.connectionStatus, .failure(ErrorEvent(error, date: Date()))))
+        return Effect(value: (tpm, tpm.vpnStatus, .failure(ErrorEvent(error, date: Date()))))
     }
     
 }

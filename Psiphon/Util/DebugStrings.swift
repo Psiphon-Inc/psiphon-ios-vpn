@@ -34,40 +34,9 @@ extension PSIStatus: CustomDebugStringConvertible {
         case .transactionAmountMismatch: return "transactionAmountMismatch"
         case .transactionTypeNotFound: return "transactionTypeNotFound"
         case .invalidTokens: return "invalidTokens"
+        case .invalidCredentials: return "invalidCredentials"
+        case .badRequest: return "badRequest"
         case .serverError: return "serverError"
-        @unknown default: return "unknown(\(self.rawValue))"
-        }
-    }
-    
-}
-
-extension AdLoadStatus: CustomDebugStringConvertible {
-    
-    public var debugDescription: String {
-        switch self {
-        case .done: return "done"
-        case .error: return "error"
-        case .inProgress: return "inProgress"
-        case .none: return "none"
-        @unknown default: return "unknown(\(self.rawValue))"
-        }
-    }
-    
-}
-
-extension AdPresentation: CustomDebugStringConvertible {
-    
-    public var debugDescription: String {
-        switch self {
-        case .willAppear: return "willAppear"
-        case .didAppear: return "didAppear"
-        case .willDisappear: return "willDisappear"
-        case .didDisappear: return "didDisappear"
-        case .didRewardUser: return "didRewardUser"
-        case .errorInappropriateState: return "errorInappropriateState"
-        case .errorNoAdsLoaded: return "errorNoAdsLoaded"
-        case .errorFailedToPlay: return "errorFailedToPlay"
-        case .errorCustomDataNotSet: return "errorCustomDataNotSet"
         @unknown default: return "unknown(\(self.rawValue))"
         }
     }

@@ -140,6 +140,16 @@ extension Effect {
         }
     }
     
+    /// Runs `work` inside the effect. Result of `work` is then emitted,
+    /// and the returned signal completed.
+    public static func deferred(
+        work: @escaping () -> Value
+    ) -> Effect<Value> {
+        Effect { observer, _ in
+            observer.fulfill(value: work())
+        }
+    }
+    
     public static func fireAndForget(work: @escaping () -> Void) -> Effect<Value> {
         Effect { observer, _ in
             if Debugging.mainThreadChecks {

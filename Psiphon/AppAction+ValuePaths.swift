@@ -24,7 +24,7 @@ import AppStoreIAP
 import PsiCashClient
 
 extension AppAction {
-
+    
     var appDelegateAction: AppDelegateAction? {
         get {
             guard case let .appDelegateAction(value) = self else { return nil }
@@ -112,7 +112,7 @@ extension AppAction {
             self = .productRequest(newValue)
         }
     }
-
+    
     var reachabilityAction: ReachabilityAction? {
         get {
             guard case let .reachabilityAction(value) = self else { return nil }
@@ -134,7 +134,7 @@ extension AppAction {
             self = .vpnStateAction(newValue)
         }
     }
-
+    
     var feedbackAction: FeedbackAction? {
         get {
             guard case let .feedbackAction(value) = self else { return nil }
@@ -143,6 +143,17 @@ extension AppAction {
         set {
             guard case .feedbackAction = self, let newValue = newValue else { return }
             self = .feedbackAction(newValue)
+        }
+    }
+    
+    var adAction: AdAction? {
+        get {
+            guard case let .adAction(value) = self else { return nil }
+            return value
+        }
+        set {
+            guard case .adAction = self, let newValue = newValue else { return }
+            self = .adAction(newValue)
         }
     }
     
@@ -156,6 +167,7 @@ extension AppAction {
             self = .mainViewAction(newValue)
         }
     }
+    
 }
 
 
@@ -189,7 +201,7 @@ extension AppState {
                 value: VPNProviderManagerReducerState (
                     vpnState: self.vpnState.value,
                     subscriptionTransactionsPendingAuthorization:
-                    self.subscriptionAuthState .transactionsPendingAuthRequest
+                        self.subscriptionAuthState .transactionsPendingAuthRequest
                 )
             )
         }
@@ -230,6 +242,18 @@ extension AppState {
         }
     }
     
+    var appDelegateReducerState: AppDelegateReducerState {
+        get {
+            AppDelegateReducerState(
+                appDelegateState: self.appDelegateState,
+                subscriptionState: self.subscription
+            )
+        }
+        set {
+            self.appDelegateState = newValue.appDelegateState
+        }
+    }
+    
     var landingPageReducerState: LandingPageReducerState {
         get {
             LandingPageReducerState(
@@ -261,6 +285,7 @@ extension AppState {
             psiCash: self.psiCash,
             iap: self.iapState,
             subscription: self.subscription,
+            adState: self.adState,
             appStorePsiCashProducts: self.products.psiCashProducts,
             isRefreshingAppStoreReceipt: self.appReceipt.isRefreshingReceipt
         )
@@ -279,7 +304,7 @@ extension AppState {
             psiCashBalance: self.psiCashBalance
         )
     }
-
+    
     var feedbackReducerState: FeedbackReducerState {
         get {
             FeedbackReducerState(
@@ -288,6 +313,18 @@ extension AppState {
         }
         set {
             self.queuedFeedbacks = newValue.queuedFeedbacks
+        }
+    }
+    
+    var adReducerState: AdReducerState {
+        get {
+            AdReducerState(
+                adState: self.adState,
+                tunnelConnection: self.tunnelConnection
+            )
+        }
+        set {
+            self.adState = newValue.adState
         }
     }
     
@@ -302,18 +339,6 @@ extension AppState {
         }
         set {
             self.mainView = newValue.mainView
-        }
-    }
-
-    var appDelegateReducerState: AppDelegateReducerState {
-        get {
-            AppDelegateReducerState(
-                appDelegateState: self.appDelegateState,
-                subscriptionState: self.subscription
-            )
-        }
-        set {
-            self.appDelegateState = newValue.appDelegateState
         }
     }
     
