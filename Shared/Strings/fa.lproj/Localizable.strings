@@ -2,7 +2,7 @@
 "ACCEPT_BUTTON_TITLE" = "پذیرفتن";
 
 /* After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
-"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Activating...";
+"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "فعال‌سازی";
 
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "مشترک شدید!";
@@ -115,17 +115,11 @@
 /*[UNTRANSLATED] Content of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
 "NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" = "Apps not working? Tap here to improve your Psiphon experience!";
 
-/*[UNTRANSLATED] Title of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
-"NOTIFICATION_TITLE_UPGRADE_PSIPHON" = "Upgrade Psiphon";
+/* Title of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
+"NOTIFICATION_TITLE_UPGRADE_PSIPHON" = "ارتقا Psiphon";
 
 /* Alert OK Button */
 "OK_BUTTON" = "تایید";
-
-/* Onboarding screen text. (Do not translate 'Psiphon'). */
-"ONBOARDING_BEYOND_BORDERS_BODY_2" = "مهم نیست که شما کجا باشید، Psiphon شما را به اطلاعاتی که می‌خواهید می‌رساند.";
-
-/* Beyond Borders title */
-"ONBOARDING_BEYOND_BORDERS_HEADER" = "فراتر از مرزها";
 
 /* Onboarding screen 'getting started' body. (Do not translate 'Psiphon'). */
 "ONBOARDING_GETTING_STARTED_BODY_2" = "برای متصل شدن، Psiphon نیاز دارد که تنظیمات وی‌پی‌ان را اضافه کند.";
@@ -373,8 +367,8 @@
 /*[UNTRANSLATED] Alert message informing user to turn on their cellular data or wifi to connect to the internet */
 "TURN_ON_DATE" = "Please turn on cellular data or use Wi-Fi.";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
-"UPGRADE_PSIPHON" = "Upgrade Psiphon";
+/* Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
+"UPGRADE_PSIPHON" = "ارتقا Psiphon";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "خطا در شروع Psiphon رخ داد. لطفا دوباره امتحان کنید. اگر این مشکل مداوم بود، برنامه Psiphon را دوباره نصب کنید.";

@@ -2,7 +2,7 @@
 "ACCEPT_BUTTON_TITLE" = "قبول";
 
 /* After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
-"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Activating...";
+"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "يحري التفعيل…";
 
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "انت مشترك!";
@@ -55,11 +55,11 @@
 /* Decline button title */
 "DECLINE_BUTTON_TITLE" = "رفض";
 
-/*[UNTRANSLATED] Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
-"DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
+/* Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
+"DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "إن بعض اتصالات الانترنت تكون غير مدعومة بواسطة إصدار Psiphon المجاني. يُرجى دفع الاشتراك في الخدمة أو « زيادة السرعة » لتفعيل استخدام Psiphon بكامل قدراته.";
 
-/*[UNTRANSLATED] Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
-"DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
+/* Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
+"DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "إن بعض اتصالات الانترنت تكون غير مدعومة بواسطة إصدار Psiphon المجاني. يُرجى دفع الاشتراك في الخدمة أو « زيادة السرعة » لتفعيل استخدام Psiphon بكامل قدراته.";
 
 /* Text next to the button indicating to the user that the rewarded video advertisement is only available when they are not connected to Psiphon. Do not translate or transliterate 'PsiCash'. Do not translate or transliterate 'Psiphon'. */
 "DISCONNECT_TO_WATCH_AND_EARN_PSICASH" = "يجب قطع الاتصال بـPsiphon لمشاهدة فيديو لكسب PsiCash";
@@ -73,14 +73,14 @@
 /* Error alert title */
 "ERROR_TITLE" = "خطأ";
 
-/*[UNTRANSLATED] No comment provided by engineer. */
-"EXTENSION_EXPIRED_SUBSCRIPTION_ALERT" = "Your Psiphon subscription has expired.\n\n Please open Psiphon app to renew your subscription.";
+/* No comment provided by engineer. */
+"EXTENSION_EXPIRED_SUBSCRIPTION_ALERT" = "لقد انتهت صلاحية الاشتراك في خدمة Psiphon.\n\nيُرجى فتح تطبيق Psiphon لتجديد اشتراكك.";
 
 /* Message shown when something fails to load */
 "FAILED_TO_LOAD" = "فشل التحميل";
 
-/*[UNTRANSLATED] Message shown when verification of a product already purchased fails. */
-"FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Failed to verify purchase";
+/* Message shown when verification of a product already purchased fails. */
+"FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "فشل التحقق من عملية الشراء";
 
 /* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "شكراً للمساعدة في تحسين اداء سايفون!";
@@ -106,26 +106,20 @@
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "لا يوجد إتصال بالانترنت";
 
-/*[UNTRANSLATED] Message shown to the user when there is no internet connect. */
-"NO_INTERNET_CONNECTION_TITLE" = "No internet connection";
+/* Message shown to the user when there is no internet connect. */
+"NO_INTERNET_CONNECTION_TITLE" = "لا يوجد اتصال بالانترنت";
 
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
 "NO_PRODUCTS_TEXT_2" = "تعذر استرداد الاشتراكات من الApp Store. الرجاء المحاولة مجدّدا في وقت لاحق.";
 
-/*[UNTRANSLATED] Content of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
-"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" = "Apps not working? Tap here to improve your Psiphon experience!";
+/* Content of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
+"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" = "التطبيق لا يعمل ؟ عليك باللمس هنا لتحسين كيفية استخدامك Psiphon !";
 
-/*[UNTRANSLATED] Title of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
-"NOTIFICATION_TITLE_UPGRADE_PSIPHON" = "Upgrade Psiphon";
+/* Title of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
+"NOTIFICATION_TITLE_UPGRADE_PSIPHON" = "ترقية Psiphon";
 
 /* Alert OK Button */
 "OK_BUTTON" = "موافق";
-
-/* Onboarding screen text. (Do not translate 'Psiphon'). */
-"ONBOARDING_BEYOND_BORDERS_BODY_2" = "يوصلك Psiphon بالمحتوى الذي تريده، بغض النظر عن مكان تواجدك.";
-
-/* Beyond Borders title */
-"ONBOARDING_BEYOND_BORDERS_HEADER" = "ما وراء الحدود ";
 
 /* Onboarding screen 'getting started' body. (Do not translate 'Psiphon'). */
 "ONBOARDING_GETTING_STARTED_BODY_2" = "من أجل الاتصال ، يحتاج Psiphon إلى صلاحية إضافة اعدادات الVPN.";
@@ -133,11 +127,11 @@
 /* Onboarding header */
 "ONBOARDING_GETTING_STARTED_HEADER" = "ابدء";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app. */
-"ONBOARDING_NOTIFICATION_PERMISSION_BODY" = "Allow Psiphon to send notifications so that you can be notified of important network events.";
+/* Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app. */
+"ONBOARDING_NOTIFICATION_PERMISSION_BODY" = "السماح لـ Psiphon لإرسال الإشعارات حتى يتم إخبارك بالأحداث المهمة في الشبكة.";
 
-/*[UNTRANSLATED] Onboarding screen title that will be asking the user permission to send notifications about important network events while they use the app. */
-"ONBOARDING_NOTIFICATION_PERMISSION_TITLE" = "Get notified about important network events";
+/* Onboarding screen title that will be asking the user permission to send notifications about important network events while they use the app. */
+"ONBOARDING_NOTIFICATION_PERMISSION_TITLE" = "تنبيهك حول الأحداث المهمة في الشبكة";
 
 /* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
 "ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "ستحتاج إلى السماح لـ Psiphon بإضافة اعدادات الVPN للاتصال.";
@@ -244,8 +238,8 @@
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon غير متصل";
 
-/*[UNTRANSLATED] 'App Store' refers to Apple's App Store, do not translate or transliterate 'App Store'. This alert message informs the user that the purchase they made has not been recorded by App Store. */
-"PURCHASE_NOT_RECORDED_BY_APPSTORE" = "Purchase not recorded by App Store.";
+/* 'App Store' refers to Apple's App Store, do not translate or transliterate 'App Store'. This alert message informs the user that the purchase they made has not been recorded by App Store. */
+"PURCHASE_NOT_RECORDED_BY_APPSTORE" = "لا تُحفَظ عمليات الشراء في مستودع تطبيقات آبل.";
 
 /* Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
 "PURCHASING_PSICASH" = "شراء PsiCash...";
@@ -253,8 +247,8 @@
 /* Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "PURCHASING_SPEED_BOOST" = "شراء تعزيز السرعة...";
 
-/*[UNTRANSLATED] Button title on an error alert that indicates it refreshes the user's purchase receipt on device. */
-"RECEIPT_REFRESH_BUTTON" = "Refresh Receipt";
+/* Button title on an error alert that indicates it refreshes the user's purchase receipt on device. */
+"RECEIPT_REFRESH_BUTTON" = "إنعاش وصل الأداء";
 
 /* Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "حدِث تلق التطبيق عندما:";
@@ -265,8 +259,8 @@
 /* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "لا يمكنك رؤية أية اشتراك قمت بشرائه على هذا الجهاز";
 
-/*[UNTRANSLATED] This alert message informs the user that the purchase they made has not been recorded and that they can tap the button 'Refresh Receipt' to try again. */
-"REFRESH_APP_RECEIPT_TO_TRY_AGAIN" = "Refresh the app receipt to try again.";
+/* This alert message informs the user that the purchase they made has not been recorded and that they can tap the button 'Refresh Receipt' to try again. */
+"REFRESH_APP_RECEIPT_TO_TRY_AGAIN" = "إنعاش تطبيق وصل الأداء ثم المحاولة لاحقا.";
 
 /* Title for a confirmation button that resets a user's previous consent. */
 "RESET_IDENTIFIER_BUTTON_TITLE" = "إعادة تعيين الموافقة";
@@ -319,8 +313,8 @@
 /* Footer text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. Please keep this text concise as the width of the text box is restricted in size. */
 "SUBSCRIPTION_BAR_FOOTER_TEXT_NOT_SUBSCRIBED_2" = "إزالة الإعلانات • السرعة القصوى";
 
-/*[UNTRANSLATED] Footer text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
-"SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED_V2" = "Premium • Max Speed";
+/* Footer text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
+"SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED_V2" = "المُميَّز • السرعة القصوى";
 
 /* Header text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
 "SUBSCRIPTION_BAR_HEADER_TEXT_NOT_SUBSCRIBED" = "الحصول على الإصدار المميز";
@@ -328,17 +322,17 @@
 /* Header text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. Please keep this text concise as the width of the text box is restricted in size. */
 "SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIBED" = "الاشتراك";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. This title is displayed on the main screen indicating that the subscription is pending activation. */
-"SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIPTION_PENDING" = "SUBSCRIPTION PENDING";
+/* After a user successfully purchases a subscription, it needs to be activated. This title is displayed on the main screen indicating that the subscription is pending activation. */
+"SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIPTION_PENDING" = "« الاشتراك مُعلَّق »";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. Label with this text displayed on the main screen, indicating that the user needs to connect to Psiphon in order to activate the subscription. */
-"SUBSCRIPTION_CONNECT_TO_ACTIVATE" = "Connect to activate";
+/* After a user successfully purchases a subscription, it needs to be activated. Label with this text displayed on the main screen, indicating that the user needs to connect to Psiphon in order to activate the subscription. */
+"SUBSCRIPTION_CONNECT_TO_ACTIVATE" = "الاتصال للتفعيل";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating that activation of user's subscription failed. */
-"SUBSCRIPTION_FAILED_TO_ACTIVATE" = "Failed to activate";
+/* After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating that activation of user's subscription failed. */
+"SUBSCRIPTION_FAILED_TO_ACTIVATE" = "فشل التفعيل";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating to the user that the subscription is in the process of getting activated */
-"SUBSCRIPTION_PLEASE_WAIT_WHILE_ACTIVATING" = "Please wait while activating";
+/* After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating to the user that the subscription is in the process of getting activated */
+"SUBSCRIPTION_PLEASE_WAIT_WHILE_ACTIVATING" = "يُرجى الانتظار خلال عملية التفعيل";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "الاشتراكات";
@@ -370,17 +364,17 @@
 /* Button title shown when something fails to load. Asks the user to tap the button to retry the operation */
 "TAP_TO_RETRY" = "انقر لاعادة المحاولة";
 
-/*[UNTRANSLATED] Alert message informing user to turn on their cellular data or wifi to connect to the internet */
-"TURN_ON_DATE" = "Please turn on cellular data or use Wi-Fi.";
+/* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
+"TURN_ON_DATE" = "يُرجى تشغيل البيانات الخلوية أو عليك باستخدام Wi-Fi.";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
-"UPGRADE_PSIPHON" = "Upgrade Psiphon";
+/* Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
+"UPGRADE_PSIPHON" = "ترقية Psiphon";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "حدث خطأ أثناء بدء Psiphon. من فضلك حاول مرة أخرى.";
 
-/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to 'Best performance', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
-"VPN_START_FAIL_REGION_INVALID_MESSAGE_3" = "The region you selected is no longer available. You have automatically been switched to \"Best performance\".\n\n You can also select a new region from the Psiphon app.";
+/* Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to 'Best performance', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
+"VPN_START_FAIL_REGION_INVALID_MESSAGE_3" = "لم تعد المنطقة التي حددت متاحة. لقد تمت تبديلك تلقائيا نحو « أفضل الأداءات ».\n\nيمكنك تحديد منطقة جديدة انطلاقا من تطبيق Psiphon.";
 
 /* Alert dialog title indicating to the user that Psiphon was unable to start */
 "VPN_START_FAIL_TITLE" = "تعذر البدء";

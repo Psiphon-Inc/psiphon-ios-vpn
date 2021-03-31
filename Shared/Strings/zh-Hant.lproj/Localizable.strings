@@ -121,12 +121,6 @@
 /*[UNTRANSLATED] Alert OK Button */
 "OK_BUTTON" = "OK";
 
-/* Onboarding screen text. (Do not translate 'Psiphon'). */
-"ONBOARDING_BEYOND_BORDERS_BODY_2" = " Psiphon 為不管身處何地用戶可以隨心所欲地連線訪問內容。";
-
-/* Beyond Borders title */
-"ONBOARDING_BEYOND_BORDERS_HEADER" = "超越國界";
-
 /* Onboarding screen 'getting started' body. (Do not translate 'Psiphon'). */
 "ONBOARDING_GETTING_STARTED_BODY_2" = "連線使用必須先讓 Psiphon 可以新增 VPN 設置。";
 
