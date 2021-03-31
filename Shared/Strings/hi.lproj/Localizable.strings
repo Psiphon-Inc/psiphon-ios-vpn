@@ -17,7 +17,7 @@
 "ALERT_TITLE_OPERATION_FAILED" = "Operation Failed";
 
 /* Title of the button which takes the user to the previous screen. Text should be short and one word when possible. */
-"BACK_BUTTON" = "पिछला";
+"BACK_BUTTON" = "स्वीकार करें";
 
 /* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
 "BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "खारिज करना";
@@ -120,12 +120,6 @@
 
 /* Alert OK Button */
 "OK_BUTTON" = "ठीक";
-
-/*[UNTRANSLATED] Onboarding screen text. (Do not translate 'Psiphon'). */
-"ONBOARDING_BEYOND_BORDERS_BODY_2" = "Psiphon connects you to the content you want, no matter where you are.";
-
-/* Beyond Borders title */
-"ONBOARDING_BEYOND_BORDERS_HEADER" = "सीमाओं के पार";
 
 /*[UNTRANSLATED] Onboarding screen 'getting started' body. (Do not translate 'Psiphon'). */
 "ONBOARDING_GETTING_STARTED_BODY_2" = "In order to connect, Psiphon needs the ability to add VPN configurations.";
@@ -289,8 +283,8 @@
 /*[UNTRANSLATED] Select language button title. */
 "SELECT_LANG_BUTTON_TITLE" = "Select Language";
 
-/*[UNTRANSLATED] Title for screen that allows user to select their desired server region. */
-"SELECT_SERVER_REGION" = "Select server region";
+/* Title for screen that allows user to select their desired server region. */
+"SELECT_SERVER_REGION" = "सर्वर क्षेत्र चुने";
 
 /*[UNTRANSLATED] Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Reinstall VPN profile";
@@ -364,8 +358,8 @@
 /*[UNTRANSLATED] Label on a button which, when pressed, opens a screen where the user can choose from multiple subscription plans. */
 "SUBSCRIPTIONS_SUBSCRIBE_BUTTON" = "Subscribe";
 
-/*[UNTRANSLATED] Title of button on subscriptions page which opens Psiphon's terms of use webpage */
-"SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Terms of Use";
+/* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
+"SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "उपयोग की शर्तें";
 
 /*[UNTRANSLATED] Button title shown when something fails to load. Asks the user to tap the button to retry the operation */
 "TAP_TO_RETRY" = "Tap to Retry";

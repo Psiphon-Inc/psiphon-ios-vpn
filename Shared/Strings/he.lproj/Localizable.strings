@@ -121,12 +121,6 @@
 /* Alert OK Button */
 "OK_BUTTON" = "אישור";
 
-/* Onboarding screen text. (Do not translate 'Psiphon'). */
-"ONBOARDING_BEYOND_BORDERS_BODY_2" = "Psiphon מחבר אותך אל התוכן שאתה רוצה, לא משנה איפה אתה.";
-
-/* Beyond Borders title */
-"ONBOARDING_BEYOND_BORDERS_HEADER" = "מִעֶבֶר לגבולות";
-
 /* Onboarding screen 'getting started' body. (Do not translate 'Psiphon'). */
 "ONBOARDING_GETTING_STARTED_BODY_2" = "על מנת להתחבר, Psiphon צריך את היכולת להוסיף תצורות VPN.";
 
