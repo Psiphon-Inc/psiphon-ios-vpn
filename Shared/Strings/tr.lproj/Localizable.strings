@@ -121,12 +121,6 @@
 /* Alert OK Button */
 "OK_BUTTON" = "Tamam";
 
-/* Onboarding screen text. (Do not translate 'Psiphon'). */
-"ONBOARDING_BEYOND_BORDERS_BODY_2" = "Psiphon nerede olursanız olun sizi erişmek istediğiniz içeriğe bağlar.";
-
-/* Beyond Borders title */
-"ONBOARDING_BEYOND_BORDERS_HEADER" = "Sınırları Aşın";
-
 /* Onboarding screen 'getting started' body. (Do not translate 'Psiphon'). */
 "ONBOARDING_GETTING_STARTED_BODY_2" = "Bağlantı kurabilmek için Psiphon uygulamasına VPN yapılandırması ekleme izni verilmelidir.";
 

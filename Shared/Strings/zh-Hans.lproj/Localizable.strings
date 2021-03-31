@@ -121,12 +121,6 @@
 /* Alert OK Button */
 "OK_BUTTON" = "是";
 
-/* Onboarding screen text. (Do not translate 'Psiphon'). */
-"ONBOARDING_BEYOND_BORDERS_BODY_2" = "无论您身处何方，Psiphon 总能连接到您想要的内容。";
-
-/* Beyond Borders title */
-"ONBOARDING_BEYOND_BORDERS_HEADER" = "超越国界";
-
 /* Onboarding screen 'getting started' body. (Do not translate 'Psiphon'). */
 "ONBOARDING_GETTING_STARTED_BODY_2" = "为了连接，Psiphon 需要能够添加 VPN 配置文件。";
 
