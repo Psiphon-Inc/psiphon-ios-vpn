@@ -121,12 +121,6 @@
 /* Alert OK Button */
 "OK_BUTTON" = "እሺ";
 
-/* Onboarding screen text. (Do not translate 'Psiphon'). */
-"ONBOARDING_BEYOND_BORDERS_BODY_2" = "የትም ቢሆኑ Psiphon የሚፈልጉት ይዘት ላይ እንዲዳረሱ ይፈቅዳል።";
-
-/* Beyond Borders title */
-"ONBOARDING_BEYOND_BORDERS_HEADER" = "ከድምበር ባሻገር";
-
 /* Onboarding screen 'getting started' body. (Do not translate 'Psiphon'). */
 "ONBOARDING_GETTING_STARTED_BODY_2" = "ለመገናኘት Psiphon ምናባዊ የግል አውታረ መረብ (ቪፒኤን) ውቅረቶችን እንዲያክል ይፍቀዱ።";
 
