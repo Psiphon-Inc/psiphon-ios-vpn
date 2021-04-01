@@ -23,8 +23,10 @@ struct Navigator {
     
     private var registered: [URL: () -> Bool] = [:]
     
-    mutating func register(url: URL, completionHandler: @escaping () -> Bool) {
-        registered[url] = completionHandler
+    mutating func register(urls: URL..., completionHandler: @escaping () -> Bool) {
+        for url in urls {
+            registered[url] = completionHandler
+        }
     }
     
     func handle(url: URL) -> Bool {
