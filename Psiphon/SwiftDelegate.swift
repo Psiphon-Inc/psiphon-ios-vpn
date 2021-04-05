@@ -458,7 +458,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             
         }
         
-        navigator.register(url: PsiphonDeepLinking.psiCashDeepLink) { [unowned self] in
+        navigator.register(urls: PsiphonDeepLinking.legacyBuyPsiCashDeepLink, PsiphonDeepLinking.buyPsiCashDeepLink) { [unowned self] in
             tryPresentPsiCashViewController(
                 platform: platform,
                 tab: .addPsiCash,
@@ -468,7 +468,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             return true
         }
         
-        navigator.register(url: PsiphonDeepLinking.speedBoostDeepLink) { [unowned self] in
+        navigator.register(urls: PsiphonDeepLinking.legacySpeedBoostDeepLink, PsiphonDeepLinking.speedBoostDeepLink) { [unowned self] in
             tryPresentPsiCashViewController(
                 platform: platform,
                 tab: .speedBoost,
