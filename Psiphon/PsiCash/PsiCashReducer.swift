@@ -360,12 +360,15 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         
     case let .userDidEarnReward(rewardAmount, reason):
         
+        // Increases displayed PsiCash balance optimistically
+        // with the given rewardAmount, until PsiCash state is refreshed.
+        
         state.psiCashBalance.waitingForExpectedIncrease(
             withAddedReward: rewardAmount,
             reason: reason,
             persisted: environment.psiCashPersistedValues)
         
-        return []
+        return [ Effect(value: .refreshPsiCashState()) ]
         
     case .connectToPsiphonTapped:
         return [

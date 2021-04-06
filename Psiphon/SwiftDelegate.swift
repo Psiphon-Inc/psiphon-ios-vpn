@@ -472,11 +472,13 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.store.send(.psiCash(.initialize))
 
         // Registers accepted deep linking URLs.
-        deepLinkingNavigator.register(url: PsiphonDeepLinking.psiCashDeepLink) { [unowned self] in
+        deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.legacyBuyPsiCashDeepLink,
+                                             PsiphonDeepLinking.buyPsiCashDeepLink ]) { [unowned self] in
             self.store.send(.mainViewAction(.presentPsiCashScreen(initialTab: .addPsiCash)))
             return true
         }
-        deepLinkingNavigator.register(url: PsiphonDeepLinking.speedBoostDeepLink) { [unowned self] in
+        deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.legacySpeedBoostDeepLink,
+                                              PsiphonDeepLinking.speedBoostDeepLink ]) { [unowned self] in
             self.store.send(.mainViewAction(.presentPsiCashScreen(initialTab: .speedBoost)))
             return true
         }
