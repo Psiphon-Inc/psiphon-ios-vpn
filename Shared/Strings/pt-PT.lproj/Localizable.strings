@@ -121,12 +121,6 @@
 /* Alert OK Button */
 "OK_BUTTON" = "ACEITAR";
 
-/*[UNTRANSLATED] Onboarding screen text. (Do not translate 'Psiphon'). */
-"ONBOARDING_BEYOND_BORDERS_BODY_2" = "Psiphon connects you to the content you want, no matter where you are.";
-
-/* Beyond Borders title */
-"ONBOARDING_BEYOND_BORDERS_HEADER" = "Além Fronteiras";
-
 /*[UNTRANSLATED] Onboarding screen 'getting started' body. (Do not translate 'Psiphon'). */
 "ONBOARDING_GETTING_STARTED_BODY_2" = "In order to connect, Psiphon needs the ability to add VPN configurations.";
 
@@ -409,8 +403,8 @@
 /* Status when the VPN was connected to a Psiphon server, got disconnected unexpectedly, and is currently trying to reconnect */
 "VPN_STATUS_RECONNECTING" = "A Reconetar";
 
-/*[UNTRANSLATED] Status when the VPN is restarting. */
-"VPN_STATUS_RESTARTING" = "Restarting";
+/* Status when the VPN is restarting. */
+"VPN_STATUS_RESTARTING" = "Reiniciar";
 
 /*[UNTRANSLATED] Error message when something was wrong with the VPN. Asks the user that if the error persists, try tapping the 'Reinstall VPN Profile' button in the settings menu. 'Reinstall VPN Profile' translation has key SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE */
 "VPN_SYNC_FAILED_REINSTALL_CONFIG" = "If this error persists, please try 'Reinstall VPN Profile'.";

@@ -121,12 +121,6 @@
 /* Alert OK Button */
 "OK_BUTTON" = "sawa";
 
-/* Onboarding screen text. (Do not translate 'Psiphon'). */
-"ONBOARDING_BEYOND_BORDERS_BODY_2" = "Psiphon ina kuunganisha na maudhui unayo yahitaji, haijalishi mahali ulipo.";
-
-/* Beyond Borders title */
-"ONBOARDING_BEYOND_BORDERS_HEADER" = "Zaidi ya mipaka";
-
 /* Onboarding screen 'getting started' body. (Do not translate 'Psiphon'). */
 "ONBOARDING_GETTING_STARTED_BODY_2" = "Ili kuweza kuunganisha, Psiphon inahitaji uwezo wa kuongeza usanidi wa VPN.";
 
