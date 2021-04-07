@@ -20,6 +20,7 @@
 import Foundation
 import PsiApi
 import PsiCashClient
+import ReactiveSwift
 
 extension PsiCashRequestError: LocalizedUserDescription where ErrorStatus: LocalizedUserDescription {
     
@@ -153,9 +154,14 @@ extension PsiCashEffects {
         getCurrentTime: @escaping () -> Date,
         feedbackLogger: FeedbackLogger
     ) -> PsiCashEffects {
+        
         PsiCashEffects(
-            initialize: { [psiCash] (fileStoreRoot: String?, psiCashLegacyDataStore: UserDefaults)
-                -> Effect<Result<PsiCashLibInitSuccess, ErrorRepr>> in
+            initialize: { [psiCash] (
+                    fileStoreRoot: String?,
+                    psiCashLegacyDataStore: UserDefaults,
+                    tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
+                ) -> Effect<Result<PsiCashLibInitSuccess, ErrorRepr>> in
+                
                 Effect { () -> Result<PsiCashLibInitSuccess, ErrorRepr> in
 
                     guard let fileStoreRoot = fileStoreRoot else {
@@ -168,6 +174,21 @@ extension PsiCashEffects {
                         psiCashLegacyDataStore: psiCashLegacyDataStore,
                         httpRequestFunc: { (request: PSIHttpRequest) -> PSIHttpResult in
                             
+                            // Synchronous check for tunnel connection status.
+                            
+                            // Blocks until the first value is received.
+                            // TODO: Replace with actors once it is introduced to Swift.
+                            guard
+                                case .some(.success(.some(let tunnelConnection))) =
+                                    tunnelConnectionRefSignal.first()
+                            else {
+                                return PSIHttpResult(recoverableError: ())
+                            }
+                            
+                            guard case .connected = tunnelConnection.tunneled else {
+                                return PSIHttpResult(recoverableError: ())
+                            }
+                            
                             // Maps [PSIPair<NSString>] to Swift type `[(String, String)]`.
                             let queryParams: [(String, String)] = request.query.map {
                                 ($0.first as String, $0.second as String)
@@ -177,8 +198,10 @@ extension PsiCashEffects {
                                 return PSIHttpResult(criticalError: ())
                             }
                             
-                            let maybeUrl = URL.make(scheme: request.scheme, hostname: request.hostname,
-                                                    port: request.port, path: request.path,
+                            let maybeUrl = URL.make(scheme: request.scheme,
+                                                    hostname: request.hostname,
+                                                    port: request.port,
+                                                    path: request.path,
                                                     queryParams: queryParams)
                             
                             guard let url = maybeUrl else {
@@ -225,18 +248,14 @@ extension PsiCashEffects {
             libData: { [psiCash] () -> PsiCashLibData in
                 psiCash.dataModel
             },
-            refreshState: { [psiCash, getCurrentTime] (priceClasses, localOnly, tunnelConnection, metadata) ->
+            refreshState: { [psiCash, getCurrentTime] (priceClasses, tunnelConnection, metadata) ->
                 Effect<PsiCashEffects.PsiCashRefreshResult> in
                 
                 Effect.deferred(dispatcher: globalDispatcher) { fulfilled in
-                    guard case .connected = tunnelConnection.tunneled else {
-                        fulfilled(
-                            .failure(
-                                ErrorEvent(.tunnelNotConnected, date: getCurrentTime())
-                            )
-                        )
-                        return
-                    }
+                    
+                    // If we are not connected, calls refreshState
+                    // with localOnly set to true.
+                    let localOnly = tunnelConnection.tunneled != .connected
                     
                     // Updates request metadata before sending the request.
                     let maybeError = psiCash.setRequestMetadata(metadata)
@@ -253,9 +272,10 @@ extension PsiCashEffects {
                     
                     fulfilled(
                         result.mapError {
-                            ErrorEvent(.requestError($0), date: getCurrentTime())
+                            ErrorEvent($0, date: getCurrentTime())
                         }
                     )
+                    
                 }
                 
             },
@@ -341,21 +361,15 @@ extension PsiCashEffects {
                     }
                 }
             },
-            accountLogout: { [psiCash, getCurrentTime] tunnelConnection
+            accountLogout: { [psiCash, getCurrentTime] ()
                 -> Effect<PsiCashAccountLogoutResult> in
                 Effect.deferred(dispatcher: globalDispatcher) { fulfilled in
-                    // This may involve a network operation and so can be blocking.
                     
-                    guard case .connected = tunnelConnection.tunneled else {
-                        fulfilled(
-                            .failure(ErrorEvent(.tunnelNotConnected, date: getCurrentTime()))
-                        )
-                        return
-                    }
+                    // This may involve a network operation and so can be blocking.
                     
                     fulfilled(
                         psiCash.accountLogout()
-                            .mapError { ErrorEvent(.requestError($0), date: getCurrentTime()) }
+                            .mapError { ErrorEvent($0, date: getCurrentTime()) }
                     )
                 }
             },
