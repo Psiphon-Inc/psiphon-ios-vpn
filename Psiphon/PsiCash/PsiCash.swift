@@ -21,6 +21,8 @@ import Foundation
 import PsiApi
 import PsiCashClient
 
+/// Maps PSIStatus returned from a call to refresh state to `Result<(), PsiCashRefreshErrorStatus>`
+/// `Result<(), PsiCashRefreshErrorStatus>`.
 fileprivate func psiStatusToRefreshStatus(
     _ status: PSIStatus
 ) -> Result<(), PsiCashRefreshErrorStatus>? {
@@ -357,8 +359,12 @@ final class PsiCash {
      
      Input parameters:
      
+     • local_only: If true, no network call will be made, and the refresh will utilize only
+       locally-stored data (i.e., only token expiry will be checked, and a transition into
+       a logged-out state may result).
+
      • purchase_classes: The purchase class names for which prices should be
-     retrieved, like `{"speed-boost"}`. If null or empty, no purchase prices will be retrieved.
+       retrieved, like `{"speed-boost"}`. If null or empty, no purchase prices will be retrieved.
      
      Result fields:
      
@@ -378,24 +384,32 @@ final class PsiCash {
      local storage corruption). The local user state will be cleared.
      */
     func refreshState(
-        purchaseClasses: [String]
-    ) -> Result<PsiCashLibData, PsiCashRefreshError> {
+        purchaseClasses: [String],
+        localOnly: Bool
+    ) -> Result<RefreshStateResponse, PsiCashRefreshError> {
+        
         guard
-            let result = Result(client.refreshState(withPurchaseClasses: purchaseClasses))
+            let result = Result(client.refreshState(withPurchaseClasses: purchaseClasses, localOnly: localOnly))
         else {
             // Programming fault
             fatalError()
         }
         
+        // Maps `Result<PSIRefreshStateResponse, PsiCashLibError>`
+        // to `Result<RefreshStateResponse, PsiCashRefreshError>`.
         return result.biFlatMap {
-            guard let statusResult = psiStatusToRefreshStatus($0) else {
+            guard let statusResult = psiStatusToRefreshStatus($0.status) else {
                 // Programming fault
                 fatalError()
             }
             
             switch statusResult {
             case .success(()):
-                return .success(self.dataModel)
+                
+                let response = RefreshStateResponse(libData: self.dataModel,
+                                                    reconnectRequired: $0.reconnectRequired)
+                return .success(response)
+                
             case .failure(let errorStatus):
                 return .failure(.errorStatus(errorStatus))
             }
@@ -403,6 +417,7 @@ final class PsiCash {
         } transformFailure: {
             return .failure(.requestFailed($0))
         }
+        
     }
     
     /** Copied from PSIPsiCashLibWrapper
@@ -505,8 +520,17 @@ final class PsiCash {
     NOTE: This (usually) does involve a network operation, so wrappers may want to be
     asynchronous.
     */
-    func accountLogout() -> PsiCashLibError? {
-        PsiCashLibError(self.client.accountLogout())
+    func accountLogout() -> Result<AccountLogoutResponse, PsiCashLibError> {
+        
+        guard let result = Result(self.client.accountLogout()) else {
+            // Programming fault.
+            fatalError()
+        }
+        
+        return result.map {
+            AccountLogoutResponse(libData: self.dataModel, reconnectRequired: $0.reconnectRequired)
+        }
+        
     }
     
     /** Copied from PSIPsiCashLibWrapper
@@ -730,6 +754,21 @@ fileprivate extension Result where Success == PSIStatus, Failure == PsiCashLibEr
     
 }
 
+fileprivate extension Result where Success == PSIRefreshStateResponse,
+                                   Failure == PsiCashLibError {
+    
+    init?(_ psiResult: PSIResult<PSIRefreshStateResponse>) {
+        if let success = psiResult.success {
+            self = .success(success)
+        } else if let failure = psiResult.failure {
+            self = .failure(PsiCashLibError(failure))
+        } else {
+            return nil
+        }
+    }
+    
+}
+
 fileprivate extension Result where Success == PSINewExpiringPurchaseResponse,
                                    Failure == PsiCashLibError {
     
@@ -749,6 +788,21 @@ fileprivate extension Result where Success == PSIAccountLoginResponse,
                                    Failure == PsiCashLibError {
     
     init?(_ psiResult: PSIResult<PSIAccountLoginResponse>) {
+        if let success = psiResult.success {
+            self = .success(success)
+        } else if let failure = psiResult.failure {
+            self = .failure(PsiCashLibError(failure))
+        } else {
+            return nil
+        }
+    }
+    
+}
+
+fileprivate extension Result where Success == PSIAccountLogoutResponse,
+                                   Failure == PsiCashLibError {
+    
+    init?(_ psiResult: PSIResult<PSIAccountLogoutResponse>) {
         if let success = psiResult.success {
             self = .success(success)
         } else if let failure = psiResult.failure {

@@ -25,8 +25,10 @@ import PsiApi
 /// Instances of this type probably wrap some kind of cross-platform PsiCash client library.
 public struct PsiCashEffects {
     
+    public typealias LocalOnly = Bool
+    
     public typealias PsiCashRefreshResult =
-        Result<PsiCashLibData,
+        Result<RefreshStateResponse,
                ErrorEvent<TunneledPsiCashRequestError<PsiCashRefreshError>>>
     
     public typealias PsiCashAccountLoginResult =
@@ -34,7 +36,7 @@ public struct PsiCashEffects {
                ErrorEvent<TunneledPsiCashRequestError<PsiCashAccountLoginError>>>
     
     public typealias PsiCashAccountLogoutResult =
-        Result<PsiCashLibData,
+        Result<AccountLogoutResponse,
                 ErrorEvent<TunneledPsiCashRequestError<PsiCashLibError>>>
 
     /// Represents success reuslt of PsiCash client lib initialization.
@@ -73,7 +75,7 @@ public struct PsiCashEffects {
     /// Initializes PsiCash client lib given path of file store root directory.
     public let initialize: (String?, UserDefaults) -> Effect<Result<PsiCashLibInitSuccess, ErrorRepr>>
     public let libData: () -> PsiCashLibData
-    public let refreshState: ([PsiCashTransactionClass], TunnelConnection, ClientMetaData) ->
+    public let refreshState: ([PsiCashTransactionClass], LocalOnly, TunnelConnection, ClientMetaData) ->
         Effect<PsiCashRefreshResult>
     public let purchaseProduct: (PsiCashPurchasableType, TunnelConnection, ClientMetaData) ->
         Effect<NewExpiringPurchaseResult>
@@ -87,7 +89,7 @@ public struct PsiCashEffects {
         initialize: @escaping (String?, UserDefaults)
             -> Effect<Result<PsiCashLibInitSuccess, ErrorRepr>>,
         libData: @escaping () -> PsiCashLibData,
-        refreshState: @escaping ([PsiCashTransactionClass], TunnelConnection, ClientMetaData) ->
+        refreshState: @escaping ([PsiCashTransactionClass], LocalOnly, TunnelConnection, ClientMetaData) ->
             Effect<PsiCashRefreshResult>,
         purchaseProduct: @escaping (PsiCashPurchasableType, TunnelConnection, ClientMetaData) ->
             Effect<NewExpiringPurchaseResult>,

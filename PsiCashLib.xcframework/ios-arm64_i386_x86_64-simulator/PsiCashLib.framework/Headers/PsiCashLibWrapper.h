@@ -164,6 +164,21 @@ typedef NS_ENUM(NSInteger, PSIStatus) {
 @end
 
 
+@interface PSIRefreshStateResponse : NSObject
+
+@property (nonatomic, readonly) PSIStatus status;
+@property (nonatomic, readonly) BOOL reconnectRequired;
+
+@end
+
+
+@interface PSIAccountLogoutResponse : NSObject
+
+@property (nonatomic, readonly) BOOL reconnectRequired;
+
+@end
+
+
 @interface PSIAccountLoginResponse : NSObject
 
 @property (nonatomic, readonly) PSIStatus status;
@@ -208,6 +223,9 @@ typedef NS_ENUM(NSInteger, PSIStatus) {
 /// Set values that will be included in the request metadata. This includes
 /// client_version, client_region, sponsor_id, and propagation_channel_id.
 - (PSIError *_Nullable)setRequestMetadataItem:(NSString *)key withValue:(NSString *)value WARN_UNUSED_RESULT;
+
+/// Set current UI locale.
+- (PSIError *_Nullable)setLocale:(NSString *)locale;
 
 // MARK: Stored info accessors
 
@@ -266,11 +284,15 @@ typedef NS_ENUM(NSInteger, PSIStatus) {
 /// where the user can buy PsiCash for real money.
 - (PSIResult<NSString *> *)getBuyPsiURL;
 
-/// Returns the URL that should be used for signing up a new account.
-- (NSString *)getAccountSignupURL;
+typedef NS_ENUM(NSInteger, PSIUserSiteURLType) {
+    PSIUserSiteURLTypeAccountSignup = 0,
+    PSIUserSiteURLTypeAccountManagement,
+    PSIUserSiteURLTypeForgotAccount
+};
 
-/// Returns the URL that should be used for managing and existing account.
-- (NSString *)getAccountManagementURL;
+/// Returns the `my.psi.cash` URL of the give type.
+/// If `webview` is true, the URL will be appended to with `#!webview`.
+- (NSString *)getUserSiteURL:(PSIUserSiteURLType)urlType webview:(BOOL)webview;
 
 /// Creates a data package that should be included with a webhook for a user
 /// action that should be rewarded (such as watching a rewarded video).
@@ -291,46 +313,65 @@ typedef NS_ENUM(NSInteger, PSIStatus) {
 // MARK: API Server Requests
 
 /**
- Refreshes the client state. Retrieves info about whether the user has an
- Account (vs Tracker), balance, valid token types, and purchase prices. After a
- successful request, the retrieved values can be accessed with the accessor
- methods.
- 
- If there are no tokens stored locally (e.g., if this is the first run), then
- new Tracker tokens will obtained.
- 
- If the user is/has an Account, then it is possible some tokens will be invalid
- (they expire at different rates). Login may be necessary before spending, etc.
- (It's even possible that validTokenTypes is empty -- i.e., there are no valid
- tokens.)
- 
- If there is no valid indicator token, then balance and purchase prices will not
- be retrieved, but there may be stored (possibly stale) values that can be used.
- 
- Input parameters:
- 
+Refreshes the client state. Retrieves info about whether the user has an Account (vs
+Tracker), balance, valid token types, purchases, and purchase prices. After a
+successful request, the retrieved values can be accessed with the accessor methods.
+
+If there are no tokens stored locally (e.g., if this is the first run), then
+new Tracker tokens will obtained.
+
+If the user has an Account, then it is possible some or all tokens will be invalid
+(they expire at different rates). Login may be necessary before spending, etc.
+(It's even possible that hasTokens is false.)
+
+If the user has an Account, then it is possible some or all tokens will be invalid
+(they may expire at different rates) and multiple states are possible:
+  • spender, indicator, and earner tokens are all valid.
+  • Some token types are valid, while others are not. The client will probably want to
+    consider itself not-logged-in and force a login.
+  • No tokens are valid.
+
+See the flow chart in the README for a graphical representation of states.
+
+If there is no valid indicator token, then balance and purchase prices will not
+be retrieved, but there may be stored (possibly stale) values that can be used.
+
+Input parameters:
+
+ • local_only: If true, no network call will be made, and the refresh will utilize only
+   locally-stored data (i.e., only token expiry will be checked, and a transition into
+   a logged-out state may result).
+
  • purchase_classes: The purchase class names for which prices should be
- retrieved, like `{"speed-boost"}`. If null or empty, no purchase prices will be retrieved.
- 
- Result fields:
- 
- • error: If set, the request failed utterly and no other params are valid.
- 
- • status: Request success indicator. See below for possible values.
- 
- Possible status codes:
- 
- • Success: Call was successful. Tokens may now be available (depending on if
- IsAccount is true, ValidTokenTypes should be checked, as a login may be required).
- 
- • ServerError: The server returned 500 error response. Note that the request has
- already been retried internally and any further retry should not be immediate.
- 
- • InvalidTokens: Should never happen (indicates something like
- local storage corruption). The local user state will be cleared.
- */
-- (PSIResult<PSIStatusWrapper *> *)
-refreshStateWithPurchaseClasses:(NSArray<NSString *> *)purchaseClasses WARN_UNUSED_RESULT;
+   retrieved, like `{"speed-boost"}`. If null or empty, no purchase prices will be retrieved.
+
+Result fields:
+
+• error: If set, the request failed utterly and no other params are valid.
+
+• status: Request success indicator. See below for possible values.
+
+• reconnect_required: If true, a reconnect is required due to the effects of this call.
+  There are two main scenarios where this is the case:
+  1. A Speed Boost purchase was retrieved and its authorization needs to be applied to
+     the tunnel.
+  2. Speed Boost is active when account tokens expires, so the authorization needs to
+     be removed from the tunnel.
+
+Possible status codes:
+
+• Success: Call was successful. Tokens may now be available (depending on if
+  IsAccount is true, HasTokens should be checked, as a login may be required).
+
+• ServerError: The server returned 500 error response. Note that the request has
+  already been retried internally and any further retry should not be immediate.
+
+• InvalidTokens: Should never happen (indicates something like local storage
+  corruption). The local user state will be cleared.
+*/
+- (PSIResult<PSIRefreshStateResponse *> *)
+refreshStateWithPurchaseClasses:(NSArray<NSString *> *)purchaseClasses
+localOnly:(BOOL)localOnly WARN_UNUSED_RESULT;
 
 /**
  Makes a new transaction for an "expiring-purchase" class, such as "speed-boost".
@@ -384,6 +425,12 @@ expectedPrice:(int64_t)expectedPrice WARN_UNUSED_RESULT;
 
 /**
 Logs out a currently logged-in account.
+
+Result fields:
+• error: If set, the request failed utterly and no other params are valid.
+• reconnect_required: If true, a reconnect is required due to the effects of this call.
+  This typically means that a Speed Boost was active at the time of logout.
+
 An error will be returned in these cases:
 • If the user is not an account
 • If the request to the server fails
@@ -394,7 +441,7 @@ will need to occur.
 NOTE: This (usually) does involve a network operation, so wrappers may want to be
 asynchronous.
 */
-- (PSIError *_Nullable)accountLogout;
+- (PSIResult<PSIAccountLogoutResponse *> *)accountLogout;
 
 /**
 Attempts to log the current user into an account. Will attempt to merge any available
