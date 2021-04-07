@@ -93,6 +93,19 @@ public struct PsiCashLibError: HashableError {
     }
 }
 
+/// Represents a successful refresh state response.
+public struct RefreshStateResponse: Equatable {
+
+    public let libData: PsiCashLibData
+    public let reconnectRequired: Bool
+    
+    public init(libData: PsiCashLibData, reconnectRequired: Bool) {
+        self.libData = libData
+        self.reconnectRequired = reconnectRequired
+    }
+    
+}
+
 /// Represents a successful expiring purchase response.
 public struct NewExpiringPurchaseResponse: Equatable {
     public let purchasedType: PsiCashParsed<PsiCashPurchasedType>
@@ -111,6 +124,19 @@ public struct AccountLoginResponse: Equatable {
     
     public init(lastTrackerMerge: Bool) {
         self.lastTrackerMerge = lastTrackerMerge
+    }
+    
+}
+
+/// Represents a successful account logout response.
+public struct AccountLogoutResponse: Equatable {
+    
+    public let libData: PsiCashLibData
+    public let reconnectRequired: Bool
+    
+    public init(libData: PsiCashLibData, reconnectRequired: Bool) {
+        self.libData = libData
+        self.reconnectRequired = reconnectRequired
     }
     
 }

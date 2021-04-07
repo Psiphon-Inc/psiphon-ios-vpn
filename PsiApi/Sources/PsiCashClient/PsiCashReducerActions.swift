@@ -34,7 +34,7 @@ public enum PsiCashAction: Equatable {
             result: PsiCashEffects.NewExpiringPurchaseResult
          )
     
-    case refreshPsiCashState(ignoreSubscriptionState: Bool = false)
+    case refreshPsiCashState(localOnly: Bool = false, ignoreSubscriptionState: Bool = false)
     case _refreshPsiCashStateResult(PsiCashEffects.PsiCashRefreshResult)
     
     case accountLogout

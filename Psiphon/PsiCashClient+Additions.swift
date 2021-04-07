@@ -225,8 +225,9 @@ extension PsiCashEffects {
             libData: { [psiCash] () -> PsiCashLibData in
                 psiCash.dataModel
             },
-            refreshState: { [psiCash, getCurrentTime] (priceClasses, tunnelConnection, metadata) ->
+            refreshState: { [psiCash, getCurrentTime] (priceClasses, localOnly, tunnelConnection, metadata) ->
                 Effect<PsiCashEffects.PsiCashRefreshResult> in
+                
                 Effect.deferred(dispatcher: globalDispatcher) { fulfilled in
                     guard case .connected = tunnelConnection.tunneled else {
                         fulfilled(
@@ -247,7 +248,8 @@ extension PsiCashEffects {
                     let purchaseClasses = priceClasses.map(\.rawValue)
                     
                     // Blocking call.
-                    let result = psiCash.refreshState(purchaseClasses: purchaseClasses)
+                    let result = psiCash.refreshState(purchaseClasses: purchaseClasses,
+                                                      localOnly: localOnly)
                     
                     fulfilled(
                         result.mapError {
@@ -255,6 +257,7 @@ extension PsiCashEffects {
                         }
                     )
                 }
+                
             },
             purchaseProduct: { [psiCash, feedbackLogger, getCurrentTime]
                 (purchasable, tunnelConnection, metadata) ->
@@ -352,7 +355,6 @@ extension PsiCashEffects {
                     
                     fulfilled(
                         psiCash.accountLogout()
-                            .optionalToFailure(success: psiCash.dataModel)
                             .mapError { ErrorEvent(.requestError($0), date: getCurrentTime()) }
                     )
                 }

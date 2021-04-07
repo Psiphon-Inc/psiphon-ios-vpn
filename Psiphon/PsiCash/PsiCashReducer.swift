@@ -180,7 +180,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             return [ environment.feedbackLogger.log(.error, errorEvent).mapNever() ]
         }
         
-    case .refreshPsiCashState(let ignoreSubscriptionState):
+    case let .refreshPsiCashState(localOnly, ignoreSubscriptionState):
         
         guard
             state.psiCash.libLoaded,
@@ -201,7 +201,9 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         return [
             environment.feedbackLogger.log(.info, "PsiCash: refresh state started").mapNever(),
             environment.psiCashEffects
-                .refreshState(PsiCashTransactionClass.allCases, tunnelConnection,
+                .refreshState(PsiCashTransactionClass.allCases,
+                              localOnly,
+                              tunnelConnection,
                               environment.metadata())
                 .map(PsiCashAction._refreshPsiCashStateResult)
         ]
@@ -215,9 +217,11 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         state.psiCash.pendingPsiCashRefresh = .completed(result.successToUnit().toUnit())
         
         switch result {
-        case .success(let refreshedLibData):
-            state.psiCash.libData = refreshedLibData
-            state.psiCashBalance = .refreshed(refreshedData: refreshedLibData,
+        case .success(let refreshStateResponse):
+            
+            
+            state.psiCash.libData = refreshStateResponse.libData
+            state.psiCashBalance = .refreshed(refreshedData: refreshStateResponse.libData,
                                               persisted: environment.psiCashPersistedValues)
             return [
                 environment.feedbackLogger.log(.info, "PsiCash: refresh state success").mapNever()
@@ -280,11 +284,14 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                                                         date: environment.getCurrentTime())
         
         switch result {
-        case .success(let refreshedLibData):
-            state.psiCash.libData = refreshedLibData
-            state.psiCashBalance = .refreshed(refreshedData: refreshedLibData,
+        case .success(let logoutResponse):
+            
+            
+            state.psiCash.libData = logoutResponse.libData
+            state.psiCashBalance = .refreshed(refreshedData: logoutResponse.libData,
                                               persisted: environment.psiCashPersistedValues)
             return []
+            
         case .failure(let error):
             state.psiCash.libData = environment.psiCashEffects.libData()
             return [
