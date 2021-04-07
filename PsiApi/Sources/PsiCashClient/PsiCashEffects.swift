@@ -19,17 +19,16 @@
 
 import Foundation
 import PsiApi
+import ReactiveSwift
 
 
 /// Container for all PsiCash effects.
 /// Instances of this type probably wrap some kind of cross-platform PsiCash client library.
 public struct PsiCashEffects {
-    
-    public typealias LocalOnly = Bool
-    
+        
     public typealias PsiCashRefreshResult =
         Result<RefreshStateResponse,
-               ErrorEvent<TunneledPsiCashRequestError<PsiCashRefreshError>>>
+               ErrorEvent<PsiCashRefreshError>>
     
     public typealias PsiCashAccountLoginResult =
         Result<AccountLoginResponse,
@@ -37,7 +36,7 @@ public struct PsiCashEffects {
     
     public typealias PsiCashAccountLogoutResult =
         Result<AccountLogoutResponse,
-                ErrorEvent<TunneledPsiCashRequestError<PsiCashLibError>>>
+                ErrorEvent<PsiCashLibError>>
 
     /// Represents success reuslt of PsiCash client lib initialization.
     public struct PsiCashLibInitSuccess: Equatable {
@@ -73,30 +72,30 @@ public struct PsiCashEffects {
     }
     
     /// Initializes PsiCash client lib given path of file store root directory.
-    public let initialize: (String?, UserDefaults) -> Effect<Result<PsiCashLibInitSuccess, ErrorRepr>>
+    public let initialize: (String?, UserDefaults, SignalProducer<TunnelConnection?, Never>) -> Effect<Result<PsiCashLibInitSuccess, ErrorRepr>>
     public let libData: () -> PsiCashLibData
-    public let refreshState: ([PsiCashTransactionClass], LocalOnly, TunnelConnection, ClientMetaData) ->
+    public let refreshState: ([PsiCashTransactionClass], TunnelConnection, ClientMetaData) ->
         Effect<PsiCashRefreshResult>
     public let purchaseProduct: (PsiCashPurchasableType, TunnelConnection, ClientMetaData) ->
         Effect<NewExpiringPurchaseResult>
     public let modifyLandingPage: (URL) -> Effect<URL>
     public let rewardedVideoCustomData: () -> String?
     public let removePurchasesNotIn: (Set<String>) -> Effect<Never>
-    public let accountLogout: (TunnelConnection) -> Effect<PsiCashAccountLogoutResult>
+    public let accountLogout: () -> Effect<PsiCashAccountLogoutResult>
     public let accountLogin: (TunnelConnection, String, SecretString) -> Effect<PsiCashAccountLoginResult>
 
     public init(
-        initialize: @escaping (String?, UserDefaults)
+        initialize: @escaping (String?, UserDefaults, SignalProducer<TunnelConnection?, Never>)
             -> Effect<Result<PsiCashLibInitSuccess, ErrorRepr>>,
         libData: @escaping () -> PsiCashLibData,
-        refreshState: @escaping ([PsiCashTransactionClass], LocalOnly, TunnelConnection, ClientMetaData) ->
+        refreshState: @escaping ([PsiCashTransactionClass], TunnelConnection, ClientMetaData) ->
             Effect<PsiCashRefreshResult>,
         purchaseProduct: @escaping (PsiCashPurchasableType, TunnelConnection, ClientMetaData) ->
             Effect<NewExpiringPurchaseResult>,
         modifyLandingPage: @escaping (URL) -> Effect<URL>,
         rewardedVideoCustomData: @escaping () -> String?,
         removePurchasesNotIn: @escaping (Set<String>) -> Effect<Never>,
-        accountLogout: @escaping (TunnelConnection) -> Effect<PsiCashAccountLogoutResult>,
+        accountLogout: @escaping () -> Effect<PsiCashAccountLogoutResult>,
         accountLogin:@escaping (TunnelConnection, String, SecretString) -> Effect<PsiCashAccountLoginResult>
     ) {
         self.initialize = initialize

@@ -448,7 +448,7 @@ func makeEnvironment(
 }
 
 fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment {
-    return PsiCashEnvironment(
+    PsiCashEnvironment(
         platform: env.platform,
         feedbackLogger: env.feedbackLogger,
         psiCashFileStoreRoot: env.psiCashFileStoreRoot,
@@ -457,6 +457,7 @@ fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment
         psiCashPersistedValues: env.userConfigs,
         notifier: env.notifier,
         vpnActionStore: env.vpnActionStore,
+        tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
         objcBridgeDelegate: env.objcBridgeDelegate,
         metadata: { ClientMetaData(env.appInfo()) },
         getCurrentTime: env.dateCompare.getCurrentTime,

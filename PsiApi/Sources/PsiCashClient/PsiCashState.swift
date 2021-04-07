@@ -27,8 +27,7 @@ public struct PsiCashState: Equatable {
     // Failure type matches PsiCashEffects.PsiCashRefreshResult.Failure
     public typealias PendingRefresh =
         PendingResult<Utilities.Unit,
-                      ErrorEvent<TunneledPsiCashRequestError<
-                                    PsiCashRequestError<PsiCashRefreshErrorStatus>>>>
+                      ErrorEvent<PsiCashRequestError<PsiCashRefreshErrorStatus>>>
     
     /// Represents whether PsiCash accounts is pending login or logout.
     public enum LoginLogoutPendingValue: Equatable {
@@ -118,7 +117,7 @@ public enum PsiCashRequestError<ErrorStatus>: HashableError where
 public enum TunneledPsiCashRequestError<RequestError: HashableError>: HashableError {
     /// Request was not sent since tunnel was not connected.
     case tunnelNotConnected
-    
+    /// Wrapped RequestError.
     case requestError(RequestError)
 }
 

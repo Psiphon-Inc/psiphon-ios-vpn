@@ -751,14 +751,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     case .success(_):
                         maybeAlert = .psiCashAccountAlert(.logoutSuccessAlert)
 
-                    case let .failure(errorEvent):
-                        switch errorEvent.error {
-                        case .tunnelNotConnected:
-                            maybeAlert = .psiCashAccountAlert(.tunnelNotConnectedAlert)
-
-                        case .requestError(_):
-                            maybeAlert = .psiCashAccountAlert(.operationFailedTryAgainAlert)
-                        }
+                    case .failure(_):
+                        maybeAlert = .psiCashAccountAlert(.operationFailedTryAgainAlert)
                     }
                     
                 }
