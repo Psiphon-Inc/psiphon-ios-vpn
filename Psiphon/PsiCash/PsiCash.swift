@@ -265,6 +265,18 @@ final class PsiCash {
         return nil
     }
     
+    /// Sets current UI Locale.
+    /// - Parameter locale: Valid BCP 47 locale (e.g. 'zh-Hans-CN').
+    func setLocale(_ locale: Locale) -> PsiCashLibError? {
+        
+        guard let identifier = locale.bcp47Identifier else {
+            fatalError("locale identifier is nil")
+        }
+        
+        return PsiCashLibError(self.client.setLocale(identifier))
+        
+    }
+    
     /// Returns all purchase authorizations. If activeOnly is true, only authorizations
     /// for non-expired purchases will be returned.
     func authorizations(activeOnly: Bool = false) -> Set<SignedAuthorizationData> {

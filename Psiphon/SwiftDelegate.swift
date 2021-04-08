@@ -213,6 +213,9 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
     private var psiCashLib: PsiCash
     private var environmentCleanup: (() -> Void)?
 
+    // NSNotification observers
+    private var appLangChagneObserver: NSObjectProtocol?
+    
     private override init() {
 
         deepLinkingNavigator = DeepLinkingNavigator()
@@ -481,6 +484,23 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                                               PsiphonDeepLinking.speedBoostDeepLink ]) { [unowned self] in
             self.store.send(.mainViewAction(.presentPsiCashScreen(initialTab: .speedBoost)))
             return true
+        }
+        
+        // Note that settings can also change outside of IASK menu,
+        // such as language selection in onboarding.
+        appLangChagneObserver = NotificationCenter.default.addObserver(
+            forName: NSNotification.Name(kIASKAppSettingChanged),
+            object: nil,
+            queue: .main
+        ) { [unowned self] note in
+            
+            let fieldName = note.userInfo?.keys.first as? String?
+            
+            if fieldName == PsiphonCommonLibConstants.kAppLanguage {
+                let currentLocale = self.userDefaultsConfig.localeForAppLanguage
+                self.store.send(.psiCash(.setLocale(currentLocale)))
+            }
+            
         }
         
         // Sends interstitial ad load signal when unknownValuesInitialized property
@@ -816,7 +836,13 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func applicationWillTerminate(_ application: UIApplication) {
+        
+        if let observer = self.appLangChagneObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        
         self.environmentCleanup?()
+        
     }
 
     @objc func application(_ app: UIApplication,

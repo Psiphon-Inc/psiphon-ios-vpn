@@ -21,6 +21,14 @@ import Foundation
 import PsiApi
 import PsiCashClient
 
+// Constants defined in PsiphonClientCommonLibrary
+struct PsiphonCommonLibConstants {
+    
+    // App language set by PsiphonClientCommonLibrary.
+    static let kAppLanguage = appLanguage
+    
+}
+
 // Feedback description note:
 // For new fields that are added, the feedback description in FeedbackDescriptions.swift
 // should also be updated.
@@ -38,7 +46,10 @@ final class UserDefaultsConfig: PsiCashPersistedValues {
     }
     
     /// App language code.
-    @UserDefault(.standard, "appLanguage", defaultValue: Language.defaultLanguageCode)
+    /// The value is set by `PsiphonClientCommonLibrary`.
+    @UserDefault(.standard,
+                 PsiphonCommonLibConstants.kAppLanguage,
+                 defaultValue: Language.defaultLanguageCode)
     var appLanguage: String
     
     /// Set of onboardings that have been completed by the user.

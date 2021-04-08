@@ -461,7 +461,8 @@ fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment
         objcBridgeDelegate: env.objcBridgeDelegate,
         metadata: { ClientMetaData(env.appInfo()) },
         getCurrentTime: env.dateCompare.getCurrentTime,
-        psiCashLegacyDataStore: env.standardUserDefaults
+        psiCashLegacyDataStore: env.standardUserDefaults,
+        userConfigs: env.userConfigs
     )
 }
 
