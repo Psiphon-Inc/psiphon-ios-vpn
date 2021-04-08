@@ -258,8 +258,6 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 
 - (void)setNonSubscriptionEncodedAuthorizations:(NSSet<NSString*>*_Nullable)encodedAuthorizations;
 
-- (void)appendNonSubscriptionEncodedAuthorization:(NSString *_Nonnull)base64Encoded;
-
 #endif
 
 - (NSSet<NSString *> *)getNonSubscriptionEncodedAuthorizations;
