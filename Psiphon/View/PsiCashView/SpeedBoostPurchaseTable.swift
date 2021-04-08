@@ -23,11 +23,22 @@ import PsiApi
 import PsiCashClient
 
 struct SpeedBoostPurchasableViewModel: Equatable {
+    
     let purchasable: SpeedBoostPurchasable
     
     var background: SpeedBoostPurchaseBackground {
         return .background(for: purchasable.product.hours)
     }
+    
+}
+
+extension SpeedBoostPurchasableViewModel: Comparable {
+    
+    static func < (lhs: Self, rhs: Self) -> Bool {
+        // Compared by hours of Speed Boost.
+        lhs.purchasable.product.hours < rhs.purchasable.product.hours
+    }
+    
 }
 
 struct SpeedBoostPurchaseTable: ViewBuilder {

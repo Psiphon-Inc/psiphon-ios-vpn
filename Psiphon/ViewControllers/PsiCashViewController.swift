@@ -483,7 +483,8 @@ final class PsiCashViewController: ReactiveViewController {
                                 let viewModel = NonEmpty(
                                     array:observed.state.psiCash.libData.availableProducts
                                         .items.compactMap { $0.speedBoost }
-                                        .map { SpeedBoostPurchasableViewModel(purchasable: $0) })
+                                        .map { SpeedBoostPurchasableViewModel(purchasable: $0) }
+                                        .sorted())
                                 
                                 if let viewModel = viewModel {
                                     self.containerBindable.bind(.right(.left(viewModel)))
