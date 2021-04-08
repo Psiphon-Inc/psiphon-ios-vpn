@@ -110,5 +110,7 @@ public protocol PsiCashEffectsProtocol {
         username: String,
         password: SecretString
     ) -> Effect<PsiCashAccountLoginResult>
+ 
+    func setLocale(_ locale: Locale) -> Effect<Never>
     
 }

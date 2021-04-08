@@ -434,5 +434,16 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
         }
         
     }
+    
+    func setLocale(_ locale: Locale) -> Effect<Never> {
+        
+        .fireAndForget {
+            guard let error = self.psiCash.setLocale(locale) else {
+                return
+            }
+            self.feedbackLogger.immediate(.error, "setLocale failed: \(error)")
+        }
+        
+    }
 
 }

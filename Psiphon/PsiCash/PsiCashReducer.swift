@@ -46,6 +46,7 @@ struct PsiCashEnvironment {
     let metadata: () -> ClientMetaData
     let getCurrentTime: () -> Date
     let psiCashLegacyDataStore: UserDefaults
+    let userConfigs: UserDefaultsConfig
 }
 
 let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironment> {
@@ -94,6 +95,10 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                     Effect(value: .refreshPsiCashState())
                 )
             }
+            // Sets locale after initialization.
+            effects.append(
+                Effect(value: .setLocale(environment.userConfigs.localeForAppLanguage))
+            )
 
             return effects
             
@@ -103,7 +108,19 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                     .mapNever()
             ]
         }
+    
+    case .setLocale(let locale):
         
+        // PsiCash Library must be initialized before setting locale.
+        guard state.psiCash.libLoaded else {
+            environment.feedbackLogger.fatalError("lib not loaded")
+            return []
+        }
+        
+        return [
+            environment.psiCashEffects.setLocale(locale)
+                .mapNever()
+        ]
         
     case .buyPsiCashProduct(let purchasableType):
         

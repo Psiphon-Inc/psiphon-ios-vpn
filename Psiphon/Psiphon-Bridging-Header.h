@@ -59,3 +59,7 @@
 #import "Feedback.h"
 #import "JetsamTracking.h"
 #import "JetsamMetrics+Feedback.h"
+
+// InAppSettingsKit (IASK)
+#import <InAppSettingsKit/IASKSettingsReader.h>
+#import <PsiphonClientCommonLibrary/PsiphonSettingsViewController.h>
