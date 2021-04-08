@@ -20,6 +20,10 @@
 import Foundation
 import PsiApi
 
+// PsiCashModels.swift contains Swift data models
+// that model PsiCash library's Objective-C data models,
+// perhaps with some additions.
+
 public typealias CustomData = String
 
 public enum PsiCashParseError: HashableError {

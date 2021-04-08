@@ -34,7 +34,7 @@ struct PsiCashEnvironment {
     let platform: Platform
     let feedbackLogger: FeedbackLogger
     let psiCashFileStoreRoot: String?
-    let psiCashEffects: PsiCashEffects
+    let psiCashEffects: PsiCashEffectsProtocol
     let sharedDB: PsiphonDataSharedDB
     let psiCashPersistedValues: PsiCashPersistedValues
     let notifier: PsiApi.Notifier
@@ -62,9 +62,9 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         
         return [
             environment.psiCashEffects.initialize(
-                environment.psiCashFileStoreRoot,
-                environment.psiCashLegacyDataStore,
-                environment.tunnelConnectionRefSignal
+                fileStoreRoot: environment.psiCashFileStoreRoot,
+                psiCashLegacyDataStore: environment.psiCashLegacyDataStore,
+                tunnelConnectionRefSignal: environment.tunnelConnectionRefSignal
             ).map(PsiCashAction._initialized)
         ]
     
@@ -81,7 +81,9 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
 
             var effects = [Effect<PsiCashAction>]()
             effects.append(
-                environment.psiCashEffects.removePurchasesNotIn(nonSubscriptionAuths).mapNever()
+                environment.psiCashEffects
+                    .removePurchasesNotIn(psiCashAuthorizations: nonSubscriptionAuths)
+                    .mapNever()
             )
 
             if libInitSuccess.requiresStateRefresh {
@@ -121,11 +123,15 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         }
         state.psiCash.purchasing = .speedBoost(purchasable)
         return [
-            environment.psiCashEffects.purchaseProduct(purchasableType, tunnelConnection,
-                                                       environment.metadata())
+            environment.psiCashEffects
+                .purchaseProduct(purchasable: purchasableType,
+                                 tunnelConnection: tunnelConnection,
+                                 clientMetaData: environment.metadata())
                 .map {
-                    ._psiCashProductPurchaseResult(purchasable: purchasableType,
-                                                   result: $0)
+                    ._psiCashProductPurchaseResult(
+                        purchasable: purchasableType,
+                        result: $0
+                    )
                 }
         ]
         
@@ -214,9 +220,9 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         return [
             environment.feedbackLogger.log(.info, "PsiCash: refresh state started").mapNever(),
             environment.psiCashEffects
-                .refreshState(PsiCashTransactionClass.allCases,
-                              tunnelConnection,
-                              environment.metadata())
+                .refreshState(priceClasses: PsiCashTransactionClass.allCases,
+                              tunnelConnection: tunnelConnection,
+                              clientMetaData: environment.metadata())
                 .map(PsiCashAction._refreshPsiCashStateResult)
         ]
         
@@ -348,7 +354,10 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                                                         date: environment.getCurrentTime())
         
         return [
-            environment.psiCashEffects.accountLogin(tunnelConnection, username, password)
+            environment.psiCashEffects
+                .accountLogin(tunnelConnection: tunnelConnection,
+                              username: username,
+                              password: password)
                 .map(PsiCashAction._accountLoginResult)
         ]
     
