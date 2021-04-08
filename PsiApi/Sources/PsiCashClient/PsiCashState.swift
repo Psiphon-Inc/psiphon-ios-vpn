@@ -39,8 +39,8 @@ public struct PsiCashState: Equatable {
     
     public typealias PendingAccountLoginLogoutEvent =
         Event<PendingValue<LoginLogoutPendingValue,
-                           Either<PsiCashEffects.PsiCashAccountLoginResult,
-                                  PsiCashEffects.PsiCashAccountLogoutResult>>>?
+                           Either<PsiCashEffectsProtocol.PsiCashAccountLoginResult,
+                                  PsiCashEffectsProtocol.PsiCashAccountLogoutResult>>>?
     
     public var purchasing: PsiCashPurchasingState
     public var libData: PsiCashLibData
@@ -82,7 +82,7 @@ extension PsiCashState {
 public enum PsiCashPurchasingState: Equatable {
     case none
     case speedBoost(SpeedBoostPurchasable)
-    case error(PsiCashEffects.NewExpiringPurchaseResult.ErrorType)
+    case error(NewExpiringPurchaseResult.ErrorType)
     
     /// True if purchasing is completed (succeeded or failed)
     public var completed: Bool {
