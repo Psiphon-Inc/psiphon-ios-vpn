@@ -22,6 +22,8 @@ import Foundation
 extension Locale {
     
     /// Returns valid BCP 47 language tag.
+    /// Returned value does not include any private subtags, if Locale identifier
+    /// contains any.
     /// https://tools.ietf.org/html/bcp47
     public var bcp47Identifier: String? {
         
