@@ -544,8 +544,8 @@ final class PsiCashViewController: ReactiveViewController {
         }
         
         hStack.addArrangedSubviews(
-            tabControl.view,
             logInView,
+            tabControl.view,
             containerView
         )
         
