@@ -110,14 +110,25 @@ extension HTTPRequestError: Arbitrary {
     public static var arbitrary: Gen<HTTPRequestError> {
         Gen.compose { c in
             return HTTPRequestError(partialResponseMetadata: c.generate(),
-                                    errorEvent: ErrorEvent(c.generate(),
-                                                           date: c.generate()))
+                                    error: c.generate())
+        }
+    }
+}
+
+extension URLSessionResult: Arbitrary {
+    public static var arbitrary: Gen<URLSessionResult> {
+        Gen.compose { c in
+            URLSessionResult(
+                date: c.generate(),
+                result: c.generate()
+            )
         }
     }
 }
 
 /// HTTPClient which generates random responses immediately with room for configuring response times in the future.
 extension HTTPClient: Arbitrary {
+    
     public static var arbitrary: Gen<HTTPClient> {
         HTTPClient.arbitrary(resultGen: { _ in
             URLSessionResult.arbitrary
@@ -156,4 +167,5 @@ extension HTTPClient: Arbitrary {
             }
         }
     }
+    
 }
