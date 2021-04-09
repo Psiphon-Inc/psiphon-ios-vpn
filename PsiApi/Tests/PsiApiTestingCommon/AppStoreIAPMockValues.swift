@@ -47,12 +47,12 @@ extension ReceiptData {
 
 final class MockPsiCashEffects: PsiCashEffectsProtocol {
     
-    private let initGen: Gen<Result<PsiCashLibInitSuccess, ErrorRepr>>? = nil
-    private let libDataGen: Gen<PsiCashLibData>? = nil
-    private let refreshStateGen: Gen<PsiCashRefreshResult>? = nil
-    private let purchaseProductGen: Gen<NewExpiringPurchaseResult>? = nil
-    private let modifyLandingPageGen: Gen<URL>? = nil
-    private let rewardedVideoCustomDataGen: Gen<String>? = nil
+    private let initGen: Gen<Result<PsiCashLibInitSuccess, ErrorRepr>>?
+    private let libDataGen: Gen<PsiCashLibData>?
+    private let refreshStateGen: Gen<PsiCashRefreshResult>?
+    private let purchaseProductGen: Gen<NewExpiringPurchaseResult>?
+    private let modifyLandingPageGen: Gen<URL>?
+    private let rewardedVideoCustomDataGen: Gen<String>?
     
     init(
         initGen: Gen<Result<PsiCashLibInitSuccess, ErrorRepr>>? = nil,
@@ -132,6 +132,9 @@ final class MockPsiCashEffects: PsiCashEffectsProtocol {
         return .empty
     }
     
+    func setLocale(_ locale: Locale) -> Effect<Never> {
+        return .empty
+    }
     
 }
 
@@ -172,7 +175,7 @@ extension IAPEnvironment {
         _ feedbackLogger: FeedbackLogger,
         tunnelStatusSignal: @autoclosure () -> SignalProducer<TunnelProviderVPNStatus, Never>? = nil,
         tunnelConnectionRefSignal: @autoclosure () -> SignalProducer<TunnelConnection?, Never>? = nil,
-        psiCashEffects: PsiCashEffects? = nil,
+        psiCashEffects: PsiCashEffectsProtocol? = nil,
         paymentQueue: PaymentQueue? = nil,
         clientMetaData: (() -> ClientMetaData)? = nil,
         isSupportedProduct: ((ProductID) -> AppStoreProductType?)? = nil,
@@ -191,7 +194,7 @@ extension IAPEnvironment {
             feedbackLogger: feedbackLogger,
             tunnelStatusSignal: _tunnelStatusSignal,
             tunnelConnectionRefSignal: _tunnelConnectionRefSignal,
-            psiCashEffects: psiCashEffects ?? PsiCashEffects.mock(),
+            psiCashEffects: psiCashEffects ?? MockPsiCashEffects(),
             clientMetaData: clientMetaData ?? { ClientMetaData(MockAppInfoProvider()) },
             paymentQueue: paymentQueue ?? PaymentQueue.mock(),
             psiCashPersistedValues: MockPsiCashPersistedValues(),
