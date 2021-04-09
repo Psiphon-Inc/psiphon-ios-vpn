@@ -47,6 +47,7 @@ final class UserDefaultsConfig: PsiCashPersistedValues {
     
     /// App language code.
     /// The value is set by `PsiphonClientCommonLibrary`.
+    /// - Note: Value stored at `PsiphonCommonLibConstants.kAppLanguage` is a valid BCP 47 tag.
     @UserDefault(.standard,
                  PsiphonCommonLibConstants.kAppLanguage,
                  defaultValue: Language.defaultLanguageCode)
