@@ -429,8 +429,10 @@ func makeEnvironment(
                 ),
                 feedbackLogger: feedbackLogger,
                 tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
-                createNewAccountURL: PsiCashHardCodedValues.devPsiCashSignUpURL,
-                forgotPasswordURL: PsiCashHardCodedValues.devPsiCashForgotPasswordURL,
+                createNewAccountURL: psiCashClient.getUserSiteURL(.accountSignup,
+                                                                  platform: platform.current),
+                forgotPasswordURL: psiCashClient.getUserSiteURL(.forgotAccount,
+                                                                platform: platform.current),
                 onDismissed: { [unowned store] in
                     store.send(.mainViewAction(.psiCashViewAction(.dismissedPsiCashAccountScreen)))
                 })

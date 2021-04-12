@@ -24,11 +24,6 @@ struct PsiCashHardCodedValues {
     static let videoAdRewardTitle = "35"
     /// Amount of time to wait for PsiCash to have an earner token for modifying .
     static let getEarnerTokenTimeout: DispatchTimeInterval = .seconds(5)
-    
-    static let devPsiCashSignUpURL = URL(string: "https://dev-my.psi.cash/signup")!
-    
-    // TODO: replace with actual value.
-    static let devPsiCashForgotPasswordURL = URL(string: "https://dev-my.psi.cash/signup")!
 }
 
 // There is no point to load an interstitial after the user
