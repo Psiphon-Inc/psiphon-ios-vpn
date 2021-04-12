@@ -342,6 +342,28 @@ final class PsiCash {
         return result
     }
     
+    /// Returns the `my.psi.cash` URL of the give type.
+    /// - Note: On iOS `webview` is set to true, and on ARM Mac `webview` is set to false.
+    func getUserSiteURL(_ urlType: PSIUserSiteURLType, platform: Platform.SupportedPlatform) -> URL {
+       
+        // If `webview` is true, the URL will be appended to with `#!webview`.
+        let webview: Bool
+        switch platform {
+        case .iOS:
+            webview = true
+        case .iOSAppOnMac:
+            webview = false
+        }
+        
+        guard let url = URL(string: client.getUserSiteURL(urlType, webview: webview)) else {
+            // Programming error.
+            fatalError()
+        }
+        
+        return url
+        
+    }
+    
     func getRewardActivityData() -> Result<CustomData, PsiCashLibError> {
         guard let result = Result(client.getRewardedActivityData()) else {
             // Programming fault
