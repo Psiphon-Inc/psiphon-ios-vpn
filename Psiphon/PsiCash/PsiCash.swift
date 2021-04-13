@@ -100,10 +100,12 @@ final class PsiCash {
     
     private let client: PSIPsiCashLibWrapper
     private let feedbackLogger: FeedbackLogger
+    private let platform: Platform
     
-    init(feedbackLogger: FeedbackLogger) {
+    init(feedbackLogger: FeedbackLogger, platform: Platform) {
         self.client = PSIPsiCashLibWrapper()
         self.feedbackLogger = feedbackLogger
+        self.platform = platform
     }
     
     var initialized: Bool {
