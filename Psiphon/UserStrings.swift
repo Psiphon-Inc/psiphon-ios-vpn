@@ -263,10 +263,10 @@ import Foundation
                                  comment: "(Do not translate 'AdMob') Title of cell in settings menu which indicates the user can change or revoke the consent they've given to admob")
     }
     
-    @objc static func Logout_of_psicash_account() -> String {
-        return NSLocalizedString("LOG_OUT_PSICASH_ACCOUNT", tableName: nil, bundle: Bundle.main,
-                                 value: "Log out of PsiCash account",
-                                 comment: "Do not translate or transliterate 'PsiCash'. Settings menu logout button that lets users log out of their PsiCash account.")
+    @objc static func PsiCash_account_management() -> String {
+        return NSLocalizedString("PSICASH_ACCOUNT_MANAGEMENT", tableName: nil, bundle: Bundle.main,
+                                 value: "Manage Account",
+                                 comment: "Button title that opens 'PsiCash' account management.")
     }
     
     @objc static func Are_you_sure_psicash_account_logout() -> String {

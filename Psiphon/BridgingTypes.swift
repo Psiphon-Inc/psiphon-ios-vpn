@@ -52,7 +52,7 @@ import PsiCashClient
     
     @objc func onReachabilityStatusDidChange(_ previousStats: ReachabilityStatus)
     
-    @objc func onPsiCashAccountStatusDidChange(_ isLoggedIn: Bool)
+    @objc func onSettingsViewModelDidChange(_ model: ObjcSettingsViewModel)
 
     @objc func dismiss(screen: DismissibleScreen, completion: (() -> Void)?)
     
@@ -276,6 +276,7 @@ import PsiCashClient
     }
 }
 
+/// Enables access to Swift properties associated with `VPNStatus` and  `TunnelProviderVPNStatus`.
 @objc final class VPNStateCompat: NSObject {
     
     @objc static func providerNotStopped(_ value: TunnelProviderVPNStatus) -> Bool {
@@ -284,6 +285,16 @@ import PsiCashClient
     
     @objc static func providerNotStopped(vpnStatus value: VPNStatus) -> Bool {
         return value.providerNotStopped
+    }
+    
+    /// Checks if `status` is `.connected`.
+    /// If `ignoreTunneledChecks` debug flag is set, then always returns True.
+    @objc static func isConnected(_ status: VPNStatus) -> Bool {
+        if Debugging.ignoreTunneledChecks {
+            return true
+        } else {
+            return status == .connected
+        }
     }
 }
 

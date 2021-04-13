@@ -120,9 +120,6 @@
 /* Title of the button that lets users log out of their account */
 "LOG_OUT_BUTTON_TITLE" = "Log Out";
 
-/* Do not translate or transliterate 'PsiCash'. Settings menu logout button that lets users log out of their PsiCash account. */
-"LOG_OUT_PSICASH_ACCOUNT" = "Log out of PsiCash account";
-
 /* Button title that takes user to the next page */
 "NEXT_PAGE_BUTTON_TITLE" = "Next";
 
@@ -239,6 +236,9 @@
 
 /* Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
 "PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "Are you sure you want to log out of your PsiCash account?";
+
+/* Button title that opens 'PsiCash' account management. */
+"PSICASH_ACCOUNT_MANAGEMENT" = "Manage Account";
 
 /* Do not translate or transliterate 'PsiCash'. */
 "PSICASH_ACCOUNTS_LAST_MERGE_WARNING" = "Note that this will be the last time that you can merge your PsiCash account.";

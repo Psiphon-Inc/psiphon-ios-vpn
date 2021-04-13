@@ -226,9 +226,9 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
         
         appSupportFileStore = ApplicationSupportFileStore(fileManager: FileManager.default)
         
-        psiCashLib = PsiCash(feedbackLogger: self.feedbackLogger)
-        
         platform = Platform(ProcessInfo.processInfo)
+        
+        psiCashLib = PsiCash(feedbackLogger: self.feedbackLogger, platform: platform)
         
     }
     
@@ -672,16 +672,25 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 objcBridge!.onReachabilityStatusDidChange(reachabilityStatus.networkStatus)
             }
         
-        // Forwards AppState `psiCash.libData.accountTyp` to ObjCBridgeDelegate.
-        self.lifetime += self.store.$value.signalProducer
-            .map(\.psiCash.libData.accountType)
-            .skipRepeats()
-            .startWithValues { [unowned objcBridge] accountType in
-                if case .account(loggedIn: true) = accountType {
-                    objcBridge!.onPsiCashAccountStatusDidChange(true)
-                } else {
-                    objcBridge!.onPsiCashAccountStatusDidChange(false)
-                }
+        // Produces a SettingsViewModel type and passes
+        // the value to the ObjCBridgeDelegte.
+        self.lifetime += SignalProducer.combineLatest(
+                self.store.$value.signalProducer.map(\.subscription.status).skipRepeats(),
+            self.store.$value.signalProducer.map(\.psiCash.libData.accountType).skipRepeats(),
+                self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus).skipRepeats()
+            ).map { [unowned self] in
+                
+                SettingsViewModel(
+                    subscriptionState: $0.0,
+                    psiCashAccountType: $0.1,
+                    vpnStatus: $0.2,
+                    psiCashAccountManagementURL: self.psiCashLib.getUserSiteURL(
+                        .accountManagement, platform: self.platform.current
+                    )
+                )
+            }
+            .startWithValues { [unowned objcBridge] model in
+                objcBridge!.onSettingsViewModelDidChange(ObjcSettingsViewModel(model))
             }
 
         // Updates PsiphonDateSharedDB `ContainerAppReceiptLatestSubscriptionExpiryDate`

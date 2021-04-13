@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		2913641F25DF06C800C79880 /* AdMobInterstitialAdController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2913641E25DF06C800C79880 /* AdMobInterstitialAdController.swift */; };
 		2913642125DF1E5700C79880 /* AdControllerStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2913642025DF1E5700C79880 /* AdControllerStatus.swift */; };
+		292B531E2620DFCB00C0C44A /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */; };
 		296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296622B425E8A554004635A1 /* LaunchScreenViewController.swift */; };
 		2968042225F2D3FF00D04B7F /* PsiCashLib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5265B00125AFBD53006BD58C /* PsiCashLib.xcframework */; };
 		2968042325F2D3FF00D04B7F /* PsiCashLib.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5265B00125AFBD53006BD58C /* PsiCashLib.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -386,6 +387,7 @@
 		1FE4700126FC2AD287FCB45B /* Pods-PsiphonTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonTests/Pods-PsiphonTests.release.xcconfig"; sourceTree = "<group>"; };
 		2913641E25DF06C800C79880 /* AdMobInterstitialAdController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdMobInterstitialAdController.swift; sourceTree = "<group>"; };
 		2913642025DF1E5700C79880 /* AdControllerStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdControllerStatus.swift; sourceTree = "<group>"; };
+		292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		296622B425E8A554004635A1 /* LaunchScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenViewController.swift; sourceTree = "<group>"; };
 		296E800125D47A6300574A74 /* AdStateReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdStateReducer.swift; sourceTree = "<group>"; };
 		29B59CE625E48F4E0051C213 /* AdMobRewardedVideoAdController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdMobRewardedVideoAdController.swift; sourceTree = "<group>"; };
@@ -927,6 +929,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		292B531C2620DFC000C0C44A /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
 		2968042125F2D3A200D04B7F /* Recovered References */ = {
 			isa = PBXGroup;
 			children = (
@@ -1332,6 +1342,7 @@
 		CE26FC8C1BBDC7B800B83375 /* Psiphon */ = {
 			isa = PBXGroup;
 			children = (
+				292B531C2620DFC000C0C44A /* Settings */,
 				EF90D79E204F22C900228A63 /* ReactiveExtensions */,
 				52055D02230C821200244F9E /* View */,
 				CE84203C2522823D00796032 /* Debug */,
@@ -2034,6 +2045,7 @@
 				8DD642C1248AAD8A006C94D2 /* Utils.swift in Sources */,
 				52D363CF230F112E002C2221 /* TabControlViewWrapper.swift in Sources */,
 				8DF805772501726B003A6223 /* AdConsent.swift in Sources */,
+				292B531E2620DFCB00C0C44A /* SettingsViewModel.swift in Sources */,
 				445F24D620E1A5BA00D004E9 /* xer_decoder.c in Sources */,
 				EF652CD71F35224C002AFB48 /* MainViewController.m in Sources */,
 				EF90D7A4204F22C900228A63 /* timestamp_format.c in Sources */,

@@ -418,8 +418,8 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [AppObservables.shared.reachabilityStatus sendNext:@(status)];
 }
 
-- (void)onPsiCashAccountStatusDidChange:(BOOL)isLoggedIn {
-    [AppObservables.shared.isLoggedInToPsiCashAccount sendNext:@(isLoggedIn)];
+- (void)onSettingsViewModelDidChange:(ObjcSettingsViewModel *)model {
+    [AppObservables.shared.settingsViewModel sendNext:model];
 }
 
 - (void)dismissWithScreen:(enum DismissibleScreen)screen
