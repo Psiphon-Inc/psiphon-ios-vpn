@@ -296,6 +296,12 @@ import PsiCashClient
             return status == .connected
         }
     }
+    
+    /// Returns true if VPN status is disconnected or invalid.
+    @objc static func isDisconnected(_ status: VPNStatus) -> Bool {
+        return !status.providerRunning
+    }
+    
 }
 
 // `SubscriptionState` case only bridged to ObjC compatible type.
