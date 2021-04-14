@@ -240,7 +240,7 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
     } else if ([specifier.key isEqualToString:SettingsPsiCashAccountLogoutCellSpecifierKey]) {
         // PsiCash Account Logout button.
         cell.textLabel.textAlignment = NSTextAlignmentCenter;
-        cell.textLabel.text = [UserStrings Log_out];
+        cell.textLabel.text = [UserStrings Logout];
     }
 
     PSIAssert(cell != nil);
@@ -358,20 +358,59 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
 }
 
 - (void)onPsiCashAccountLogOutWithSourceView:(UIView *_Nonnull)sourceView {
+    
+    // No-op if tunnel is not connected or disconnected.
+    if ([VPNStateCompat isInTransition:self.viewModel.vpnStatus] == TRUE) {
+        return;
+    }
+    
+    BOOL isOffline = [VPNStateCompat isDisconnected:self.viewModel.vpnStatus];
+    
+    NSString *message;
+    NSString *logoutTitle;
+    
+    if (isOffline == TRUE) {
+        
+        message = [UserStrings PsiCash_logout_offline_body];
+        logoutTitle = [UserStrings Logout_anyway];
+        
+    } else {
+        
+        message = [UserStrings Are_you_sure_psicash_account_logout];
+        logoutTitle = [UserStrings Logout];
+        
+    }
+    
     UIAlertController *alert = [UIAlertController
-                                alertControllerWithTitle:[UserStrings Log_out]
-                                message:[UserStrings Are_you_sure_psicash_account_logout]
+                                alertControllerWithTitle:[UserStrings Logout]
+                                message:message
                                 preferredStyle:UIAlertControllerStyleActionSheet];
     
-    UIAlertAction *logoutAction = [UIAlertAction actionWithTitle:[UserStrings Log_out]
+    UIAlertAction *logoutAction = [UIAlertAction actionWithTitle:logoutTitle
                                                            style:UIAlertActionStyleDestructive
                                                          handler:^(UIAlertAction *action) {
         [SwiftDelegate.bridge logOutPsiCashAccount];
     }];
     
+    // Adds a "Connect" button if tunnel is not connected,
+    // and sets it as the default action.
+    if (isOffline == TRUE) {
+        
+        UIAlertAction *connectAction = [UIAlertAction actionWithTitle:[UserStrings Connect]
+                                                               style:UIAlertActionStyleDefault
+                                                             handler:^(UIAlertAction *action) {
+            [SwiftDelegate.bridge connectButtonTappedFromSettings];
+        }];
+        
+        [alert addAction:connectAction];
+        
+        alert.preferredAction = connectAction;
+        
+    }
+    
     [alert addAction:logoutAction];
     [alert addCancelAction:nil];
-
+    
     [[alert popoverPresentationController] setSourceView:sourceView];
     [[alert popoverPresentationController] setSourceRect:CGRectMake(0,0,1,1)];
     [[alert popoverPresentationController]

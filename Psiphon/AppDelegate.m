@@ -51,6 +51,7 @@
 #import "AppObservables.h"
 #import <PsiphonTunnel/PsiphonTunnel.h>
 #import "RegionAdapter.h"
+#import "SettingsViewController.h"
 
 PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 
@@ -428,6 +429,10 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     switch (screen) {
         case DismissibleScreenPsiCash:
             [self.window.rootViewController dismissViewControllerType:PsiCashViewController.class
+                                                           completion:completion];
+            break;
+        case DismissibleScreenSettings:
+            [self.window.rootViewController dismissViewControllerType:SettingsViewController.class
                                                            completion:completion];
             break;
     }

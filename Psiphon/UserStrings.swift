@@ -275,10 +275,28 @@ import Foundation
                                  comment: "Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account")
     }
     
-    @objc static func Log_out() -> String {
+    @objc static func Logout() -> String {
         return NSLocalizedString("LOG_OUT_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
-                                 value: "Log Out",
+                                 value: "Logout",
                                  comment: "Title of the button that lets users log out of their account")
+    }
+    
+    @objc static func Logout_anyway() -> String {
+        return NSLocalizedString("LOG_OUT_ANY_WAY_BUTTON_TITLE", tableName: nil, bundle: .main,
+                                 value: "Logout anyway",
+                                 comment: "Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed.")
+    }
+    
+    @objc static func Connect() -> String {
+        NSLocalizedString("CONNECT_BUTTON", tableName: nil, bundle: .main,
+                          value: "Connect",
+                          comment: "Button text telling the user that if they click it, Psiphon will start trying to connect to the network. This is shown to the user while Psiphon is disconnected.")
+    }
+    
+    @objc static func PsiCash_logout_offline_body() -> String {
+        return NSLocalizedString("PSICASH_LOGOUT_OFFLINE_BODY", tableName: nil, bundle: .main,
+                                 value: "Being connected to the Psiphon network enables a more secure PsiCash logout. Would you like to connect before logging out?",
+                                 comment: "Body of a modal dialog that appears when the user tries to log out of thier PsiCash account while not currently connected to the Psiphon network. We don't allow PsiCash network requests when not connected, so only an inferior localy-only logout is available. 'Psiphon' must not be translated/transliterated. The word 'PsiCash' must not be translated or transliterated.")
     }
     
     static func Sign_up_or_log_in() -> String {
