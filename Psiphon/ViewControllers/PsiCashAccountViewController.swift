@@ -319,9 +319,6 @@ final class PsiCashAccountViewController: ReactiveViewController {
             $0.addTarget(self, action: #selector(onForgotPassword), for: .touchUpInside)
         }
         
-        forgotPasswordButton.isHidden = true
-        
-        
         mutate(loginButton) {
             $0.setTitleColor(.darkBlue(), for: .normal)
             
@@ -420,6 +417,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
     }
     
     @objc func onForgotPassword() {
+        let _ = self.display(screenToPresent: .presented(.forgotPassword))
     }
 
     // TODO: Can this be applied more generally to other view controllers?
