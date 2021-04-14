@@ -241,6 +241,12 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
         // PsiCash Account Logout button.
         cell.textLabel.textAlignment = NSTextAlignmentCenter;
         cell.textLabel.text = [UserStrings Logout];
+        
+        // Logout button is enabled when VPN state in not in a transitory state.
+        BOOL enabled = ![VPNStateCompat isInTransition:self.viewModel.vpnStatus];
+        cell.userInteractionEnabled = enabled;
+        cell.textLabel.enabled = enabled;
+        cell.detailTextLabel.enabled = enabled;
     }
 
     PSIAssert(cell != nil);
