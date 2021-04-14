@@ -28,6 +28,7 @@ var Style = AppStyle()
 /// Represents UIViewController's that can be dismissed.
 @objc enum DismissibleScreen: Int {
     case psiCash
+    case settings
 }
 
 struct AppState: Equatable {

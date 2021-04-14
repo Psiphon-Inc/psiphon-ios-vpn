@@ -773,6 +773,18 @@ extension VPNStatus: Equatable {
         }
     }
     
+    /// `isInTranisition` is true if VPNStatus is in a transitory state (going from connected to disconnected or vice versa.)
+    var isInTransition: Bool {
+        switch self {
+        case .invalid, .disconnected, .connected:
+            return false
+        case .disconnecting, .connecting, .reasserting, .restarting:
+            return true
+        @unknown default:
+            fatalError("unknown NEVPNStatus '\(self.rawValue)'")
+        }
+    }
+    
 }
 
 extension TunnelProviderVPNStatus {

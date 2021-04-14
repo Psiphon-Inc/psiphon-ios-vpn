@@ -1246,4 +1246,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         return "V.\(shortVersionString)\(postfix)"
     }
 
+    func connectButtonTappedFromSettings() {
+        // This is a round-about way of calling into ObjC AppDelegate through Swift.
+        // This is to make transition to Swift-only codebase easier in the future.
+        self.objcBridge.dismiss(screen: .settings) { [unowned self] in
+            self.objcBridge.startStopVPNWithInterstitial()
+        }
+    }
+    
 }

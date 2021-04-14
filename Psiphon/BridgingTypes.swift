@@ -142,6 +142,8 @@ import PsiCashClient
     // Version string to be displayed by the user-interface.
     @objc func versionLabelText() -> String
     
+    @objc func connectButtonTappedFromSettings()
+    
 }
 
 // MARK: Bridged Types
@@ -300,6 +302,11 @@ import PsiCashClient
     /// Returns true if VPN status is disconnected or invalid.
     @objc static func isDisconnected(_ status: VPNStatus) -> Bool {
         return !status.providerRunning
+    }
+    
+    /// Returns true if tunnel is neither connected or disconnected.
+    @objc static func isInTransition(_ status: VPNStatus) -> Bool {
+        return status.isInTransition
     }
     
 }
