@@ -76,7 +76,7 @@ public struct IAPEnvironment {
     var feedbackLogger: FeedbackLogger
     var tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
     var tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
-    var psiCashEffects: PsiCashEffects
+    var psiCashEffects: PsiCashEffectsProtocol
     var clientMetaData: () -> ClientMetaData
     var paymentQueue: PaymentQueue
     var psiCashPersistedValues: PsiCashPersistedValues
@@ -90,7 +90,7 @@ public struct IAPEnvironment {
         feedbackLogger: FeedbackLogger,
         tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
         tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
-        psiCashEffects: PsiCashEffects,
+        psiCashEffects: PsiCashEffectsProtocol,
         clientMetaData: @escaping () -> ClientMetaData,
         paymentQueue: PaymentQueue,
         psiCashPersistedValues: PsiCashPersistedValues,

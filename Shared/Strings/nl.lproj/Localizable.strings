@@ -2,13 +2,13 @@
 "ACCEPT_BUTTON_TITLE" = "Accepteer";
 
 /* After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
-"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Activating...";
+"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Activeren…";
 
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "U bent ingeschreven!";
 
-/*[UNTRANSLATED] Button title to add to user's PsiCash balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
-"ADD_PSICASH" = "Add PsiCash";
+/* Button title to add to user's PsiCash balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
+"ADD_PSICASH" = "Voeg PsiCash toe";
 
 /* Alert dialog body when requested operation by the user failed. */
 "ALERT_BODY_OPERATION_FAILED" = "Bewerking mislukt, probeer het opnieuw.";
@@ -40,14 +40,14 @@
 /* Action button title, that when pressed connects the user to Psiphon network. */
 "CONNECT_BUTTON_TITLE" = "Verbinden";
 
-/*[UNTRANSLATED] Text shown to the user telling them to connect to 'Psiphon', to finish their unfinished transaction. Do not translate or transliterate 'Psiphon'. */
-"CONNECT_TO_FINISH_PSICASH_TRANSACTION" = "Please connect to Psiphon to finish your transaction";
+/* Text shown to the user telling them to connect to 'Psiphon', to finish their unfinished transaction. Do not translate or transliterate 'Psiphon'. */
+"CONNECT_TO_FINISH_PSICASH_TRANSACTION" = "Maak verbinding met Psiphon om uw transactie te voltooien";
 
-/*[UNTRANSLATED] Button title that lets the user to connect to the Psiphon network. Do not translate or transliterate 'Psiphon' */
-"CONNECT_TO_PSIPHON" = "Connect to Psiphon";
+/* Button title that lets the user to connect to the Psiphon network. Do not translate or transliterate 'Psiphon' */
+"CONNECT_TO_PSIPHON" = "Verbind met Psiphon";
 
-/*[UNTRANSLATED] User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"CONNECT_TO_USE_SPEED_BOOST" = "Connect to Psiphon to use Speed Boost";
+/* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"CONNECT_TO_USE_SPEED_BOOST" = "Verbind met Psiphon om Speed Boost te gebruiken";
 
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "Je app-instellingen bestand lijkt corrupt. Probeer de app opnieuw te installeren om het bestand te herstellen.";
@@ -55,14 +55,14 @@
 /* Decline button title */
 "DECLINE_BUTTON_TITLE" = "Wijs af";
 
-/*[UNTRANSLATED] Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
-"DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
+/* Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
+"DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "Sommig internetverkeer wordt niet ondersteund door de gratis versie van Psiphon. Koop een abonnement of Speed Boost om het volledige potentieel van uw Psiphon-ervaring te ontgrendelen.";
 
-/*[UNTRANSLATED] Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
-"DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
+/* Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
+"DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "Sommig internetverkeer wordt niet ondersteund door de gratis versie van Psiphon. Koop een abonnement of Speed Boost om het volledige potentieel van uw Psiphon-ervaring te ontgrendelen.";
 
-/*[UNTRANSLATED] Text next to the button indicating to the user that the rewarded video advertisement is only available when they are not connected to Psiphon. Do not translate or transliterate 'PsiCash'. Do not translate or transliterate 'Psiphon'. */
-"DISCONNECT_TO_WATCH_AND_EARN_PSICASH" = "You must disconnect from Psiphon to watch a video to earn PsiCash";
+/* Text next to the button indicating to the user that the rewarded video advertisement is only available when they are not connected to Psiphon. Do not translate or transliterate 'PsiCash'. Do not translate or transliterate 'Psiphon'. */
+"DISCONNECT_TO_WATCH_AND_EARN_PSICASH" = "U moet de verbinding verbreken met Psiphon om een video te bekijken om PsiCash te verdienen";
 
 /* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
 "DISMISS_BUTTON_TITLE" = "Afwijzen";
@@ -73,14 +73,14 @@
 /* Error alert title */
 "ERROR_TITLE" = "Fout";
 
-/*[UNTRANSLATED] No comment provided by engineer. */
-"EXTENSION_EXPIRED_SUBSCRIPTION_ALERT" = "Your Psiphon subscription has expired.\n\n Please open Psiphon app to renew your subscription.";
+/* No comment provided by engineer. */
+"EXTENSION_EXPIRED_SUBSCRIPTION_ALERT" = "Uw Psiphon abonnement is verlopen.\n\n Open de Psiphon-app om uw abonnement te verlengen.";
 
-/*[UNTRANSLATED] Message shown when something fails to load */
-"FAILED_TO_LOAD" = "Failed to load";
+/* Message shown when something fails to load */
+"FAILED_TO_LOAD" = "Laden mislukt";
 
-/*[UNTRANSLATED] Message shown when verification of a product already purchased fails. */
-"FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Failed to verify purchase";
+/* Message shown when verification of a product already purchased fails. */
+"FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Verifiëren van aankoop mislukt";
 
 /* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Bedankt voor het helpen verbeteren van Psiphon!";
@@ -88,8 +88,8 @@
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "Gratis";
 
-/*[UNTRANSLATED] Generic alert shown when purchase of a product fails. */
-"GENERIC_PURCHASE_FAILED" = "Purchase Failed";
+/* Generic alert shown when purchase of a product fails. */
+"GENERIC_PURCHASE_FAILED" = "Aankoop mislukt";
 
 /* User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
 "INSUFFICIENT_PSICASH_BALANCE" = "Onvoldoende PsiCash-saldo";
@@ -106,14 +106,14 @@
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "Geen Internet Verbinding";
 
-/*[UNTRANSLATED] Message shown to the user when there is no internet connect. */
-"NO_INTERNET_CONNECTION_TITLE" = "No internet connection";
+/* Message shown to the user when there is no internet connect. */
+"NO_INTERNET_CONNECTION_TITLE" = "Geen internetverbinding";
 
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
 "NO_PRODUCTS_TEXT_2" = "Kan geen abonnementen ophalen uit de App Store. Probeer het later opnieuw.";
 
-/*[UNTRANSLATED] Content of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
-"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" = "Apps not working? Tap here to improve your Psiphon experience!";
+/* Content of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
+"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" = "Apps werken niet? Tik hier om uw Psiphon-ervaring te verbeteren!";
 
 /*[UNTRANSLATED] Title of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
 "NOTIFICATION_TITLE_UPGRADE_PSIPHON" = "Upgrade Psiphon";
@@ -121,23 +121,17 @@
 /*[UNTRANSLATED] Alert OK Button */
 "OK_BUTTON" = "OK";
 
-/* Onboarding screen text. (Do not translate 'Psiphon'). */
-"ONBOARDING_BEYOND_BORDERS_BODY_2" = "Psiphon verbindt u met de inhoud die u wilt, waar u ook bent.";
-
-/* Beyond Borders title */
-"ONBOARDING_BEYOND_BORDERS_HEADER" = "Voorbij de Grenzen";
-
 /* Onboarding screen 'getting started' body. (Do not translate 'Psiphon'). */
 "ONBOARDING_GETTING_STARTED_BODY_2" = "Om verbinding te maken, heeft Psiphon de mogelijkheid nodig om te toevoegen de VPN-configuraties.";
 
 /* Onboarding header */
 "ONBOARDING_GETTING_STARTED_HEADER" = "Aan de slag";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app. */
-"ONBOARDING_NOTIFICATION_PERMISSION_BODY" = "Allow Psiphon to send notifications so that you can be notified of important network events.";
+/* Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app. */
+"ONBOARDING_NOTIFICATION_PERMISSION_BODY" = "Sta Psiphon toe om meldingen te verzenden, zodat u op de hoogte kunt worden gehouden van belangrijke netwerkgebeurtenissen.";
 
-/*[UNTRANSLATED] Onboarding screen title that will be asking the user permission to send notifications about important network events while they use the app. */
-"ONBOARDING_NOTIFICATION_PERMISSION_TITLE" = "Get notified about important network events";
+/* Onboarding screen title that will be asking the user permission to send notifications about important network events while they use the app. */
+"ONBOARDING_NOTIFICATION_PERMISSION_TITLE" = "Ontvang meldingen over belangrijke netwerkgebeurtenissen";
 
 /* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
 "ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "Je moet Psiphon toestaan om VPN-configuraties laten toevoegen om verbinding te maken.";
@@ -148,8 +142,8 @@
 /* Alert dialog title indicating to the user that Psiphon needs their permission */
 "PERMISSION_REQUIRED_ALERT__TITLE" = "Toestemming vereist";
 
-/*[UNTRANSLATED] Subtitle shown when the current operation failed, asking the user to try again at a later time. */
-"PLEASE_TRY_AGAIN_LATER" = "Please try again later.";
+/* Subtitle shown when the current operation failed, asking the user to try again at a later time. */
+"PLEASE_TRY_AGAIN_LATER" = "Probeer het a.u.b. later opnieuw.";
 
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
 "PRIVACY_POLICY_DECLINED_ALERT_BODY" = "U moet ons Privacybeleid accepteren voordat u doorgaat met het gebruik van Psiphon.";
@@ -208,53 +202,53 @@
 /* page title for the Privacy Policy page */
 "PrivacyTitle" = "privacybeleid";
 
-/*[UNTRANSLATED] Message shown when products available for purchase could not be retrieved. */
-"PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "Product list could not be retrieved";
+/* Message shown when products available for purchase could not be retrieved. */
+"PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "Productlijst kon niet worden opgehaald ";
 
-/*[UNTRANSLATED] PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
-"PSICASH_BALANCE" = "PsiCash Balance:";
+/* PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
+"PSICASH_BALANCE" = "PsiCash saldo:";
 
-/*[UNTRANSLATED] User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
-"PSICASH_BALANCE_OUT_OF_DATE_ALERT_BODY" = "Connect to Psiphon to update your PsiCash balance.";
+/* User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
+"PSICASH_BALANCE_OUT_OF_DATE_ALERT_BODY" = "Maak verbinding met Psiphon om uw PsiCash-saldo bij te werken.";
 
-/*[UNTRANSLATED] User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
-"PSICASH_BALANCE_OUT_OF_DATE_ALERT_TITLE" = "PsiCash Balance Out of Date";
+/* User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
+"PSICASH_BALANCE_OUT_OF_DATE_ALERT_TITLE" = "PsiCash tegoed niet bijgewerkt";
 
-/*[UNTRANSLATED] PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
-"PSICASH_PURCHASE_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon.";
+/* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
+"PSICASH_PURCHASE_SCREEN_NOTICE" = "BELANGRIJK: Uw PsiCash zal niet worden bewaard als u Psiphon verwijdert.";
 
-/*[UNTRANSLATED] An error that signifies a state where the user has made a 'PsiCash' purchase, but extra action is needed from the user to finish the transaction. Do not translate or transliterate 'PsiCash'. */
-"PSICASH_TRANSACTION_PENDING" = "Transaction Pending";
+/* An error that signifies a state where the user has made a 'PsiCash' purchase, but extra action is needed from the user to finish the transaction. Do not translate or transliterate 'PsiCash'. */
+"PSICASH_TRANSACTION_PENDING" = "Transactie in behandeling";
 
-/*[UNTRANSLATED] PsiCash currently unavailable. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
-"PSICASH_UNAVAILABLE" = "PsiCash Unavailable";
+/* PsiCash currently unavailable. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
+"PSICASH_UNAVAILABLE" = "PsiCash niet beschikbaar";
 
-/*[UNTRANSLATED] 'PsiCash' features are unavailable while the app the connecting to 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash' */
-"PSICASH_UNAVAILABLE_WHILE_CONNECTING" = "PsiCash is unavailable while connecting to Psiphon";
+/* 'PsiCash' features are unavailable while the app the connecting to 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash' */
+"PSICASH_UNAVAILABLE_WHILE_CONNECTING" = "PsiCash is niet beschikbaar tijdens het verbinden met Psiphon";
 
-/*[UNTRANSLATED] 'PsiCash' features are unavailable while the app the is disconnecting from 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash' */
-"PSICASH_UNAVAILABLE_WHILE_DISCONNECTING" = "PsiCash is unavailable while disconnecting from Psiphon";
+/* 'PsiCash' features are unavailable while the app the is disconnecting from 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash' */
+"PSICASH_UNAVAILABLE_WHILE_DISCONNECTING" = "PsiCash is niet beschikbaar tijdens het verbreken van de verbinding met Psiphon";
 
-/*[UNTRANSLATED] 'PsiCash' features are unavailable while the user has a subscription. Do not translate or transliterate 'PsiCash' */
-"PSICASH_UNAVAILABLE_WHILE_SUBSCRIBED" = "PsiCash is unavailable while subscribed";
+/* 'PsiCash' features are unavailable while the user has a subscription. Do not translate or transliterate 'PsiCash' */
+"PSICASH_UNAVAILABLE_WHILE_SUBSCRIBED" = "PsiCash is niet beschikbaar tijdens abonnement";
 
-/*[UNTRANSLATED] Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
-"PSICASH_WAIT_TRANSACTION_VERIFIED" = "Please wait while your transaction is being verified";
+/* Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
+"PSICASH_WAIT_TRANSACTION_VERIFIED" = "Een ogenblik geduld terwijl uw transactie wordt geverifieerd";
 
-/*[UNTRANSLATED] Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
-"PSIPHON_IS_NOT_CONNECTED" = "Psiphon is not connected";
+/* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
+"PSIPHON_IS_NOT_CONNECTED" = "Psiphon is niet verbonden";
 
-/*[UNTRANSLATED] 'App Store' refers to Apple's App Store, do not translate or transliterate 'App Store'. This alert message informs the user that the purchase they made has not been recorded by App Store. */
-"PURCHASE_NOT_RECORDED_BY_APPSTORE" = "Purchase not recorded by App Store.";
+/* 'App Store' refers to Apple's App Store, do not translate or transliterate 'App Store'. This alert message informs the user that the purchase they made has not been recorded by App Store. */
+"PURCHASE_NOT_RECORDED_BY_APPSTORE" = "Aankoop niet geregistreerd door App Store.";
 
-/*[UNTRANSLATED] Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
-"PURCHASING_PSICASH" = "Purchasing PsiCash…";
+/* Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
+"PURCHASING_PSICASH" = "Aankopen van PsiCash…";
 
-/*[UNTRANSLATED] Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PURCHASING_SPEED_BOOST" = "Purchasing Speed Boost…";
+/* Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PURCHASING_SPEED_BOOST" = "Speed Boost kopen...";
 
-/*[UNTRANSLATED] Button title on an error alert that indicates it refreshes the user's purchase receipt on device. */
-"RECEIPT_REFRESH_BUTTON" = "Refresh Receipt";
+/* Button title on an error alert that indicates it refreshes the user's purchase receipt on device. */
+"RECEIPT_REFRESH_BUTTON" = "Ververs ontvangstbewijs";
 
 /* Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "Vernieuw je app kwitantie wanneer:";
@@ -265,8 +259,8 @@
 /* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "Je kunt een abonnement dat je op dit apparaat hebt gekocht niet zien";
 
-/*[UNTRANSLATED] This alert message informs the user that the purchase they made has not been recorded and that they can tap the button 'Refresh Receipt' to try again. */
-"REFRESH_APP_RECEIPT_TO_TRY_AGAIN" = "Refresh the app receipt to try again.";
+/* This alert message informs the user that the purchase they made has not been recorded and that they can tap the button 'Refresh Receipt' to try again. */
+"REFRESH_APP_RECEIPT_TO_TRY_AGAIN" = "Ververs het ontvangstbewijs van de app om opnieuw te proberen.";
 
 /* Title for a confirmation button that resets a user's previous consent. */
 "RESET_IDENTIFIER_BUTTON_TITLE" = "Reset toestemming";
@@ -280,8 +274,8 @@
 /* Action button title, that when pressed retries the recently failed operation. */
 "RETRY_BUTTON_TITLE" = "Opnieuw proberen";
 
-/*[UNTRANSLATED] Shown in a pop-up alert if user's rewarded video ad failed to load. */
-"REWARDED_VIDEO_LOAD_FAILED" = "Failed to load rewarded video. Please try again later.";
+/* Shown in a pop-up alert if user's rewarded video ad failed to load. */
+"REWARDED_VIDEO_LOAD_FAILED" = "Kan de als beloning gegeven video niet laden. Probeer het later opnieuw.";
 
 /* Title for screen that allows user to select language. Use all capital letters in the translation only if it makes sense. */
 "SELECT_LANG" = "SELECTEER TAAL";
@@ -289,8 +283,8 @@
 /* Select language button title. */
 "SELECT_LANG_BUTTON_TITLE" = "Selecteer taal";
 
-/*[UNTRANSLATED] Title for screen that allows user to select their desired server region. */
-"SELECT_SERVER_REGION" = "Select server region";
+/* Title for screen that allows user to select their desired server region. */
+"SELECT_SERVER_REGION" = "Selecteer een server regio";
 
 /* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Installeer VPN-profiel";
@@ -307,20 +301,20 @@
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST_ACTIVE" = "Speed Boost Actief";
 
-/*[UNTRANSLATED] '%@' is going to be replace by a timer (e.g. '02:12'). Place the exact string '%@' at the appropriate place. This string is shown when the user's 'Speed Boost' is active. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"SPEED_BOOST_IS_ACTIVE" = "Speed Boost Active %@";
+/* '%@' is going to be replace by a timer (e.g. '02:12'). Place the exact string '%@' at the appropriate place. This string is shown when the user's 'Speed Boost' is active. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"SPEED_BOOST_IS_ACTIVE" = "Speed Boost  %@ actief";
 
-/*[UNTRANSLATED] 'Speed Boost' product is currently unavailable. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"SPEED_BOOST_UNAVAILABLE" = "Speed Boost Unavailable";
+/* 'Speed Boost' product is currently unavailable. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"SPEED_BOOST_UNAVAILABLE" = "Speed Boost is niet beschikbaar";
 
-/*[UNTRANSLATED] Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"SPEED_BOOST_YOU_ALREADY_HAVE" = "You already have Speed Boost";
+/* Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"SPEED_BOOST_YOU_ALREADY_HAVE" = "U heeft Speed Boost al";
 
 /* Footer text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. Please keep this text concise as the width of the text box is restricted in size. */
 "SUBSCRIPTION_BAR_FOOTER_TEXT_NOT_SUBSCRIBED_2" = "Verwijder advertenties • Max snelheid";
 
-/*[UNTRANSLATED] Footer text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
-"SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED_V2" = "Premium • Max Speed";
+/* Footer text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
+"SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED_V2" = "Premium • Max Snelheid";
 
 /* Header text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
 "SUBSCRIPTION_BAR_HEADER_TEXT_NOT_SUBSCRIBED" = "HAAL PREMIUM";
@@ -328,17 +322,17 @@
 /* Header text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. Please keep this text concise as the width of the text box is restricted in size. */
 "SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIBED" = "ABONNEMENT";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. This title is displayed on the main screen indicating that the subscription is pending activation. */
-"SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIPTION_PENDING" = "SUBSCRIPTION PENDING";
+/* After a user successfully purchases a subscription, it needs to be activated. This title is displayed on the main screen indicating that the subscription is pending activation. */
+"SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIPTION_PENDING" = "ABONNEMENT IN AFWACHTING";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. Label with this text displayed on the main screen, indicating that the user needs to connect to Psiphon in order to activate the subscription. */
-"SUBSCRIPTION_CONNECT_TO_ACTIVATE" = "Connect to activate";
+/* After a user successfully purchases a subscription, it needs to be activated. Label with this text displayed on the main screen, indicating that the user needs to connect to Psiphon in order to activate the subscription. */
+"SUBSCRIPTION_CONNECT_TO_ACTIVATE" = "Verbind om te activeren";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating that activation of user's subscription failed. */
-"SUBSCRIPTION_FAILED_TO_ACTIVATE" = "Failed to activate";
+/* After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating that activation of user's subscription failed. */
+"SUBSCRIPTION_FAILED_TO_ACTIVATE" = "Activeren mislukt";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating to the user that the subscription is in the process of getting activated */
-"SUBSCRIPTION_PLEASE_WAIT_WHILE_ACTIVATING" = "Please wait while activating";
+/* After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating to the user that the subscription is in the process of getting activated */
+"SUBSCRIPTION_PLEASE_WAIT_WHILE_ACTIVATING" = "Even geduld a.u.b. tijdens het activeren";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "Abonnementen";
@@ -349,8 +343,8 @@
 /* Subtitle of the banner on the subscriptions page informing the user that the subscriptions require no commitment, and can be cancelled anytime */
 "SUBSCRIPTIONS_PAGE_BANNER_SUBTITLE" = "Geen verplichtingen, op elk moment annuleren.";
 
-/*[UNTRANSLATED] Title of the banner on the subscriptions page advertising that subscriptions enable no ads and maximum speed. */
-"SUBSCRIPTIONS_PAGE_BANNER_TITLE_2" = "No ads and maximum speed.";
+/* Title of the banner on the subscriptions page advertising that subscriptions enable no ads and maximum speed. */
+"SUBSCRIPTIONS_PAGE_BANNER_TITLE_2" = "Geen advertenties en maximale snelheid.";
 
 /* Title of the button on the subscriptions page which takes the user of of the app to iTunes where they can view detailed information about their subscription */
 "SUBSCRIPTIONS_PAGE_MANAGE_SUBSCRIPTION_BUTTON" = "Beheer je abonnement";
@@ -367,20 +361,20 @@
 /* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
 "SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "Gebruiksvoorwaarden";
 
-/*[UNTRANSLATED] Button title shown when something fails to load. Asks the user to tap the button to retry the operation */
-"TAP_TO_RETRY" = "Tap to Retry";
+/* Button title shown when something fails to load. Asks the user to tap the button to retry the operation */
+"TAP_TO_RETRY" = "Tik om opnieuw te proberen";
 
-/*[UNTRANSLATED] Alert message informing user to turn on their cellular data or wifi to connect to the internet */
-"TURN_ON_DATE" = "Please turn on cellular data or use Wi-Fi.";
+/* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
+"TURN_ON_DATE" = "Schakel mobiel dataverkeer in of gebruik WiFi.";
 
 /*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
 "UPGRADE_PSIPHON" = "Upgrade Psiphon";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
-"VPN_START_FAIL_MESSAGE" = "Er is een fout opgetreden tijdens het opstarten van Psiphon. Probeer het opnieuw. Als dit probleem aanhoudt, probeert u de Psiphon-app opnieuw te installeren.";
+"VPN_START_FAIL_MESSAGE" = "Er is een fout opgetreden bij het starten van Psiphon. Probeer het a.u.b. opnieuw.";
 
-/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to 'Best performance', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
-"VPN_START_FAIL_REGION_INVALID_MESSAGE_3" = "The region you selected is no longer available. You have automatically been switched to \"Best performance\".\n\n You can also select a new region from the Psiphon app.";
+/* Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to 'Best performance', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
+"VPN_START_FAIL_REGION_INVALID_MESSAGE_3" = "De regio die u selecteerde is niet langer beschikbaar. U bent automatisch overschakeld naar \"Beste prestatie\".\n\n U kunt ook een nieuwe regio uit de Psiphon app kiezen.";
 
 /* Alert dialog title indicating to the user that Psiphon was unable to start */
 "VPN_START_FAIL_TITLE" = "Kan niet starten";
@@ -412,9 +406,9 @@
 /* Status when the VPN is restarting. */
 "VPN_STATUS_RESTARTING" = "Herstarten";
 
-/*[UNTRANSLATED] Error message when something was wrong with the VPN. Asks the user that if the error persists, try tapping the 'Reinstall VPN Profile' button in the settings menu. 'Reinstall VPN Profile' translation has key SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE */
-"VPN_SYNC_FAILED_REINSTALL_CONFIG" = "If this error persists, please try 'Reinstall VPN Profile'.";
+/* Error message when something was wrong with the VPN. Asks the user that if the error persists, try tapping the 'Reinstall VPN Profile' button in the settings menu. 'Reinstall VPN Profile' translation has key SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE */
+"VPN_SYNC_FAILED_REINSTALL_CONFIG" = "Als deze fout zich blijft voordoen, probeer dan 'VPN-profiel opnieuw installeren'.";
 
-/*[UNTRANSLATED] Button subtitle informing the user that if pressed a rewarded video ad will be displayed and they will earn credit. */
-"WATCH_REWARDED_VIDEO_AND_EARN" = "Watch Video and Earn";
+/* Button subtitle informing the user that if pressed a rewarded video ad will be displayed and they will earn credit. */
+"WATCH_REWARDED_VIDEO_AND_EARN" = "Bekijk de video en verdien";
 

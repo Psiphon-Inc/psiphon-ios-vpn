@@ -67,14 +67,16 @@ final class MockHTTPClient {
                 XCTFatal()
             }
             
-            let sessionResult: URLSessionResult = response.map { responseData
-                -> HTTPResponseData in
-                HTTPResponseData(data: responseData,
-                                 metadata:HTTPResponseMetadata(
-                                    url: url,
-                                    headers: self.headers,
-                                    statusCode: self.responseStatusCode))
-            }
+            let sessionResult = URLSessionResult(
+                date: Date(),
+                result: response.map { responseData -> HTTPResponseData in
+                    HTTPResponseData(data: responseData,
+                                     metadata:HTTPResponseMetadata(
+                                        url: url,
+                                        headers: self.headers,
+                                        statusCode: self.responseStatusCode))
+                }
+            )
             
             completionHandler(sessionResult)
 
@@ -124,14 +126,16 @@ final class EchoHTTPClient {
                 XCTFatal()
             }
             
-            let sessionResult: URLSessionResult = response.map { _
-                -> HTTPResponseData in
-                HTTPResponseData(data: resp,
-                                 metadata: HTTPResponseMetadata(
-                                    url: url,
-                                    headers: self.headers,
-                                    statusCode: self.responseStatusCode))
-            }
+            let sessionResult = URLSessionResult(
+                date: Date(),
+                result: response.map { _ -> HTTPResponseData in
+                    HTTPResponseData(data: resp,
+                                     metadata: HTTPResponseMetadata(
+                                        url: url,
+                                        headers: self.headers,
+                                        statusCode: self.responseStatusCode))
+                }
+            )
             
             completionHandler(sessionResult)
 

@@ -39,7 +39,7 @@ final class IAPReducerTests: XCTestCase {
     override func setUpWithError() throws {
         feedbackHandler = ArrayFeedbackLogHandler()
         feedbackLogger = FeedbackLogger(feedbackHandler)
-        Debugging = .disabled()
+        Debugging = .disabled(buildConfig: .debug)
     }
     
     override func tearDownWithError() throws {
@@ -239,7 +239,7 @@ final class IAPReducerTests: XCTestCase {
             tunnelStatusSignal: SignalProducer(value: .connected),
             tunnelConnectionRefSignal: SignalProducer(value:
                 .some(TunnelConnection { .connection(.connected) })),
-            psiCashEffects: .mock(rewardedVideoCustomData: String.arbitrary),
+            psiCashEffects: MockPsiCashEffects(rewardedVideoCustomDataGen: String.arbitrary),
             getCurrentTime: { () -> Date in return fixedDate }
         )
         
@@ -382,7 +382,7 @@ final class IAPReducerTests: XCTestCase {
             tunnelStatusSignal: SignalProducer(value: .connected),
             tunnelConnectionRefSignal: SignalProducer(value:
                 .some(TunnelConnection { .connection(.connected) })),
-            psiCashEffects: .mock(rewardedVideoCustomData: String.arbitrary),
+            psiCashEffects: MockPsiCashEffects(rewardedVideoCustomDataGen: String.arbitrary),
             psiCashStore: { (action: PsiCashAction) -> Effect<Never> in
                 return .empty
             },
