@@ -29,7 +29,6 @@
 #import "UIAlertController+Additions.h"
 #import "AppObservables.h"
 #import "Psiphon-Swift.h"
-#import "Logging.h"
 #import <SafariServices/SafariServices.h>
 
 // Specifier keys for cells in settings menu
@@ -39,7 +38,7 @@ NSString * const SettingsReinstallVPNConfigurationKey = @"settingsReinstallVPNCo
 NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConsent";
 
 // PsiCash group
-NSString * const SettingsPsiCashHeaderTitleKey = @"settingsPsiCashGroupTitle";
+NSString * const SettingsPsiCashGroupHeaderTitleKey = @"settingsPsiCashGroupTitle";
 NSString * const SettingsPsiCashCellSpecifierKey = @"settingsPsiCash";
 NSString * const SettingsPsiCashAccountLogoutCellSpecifierKey = @"settingsLogOutPsiCashAccount";
 NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManagePsiCashAccount";
@@ -50,21 +49,30 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
 
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
 
+// Set of keys for custom views that are managed by this class (SettingsViewController).
+// These cells have type `IASKCustomViewSpecifier`.
+// - Note: Some custom views are managed by the super class.
+@property (nonatomic) NSArray<NSString *> *customKeys;
+
 @end
 
-@implementation SettingsViewController {
-    UITableViewCell *_Nullable subscriptionTableViewCell;
-    UITableViewCell *_Nullable reinstallVPNProfileCell;
-    UITableViewCell *_Nullable resetConsentCell;
-    UITableViewCell *_Nullable psiCashCell;
-    UITableViewCell *_Nullable psiCashAccountManagementCell;
-    UITableViewCell *_Nullable psiCashAccountLogOutCell;
-}
+@implementation SettingsViewController
 
 - (instancetype)init {
     self = [super init];
     if (self) {
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
+        
+        _customKeys = @[
+          SettingsSubscriptionCellSpecifierKey,
+          SettingsReinstallVPNConfigurationKey,
+          SettingsResetAdConsentCellSpecifierKey,
+          SettingsPsiCashGroupHeaderTitleKey,
+          SettingsPsiCashCellSpecifierKey,
+          SettingsPsiCashAccountManagementSpecifierKey,
+          SettingsPsiCashAccountLogoutCellSpecifierKey
+        ];
+           
     }
     return self;
 }
@@ -85,10 +93,14 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
         
         // Self can only be mutated on the main thread.
         SettingsViewController *__strong strongSelf = weakSelf;
+        
         if (strongSelf) {
+            
             strongSelf.viewModel = viewModel;
-            [strongSelf updateReinstallVPNProfileCell];
+
             [strongSelf updateHiddenKeys];
+            [strongSelf.tableView reloadData];
+            
         }
         
     }]];
@@ -113,9 +125,8 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
     
     // PsiCash Manage Account button:
     // - Shown when logged in account.
-    // - Not allowed when disconnected.
-    if (self.viewModel.isPsiCashAccountLoggedIn == TRUE &&
-        [VPNStateCompat isConnected:self.viewModel.vpnStatus] == TRUE) {
+    // - Not allowed when disconnected (button disabled, not hidden).
+    if (self.viewModel.isPsiCashAccountLoggedIn == TRUE) {
         [hiddenKeys removeObject:SettingsPsiCashAccountManagementSpecifierKey];
     } else {
         [hiddenKeys addObject:SettingsPsiCashAccountManagementSpecifierKey];
@@ -130,7 +141,7 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
         [hiddenKeys addObject:SettingsPsiCashAccountLogoutCellSpecifierKey];
     }
     
-    self.hiddenKeys = hiddenKeys;
+    [self setHiddenKeys:hiddenKeys animated:FALSE];
     
 }
 
@@ -143,139 +154,158 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
     [self.navigationController.navigationBar setTitleTextAttributes:nil];
 }
 
-#pragma mark - UI update methods
-
-- (void)updateReinstallVPNProfileCell {
-    if (reinstallVPNProfileCell != nil && self.viewModel != nil) {
-        VPNStatus s = self.viewModel.vpnStatus;
-        BOOL enabled = (s == VPNStatusDisconnected || s == VPNStatusInvalid);
-        
-        reinstallVPNProfileCell.userInteractionEnabled = enabled;
-        reinstallVPNProfileCell.textLabel.enabled = enabled;
-        reinstallVPNProfileCell.detailTextLabel.enabled = enabled;
-    }
-}
-
 #pragma mark - Table constructor methods
 
-- (void)settingsViewController:(IASKAppSettingsViewController*)sender
-                     tableView:(UITableView *)tableView
-    didSelectCustomViewSpecifier:(IASKSpecifier*)specifier {
-
-    [super settingsViewController:self tableView:tableView didSelectCustomViewSpecifier:specifier];
-
-    if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
-        [self openIAPViewController];
-
-    } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
-        [SwiftDelegate.bridge reinstallVPNConfig];
-        [self settingsViewControllerDidEnd:nil];
-
-    } else if ([specifier.key isEqualToString:SettingsResetAdConsentCellSpecifierKey]) {
-        [self onResetConsent];
-        NSIndexPath *path = [tableView indexPathForCell:resetConsentCell];
-        [tableView deselectRowAtIndexPath:path animated:TRUE];
-        
-    } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
-        // PsiCash button
-        [self openPsiCashViewController];
-        NSIndexPath *path = [tableView indexPathForCell:psiCashCell];
-        [tableView deselectRowAtIndexPath:path animated:TRUE];
-        
-    } else if ([specifier.key isEqualToString:SettingsPsiCashAccountManagementSpecifierKey]) {
-        [self openPsiCashAccountManagement];
-        NSIndexPath *path = [tableView indexPathForCell:psiCashAccountManagementCell];
-        [tableView deselectRowAtIndexPath:path animated:TRUE];
-        
-    } else if ([specifier.key isEqualToString:SettingsPsiCashAccountLogoutCellSpecifierKey]) {
-        [self onPsiCashAccountLogOut];
-        NSIndexPath *path = [tableView indexPathForCell:psiCashAccountLogOutCell];
-        [tableView deselectRowAtIndexPath:path animated:TRUE];
-    }
-}
-
-- (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
- 
-    // For header titles that are customzied in this class (SettingsViewController),
-    // it's value is expected to be the key of the header that is customized.
-    NSString *value = [super tableView:tableView titleForHeaderInSection:section];
+- (NSString *)settingsViewController:(id<IASKViewController>)settingsViewController
+                           tableView:(UITableView *)tableView
+            titleForHeaderForSection:(NSInteger)section {
     
-    if ([value isEqualToString:SettingsPsiCashHeaderTitleKey]) {
-        // PsiCash header.
+    // specifierKey can be nil for section that don't have a key.
+    NSString *_Nullable specifierKey = [self.settingsReader keyForSection:section];
+    
+    if ([self.customKeys containsObject:specifierKey] == FALSE) {
+        return nil;
+    }
+    
+    if ([specifierKey isEqualToString:SettingsPsiCashGroupHeaderTitleKey]) {
         return [UserStrings PsiCash];
+        
     } else {
-        return value;
+        
+        // Programming error.
+        PSIAssert(FALSE);
+        return @"(null)";
+        
     }
     
 }
 
-- (UITableViewCell*)tableView:(UITableView*)tableView cellForSpecifier:(IASKSpecifier*)specifier {
-    UITableViewCell *cell = nil;
-
-    // List of cells created by this class (SettingsViewController).
-    NSArray<NSString *> *customKeys = @[
-      SettingsSubscriptionCellSpecifierKey,
-      SettingsReinstallVPNConfigurationKey,
-      SettingsResetAdConsentCellSpecifierKey,
-      SettingsPsiCashCellSpecifierKey,
-      SettingsPsiCashAccountManagementSpecifierKey,
-      SettingsPsiCashAccountLogoutCellSpecifierKey
-    ];
-
-    // Returns cell from superclass if the specifier.key
-    // is not in the customKeys list.
-    if ([customKeys containsObject:specifier.key] == FALSE) {
-        cell = [super tableView:tableView cellForSpecifier:specifier];
-        return cell;
+- (UITableViewCell *)tableView:(UITableView *)tableView
+              cellForSpecifier:(IASKSpecifier *)specifier {
+    
+    // `self.viewModel` is expected to have a value.
+    if (self.viewModel == nil) {
+        return nil;
     }
-
+        
+    // If custom cell's key is not in `self.customKeys` then
+    // it is managed by the superclass.
+    if ([self.customKeys containsObject:specifier.key] == FALSE) {
+        return [super tableView:tableView cellForSpecifier:specifier];
+    }
+    
+    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:specifier.key];
+    if (cell == nil) {
+        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1
+                                      reuseIdentifier:specifier.key];
+    }
+    
     if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
         
-        cell = [super tableView:tableView cellForSpecifier:specifier];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-        subscriptionTableViewCell = cell;
-        [subscriptionTableViewCell.textLabel setText:[UserStrings Subscription]];
+        [cell.textLabel setText:[UserStrings Subscription]];
 
     } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
 
-        cell = [super tableView:tableView cellForSpecifier:specifier];
         [cell setAccessoryType:UITableViewCellAccessoryNone];
         [cell.textLabel setText:[UserStrings Reinstall_vpn_config]];
-        reinstallVPNProfileCell = cell;
-        [self updateReinstallVPNProfileCell];
+                
+        BOOL enabled = [VPNStateCompat isDisconnected:self.viewModel.vpnStatus];
+        cell.userInteractionEnabled = enabled;
+        cell.textLabel.enabled = enabled;
+        cell.detailTextLabel.enabled = enabled;
 
     } else if ([specifier.key isEqualToString:SettingsResetAdConsentCellSpecifierKey]) {
         
-        cell = [super tableView:tableView cellForSpecifier:specifier];
         cell.textLabel.textAlignment = NSTextAlignmentCenter;
         cell.textLabel.textColor = self.view.tintColor;
         cell.textLabel.text = [UserStrings Reset_admob_consent];
-        resetConsentCell = cell;
         
     } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
         // PsiCash button.
-        cell = [super tableView:tableView cellForSpecifier:specifier];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
         cell.textLabel.text = [UserStrings PsiCash];
-        psiCashCell = cell;
         
     } else if ([specifier.key isEqualToString:SettingsPsiCashAccountManagementSpecifierKey]) {
         // PsiCash Account Management button.
-        cell = [super tableView:tableView cellForSpecifier:specifier];
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
         [cell.textLabel setText:[UserStrings PsiCash_account_management]];
-        psiCashAccountManagementCell = cell;
+        
+        // PsiCash account management button hidden when not connected.
+        BOOL enabled = [VPNStateCompat isConnected:self.viewModel.vpnStatus];
+        cell.userInteractionEnabled = enabled;
+        cell.textLabel.enabled = enabled;
+        cell.detailTextLabel.enabled = enabled;
         
     } else if ([specifier.key isEqualToString:SettingsPsiCashAccountLogoutCellSpecifierKey]) {
         // PsiCash Account Logout button.
-        cell = [super tableView:tableView cellForSpecifier:specifier];
         cell.textLabel.textAlignment = NSTextAlignmentCenter;
         cell.textLabel.text = [UserStrings Log_out];
-        psiCashAccountLogOutCell = cell;
     }
 
     PSIAssert(cell != nil);
     return cell;
+    
+}
+
+#pragma mark - Selection handler
+
+- (void)settingsViewController:(IASKAppSettingsViewController *)sender
+                     tableView:(UITableView *)tableView
+  didSelectCustomViewSpecifier:(IASKSpecifier *)specifier {
+    
+    // If custom cell's key is not in `self.customKeys` then
+    // it is managed by the superclass.
+    if ([self.customKeys containsObject:specifier.key] == FALSE) {
+        
+        [super settingsViewController:sender
+                            tableView:tableView
+         didSelectCustomViewSpecifier:specifier];
+        
+        return;
+    }
+    
+    // Gets cell for current `specifier.key`.
+    NSIndexPath *indexPath = [self.settingsReader indexPathForKey:specifier.key];
+    UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+    
+    // Deselects given cell.
+    [tableView deselectRowAtIndexPath:indexPath animated:TRUE];
+    
+    // Handles selection based on `specifier.key`.
+    if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
+        
+        // Subscription button
+        [self openIAPViewController];
+
+    } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
+        
+        // Reinstall VPN config button
+        [SwiftDelegate.bridge reinstallVPNConfig];
+        [self settingsViewControllerDidEnd:nil];
+
+    } else if ([specifier.key isEqualToString:SettingsResetAdConsentCellSpecifierKey]) {
+
+        // Reset Ad Consent button
+        [self onResetConsentWithSourceView:cell];
+        
+    } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
+        
+        // PsiCash button
+        [self openPsiCashViewController];
+        
+    } else if ([specifier.key isEqualToString:SettingsPsiCashAccountManagementSpecifierKey]) {
+        
+        // PsiCash Account Management button
+        [self openPsiCashAccountManagement];
+        
+    } else if ([specifier.key isEqualToString:SettingsPsiCashAccountLogoutCellSpecifierKey]) {
+        
+        // PsiCash Account Logout button
+        [self onPsiCashAccountLogOutWithSourceView:cell];
+        
+    }
+    
 }
 
 #pragma mark - Callbacks
@@ -305,7 +335,7 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
     [self.navigationController pushViewController:iapViewController animated:YES];
 }
 
-- (void)onResetConsent {
+- (void)onResetConsentWithSourceView:(UIView *_Nonnull)sourceView {
     UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil
                                                                      message:nil
                                                   preferredStyle:UIAlertControllerStyleActionSheet];
@@ -319,7 +349,7 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
     [alert addAction:resetAction];
     [alert addCancelAction:nil];
 
-    [[alert popoverPresentationController] setSourceView:resetConsentCell];
+    [[alert popoverPresentationController] setSourceView:sourceView];
     [[alert popoverPresentationController] setSourceRect:CGRectMake(0,0,1,1)];
     [[alert popoverPresentationController]
      setPermittedArrowDirections:UIPopoverArrowDirectionDown];
@@ -327,7 +357,7 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
     [alert presentFromTopController];
 }
 
-- (void)onPsiCashAccountLogOut {
+- (void)onPsiCashAccountLogOutWithSourceView:(UIView *_Nonnull)sourceView {
     UIAlertController *alert = [UIAlertController
                                 alertControllerWithTitle:[UserStrings Log_out]
                                 message:[UserStrings Are_you_sure_psicash_account_logout]
@@ -342,7 +372,7 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
     [alert addAction:logoutAction];
     [alert addCancelAction:nil];
 
-    [[alert popoverPresentationController] setSourceView:psiCashAccountLogOutCell];
+    [[alert popoverPresentationController] setSourceView:sourceView];
     [[alert popoverPresentationController] setSourceRect:CGRectMake(0,0,1,1)];
     [[alert popoverPresentationController]
      setPermittedArrowDirections:UIPopoverArrowDirectionDown];
