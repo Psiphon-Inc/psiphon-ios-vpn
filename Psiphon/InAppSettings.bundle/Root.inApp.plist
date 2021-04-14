@@ -14,16 +14,6 @@
 			<key>Title</key>
 			<string>!!! Not in the Root.strings, this title is set from SettingsViewController!!!</string>
 			<key>Key</key>
-			<string>settingsPsiCash</string>
-			<key>Type</key>
-			<string>IASKCustomViewSpecifier</string>
-			<key>DefaultValue</key>
-			<string></string>
-		</dict>
-		<dict>
-			<key>Title</key>
-			<string>!!! Not in the Root.strings, this title is set from SettingsViewController!!!</string>
-			<key>Key</key>
 			<string>settingsSubscription</string>
 			<key>Type</key>
 			<string>IASKCustomViewSpecifier</string>
@@ -470,18 +460,36 @@
 			<string>about</string>
 		</dict>
         <dict>
+            <key>Title</key>
+            <string>!!! Not in the Root.strings, this title is set from SettingsViewController!!!</string>
             <key>Type</key>
             <string>PSGroupSpecifier</string>
+            <key>Key</key>
+            <string>settingsPsiCashGroupTitle</string>
         </dict>
         <dict>
             <key>Title</key>
             <string>!!! Not in the Root.strings, this title is set from SettingsViewController!!!</string>
+            <key>Key</key>
+            <string>settingsPsiCash</string>
             <key>Type</key>
             <string>IASKCustomViewSpecifier</string>
+        </dict>
+        <dict>
+            <key>Title</key>
+            <string>!!! Not in the Root.strings, this title is set from SettingsViewController!!!</string>
+            <key>Key</key>
+            <string>settingsManagePsiCashAccount</string>
+            <key>Type</key>
+            <string>IASKCustomViewSpecifier</string>
+        </dict>
+        <dict>
+            <key>Title</key>
+            <string>!!! Not in the Root.strings, this title is set from SettingsViewController!!!</string>
             <key>Key</key>
             <string>settingsLogOutPsiCashAccount</string>
-            <key>DefaultValue</key>
-            <string></string>
+            <key>Type</key>
+            <string>IASKCustomViewSpecifier</string>
         </dict>
 		<dict>
 			<key>Type</key>
@@ -490,12 +498,10 @@
 		<dict>
 			<key>Title</key>
 			<string>!!! Not in the Root.strings, this title is set from SettingsViewController!!!</string>
-			<key>Type</key>
-			<string>IASKCustomViewSpecifier</string>
 			<key>Key</key>
 			<string>settingsResetAdConsent</string>
-			<key>DefaultValue</key>
-			<string></string>
+            <key>Type</key>
+            <string>IASKCustomViewSpecifier</string>
 		</dict>
 	</array>
 	<key>StringsTable</key>

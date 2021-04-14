@@ -137,35 +137,6 @@ extension PsiCashParseError: Arbitrary {
     }
 }
 
-extension PsiCashTokenType: Arbitrary {
-    public static var arbitrary: Gen<PsiCashTokenType> {
-        Gen.fromElements(of: [
-            // Should cover all cases.
-            PsiCashTokenType.earner,
-            PsiCashTokenType.spender,
-            PsiCashTokenType.indicator,
-            PsiCashTokenType.account
-        ])
-    }
-    
-    /// Gen with a bit of domain-specific knowledge that a PsiCash user either
-    /// has only tracker tokens or an account.
-    ///
-    /// There are three possible values:
-    /// - 1: Empty set.
-    /// - 2: Set of tokens for a tracker.
-    /// - 3: Set of tokens for an account.
-    public static var arbitrarySetOfTokens: Gen<Set<PsiCashTokenType>> {
-        Gen.fromElements(of: [
-            Set([]),
-            
-            Set([.earner, .spender, .indicator]),
-            
-            Set([.earner, .spender, .indicator, .account]),
-        ])
-    }
-}
-
 extension PsiCashAccountType: Arbitrary {
     public static var arbitrary: Gen<PsiCashAccountType> {
         Gen.fromElements(of: [
@@ -176,6 +147,8 @@ extension PsiCashAccountType: Arbitrary {
         ])
     }
 }
+
+
 
 extension PsiCashLibData: Arbitrary {
     /// Leans 9/10 times towards producing a non-empty `PsiCashLibData` value.
@@ -188,13 +161,16 @@ extension PsiCashLibData: Arbitrary {
         ]).flatMap { hasPsiCash in
             // Uses generated bool values to determine availability of PsiCash.
             if hasPsiCash {
-                return Gen.zip(
-                    PsiCashTokenType.arbitrarySetOfTokens,
-                    PsiCashAccountType.arbitrary,
-                    PsiCashAmount.arbitrary,
-                    [PsiCashParsed<PsiCashPurchasableType>].arbitrary,
-                    [PsiCashParsed<PsiCashPurchasedType>].arbitrary
-                ).map(PsiCashLibData.init(validTokens: accountType: balance: availableProducts: activePurchases: ))
+                
+                return Gen.compose { c -> PsiCashLibData in
+                    PsiCashLibData(
+                        accountType: c.generate(),
+                        balance: c.generate(),
+                        availableProducts: c.generate(),
+                        activePurchases: c.generate()
+                    )
+                }
+                
             } else {
                 return Gen.pure(PsiCashLibData())
             }
@@ -247,7 +223,7 @@ extension PaymentTransaction.TransactionState.TransactionErrorState: Arbitrary {
         Gen.frequency([
             (1, Gen.pure(PaymentTransaction.TransactionState.TransactionErrorState.invalidTransaction)),
             (3,
-             Either<SystemError, SKError>.arbitrary
+             Either<SystemError<Int>, SystemError<SKError.Code>>.arbitrary
                 .map(PaymentTransaction.TransactionState.TransactionErrorState.error))
         ])
     }
@@ -369,12 +345,20 @@ extension AppStoreProductType: Arbitrary {
     }
 }
 
+extension PriceLocale: Arbitrary {
+    public static var arbitrary: Gen<PriceLocale> {
+        Gen.compose { c -> PriceLocale in
+            PriceLocale(c.generate())
+        }
+    }
+}
+
 extension LocalizedPrice: Arbitrary {
     public static var arbitrary: Gen<LocalizedPrice> {
         Gen.one(of: [
             // Should cover all cases
             Gen.pure(LocalizedPrice.free),
-            Gen.zip(positiveDouble(), Locale.arbitrary)
+            Gen.zip(positiveDouble(), PriceLocale.arbitrary)
                 .map(LocalizedPrice.localizedPrice(price: priceLocale:))
         ])
     }
@@ -480,18 +464,23 @@ extension IAPState: Arbitrary {
     }
 }
 
-extension PsiCashBalance.BalanceIncreaseExpectationReason: Arbitrary {
-    public static var arbitrary: Gen<PsiCashBalance.BalanceIncreaseExpectationReason> {
-        Gen.fromElements(of: PsiCashBalance.BalanceIncreaseExpectationReason.allCases)
+extension PsiCashBalance.BalanceOutOfDateReason: Arbitrary {
+    public static var arbitrary: Gen<PsiCashBalance.BalanceOutOfDateReason> {
+        Gen.fromElements(of: PsiCashBalance.BalanceOutOfDateReason.allCases)
     }
 }
 
 extension PsiCashBalance: Arbitrary {
     public static var arbitrary: Gen<PsiCashBalance> {
-        Gen.zip(BalanceIncreaseExpectationReason?.arbitrary,
-                PsiCashAmount.arbitrary,
-                PsiCashAmount.arbitrary)
-            .map(PsiCashBalance.init(pendingExpectedBalanceIncrease:optimisticBalance:lastRefreshBalance:))
+        
+        Gen.compose { c -> PsiCashBalance in
+            PsiCashBalance(
+                balanceOutOfDateReason: c.generate(),
+                optimisticBalance: c.generate(),
+                lastRefreshBalance: c.generate()
+            )
+        }
+
     }
 }
 
@@ -606,7 +595,7 @@ extension IAPReducerState: Arbitrary {
                 purchasing: c.generate()
             ),
             psiCashBalance: c.generate(),
-            psiCashAccountType: nil
+            psiCashAccountType: .none
         )
     }
     
@@ -632,14 +621,34 @@ extension PsiCashValidationResponse: Arbitrary {
     }
 }
 
-extension PsiCashRefreshError: Arbitrary {
-    public static var arbitrary: Gen<PsiCashRefreshError> {
+extension PsiCashLibError: Arbitrary {
+    public static var arbitrary: Gen<PsiCashLibError> {
+        Gen.compose { c -> PsiCashLibError in
+            PsiCashLibError(critical: c.generate(), description: "")
+        }
+    }
+}
+
+extension PsiCashRequestError: Arbitrary where ErrorStatus: Arbitrary {
+    public static var arbitrary: Gen<PsiCashRequestError<ErrorStatus>> {
+        Gen.one(of: [
+            ErrorStatus.arbitrary.map {
+                PsiCashRequestError.errorStatus($0)
+            },
+            
+            PsiCashLibError.arbitrary.map {
+                PsiCashRequestError.requestFailed($0)
+            }
+        ])
+    }
+}
+
+extension PsiCashRefreshErrorStatus: Arbitrary {
+    public static var arbitrary: Gen<PsiCashRefreshErrorStatus> {
         Gen.one(of: [
             // Should cover all cases
-            Gen.pure(.tunnelNotConnected),
             Gen.pure(.serverError),
-            Gen.pure(.invalidTokens),
-            String.arbitrary.map(PsiCashRefreshError.error)
+            Gen.pure(.invalidTokens)
         ])
     }
 }

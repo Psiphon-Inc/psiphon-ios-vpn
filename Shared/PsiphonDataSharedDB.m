@@ -510,13 +510,6 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
     [sharedDefaults synchronize];
 }
 
-- (void)appendNonSubscriptionEncodedAuthorization:(NSString *_Nonnull)base64Encoded {
-    NSMutableSet<NSString *> *newSet = [NSMutableSet
-                                        setWithSet:[self getNonSubscriptionEncodedAuthorizations]];
-    [newSet addObject:base64Encoded];
-    [self setNonSubscriptionEncodedAuthorizations:newSet];
-}
-
 - (NSSet<NSString *> *_Nonnull)getNonSubscriptionEncodedAuthorizations {
     NSArray<NSString *> *_Nullable encodedAuths = [sharedDefaults
                                                    stringArrayForKey:ContainerAuthorizationSetKey];

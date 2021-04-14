@@ -26,22 +26,24 @@ public enum PsiCashAction: Equatable {
     case initialize
 
     /// Success result Bool represents whether a refresh state is required or not.
-    case _initialized(Result<PsiCashEffects.PsiCashLibInitSuccess, ErrorRepr>)
+    case _initialized(Result<PsiCashLibInitSuccess, ErrorRepr>)
+    
+    case setLocale(Locale)
     
     case buyPsiCashProduct(PsiCashPurchasableType)
     case _psiCashProductPurchaseResult(
             purchasable: PsiCashPurchasableType,
-            result: PsiCashEffects.NewExpiringPurchaseResult
+            result: NewExpiringPurchaseResult
          )
     
     case refreshPsiCashState(ignoreSubscriptionState: Bool = false)
-    case _refreshPsiCashStateResult(PsiCashEffects.PsiCashRefreshResult)
+    case _refreshPsiCashStateResult(PsiCashEffectsProtocol.PsiCashRefreshResult)
     
     case accountLogout
-    case _accountLogoutResult(PsiCashEffects.PsiCashAccountLogoutResult)
+    case _accountLogoutResult(PsiCashEffectsProtocol.PsiCashAccountLogoutResult)
     
     case accountLogin(username: String, password: SecretString)
-    case _accountLoginResult(PsiCashEffects.PsiCashAccountLoginResult)
+    case _accountLoginResult(PsiCashEffectsProtocol.PsiCashAccountLoginResult)
     
     case userDidEarnReward(PsiCashAmount, PsiCashBalance.BalanceOutOfDateReason)
     

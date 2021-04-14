@@ -496,7 +496,9 @@ final class PsiCashViewController: ReactiveViewController {
                         let speedBoostPurchasables =
                             observed.readerState.psiCash.libData.purchasePrices.compactMap {
                                 $0.successToOptional()?.speedBoost
-                            }.map(SpeedBoostPurchasableViewModel.init(purchasable:))
+                            }
+                            .map(SpeedBoostPurchasableViewModel.init(purchasable:))
+                            .sorted() // Sorts by Comparable impl of SpeedBoostPurchasableViewModel.
                         
                         let viewModel = NonEmpty(array: speedBoostPurchasables)
                         
@@ -542,8 +544,8 @@ final class PsiCashViewController: ReactiveViewController {
         }
         
         hStack.addArrangedSubviews(
-            tabControl.view,
             logInView,
+            tabControl.view,
             containerView
         )
         

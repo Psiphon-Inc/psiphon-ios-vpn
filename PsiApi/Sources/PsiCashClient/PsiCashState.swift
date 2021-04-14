@@ -27,8 +27,7 @@ public struct PsiCashState: Equatable {
     // Failure type matches PsiCashEffects.PsiCashRefreshResult.Failure
     public typealias PendingRefresh =
         PendingResult<Utilities.Unit,
-                      ErrorEvent<TunneledPsiCashRequestError<
-                                    PsiCashRequestError<PsiCashRefreshErrorStatus>>>>
+                      ErrorEvent<PsiCashRequestError<PsiCashRefreshErrorStatus>>>
     
     /// Represents whether PsiCash accounts is pending login or logout.
     public enum LoginLogoutPendingValue: Equatable {
@@ -40,8 +39,8 @@ public struct PsiCashState: Equatable {
     
     public typealias PendingAccountLoginLogoutEvent =
         Event<PendingValue<LoginLogoutPendingValue,
-                           Either<PsiCashEffects.PsiCashAccountLoginResult,
-                                  PsiCashEffects.PsiCashAccountLogoutResult>>>?
+                           Either<PsiCashEffectsProtocol.PsiCashAccountLoginResult,
+                                  PsiCashEffectsProtocol.PsiCashAccountLogoutResult>>>?
     
     public var purchasing: PsiCashPurchasingState
     public var libData: PsiCashLibData
@@ -83,7 +82,7 @@ extension PsiCashState {
 public enum PsiCashPurchasingState: Equatable {
     case none
     case speedBoost(SpeedBoostPurchasable)
-    case error(PsiCashEffects.NewExpiringPurchaseResult.ErrorType)
+    case error(NewExpiringPurchaseResult.ErrorType)
     
     /// True if purchasing is completed (succeeded or failed)
     public var completed: Bool {
@@ -118,7 +117,7 @@ public enum PsiCashRequestError<ErrorStatus>: HashableError where
 public enum TunneledPsiCashRequestError<RequestError: HashableError>: HashableError {
     /// Request was not sent since tunnel was not connected.
     case tunnelNotConnected
-    
+    /// Wrapped RequestError.
     case requestError(RequestError)
 }
 

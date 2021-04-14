@@ -213,6 +213,9 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
     private var psiCashLib: PsiCash
     private var environmentCleanup: (() -> Void)?
 
+    // NSNotification observers
+    private var appLangChagneObserver: NSObjectProtocol?
+    
     private override init() {
 
         deepLinkingNavigator = DeepLinkingNavigator()
@@ -223,9 +226,9 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
         
         appSupportFileStore = ApplicationSupportFileStore(fileManager: FileManager.default)
         
-        psiCashLib = PsiCash(feedbackLogger: self.feedbackLogger)
-        
         platform = Platform(ProcessInfo.processInfo)
+        
+        psiCashLib = PsiCash(feedbackLogger: self.feedbackLogger, platform: platform)
         
     }
     
@@ -472,13 +475,32 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.store.send(.psiCash(.initialize))
 
         // Registers accepted deep linking URLs.
-        deepLinkingNavigator.register(url: PsiphonDeepLinking.psiCashDeepLink) { [unowned self] in
+        deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.legacyBuyPsiCashDeepLink,
+                                             PsiphonDeepLinking.buyPsiCashDeepLink ]) { [unowned self] in
             self.store.send(.mainViewAction(.presentPsiCashScreen(initialTab: .addPsiCash)))
             return true
         }
-        deepLinkingNavigator.register(url: PsiphonDeepLinking.speedBoostDeepLink) { [unowned self] in
+        deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.legacySpeedBoostDeepLink,
+                                              PsiphonDeepLinking.speedBoostDeepLink ]) { [unowned self] in
             self.store.send(.mainViewAction(.presentPsiCashScreen(initialTab: .speedBoost)))
             return true
+        }
+        
+        // Note that settings can also change outside of IASK menu,
+        // such as language selection in onboarding.
+        appLangChagneObserver = NotificationCenter.default.addObserver(
+            forName: NSNotification.Name(kIASKAppSettingChanged),
+            object: nil,
+            queue: .main
+        ) { [unowned self] note in
+            
+            let fieldName = note.userInfo?.keys.first as? String?
+            
+            if fieldName == PsiphonCommonLibConstants.kAppLanguage {
+                let currentLocale = self.userDefaultsConfig.localeForAppLanguage
+                self.store.send(.psiCash(.setLocale(currentLocale)))
+            }
+            
         }
         
         // Sends interstitial ad load signal when unknownValuesInitialized property
@@ -650,16 +672,25 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 objcBridge!.onReachabilityStatusDidChange(reachabilityStatus.networkStatus)
             }
         
-        // Forwards AppState `psiCash.libData.accountTyp` to ObjCBridgeDelegate.
-        self.lifetime += self.store.$value.signalProducer
-            .map(\.psiCash.libData.accountType)
-            .skipRepeats()
-            .startWithValues { [unowned objcBridge] accountType in
-                if case .account(loggedIn: true) = accountType {
-                    objcBridge!.onPsiCashAccountStatusDidChange(true)
-                } else {
-                    objcBridge!.onPsiCashAccountStatusDidChange(false)
-                }
+        // Produces a SettingsViewModel type and passes
+        // the value to the ObjCBridgeDelegte.
+        self.lifetime += SignalProducer.combineLatest(
+                self.store.$value.signalProducer.map(\.subscription.status).skipRepeats(),
+            self.store.$value.signalProducer.map(\.psiCash.libData.accountType).skipRepeats(),
+                self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus).skipRepeats()
+            ).map { [unowned self] in
+                
+                SettingsViewModel(
+                    subscriptionState: $0.0,
+                    psiCashAccountType: $0.1,
+                    vpnStatus: $0.2,
+                    psiCashAccountManagementURL: self.psiCashLib.getUserSiteURL(
+                        .accountManagement, platform: self.platform.current
+                    )
+                )
+            }
+            .startWithValues { [unowned objcBridge] model in
+                objcBridge!.onSettingsViewModelDidChange(ObjcSettingsViewModel(model))
             }
 
         // Updates PsiphonDateSharedDB `ContainerAppReceiptLatestSubscriptionExpiryDate`
@@ -749,14 +780,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     case .success(_):
                         maybeAlert = .psiCashAccountAlert(.logoutSuccessAlert)
 
-                    case let .failure(errorEvent):
-                        switch errorEvent.error {
-                        case .tunnelNotConnected:
-                            maybeAlert = .psiCashAccountAlert(.tunnelNotConnectedAlert)
-
-                        case .requestError(_):
-                            maybeAlert = .psiCashAccountAlert(.operationFailedTryAgainAlert)
-                        }
+                    case .failure(_):
+                        maybeAlert = .psiCashAccountAlert(.operationFailedTryAgainAlert)
                     }
                     
                 }
@@ -820,7 +845,13 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func applicationWillTerminate(_ application: UIApplication) {
+        
+        if let observer = self.appLangChagneObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        
         self.environmentCleanup?()
+        
     }
 
     @objc func application(_ app: UIApplication,
@@ -1215,4 +1246,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         return "V.\(shortVersionString)\(postfix)"
     }
 
+    func connectButtonTappedFromSettings() {
+        // This is a round-about way of calling into ObjC AppDelegate through Swift.
+        // This is to make transition to Swift-only codebase easier in the future.
+        self.objcBridge.dismiss(screen: .settings) { [unowned self] in
+            self.objcBridge.startStopVPNWithInterstitial()
+        }
+    }
+    
 }

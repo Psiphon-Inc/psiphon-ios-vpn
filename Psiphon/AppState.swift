@@ -28,6 +28,7 @@ var Style = AppStyle()
 /// Represents UIViewController's that can be dismissed.
 @objc enum DismissibleScreen: Int {
     case psiCash
+    case settings
 }
 
 struct AppState: Equatable {
@@ -234,11 +235,11 @@ func makeEnvironment(
         appBundle: PsiphonBundle.from(bundle: Bundle.main),
         feedbackLogger: feedbackLogger,
         httpClient: httpClient,
-        psiCashEffects: PsiCashEffects.default(psiCash: psiCashClient,
-                                               httpClient: httpClient,
-                                               globalDispatcher: globalDispatcher,
-                                               getCurrentTime: dateCompare.getCurrentTime,
-                                               feedbackLogger: feedbackLogger),
+        psiCashEffects: PsiCashEffects(psiCashClient: psiCashClient,
+                                       httpClient: httpClient,
+                                       globalDispatcher: globalDispatcher,
+                                       getCurrentTime: dateCompare.getCurrentTime,
+                                       feedbackLogger: feedbackLogger),
         psiCashFileStoreRoot: psiCashFileStoreRoot,
         appInfo: { AppInfoObjC() },
         sharedDB: sharedDB,
@@ -429,8 +430,10 @@ func makeEnvironment(
                 ),
                 feedbackLogger: feedbackLogger,
                 tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
-                createNewAccountURL: PsiCashHardCodedValues.devPsiCashSignUpURL,
-                forgotPasswordURL: PsiCashHardCodedValues.devPsiCashForgotPasswordURL,
+                createNewAccountURL: psiCashClient.getUserSiteURL(.accountSignup,
+                                                                  platform: platform.current),
+                forgotPasswordURL: psiCashClient.getUserSiteURL(.forgotAccount,
+                                                                platform: platform.current),
                 onDismissed: { [unowned store] in
                     store.send(.mainViewAction(.psiCashViewAction(.dismissedPsiCashAccountScreen)))
                 })
@@ -448,7 +451,7 @@ func makeEnvironment(
 }
 
 fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment {
-    return PsiCashEnvironment(
+    PsiCashEnvironment(
         platform: env.platform,
         feedbackLogger: env.feedbackLogger,
         psiCashFileStoreRoot: env.psiCashFileStoreRoot,
@@ -457,10 +460,12 @@ fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment
         psiCashPersistedValues: env.userConfigs,
         notifier: env.notifier,
         vpnActionStore: env.vpnActionStore,
+        tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
         objcBridgeDelegate: env.objcBridgeDelegate,
         metadata: { ClientMetaData(env.appInfo()) },
         getCurrentTime: env.dateCompare.getCurrentTime,
-        psiCashLegacyDataStore: env.standardUserDefaults
+        psiCashLegacyDataStore: env.standardUserDefaults,
+        userConfigs: env.userConfigs
     )
 }
 

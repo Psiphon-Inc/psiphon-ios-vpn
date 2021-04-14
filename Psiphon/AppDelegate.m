@@ -51,6 +51,7 @@
 #import "AppObservables.h"
 #import <PsiphonTunnel/PsiphonTunnel.h>
 #import "RegionAdapter.h"
+#import "SettingsViewController.h"
 
 PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 
@@ -418,8 +419,8 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [AppObservables.shared.reachabilityStatus sendNext:@(status)];
 }
 
-- (void)onPsiCashAccountStatusDidChange:(BOOL)isLoggedIn {
-    [AppObservables.shared.isLoggedInToPsiCashAccount sendNext:@(isLoggedIn)];
+- (void)onSettingsViewModelDidChange:(ObjcSettingsViewModel *)model {
+    [AppObservables.shared.settingsViewModel sendNext:model];
 }
 
 - (void)dismissWithScreen:(enum DismissibleScreen)screen
@@ -428,6 +429,10 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     switch (screen) {
         case DismissibleScreenPsiCash:
             [self.window.rootViewController dismissViewControllerType:PsiCashViewController.class
+                                                           completion:completion];
+            break;
+        case DismissibleScreenSettings:
+            [self.window.rootViewController dismissViewControllerType:SettingsViewController.class
                                                            completion:completion];
             break;
     }
