@@ -49,6 +49,7 @@ final class SpeedBoostCollection: NSObject, ViewWrapper, Bindable {
     typealias BindingType = NonEmpty<SpeedBoostPurchasableViewModel>
 
     private let purchaseCell = "purchaseCell"
+    private let SpeedBoostPurchaseCellIdentifier = "purchaseCell"
     private let minimumLineSpacing: CGFloat = 10.0
     private let itemsPerRow: CGFloat = 3
     private let imageAspectRatio: CGFloat = 161 / 119
@@ -72,8 +73,8 @@ final class SpeedBoostCollection: NSObject, ViewWrapper, Bindable {
 
         collectionView.dataSource = self
         collectionView.delegate = self
-        collectionView.register(UICollectionViewCell.self,
-                                forCellWithReuseIdentifier: purchaseCell)
+        collectionView.register(SpeedBoostPurchaseCell.self,
+                                forCellWithReuseIdentifier: SpeedBoostPurchaseCellIdentifier)
 
         // UI Properties
         collectionView.backgroundColor = .clear
@@ -103,22 +104,16 @@ extension SpeedBoostCollection: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: purchaseCell,
-                                                      for: indexPath)
-
-        if cell.contentView.subviews[maybe: 0] == nil {
-            let content = PurchaseCellContent(psiCashPriceFormatter: self.psiCashPriceFormatter,
-                                              purchaseHandler: self.purchaseHandler)
-            cell.contentView.addSubview(content)
-            content.activateConstraints { $0.matchParentConstraints() }
-            cell.backgroundColor = .clear
-        }
-
-        guard let content = cell.contentView.subviews[maybe: 0] as? PurchaseCellContent else {
-            fatalError("Expected cell to have subview of type 'PurchaseCellContent'")
-        }
-
-        content.bind(data![indexPath.row])
+        let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: SpeedBoostPurchaseCellIdentifier, for: indexPath
+        ) as! SpeedBoostPurchaseCell
+                    
+        cell.bind(
+            data: data![indexPath.row],
+            psiCashPriceFormatter: self.psiCashPriceFormatter,
+            purchaseHandler: self.purchaseHandler
+        )
+        
         return cell
     }
 
@@ -154,24 +149,27 @@ extension SpeedBoostCollection: UICollectionViewDelegateFlowLayout {
 
 }
 
+// MARK: PurchaseCellContent
 
-fileprivate final class PurchaseCellContent: AnimatedUIView, Bindable {
+fileprivate final class SpeedBoostPurchaseCell: UICollectionViewCell {
+    
     private var purchasable: SpeedBoostPurchasable? = .none
-    private let purchaseHandler: (SpeedBoostPurchasable) -> Void
-
-    private let psiCashPriceFormatter: PsiCashAmountFormatter
-    private let backgroundView: UIImageView
+    
+    private let backgroundImage: UIImageView
     private let title = UILabel.make(fontSize: .h3, typeface: .bold)
     private let button = GradientButton(gradient: .grey)
+    
+    private var purchaseHandler: ((SpeedBoostPurchasable) -> Void)?
 
-    init(psiCashPriceFormatter: PsiCashAmountFormatter,
-         purchaseHandler: @escaping (SpeedBoostPurchasable) -> Void) {
-        self.psiCashPriceFormatter = psiCashPriceFormatter
-        self.purchaseHandler = purchaseHandler
-        self.backgroundView = UIImageView.make(image:
+    override init(frame: CGRect) {
+                
+        self.backgroundImage = UIImageView.make(image:
             SpeedBoostPurchaseBackground.allCases.randomElement()!.rawValue)
-        super.init(frame: .zero)
-
+        
+        super.init(frame: frame)
+        
+        self.backgroundColor = .clear
+        
         addShadow(toLayer: title.layer)
         let psiCashCoinImage = UIImage(named: "PsiCashCoin")
         button.setImage(psiCashCoinImage, for: .normal)
@@ -179,10 +177,10 @@ fileprivate final class PurchaseCellContent: AnimatedUIView, Bindable {
         button.setTitleColor(.darkBlue(), for: .normal)
         button.titleLabel!.font = AvenirFont.bold.font(.h3)
         button.isUserInteractionEnabled = false
+        
+        self.addSubviews(backgroundImage, title, button)
 
-        self.addSubviews(backgroundView, title, button)
-
-        self.backgroundView.activateConstraints {
+        self.backgroundImage.activateConstraints {
             $0.matchParentConstraints()
         }
 
@@ -204,9 +202,14 @@ fileprivate final class PurchaseCellContent: AnimatedUIView, Bindable {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func bind(_ newValue: SpeedBoostPurchasableViewModel) {
+    func bind(
+        data newValue: SpeedBoostPurchasableViewModel,
+        psiCashPriceFormatter: PsiCashAmountFormatter,
+        purchaseHandler: @escaping (SpeedBoostPurchasable) -> Void
+    ) {
+        self.purchaseHandler = purchaseHandler
         self.purchasable = newValue.purchasable
-        backgroundView.image = UIImage(named: newValue.background.rawValue)
+        backgroundImage.image = UIImage(named: newValue.background.rawValue)
         title.text = "\(newValue.purchasable.product.hours) HOUR"
 
         button.setTitle(
@@ -216,7 +219,7 @@ fileprivate final class PurchaseCellContent: AnimatedUIView, Bindable {
     
     @objc func onViewTapped() {
         if let purchasable = self.purchasable {
-            self.purchaseHandler(purchasable)
+            self.purchaseHandler!(purchasable)
         }
     }
 
