@@ -219,6 +219,12 @@
 /* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
 "PSICASH_PURCHASE_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon.";
 
+/* Body of an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. The word 'PsiCash' must not be translated or transliterated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_PORT_LIMITS_BODY" = "Without active Speed Boost, your speed is limited and some internet traffic is not supported. Activate Speed Boost with PsiCash to unlock the full potential of your Psiphon experience.";
+
+/* Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. */
+"PSICASH_SPEED_PORT_LIMITS_HEAD" = "Speed and Port Limits";
+
 /* An error that signifies a state where the user has made a 'PsiCash' purchase, but extra action is needed from the user to finish the transaction. Do not translate or transliterate 'PsiCash'. */
 "PSICASH_TRANSACTION_PENDING" = "Transaction Pending";
 
