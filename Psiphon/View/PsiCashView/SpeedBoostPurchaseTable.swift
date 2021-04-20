@@ -48,15 +48,15 @@ struct SpeedBoostPurchaseTable: ViewBuilder {
 final class SpeedBoostCollection: NSObject, ViewWrapper, Bindable {
     typealias BindingType = NonEmpty<SpeedBoostPurchasableViewModel>
 
-    private let purchaseCell = "purchaseCell"
+    // Cell types
+    private let HeaderCellIdentifier = "headerCell"
     private let SpeedBoostPurchaseCellIdentifier = "purchaseCell"
-    private let minimumLineSpacing: CGFloat = 10.0
+    
+    // Minimum interitem and line spacing.
+    private let minimumSpacing: CGFloat = 5.0
+    
     private let itemsPerRow: CGFloat = 3
-    private let imageAspectRatio: CGFloat = 161 / 119
-    private let sectionInsets = UIEdgeInsets(top: 15.0,
-                                             left: 15.0,
-                                             bottom: 15.0,
-                                             right: 15.0)
+    
     private let psiCashPriceFormatter = PsiCashAmountFormatter(locale: Locale.current)
     
     private var data: BindingType?
@@ -64,6 +64,10 @@ final class SpeedBoostCollection: NSObject, ViewWrapper, Bindable {
     private let purchaseHandler: (SpeedBoostPurchasable) -> Void
 
     var view: UIView { collectionView }
+    
+    var flowLayout: UICollectionViewFlowLayout {
+        collectionView.collectionViewLayout as! UICollectionViewFlowLayout
+    }
 
     init(purchaseHandler: @escaping (SpeedBoostPurchasable) -> Void) {
         self.purchaseHandler = purchaseHandler
@@ -73,11 +77,26 @@ final class SpeedBoostCollection: NSObject, ViewWrapper, Bindable {
 
         collectionView.dataSource = self
         collectionView.delegate = self
+        
+        // Registers cell types
+        
+        collectionView.register(SpeedBoostExplainerCell.self,
+                                forCellWithReuseIdentifier: HeaderCellIdentifier)
+        
         collectionView.register(SpeedBoostPurchaseCell.self,
                                 forCellWithReuseIdentifier: SpeedBoostPurchaseCellIdentifier)
 
         // UI Properties
         collectionView.backgroundColor = .clear
+        
+        // estimatedItemSize is set to a non-zero value (.automaticSize).
+        // This causes the collection view to query each cell for its actual size
+        // using the cell’s preferredLayoutAttributesFitting(_:) method.
+        self.flowLayout.estimatedItemSize = UICollectionViewFlowLayout.automaticSize
+        
+        self.flowLayout.minimumInteritemSpacing = minimumSpacing
+        self.flowLayout.minimumLineSpacing = minimumSpacing
+        
     }
 
     func bind(_ newValue: NonEmpty<SpeedBoostPurchasableViewModel>) {
@@ -92,29 +111,53 @@ final class SpeedBoostCollection: NSObject, ViewWrapper, Bindable {
 extension SpeedBoostCollection: UICollectionViewDataSource {
 
     func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
+        return 2
     }
 
     func collectionView(_ collectionView: UICollectionView,
                         numberOfItemsInSection section: Int) -> Int {
-        precondition(section == 0, "Section is not 0: '\(section)'")
-        return data?.count ?? 0
+        
+        switch section {
+        case 0:
+            return 1
+        case 1:
+            return data?.count ?? 0
+        default:
+            fatalError()
+        }
+        
     }
 
     func collectionView(_ collectionView: UICollectionView,
                         cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
 
-        let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: SpeedBoostPurchaseCellIdentifier, for: indexPath
-        ) as! SpeedBoostPurchaseCell
-                    
-        cell.bind(
-            data: data![indexPath.row],
-            psiCashPriceFormatter: self.psiCashPriceFormatter,
-            purchaseHandler: self.purchaseHandler
-        )
+        switch indexPath.section {
+        case 0:
+            
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: HeaderCellIdentifier, for: indexPath)
+            
+            return cell
+            
+        case 1:
+            
+            let cell = collectionView.dequeueReusableCell(
+                withReuseIdentifier: SpeedBoostPurchaseCellIdentifier, for: indexPath
+            ) as! SpeedBoostPurchaseCell
+                        
+            cell.bind(
+                data: data![indexPath.row],
+                psiCashPriceFormatter: self.psiCashPriceFormatter,
+                purchaseHandler: self.purchaseHandler
+            )
+            
+            return cell
         
-        return cell
+            
+        default:
+            fatalError()
+        }
+        
     }
 
 }
@@ -123,16 +166,40 @@ extension SpeedBoostCollection: UICollectionViewDataSource {
 
 extension SpeedBoostCollection: UICollectionViewDelegateFlowLayout {
 
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        sizeForItemAt indexPath: IndexPath) -> CGSize {
+    func collectionView(
+        _ collectionView: UICollectionView,
+        layout collectionViewLayout: UICollectionViewLayout,
+        sizeForItemAt indexPath: IndexPath
+    ) -> CGSize {
+        
+        // The CGSize for item at indexPath calculated here acts as the default
+        // layout attribute size. This value is passed as the argument of
+        // preferredLayoutAttributesFitting(_:) for each cell,
+        // and can be modified by the cell.
+        //
+        // Note that this behaviour exists since `containerView.estimatedItemSize`
+        // is set to `.automaticSize`, otherwise preferredLayoutAttributesFitting(_:)
+        // will not get called.
+        
+        switch indexPath.section {
 
-        let totalPaddingInRow = minimumLineSpacing * (itemsPerRow - 1)
-        let totalAvailableWidth = view.frame.width - totalPaddingInRow
-        let availableWidthPerItem = (totalAvailableWidth / itemsPerRow).rounded(.towardZero)
+        case 0:
+            // Height is determined by the self-sizing cell, it only needs to be a non-zero value.
+            return CGSize(width: collectionView.bounds.width, height: 50)
 
-        return CGSize(width: availableWidthPerItem,
-                      height: availableWidthPerItem * imageAspectRatio)
+        case 1:
+            let totalPaddingInRow = minimumSpacing * (itemsPerRow - 1)
+            let totalAvailableWidth = collectionView.bounds.width - totalPaddingInRow
+            let availableWidthPerItem = (totalAvailableWidth / itemsPerRow).rounded(.towardZero)
+            
+            // Height is determined by the self-sizing cell, it only needs to be a non-zero value.
+            return CGSize(width: availableWidthPerItem, height: 50)
+
+        default:
+            fatalError()
+
+        }
+
     }
 
     func collectionView(_ collectionView: UICollectionView,
@@ -141,12 +208,72 @@ extension SpeedBoostCollection: UICollectionViewDelegateFlowLayout {
         return .zero
     }
 
-    func collectionView(_ collectionView: UICollectionView,
-                        layout collectionViewLayout: UICollectionViewLayout,
-                        minimumLineSpacingForSectionAt section: Int) -> CGFloat {
-        return minimumLineSpacing
-    }
+}
 
+// MARK: SpeedBoostExplainerCell
+
+fileprivate final class SpeedBoostExplainerCell: UICollectionViewCell {
+
+    private let title: UILabel
+    private let subtitle: UILabel
+        
+    override init(frame: CGRect) {
+        
+        title = .make(text: UserStrings.Speed_and_port_limits_header(),
+                      fontSize: .h2,
+                      typeface: .demiBold,
+                      color: .white,
+                      numberOfLines: 1,
+                      alignment: .center)
+        
+        subtitle = .make(text: UserStrings.Speed_and_port_limibts_body(),
+                         fontSize: .normal,
+                         typeface: .medium,
+                         color: .white,
+                         numberOfLines: 0,
+                         alignment: .center)
+        
+        super.init(frame: frame)
+        
+        // Adds Subviews
+        contentView.addSubviews(title, subtitle)
+        
+        // Sets auto layout constraints
+        title.activateConstraints {
+            $0.constraintToParent(.top(0), .leading(0), .trailing(0))
+        }
+        
+        subtitle.activateConstraints {
+            [
+                $0.topAnchor.constraint(
+                    equalTo: title.bottomAnchor, constant: Style.default.padding)
+            ] +
+            $0.constraintToParent(.leading(0), .trailing(0), .bottom(-20))
+        }
+
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func preferredLayoutAttributesFitting(
+        _ layoutAttributes: UICollectionViewLayoutAttributes
+    ) -> UICollectionViewLayoutAttributes {
+                            
+        // Cell is expected to fit the given calculated width `layoutAttributes.size.width`.
+        // This value is calcualted as part collectionView(_:layout:sizeForItemAt:)
+        let autoLayoutSize = contentView.systemLayoutSizeFitting(
+            layoutAttributes.size,
+            withHorizontalFittingPriority: .required,
+            verticalFittingPriority: .fittingSizeLevel)
+        
+        layoutAttributes.frame = CGRect(origin: layoutAttributes.frame.origin,
+                                        size: autoLayoutSize)
+        
+        return layoutAttributes
+    }
+    
 }
 
 // MARK: PurchaseCellContent
@@ -160,9 +287,9 @@ fileprivate final class SpeedBoostPurchaseCell: UICollectionViewCell {
     private let button = GradientButton(gradient: .grey)
     
     private var purchaseHandler: ((SpeedBoostPurchasable) -> Void)?
-
+    
     override init(frame: CGRect) {
-                
+        
         self.backgroundImage = UIImageView.make(image:
             SpeedBoostPurchaseBackground.allCases.randomElement()!.rawValue)
         
@@ -178,24 +305,42 @@ fileprivate final class SpeedBoostPurchaseCell: UICollectionViewCell {
         button.titleLabel!.font = AvenirFont.bold.font(.h3)
         button.isUserInteractionEnabled = false
         
-        self.addSubviews(backgroundImage, title, button)
-
-        self.backgroundImage.activateConstraints {
-            $0.matchParentConstraints()
+        contentView.addSubviews(backgroundImage, title, button)
+        
+        // `backgroundImage` should extend itself to fit parent view (contentView)
+        // as much as possible, but still keeping the ratio of it's width to height
+        // the same as the image that it contains.
+        // This is necessary, since this surface is tappable, and we wouldn't
+        // an empty area of the screen to respond to touch events.
+        
+        backgroundImage.activateConstraints {
+            $0.constraintToParent(.centerX(), .centerY()) +
+            [
+                $0.leadingAnchor.constraint(greaterThanOrEqualTo: contentView.leadingAnchor),
+                $0.trailingAnchor.constraint(lessThanOrEqualTo: contentView.trailingAnchor),
+                $0.topAnchor.constraint(greaterThanOrEqualTo: contentView.topAnchor),
+                $0.bottomAnchor.constraint(lessThanOrEqualTo: contentView.bottomAnchor)
+            ]
         }
 
-        self.title.activateConstraints {
+        title.activateConstraints {
             $0.constraintToParent(.centerX(), .centerY(5))
         }
 
-        self.button.activateConstraints {
-            $0.constraintToParent(.leading(10), .trailing(-10), .bottom(-13)) +
+        button.activateConstraints {
+            $0.constraint(to: backgroundImage, .leading(10), .trailing(-10)) +
                 [ $0.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 2) ]
         }
         
         // Gesture recognizer
-        let tapRecognizer = UITapGestureRecognizer(target: self, action: #selector(onViewTapped))
-        addGestureRecognizer(tapRecognizer)
+        let tapRecognizer = UITapGestureRecognizer(target: self,
+                                                   action: #selector(onViewTapped))
+        
+        // Adds gesture to the background image only, since
+        // the entire contentView might not be filled by the image.
+        backgroundImage.isUserInteractionEnabled = true
+        backgroundImage.addGestureRecognizer(tapRecognizer)
+        
     }
 
     required init?(coder: NSCoder) {
@@ -223,6 +368,23 @@ fileprivate final class SpeedBoostPurchaseCell: UICollectionViewCell {
         }
     }
 
+    override func preferredLayoutAttributesFitting(
+        _ layoutAttributes: UICollectionViewLayoutAttributes
+    ) -> UICollectionViewLayoutAttributes {
+                    
+        // Cell is expected to fit the given calculated width `layoutAttributes.size.width`.
+        // This value is calcualted as part collectionView(_:layout:sizeForItemAt:)
+        let autoLayoutSize = contentView.systemLayoutSizeFitting(
+            layoutAttributes.size,
+            withHorizontalFittingPriority: .required,
+            verticalFittingPriority: .fittingSizeLevel)
+        
+        layoutAttributes.frame = CGRect(origin: layoutAttributes.frame.origin,
+                                        size: autoLayoutSize)
+        
+        return layoutAttributes
+    }
+    
 }
 
 // MARK: PurchaseRowCellContent

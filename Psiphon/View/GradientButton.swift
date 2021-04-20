@@ -33,6 +33,8 @@ import UIKit
         gradientColors = gradient.colors
 
         super.init(frame: .zero)
+        
+        contentEdgeInsets = UIEdgeInsets(top: 5.0, left: 5.0, bottom: 5.0, right: 5.0)
 
         backgroundColor = UIColor.clear
         layer.cornerRadius = Style.default.cornerRadius

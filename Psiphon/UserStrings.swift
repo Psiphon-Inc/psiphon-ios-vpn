@@ -251,6 +251,18 @@ import Foundation
                                  comment: "Text displayed while app loads")
     }
     
+    static func Speed_and_port_limits_header() -> String {
+        return NSLocalizedString("PSICASH_SPEED_PORT_LIMITS_HEAD", tableName: nil, bundle: .main,
+                                 value: "Speed and Port Limits",
+                                 comment: "Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active.")
+    }
+    
+    static func Speed_and_port_limibts_body() -> String {
+        return NSLocalizedString("PSICASH_SPEED_PORT_LIMITS_BODY", tableName: nil, bundle: .main,
+                                 value: "Without active Speed Boost, your speed is limited and some internet traffic is not supported. Activate Speed Boost with PsiCash to unlock the full potential of your Psiphon experience.",
+                                 comment: "Body of an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. The word 'PsiCash' must not be translated or transliterated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.")
+    }
+    
 }
 
 // MARK: Internet reachability
