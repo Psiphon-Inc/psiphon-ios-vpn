@@ -88,6 +88,7 @@ final class SpeedBoostCollection: NSObject, ViewWrapper, Bindable {
 
         // UI Properties
         collectionView.backgroundColor = .clear
+        collectionView.contentInset.bottom = Style.default.screenBottomOffset
         
         // estimatedItemSize is set to a non-zero value (.automaticSize).
         // This causes the collection view to query each cell for its actual size
