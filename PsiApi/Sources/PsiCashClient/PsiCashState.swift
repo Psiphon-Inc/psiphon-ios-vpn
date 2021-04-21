@@ -108,7 +108,7 @@ public enum PsiCashRequestError<ErrorStatus>: HashableError where
     case errorStatus(ErrorStatus)
     
     /// Sending the request failed utterly.
-    case requestFailed(PsiCashLibError)
+    case requestCatastrophicFailure(PsiCashLibError)
 
 }
 

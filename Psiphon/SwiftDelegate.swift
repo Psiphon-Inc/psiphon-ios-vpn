@@ -739,7 +739,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
             .send(store: self.store)
 
-        // Displays alerts related to PsiCash accounts login events.
+        // Displays alerts related to PsiCash accounts login and logout events.
         self.lifetime += self.store.$value.signalProducer
             .map(\.psiCash.pendingAccountLoginLogout)
             .skipRepeats()
@@ -752,36 +752,51 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 
                 switch loginLogoutEvent.wrapped {
                 case .pending(_):
-                    maybeAlert = nil
+                    maybeAlert = .none
                     
                 case let .completed(.left(completedLoginEvent)):
+                    // PsiCash Account Login
                     
                     switch completedLoginEvent {
                     case let .success(loginResponse):
-                        maybeAlert = .psiCashAccountAlert(
-                            .loginSuccessAlert(lastTrackerMerge:loginResponse.lastTrackerMerge))
+                        if loginResponse.lastTrackerMerge {
+                            maybeAlert = .psiCashAccountAlert(.loginSuccessLastTrackerMergeAlert)
+                        } else {
+                            maybeAlert = .none
+                        }
 
                     case let .failure(errorEvent):
                         switch errorEvent.error {
                         case .tunnelNotConnected:
                             maybeAlert = .psiCashAccountAlert(.tunnelNotConnectedAlert)
 
-                        case .requestError(.errorStatus(.invalidCredentials)):
-                            maybeAlert = .psiCashAccountAlert(.incorrectUsernameOrPasswordAlert)
-
-                        case .requestError(.errorStatus(_)),
-                             .requestError(.requestFailed(_)):
-                            maybeAlert = .psiCashAccountAlert(.operationFailedTryAgainAlert)
+                        case .requestError(.errorStatus(let psiCashServerErrorStatus)):
+                            
+                            switch psiCashServerErrorStatus {
+                            case .invalidCredentials:
+                                maybeAlert = .psiCashAccountAlert(.incorrectUsernameOrPasswordAlert)
+                                
+                            case .badRequest:
+                                maybeAlert = .psiCashAccountAlert(.accountLoginBadRequestAlert)
+                                
+                            case .serverError:
+                                maybeAlert = .psiCashAccountAlert(.accountLoginServerErrorAlert)
+                            }
+                            
+                        case .requestError(.requestCatastrophicFailure(_)):
+                            maybeAlert = .psiCashAccountAlert(.accountLoginCatastrophicFailureAlert)
                         }
                     }
 
                 case let .completed(.right(completedLogoutEvent)):
+                    // PsiCash Account Logout
+                    
                     switch completedLogoutEvent {
                     case .success(_):
                         maybeAlert = .psiCashAccountAlert(.logoutSuccessAlert)
 
                     case .failure(_):
-                        maybeAlert = .psiCashAccountAlert(.operationFailedTryAgainAlert)
+                        maybeAlert = .psiCashAccountAlert(.accountLogoutCatastrophicFailureAlert)
                     }
                     
                 }

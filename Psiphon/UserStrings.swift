@@ -293,12 +293,6 @@ import Foundation
                           comment: "Button text telling the user that if they click it, Psiphon will start trying to connect to the network. This is shown to the user while Psiphon is disconnected.")
     }
     
-    @objc static func PsiCash_logout_offline_body() -> String {
-        return NSLocalizedString("PSICASH_LOGOUT_OFFLINE_BODY", tableName: nil, bundle: .main,
-                                 value: "Being connected to the Psiphon network enables a more secure PsiCash logout. Would you like to connect before logging out?",
-                                 comment: "Body of a modal dialog that appears when the user tries to log out of thier PsiCash account while not currently connected to the Psiphon network. We don't allow PsiCash network requests when not connected, so only an inferior localy-only logout is available. 'Psiphon' must not be translated/transliterated. The word 'PsiCash' must not be translated or transliterated.")
-    }
-    
     static func Sign_up_or_log_in() -> String {
         return NSLocalizedString("SIGN_UP_OR_LOG_IN", tableName: nil, bundle: Bundle.main,
                                  value: "Sign Up or Log In",
@@ -317,30 +311,72 @@ import Foundation
                                  comment: "Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts.")
     }
     
-    static func Psicash_accounts_last_merge_warning() -> String {
-        return NSLocalizedString("PSICASH_ACCOUNTS_LAST_MERGE_WARNING", tableName: nil, bundle: Bundle.main,
-                                 value: "Note that this will be the last time that you can merge your PsiCash account.",
-                                 comment: "Do not translate or transliterate 'PsiCash'.")
+    static func Psicash_accounts_last_merge_warning_body() -> String {
+        return NSLocalizedString("PSICASH_ACCOUNTS_LAST_MERGE_WARNING_BODY", tableName: nil, bundle: Bundle.main,
+                                 value: "You are logged into your PsiCash account. The preexisting balance from this device has been transferred into your account, but this is the last time a balance merge will occur.",
+                                 comment: "Body text of a modal dialog shown when a PsiCash login succeeds. There is a fixed number of times that a user can merge a pre-account balance into a PsiCash account. This message indicates that the user has hit that limit and the merge that occurred is the last one allowed. The word 'PsiCash' must not be translated or transliterated.")
     }
     
     static func Incorrect_username_or_password() -> String {
         return NSLocalizedString("INCORRECT_USERNAME_OR_PASSWORD", tableName: nil, bundle: Bundle.main,
-                                 value: "The username or password you entered is incorrect. Please try again.",
-                                 comment: "Error message when username or password entered by the user to login into their account is incorrect.")
+                                 value: "The username or password entered was incorrect.",
+                                 comment: "Body text of a modal dialog shown when a PsiCash login fails due to bad username or password.")
     }
     
-    static func Psicash_logged_in_successfully() -> String {
-        return NSLocalizedString("PSICASH_LOGGED_IN_SUCCESSFULLY", tableName: nil, bundle: Bundle.main,
-                                 value: "You successfully logged into your PsiCash account.",
-                                 comment: "Do not translate or transliterate 'PsiCash'. Alert message when the user has been able to successfully log into their PsiCash account.")
+    static func Psicash_login_success_title() -> String {
+        return NSLocalizedString("PSICASH_LOGIN_SUCCESS_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "PsiCash Login Success",
+                                 comment: "Title of modal dialog shown when the PsiCash account login attempt succeeds, if additional information needs to be conveyed. The word 'PsiCash' must not be translated or transliterated.")
     }
     
-    static func Psicash_logged_out_successfully() -> String {
-        return NSLocalizedString("PSICASH_LOGGED_OUT_SUCCESSFULLY", tableName: nil, bundle: Bundle.main,
-                                 value: "You successfully logged out of your PsiCash account.",
-                                 comment: "Do not translate or transliterate 'PsiCash'. Alert message when the user has been able to successfully log out of their PsiCash account.")
+    static func Psicash_login_failed_title() -> String {
+        return NSLocalizedString("PSICASH_LOGIN_FAILED_TITLE", tableName: nil, bundle: .main,
+                                 value: "PsiCash Login Failed",
+                                 comment: "Title of modal dialog shown when the PsiCash account login attempt fails for some reason. Text within the modal will explain why. The word 'PsiCash' must not be translated or transliterated.")
     }
-
+    
+    @objc static func Psicash_account_logout_title() -> String {
+        return NSLocalizedString("PSICASH_ACCOUNT_LOGOUT_TITLE", tableName: nil, bundle: .main,
+                                 value: "PsiCash Account Logout",
+                                 comment: "Header of a modal dialog that appears when the user tries to log out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated.")
+    }
+    
+    static func Psicash_account_logged_out_complete() -> String {
+        return NSLocalizedString("PSICASH_ACCOUNT_LOGOUT_COMPLETE_TITLE", tableName: nil, bundle: .main,
+                                 value: "PsiCash account logout complete.",
+                                 comment: "An alert shown when the user logs out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated.")
+    }
+    
+    static func Psicash_account_logout_failed_body() -> String {
+        return NSLocalizedString("PSICASH_ACCOUNT_LOGOUT_FAILED_BODY", tableName: nil, bundle: .main,
+                                 value: "You logout attempt failed unexpectedly. Please try restarting the application.",
+                                 comment: "Body of modal dialog shown when the user attempts to log out of their PsiCash account and an unexpected error occurs. Please don't modify the link URL.")
+    }
+    
+    @objc static func PsiCash_logout_offline_body() -> String {
+        return NSLocalizedString("PSICASH_LOGOUT_OFFLINE_BODY", tableName: nil, bundle: .main,
+                                 value: "Being connected to the Psiphon network enables a more secure PsiCash logout. Would you like to connect before logging out?",
+                                 comment: "Body of a modal dialog that appears when the user tries to log out of thier PsiCash account while not currently connected to the Psiphon network. We don't allow PsiCash network requests when not connected, so only an inferior localy-only logout is available. 'Psiphon' must not be translated/transliterated. The word 'PsiCash' must not be translated or transliterated.")
+    }
+    
+    static func Psicash_login_bad_request_error_body() -> String {
+        return NSLocalizedString("PSICASH_LOGIN_BAD_REQUEST_ERROR_BODY", tableName: nil, bundle: .main,
+                                 value: "The PsiCash server indicated that the login request was invalid. Please try again later.",
+                                 comment: "Body text of a modal dialog shown when a PsiCash account login fails due to a 'bad request' error. The word 'PsiCash' must not be translated or transliterated.")
+    }
+    
+    static func Psicash_login_server_error_body() -> String {
+        return NSLocalizedString("PSICASH_LOGIN_SERVER_ERROR_BODY", tableName: nil, bundle: .main,
+                                 value: "The PsiCash server responded with an error while trying to log you in. Please try again later.",
+                                 comment: "Body text of a modal dialog shown when a PsiCash account login fails due to a server error. The word 'PsiCash' must not be translated or transliterated.")
+    }
+    
+    static func Psicash_login_catastrophic_error_body() -> String {
+        return NSLocalizedString("PSICASH_LOGIN_CATASTROPHIC_ERROR_BODY", tableName: nil, bundle: .main,
+                                 value: "Your PsiCash login attempt failed unexpectedly.",
+                                 comment: "Body text of a modal dialog shown when a PsiCash login fails without a specific reason. The word 'PsiCash' must not be translated or transliterated.")
+    }
+    
     static func Encourage_psicash_account_creation() -> String {
         // TODO: Localize
         return "We strongly encourage you to make a PsiCash account. Having an account allows you to share your balance between devices and protect your purchases."
@@ -427,22 +463,10 @@ extension UserStrings {
                                  comment: "Generic alert shown when purchase of a product fails.")
     }
     
-    static func Create_your_PsiCash_account() -> String {
-        return NSLocalizedString("CREATE_PSICASH_YOUR_ACCOUNT", tableName: nil, bundle: Bundle.main,
-                                 value: "Create your PsiCash account",
-                                 comment: "Title label next to a button that lets users create a PsiCash account. Do not translate or transliterate 'PsiCash'")
-    }
-    
     static func Create_new_account_button_title() -> String {
         return NSLocalizedString("CREATE_NEW_ACCOUNT_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
                                  value: "Create New Account",
                                  comment: "Button label that lets users create a new account.")
-    }
-    
-    static func Sign_up() -> String {
-        return NSLocalizedString("SIGN_UP_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
-                                 value: "Sign Up",
-                                 comment: "Title on a button that lets users sign up for an account")
     }
     
     static func Log_in() -> String {

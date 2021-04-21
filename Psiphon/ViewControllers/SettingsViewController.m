@@ -388,7 +388,7 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
     }
     
     UIAlertController *alert = [UIAlertController
-                                alertControllerWithTitle:[UserStrings Logout]
+                                alertControllerWithTitle:[UserStrings Psicash_account_logout_title]
                                 message:message
                                 preferredStyle:UIAlertControllerStyleActionSheet];
     

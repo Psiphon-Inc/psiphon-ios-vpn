@@ -28,7 +28,7 @@ extension PsiCashRequestError: LocalizedUserDescription where ErrorStatus: Local
         switch self {
         case .errorStatus(let errorStatus):
             return errorStatus.localizedUserDescription
-        case .requestFailed(let psiCashLibError):
+        case .requestCatastrophicFailure(let psiCashLibError):
             return psiCashLibError.localizedDescription
         }
     }
