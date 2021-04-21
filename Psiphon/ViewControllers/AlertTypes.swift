@@ -59,6 +59,9 @@ enum PsiCashAccountAlert: Hashable {
     case tunnelNotConnectedAlert
     
     case accountLogoutCatastrophicFailureAlert
+    
+    // PsiCash Account tokens expired
+    case accountTokensExpiredAlert
 }
 
 enum DisallowedTrafficAlertAction: Equatable {
@@ -181,6 +184,16 @@ extension UIAlertController {
                 return .makeAlert(
                     title: UserStrings.Psicash_account_logout_title(),
                     message: UserStrings.Psicash_account_logout_failed_body(),
+                    actions: [
+                        .dismissButton {
+                            onActionButtonTapped(alertEvent, .dismissTapped)
+                        }
+                    ])
+                
+            case .accountTokensExpiredAlert:
+                return .makeAlert(
+                    title: UserStrings.Psicash_account(),
+                    message: UserStrings.Psicash_account_tokens_expired_body(),
                     actions: [
                         .dismissButton {
                             onActionButtonTapped(alertEvent, .dismissTapped)

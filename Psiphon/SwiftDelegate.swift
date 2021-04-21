@@ -809,7 +809,88 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     store!.send(.mainViewAction(.presentAlert(alertEvent)))
                 }
             }
+        
+        
+        // TODO: Replace with tuple once equatable synthesis for tuples is added to Swift.
+        struct _TokensExpiredData: Equatable {
+            let pendingAccountLoginLogout: PsiCashState.PendingAccountLoginLogoutEvent
+            let accountType: PsiCashAccountType
+        }
+        
+        // Scans PsiCash libdata for when the login expires (i.e. token expiring),
+        // alerting the user if state transitioned from having tokens
+        // into logged out state.
+        self.lifetime += self.store.$value.signalProducer
+            .map(\.psiCash)
+            .skipRepeats()  // Reduces number of redundant items downstream.
+            .map {
+                _TokensExpiredData(
+                    pendingAccountLoginLogout: $0.pendingAccountLoginLogout,
+                    accountType: $0.libData.accountType
+                )
+            }
+            .skipRepeats()
+            .scan(nil) { (prvCombined, cur) -> (_TokensExpiredData, Date?)? in
+                
+                // The goal is to scan upstream signal for the last two values emitted.
+                // Since RxSwift doens't have a buffer operator, the returned tuple's
+                // first element is always `cur`, and second element is to be used downstream,
+                // and ignroed by this scan operator.
+                let prv = prvCombined?.0
+                
+                // If we are newly transitioning into a logged out state, let the user know
+                guard
+                    case .account(loggedIn: false) = cur.accountType,
+                    case .account(loggedIn: true) = prv?.accountType
+                else {
+                    return (cur, nil)
+                }
+                
+                // Either the user just logged out manually or our tokens expired
+                switch cur.pendingAccountLoginLogout {
+                
+                case .some(let loginLogoutEvent):
+                    
+                    switch loginLogoutEvent.wrapped {
+                    
+                    case .pending(.logout),
+                         .completed(.right(_)):
+                        // User is logging out or has logged out manually.
+                        return (cur, nil)
+                        
+                    case .pending(.login):
+                        // Tokens expired just as we're logging in
+                        // (highly unlikely event which depends on psicash lib implementation).
+                        return (cur, nil)
+                        
+                    case .completed(.left(_)):
+                        // Going to logged out state after being logged in.
+                        return (cur, loginLogoutEvent.date)
+                    }
+                    
+                case .none:
+                    // User has not logged out manually.
+                    
+                    let date = prvCombined?.1 ?? Date() // Date events should be unique for each
+                                                        // unique event.
+                    return (cur, date)
+                    
+                }
+                
+            }
+            .map {
+                $0?.1 // `Date?` field
+            }
+            .startWithValues { [unowned store] maybeAccountTokenExpired in
+                guard let date = maybeAccountTokenExpired else {
+                    return
+                }
+                let alertEvent = AlertEvent(.psiCashAccountAlert(.accountTokensExpiredAlert),
+                                            date: date)
+                store!.send(.mainViewAction(.presentAlert(alertEvent)))
+            }
 
+        
         if Debugging.printAppState {
 
             self.lifetime += self.store.$value.signalProducer
