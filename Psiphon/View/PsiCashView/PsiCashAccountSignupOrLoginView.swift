@@ -20,12 +20,7 @@
 import Foundation
 import UIKit
 
-final class PsiCashAccountLogInView: UIView, Bindable {
-    
-    enum Message: Equatable {
-        case signUp
-        case signUpOrLogIn
-    }
+final class PsiCashAccountSignupOrLoginView: UIView {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -33,12 +28,14 @@ final class PsiCashAccountLogInView: UIView, Bindable {
     
     private let title: UILabel
     private let button: GradientButton
-    private var message: Message? = nil
     
     init() {
-        title = UILabel.make(fontSize: .normal,
-                             typeface: .bold,
-                             numberOfLines: 0)
+        
+        title = UILabel.make(
+            text: UserStrings.Psicash_account(),
+            fontSize: .normal,
+            typeface: .bold,
+            numberOfLines: 0)
         
         button = GradientButton(gradient: .grey)
         super.init(frame: .zero)
@@ -49,6 +46,7 @@ final class PsiCashAccountLogInView: UIView, Bindable {
         backgroundColor = .white(withAlpha: 0.42)
         
         mutate(button) {
+            $0.setTitle(UserStrings.Sign_up_or_log_in(), for: .normal)
             $0.setTitleColor(.darkBlue(), for: .normal)
             $0.titleLabel?.font = UIFont.avenirNextBold(CGFloat(FontSize.h3.rawValue))
             $0.contentEdgeInsets = Style.default.buttonMinimumContentEdgeInsets
@@ -77,23 +75,6 @@ final class PsiCashAccountLogInView: UIView, Bindable {
     
     func onLogInTapped(_ handler: @escaping () -> Void) {
         button.setEventHandler(handler)
-    }
-    
-    func bind(_ newValue: Message) {
-        guard message != newValue else {
-            return
-        }
-        
-        switch newValue {
-        case .signUp:
-            self.title.text = UserStrings.Create_your_PsiCash_account()
-            self.button.setTitle(UserStrings.Sign_up(), for: .normal)
-            
-        case .signUpOrLogIn:
-            self.title.text = UserStrings.Psicash_account()
-            self.button.setTitle(UserStrings.Sign_up_or_log_in(), for: .normal)
-        }
-        
     }
     
 }
