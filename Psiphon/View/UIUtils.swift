@@ -38,6 +38,12 @@ struct Styling {
     var cornerRadius: CGFloat = 8.0
     var padding: CGFloat = 15.0
     var largePadding: CGFloat = 20.0
+
+    /// Offset for negative space at the bottom of screen.
+    /// This is useful for scroll views, where last items might
+    /// be too close to the bottom edge of the screen.
+    var screenBottomOffset: CGFloat = 40.0
+
     var buttonHeight: CGFloat = 44.0
     var largeButtonHeight: CGFloat = 60.0
     var statusBarStyle = UIStatusBarStyle.lightContent
