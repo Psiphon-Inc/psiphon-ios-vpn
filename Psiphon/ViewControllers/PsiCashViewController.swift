@@ -311,7 +311,7 @@ final class PsiCashViewController: ReactiveViewController {
 
                 // PsiCash account type
                 switch observed.readerState.psiCash.libData.accountType {
-                case .none:
+                case .noTokens:
                     self.balanceViewWrapper.view.isHidden = true
                     self.tabControl.view.isHidden = true
                     self.signupOrLogInView.isHidden = true

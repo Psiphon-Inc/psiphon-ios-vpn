@@ -48,7 +48,7 @@ struct SettingsViewModel: Equatable {
             return true
         case .account(loggedIn: false),
              .tracker,
-             .none:
+             .noTokens:
             return false
         }
     }

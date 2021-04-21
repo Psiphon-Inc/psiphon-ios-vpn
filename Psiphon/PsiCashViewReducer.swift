@@ -119,7 +119,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
         // to confirm whether they would like to make an account,
         // or continue the purchase without an account.
         switch state.psiCashAccountType {
-        case .none:
+        case .noTokens:
             return [
                 environment.feedbackLogger.log(
                     .error, "not allowed to make a purchase without PsiCash tokens").mapNever()
