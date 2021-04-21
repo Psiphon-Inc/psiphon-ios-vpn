@@ -101,7 +101,7 @@ fileprivate func modifyLandingPagePendingObtainingToken(
 ) -> Effect<URL> {
     psiCashAccountTypeSignal
         .map {
-            $0 != .none
+            $0 != .noTokens
         }
         .falseIfNotTrue(within: PsiCashHardCodedValues.getEarnerTokenTimeout)
         .flatMap(.latest) { hasTokens -> SignalProducer<URL, Never> in

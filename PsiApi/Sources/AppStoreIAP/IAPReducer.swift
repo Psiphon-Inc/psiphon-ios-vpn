@@ -154,7 +154,7 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
             }
             
             // PsiCash IAP requires presence of PsiCash spender token.
-            guard state.psiCashAccountType != .none else {
+            guard state.psiCashAccountType != .noTokens else {
                 
                 state.iap.purchasing[product.type] = IAPPurchasing(
                     productType: product.type,

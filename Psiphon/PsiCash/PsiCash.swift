@@ -115,7 +115,7 @@ final class PsiCash {
     var accountType: PsiCashAccountType {
         switch (hasTokens: self.client.hasTokens(), isAccount: self.client.isAccount()) {
         case (false, false):
-            return .none
+            return .noTokens
         case (true, false):
             return .tracker
         case (false, true):
