@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>StringsTable</key>
+	<string>Root</string>
+	<key>PreferenceSpecifiers</key>
+	<array>
+		<dict>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>Key</key>
+			<string>introText</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>Key</key>
+			<string>thumbs</string>
+		</dict>
+		<dict>
+			<key>Title</key>
+			<string>FEEDBACK_COMMENTS_LABEL</string>
+			<key>TitleDefault</key>
+			<string>Your Comments</string>
+			<key>TitleDescription</key>
+			<string>On the feedback screen, this is the label on the text box where the user can supply their comments that will be sent to Psiphon Inc. This text should be kept short.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>Key</key>
+			<string>comments</string>
+		</dict>
+		<dict>
+			<key>Title</key>
+			<string>FEEDBACK_EMAIL_LABEL</string>
+			<key>TitleDefault</key>
+			<string>Your Email Address</string>
+			<key>TitleDescription</key>
+			<string>On the feedback screen, this is the label on the text box where the user can supply their email address along with their feedback that will be sent to Psiphon Inc. This text should be kept short.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>Key</key>
+			<string>email</string>
+			<key>IASKPlaceholder</key>
+			<string>FEEDBACK_EMAIL_PLACEHOLDER</string>
+			<key>IASKPlaceholderDefault</key>
+			<string>Where can we respond to you?</string>
+			<key>IASKPlaceholderDescription</key>
+			<string>On the feedback screen, this is the placeholder text for the email address text field. This text should be kept short.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>KeyboardType</key>
+			<string>EmailAddress</string>
+			<key>AutocorrectionType</key>
+			<string>No</string>
+		</dict>
+		<dict>
+			<key>Title</key>
+			<string>FEEDBACK_DIAGNOSTIC_DATA_SECTION</string>
+			<key>TitleDefault</key>
+			<string>Diagnostic Data</string>
+			<key>TitleDescription</key>
+			<string>On the feedback screen, this is the label above the "Upload diagnostic data" option. This text should be kept short.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>DefaultValue</key>
+			<true/>
+			<key>Key</key>
+			<string>sendDiagnostics</string>
+			<key>Title</key>
+			<string>FEEDBACK_DIAGNOSTIC_DATA_LABEL</string>
+			<key>TitleDefault</key>
+			<string>Upload diagnostic data</string>
+			<key>TitleDescription</key>
+			<string>On the feedback screen, this is the label for the option that causes some diagnostic data to be send along with the feedback. The diagnostic data is stuff like OS version, app configuration, and logs indicating Psiphon connection info. This text should be kept short.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>Key</key>
+			<string>footerText</string>
+		</dict>
+	</array>
+</dict>
+</plist>
