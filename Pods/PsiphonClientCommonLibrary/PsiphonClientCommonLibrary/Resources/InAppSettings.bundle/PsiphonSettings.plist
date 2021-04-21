@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>StringsTable</key>
+	<string>Root</string>
+	<key>PreferenceSpecifiers</key>
+	<array>
+		<dict>
+			<key>Title</key>
+			<string>PSIPHON_SETTINGS_TIMEOUTS_SECTION</string>
+			<key>TitleDefault</key>
+			<string>Timeouts</string>
+			<key>TitleDescription</key>
+			<string>Settings sub-group text. The group contains 'Disable timeouts'. Refers to network request timeouts. Text should be kept short.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>DefaultValue</key>
+			<false/>
+			<key>Key</key>
+			<string>disableTimeouts</string>
+			<key>Title</key>
+			<string>DISABLE_TIMEOUTS</string>
+			<key>TitleDefault</key>
+			<string>Disable timeouts</string>
+			<key>TitleDescription</key>
+			<string>Settings item text, under 'Psiphon settings'. Disabling timeouts in the Psiphon tunnel can help in really bad network conditions. Text should be kept short.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+		</dict>
+		<dict>
+			<key>Title</key>
+			<string>PSIPHON_SETTINGS_PROXY_SECTION</string>
+			<key>TitleDefault</key>
+			<string>Proxy</string>
+			<key>TitleDescription</key>
+			<string>Settings sub-group text. The group contains 'Use upstream proxy'. Text should be kept short.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>DefaultValue</key>
+			<false/>
+			<key>Key</key>
+			<string>useUpstreamProxy</string>
+			<key>Title</key>
+			<string>PSIPHON_SETTINGS_USE_UPSTREAM_LABEL</string>
+			<key>TitleDefault</key>
+			<string>Use upstream proxy</string>
+			<key>TitleDescription</key>
+			<string>Settings item text. User can configure Psiphon to a server connect through another proxy. So the proxy is 'upstream' of the client -- between the client and the server. Text should be kept short.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+		</dict>
+		<dict>
+			<key>Key</key>
+			<string>upstreamProxyHostAddress</string>
+			<key>Title</key>
+			<string>PSIPHON_SETTINGS_UPSTREAM_HOST</string>
+			<key>TitleDefault</key>
+			<string>Host address</string>
+			<key>TitleDescription</key>
+			<string>Settings item text. The host name or address for the upstream proxy. Text should be kept short.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>AutocorrectionType</key>
+			<string>No</string>
+			<key>KeyboardType</key>
+			<string>URL</string>
+			<key>IASKPlaceholder</key>
+			<string>127.0.0.1</string>
+		</dict>
+		<dict>
+			<key>Title</key>
+			<string>PSIPHON_SETTINGS_UPSTREAM_PORT</string>
+			<key>TitleDefault</key>
+			<string>Port</string>
+			<key>TitleDescription</key>
+			<string>Settings item text. The network port number for the upstream proxy. Text should be kept short.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Key</key>
+			<string>upstreamProxyPort</string>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>KeyboardType</key>
+			<string>NumberPad</string>
+			<key>AutocorrectionType</key>
+			<string>No</string>
+			<key>IASKPlaceholder</key>
+			<string>12345</string>
+		</dict>
+		<dict>
+			<key>DefaultValue</key>
+			<false/>
+			<key>Key</key>
+			<string>useProxyAuthentication</string>
+			<key>Title</key>
+			<string>PSIPHON_SETTINGS_UPSTREAM_USE_AUTH</string>
+			<key>TitleDefault</key>
+			<string>Use proxy authentication</string>
+			<key>TitleDescription</key>
+			<string>Settings item text. Some upstream proxies will require authentication (like username and password) to use. This enables that authentication. Text should be kept short.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+		</dict>
+		<dict>
+			<key>Key</key>
+			<string>proxyUsername</string>
+			<key>Title</key>
+			<string>PSIPHON_SETTINGS_UPSTREAM_AUTH_USERNAME</string>
+			<key>TitleDefault</key>
+			<string>Proxy username</string>
+			<key>TitleDescription</key>
+			<string>Settings item text for upstream proxy authentication username. Text should be kept short.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>AutocorrectionType</key>
+			<string>No</string>
+			<key>IASKPlaceholder</key>
+			<string>PSIPHON_SETTINGS_UPSTREAM_AUTH_USERNAME_PLACEHOLDER</string>
+			<key>IASKPlaceholderDefault</key>
+			<string>username</string>
+			<key>IASKPlaceholderDescription</key>
+			<string>Placeholder text for the upstream proxy authentication username. Text should be kept short.</string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>IsSecure</key>
+			<true/>
+			<key>Title</key>
+			<string>PSIPHON_SETTINGS_UPSTREAM_AUTH_PASSWORD</string>
+			<key>TitleDefault</key>
+			<string>Proxy password</string>
+			<key>TitleDescription</key>
+			<string>Settings item text for upstream proxy authentication password. Text should be kept short.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Key</key>
+			<string>proxyPassword</string>
+			<key>IASKPlaceholder</key>
+			<string>PSIPHON_SETTINGS_UPSTREAM_AUTH_PASSWORD_PLACEHOLDER</string>
+			<key>IASKPlaceholderDefault</key>
+			<string>password</string>
+			<key>IASKPlaceholderDescription</key>
+			<string>Placeholder text for the upstream proxy authentication password. Text should be kept short.</string>
+		</dict>
+		<dict>
+			<key>Key</key>
+			<string>proxyDomain</string>
+			<key>Title</key>
+			<string>PSIPHON_SETTINGS_UPSTREAM_AUTH_DOMAIN</string>
+			<key>TitleDefault</key>
+			<string>Proxy domain</string>
+			<key>TitleDescription</key>
+			<string>Settings item text for upstream proxy authentication domain. Text should be kept short.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>AutocorrectionType</key>
+			<string>No</string>
+			<key>IASKPlaceholder</key>
+			<string>EXAMPLE_HOSTNAME</string>
+			<key>IASKPlaceholderDefault</key>
+			<string>example.com</string>
+			<key>IASKPlaceholderDescription</key>
+			<string>Placeholder text for the upstream proxy authentication domain. This should convey to the user that a domain name should be used in this field. Text should be kept short.</string>
+		</dict>
+		<dict>
+			<key>File</key>
+			<string>CustomHeaders</string>
+			<key>Key</key>
+			<string>setUpstreamProxyCustomHeaders</string>
+			<key>Title</key>
+			<string>PSIPHON_CUSTOM_HEADERS_SUBSETTINGS_LABEL</string>
+			<key>TitleDefault</key>
+			<string>Custom HTTP headers</string>
+			<key>TitleDescription</key>
+			<string>Settings item text. Leads to settings specific to the custom headers.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Type</key>
+			<string>PSChildPaneSpecifier</string>	
+		</dict>
+		<dict>
+			<key>Title</key>
+			<string>LOGS</string>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>Key</key>
+			<string>logs</string>
+		</dict>
+	</array>
+</dict>
+</plist>

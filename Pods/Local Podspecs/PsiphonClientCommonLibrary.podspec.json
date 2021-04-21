@@ -1,0 +1,33 @@
+{
+  "name": "PsiphonClientCommonLibrary",
+  "version": "4.0.5",
+  "summary": "Psiphon iOS Shared Client Library.",
+  "description": "A shared library that encapsulates common client code used across different Psiphon iOS apps.",
+  "homepage": "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library",
+  "license": {
+    "type": "GPLv3",
+    "file": "LICENSE"
+  },
+  "authors": {
+    "Psiphon Inc.": "info@psiphon.ca"
+  },
+  "source": {
+    "git": "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git",
+    "tag": "4.0.5"
+  },
+  "platforms": {
+    "ios": "8.0"
+  },
+  "source_files": "PsiphonClientCommonLibrary/Classes/**/*",
+  "resource_bundles": {
+    "PsiphonClientCommonLibrary": [
+      "PsiphonClientCommonLibrary/Resources/**/*"
+    ]
+  },
+  "public_header_files": "PsiphonClientCommonLibrary/Classes/**/*.h",
+  "dependencies": {
+    "InAppSettingsKit": [
+      "2.15"
+    ]
+  }
+}
