@@ -94,7 +94,7 @@ final class PsiCashViewController: ReactiveViewController {
     private var hStack: UIStackView
     
     private let tabControl = TabControlViewWrapper<PsiCashScreenTab>()
-    private let logInView = PsiCashAccountLogInView()
+    private let signupOrLogInView = PsiCashAccountSignupOrLoginView()
     
     
     private let container: ContainerViewType
@@ -159,7 +159,7 @@ final class PsiCashViewController: ReactiveViewController {
         
         super.init(onDismissed: onDismissed)
         
-        self.logInView.onLogInTapped { [unowned self] in
+        self.signupOrLogInView.onLogInTapped { [unowned self] in
             // Last minute check for tunnel status.
             if case .success(.connected) = tunnelConnectedSignal.first() {
                 self.store.send(.mainViewAction(.psiCashViewAction(.signupOrLoginTapped)))
@@ -290,7 +290,7 @@ final class PsiCashViewController: ReactiveViewController {
                 // There is not PsiCash state or subscription state is unknown.
                 self.balanceViewWrapper.view.isHidden = true
                 self.tabControl.view.isHidden = true
-                self.logInView.isHidden = true
+                self.signupOrLogInView.isHidden = true
                 self.containerBindable.bind(
                     .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
                 )
@@ -300,7 +300,7 @@ final class PsiCashViewController: ReactiveViewController {
                 // User is subscribed. Only shows the PsiCash balance.
                 self.balanceViewWrapper.view.isHidden = false
                 self.tabControl.view.isHidden = true
-                self.logInView.isHidden = true
+                self.signupOrLogInView.isHidden = true
                 self.balanceViewWrapper.bind(observed.readerState.psiCashBalanceViewModel)
                 self.containerBindable.bind(
                     .left(.right(.right(.right(.right(.userSubscribed)))))
@@ -314,7 +314,7 @@ final class PsiCashViewController: ReactiveViewController {
                 case .none:
                     self.balanceViewWrapper.view.isHidden = true
                     self.tabControl.view.isHidden = true
-                    self.logInView.isHidden = true
+                    self.signupOrLogInView.isHidden = true
                     self.containerBindable.bind(
                         .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
                     )
@@ -326,8 +326,7 @@ final class PsiCashViewController: ReactiveViewController {
                     self.balanceViewWrapper.view.isHidden = true
                     self.tabControl.view.isHidden = true
 
-                    self.logInView.isHidden = false
-                    self.logInView.bind(.signUpOrLogIn)
+                    self.signupOrLogInView.isHidden = false
 
                     self.containerBindable.bind(
                         .left(.right(.right(.right(.right(.signupOrLoginToPsiCash)))))
@@ -347,17 +346,16 @@ final class PsiCashViewController: ReactiveViewController {
                 switch observed.tunneled {
                 case .connecting, .disconnecting:
                     self.tabControl.view.isHidden = true
-                    self.logInView.isHidden = true
+                    self.signupOrLogInView.isHidden = true
                     
                 case .connected, .notConnected:
                     self.tabControl.view.isHidden = false
                     
                     if case .tracker = observed.readerState.psiCash.libData.accountType {
                         // LogIn button is displayed to encourage the user to login.
-                        self.logInView.isHidden = false
-                        self.logInView.bind(.signUp)
+                        self.signupOrLogInView.isHidden = false
                     } else {
-                        self.logInView.isHidden = true
+                        self.signupOrLogInView.isHidden = true
                     }
                 }
                 
@@ -544,7 +542,7 @@ final class PsiCashViewController: ReactiveViewController {
         }
         
         hStack.addArrangedSubviews(
-            logInView,
+            signupOrLogInView,
             tabControl.view,
             containerView
         )
@@ -580,7 +578,7 @@ final class PsiCashViewController: ReactiveViewController {
         self.balanceViewWrapper.view.setContentHuggingPriority(
             higherThan: self.hStack, for: .vertical)
         
-        self.logInView.setContentHuggingPriority(
+        self.signupOrLogInView.setContentHuggingPriority(
             higherThan: self.hStack, for: .vertical)
         
         self.closeButton.activateConstraints {
