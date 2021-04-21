@@ -129,8 +129,8 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
             }
             
             UISceneSizeRestrictions *sizeRestrictions = self.window.windowScene.sizeRestrictions;
-            sizeRestrictions.maximumSize = CGSizeMake(414, 736);
-            sizeRestrictions.minimumSize = CGSizeMake(414, 736);
+            sizeRestrictions.maximumSize = CGSizeMake(468, 736);
+            sizeRestrictions.minimumSize = CGSizeMake(468, 736);
             
         }
 
