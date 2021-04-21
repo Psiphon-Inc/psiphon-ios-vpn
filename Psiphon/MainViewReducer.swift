@@ -250,7 +250,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
 
             let alertType: AlertType = alertEvent.wrapped
             switch alertType {
-            case .psiCashAccountAlert(.loginSuccessAlert(lastTrackerMerge: _)):
+            case .psiCashAccountAlert(.loginSuccessLastTrackerMergeAlert):
                 // Dismisses PsiCashAccountViewController if it is top of the stack.
                 return [
                     .fireAndForget {

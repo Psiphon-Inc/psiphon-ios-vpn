@@ -451,7 +451,7 @@ final class PsiCash {
             }
             
         } transformFailure: {
-            return .failure(.requestFailed($0))
+            return .failure(.requestCatastrophicFailure($0))
         }
         
     }
@@ -540,7 +540,7 @@ final class PsiCash {
             }
             
         } transformFailure: {
-            return .failure(.requestFailed($0))
+            return .failure(.requestCatastrophicFailure($0))
         }
     }
     
@@ -629,7 +629,7 @@ final class PsiCash {
                 }
                 
             } transformFailure: {
-                return .failure(.requestFailed($0))
+                return .failure(.requestCatastrophicFailure($0))
             }
         }
         
