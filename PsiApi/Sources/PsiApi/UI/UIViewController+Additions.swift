@@ -30,6 +30,13 @@ public extension UIViewController {
         animated flag: Bool,
         viewDidAppearHandler: (() -> Void)? = nil
     ) -> Bool {
+        
+        // Guards against presenting a view controller, from a view controller
+        // that is being dismissed.
+        guard !self.isBeingDismissed else {
+            return false
+        }
+        
         self.present(viewControllerToPresent, animated: flag, completion: viewDidAppearHandler)
 
         // `isBeingPresented` value here is interpreted as meaning that
