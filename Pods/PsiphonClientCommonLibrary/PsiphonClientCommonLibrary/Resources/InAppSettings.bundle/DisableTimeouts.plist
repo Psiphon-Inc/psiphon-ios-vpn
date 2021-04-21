@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+	<dict>
+		<key>StringsTable</key>
+		<string>Root</string>
+		<key>PreferenceSpecifiers</key>
+		<array>
+			<dict>
+				<key>Type</key>
+				<string>PSGroupSpecifier</string>
+				<key>FooterText</key>
+				<string>CONNECTION_HELP_DISABLE_TIMEOUTS_FOOTER</string>
+				<key>FooterTextDefault</key>
+				<string>Disabling timeouts may help you stay connected on slower networks.</string>
+				<key>FooterTextDescription</key>
+				<string>Explanatory text for the "Disable Timeouts" setting on the "My connection is bad, help!" settings page.</string>
+				<key>BundleTable</key>
+				<string>PsiphonClientCommonLibrary</string>
+			</dict>
+			<dict>
+				<key>DefaultValue</key>
+				<false/>
+				<key>Key</key>
+				<string>disableTimeouts</string>
+				<key>Title</key>
+				<string>DISABLE_TIMEOUTS</string>
+				<key>TitleDefault</key>
+				<string>Disable timeouts</string>
+				<key>TitleDescription</key>
+				<string>Settings item text, under 'Psiphon settings'. Disabling timeouts in the Psiphon tunnel can help in really bad network conditions. Text should be kept short.</string>
+				<key>BundleTable</key>
+				<string>PsiphonClientCommonLibrary</string>
+				<key>Type</key>
+				<string>PSToggleSwitchSpecifier</string>
+			</dict>
+		</array>
+	</dict>
+</plist>
