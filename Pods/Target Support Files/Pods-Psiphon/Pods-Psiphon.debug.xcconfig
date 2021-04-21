@@ -1,0 +1,15 @@
+ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES
+CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = NO
+GCC_PREPROCESSOR_DEFINITIONS = $(inherited) COCOAPODS=1
+HEADER_SEARCH_PATHS = $(inherited) "${PODS_ROOT}/Headers/Public" "${PODS_ROOT}/Headers/Public/InAppSettingsKit" "${PODS_ROOT}/Headers/Public/MBProgressHUD" "${PODS_ROOT}/Headers/Public/PsiphonClientCommonLibrary" "${PODS_ROOT}/Headers/Public/ReactiveObjC" "${PODS_ROOT}/Headers/Public/SVProgressHUD"
+LIBRARY_SEARCH_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/EFCountingLabel" "${PODS_CONFIGURATION_BUILD_DIR}/InAppSettingsKit" "${PODS_CONFIGURATION_BUILD_DIR}/MBProgressHUD" "${PODS_CONFIGURATION_BUILD_DIR}/PsiphonClientCommonLibrary" "${PODS_CONFIGURATION_BUILD_DIR}/ReactiveObjC" "${PODS_CONFIGURATION_BUILD_DIR}/SVProgressHUD"
+OTHER_CFLAGS = $(inherited) -fmodule-map-file="${PODS_CONFIGURATION_BUILD_DIR}/EFCountingLabel/EFCountingLabel.modulemap" -fmodule-map-file="${PODS_ROOT}/Headers/Public/InAppSettingsKit/InAppSettingsKit.modulemap" -fmodule-map-file="${PODS_ROOT}/Headers/Public/MBProgressHUD/MBProgressHUD.modulemap" -fmodule-map-file="${PODS_ROOT}/Headers/Public/PsiphonClientCommonLibrary/PsiphonClientCommonLibrary.modulemap" -fmodule-map-file="${PODS_ROOT}/Headers/Public/ReactiveObjC/ReactiveObjC.modulemap" -fmodule-map-file="${PODS_ROOT}/Headers/Public/SVProgressHUD/SVProgressHUD.modulemap"
+OTHER_LDFLAGS = $(inherited) -ObjC -l"EFCountingLabel" -l"InAppSettingsKit" -l"MBProgressHUD" -l"PsiphonClientCommonLibrary" -l"ReactiveObjC" -l"SVProgressHUD" -framework "CoreGraphics" -framework "Foundation" -framework "MessageUI" -framework "QuartzCore" -framework "UIKit"
+OTHER_SWIFT_FLAGS = $(inherited) -D COCOAPODS -Xcc -fmodule-map-file="${PODS_CONFIGURATION_BUILD_DIR}/EFCountingLabel/EFCountingLabel.modulemap" -Xcc -fmodule-map-file="${PODS_ROOT}/Headers/Public/InAppSettingsKit/InAppSettingsKit.modulemap" -Xcc -fmodule-map-file="${PODS_ROOT}/Headers/Public/MBProgressHUD/MBProgressHUD.modulemap" -Xcc -fmodule-map-file="${PODS_ROOT}/Headers/Public/PsiphonClientCommonLibrary/PsiphonClientCommonLibrary.modulemap" -Xcc -fmodule-map-file="${PODS_ROOT}/Headers/Public/ReactiveObjC/ReactiveObjC.modulemap" -Xcc -fmodule-map-file="${PODS_ROOT}/Headers/Public/SVProgressHUD/SVProgressHUD.modulemap"
+PODS_BUILD_DIR = ${BUILD_DIR}
+PODS_CONFIGURATION_BUILD_DIR = ${PODS_BUILD_DIR}/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)
+PODS_PODFILE_DIR_PATH = ${SRCROOT}/.
+PODS_ROOT = ${SRCROOT}/Pods
+PODS_XCFRAMEWORKS_BUILD_DIR = $(PODS_CONFIGURATION_BUILD_DIR)/XCFrameworkIntermediates
+SWIFT_INCLUDE_PATHS = $(inherited) "${PODS_CONFIGURATION_BUILD_DIR}/EFCountingLabel"
+USE_RECURSIVE_SCRIPT_INPUTS_IN_SCRIPT_PHASES = YES

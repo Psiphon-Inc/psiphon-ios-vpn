@@ -1,0 +1,6 @@
+module Pods_Psiphon {
+  umbrella header "Pods-Psiphon-umbrella.h"
+
+  export *
+  module * { export * }
+}
