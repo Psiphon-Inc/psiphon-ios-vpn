@@ -377,6 +377,12 @@ import Foundation
                                  comment: "Body text of a modal dialog shown when a PsiCash login fails without a specific reason. The word 'PsiCash' must not be translated or transliterated.")
     }
     
+    static func Psicash_account_tokens_expired_body() -> String {
+        return NSLocalizedString("PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY", tableName: nil, bundle: .main,
+                                 value: "PsiCash login expired. Please log back in.",
+                                 comment: "An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated.")
+    }
+    
     static func Encourage_psicash_account_creation() -> String {
         // TODO: Localize
         return "We strongly encourage you to make a PsiCash account. Having an account allows you to share your balance between devices and protect your purchases."
