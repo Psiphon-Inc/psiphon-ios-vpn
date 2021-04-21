@@ -147,33 +147,50 @@ final class PsiCashAccountViewController: ReactiveViewController {
                 self.updateNoPendingLoginEvent()
                 return
             
-            case .some(let pendingAccountLoginEvent):
+            case .some(let accountLoginEvent):
 
                 defer {
-                    self.lastLoginLogoutEventDate = pendingAccountLoginEvent.date
+                    self.lastLoginLogoutEventDate = accountLoginEvent.date
                 }
                 
                 guard let lastLoginEventDate = self.lastLoginLogoutEventDate else {
                     fatalError()
                 }
                 
-                switch pendingAccountLoginEvent.wrapped {
+                switch accountLoginEvent.wrapped {
                 case .pending(.login):
                     self.updatePendingLoginEvent()
                 
-                case .completed(.left(_)):
+                case .completed(.left(let completedLogin)):
                     // Login event completed.
                     
-                    guard pendingAccountLoginEvent.date > lastLoginEventDate else {
+                    switch completedLogin {
+                    case .success(_):
+                        
+                        guard accountLoginEvent.date >= viewControllerDidLoadDate else {
+                            // It is an error to present this view controller,
+                            // if the user is already logged in.
+                            fatalError("already logged in")
+                        }
+                        
+                        // In case of lastTrackerMerge, an alert should be displayed.
+                        // This is currently handled outside of this view controller
+                        // (SwiftDelegate.swift).
+                        
+                        // Login was successful, dismisses this view controller.
+                        self.dismiss(animated: true, completion: nil)
+                        
+                    case .failure(_):
+                        
+                        // Login failure (either before or after presentation
+                        // of this view controller).
                         self.updateNoPendingLoginEvent()
-                        return
+                        
                     }
-                    
-                    self.updateNoPendingLoginEvent()
                     
                 case .pending(.logout), .completed(.right(_)):
                     
-                    guard pendingAccountLoginEvent.date > lastLoginEventDate else {
+                    guard accountLoginEvent.date > lastLoginEventDate else {
                         self.updateNoPendingLoginEvent()
                         return
                     }
