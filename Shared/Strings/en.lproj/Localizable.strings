@@ -63,6 +63,12 @@
 /* Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
 "DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
 
+/* Appears in the notification area when Psiphon disallows some non-web internet traffic. The user needs to purchase Speed Boost or subscription in order to full app compatibilty and more speed. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"DISALLOWED_TRAFFIC_NOTIFICATION_BODY_V2" = "Activate Speed Boost or Psiphon subscription to unlock the full potential of your Psiphon experience.";
+
+/* Appears in the notification area when Psiphon disallows some non-web internet traffic. The user needs to purchase Speed Boost or subscription in order to full app compatibilty and more speed. */
+"DISALLOWED_TRAFFIC_NOTIFICATION_TITLE_V2" = "Apps not working?";
+
 /* Text next to the button indicating to the user that the rewarded video advertisement is only available when they are not connected to Psiphon. Do not translate or transliterate 'PsiCash'. Do not translate or transliterate 'Psiphon'. */
 "DISCONNECT_TO_WATCH_AND_EARN_PSICASH" = "You must disconnect from Psiphon to watch a video to earn PsiCash";
 
@@ -113,12 +119,6 @@
 
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
 "NO_PRODUCTS_TEXT_2" = "Could not retrieve subscriptions from the App Store. Please try again later.";
-
-/* Content of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
-"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" = "Apps not working? Tap here to improve your Psiphon experience!";
-
-/* Title of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
-"NOTIFICATION_TITLE_UPGRADE_PSIPHON" = "Upgrade Psiphon";
 
 /* Alert OK Button */
 "OK_BUTTON" = "OK";
