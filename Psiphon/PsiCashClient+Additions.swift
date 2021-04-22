@@ -221,3 +221,34 @@ extension PsiCashEffects {
     }
     
 }
+
+// MARK: Localization
+
+extension SpeedBoostProduct {
+    
+    var localizedString: String {
+        switch self.distinguisher {
+        case "1hr":
+            return UserStrings.Speed_boost_1_hour()
+        case "2hr":
+            return UserStrings.Speed_boost_2_hours()
+        case "3hr":
+            return UserStrings.Speed_boost_3_hours()
+        case "4hr":
+            return UserStrings.Speed_boost_4_hours()
+        case "5hr":
+            return UserStrings.Speed_boost_5_hours()
+        case "6hr":
+            return UserStrings.Speed_boost_6_hours()
+        case "7hr":
+            return UserStrings.Speed_boost_7_hours()
+        case "8hr":
+            return UserStrings.Speed_boost_8_hours()
+        case "9hr":
+            return UserStrings.Speed_boost_9_hours()
+        default:
+            return "(unsupported '\(distinguisher)')"
+        }
+    }
+        
+}
