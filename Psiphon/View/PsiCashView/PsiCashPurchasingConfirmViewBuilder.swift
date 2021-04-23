@@ -62,7 +62,7 @@ struct PsiCashPurchasingConfirmViewBuilder: ViewBuilder {
         closeButton.setEventHandler(self.closeButtonHandler)
         
         let explanation = UILabel.make(
-            text: UserStrings.Encourage_psicash_account_creation(),
+            text: UserStrings.Encourage_psicash_account_creation_body(),
             fontSize: .normal,
             typeface: .medium,
             color: .blueGrey(),
@@ -75,13 +75,13 @@ struct PsiCashPurchasingConfirmViewBuilder: ViewBuilder {
             $0.titleLabel!.apply(fontSize: .h3,
                                  typeface: .demiBold)
             $0.setTitleColor(.white, for: .normal)
-            $0.setTitle(UserStrings.Create_account(), for: .normal)
+            $0.setTitle(UserStrings.Create_or_log_into_account(), for: .normal)
             $0.setEventHandler(self.signUpButtonHandler)
         }
         
         let continueWithoutAccountButton = SwiftUIButton()
         mutate(continueWithoutAccountButton) {
-            $0.setTitle(UserStrings.Continue_without_an_account(), for: .normal)
+            $0.setTitle(UserStrings.Continue_without_account(), for: .normal)
             $0.setTitleColor(.white, for: .normal)
             $0.titleLabel!.apply(fontSize: .normal,
                                  typeface: .medium,
