@@ -96,7 +96,7 @@ extension PsiCashLibError: FeedbackDescription {}
 /// `PsiCash` is a thin wrapper around `PSIPsiCashLibWrapper`.
 /// This class is mostly concerned with translating the raw data types used by `PSIPsiCashLibWrapper`
 /// to those defined in the `PsiCashClient` module.
-final class PsiCash {
+final class PsiCashLib {
     
     private let client: PSIPsiCashLibWrapper
     private let feedbackLogger: FeedbackLogger

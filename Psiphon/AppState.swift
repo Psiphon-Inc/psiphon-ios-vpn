@@ -179,7 +179,7 @@ func makeEnvironment(
     store: Store<AppState, AppAction>,
     feedbackLogger: FeedbackLogger,
     sharedDB: PsiphonDataSharedDB,
-    psiCashClient: PsiCash,
+    psiCashClient: PsiCashLib,
     psiCashFileStoreRoot: String?,
     supportedAppStoreProducts: SupportedAppStoreProducts,
     userDefaultsConfig: UserDefaultsConfig,

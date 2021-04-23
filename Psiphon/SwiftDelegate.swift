@@ -210,7 +210,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
     private var (lifetime, token) = Lifetime.make()
     private var objcBridge: ObjCBridgeDelegate!
     private var store: Store<AppState, AppAction>!
-    private var psiCashLib: PsiCash
+    private var psiCashLib: PsiCashLib
     private var environmentCleanup: (() -> Void)?
 
     // NSNotification observers
@@ -228,7 +228,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
         
         platform = Platform(ProcessInfo.processInfo)
         
-        psiCashLib = PsiCash(feedbackLogger: self.feedbackLogger, platform: platform)
+        psiCashLib = PsiCashLib(feedbackLogger: self.feedbackLogger, platform: platform)
         
     }
     
