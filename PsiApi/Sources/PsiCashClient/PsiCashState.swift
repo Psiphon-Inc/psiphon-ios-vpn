@@ -37,10 +37,14 @@ public struct PsiCashState: Equatable {
         case logout
     }
     
+    /// Represents  result of account login/logout.
+    public typealias AccountLoginLogoutCompleted =
+        Either<PsiCashEffectsProtocol.PsiCashAccountLoginResult,
+               PsiCashEffectsProtocol.PsiCashAccountLogoutResult>
+    
+    /// Represents event of logging in or logging out of PsiCash account.
     public typealias PendingAccountLoginLogoutEvent =
-        Event<PendingValue<LoginLogoutPendingValue,
-                           Either<PsiCashEffectsProtocol.PsiCashAccountLoginResult,
-                                  PsiCashEffectsProtocol.PsiCashAccountLogoutResult>>>?
+        Event<PendingValue<LoginLogoutPendingValue, AccountLoginLogoutCompleted>>
     
     public var purchasing: PsiCashPurchasingState
     
@@ -48,7 +52,7 @@ public struct PsiCashState: Equatable {
     /// `nil` if library is not initialized
     public var libData: PsiCashLibData?
     
-    public var pendingAccountLoginLogout: PendingAccountLoginLogoutEvent
+    public var pendingAccountLoginLogout: PendingAccountLoginLogoutEvent?
     public var pendingPsiCashRefresh: PendingRefresh
     
 }

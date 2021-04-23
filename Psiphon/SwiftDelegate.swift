@@ -813,8 +813,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         
         // TODO: Replace with tuple once equatable synthesis for tuples is added to Swift.
         struct _TokensExpiredData: Equatable {
-            let pendingAccountLoginLogout: PsiCashState.PendingAccountLoginLogoutEvent
-            let accountType: PsiCashAccountType?
+            // PsiCash account completed login/logout event.
+            let accountLoginLogoutCompletedEvent: Event<PsiCashState.AccountLoginLogoutCompleted>?
+            let accountType: PsiCashAccountType
         }
         
         // Scans PsiCash libdata for when the login expires (i.e. token expiring),
@@ -823,63 +824,78 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.lifetime += self.store.$value.signalProducer
             .map(\.psiCash)
             .skipRepeats()  // Reduces number of redundant items downstream.
-            .map {
-                _TokensExpiredData(
-                    pendingAccountLoginLogout: $0.pendingAccountLoginLogout,
-                    accountType: $0.libData?.accountType
-                )
+            .compactMap { psiCashState -> _TokensExpiredData? in
+                
+                // Removes PsiCash library non-initialized value (literal `nil`) from signal.
+                guard let accountType = psiCashState.libData?.accountType else {
+                    return nil
+                }
+                
+                // Removes PsiCash account pending login/logout events from signal,
+                // to simplify the state space by removing states we don't care about.
+                switch psiCashState.pendingAccountLoginLogout {
+                case .none:
+                    return _TokensExpiredData(accountLoginLogoutCompletedEvent: nil,
+                                              accountType: accountType)
+                case .some(let loginLogoutEvent):
+                    switch loginLogoutEvent.wrapped {
+                    case .pending(_):
+                        return nil
+                    case let .completed(loginLogoutCompleted):
+                        let loginLogoutCompletedEvent = Event(loginLogoutCompleted,
+                                                              date: loginLogoutEvent.date)
+                        return _TokensExpiredData(
+                            accountLoginLogoutCompletedEvent: loginLogoutCompletedEvent,
+                            accountType: accountType
+                        )
+                    }
+                }
+                
             }
-            .skipRepeats()
+            .skipRepeats()  // Scan operator below assumes that events are unique
+                            // in determining the expiry date of account token.
             .scan(nil) { (prvCombined, cur) -> (_TokensExpiredData, Date?)? in
                 
-                // The goal is to scan upstream signal for the last two values emitted.
+                // Scans upstream signal for the last two values emitted.
                 // Since RxSwift doens't have a buffer operator, the returned tuple's
                 // first element is always `cur`, and second element is to be used downstream,
                 // and ignroed by this scan operator.
-                let prv = prvCombined?.0
+                //
+                // This operator returns date of when the PsiCah account token expired.
                 
-                // If we are newly transitioning into a logged out state, let the user know
-                guard
-                    case .account(loggedIn: false) = cur.accountType,
-                    case .account(loggedIn: true) = prv?.accountType
-                else {
+                // Ignores initial nil value of `prv`, since we're interested in state change.
+                guard let prv = prvCombined?.0 else {
                     return (cur, nil)
                 }
                 
-                // Either the user just logged out manually or our tokens expired
-                switch cur.pendingAccountLoginLogout {
-                
-                case .some(let loginLogoutEvent):
-                    
-                    switch loginLogoutEvent.wrapped {
-                    
-                    case .pending(.logout),
-                         .completed(.right(_)):
-                        // User is logging out or has logged out manually.
-                        return (cur, nil)
-                        
-                    case .pending(.login):
-                        // Tokens expired just as we're logging in
-                        // (highly unlikely event which depends on psicash lib implementation).
-                        return (cur, nil)
-                        
-                    case .completed(.left(_)):
-                        // Going to logged out state after being logged in.
-                        return (cur, loginLogoutEvent.date)
-                    }
-                    
-                case .none:
-                    // User has not logged out manually.
-                    
-                    let date = prvCombined?.1 ?? Date() // Date events should be unique for each
-                                                        // unique event.
-                    return (cur, date)
-                    
+                // Ensure that events are unique.
+                guard prv != cur else {
+                    fatalError("programming error")
                 }
+                
+                // If we are newly transitioning into a logged out state due
+                // to account token expiry, let the user know
+                guard
+                    case .account(loggedIn: false) = cur.accountType,
+                    case .account(loggedIn: true) = prv.accountType,
+                    cur.accountLoginLogoutCompletedEvent == prv.accountLoginLogoutCompletedEvent
+                else {
+                    // Either the user has logged out,
+                    // or logged in (which would be a programming error).
+                    return (cur, nil)
+                }
+                
+                // User is logged out due to token expiry, because there has been
+                // no manual logout event (since `prv`), and the user cannot login if
+                // the previous state (`prv`) is logged in.
+                
+                // Unique timestamp of token expiry.
+                let tokenExpiryDate = Date()
+                return (cur, tokenExpiryDate)
                 
             }
             .map {
-                $0?.1 // `Date?` field
+                $0?.1 // `Date?` field - account token expiry date
             }
             .startWithValues { [unowned store] maybeAccountTokenExpired in
                 guard let date = maybeAccountTokenExpired else {
