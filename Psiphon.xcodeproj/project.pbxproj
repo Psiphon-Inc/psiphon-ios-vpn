@@ -144,7 +144,7 @@
 		8D778978247469FE0038BFDA /* AppInfo.h in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920620F3DA190033114B /* AppInfo.h */; };
 		8D7789B9247491CA0038BFDA /* PsiphonBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */; };
 		8D7789BD247493300038BFDA /* VPNState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789BC247493300038BFDA /* VPNState.swift */; };
-		8D7789C5247496F60038BFDA /* PsiCash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C4247496F60038BFDA /* PsiCash.swift */; };
+		8D7789C5247496F60038BFDA /* PsiCashLib.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C4247496F60038BFDA /* PsiCashLib.swift */; };
 		8D7789CA247499110038BFDA /* Reachability+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789C9247499110038BFDA /* Reachability+Additions.swift */; };
 		8D7E9B9D2425DF42006F3A2F /* AnimatedUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */; };
 		8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7E9B9E2425E053006F3A2F /* Animations.swift */; };
@@ -631,7 +631,7 @@
 		8D75EF6525265F3B00D44101 /* SpacerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpacerView.swift; sourceTree = "<group>"; };
 		8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonBundle.swift; sourceTree = "<group>"; };
 		8D7789BC247493300038BFDA /* VPNState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNState.swift; sourceTree = "<group>"; };
-		8D7789C4247496F60038BFDA /* PsiCash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCash.swift; sourceTree = "<group>"; };
+		8D7789C4247496F60038BFDA /* PsiCashLib.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashLib.swift; sourceTree = "<group>"; };
 		8D7789C9247499110038BFDA /* Reachability+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Reachability+Additions.swift"; sourceTree = "<group>"; };
 		8D7789CF2474D53D0038BFDA /* PsiphonRotatingFileFeedbackLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonRotatingFileFeedbackLogger.swift; sourceTree = "<group>"; };
 		8D7E9B9C2425DF42006F3A2F /* AnimatedUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnimatedUIView.swift; sourceTree = "<group>"; };
@@ -1162,7 +1162,7 @@
 			isa = PBXGroup;
 			children = (
 				8D417E982411954A00FEE587 /* PsiCashReducer.swift */,
-				8D7789C4247496F60038BFDA /* PsiCash.swift */,
+				8D7789C4247496F60038BFDA /* PsiCashLib.swift */,
 			);
 			path = PsiCash;
 			sourceTree = "<group>";
@@ -2141,7 +2141,7 @@
 				445F24F620E1A85D00D004E9 /* UTF8String.c in Sources */,
 				445F24ED20E1A5BA00D004E9 /* ber_tlv_tag.c in Sources */,
 				4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */,
-				8D7789C5247496F60038BFDA /* PsiCash.swift in Sources */,
+				8D7789C5247496F60038BFDA /* PsiCashLib.swift in Sources */,
 				CE84204A2522823D00796032 /* DebugDirectoryViewerViewController.m in Sources */,
 				4E10920820F3DA190033114B /* AppInfo.m in Sources */,
 				445F24EE20E1A5BA00D004E9 /* asn_codecs_prim.c in Sources */,
