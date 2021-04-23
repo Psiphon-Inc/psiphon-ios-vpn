@@ -60,11 +60,13 @@ extension TransactionUpdate {
 public struct IAPReducerState: Equatable {
     public var iap: IAPState
     public var psiCashBalance: PsiCashBalance
-    public let psiCashAccountType: PsiCashAccountType
+    public let psiCashAccountType: PsiCashAccountType?
     
-    public init(iap: IAPState,
-                psiCashBalance: PsiCashBalance,
-                psiCashAccountType: PsiCashAccountType) {
+    public init(
+        iap: IAPState,
+        psiCashBalance: PsiCashBalance,
+        psiCashAccountType: PsiCashAccountType?
+    ) {
         self.iap = iap
         self.psiCashBalance = psiCashBalance
         self.psiCashAccountType = psiCashAccountType

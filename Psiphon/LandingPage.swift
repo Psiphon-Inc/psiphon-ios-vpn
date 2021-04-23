@@ -40,7 +40,7 @@ typealias LandingPageEnvironment = (
     sharedDB: PsiphonDataSharedDB,
     urlHandler: URLHandler,
     psiCashEffects: PsiCashEffects,
-    psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType, Never>,
+    psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType?, Never>,
     mainDispatcher: MainDispatcher
 )
 
@@ -96,12 +96,12 @@ let landingPageReducer = Reducer<LandingPageReducerState
 /// If no PsiCash tokens are available, waits up to `PsiCashHardCodedValues.getEarnerTokenTimeout`
 /// for PsiCash tokens to be obtained.
 fileprivate func modifyLandingPagePendingObtainingToken(
-    url: URL, psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType, Never>,
+    url: URL, psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType?, Never>,
     psiCashEffects: PsiCashEffects
 ) -> Effect<URL> {
     psiCashAccountTypeSignal
         .map {
-            $0 != .noTokens
+            $0?.hasTokens ?? false
         }
         .falseIfNotTrue(within: PsiCashHardCodedValues.getEarnerTokenTimeout)
         .flatMap(.latest) { hasTokens -> SignalProducer<URL, Never> in

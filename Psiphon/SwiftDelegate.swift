@@ -675,23 +675,23 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // Produces a SettingsViewModel type and passes
         // the value to the ObjCBridgeDelegte.
         self.lifetime += SignalProducer.combineLatest(
-                self.store.$value.signalProducer.map(\.subscription.status).skipRepeats(),
-            self.store.$value.signalProducer.map(\.psiCash.libData.accountType).skipRepeats(),
-                self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus).skipRepeats()
-            ).map { [unowned self] in
-                
-                SettingsViewModel(
-                    subscriptionState: $0.0,
-                    psiCashAccountType: $0.1,
-                    vpnStatus: $0.2,
-                    psiCashAccountManagementURL: self.psiCashLib.getUserSiteURL(
-                        .accountManagement, platform: self.platform.current
-                    )
+            self.store.$value.signalProducer.map(\.subscription.status).skipRepeats(),
+            self.store.$value.signalProducer.map(\.psiCash.libData?.accountType).skipRepeats(),
+            self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus).skipRepeats()
+        ).map { [unowned self] in
+            
+            SettingsViewModel(
+                subscriptionState: $0.0,
+                psiCashAccountType: $0.1,
+                vpnStatus: $0.2,
+                psiCashAccountManagementURL: self.psiCashLib.getUserSiteURL(
+                    .accountManagement, platform: self.platform.current
                 )
-            }
-            .startWithValues { [unowned objcBridge] model in
-                objcBridge!.onSettingsViewModelDidChange(ObjcSettingsViewModel(model))
-            }
+            )
+        }
+        .startWithValues { [unowned objcBridge] model in
+            objcBridge!.onSettingsViewModelDidChange(ObjcSettingsViewModel(model))
+        }
 
         // Updates PsiphonDateSharedDB `ContainerAppReceiptLatestSubscriptionExpiryDate`
         // based on the app's receipt's latest subscription state.
@@ -814,7 +814,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // TODO: Replace with tuple once equatable synthesis for tuples is added to Swift.
         struct _TokensExpiredData: Equatable {
             let pendingAccountLoginLogout: PsiCashState.PendingAccountLoginLogoutEvent
-            let accountType: PsiCashAccountType
+            let accountType: PsiCashAccountType?
         }
         
         // Scans PsiCash libdata for when the login expires (i.e. token expiring),
@@ -826,7 +826,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .map {
                 _TokensExpiredData(
                     pendingAccountLoginLogout: $0.pendingAccountLoginLogout,
-                    accountType: $0.libData.accountType
+                    accountType: $0.libData?.accountType
                 )
             }
             .skipRepeats()

@@ -25,7 +25,7 @@ import PsiCashClient
 // Container for data used by `SettingsViewController`.
 struct SettingsViewModel: Equatable {
     let subscriptionState: SubscriptionStatus
-    let psiCashAccountType: PsiCashAccountType
+    let psiCashAccountType: PsiCashAccountType?
     let vpnStatus: VPNStatus
     let psiCashAccountManagementURL: URL?
 }
@@ -44,6 +44,9 @@ struct SettingsViewModel: Equatable {
     
     @objc var isPsiCashAccountLoggedIn: Bool {
         switch model.psiCashAccountType {
+        case .none:
+            // PsiCash lib not loaded.
+            return false
         case .account(loggedIn: true):
             return true
         case .account(loggedIn: false),

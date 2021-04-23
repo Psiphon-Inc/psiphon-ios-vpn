@@ -202,6 +202,10 @@ final class PsiCashViewController: ReactiveViewController {
                 return
             }
             
+            guard let psiCashLibData = observed.readerState.psiCash.libData else {
+                fatalError("PsiCash lib not loaded")
+            }
+            
             // Presents alert if rewarded video load failed.
             if case .loadFailed(let rewardedVideoLoadFailure) =
                 observed.readerState.adState.rewardedVideoAdControllerStatus {
@@ -310,7 +314,7 @@ final class PsiCashViewController: ReactiveViewController {
             case .notSubscribed:
 
                 // PsiCash account type
-                switch observed.readerState.psiCash.libData.accountType {
+                switch psiCashLibData.accountType {
                 case .noTokens:
                     self.balanceViewWrapper.view.isHidden = true
                     self.tabControl.view.isHidden = true
@@ -351,7 +355,7 @@ final class PsiCashViewController: ReactiveViewController {
                 case .connected, .notConnected:
                     self.tabControl.view.isHidden = false
                     
-                    if case .tracker = observed.readerState.psiCash.libData.accountType {
+                    if case .tracker = psiCashLibData.accountType {
                         // LogIn button is displayed to encourage the user to login.
                         self.signupOrLogInView.isHidden = false
                     } else {
@@ -445,13 +449,13 @@ final class PsiCashViewController: ReactiveViewController {
                         case .pending(let lastSuccess):
                             // Displays product list from previous retrieval.
 
-                            self.containerBindable.bind(.left(.left(.makeViewModel(purchasables: lastSuccess, accountType: observed.readerState.psiCash.libData.accountType))))
+                            self.containerBindable.bind(.left(.left(.makeViewModel(purchasables: lastSuccess, accountType: psiCashLibData.accountType))))
                             
                         case .completed(let productRequestResult):
                             // Product list retrieved from App Store.
                             switch productRequestResult {
                             case .success(let psiCashCoinProducts):
-                                self.containerBindable.bind(.left(.left(.makeViewModel(purchasables: psiCashCoinProducts, accountType: observed.readerState.psiCash.libData.accountType))))
+                                self.containerBindable.bind(.left(.left(.makeViewModel(purchasables: psiCashCoinProducts, accountType: psiCashLibData.accountType))))
                                 
                             case .failure(_):
                                 // Shows failed to load message with tap to retry button.
@@ -492,7 +496,7 @@ final class PsiCashViewController: ReactiveViewController {
                     case .none:
                         // There is no active speed boost.
                         let speedBoostPurchasables =
-                            observed.readerState.psiCash.libData.purchasePrices.compactMap {
+                            psiCashLibData.purchasePrices.compactMap {
                                 $0.successToOptional()?.speedBoost
                             }
                             .map(SpeedBoostPurchasableViewModel.init(purchasable:))

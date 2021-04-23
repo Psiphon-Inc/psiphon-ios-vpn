@@ -51,7 +51,7 @@ struct MainViewState: Equatable {
 struct MainViewReducerState: Equatable {
     var mainView: MainViewState
     let subscriptionState: SubscriptionState
-    let psiCashAccountType: PsiCashAccountType
+    let psiCashAccountType: PsiCashAccountType?
     let appLifecycle: AppLifecycle
 }
 
