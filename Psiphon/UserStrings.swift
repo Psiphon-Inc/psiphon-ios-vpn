@@ -383,19 +383,22 @@ import Foundation
                                  comment: "An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated.")
     }
     
-    static func Encourage_psicash_account_creation() -> String {
-        // TODO: Localize
-        return "We strongly encourage you to make a PsiCash account. Having an account allows you to share your balance between devices and protect your purchases."
+    static func Encourage_psicash_account_creation_body() -> String {
+        return NSLocalizedString("CREATE_PSICASH_ACCOUNT_BODY", tableName: nil, bundle: .main,
+                                 value: "We strongly encourage you to make a PsiCash account before buying PsiCash. Having an account allows you to share your balance between devices and protect your purchases.",
+                                 comment: "Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated.")
     }
 
-    static func Continue_without_an_account() -> String {
-        // TODO: Localize
-        return "Continue without an account"
+    static func Continue_without_account() -> String {
+        return NSLocalizedString("CREATE_PSICASH_ACCOUNT_CONTINUE_BUTTON", tableName: nil, bundle: .main,
+                                 value: "Continue without account",
+                                 comment: "Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will continue on to the PsiCash store.")
     }
 
-    static func Create_account() -> String {
-        // TODO: Localize
-        return "Create account"
+    static func Create_or_log_into_account() -> String {
+        return NSLocalizedString("CREATE_PSICASH_ACCOUNT_CREATE_BUTTON", tableName: nil, bundle: .main,
+                                 value: "Create or log into account",
+                                 comment: "Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will be taken to a screen where they can create an account or log into an existing one.")
     }
 
     static func Loading() -> String {
