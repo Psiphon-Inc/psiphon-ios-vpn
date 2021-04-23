@@ -56,7 +56,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
     
     case .initialize:
         
-        guard !state.psiCash.libLoaded else {
+        guard state.psiCash.libData == nil else {
             environment.feedbackLogger.fatalError("PsiCash already initialized")
             return []
         }
@@ -73,7 +73,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
 
         switch result {
         case let .success(libInitSuccess):
-            state.psiCash.initialized(libInitSuccess.libData)
+            state.psiCash.libData = libInitSuccess.libData
             state.psiCashBalance = .fromStoredExpectedReward(
                 libData: libInitSuccess.libData, persisted: environment.psiCashPersistedValues)
             
@@ -112,7 +112,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
     case .setLocale(let locale):
         
         // PsiCash Library must be initialized before setting locale.
-        guard state.psiCash.libLoaded else {
+        guard state.psiCash.libData != nil else {
             environment.feedbackLogger.fatalError("lib not loaded")
             return []
         }
@@ -125,7 +125,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
     case .buyPsiCashProduct(let purchasableType):
         
         guard
-            state.psiCash.libLoaded,
+            state.psiCash.libData != nil,
             let tunnelConnection = state.tunnelConnection,
             case .notSubscribed = state.subscription.status,
             state.psiCash.purchasing.completed
@@ -192,7 +192,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                     // Updates sharedDB with new auths, and notifies
                     // network extension of the change.
                     setSharedDBPsiCashAuthTokens(
-                        state.psiCash.libData,
+                        purchaseResult.refreshedLibData,
                         sharedDB: environment.sharedDB,
                         reconnectRequired: true,
                         notifier: environment.notifier
@@ -219,7 +219,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
     case let .refreshPsiCashState(ignoreSubscriptionState):
         
         guard
-            state.psiCash.libLoaded,
+            state.psiCash.libData != nil,
             let tunnelConnection = state.tunnelConnection,
             case .completed(_) = state.psiCash.pendingPsiCashRefresh
         else {
@@ -264,7 +264,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                 // Updates sharedDB with new auths, and notifies
                 // network extension if `reconnectRequired`.
                 setSharedDBPsiCashAuthTokens(
-                    state.psiCash.libData,
+                    refreshStateResponse.libData,
                     sharedDB: environment.sharedDB,
                     reconnectRequired: refreshStateResponse.reconnectRequired,
                     notifier: environment.notifier
@@ -294,10 +294,11 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             }
         }
         
-        guard case .account(loggedIn: _) = state.psiCash.libData.accountType else {
+        guard case .account(loggedIn: _) = state.psiCash.libData?.accountType else {
             return [
                 environment.feedbackLogger.log(.warn ,"""
-                    user is not an account: '\(String(describing: state.psiCash.libData.accountType))'
+                    user is not an account: \
+                    '\(String(describing: state.psiCash.libData?.accountType))'
                     """).mapNever()
             ]
         }
@@ -333,7 +334,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                 // Updates sharedDB with new auths, and notifies
                 // network extension if `reconnectRequired`.
                 setSharedDBPsiCashAuthTokens(
-                    state.psiCash.libData,
+                    logoutResponse.libData,
                     sharedDB: environment.sharedDB,
                     reconnectRequired: logoutResponse.reconnectRequired,
                     notifier: environment.notifier

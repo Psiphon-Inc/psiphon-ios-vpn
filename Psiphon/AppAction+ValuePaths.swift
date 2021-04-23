@@ -218,7 +218,7 @@ extension AppState {
             IAPReducerState(
                 iap: self.iapState,
                 psiCashBalance: self.psiCashBalance,
-                psiCashAccountType: self.psiCash.libData.accountType
+                psiCashAccountType: self.psiCash.libData?.accountType
             )
         }
         set {
@@ -293,7 +293,7 @@ extension AppState {
     
     var psiCashBalanceViewModel: PsiCashBalanceViewModel {
         PsiCashBalanceViewModel(
-            psiCashLibLoaded: self.psiCash.libLoaded,
+            psiCashLibLoaded: self.psiCash.libData != nil,
             balanceState: self.balanceState
         )
     }
@@ -333,7 +333,7 @@ extension AppState {
             MainViewReducerState(
                 mainView: self.mainView,
                 subscriptionState: self.subscription,
-                psiCashAccountType: self.psiCash.libData.accountType,
+                psiCashAccountType: self.psiCash.libData?.accountType,
                 appLifecycle: self.appDelegateState.appLifecycle
             )
         }

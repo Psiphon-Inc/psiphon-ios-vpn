@@ -28,7 +28,6 @@ import ReactiveSwift
 final class PsiCashAccountViewController: ReactiveViewController {
     
     struct ReaderState: Equatable {
-        let accountType: PsiCashAccountType
         let pendingAccountLoginLogout: PsiCashState.PendingAccountLoginLogoutEvent
     }
 
