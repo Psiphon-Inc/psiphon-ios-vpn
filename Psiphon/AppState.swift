@@ -34,7 +34,7 @@ var Style = AppStyle()
 struct AppState: Equatable {
     var vpnState = VPNState<PsiphonTPM>(.init())
     var psiCashBalance = PsiCashBalance()
-    var psiCash = PsiCashState()
+    var psiCashState = PsiCashState()
     var appReceipt = ReceiptState()
     var subscription = SubscriptionState()
     var subscriptionAuthState = SubscriptionAuthState()
@@ -64,7 +64,7 @@ extension AppState {
         }
         
         // PsiCash lib load.
-        guard psiCash.libData != nil else {
+        guard psiCashState.libData != nil else {
             return false
         }
         
@@ -249,7 +249,7 @@ func makeEnvironment(
         internetReachabilityStatusSignal: store.$value.signalProducer.map(\.internetReachability.networkStatus),
         tunnelStatusSignal: store.$value.signalProducer
             .map(\.vpnState.value.providerVPNStatus),
-        psiCashAccountTypeSignal: store.$value.signalProducer.map(\.psiCash.libData?.accountType),
+        psiCashAccountTypeSignal: store.$value.signalProducer.map(\.psiCashState.libData?.accountType),
         tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
         subscriptionStatusSignal: store.$value.signalProducer.map(\.subscription.status),
         urlHandler: .default(),
@@ -415,7 +415,7 @@ func makeEnvironment(
                 store: store.projection(
                     value: {
                         PsiCashAccountViewController.ReaderState(
-                            pendingAccountLoginLogout: $0.psiCash.pendingAccountLoginLogout
+                            pendingAccountLoginLogout: $0.psiCashState.pendingAccountLoginLogout
                         )
                     },
                     action: {

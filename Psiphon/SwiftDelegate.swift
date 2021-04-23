@@ -647,7 +647,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 if case .subscribed(_) = appState.subscription.status {
                     return nil
                 } else {
-                    let activeSpeedBoost = appState.psiCash.activeSpeedBoost(self.dateCompare)
+                    let activeSpeedBoost = appState.psiCashState.activeSpeedBoost(self.dateCompare)
                     return activeSpeedBoost?.transaction.localTimeExpiry
                 }
             }
@@ -676,7 +676,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // the value to the ObjCBridgeDelegte.
         self.lifetime += SignalProducer.combineLatest(
             self.store.$value.signalProducer.map(\.subscription.status).skipRepeats(),
-            self.store.$value.signalProducer.map(\.psiCash.libData?.accountType).skipRepeats(),
+            self.store.$value.signalProducer.map(\.psiCashState.libData?.accountType).skipRepeats(),
             self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus).skipRepeats()
         ).map { [unowned self] in
             
@@ -741,7 +741,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
 
         // Displays alerts related to PsiCash accounts login and logout events.
         self.lifetime += self.store.$value.signalProducer
-            .map(\.psiCash.pendingAccountLoginLogout)
+            .map(\.psiCashState.pendingAccountLoginLogout)
             .skipRepeats()
             .startWithValues { [unowned store] maybeLoginLogoutEvent in
                 guard let loginLogoutEvent = maybeLoginLogoutEvent else {
@@ -822,7 +822,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // alerting the user if state transitioned from having tokens
         // into logged out state.
         self.lifetime += self.store.$value.signalProducer
-            .map(\.psiCash)
+            .map(\.psiCashState)
             .skipRepeats()  // Reduces number of redundant items downstream.
             .compactMap { psiCashState -> _TokensExpiredData? in
                 
@@ -1018,7 +1018,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     return true
                 }
                 
-                if case .some(_) = appState.psiCash.activeSpeedBoost(self.dateCompare) {
+                if case .some(_) = appState.psiCashState.activeSpeedBoost(self.dateCompare) {
                     // If user has an active Speed Boost, dismiss loading screen.
                     return true
                 }
@@ -1201,7 +1201,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         let activeSpeedBoost: SignalProducer<PurchasedExpirableProduct<SpeedBoostProduct>?, Never> =
             self.store.$value.signalProducer
             .map { [unowned self] in
-                $0.psiCash.activeSpeedBoost(self.dateCompare)
+                $0.psiCashState.activeSpeedBoost(self.dateCompare)
             }
             .take(first: 1)
         

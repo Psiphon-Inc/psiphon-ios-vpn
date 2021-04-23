@@ -218,7 +218,7 @@ extension AppState {
             IAPReducerState(
                 iap: self.iapState,
                 psiCashBalance: self.psiCashBalance,
-                psiCashAccountType: self.psiCash.libData?.accountType
+                psiCashAccountType: self.psiCashState.libData?.accountType
             )
         }
         set {
@@ -231,14 +231,14 @@ extension AppState {
         get {
             PsiCashReducerState(
                 psiCashBalance: self.psiCashBalance,
-                psiCash: self.psiCash,
+                psiCash: self.psiCashState,
                 subscription: self.subscription,
                 tunnelConnection: self.tunnelConnection
             )
         }
         set {
             self.psiCashBalance = newValue.psiCashBalance
-            self.psiCash = newValue.psiCash
+            self.psiCashState = newValue.psiCash
         }
     }
     
@@ -282,7 +282,7 @@ extension AppState {
         PsiCashViewController.ReaderState(
             mainViewState: self.mainView,
             psiCashBalanceViewModel: self.psiCashBalanceViewModel,
-            psiCash: self.psiCash,
+            psiCash: self.psiCashState,
             iap: self.iapState,
             subscription: self.subscription,
             adState: self.adState,
@@ -293,14 +293,14 @@ extension AppState {
     
     var psiCashBalanceViewModel: PsiCashBalanceViewModel {
         PsiCashBalanceViewModel(
-            psiCashLibLoaded: self.psiCash.libData != nil,
+            psiCashLibLoaded: self.psiCashState.libData != nil,
             balanceState: self.balanceState
         )
     }
     
     var balanceState: BalanceState {
         BalanceState(
-            pendingPsiCashRefresh: self.psiCash.pendingPsiCashRefresh,
+            pendingPsiCashRefresh: self.psiCashState.pendingPsiCashRefresh,
             psiCashBalance: self.psiCashBalance
         )
     }
@@ -333,7 +333,7 @@ extension AppState {
             MainViewReducerState(
                 mainView: self.mainView,
                 subscriptionState: self.subscription,
-                psiCashAccountType: self.psiCash.libData?.accountType,
+                psiCashAccountType: self.psiCashState.libData?.accountType,
                 appLifecycle: self.appDelegateState.appLifecycle
             )
         }
