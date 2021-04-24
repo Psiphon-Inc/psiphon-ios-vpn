@@ -28,6 +28,7 @@ import ReactiveSwift
 final class PsiCashAccountViewController: ReactiveViewController {
     
     struct ReaderState: Equatable {
+        let psiCashAccountType: PsiCashAccountType?
         let pendingAccountLoginLogout: PsiCashState.PendingAccountLoginLogoutEvent?
     }
 
@@ -166,10 +167,18 @@ final class PsiCashAccountViewController: ReactiveViewController {
                     switch completedLogin {
                     case .success(_):
                         
+                        // Ignores previous login event if any.
                         guard accountLoginEvent.date >= viewControllerDidLoadDate else {
-                            // It is an error to present this view controller,
-                            // if the user is already logged in.
-                            fatalError("already logged in")
+                            
+                            guard
+                                observed.readerState.psiCashAccountType != .account(loggedIn: true)
+                            else {
+                                // User was already logged in prior to display
+                                // of this view controller.
+                                fatalError("illegal state")
+                            }
+                            
+                            return
                         }
                         
                         // In case of lastTrackerMerge, an alert should be displayed.

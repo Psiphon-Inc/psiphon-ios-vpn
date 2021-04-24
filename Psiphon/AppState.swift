@@ -415,6 +415,7 @@ func makeEnvironment(
                 store: store.projection(
                     value: {
                         PsiCashAccountViewController.ReaderState(
+                            psiCashAccountType: $0.psiCashState.libData?.accountType,
                             pendingAccountLoginLogout: $0.psiCashState.pendingAccountLoginLogout
                         )
                     },
