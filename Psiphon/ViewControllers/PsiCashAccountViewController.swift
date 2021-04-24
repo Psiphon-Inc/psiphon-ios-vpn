@@ -577,7 +577,6 @@ extension PsiCashAccountViewController: UITextFieldDelegate {
         
         if self.usernameTextField.textField === textField {
             // Selects next field (password field) for text input.
-            self.usernameTextField.textField.resignFirstResponder()
             self.passwordTextField.textField.becomeFirstResponder()
 
         } else if self.passwordTextField.textField === textField {
