@@ -332,6 +332,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
         mutate(usernameTextField.textField, passwordTextField.textField) {
             $0.delegate = self
             $0.clearButtonMode = .whileEditing
+            $0.enablesReturnKeyAutomatically = true  // Disables "enter" key if textfield is empty
         }
         
         let forgotPasswordButton = UIButton()
