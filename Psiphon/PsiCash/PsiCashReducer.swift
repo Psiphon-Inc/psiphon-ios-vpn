@@ -93,15 +93,21 @@ func psiCashReducer(
             }
             state.psiCash.purchasing = .none
             return [
+                
+                environment.feedbackLogger.log(
+                    .info, "Speed Boost purchased successfully: '\(purchasedProduct)'").mapNever(),
+                
                 .fireAndForget {
                     environment.sharedDB.appendNonSubscriptionEncodedAuthorization(
                         purchasedProduct.transaction.authorization.rawData
                     )
                     environment.notifier.post(NotifierUpdatedNonSubscriptionAuths)
                 },
+                
                 .fireAndForget {
                     environment.objcBridgeDelegate?.dismiss(screen: .psiCash, completion: nil)
                 }
+                
             ]
             
         case .failure(let errorEvent):
