@@ -40,9 +40,6 @@ go-ios-build
 CipherShare
 psi_export_doc.log
 
-# Cocoapods
-Pods
-
 # Intellij IDE
 .idea
 

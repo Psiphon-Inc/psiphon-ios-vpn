@@ -437,7 +437,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
             
         }
-
         self.store = Store(
             initialValue: AppState(),
             reducer: makeAppReducer(feedbackLogger: self.feedbackLogger),
