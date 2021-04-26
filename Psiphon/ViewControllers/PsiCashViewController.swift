@@ -139,6 +139,7 @@ final class PsiCashViewController: ReactiveViewController {
     private let viewControllerInitTime = Date()
 
     private let platform: Platform
+    private let locale: Locale
     
     private let (lifetime, token) = Lifetime.make()
     private let store: Store<PsiCashViewControllerState, PsiCashAction>
@@ -166,6 +167,7 @@ final class PsiCashViewController: ReactiveViewController {
     
     init(
         platform: Platform,
+        locale: Locale,
         initialTab: PsiCashViewControllerTabs,
         store: Store<PsiCashViewControllerState, PsiCashAction>,
         adStore: Store<Utilities.Unit, AdAction>,
@@ -176,6 +178,7 @@ final class PsiCashViewController: ReactiveViewController {
         feedbackLogger: FeedbackLogger
     ) {
         self.platform = platform
+        self.locale = locale
         self.activeTab = initialTab
         self.store = store
         self.productRequestStore = productRequestStore
@@ -483,7 +486,16 @@ final class PsiCashViewController: ReactiveViewController {
                                 let viewModel = NonEmpty(
                                     array:observed.state.psiCash.libData.availableProducts
                                         .items.compactMap { $0.speedBoost }
-                                        .map { SpeedBoostPurchasableViewModel(purchasable: $0) }
+                                        .map { purchasable -> SpeedBoostPurchasableViewModel in
+                                            
+                                            let productTitle = purchasable.product.localizedString
+                                                .uppercased(with: self.locale)
+                                            
+                                            return SpeedBoostPurchasableViewModel(
+                                                purchasable: purchasable,
+                                                localizedProductTitle: productTitle
+                                            )
+                                        }
                                         .sorted())
                                 
                                 if let viewModel = viewModel {

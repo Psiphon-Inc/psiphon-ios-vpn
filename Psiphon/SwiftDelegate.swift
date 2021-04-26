@@ -184,9 +184,10 @@ func appDelegateReducer(
                         onSpeedBoostClicked: {
                             tryPresentPsiCashViewController(
                                 platform: environment.platform,
+                                locale: environment.userDefaultsConfig.localeForAppLanguage,
                                 tab: .speedBoost,
                                 makePsiCashViewController:
-                                    SwiftDelegate.instance.makePsiCashViewController(platform:initialTab:),
+                                    SwiftDelegate.instance.makePsiCashViewController(platform:locale:initialTab:),
                                 getTopMostPresentedViewController:
                                     AppDelegate.getTopPresentedViewController
                             )
@@ -461,8 +462,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         navigator.register(urls: PsiphonDeepLinking.legacyBuyPsiCashDeepLink, PsiphonDeepLinking.buyPsiCashDeepLink) { [unowned self] in
             tryPresentPsiCashViewController(
                 platform: platform,
+                locale: userDefaultsConfig.localeForAppLanguage,
                 tab: .addPsiCash,
-                makePsiCashViewController: self.makePsiCashViewController(platform:initialTab:),
+                makePsiCashViewController: self.makePsiCashViewController(platform:locale:initialTab:),
                 getTopMostPresentedViewController: AppDelegate.getTopPresentedViewController
             )
             return true
@@ -471,8 +473,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         navigator.register(urls: PsiphonDeepLinking.legacySpeedBoostDeepLink, PsiphonDeepLinking.speedBoostDeepLink) { [unowned self] in
             tryPresentPsiCashViewController(
                 platform: platform,
+                locale: userDefaultsConfig.localeForAppLanguage,
                 tab: .speedBoost,
-                makePsiCashViewController: self.makePsiCashViewController(platform:initialTab:),
+                makePsiCashViewController: self.makePsiCashViewController(platform:locale:initialTab:),
                 getTopMostPresentedViewController: AppDelegate.getTopPresentedViewController
             )
             return true
@@ -874,7 +877,10 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         _ initialTab: PsiCashViewController.PsiCashViewControllerTabs
     ) -> UIViewController {
 
-        return self.makePsiCashViewController(platform: platform, initialTab: initialTab)
+        return self.makePsiCashViewController(
+            platform: platform,
+            locale: userDefaultsConfig.localeForAppLanguage,
+            initialTab: initialTab)
 
     }
     
@@ -1155,10 +1161,12 @@ fileprivate extension SwiftDelegate {
     
     func makePsiCashViewController(
         platform: Platform,
+        locale: Locale,
         initialTab: PsiCashViewController.PsiCashViewControllerTabs
     ) -> PsiCashViewController {
         PsiCashViewController(
             platform: platform,
+            locale: locale,
             initialTab: initialTab,
             store: self.store.projection(
                 value: { $0.psiCashViewController },
@@ -1186,9 +1194,10 @@ fileprivate extension SwiftDelegate {
 
 fileprivate func tryPresentPsiCashViewController(
     platform: Platform,
+    locale: Locale,
     tab: PsiCashViewController.PsiCashViewControllerTabs,
     makePsiCashViewController:
-        @escaping (Platform, PsiCashViewController.PsiCashViewControllerTabs) -> PsiCashViewController,
+        @escaping (Platform, Locale, PsiCashViewController.PsiCashViewControllerTabs) -> PsiCashViewController,
     getTopMostPresentedViewController: @escaping () -> UIViewController
 ) {
     let topMostViewController = getTopMostPresentedViewController()
@@ -1205,7 +1214,7 @@ fileprivate func tryPresentPsiCashViewController(
         psiCashViewController.activeTab = tab
         
     case .notPresent:
-        let psiCashViewController = makePsiCashViewController(platform, tab)
+        let psiCashViewController = makePsiCashViewController(platform, locale, tab)
         topMostViewController.present(psiCashViewController, animated: true)
     }
 }

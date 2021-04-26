@@ -25,9 +25,10 @@ import PsiCashClient
 struct SpeedBoostPurchasableViewModel: Equatable {
     
     let purchasable: SpeedBoostPurchasable
+    let localizedProductTitle: String
     
     var background: SpeedBoostPurchaseBackground {
-        return .background(for: purchasable.product.hours)
+        return .background(speedBoostDistinguisher: purchasable.product.distinguisher)
     }
     
 }
@@ -367,7 +368,8 @@ fileprivate final class SpeedBoostPurchaseCell: UICollectionViewCell {
         self.purchaseHandler = purchaseHandler
         self.purchasable = newValue.purchasable
         backgroundImage.image = UIImage(named: newValue.background.rawValue)
-        title.text = "\(newValue.purchasable.product.hours) HOUR"
+        
+        title.text = newValue.localizedProductTitle
 
         button.setTitle(
             psiCashPriceFormatter.string(from: newValue.purchasable.price.inPsi),
@@ -412,17 +414,17 @@ enum SpeedBoostPurchaseBackground: String, CaseIterable {
     case yellow = "SpeedBoostBackground_Yellow"
     case limeGreen = "SpeedBoostBackground_LimeGreen"
 
-    static func background(for speedBoost: Int) -> Self {
-        switch speedBoost {
-        case 1: return .orange
-        case 2: return .pink
-        case 3: return .purple
-        case 4: return .darkBlue
-        case 5: return .blue
-        case 6: return .green
-        case 7: return .lightOrange
-        case 8: return .yellow
-        case 9: return .limeGreen
+    static func background(speedBoostDistinguisher: String) -> Self {
+        switch speedBoostDistinguisher {
+        case "1hr": return .orange
+        case "2hr": return .pink
+        case "3hr": return .purple
+        case "4hr": return .darkBlue
+        case "5hr": return .blue
+        case "6hr": return .green
+        case "7hr": return .lightOrange
+        case "8hr": return .yellow
+        case "9hr": return .limeGreen
         default: return allCases.randomElement()!
         }
     }
