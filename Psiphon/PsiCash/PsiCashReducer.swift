@@ -93,15 +93,22 @@ func psiCashReducer(
             }
             state.psiCash.purchasing = .none
             return [
-                .fireAndForget {
-                    environment.sharedDB.appendNonSubscriptionEncodedAuthorization(
-                        purchasedProduct.transaction.authorization.rawData
-                    )
-                    environment.notifier.post(NotifierUpdatedNonSubscriptionAuths)
-                },
+                
+                environment.feedbackLogger.log(
+                    .info, "Speed Boost purchased successfully: '\(purchasedProduct)'").mapNever(),
+                
+                // Updates sharedDB with new auths, and notifies
+                // network extension of the change if required.
+                setSharedDBPsiCashAuthTokens(
+                    state.psiCash.libData,
+                    sharedDB: environment.sharedDB,
+                    notifier: environment.notifier
+                ).mapNever(),
+                
                 .fireAndForget {
                     environment.objcBridgeDelegate?.dismiss(screen: .psiCash, completion: nil)
                 }
+                
             ]
             
         case .failure(let errorEvent):
@@ -138,6 +145,15 @@ func psiCashReducer(
             state.psiCashBalance = .refreshed(refreshedData: refreshedLibData,
                                               persisted: environment.psiCashPersistedValues)
             return [
+                
+                // Updates sharedDB with new auths, and notifies
+                // network extension if required.
+                setSharedDBPsiCashAuthTokens(
+                    state.psiCash.libData,
+                    sharedDB: environment.sharedDB,
+                    notifier: environment.notifier
+                ).mapNever(),
+                
                 environment.feedbackLogger.log(.info, "PsiCash: refresh state success").mapNever()
             ]
         case .completed(.failure(let error)):
@@ -179,4 +195,45 @@ func psiCashReducer(
             }
         ]
     }
+}
+
+/// Sets PsiphonDataSharedDB non-subscription auth tokens,
+/// to the active tokens provided by the PsiCash library.
+/// If set of active authorizations has changed, then sends a message to the network extension
+/// to notify it of the new authorization tokens.
+fileprivate func setSharedDBPsiCashAuthTokens(
+    _ libData: PsiCashLibData,
+    sharedDB: PsiphonDataSharedDB,
+    notifier: PsiApi.Notifier
+) -> Effect<Never> {
+
+    // Set of all authorizations from PsiCash library.
+    let psiCashLibAuths = Set(libData.activePurchases.items.map { parsedPurchase -> String in
+
+        switch parsedPurchase {
+        case .speedBoost(let product):
+            return product.transaction.authorization.rawData
+        }
+
+    })
+
+    return .fireAndForget {
+
+        // Updates PsiphonDataSharedDB with with the set of PsiCash authorizations.
+        
+        // If current set of authorizations stored by PsiCash library is not equal to
+        // the set of non-subscription authorizations stored by the extension
+        // sends a notification to the extension of the change.
+        let sendNotification = sharedDB.getNonSubscriptionEncodedAuthorizations() != psiCashLibAuths
+        
+        // Updates set of non-susbscription authorizations stored by the extension.
+        sharedDB.setNonSubscriptionEncodedAuthorizations(psiCashLibAuths)
+
+        if sendNotification {
+            // Notifies network extension of updated non-subscriptions authorizations.
+            notifier.post(NotifierUpdatedNonSubscriptionAuths)
+        }
+
+    }
+
 }
