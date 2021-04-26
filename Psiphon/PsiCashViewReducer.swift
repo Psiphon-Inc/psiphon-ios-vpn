@@ -77,7 +77,7 @@ struct PsiCashViewState: Equatable {
 
 struct PsiCashViewReducerState: Equatable {
     var viewState: PsiCashViewState
-    let psiCashAccountType: PsiCashAccountType
+    let psiCashAccountType: PsiCashAccountType?
 }
 
 struct PsiCashViewEnvironment {
@@ -120,6 +120,11 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
         // or continue the purchase without an account.
         switch state.psiCashAccountType {
         case .none:
+            // Illegal state.
+            environment.feedbackLogger.fatalError("PsiCash lib not initialized")
+            return []
+            
+        case .noTokens:
             return [
                 environment.feedbackLogger.log(
                     .error, "not allowed to make a purchase without PsiCash tokens").mapNever()

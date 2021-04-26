@@ -94,7 +94,7 @@ final class PsiCashViewController: ReactiveViewController {
     private var hStack: UIStackView
     
     private let tabControl = TabControlViewWrapper<PsiCashScreenTab>()
-    private let logInView = PsiCashAccountLogInView()
+    private let signupOrLogInView = PsiCashAccountSignupOrLoginView()
     
     
     private let container: ContainerViewType
@@ -159,7 +159,7 @@ final class PsiCashViewController: ReactiveViewController {
         
         super.init(onDismissed: onDismissed)
         
-        self.logInView.onLogInTapped { [unowned self] in
+        self.signupOrLogInView.onLogInTapped { [unowned self] in
             // Last minute check for tunnel status.
             if case .success(.connected) = tunnelConnectedSignal.first() {
                 self.store.send(.mainViewAction(.psiCashViewAction(.signupOrLoginTapped)))
@@ -200,6 +200,10 @@ final class PsiCashViewController: ReactiveViewController {
                 // View controller state has been set to nil,
                 // and it will be dismissed (if not already).
                 return
+            }
+            
+            guard let psiCashLibData = observed.readerState.psiCash.libData else {
+                fatalError("PsiCash lib not loaded")
             }
             
             // Presents alert if rewarded video load failed.
@@ -290,7 +294,7 @@ final class PsiCashViewController: ReactiveViewController {
                 // There is not PsiCash state or subscription state is unknown.
                 self.balanceViewWrapper.view.isHidden = true
                 self.tabControl.view.isHidden = true
-                self.logInView.isHidden = true
+                self.signupOrLogInView.isHidden = true
                 self.containerBindable.bind(
                     .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
                 )
@@ -300,7 +304,7 @@ final class PsiCashViewController: ReactiveViewController {
                 // User is subscribed. Only shows the PsiCash balance.
                 self.balanceViewWrapper.view.isHidden = false
                 self.tabControl.view.isHidden = true
-                self.logInView.isHidden = true
+                self.signupOrLogInView.isHidden = true
                 self.balanceViewWrapper.bind(observed.readerState.psiCashBalanceViewModel)
                 self.containerBindable.bind(
                     .left(.right(.right(.right(.right(.userSubscribed)))))
@@ -310,11 +314,11 @@ final class PsiCashViewController: ReactiveViewController {
             case .notSubscribed:
 
                 // PsiCash account type
-                switch observed.readerState.psiCash.libData.accountType {
-                case .none:
+                switch psiCashLibData.accountType {
+                case .noTokens:
                     self.balanceViewWrapper.view.isHidden = true
                     self.tabControl.view.isHidden = true
-                    self.logInView.isHidden = true
+                    self.signupOrLogInView.isHidden = true
                     self.containerBindable.bind(
                         .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
                     )
@@ -326,8 +330,7 @@ final class PsiCashViewController: ReactiveViewController {
                     self.balanceViewWrapper.view.isHidden = true
                     self.tabControl.view.isHidden = true
 
-                    self.logInView.isHidden = false
-                    self.logInView.bind(.signUpOrLogIn)
+                    self.signupOrLogInView.isHidden = false
 
                     self.containerBindable.bind(
                         .left(.right(.right(.right(.right(.signupOrLoginToPsiCash)))))
@@ -347,17 +350,16 @@ final class PsiCashViewController: ReactiveViewController {
                 switch observed.tunneled {
                 case .connecting, .disconnecting:
                     self.tabControl.view.isHidden = true
-                    self.logInView.isHidden = true
+                    self.signupOrLogInView.isHidden = true
                     
                 case .connected, .notConnected:
                     self.tabControl.view.isHidden = false
                     
-                    if case .tracker = observed.readerState.psiCash.libData.accountType {
+                    if case .tracker = psiCashLibData.accountType {
                         // LogIn button is displayed to encourage the user to login.
-                        self.logInView.isHidden = false
-                        self.logInView.bind(.signUp)
+                        self.signupOrLogInView.isHidden = false
                     } else {
-                        self.logInView.isHidden = true
+                        self.signupOrLogInView.isHidden = true
                     }
                 }
                 
@@ -447,13 +449,13 @@ final class PsiCashViewController: ReactiveViewController {
                         case .pending(let lastSuccess):
                             // Displays product list from previous retrieval.
 
-                            self.containerBindable.bind(.left(.left(.makeViewModel(purchasables: lastSuccess, accountType: observed.readerState.psiCash.libData.accountType))))
+                            self.containerBindable.bind(.left(.left(.makeViewModel(purchasables: lastSuccess, accountType: psiCashLibData.accountType))))
                             
                         case .completed(let productRequestResult):
                             // Product list retrieved from App Store.
                             switch productRequestResult {
                             case .success(let psiCashCoinProducts):
-                                self.containerBindable.bind(.left(.left(.makeViewModel(purchasables: psiCashCoinProducts, accountType: observed.readerState.psiCash.libData.accountType))))
+                                self.containerBindable.bind(.left(.left(.makeViewModel(purchasables: psiCashCoinProducts, accountType: psiCashLibData.accountType))))
                                 
                             case .failure(_):
                                 // Shows failed to load message with tap to retry button.
@@ -494,7 +496,7 @@ final class PsiCashViewController: ReactiveViewController {
                     case .none:
                         // There is no active speed boost.
                         let speedBoostPurchasables =
-                            observed.readerState.psiCash.libData.purchasePrices.compactMap {
+                            psiCashLibData.purchasePrices.compactMap {
                                 $0.successToOptional()?.speedBoost
                             }
                             .map(SpeedBoostPurchasableViewModel.init(purchasable:))
@@ -544,7 +546,7 @@ final class PsiCashViewController: ReactiveViewController {
         }
         
         hStack.addArrangedSubviews(
-            logInView,
+            signupOrLogInView,
             tabControl.view,
             containerView
         )
@@ -580,7 +582,7 @@ final class PsiCashViewController: ReactiveViewController {
         self.balanceViewWrapper.view.setContentHuggingPriority(
             higherThan: self.hStack, for: .vertical)
         
-        self.logInView.setContentHuggingPriority(
+        self.signupOrLogInView.setContentHuggingPriority(
             higherThan: self.hStack, for: .vertical)
         
         self.closeButton.activateConstraints {

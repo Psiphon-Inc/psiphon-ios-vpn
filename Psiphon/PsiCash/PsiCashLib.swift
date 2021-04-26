@@ -96,7 +96,7 @@ extension PsiCashLibError: FeedbackDescription {}
 /// `PsiCash` is a thin wrapper around `PSIPsiCashLibWrapper`.
 /// This class is mostly concerned with translating the raw data types used by `PSIPsiCashLibWrapper`
 /// to those defined in the `PsiCashClient` module.
-final class PsiCash {
+final class PsiCashLib {
     
     private let client: PSIPsiCashLibWrapper
     private let feedbackLogger: FeedbackLogger
@@ -115,7 +115,7 @@ final class PsiCash {
     var accountType: PsiCashAccountType {
         switch (hasTokens: self.client.hasTokens(), isAccount: self.client.isAccount()) {
         case (false, false):
-            return .none
+            return .noTokens
         case (true, false):
             return .tracker
         case (false, true):
@@ -451,7 +451,7 @@ final class PsiCash {
             }
             
         } transformFailure: {
-            return .failure(.requestFailed($0))
+            return .failure(.requestCatastrophicFailure($0))
         }
         
     }
@@ -540,7 +540,7 @@ final class PsiCash {
             }
             
         } transformFailure: {
-            return .failure(.requestFailed($0))
+            return .failure(.requestCatastrophicFailure($0))
         }
     }
     
@@ -629,7 +629,7 @@ final class PsiCash {
                 }
                 
             } transformFailure: {
-                return .failure(.requestFailed($0))
+                return .failure(.requestCatastrophicFailure($0))
             }
         }
         

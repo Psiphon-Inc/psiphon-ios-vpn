@@ -46,9 +46,23 @@ public typealias PsiCashParsed<Value: Equatable> = Result<Value, PsiCashParseErr
 /// Note that a user that has upgraded from tracker to account,
 /// cannot go back to being a tracker only.
 public enum PsiCashAccountType: Equatable {
-    case none
+    case noTokens
     case account(loggedIn: Bool)
     case tracker
+}
+
+public extension PsiCashAccountType {
+    
+    /// True iff PsiCash `HasTokens()` is true.
+    var hasTokens: Bool {
+        switch self {
+        case .noTokens, .account(loggedIn: false):
+            return false
+        case .tracker, .account(loggedIn: true):
+            return true
+        }
+    }
+    
 }
 
 // MARK: PsiCash data model
@@ -69,17 +83,6 @@ public struct PsiCashLibData: Equatable {
         self.balance = balance
         self.purchasePrices = availableProducts
         self.activePurchases = activePurchases
-    }
-    
-}
-
-extension PsiCashLibData {
-    
-    public init() {
-        accountType = .none
-        balance = .zero
-        purchasePrices = []
-        activePurchases = []
     }
     
 }

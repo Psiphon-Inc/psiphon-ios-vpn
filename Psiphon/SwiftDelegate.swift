@@ -210,7 +210,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
     private var (lifetime, token) = Lifetime.make()
     private var objcBridge: ObjCBridgeDelegate!
     private var store: Store<AppState, AppAction>!
-    private var psiCashLib: PsiCash
+    private var psiCashLib: PsiCashLib
     private var environmentCleanup: (() -> Void)?
 
     // NSNotification observers
@@ -228,7 +228,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
         
         platform = Platform(ProcessInfo.processInfo)
         
-        psiCashLib = PsiCash(feedbackLogger: self.feedbackLogger, platform: platform)
+        psiCashLib = PsiCashLib(feedbackLogger: self.feedbackLogger, platform: platform)
         
     }
     
@@ -647,7 +647,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 if case .subscribed(_) = appState.subscription.status {
                     return nil
                 } else {
-                    let activeSpeedBoost = appState.psiCash.activeSpeedBoost(self.dateCompare)
+                    let activeSpeedBoost = appState.psiCashState.activeSpeedBoost(self.dateCompare)
                     return activeSpeedBoost?.transaction.localTimeExpiry
                 }
             }
@@ -675,23 +675,23 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // Produces a SettingsViewModel type and passes
         // the value to the ObjCBridgeDelegte.
         self.lifetime += SignalProducer.combineLatest(
-                self.store.$value.signalProducer.map(\.subscription.status).skipRepeats(),
-            self.store.$value.signalProducer.map(\.psiCash.libData.accountType).skipRepeats(),
-                self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus).skipRepeats()
-            ).map { [unowned self] in
-                
-                SettingsViewModel(
-                    subscriptionState: $0.0,
-                    psiCashAccountType: $0.1,
-                    vpnStatus: $0.2,
-                    psiCashAccountManagementURL: self.psiCashLib.getUserSiteURL(
-                        .accountManagement, platform: self.platform.current
-                    )
+            self.store.$value.signalProducer.map(\.subscription.status).skipRepeats(),
+            self.store.$value.signalProducer.map(\.psiCashState.libData?.accountType).skipRepeats(),
+            self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus).skipRepeats()
+        ).map { [unowned self] in
+            
+            SettingsViewModel(
+                subscriptionState: $0.0,
+                psiCashAccountType: $0.1,
+                vpnStatus: $0.2,
+                psiCashAccountManagementURL: self.psiCashLib.getUserSiteURL(
+                    .accountManagement, platform: self.platform.current
                 )
-            }
-            .startWithValues { [unowned objcBridge] model in
-                objcBridge!.onSettingsViewModelDidChange(ObjcSettingsViewModel(model))
-            }
+            )
+        }
+        .startWithValues { [unowned objcBridge] model in
+            objcBridge!.onSettingsViewModelDidChange(ObjcSettingsViewModel(model))
+        }
 
         // Updates PsiphonDateSharedDB `ContainerAppReceiptLatestSubscriptionExpiryDate`
         // based on the app's receipt's latest subscription state.
@@ -739,9 +739,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
             .send(store: self.store)
 
-        // Displays alerts related to PsiCash accounts login events.
+        // Displays alerts related to PsiCash accounts login and logout events.
         self.lifetime += self.store.$value.signalProducer
-            .map(\.psiCash.pendingAccountLoginLogout)
+            .map(\.psiCashState.pendingAccountLoginLogout)
             .skipRepeats()
             .startWithValues { [unowned store] maybeLoginLogoutEvent in
                 guard let loginLogoutEvent = maybeLoginLogoutEvent else {
@@ -752,36 +752,51 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 
                 switch loginLogoutEvent.wrapped {
                 case .pending(_):
-                    maybeAlert = nil
+                    maybeAlert = .none
                     
                 case let .completed(.left(completedLoginEvent)):
+                    // PsiCash Account Login
                     
                     switch completedLoginEvent {
                     case let .success(loginResponse):
-                        maybeAlert = .psiCashAccountAlert(
-                            .loginSuccessAlert(lastTrackerMerge:loginResponse.lastTrackerMerge))
+                        if loginResponse.lastTrackerMerge {
+                            maybeAlert = .psiCashAccountAlert(.loginSuccessLastTrackerMergeAlert)
+                        } else {
+                            maybeAlert = .none
+                        }
 
                     case let .failure(errorEvent):
                         switch errorEvent.error {
                         case .tunnelNotConnected:
                             maybeAlert = .psiCashAccountAlert(.tunnelNotConnectedAlert)
 
-                        case .requestError(.errorStatus(.invalidCredentials)):
-                            maybeAlert = .psiCashAccountAlert(.incorrectUsernameOrPasswordAlert)
-
-                        case .requestError(.errorStatus(_)),
-                             .requestError(.requestFailed(_)):
-                            maybeAlert = .psiCashAccountAlert(.operationFailedTryAgainAlert)
+                        case .requestError(.errorStatus(let psiCashServerErrorStatus)):
+                            
+                            switch psiCashServerErrorStatus {
+                            case .invalidCredentials:
+                                maybeAlert = .psiCashAccountAlert(.incorrectUsernameOrPasswordAlert)
+                                
+                            case .badRequest:
+                                maybeAlert = .psiCashAccountAlert(.accountLoginBadRequestAlert)
+                                
+                            case .serverError:
+                                maybeAlert = .psiCashAccountAlert(.accountLoginServerErrorAlert)
+                            }
+                            
+                        case .requestError(.requestCatastrophicFailure(_)):
+                            maybeAlert = .psiCashAccountAlert(.accountLoginCatastrophicFailureAlert)
                         }
                     }
 
                 case let .completed(.right(completedLogoutEvent)):
+                    // PsiCash Account Logout
+                    
                     switch completedLogoutEvent {
                     case .success(_):
                         maybeAlert = .psiCashAccountAlert(.logoutSuccessAlert)
 
                     case .failure(_):
-                        maybeAlert = .psiCashAccountAlert(.operationFailedTryAgainAlert)
+                        maybeAlert = .psiCashAccountAlert(.accountLogoutCatastrophicFailureAlert)
                     }
                     
                 }
@@ -794,7 +809,104 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     store!.send(.mainViewAction(.presentAlert(alertEvent)))
                 }
             }
+        
+        
+        // TODO: Replace with tuple once equatable synthesis for tuples is added to Swift.
+        struct _TokensExpiredData: Equatable {
+            // PsiCash account completed login/logout event.
+            let accountLoginLogoutCompletedEvent: Event<PsiCashState.AccountLoginLogoutCompleted>?
+            let accountType: PsiCashAccountType
+        }
+        
+        // Scans PsiCash libdata for when the login expires (i.e. token expiring),
+        // alerting the user if state transitioned from having tokens
+        // into logged out state.
+        self.lifetime += self.store.$value.signalProducer
+            .map(\.psiCashState)
+            .skipRepeats()  // Reduces number of redundant items downstream.
+            .compactMap { psiCashState -> _TokensExpiredData? in
+                
+                // Removes PsiCash library non-initialized value (literal `nil`) from signal.
+                guard let accountType = psiCashState.libData?.accountType else {
+                    return nil
+                }
+                
+                // Removes PsiCash account pending login/logout events from signal,
+                // to simplify the state space by removing states we don't care about.
+                switch psiCashState.pendingAccountLoginLogout {
+                case .none:
+                    return _TokensExpiredData(accountLoginLogoutCompletedEvent: nil,
+                                              accountType: accountType)
+                case .some(let loginLogoutEvent):
+                    switch loginLogoutEvent.wrapped {
+                    case .pending(_):
+                        return nil
+                    case let .completed(loginLogoutCompleted):
+                        let loginLogoutCompletedEvent = Event(loginLogoutCompleted,
+                                                              date: loginLogoutEvent.date)
+                        return _TokensExpiredData(
+                            accountLoginLogoutCompletedEvent: loginLogoutCompletedEvent,
+                            accountType: accountType
+                        )
+                    }
+                }
+                
+            }
+            .skipRepeats()  // Scan operator below assumes that events are unique
+                            // in determining the expiry date of account token.
+            .scan(nil) { (prvCombined, cur) -> (_TokensExpiredData, Date?)? in
+                
+                // Scans upstream signal for the last two values emitted.
+                // Since RxSwift doens't have a buffer operator, the returned tuple's
+                // first element is always `cur`, and second element is to be used downstream,
+                // and ignroed by this scan operator.
+                //
+                // This operator returns date of when the PsiCah account token expired.
+                
+                // Ignores initial nil value of `prv`, since we're interested in state change.
+                guard let prv = prvCombined?.0 else {
+                    return (cur, nil)
+                }
+                
+                // Ensure that events are unique.
+                guard prv != cur else {
+                    fatalError("programming error")
+                }
+                
+                // If we are newly transitioning into a logged out state due
+                // to account token expiry, let the user know
+                guard
+                    case .account(loggedIn: false) = cur.accountType,
+                    case .account(loggedIn: true) = prv.accountType,
+                    cur.accountLoginLogoutCompletedEvent == prv.accountLoginLogoutCompletedEvent
+                else {
+                    // Either the user has logged out,
+                    // or logged in (which would be a programming error).
+                    return (cur, nil)
+                }
+                
+                // User is logged out due to token expiry, because there has been
+                // no manual logout event (since `prv`), and the user cannot login if
+                // the previous state (`prv`) is logged in.
+                
+                // Unique timestamp of token expiry.
+                let tokenExpiryDate = Date()
+                return (cur, tokenExpiryDate)
+                
+            }
+            .map {
+                $0?.1 // `Date?` field - account token expiry date
+            }
+            .startWithValues { [unowned store] maybeAccountTokenExpired in
+                guard let date = maybeAccountTokenExpired else {
+                    return
+                }
+                let alertEvent = AlertEvent(.psiCashAccountAlert(.accountTokensExpiredAlert),
+                                            date: date)
+                store!.send(.mainViewAction(.presentAlert(alertEvent)))
+            }
 
+        
         if Debugging.printAppState {
 
             self.lifetime += self.store.$value.signalProducer
@@ -906,7 +1018,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     return true
                 }
                 
-                if case .some(_) = appState.psiCash.activeSpeedBoost(self.dateCompare) {
+                if case .some(_) = appState.psiCashState.activeSpeedBoost(self.dateCompare) {
                     // If user has an active Speed Boost, dismiss loading screen.
                     return true
                 }
@@ -1089,7 +1201,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         let activeSpeedBoost: SignalProducer<PurchasedExpirableProduct<SpeedBoostProduct>?, Never> =
             self.store.$value.signalProducer
             .map { [unowned self] in
-                $0.psiCash.activeSpeedBoost(self.dateCompare)
+                $0.psiCashState.activeSpeedBoost(self.dateCompare)
             }
             .take(first: 1)
         
