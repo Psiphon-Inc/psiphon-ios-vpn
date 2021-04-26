@@ -28,7 +28,7 @@ extension PsiCashRequestError: LocalizedUserDescription where ErrorStatus: Local
         switch self {
         case .errorStatus(let errorStatus):
             return errorStatus.localizedUserDescription
-        case .requestFailed(let psiCashLibError):
+        case .requestCatastrophicFailure(let psiCashLibError):
             return psiCashLibError.localizedDescription
         }
     }
@@ -147,14 +147,14 @@ fileprivate struct PsiCashHTTPResponse: HTTPResponse {
 
 final class PsiCashEffects: PsiCashEffectsProtocol {
     
-    private let psiCash: PsiCash
+    private let psiCash: PsiCashLib
     private let httpClient: HTTPClient
     private let globalDispatcher: GlobalDispatcher
     private let getCurrentTime: () -> Date
     private let feedbackLogger: FeedbackLogger
     
     init(
-        psiCashClient: PsiCash,
+        psiCashClient: PsiCashLib,
         httpClient: HTTPClient,
         globalDispatcher: GlobalDispatcher,
         getCurrentTime: @escaping () -> Date,

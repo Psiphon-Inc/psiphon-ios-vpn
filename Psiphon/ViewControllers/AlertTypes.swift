@@ -44,11 +44,24 @@ enum PsiCashAlert: Hashable {
 }
 
 enum PsiCashAccountAlert: Hashable {
-    case loginSuccessAlert(lastTrackerMerge: Bool)
+    case loginSuccessLastTrackerMergeAlert
     case logoutSuccessAlert
     case incorrectUsernameOrPasswordAlert
+    
+    // Bad request response from PsiCash server.
+    case accountLoginBadRequestAlert
+    
+    // Server error response from PsiCash server.
+    case accountLoginServerErrorAlert
+    
+    case accountLoginCatastrophicFailureAlert
+    
     case tunnelNotConnectedAlert
-    case operationFailedTryAgainAlert
+    
+    case accountLogoutCatastrophicFailureAlert
+    
+    // PsiCash Account tokens expired
+    case accountTokensExpiredAlert
 }
 
 enum DisallowedTrafficAlertAction: Equatable {
@@ -96,21 +109,11 @@ extension UIAlertController {
 
         case .psiCashAccountAlert(let accountAlertType):
             switch accountAlertType {
-            case .loginSuccessAlert(lastTrackerMerge: let lastTrackerMerge):
-                let message: String
-                if lastTrackerMerge {
-                    message = """
-                            \(UserStrings.Psicash_logged_in_successfully())\
-                            \n
-                            \(UserStrings.Psicash_accounts_last_merge_warning())
-                            """
-                } else {
-                    message = UserStrings.Psicash_logged_in_successfully()
-                }
-
+            
+            case .loginSuccessLastTrackerMergeAlert:
                 return .makeAlert(
-                    title: UserStrings.Psicash_account(),
-                    message: message,
+                    title: UserStrings.Psicash_login_success_title(),
+                    message: UserStrings.Psicash_accounts_last_merge_warning_body(),
                     actions: [
                         .dismissButton {
                             onActionButtonTapped(alertEvent, .dismissTapped)
@@ -119,8 +122,8 @@ extension UIAlertController {
 
             case .logoutSuccessAlert:
                 return .makeAlert(
-                    title: UserStrings.Psicash_account(),
-                    message: UserStrings.Psicash_logged_out_successfully(),
+                    title: UserStrings.Psicash_account_logout_title(),
+                    message: UserStrings.Psicash_account_logged_out_complete(),
                     actions: [
                         .dismissButton {
                             onActionButtonTapped(alertEvent, .dismissTapped)
@@ -129,14 +132,44 @@ extension UIAlertController {
 
             case .incorrectUsernameOrPasswordAlert:
                 return .makeAlert(
-                    title: UserStrings.Psicash_account(),
+                    title: UserStrings.Psicash_login_failed_title(),
                     message: UserStrings.Incorrect_username_or_password(),
                     actions: [
                         .dismissButton {
                             onActionButtonTapped(alertEvent, .dismissTapped)
                         }
                     ])
+                
+            case .accountLoginBadRequestAlert:
+                return .makeAlert(
+                    title: UserStrings.Psicash_login_failed_title(),
+                    message: UserStrings.Psicash_login_bad_request_error_body(),
+                    actions: [
+                        .dismissButton {
+                            onActionButtonTapped(alertEvent, .dismissTapped)
+                        }
+                    ])
 
+            case .accountLoginServerErrorAlert:
+                return .makeAlert(
+                    title: UserStrings.Psicash_login_failed_title(),
+                    message: UserStrings.Psicash_login_server_error_body(),
+                    actions: [
+                        .dismissButton {
+                            onActionButtonTapped(alertEvent, .dismissTapped)
+                        }
+                    ])
+                
+            case .accountLoginCatastrophicFailureAlert:
+                return .makeAlert(
+                    title: UserStrings.Psicash_login_failed_title(),
+                    message: UserStrings.Psicash_login_catastrophic_error_body(),
+                    actions: [
+                        .dismissButton {
+                            onActionButtonTapped(alertEvent, .dismissTapped)
+                        }
+                    ])
+                
             case .tunnelNotConnectedAlert:
                 return .makeAlert(
                     title: UserStrings.Psicash_account(),
@@ -147,10 +180,20 @@ extension UIAlertController {
                         }
                     ])
 
-            case .operationFailedTryAgainAlert:
+            case .accountLogoutCatastrophicFailureAlert:
+                return .makeAlert(
+                    title: UserStrings.Psicash_account_logout_title(),
+                    message: UserStrings.Psicash_account_logout_failed_body(),
+                    actions: [
+                        .dismissButton {
+                            onActionButtonTapped(alertEvent, .dismissTapped)
+                        }
+                    ])
+                
+            case .accountTokensExpiredAlert:
                 return .makeAlert(
                     title: UserStrings.Psicash_account(),
-                    message: UserStrings.Operation_failed_please_try_again_alert_message(),
+                    message: UserStrings.Psicash_account_tokens_expired_body(),
                     actions: [
                         .dismissButton {
                             onActionButtonTapped(alertEvent, .dismissTapped)

@@ -34,7 +34,7 @@ var Style = AppStyle()
 struct AppState: Equatable {
     var vpnState = VPNState<PsiphonTPM>(.init())
     var psiCashBalance = PsiCashBalance()
-    var psiCash = PsiCashState()
+    var psiCashState = PsiCashState()
     var appReceipt = ReceiptState()
     var subscription = SubscriptionState()
     var subscriptionAuthState = SubscriptionAuthState()
@@ -64,7 +64,7 @@ extension AppState {
         }
         
         // PsiCash lib load.
-        guard psiCash.libLoaded else {
+        guard psiCashState.libData != nil else {
             return false
         }
         
@@ -117,7 +117,7 @@ struct AppEnvironment {
     let notifier: PsiApi.Notifier
     let internetReachabilityStatusSignal: SignalProducer<ReachabilityStatus, Never>
     let tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
-    let psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType, Never>
+    let psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType?, Never>
     let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
     let subscriptionStatusSignal: SignalProducer<AppStoreIAP.SubscriptionStatus, Never>
     let urlHandler: URLHandler
@@ -179,7 +179,7 @@ func makeEnvironment(
     store: Store<AppState, AppAction>,
     feedbackLogger: FeedbackLogger,
     sharedDB: PsiphonDataSharedDB,
-    psiCashClient: PsiCash,
+    psiCashClient: PsiCashLib,
     psiCashFileStoreRoot: String?,
     supportedAppStoreProducts: SupportedAppStoreProducts,
     userDefaultsConfig: UserDefaultsConfig,
@@ -249,7 +249,7 @@ func makeEnvironment(
         internetReachabilityStatusSignal: store.$value.signalProducer.map(\.internetReachability.networkStatus),
         tunnelStatusSignal: store.$value.signalProducer
             .map(\.vpnState.value.providerVPNStatus),
-        psiCashAccountTypeSignal: store.$value.signalProducer.map(\.psiCash.libData.accountType),
+        psiCashAccountTypeSignal: store.$value.signalProducer.map(\.psiCashState.libData?.accountType),
         tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
         subscriptionStatusSignal: store.$value.signalProducer.map(\.subscription.status),
         urlHandler: .default(),
@@ -415,8 +415,8 @@ func makeEnvironment(
                 store: store.projection(
                     value: {
                         PsiCashAccountViewController.ReaderState(
-                            accountType: $0.psiCash.libData.accountType,
-                            pendingAccountLoginLogout: $0.psiCash.pendingAccountLoginLogout
+                            psiCashAccountType: $0.psiCashState.libData?.accountType,
+                            pendingAccountLoginLogout: $0.psiCashState.pendingAccountLoginLogout
                         )
                     },
                     action: {

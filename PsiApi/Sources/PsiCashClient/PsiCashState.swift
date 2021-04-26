@@ -37,33 +37,33 @@ public struct PsiCashState: Equatable {
         case logout
     }
     
+    /// Represents  result of account login/logout.
+    public typealias AccountLoginLogoutCompleted =
+        Either<PsiCashEffectsProtocol.PsiCashAccountLoginResult,
+               PsiCashEffectsProtocol.PsiCashAccountLogoutResult>
+    
+    /// Represents event of logging in or logging out of PsiCash account.
     public typealias PendingAccountLoginLogoutEvent =
-        Event<PendingValue<LoginLogoutPendingValue,
-                           Either<PsiCashEffectsProtocol.PsiCashAccountLoginResult,
-                                  PsiCashEffectsProtocol.PsiCashAccountLogoutResult>>>?
+        Event<PendingValue<LoginLogoutPendingValue, AccountLoginLogoutCompleted>>
     
     public var purchasing: PsiCashPurchasingState
-    public var libData: PsiCashLibData
     
-    public var pendingAccountLoginLogout: PendingAccountLoginLogoutEvent
+    /// Representation of PsiCash data held by PsiCash library.
+    /// `nil` if library is not initialized
+    public var libData: PsiCashLibData?
+    
+    public var pendingAccountLoginLogout: PendingAccountLoginLogoutEvent?
     public var pendingPsiCashRefresh: PendingRefresh
-    /// True if PsiCashLibData has been loaded from persisted value.
-    public var libLoaded: Bool
+    
 }
 
 extension PsiCashState {
     
     public init() {
         purchasing = .none
-        libData = .init()
+        libData = nil
         pendingAccountLoginLogout = nil
         pendingPsiCashRefresh = .completed(.success(.unit))
-        libLoaded = false
-    }
-    
-    public mutating func initialized(_ libData: PsiCashLibData) {
-        self.libData = libData
-        self.libLoaded = true
     }
     
     /// Returns the first Speed Boost product that has not expired.
@@ -71,11 +71,11 @@ extension PsiCashState {
         _ dateCompare: DateCompare
     ) -> PurchasedExpirableProduct<SpeedBoostProduct>? {
         
-        let activeSpeedBoosts = libData.activePurchases.partitionResults().successes
+        let activeSpeedBoosts = libData?.activePurchases.partitionResults().successes
             .compactMap(\.speedBoost)
             .filter { !$0.transaction.isExpired(dateCompare) }
         
-        return activeSpeedBoosts[maybe: 0]
+        return activeSpeedBoosts?[maybe: 0]
     }
 }
 
@@ -108,7 +108,7 @@ public enum PsiCashRequestError<ErrorStatus>: HashableError where
     case errorStatus(ErrorStatus)
     
     /// Sending the request failed utterly.
-    case requestFailed(PsiCashLibError)
+    case requestCatastrophicFailure(PsiCashLibError)
 
 }
 

@@ -51,7 +51,7 @@ struct MainViewState: Equatable {
 struct MainViewReducerState: Equatable {
     var mainView: MainViewState
     let subscriptionState: SubscriptionState
-    let psiCashAccountType: PsiCashAccountType
+    let psiCashAccountType: PsiCashAccountType?
     let appLifecycle: AppLifecycle
 }
 
@@ -250,7 +250,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
 
             let alertType: AlertType = alertEvent.wrapped
             switch alertType {
-            case .psiCashAccountAlert(.loginSuccessAlert(lastTrackerMerge: _)):
+            case .psiCashAccountAlert(.loginSuccessLastTrackerMergeAlert):
                 // Dismisses PsiCashAccountViewController if it is top of the stack.
                 return [
                     .fireAndForget {

@@ -429,36 +429,6 @@
 			<key>Key</key>
 			<string>faq</string>
 		</dict>
-		<dict>
-			<key>Title</key>
-			<string>SETTINGS_PRIVACY_POLICY</string>
-			<key>BundleTable</key>
-			<string>PsiphonClientCommonLibrary</string>
-			<key>Type</key>
-			<string>IASKCustomViewSpecifier</string>
-			<key>Key</key>
-			<string>privacyPolicy</string>
-		</dict>
-		<dict>
-			<key>Title</key>
-			<string>SETTINGS_TERMS_OF_USE</string>
-			<key>BundleTable</key>
-			<string>PsiphonClientCommonLibrary</string>
-			<key>Type</key>
-			<string>IASKCustomViewSpecifier</string>
-			<key>Key</key>
-			<string>termsOfUse</string>
-		</dict>
-		<dict>
-			<key>Title</key>
-			<string>SETTINGS_ABOUT</string>
-			<key>BundleTable</key>
-			<string>PsiphonClientCommonLibrary</string>
-			<key>Type</key>
-			<string>IASKCustomViewSpecifier</string>
-			<key>Key</key>
-			<string>about</string>
-		</dict>
         <dict>
             <key>Title</key>
             <string>!!! Not in the Root.strings, this title is set from SettingsViewController!!!</string>
@@ -491,7 +461,47 @@
             <key>Type</key>
             <string>IASKCustomViewSpecifier</string>
         </dict>
+        <dict>
+            <key>Title</key>
+            <string>SETTINGS_ABOUT</string>
+            <key>BundleTable</key>
+            <string>PsiphonClientCommonLibrary</string>
+            <key>Type</key>
+            <string>PSGroupSpecifier</string>
+        </dict>
+        <dict>
+            <key>Title</key>
+            <string>SETTINGS_PRIVACY_POLICY</string>
+            <key>BundleTable</key>
+            <string>PsiphonClientCommonLibrary</string>
+            <key>Type</key>
+            <string>IASKCustomViewSpecifier</string>
+            <key>Key</key>
+            <string>privacyPolicy</string>
+        </dict>
+        <dict>
+            <key>Title</key>
+            <string>SETTINGS_TERMS_OF_USE</string>
+            <key>BundleTable</key>
+            <string>PsiphonClientCommonLibrary</string>
+            <key>Type</key>
+            <string>IASKCustomViewSpecifier</string>
+            <key>Key</key>
+            <string>termsOfUse</string>
+        </dict>
+        <dict>
+            <key>Title</key>
+            <string>SETTINGS_ABOUT</string>
+            <key>BundleTable</key>
+            <string>PsiphonClientCommonLibrary</string>
+            <key>Type</key>
+            <string>IASKCustomViewSpecifier</string>
+            <key>Key</key>
+            <string>about</string>
+        </dict>
 		<dict>
+            <key>Title</key>
+            <string>Ad</string>
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>
