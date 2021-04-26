@@ -73,6 +73,7 @@ final class PsiCashViewController: ReactiveViewController {
     }
 
     private let platform: Platform
+    private let locale: Locale
     private let feedbackLogger: FeedbackLogger
     private let tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>
     
@@ -103,6 +104,7 @@ final class PsiCashViewController: ReactiveViewController {
     
     init(
         platform: Platform,
+        locale: Locale,
         store: Store<ReaderState, ViewControllerAction>,
         adStore: Store<Utilities.Unit, AdAction>,
         iapStore: Store<Utilities.Unit, IAPAction>,
@@ -115,6 +117,7 @@ final class PsiCashViewController: ReactiveViewController {
         onDismissed: @escaping () -> Void
     ) {
         self.platform = platform
+        self.locale = locale
         self.feedbackLogger = feedbackLogger
         self.tunnelConnectedSignal = tunnelConnectedSignal
         
@@ -499,7 +502,16 @@ final class PsiCashViewController: ReactiveViewController {
                             psiCashLibData.purchasePrices.compactMap {
                                 $0.successToOptional()?.speedBoost
                             }
-                            .map(SpeedBoostPurchasableViewModel.init(purchasable:))
+                            .map { purchasable -> SpeedBoostPurchasableViewModel in
+                                
+                                let productTitle = purchasable.product.localizedString
+                                    .uppercased(with: self.locale)
+                                
+                                return SpeedBoostPurchasableViewModel(
+                                    purchasable: purchasable,
+                                    localizedProductTitle: productTitle
+                                )
+                            }
                             .sorted() // Sorts by Comparable impl of SpeedBoostPurchasableViewModel.
                         
                         let viewModel = NonEmpty(array: speedBoostPurchasables)

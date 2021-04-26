@@ -766,3 +766,63 @@ extension UserStrings {
                                  comment: "Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback.")
     }
 }
+
+// MARK: PsiCash product titles
+
+extension UserStrings {
+    
+    static func Speed_boost_1_hour() -> String {
+        return NSLocalizedString("SPEED_BOOST_1HR", tableName: nil, bundle: Bundle.main,
+                                 value: "1 hour",
+                                 comment: "Label on a button. Clicking this button will buy 1 hour of Speed Boost.")
+    }
+    
+    static func Speed_boost_2_hours() -> String {
+        return NSLocalizedString("SPEED_BOOST_2HR", tableName: nil, bundle: Bundle.main,
+                                 value: "2 hours",
+                                 comment: "Label on a button. Clicking this button will buy 2 hours of Speed Boost.")
+    }
+    
+    static func Speed_boost_3_hours() -> String {
+        return NSLocalizedString("SPEED_BOOST_3HR", tableName: nil, bundle: Bundle.main,
+                                 value: "3 hours",
+                                 comment: "Label on a button. Clicking this button will buy 3 hours of Speed Boost.")
+    }
+    
+    static func Speed_boost_4_hours() -> String {
+        return NSLocalizedString("SPEED_BOOST_4HR", tableName: nil, bundle: Bundle.main,
+                                 value: "4 hours",
+                                 comment: "Label on a button. Clicking this button will buy 4 hours of Speed Boost.")
+    }
+    
+    static func Speed_boost_5_hours() -> String {
+        return NSLocalizedString("SPEED_BOOST_5HR", tableName: nil, bundle: Bundle.main,
+                                 value: "5 hours",
+                                 comment: "Label on a button. Clicking this button will buy 5 hours of Speed Boost.")
+    }
+    
+    static func Speed_boost_6_hours() -> String {
+        return NSLocalizedString("SPEED_BOOST_6HR", tableName: nil, bundle: Bundle.main,
+                                 value: "6 hours",
+                                 comment: "Label on a button. Clicking this button will buy 6 hours of Speed Boost.")
+    }
+    
+    static func Speed_boost_7_hours() -> String {
+        return NSLocalizedString("SPEED_BOOST_7HR", tableName: nil, bundle: Bundle.main,
+                                 value: "7 hours",
+                                 comment: "Label on a button. Clicking this button will buy 7 hours of Speed Boost.")
+    }
+    
+    static func Speed_boost_8_hours() -> String {
+        return NSLocalizedString("SPEED_BOOST_8HR", tableName: nil, bundle: Bundle.main,
+                                 value: "8 hours",
+                                 comment: "Label on a button. Clicking this button will buy 8 hours of Speed Boost.")
+    }
+    
+    static func Speed_boost_9_hours() -> String {
+        return NSLocalizedString("SPEED_BOOST_9HR", tableName: nil, bundle: Bundle.main,
+                                 value: "9 hours",
+                                 comment: "Label on a button. Clicking this button will buy 9 hours of Speed Boost.")
+    }
+    
+}

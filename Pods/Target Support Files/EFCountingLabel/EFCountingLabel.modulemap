@@ -1,0 +1,6 @@
+module EFCountingLabel {
+  umbrella header "EFCountingLabel-umbrella.h"
+
+  export *
+  module * { export * }
+}
