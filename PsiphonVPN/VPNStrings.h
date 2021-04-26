@@ -23,11 +23,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VPNStrings : NSObject
 
-+ (NSString *)disallowedTrafficAlertMessage;
+// Simple alert message when user notification cannot be displayed.
++ (NSString *)disallowed_traffic_simple_alert_message;
 
-+ (NSString *)disallowedTrafficNotificationTitle;
++ (NSString *)disallowed_traffic_notification_title;
 
-+ (NSString *)disallowedTrafficNotificationBody;
++ (NSString *)disallowed_traffic_alert_notification_body;
 
 + (NSString *)corruptSettingsFileAlertMessage;
 
