@@ -48,7 +48,7 @@ final class AdMobRewardedVideoAdController: StoreDelegate<AdAction> {
         super.init(store: store)
     }
     
-    func load(rewardData: String?, adConsent: AdConsent) {
+    func load(rewardData: String?) {
         
         guard let rewardData = rewardData else {
             self.status = .loadFailed(ErrorEvent(.nilRewardData, date: Date()))
@@ -59,7 +59,7 @@ final class AdMobRewardedVideoAdController: StoreDelegate<AdAction> {
         
         self.status = .loading
         
-        let request = adConsent.makeGADRequestWithNPA()
+        let request = GADRequest.makeGADRequestWithNPA()
         
         GADRewardedAd.load(withAdUnitID: adUnitID, request: request) { maybeRewardedVideo, maybeError in
             
