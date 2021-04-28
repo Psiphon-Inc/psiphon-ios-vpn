@@ -25,22 +25,8 @@ import PsiCashClient
 import AppStoreIAP
 import GoogleMobileAds
 
-/// Represent ad consent failures.
-enum AdConsentError: HashableError {
-    
-    /// Ad consent request failed due to tunnel not being connected.
-    case notUntunneled
-    
-    /// Ad consent request failed.
-    case other(SystemError<Int>)
-    
-}
-
 /// Ad SDK initialization failure type.
 enum AdSdkInitError: HashableError {
-    
-    /// Represents an error while collecting user consent through `AdConsent`.
-    case adConsentError(AdConsentError)
     
     /// Represents failure of all AdMob adapters (there is currently just one) to be in a ready state.
     case adMobSDKInitNoAdaptersReady(GADInitializationStatus)
@@ -88,9 +74,9 @@ enum AdAction {
     
     /// Initializes the Ad SDK(s), and collects consent if required.
     /// - Note: Ad SDKs might pre-fetch ads automatically after initialization.
-    case collectConsentAndInitAdSdk
+    case initAdSdk
     
-    case _collectConsentAndInitAdSdkResult(Result<GADInitializationStatus, AdSdkInitError>)
+    case _initAdSdkResult(Result<GADInitializationStatus, AdSdkInitError>)
     
     /// Loads interstitial ad, if user is unsubscribed and tunnel is not connected.
     /// Collects consent and inits Ad SDK if not done already.
@@ -120,14 +106,11 @@ enum AdAction {
     /// User earned rewarded of a rewarded video ad.
     case rewardedVideoAdUserEarnedReward
     
-    case resetUserConsent
-    
 }
 
 typealias AdStateEnvironment = (
     platform: Platform,
     feedbackLogger: FeedbackLogger,
-    adConsent: AdConsent,
     psiCashLib: PsiCashEffects,
     psiCashStore: (PsiCashAction) -> Effect<Never>,
     tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
@@ -144,7 +127,7 @@ func adStateReducer(
     
     switch action {
     
-    case .collectConsentAndInitAdSdk:
+    case .initAdSdk:
         
         if let error = environment.adLoadCondition() {
             return [
@@ -162,17 +145,16 @@ func adStateReducer(
         state.adState.appTrackingTransparencyPermission = .pending
         
         return [
-            collectATTConsentAndInitAdMobSDK(
+            initAdMobSDK(
                 tunnelStatusSignal: environment.tunnelStatusSignal,
-                adConsent: environment.adConsent,
                 topMostViewController: environment.topMostViewController
             )
             .mapBothAsResult {
-                ._collectConsentAndInitAdSdkResult($0)
+                ._initAdSdkResult($0)
             }
         ]
         
-    case ._collectConsentAndInitAdSdkResult(let result):
+    case ._initAdSdkResult(let result):
         
         switch result {
         case .success(let gadInitializationStatus):
@@ -192,13 +174,7 @@ func adStateReducer(
             state.adState.appTrackingTransparencyPermission = .completed(.failure(error))
             
             switch error {
-            case .adConsentError(.notUntunneled):
-                // Logs untunneled error as an info
-                return [
-                    environment.feedbackLogger.log(.info, "AdMob failed to init: \(error)")
-                        .mapNever()
-                ]
-            default:
+            case .adMobSDKInitNoAdaptersReady(_):
                 // Logs untunneled error as an info
                 return [
                     environment.feedbackLogger.log(.error, "AdMob failed to init: \(error)")
@@ -231,19 +207,18 @@ func adStateReducer(
             state.adState.appTrackingTransparencyPermission = .pending
             
             return [
-                collectATTConsentAndInitAdMobSDK(
+                initAdMobSDK(
                     tunnelStatusSignal: environment.tunnelStatusSignal,
-                    adConsent: environment.adConsent,
                     topMostViewController: environment.topMostViewController
                 )
                 .mapBothAsResult(id)
                 .flatMap(.latest, { consentResult in
                     
                     if case .success(_) = consentResult {
-                        return Effect(value: ._collectConsentAndInitAdSdkResult(consentResult))
+                        return Effect(value: ._initAdSdkResult(consentResult))
                             .concat(value: .loadInterstitial(reason: reason))
                     } else {
-                        return Effect(value: ._collectConsentAndInitAdSdkResult(consentResult))
+                        return Effect(value: ._initAdSdkResult(consentResult))
                     }
                     
                 })
@@ -279,8 +254,7 @@ func adStateReducer(
                     .mapNever(),
                 
                 .fireAndForget {
-                    environment.adMobInterstitialAdController
-                        .load(adConsent: environment.adConsent)
+                    environment.adMobInterstitialAdController.load()
                 }
                 
             ]
@@ -394,19 +368,18 @@ func adStateReducer(
             
             return [
                 
-                collectATTConsentAndInitAdMobSDK(
+                initAdMobSDK(
                     tunnelStatusSignal: environment.tunnelStatusSignal,
-                    adConsent: environment.adConsent,
                     topMostViewController: environment.topMostViewController
                 )
                 .mapBothAsResult(id)
                 .flatMap(.latest, { consentResult in
                     
                     if case .success(_) = consentResult {
-                        return Effect(value: ._collectConsentAndInitAdSdkResult(consentResult))
+                        return Effect(value: ._initAdSdkResult(consentResult))
                             .concat(value: .loadRewardedVideo(presentAfterLoad: presentAfterLoad))
                     } else {
-                        return Effect(value: ._collectConsentAndInitAdSdkResult(consentResult))
+                        return Effect(value: ._initAdSdkResult(consentResult))
                     }
                     
                 })
@@ -447,8 +420,7 @@ func adStateReducer(
                 
                 .fireAndForget {
                     let rewardData = environment.psiCashLib.rewardedVideoCustomData()
-                    environment.adMobRewardedVideoAdController
-                        .load(rewardData: rewardData, adConsent: environment.adConsent)
+                    environment.adMobRewardedVideoAdController.load(rewardData: rewardData)
                 }
                 
             ]
@@ -563,131 +535,46 @@ func adStateReducer(
             
         ]
         
-    case .resetUserConsent:
-        
-        return [
-            .fireAndForget {
-                environment.adConsent.resetConsent()
-            }
-        ]
-        
     }
     
 }
 
 
 /// Permission request for AppTrackingTransparency, and initializes AdMob SDK.
-fileprivate func collectATTConsentAndInitAdMobSDK(
+fileprivate func initAdMobSDK(
     tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
-    adConsent: AdConsent,
     topMostViewController: @escaping () -> UIViewController
 ) -> SignalProducer<GADInitializationStatus, AdSdkInitError> {
     
     tunnelStatusSignal
         .take(first: 1)
-        .flatMap(.latest) { vpnStatus -> SignalProducer<(), AdConsentError> in
+        .flatMap(.latest) { vpnStatus in
             
-            // Consent info update if VPN status is invalid or disconnected.
             switch vpnStatus {
             case .invalid, .disconnected:
                 
-                // UMP consentInfoUpdate.
                 return SignalProducer.async { observer in
-
-                    // Observer is called with the result of
-                    // AdConsent.consentInfoUpdate(completionHandler:).
-                    adConsent.consentInfoUpdate { maybeError in
+                    
+                    GADMobileAds.sharedInstance().start { gadInitializationStatus in
                         
-                        // Maps Error? to Result<(), AdConsentError>
-                        let result: Result<(), AdConsentError> =
-                            Optional<SystemError<Int>>.make(maybeError as NSError?)
-                            .maybeToRight(())
-                            .mapError { .other($0) }
-
-                        observer(result)
+                        // If no ad adapters are ready to service ad requests,
+                        // SDK initialization is considered to have failed.
+                        guard gadInitializationStatus.adaptersReady.count > 0 else {
+                            observer(.failure(.adMobSDKInitNoAdaptersReady(gadInitializationStatus)))
+                            return
+                        }
+                        
+                        // There is at least one adapter ready to service ad requests.
+                        observer(.success(gadInitializationStatus))
                         
                     }
-
                 }
-                            
+                
             default:
-                return SignalProducer(error: .notUntunneled)
+                return .empty
+                
             }
             
-        }
-        .flatMap(.latest) { () -> SignalProducer<(), AdConsentError> in
-            
-            // Presents consent form if needed, only if VPN status is invalid or disconnected.
-            tunnelStatusSignal
-                .take(first: 1)
-                .flatMap(.latest) { vpnStatus in
-                    
-                    switch vpnStatus {
-                    case .invalid, .disconnected:
-                        
-                        // UMP present consent form if needed.
-                        return SignalProducer.async { observer in
-
-                            // Presents consent form.
-                            adConsent.presentConsentFormIfNeeded(
-                                fromViewController: topMostViewController
-                            ) { maybeError, _ in
-
-                                // Maps Error? to Result<(), AdConsentError>
-                                let result: Result<(), AdConsentError> =
-                                    Optional<SystemError<Int>>.make(maybeError as NSError?)
-                                    .maybeToRight(())
-                                    .mapError { .other($0) }
-
-                                observer(result)
-
-                            }
-
-                        }
-                                            
-                    default:
-                        return SignalProducer(error: .notUntunneled)
-                        
-                    }
-                    
-                }
-            
-        }
-        .mapError { adConsentError in
-            .adConsentError(adConsentError)
-        }
-        .flatMap(.latest) { () -> SignalProducer<GADInitializationStatus, AdSdkInitError> in
-            
-            tunnelStatusSignal
-                .take(first: 1)
-                .flatMap(.latest) { vpnStatus in
-                    
-                    switch vpnStatus {
-                    case .invalid, .disconnected:
-                        
-                        return SignalProducer.async { observer in
-                            
-                            GADMobileAds.sharedInstance().start { gadInitializationStatus in
-                                
-                                // If no ad adapters are ready to service ad requests,
-                                // SDK initialization is considered to have failed.
-                                guard gadInitializationStatus.adaptersReady.count > 0 else {
-                                    observer(.failure(.adMobSDKInitNoAdaptersReady(gadInitializationStatus)))
-                                    return
-                                }
-                                
-                                // There is at least one adapter ready to service ad requests.
-                                observer(.success(gadInitializationStatus))
-                                
-                            }
-                        }
-                        
-                    default:
-                        return .empty
-                        
-                    }
-                    
-                }
         }
     
 }

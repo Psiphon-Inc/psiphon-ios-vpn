@@ -498,7 +498,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     userDefaultsConfig: self.userDefaultsConfig,
                     objcBridgeDelegate: objcBridge,
                     calendar: Calendar.current,
-                    adConsent: AdConsent(),
                     topMostViewController: AppDelegate.getTopPresentedViewController
                 )
                 self.environmentCleanup = cleanup
@@ -1034,10 +1033,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             self.feedbackLogger.fatalError("Unexpected state '\(value.switchedIntent)'")
             return
         }
-    }
-    
-    @objc func resetAdConsent() {
-        self.store.send(.adAction(.resetUserConsent))
     }
     
     @objc func presentInterstitial(_ completionHandler: @escaping () -> Void) {

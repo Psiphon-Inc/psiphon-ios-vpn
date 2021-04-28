@@ -142,7 +142,6 @@ typealias AppEnvironment = (
     getPsiphonConfig: () -> [AnyHashable: Any]?,
     getAppStateFeedbackEntry: SignalProducer<DiagnosticEntry, Never>,
     getFeedbackUpload: () -> FeedbackUploadProvider,
-    adConsent: AdConsent,
     adMobInterstitialAdController: AdMobInterstitialAdController,
     adMobRewardedVideoAdController: AdMobRewardedVideoAdController,
     topMostViewController: () -> UIViewController
@@ -161,7 +160,6 @@ func makeEnvironment(
     userDefaultsConfig: UserDefaultsConfig,
     objcBridgeDelegate: ObjCBridgeDelegate,
     calendar: Calendar,
-    adConsent: AdConsent,
     topMostViewController: @escaping () -> UIViewController
 ) -> (environment: AppEnvironment, cleanup: () -> Void) {
     
@@ -329,7 +327,6 @@ func makeEnvironment(
                                               store: store)
             },
         getFeedbackUpload: {PsiphonTunnelFeedback()},
-        adConsent: adConsent,
         adMobInterstitialAdController: adMobInterstitialAdController,
         adMobRewardedVideoAdController: adMobRewardedVideoAdController,
         topMostViewController: topMostViewController
@@ -496,7 +493,6 @@ fileprivate func toAdStateEnvironment(env: AppEnvironment) -> AdStateEnvironment
     AdStateEnvironment(
         platform: env.platform,
         feedbackLogger: env.feedbackLogger,
-        adConsent: env.adConsent,
         psiCashLib: env.psiCashEffects,
         psiCashStore: env.psiCashStore,
         tunnelStatusSignal: env.tunnelStatusSignal,
