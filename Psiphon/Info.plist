@@ -81,7 +81,5 @@
 			<string>cstr6suwn9.skadnetwork</string>
 		</dict>
 	</array>
-	<key>NSUserTrackingUsageDescription</key>
-	<string>This identifier will be used to deliver personalized ads to you. These ads help keep Psiphon free.</string>
 </dict>
 </plist>
