@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Psiphon Inc.
+ * Copyright (c) 2021, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,10 +18,17 @@
  */
 
 import Foundation
-import PsiApi
+import GoogleMobileAds
 
-#if DEBUG
-let adMobTestDeviceIdentifiers: [String] = ["6c6ae82d1df714bdd475d46562ffa1fc"]
-#else
-let adMobTestDeviceIdentifiers: [String] = []
-#endif
+extension GADRequest {
+    
+    /// Makes GADRequest object with non-persoanlized ads for all users ("npa" set to "1").
+    static func makeGADRequestWithNPA() -> GADRequest {
+        let request = GADRequest()
+        let extras = GADExtras()
+        extras.additionalParameters = ["npa": "1"]
+        request.register(extras)
+        return request
+    }
+    
+}

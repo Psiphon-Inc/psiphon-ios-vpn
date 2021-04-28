@@ -34,7 +34,6 @@
 NSString * const SettingsPsiCashCellSpecifierKey = @"settingsPsiCash";
 NSString * const SettingsSubscriptionCellSpecifierKey = @"settingsSubscription";
 NSString * const SettingsReinstallVPNConfigurationKey = @"settingsReinstallVPNConfiguration";
-NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConsent";
 
 @interface SettingsViewController ()
 
@@ -48,7 +47,6 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
 @implementation SettingsViewController {
     UITableViewCell *subscriptionTableViewCell;
     UITableViewCell *reinstallVPNProfileCell;
-    UITableViewCell *resetConsentCell;
 }
 
 - (instancetype)init {
@@ -157,10 +155,6 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
         [SwiftDelegate.bridge reinstallVPNConfig];
         [self settingsViewControllerDidEnd:nil];
 
-    } else if ([specifier.key isEqualToString:SettingsResetAdConsentCellSpecifierKey]) {
-        [self onResetConsent];
-        NSIndexPath *path = [tableView indexPathForCell:resetConsentCell];
-        [tableView deselectRowAtIndexPath:path animated:TRUE];
     }
 }
 
@@ -171,7 +165,6 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
       SettingsPsiCashCellSpecifierKey,
       SettingsSubscriptionCellSpecifierKey,
       SettingsReinstallVPNConfigurationKey,
-      SettingsResetAdConsentCellSpecifierKey
     ];
 
     if (![customKeys containsObject:specifier.key]) {
@@ -198,17 +191,6 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
         reinstallVPNProfileCell = cell;
         [self updateReinstallVPNProfileCell];
 
-    } else if ([specifier.key isEqualToString:SettingsResetAdConsentCellSpecifierKey]) {
-        cell = [super tableView:tableView cellForSpecifier:specifier];
-        cell.textLabel.textAlignment = NSTextAlignmentCenter;
-        cell.textLabel.textColor = self.view.tintColor;
-        cell.textLabel.text = NSLocalizedStringWithDefaultValue(@"SETTINGS_RESET_ADMOB_CONSENT",
-          nil,
-          [NSBundle mainBundle],
-          @"Reset AdMob Consent",
-          @"(Do not translate 'AdMob') Title of cell in settings menu which indicates the user can change or revoke the consent they've given to admob");
-
-        resetConsentCell = cell;
     }
 
     PSIAssert(cell != nil);
@@ -227,22 +209,6 @@ NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConse
     IAPViewController *iapViewController = [[IAPViewController alloc]init];
     iapViewController.openedFromSettings = YES;
     [self.navigationController pushViewController:iapViewController animated:YES];
-}
-
-- (void)onResetConsent {
-    UIAlertController *options = [UIAlertController alertControllerWithTitle:nil
-                                                                     message:nil
-                                                  preferredStyle:UIAlertControllerStyleActionSheet];
-
-    UIAlertAction *resetAction = [UIAlertAction actionWithTitle:[Strings resetConsentButtonTitle]
-        style:UIAlertActionStyleDestructive
-      handler:^(UIAlertAction *action) {
-          [SwiftDelegate.bridge resetAdConsent];
-      }];
-
-    [options addAction:resetAction];
-    [options addCancelAction:nil];
-    [options presentFromTopController];
 }
 
 @end
