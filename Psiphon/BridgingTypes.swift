@@ -117,8 +117,6 @@ import PsiCashClient
     
     // Ad
     
-    @objc func resetAdConsent()
-    
     @objc func presentInterstitial(_ completionHandler: @escaping () -> Void)
     
     @objc func restartVPNIfActive()
