@@ -132,7 +132,6 @@
 		8D417EDD2419DBA100FEE587 /* ProductRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDC2419DBA100FEE587 /* ProductRequest.swift */; };
 		8D4ACD32247E3626008E404C /* AppStoreIAP+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */; };
 		8D53C6A824C5EED8001E4E2D /* SessionConfigValues.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D53C6A724C5EED8001E4E2D /* SessionConfigValues.m */; };
-		8D6BD9292507E54600D03EBB /* Debugging.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D6BD9282507E54600D03EBB /* Debugging.swift */; };
 		8D778978247469FE0038BFDA /* AppInfo.h in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920620F3DA190033114B /* AppInfo.h */; };
 		8D7789B9247491CA0038BFDA /* PsiphonBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */; };
 		8D7789BD247493300038BFDA /* VPNState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D7789BC247493300038BFDA /* VPNState.swift */; };
@@ -613,7 +612,6 @@
 		8D5F08A5247DB21700F51A42 /* Testing */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Testing; sourceTree = SOURCE_ROOT; };
 		8D5F08A6247DB23A00F51A42 /* Utilities */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Utilities; sourceTree = SOURCE_ROOT; };
 		8D5F08A7247DB24C00F51A42 /* PsiApi */ = {isa = PBXFileReference; lastKnownFileType = folder; path = PsiApi; sourceTree = SOURCE_ROOT; };
-		8D6BD9282507E54600D03EBB /* Debugging.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Debugging.swift; sourceTree = "<group>"; };
 		8D7789B8247491CA0038BFDA /* PsiphonBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiphonBundle.swift; sourceTree = "<group>"; };
 		8D7789BC247493300038BFDA /* VPNState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VPNState.swift; sourceTree = "<group>"; };
 		8D7789C4247496F60038BFDA /* PsiCashLib+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PsiCashLib+Additions.swift"; sourceTree = "<group>"; };
@@ -1362,7 +1360,6 @@
 				8D26455E24D4842E000F46C0 /* Navigator.swift */,
 				8D0017DA24DDD99A00EC3409 /* AppUpgrade.swift */,
 				8DEEE12E252F757600B0A9EC /* SupportedLocalizations.swift */,
-				8D6BD9282507E54600D03EBB /* Debugging.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -2034,7 +2031,6 @@
 				2913641F25DF06C800C79880 /* AdMobInterstitialAdController.swift in Sources */,
 				445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */,
 				296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */,
-				8D6BD9292507E54600D03EBB /* Debugging.swift in Sources */,
 				52A2466F23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift in Sources */,
 				8D0017D924DB4B1200EC3409 /* OnboardingViewController.swift in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
