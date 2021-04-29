@@ -35,7 +35,7 @@ enum MainViewAction: Equatable {
 
     case _alertButtonTapped(AlertEvent, AlertAction)
 
-    case presentPsiCashScreen(initialTab: PsiCashScreenTab)
+    case presentPsiCashScreen(initialTab: PsiCashScreenTab, animated: Bool = true)
     case dismissedPsiCashScreen
 
     case psiCashViewAction(PsiCashViewAction)
@@ -320,7 +320,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             }
         }
 
-    case let .presentPsiCashScreen(initialTab):
+    case let .presentPsiCashScreen(initialTab, animated):
         // If psiCashViewState is not nil, it implies the PsiCashViewController is presented.
         guard case .none = state.mainView.psiCashViewState else {
             return []
@@ -355,7 +355,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                     let psiCashViewController = environment.makePsiCashViewController()
 
                     topVC.safePresent(psiCashViewController,
-                                      animated: true,
+                                      animated: animated,
                                       viewDidAppearHandler: nil)
 
                 case .presentInStack(_),
