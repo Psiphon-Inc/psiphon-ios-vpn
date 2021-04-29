@@ -268,25 +268,13 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
         [self.compoundDisposable addDisposable:disposable];
     }
 
-    // Subscribes to `AppDelegate.psiCashBalance` subject to receive PsiCash balance updates.
+    // Updates PsiCashWidgetView with updated view model.
     {
-        [self.compoundDisposable addDisposable:[AppObservables.shared.psiCashBalance
-                                subscribeNext:^(BridgedBalanceViewBindingType * _Nullable balance) {
+        [self.compoundDisposable addDisposable:[AppObservables.shared.psiCashWidgetViewModel
+                                subscribeNext:^(BridgedPsiCashWidgetBindingType * _Nullable newValue) {
             MainViewController *__strong strongSelf = weakSelf;
             if (strongSelf) {
-                [strongSelf->psiCashWidget.balanceViewWrapper objcBind:balance];
-            }
-        }]];
-    }
-
-    // Subscribes to `AppObservable.shared.speedBoostExpiry` subject
-    // to update `psiCashWidget` with the latest expiry time.
-    {
-        [self.compoundDisposable addDisposable:[AppObservables.shared.speedBoostExpiry
-                                                subscribeNext:^(NSDate * _Nullable expiry) {
-            MainViewController *__strong strongSelf = weakSelf;
-            if (strongSelf) {
-                [strongSelf->psiCashWidget.speedBoostButton setExpiryTime:expiry];
+                [strongSelf->psiCashWidget objcBind:newValue];
             }
         }]];
     }

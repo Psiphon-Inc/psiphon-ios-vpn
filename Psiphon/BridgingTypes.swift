@@ -33,12 +33,7 @@ import PsiCashClient
     
     @objc func startStopVPNWithInterstitial()
     
-    @objc func onPsiCashBalanceUpdate(_ balance: BridgedBalanceViewBindingType)
-
-    /// Called with latest active Speed Boost expiry time.
-    /// If no Speed Boost purchase exists, or if it has already expired, delegate is called
-    /// with nil value.
-    @objc func onSpeedBoostActivePurchase(_ expiryTime: Date?)
+    @objc func onPsiCashWidgetViewModelUpdate(_ newValue: BridgedPsiCashWidgetBindingType)
 
     @objc func onSubscriptionStatus(_ status: BridgedUserSubscription)
     
@@ -346,11 +341,11 @@ import PsiCashClient
 
 }
 
-/// Wraps `BalanceState` struct.
-@objc final class BridgedBalanceViewBindingType: NSObject {
-    let state: PsiCashBalanceViewWrapper.BindingType
+/// Wraps `PsiCashWidgetView.BindingType` struct.
+@objc final class BridgedPsiCashWidgetBindingType: NSObject {
+    let swiftValue: PsiCashWidgetView.BindingType
 
-    init(swiftState state: PsiCashBalanceViewWrapper.BindingType) {
-        self.state = state
+    init(swiftValue: PsiCashWidgetView.BindingType) {
+        self.swiftValue = swiftValue
     }
 }

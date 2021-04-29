@@ -174,12 +174,3 @@ struct PsiCashBalanceViewModel: Equatable {
     }
 
 }
-
-// ObjC bindings for updating balance view.
-extension PsiCashBalanceViewWrapper {
-
-    @objc func objcBind(_ bindingValue: BridgedBalanceViewBindingType) {
-        self.bind(bindingValue.state)
-    }
-
-}
