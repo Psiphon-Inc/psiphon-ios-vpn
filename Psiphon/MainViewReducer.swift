@@ -99,8 +99,20 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                 return false
             }
         }
+        
+        guard failedMessages.count > 0 else {
+            return []
+        }
+        
+        let failedMessagesAlertTypes = failedMessages.map(\.viewModel.wrapped)
 
-        return failedMessages.map {
+        return [
+            environment.feedbackLogger.log(
+                .warn, "presenting previously failed alert messages: '\(failedMessagesAlertTypes)'")
+                .mapNever()
+        ]
+        +
+        failedMessages.map {
             Effect(value: .presentAlert($0.viewModel))
         }
 
