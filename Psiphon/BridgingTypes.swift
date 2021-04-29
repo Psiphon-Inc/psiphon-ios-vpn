@@ -82,6 +82,9 @@ import PsiCashClient
                            open url: URL,
                            options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool
 
+    
+    @objc func presentPsiCashAccountViewController()
+    
     @objc func presentPsiCashViewController(_ initialTab: PsiCashScreenTab)
     
     @objc func loadingScreenDismissSignal(_ completionHandler: @escaping () -> Void)

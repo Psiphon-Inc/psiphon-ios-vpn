@@ -25,9 +25,21 @@ import UIKit
     @objc let balanceViewWrapper = PsiCashBalanceViewWrapper()
     @objc let speedBoostButton = SpeedBoostButton()
     @objc let addPsiCashButton = DuskButton()
-    private let topRowLayoutGuide = UILayoutGuide()
+    @objc let psiCashAccountButton = DuskButton()
+
+    // Horizonal stack containing the top row items.
+    private let topRowHStack: UIStackView
+    
 
     override init(frame: CGRect) {
+        
+        topRowHStack = UIStackView.make(
+            axis: .horizontal,
+            distribution: .equalSpacing,
+            alignment: .center,
+            spacing: 10.0
+        )
+        
         super.init(frame: frame)
         
         addPsiCashButton.setTitle("+", for: .normal)
@@ -35,35 +47,36 @@ import UIKit
         addPsiCashButton.setTitleColor(.white, for: .normal)
         addPsiCashButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 7, bottom: 0, right: 7)
         
+        let accountIcon = UIImage(named: "AccountIcon")!
+        psiCashAccountButton.setImage(accountIcon, for: .normal)
+        
         speedBoostButton.contentEdgeInset(.normal)
 
-        addLayoutGuide(topRowLayoutGuide)
-        addSubview(speedBoostButton)
-        addSubview(balanceViewWrapper.view)
-        addSubview(addPsiCashButton)
+        topRowHStack.addArrangedSubviews(
+            balanceViewWrapper.view,
+            addPsiCashButton,
+            psiCashAccountButton
+        )
         
-        topRowLayoutGuide.activateConstraints {[
-            $0.topAnchor.constraint(equalTo: self.topAnchor),
-            $0.bottomAnchor.constraint(equalTo: balanceViewWrapper.view.bottomAnchor),
-            $0.leadingAnchor.constraint(equalTo: balanceViewWrapper.view.leadingAnchor),
-            $0.trailingAnchor.constraint(equalTo: addPsiCashButton.trailingAnchor),
-            $0.centerXAnchor.constraint(equalTo: self.centerXAnchor)
-        ]}
+        self.addSubviews(
+            topRowHStack,
+            speedBoostButton
+        )
         
-        balanceViewWrapper.view.activateConstraints {
-            $0.constraint(to: topRowLayoutGuide, [.leading(0), .top(0)]) +
-                [ $0.centerYAnchor.constraint(equalTo: addPsiCashButton.centerYAnchor) ]
+        topRowHStack.activateConstraints {
+            $0.constraintToParent(.top(), .centerX())
         }
         
-        addPsiCashButton.activateConstraints {
-            [ $0.topAnchor.constraint(equalTo: balanceViewWrapper.view.topAnchor),
-              $0.leadingAnchor.constraint(equalTo: balanceViewWrapper.view.trailingAnchor,
-                                          constant: 10.0) ]
+        psiCashAccountButton.activateConstraints {
+            [
+              $0.widthAnchor.constraint(equalTo: addPsiCashButton.widthAnchor),
+              $0.heightAnchor.constraint(equalTo: addPsiCashButton.heightAnchor)
+            ]
         }
         
         speedBoostButton.activateConstraints {
             $0.constraintToParent(.bottom(), .leading(), .trailing()) +
-                [ $0.topAnchor.constraint(equalTo: balanceViewWrapper.view.bottomAnchor,
+                [ $0.topAnchor.constraint(equalTo: topRowHStack.bottomAnchor,
                                           constant: Style.default.padding) ]
         }
 
