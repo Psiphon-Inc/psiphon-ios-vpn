@@ -39,8 +39,6 @@ import PsiCashClient
     // Horizonal stack containing the top row items.
     private let topRowHStack: UIStackView
     
-    private var accountButtonDisplayed: Bool = false
-
     override init(frame: CGRect) {
         
         topRowHStack = UIStackView.make(
@@ -65,7 +63,8 @@ import PsiCashClient
         // Adds permanent views to the stack view.
         topRowHStack.addArrangedSubviews(
             balanceViewWrapper.view,
-            addPsiCashButton
+            addPsiCashButton,
+            psiCashAccountButton
         )
         
         self.addSubviews(
@@ -75,6 +74,13 @@ import PsiCashClient
         
         topRowHStack.activateConstraints {
             $0.constraintToParent(.top(), .centerX())
+        }
+        
+        psiCashAccountButton.activateConstraints {
+            [
+              $0.widthAnchor.constraint(equalTo: addPsiCashButton.widthAnchor),
+              $0.heightAnchor.constraint(equalTo: addPsiCashButton.heightAnchor)
+            ]
         }
         
         speedBoostButton.activateConstraints {
@@ -97,22 +103,16 @@ import PsiCashClient
         switch newValue.accountType {
         case .none, .noTokens, .tracker, .account(loggedIn: false):
             // Shows psiCashAccountButton, if not displayed already.
-            if !accountButtonDisplayed {
+            if psiCashAccountButton.isHidden {
                 topRowHStack.addArrangedSubview(psiCashAccountButton)
-                psiCashAccountButton.activateConstraints {
-                    [
-                      $0.widthAnchor.constraint(equalTo: addPsiCashButton.widthAnchor),
-                      $0.heightAnchor.constraint(equalTo: addPsiCashButton.heightAnchor)
-                    ]
-                }
-                accountButtonDisplayed = true
+                psiCashAccountButton.isHidden = false
             }
             
         case .account(loggedIn: true):
             // Hides psiCashAccountButton, if not removed already.
-            if accountButtonDisplayed {
+            if !psiCashAccountButton.isHidden {
                 topRowHStack.removeArrangedSubview(psiCashAccountButton)
-                accountButtonDisplayed = false
+                psiCashAccountButton.isHidden = true
             }
 
         }
