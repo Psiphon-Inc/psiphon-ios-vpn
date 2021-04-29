@@ -78,16 +78,20 @@ struct PsiCashViewState: Equatable {
 struct PsiCashViewReducerState: Equatable {
     var viewState: PsiCashViewState
     let psiCashAccountType: PsiCashAccountType?
+    let vpnStatus: TunnelProviderVPNStatus
 }
 
 struct PsiCashViewEnvironment {
     let feedbackLogger: FeedbackLogger
     let iapStore: (IAPAction) -> Effect<Never>
+    let mainViewStore: (MainViewAction) -> Effect<Never>
 
     let getTopPresentedViewController: () -> UIViewController
 
     /// Makes `PsiCashAccountViewController` as root of UINavigationController.
     let makePsiCashAccountViewController: () -> UIViewController
+    
+    let dateCompare: DateCompare
 }
 
 let psiCashViewReducer = Reducer<PsiCashViewReducerState,
@@ -201,8 +205,27 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
         ]
         
     case .signupOrLoginTapped:
+        
         guard state.viewState.isPsiCashAccountScreenShown == false else {
             return []
+        }
+        
+        // Skips presenting PsiCash Account screen if tunnel is not connected.
+        // Note that this is a quick check for informing the user,
+        // and PsiCash Account screen performs it's own last second tunnel checks
+        // before making any API requests.
+        guard case .connected = state.vpnStatus else {
+
+            // Informs user that tunnel is not connected.
+            let alertEvent = AlertEvent(
+                .psiCashAccountAlert(.tunnelNotConnectedAlert),
+                date: environment.dateCompare.getCurrentTime()
+            )
+            
+            return [
+                environment.mainViewStore(.presentAlert(alertEvent)).mapNever()
+            ]
+            
         }
 
         if case .confirmAccountLogin(_) = state.viewState.psiCashIAPPurchaseRequestState {
