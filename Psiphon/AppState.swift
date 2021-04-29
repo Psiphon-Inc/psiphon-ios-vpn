@@ -375,6 +375,7 @@ func makeEnvironment(
         makePsiCashViewController: { [unowned store] in
             PsiCashViewController(
                 platform: platform,
+                locale: userDefaultsConfig.localeForAppLanguage,
                 store: store.projection(
                     value: { $0.psiCashViewControllerReaderState },
                     action: {

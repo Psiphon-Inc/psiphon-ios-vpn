@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>StringsTable</key>
+	<string>Root</string>
+	<key>PreferenceSpecifiers</key>
+	<array>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>FooterText</key>
+			<string>CONNECTION_HELP_BEST_PERFORMANCE_FOOTER</string>
+			<key>FooterTextDefault</key>
+			<string>Changing your region to “Best performance” increases your chances of getting connected.</string>
+			<key>FooterTextDescription</key>
+			<string>Explanatory text for the &quot;Select server region&quot; setting on the &quot;My connection is bad, help!&quot; settings page.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+		</dict>
+		<dict>
+			<key>Title</key>
+			<string>SELECT_SERVER_REGION</string>
+            <key>TitleDefault</key>
+            <string>Select server region</string>
+            <key>TitleDescription</key>
+            <string>Title for screen that allows user to select their desired server region.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Key</key>
+			<string>regionSelection</string>
+			<key>Type</key>
+			<string>IASKCustomViewSpecifier</string>
+			<key>DefaultValue</key>
+			<string></string>
+		</dict>
+		<dict>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>FooterText</key>
+			<string>CONNECTION_HELP_DISABLE_TIMEOUTS_FOOTER</string>
+			<key>FooterTextDefault</key>
+			<string>Disabling timeouts may help you stay connected on slower networks.</string>
+			<key>FooterTextDescription</key>
+			<string>Explanatory text for the &quot;Disable Timeouts&quot; setting on the &quot;My connection is bad, help!&quot; settings page.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+		</dict>
+		<dict>
+			<key>DefaultValue</key>
+			<false/>
+			<key>Key</key>
+			<string>disableTimeouts</string>
+			<key>Title</key>
+			<string>DISABLE_TIMEOUTS</string>
+			<key>TitleDefault</key>
+			<string>Disable timeouts</string>
+			<key>TitleDescription</key>
+			<string>Settings item text, under &apos;Psiphon settings&apos;. Disabling timeouts in the Psiphon tunnel can help in really bad network conditions. Text should be kept short.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Type</key>
+			<string>PSToggleSwitchSpecifier</string>
+		</dict>
+		<dict>
+			<key>Key</key>
+			<string>forceReconnectFooter</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+			<key>FooterText</key>
+			<string>CONNECTION_HELP_FORCE_RECONNECT_FOOTER</string>
+			<key>FooterTextDefault</key>
+			<string>Reconnecting to the Psiphon server may help if your current connection is slow or non-responsive.</string>
+			<key>FooterTextDescription</key>
+			<string>Explanatory text for the &quot;Reconnect to the Psiphon server&quot; command on the &quot;My connection is bad, help!&quot; settings page. DO NOT translate the word &apos;Psiphon&apos;.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+		</dict>
+		<dict>
+			<key>Key</key>
+			<string>forceReconnect</string>
+			<key>Title</key>
+			<string>FORCE_RECONNECT</string>
+			<key>TitleDefault</key>
+			<string>Reconnect to the Psiphon server</string>
+			<key>TitleDescription</key>
+			<string>Label for a command on the &quot;My connection is bad, help!&quot; settings page that causes Psiphon to close its server connection and open a new one. DO NOT translate the word &apos;Psiphon&apos;.</string>
+			<key>BundleTable</key>
+			<string>PsiphonClientCommonLibrary</string>
+			<key>Type</key>
+			<string>IASKButtonSpecifier</string>
+		</dict>
+	</array>
+</dict>
+</plist>

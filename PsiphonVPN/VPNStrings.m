@@ -20,16 +20,22 @@
 
 @implementation VPNStrings
 
-+ (NSString *)disallowedTrafficAlertMessage {
++ (NSString *)disallowed_traffic_simple_alert_message {
     return NSLocalizedStringWithDefaultValue(@"DISALLOWED_TRAFFIC_EXTENSION_ALERT", nil, [NSBundle mainBundle], @"Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.", @"Alert dialog which is shown to the user when if unsupported Internet traffic has been requested");
 }
 
-+ (NSString *)disallowedTrafficNotificationTitle {
-    return NSLocalizedStringWithDefaultValue(@"NOTIFICATION_TITLE_UPGRADE_PSIPHON", nil, [NSBundle mainBundle], @"Upgrade Psiphon", @"Title of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request");
++ (NSString *)disallowed_traffic_notification_title {
+    // NOTE: The key is hard-coded in PacketTunnelProvider.m
+    return NSLocalizedStringWithDefaultValue(@"DISALLOWED_TRAFFIC_NOTIFICATION_TITLE_V2", nil, [NSBundle mainBundle],
+                                             @"Upgrade your Psiphon connection",
+                                             @"Appears in the notification area when Psiphon disallows some non-web internet traffic. The user will be told to 'upgrade' their connection with Speed Boost (giving more speed and app compatibility). The word 'Psiphon' must not be translated or transliterated.");
 }
 
-+ (NSString *)disallowedTrafficNotificationBody {
-    return NSLocalizedStringWithDefaultValue(@"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT", nil, [NSBundle mainBundle], @"Apps not working? Tap here to improve your Psiphon experience!", @"Content of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request");
++ (NSString *)disallowed_traffic_alert_notification_body {
+    // NOTE: The key is hard-coded in PacketTunnelProvider.m
+    return NSLocalizedStringWithDefaultValue(@"DISALLOWED_TRAFFIC_NOTIFICATION_BODY_V2", nil, [NSBundle mainBundle],
+                                             @"Apps not working? Activate Speed Boost or purchase subscription to unlock the full potential of your Psiphon experience.",
+                                             @"Appears in the notification area when Psiphon disallows some non-web internet traffic. The user needs to purchase Speed Boost or subscription in order to full app compatibilty and more speed. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.");
 }
 
 + (NSString *)corruptSettingsFileAlertMessage {

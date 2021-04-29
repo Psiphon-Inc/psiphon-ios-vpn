@@ -672,7 +672,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 [self.sharedDB getAppForegroundState] == TRUE ||
                 [AppInfo isiOSAppOnMac] == TRUE) {
                 
-                [self displayMessageOnce:VPNStrings.disallowedTrafficAlertMessage
+                [self displayMessageOnce:VPNStrings.disallowed_traffic_simple_alert_message
                               identifier:AlertIdDisallowedTraffic];
                 
             } else {
@@ -684,8 +684,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 }
                 
                 UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
-                content.title = [NSString localizedUserNotificationStringForKey:@"NOTIFICATION_TITLE_UPGRADE_PSIPHON" arguments:nil];
-                content.body = [NSString localizedUserNotificationStringForKey:@"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" arguments:nil];
+                content.title = [NSString localizedUserNotificationStringForKey:@"DISALLOWED_TRAFFIC_NOTIFICATION_TITLE_V2" arguments:nil];
+                content.body = [NSString localizedUserNotificationStringForKey:@"DISALLOWED_TRAFFIC_NOTIFICATION_BODY_V2" arguments:nil];
                 
                 // Delivers the notification immediately.
                 UNNotificationRequest* request = [UNNotificationRequest
@@ -707,7 +707,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                             // Removes alert id from set of session alerts,
                             // and retries to display the alert using `-displayMessageOnce::` mechanism.
                             [self->localDataStore removeSessionAlert:@(AlertIdDisallowedTraffic)];
-                            [self displayMessageOnce:VPNStrings.disallowedTrafficAlertMessage
+                            [self displayMessageOnce:VPNStrings.disallowed_traffic_simple_alert_message
                                           identifier:AlertIdDisallowedTraffic];
                         }
                     });
