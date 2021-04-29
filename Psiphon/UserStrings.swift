@@ -306,8 +306,8 @@ import Foundation
     }
     
     static func Sign_up_or_login_to_psicash_account_to_continue() -> String {
-        return NSLocalizedString("SIGN_UP_LOG_IN_TO_PSICASH_ACCOUNT_TO_CONTINUE", tableName: nil, bundle: Bundle.main,
-                                 value: "Sign Up or Log In to your PsiCash account to continue",
+        return NSLocalizedString("LOG_IN_OR_SIGNUP_TO_CONTINUE", tableName: nil, bundle: Bundle.main,
+                                 value: "Log In or Sign Up to continue using PsiCash",
                                  comment: "Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features.")
     }
     
