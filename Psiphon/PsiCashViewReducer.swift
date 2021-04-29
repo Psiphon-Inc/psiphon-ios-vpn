@@ -35,7 +35,7 @@ enum PsiCashViewAction: Equatable {
     
     case signupOrLoginTapped
 
-    case _signupOrLoginTapped
+    case presentPsiCashAccountScreen(animated: Bool = true)
 
     case dismissedPsiCashAccountScreen
     
@@ -248,27 +248,27 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
 
                     case .presentInStack(let viewController):
                         viewController.dismiss(animated: false, completion: {
-                            observer.send(value: ._signupOrLoginTapped)
+                            observer.send(value: .presentPsiCashAccountScreen())
                             observer.sendCompleted()
                         })
 
                     case .presentTopOfStack(let viewController):
                         viewController.dismiss(animated: false, completion: {
-                            observer.send(value: ._signupOrLoginTapped)
+                            observer.send(value: .presentPsiCashAccountScreen())
                             observer.sendCompleted()
                         })
                     }
                 }
             ]
         } else {
-            return [ Effect(value: ._signupOrLoginTapped) ]
+            return [ Effect(value: .presentPsiCashAccountScreen()) ]
         }
 
 
-    case ._signupOrLoginTapped:
+    case .presentPsiCashAccountScreen(let animated):
 
+        // Presents PsiCash Account screen if not already shown.
         guard state.viewState.isPsiCashAccountScreenShown == false else {
-            environment.feedbackLogger.fatalError("unexpected state")
             return []
         }
 
@@ -284,7 +284,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
                 case .notPresent:
                     let accountsViewController = environment.makePsiCashAccountViewController()
                     topVC.safePresent(accountsViewController,
-                                      animated: true,
+                                      animated: animated,
                                       viewDidAppearHandler: nil)
 
                 case .presentInStack(_),
