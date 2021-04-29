@@ -625,8 +625,10 @@ fileprivate func toMainViewReducerEnvironment(env: AppEnvironment) -> MainViewEn
         psiCashViewEnvironment: PsiCashViewEnvironment(
             feedbackLogger: env.feedbackLogger,
             iapStore: env.iapStore,
+            mainViewStore: env.mainViewStore,
             getTopPresentedViewController: env.getTopPresentedViewController,
-            makePsiCashAccountViewController: env.makePsiCashAccountViewController
+            makePsiCashAccountViewController: env.makePsiCashAccountViewController,
+            dateCompare: env.dateCompare
         ),
         getTopPresentedViewController: env.getTopPresentedViewController,
         feedbackLogger: env.feedbackLogger,
