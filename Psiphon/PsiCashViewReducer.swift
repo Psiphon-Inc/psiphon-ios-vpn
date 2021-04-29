@@ -271,6 +271,27 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
         guard state.viewState.isPsiCashAccountScreenShown == false else {
             return []
         }
+        
+        // Skips presenting PsiCash Account screen if tunnel is not connected.
+        // Note that this is a quick check for informing the user,
+        // and PsiCash Account screen performs it's own last second tunnel checks
+        // before making any API requests.
+        //
+        // Note this this check is independent of the check performed when
+        // handling other actions such as `.signupOrLoginTapped`.
+        guard case .connected = state.vpnStatus else {
+
+            // Informs user that tunnel is not connected.
+            let alertEvent = AlertEvent(
+                .psiCashAccountAlert(.tunnelNotConnectedAlert),
+                date: environment.dateCompare.getCurrentTime()
+            )
+            
+            return [
+                environment.mainViewStore(.presentAlert(alertEvent)).mapNever()
+            ]
+            
+        }
 
         state.viewState.isPsiCashAccountScreenShown = true
 
