@@ -53,7 +53,7 @@ struct MainViewReducerState: Equatable {
     let subscriptionState: SubscriptionState
     let psiCashAccountType: PsiCashAccountType?
     let appLifecycle: AppLifecycle
-    let vpnStatus: TunnelProviderVPNStatus
+    let tunnelConnectedStatus: TunnelConnectedStatus
 }
 
 extension MainViewReducerState {
@@ -65,7 +65,7 @@ extension MainViewReducerState {
             return PsiCashViewReducerState(
                 viewState: psiCashState,
                 psiCashAccountType: self.psiCashAccountType,
-                vpnStatus: self.vpnStatus
+                tunnelConnectedStatus: self.tunnelConnectedStatus
             )
         }
         set {

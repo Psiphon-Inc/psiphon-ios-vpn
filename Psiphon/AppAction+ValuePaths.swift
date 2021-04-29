@@ -335,7 +335,7 @@ extension AppState {
                 subscriptionState: self.subscription,
                 psiCashAccountType: self.psiCashState.libData?.accountType,
                 appLifecycle: self.appDelegateState.appLifecycle,
-                vpnStatus: self.vpnState.value.providerVPNStatus
+                tunnelConnectedStatus: self.vpnState.value.providerVPNStatus.tunneled
             )
         }
         set {
