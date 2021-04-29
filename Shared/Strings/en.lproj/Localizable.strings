@@ -132,6 +132,9 @@
 /* Title on a button that lets users login to their account with the username and password they have entered. */
 "LOG_IN_BUTTON_TITLE" = "Log In";
 
+/* Message title informing the user that they must sign up for an account or log in to their account */
+"LOG_IN_OR_SIGN_UP" = "Log In or Sign Up";
+
 /* Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed. */
 "LOG_OUT_ANY_WAY_BUTTON_TITLE" = "Logout anyway";
 
@@ -242,6 +245,9 @@
 
 /* Message shown when products available for purchase could not be retrieved. */
 "PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "Product list could not be retrieved";
+
+/* Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
+"PROTECT_YOUR_PURCHASES" = "Protect Your Purchases";
 
 /* Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts. */
 "PSICASH_ACCOUNT" = "PsiCash Account";
@@ -389,9 +395,6 @@
 
 /* Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
 "SIGN_UP_LOG_IN_TO_PSICASH_ACCOUNT_TO_CONTINUE" = "Sign Up or Log In to your PsiCash account to continue";
-
-/* Message title informing the user that they must sign up for an account or log in to their account */
-"SIGN_UP_OR_LOG_IN" = "Sign Up or Log In";
 
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST" = "Speed Boost";
