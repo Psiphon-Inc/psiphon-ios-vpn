@@ -329,9 +329,10 @@ func addShadow(toLayer layer: CALayer?) {
     }
 
     layer.shadowColor = UIColor.black.cgColor
-    layer.shadowOffset = CGSize(width: 0.0, height: 1.0)
-    layer.shadowOpacity = 0.22
+    layer.shadowOffset = CGSize(width: 0.0, height: 2.0)
+    layer.shadowOpacity = 0.3
     layer.shadowRadius = 2.0
+    layer.masksToBounds = false
 }
 
 
