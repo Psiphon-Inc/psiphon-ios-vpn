@@ -78,7 +78,7 @@ struct PsiCashViewState: Equatable {
 struct PsiCashViewReducerState: Equatable {
     var viewState: PsiCashViewState
     let psiCashAccountType: PsiCashAccountType?
-    let vpnStatus: TunnelProviderVPNStatus
+    let tunnelConnectedStatus: TunnelConnectedStatus
 }
 
 struct PsiCashViewEnvironment {
@@ -218,7 +218,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
         // Note that this is a quick check for informing the user,
         // and PsiCash Account screen performs it's own last second tunnel checks
         // before making any API requests.
-        guard case .connected = state.vpnStatus else {
+        guard case .connected = state.tunnelConnectedStatus else {
 
             // Informs user that tunnel is not connected.
             let alertEvent = AlertEvent(
@@ -279,7 +279,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
         //
         // Note this this check is independent of the check performed when
         // handling other actions such as `.signupOrLoginTapped`.
-        guard case .connected = state.vpnStatus else {
+        guard case .connected = state.tunnelConnectedStatus else {
 
             // Informs user that tunnel is not connected.
             let alertEvent = AlertEvent(
