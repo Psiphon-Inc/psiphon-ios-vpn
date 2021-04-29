@@ -69,7 +69,7 @@ import UIKit
         formatter.unitsStyle = .positional
         formatter.zeroFormattingBehavior = .pad
 
-        super.init(gradient: .blue)
+        super.init(shadow: .light, contentShadow: true, gradient: .blue)
     }
 
     required init?(coder: NSCoder) {

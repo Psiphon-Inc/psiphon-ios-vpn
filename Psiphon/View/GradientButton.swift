@@ -20,8 +20,16 @@
 import UIKit
 
 @objc class GradientButton: AnimatedUIButton {
+    
+    @objc enum ShadowType: Int {
+        case light
+        case strong
+    }
 
+    private let shadowLayer: CAShapeLayer?
     private let gradientLayer = CAGradientLayer()
+    
+    private let cornerRadius = Style.default.cornerRadius
 
     var gradientColors: [CGColor] {
         didSet {
@@ -29,21 +37,51 @@ import UIKit
         }
     }
 
-    init(addContentShadow contentShadow: Bool = false, gradient: Gradients) {
+    init(shadow: ShadowType? = .none, contentShadow: Bool = false, gradient: Gradients) {
+        
+        // Adds shadow layer to self, if content also get a shadow.
+        if let shadow = shadow {
+            shadowLayer = CAShapeLayer()
+            shadowLayer!.fillColor = UIColor.clear.cgColor
+            shadowLayer!.shadowColor = UIColor.black.cgColor
+            shadowLayer!.shadowRadius = 2.0
+            shadowLayer!.shadowOffset = CGSize(width: 0.0, height: 2.0)
+
+            switch shadow {
+            case .light:
+                shadowLayer!.shadowOpacity = 0.3
+            case .strong:
+                shadowLayer!.shadowOpacity = 0.84
+            }
+            
+        } else {
+            shadowLayer = nil
+        }
+        
         gradientColors = gradient.colors
 
         super.init(frame: .zero)
         
         contentEdgeInsets = UIEdgeInsets(top: 5.0, left: 5.0, bottom: 5.0, right: 5.0)
-
+        
         backgroundColor = UIColor.clear
-        layer.cornerRadius = Style.default.cornerRadius
-        clipsToBounds = true
-
         contentMode = .center
 
         initViewBeforeShadowAndGradient()
 
+        // Note that currently shadow is tied to layer.masksToBounds,
+        // since whenever shadows are not used, it is desired for layer.masksToBounds
+        // to be true (e.g. PsiCashViewController tab buttons.)
+        // If shadow is set, then corner radius is added to the gradientLayer,
+        // otherwise corner radius is added to view's main layer.
+        
+        if shadow != nil {
+            gradientLayer.cornerRadius = cornerRadius
+        } else {
+            layer.cornerRadius = cornerRadius
+            layer.masksToBounds = true
+        }
+        
         if contentShadow {
             addShadow(toLayer: imageView?.layer)
             addShadow(toLayer: titleLabel?.layer)
@@ -73,6 +111,12 @@ import UIKit
     override func layoutSublayers(of layer: CALayer) {
         super.layoutSublayers(of: layer)
         gradientLayer.frame = bounds
+        
+        if let shadowLayer = shadowLayer {
+            shadowLayer.path = UIBezierPath(roundedRect: bounds, cornerRadius: cornerRadius).cgPath
+            shadowLayer.shadowPath = shadowLayer.path
+        }
+        
     }
 
     func setClearBackground() {
@@ -81,6 +125,10 @@ import UIKit
 
     func setGradientBackground() {
         layer.insertSublayer(gradientLayer, at: 0)
+        
+        if let shadowLayer = shadowLayer {
+            layer.insertSublayer(shadowLayer, below: gradientLayer)
+        }
     }
 
     /// Subclasses should override this function when initializing and adding their own subviews and layers.
