@@ -1,0 +1,138 @@
+/* Settings item text. Leads to the user being able to choose which country/region they want to use a Psiphon Server in. Should be kept short. */
+"CHANGE_REGION" = "क्षेत्र बदलें";
+
+/* Item in a list of languages. Sets the application UI language to the one used by the system. */
+"DEFAULT_LANGUAGE" = "डिफ़ॉल्ट भाषा";
+
+/* Settings item to change the application UI language. */
+"SETTINGS_LANGUAGE" = "भाषा";
+
+/*[UNTRANSLATED] Settings item text. Leads to settings specific to the Psiphon tunnel, like 'Disable timeouts' and 'Use upstream proxy'. DO NOT translate the word "Psiphon". */
+"PSIPHON_SUBSETTINGS_LABEL" = "Psiphon settings";
+
+/* Settings section text. This section contains 'Feedback', 'FAQ', 'About', etc. */
+"SETTINGS_HELP_SECTION" = "सहायता";
+
+/*[UNTRANSLATED] Label for a settings item that will lead the user to some suggestions for improving a "bad" -- slow, unresponsive, etc. -- connection. This text should be kept short. */
+"SETTINGS_BAD_CONNECTION_SUBSETTINGS_LABEL" = "My connection is bad, help!";
+
+/* Settings item text. Leads to screen where user can send feedback about the app to Psiphon Inc. Should be kept short. */
+"SETTINGS_FEEDBACK_SUBSETTINGS_LABEL" = "प्रतिक्रिया";
+
+/* Settings item text. Leads to a frequently asked questions page. */
+"SETTINGS_FAQ" = "सामान्य प्रश्न";
+
+/* Settings item text. Leads to a web page with the Psiphon privacy policy. */
+"SETTINGS_PRIVACY_POLICY" = "गोपनीयता नीति";
+
+/* Settings item text. Leads to web page with Psiphon's end user license agreement. Should be kept short. */
+"SETTINGS_TERMS_OF_USE" = "उपयोग की शर्तें";
+
+/* Settings item text. Leads to info about Psiphon Inc. */
+"SETTINGS_ABOUT" = "बारे में";
+
+/*[UNTRANSLATED] Explanatory text for the "Select server region" setting on the "My connection is bad, help!" settings page. */
+"CONNECTION_HELP_BEST_PERFORMANCE_FOOTER" = "Changing your region to “Best performance” increases your chances of getting connected.";
+
+/* Title for screen that allows user to select their desired server region. */
+"SELECT_SERVER_REGION" = "सर्वर क्षेत्र चुने";
+
+/*[UNTRANSLATED] Explanatory text for the "Disable Timeouts" setting on the "My connection is bad, help!" settings page. */
+"CONNECTION_HELP_DISABLE_TIMEOUTS_FOOTER" = "Disabling timeouts may help you stay connected on slower networks.";
+
+/* Settings item text, under 'Psiphon settings'. Disabling timeouts in the Psiphon tunnel can help in really bad network conditions. Text should be kept short. */
+"DISABLE_TIMEOUTS" = "टाइमआउट अक्षम करें";
+
+/*[UNTRANSLATED] Explanatory text for the "Reconnect to the Psiphon server" command on the "My connection is bad, help!" settings page. DO NOT translate the word 'Psiphon'. */
+"CONNECTION_HELP_FORCE_RECONNECT_FOOTER" = "Reconnecting to the Psiphon server may help if your current connection is slow or non-responsive.";
+
+/*[UNTRANSLATED] Label for a command on the "My connection is bad, help!" settings page that causes Psiphon to close its server connection and open a new one. DO NOT translate the word 'Psiphon'. */
+"FORCE_RECONNECT" = "Reconnect to the Psiphon server";
+
+/*[UNTRANSLATED] Explanatory text for the "Reinstall VPN profie" command on the "My connection is bad, help!" settings page. DO NOT translate the word 'Psiphon'. */
+"REINSTALL_VPN_PROFILE_FOOTER" = "If pressing the start/stop button seems to do nothing you may need to reinstall the Psiphon VPN profile.";
+
+/*[UNTRANSLATED] On the feedback screen, this is the label on the text box where the user can supply their comments that will be sent to Psiphon Inc. This text should be kept short. */
+"FEEDBACK_COMMENTS_LABEL" = "Your Comments";
+
+/*[UNTRANSLATED] On the feedback screen, this is the label on the text box where the user can supply their email address along with their feedback that will be sent to Psiphon Inc. This text should be kept short. */
+"FEEDBACK_EMAIL_LABEL" = "Your Email Address";
+
+/*[UNTRANSLATED] On the feedback screen, this is the placeholder text for the email address text field. This text should be kept short. */
+"FEEDBACK_EMAIL_PLACEHOLDER" = "Where can we respond to you?";
+
+/*[UNTRANSLATED] On the feedback screen, this is the label above the "Upload diagnostic data" option. This text should be kept short. */
+"FEEDBACK_DIAGNOSTIC_DATA_SECTION" = "Diagnostic Data";
+
+/*[UNTRANSLATED] On the feedback screen, this is the label for the option that causes some diagnostic data to be send along with the feedback. The diagnostic data is stuff like OS version, app configuration, and logs indicating Psiphon connection info. This text should be kept short. */
+"FEEDBACK_DIAGNOSTIC_DATA_LABEL" = "Upload diagnostic data";
+
+/* Settings sub-group text. The group contains 'Disable timeouts'. Refers to network request timeouts. Text should be kept short. */
+"PSIPHON_SETTINGS_TIMEOUTS_SECTION" = "टाइमआउट";
+
+/*[UNTRANSLATED] Settings sub-group text. The group contains 'Use upstream proxy'. Text should be kept short. */
+"PSIPHON_SETTINGS_PROXY_SECTION" = "Proxy";
+
+/*[UNTRANSLATED] Settings item text. User can configure Psiphon to a server connect through another proxy. So the proxy is 'upstream' of the client -- between the client and the server. Text should be kept short. */
+"PSIPHON_SETTINGS_USE_UPSTREAM_LABEL" = "Use upstream proxy";
+
+/*[UNTRANSLATED] Settings item text. The host name or address for the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_HOST" = "Host address";
+
+/* Settings item text. The network port number for the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_PORT" = "पोर्ट";
+
+/* Settings item text. Some upstream proxies will require authentication (like username and password) to use. This enables that authentication. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_USE_AUTH" = "प्रॉक्सी प्रमाणीकरण का इस्तेमाल करें";
+
+/* Settings item text for upstream proxy authentication username. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_AUTH_USERNAME" = "प्रॉक्सी उपयोगकर्ता नाम";
+
+/*[UNTRANSLATED] Placeholder text for the upstream proxy authentication username. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_AUTH_USERNAME_PLACEHOLDER" = "username";
+
+/* Settings item text for upstream proxy authentication password. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_AUTH_PASSWORD" = "प्रॉक्सी पासवर्ड";
+
+/*[UNTRANSLATED] Placeholder text for the upstream proxy authentication password. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_AUTH_PASSWORD_PLACEHOLDER" = "password";
+
+/* Settings item text for upstream proxy authentication domain. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_AUTH_DOMAIN" = "प्रॉक्सी डोमेन";
+
+/*[UNTRANSLATED] Placeholder text for the upstream proxy authentication domain. This should convey to the user that a domain name should be used in this field. Text should be kept short. */
+"EXAMPLE_HOSTNAME" = "example.com";
+
+/*[UNTRANSLATED] Settings item text. Leads to settings specific to the custom headers. */
+"PSIPHON_CUSTOM_HEADERS_SUBSETTINGS_LABEL" = "Custom HTTP headers";
+
+/*[UNTRANSLATED] Explanatory text for the "Use custom headers" setting. */
+"CUSTOM_HEADERS_FOOTER" = "Some network configurations may require custom HTTP headers in order to connect successfully.";
+
+/*[UNTRANSLATED] Settings item text. Some users will need to set custom HTTP headers to authenticate or convey other information to the upstream proxy. Enabling the switch beside this text will allow users to configure the headers they want passed along to the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_USE_CUSTOM_HEADERS_LABEL" = "Use custom headers";
+
+/*[UNTRANSLATED] Settings item text. Header text above the text boxes where the user configures the first of six custom headers to be passed along to the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_HEADER_1" = "Header 1";
+
+/*[UNTRANSLATED] Placeholder text for the name of an HTTP header which should be set and passed along to the upstream proxy. This should convey to the user that a header name should be used in this field. Text should be kept short. */
+"PSIPHON_SETTINGS_ENTER_HEADER_NAME" = "Enter header name";
+
+/*[UNTRANSLATED] Placeholder text for the value of an HTTP header which should be set and passed along to the upstream proxy. This should convey to the user that a header value should be used in this field. Text should be kept short. */
+"PSIPHON_SETTINGS_ENTER_HEADER_VALUE" = "Enter header value";
+
+/*[UNTRANSLATED] Settings item text. Header text above the text boxes where the user configures the second of six custom headers to be passed along to the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_HEADER_2" = "Header 2";
+
+/*[UNTRANSLATED] Settings item text. Header text above the text boxes where the user configures the third of six custom headers to be passed along to the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_HEADER_3" = "Header 3";
+
+/*[UNTRANSLATED] Settings item text. Header text above the text boxes where the user configures the fourth of six custom headers to be passed along to the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_HEADER_4" = "Header 4";
+
+/*[UNTRANSLATED] Settings item text. Header text above the text boxes where the user configures the fifth of six custom headers to be passed along to the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_HEADER_5" = "Header 5";
+
+/*[UNTRANSLATED] Settings item text. Header text above the text boxes where the user configures the sixth of six custom headers to be passed along to the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_HEADER_6" = "Header 6";
+

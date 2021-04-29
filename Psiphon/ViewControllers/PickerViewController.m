@@ -96,6 +96,19 @@ NSString * const CellIdentifier = @"cell";
     }
 }
 
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    
+    // Scrolls to selected item after views are laid out, expects self.selectedIndex
+    // has already been set.
+    // Any earlier, and the correct offset will not have been calculated.
+    NSIndexPath *selectedPath = [NSIndexPath indexPathForItem:self.selectedIndex inSection:0];
+    [pickerTableView scrollToRowAtIndexPath:selectedPath
+                           atScrollPosition:UITableViewScrollPositionMiddle
+                                   animated:FALSE];
+    
+}
+
 - (void)setSelectedIndex:(NSUInteger)selectedIndex {
     _selectedIndex = selectedIndex;
     

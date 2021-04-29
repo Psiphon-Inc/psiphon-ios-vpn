@@ -1,0 +1,138 @@
+/* Settings item text. Leads to the user being able to choose which country/region they want to use a Psiphon Server in. Should be kept short. */
+"CHANGE_REGION" = "ဒေသ ပြောင်းမယ်";
+
+/* Item in a list of languages. Sets the application UI language to the one used by the system. */
+"DEFAULT_LANGUAGE" = "မူလသတ်မှတ်ထားသည့် ဘာသာစကား";
+
+/* Settings item to change the application UI language. */
+"SETTINGS_LANGUAGE" = "ဘာသာစကား";
+
+/* Settings item text. Leads to settings specific to the Psiphon tunnel, like 'Disable timeouts' and 'Use upstream proxy'. DO NOT translate the word "Psiphon". */
+"PSIPHON_SUBSETTINGS_LABEL" = "Psiphon အပြင်အဆင်များ";
+
+/* Settings section text. This section contains 'Feedback', 'FAQ', 'About', etc. */
+"SETTINGS_HELP_SECTION" = "အကူအညီ";
+
+/* Label for a settings item that will lead the user to some suggestions for improving a "bad" -- slow, unresponsive, etc. -- connection. This text should be kept short. */
+"SETTINGS_BAD_CONNECTION_SUBSETTINGS_LABEL" = "ကျွန်ုပ်၏အင်တာနက်လိုင်းမကောင်းပါ၊ ကူညီပါဦး။";
+
+/* Settings item text. Leads to screen where user can send feedback about the app to Psiphon Inc. Should be kept short. */
+"SETTINGS_FEEDBACK_SUBSETTINGS_LABEL" = "အကြံပြုချက်များ";
+
+/* Settings item text. Leads to a frequently asked questions page. */
+"SETTINGS_FAQ" = "မကြာခဏမေးလေ့ရှိသောမေးခွန်းများ";
+
+/* Settings item text. Leads to a web page with the Psiphon privacy policy. */
+"SETTINGS_PRIVACY_POLICY" = "ကိုယ်ရေးကိုယ်တာအချက်အလက် လုံခြုံရေး မူဝါဒ";
+
+/* Settings item text. Leads to web page with Psiphon's end user license agreement. Should be kept short. */
+"SETTINGS_TERMS_OF_USE" = "အသုံးပြုရန် သတ်မှတ်ချက်များ";
+
+/* Settings item text. Leads to info about Psiphon Inc. */
+"SETTINGS_ABOUT" = "အကြောင်း ";
+
+/* Explanatory text for the "Select server region" setting on the "My connection is bad, help!" settings page. */
+"CONNECTION_HELP_BEST_PERFORMANCE_FOOTER" = "သင့်ဒေသအား \"အကောင်းဆုံး စွမ်းဆောင်ရည်\" သို့ပြောင်းထားလျှင် ချိတ်ဆက်နိုင်ခြင်း၏ အခွင့်အရေးများ ပိုမိုများနိုင်ပါသည်။";
+
+/* Title for screen that allows user to select their desired server region. */
+"SELECT_SERVER_REGION" = "ဆာဗာဒေသူ ရွေးချယ်ပါ";
+
+/* Explanatory text for the "Disable Timeouts" setting on the "My connection is bad, help!" settings page. */
+"CONNECTION_HELP_DISABLE_TIMEOUTS_FOOTER" = "နှေးသောချိတ်ဆက်မှုလိုင်းများပေါ်တွင် ဆက်လက်ချိတ်ဆက်ထားနိုင်ရန်အတွက် ခေတ္တရပ်ဆိုင်းခြင်းများအား ပိတ်ပယ်ထားနိုင်ပါသည်။";
+
+/* Settings item text, under 'Psiphon settings'. Disabling timeouts in the Psiphon tunnel can help in really bad network conditions. Text should be kept short. */
+"DISABLE_TIMEOUTS" = "ခေတ္တရပ်ဆိုင်းခြင်းများအား ပိတ်ပယ်မယ်";
+
+/* Explanatory text for the "Reconnect to the Psiphon server" command on the "My connection is bad, help!" settings page. DO NOT translate the word 'Psiphon'. */
+"CONNECTION_HELP_FORCE_RECONNECT_FOOTER" = "သင်၏လက်ရှိအင်တာနက်လိုင်းသည်နှေးနေပါက သို့မဟုတ် တုံ့ပြန်နိုင်စွမ်းမရှိပါက Psiphon ဆာဗာနှင့် ပြန်လည်ချိတ်ဆက်ခြင်းသည် အထောက်အကူပြုပါလိမ့်မည်။";
+
+/* Label for a command on the "My connection is bad, help!" settings page that causes Psiphon to close its server connection and open a new one. DO NOT translate the word 'Psiphon'. */
+"FORCE_RECONNECT" = "Psiphon ဆာဗာနှင့် ပြန်လည်ချိတ်ဆက်မယ်";
+
+/* Explanatory text for the "Reinstall VPN profie" command on the "My connection is bad, help!" settings page. DO NOT translate the word 'Psiphon'. */
+"REINSTALL_VPN_PROFILE_FOOTER" = "အကယ်၍ စမယ်/ရပ်မယ် ခလုတ်အား နှိပ်၍ ဘာမှမထူးလာလျှင် သင် Psiphon VPN ပရိုဖိုင်အား ပြန်တပ်ဆင်သွင်းရလိမ့်ပါမည်။";
+
+/* On the feedback screen, this is the label on the text box where the user can supply their comments that will be sent to Psiphon Inc. This text should be kept short. */
+"FEEDBACK_COMMENTS_LABEL" = "သင့် မှတ်ချက်များ";
+
+/* On the feedback screen, this is the label on the text box where the user can supply their email address along with their feedback that will be sent to Psiphon Inc. This text should be kept short. */
+"FEEDBACK_EMAIL_LABEL" = "သင့် အီးမေလ်းလိပ်စာ";
+
+/* On the feedback screen, this is the placeholder text for the email address text field. This text should be kept short. */
+"FEEDBACK_EMAIL_PLACEHOLDER" = "ကျွန်ုပ်တို့သင့်ကို မည်သည့်နေရာမှ တုံ့ပြန်မှုပေးနိုင်မည်နည်း?";
+
+/* On the feedback screen, this is the label above the "Upload diagnostic data" option. This text should be kept short. */
+"FEEDBACK_DIAGNOSTIC_DATA_SECTION" = "ထူးခြားသည့်ဝိသေသပါသည့်အချက်အလက်";
+
+/* On the feedback screen, this is the label for the option that causes some diagnostic data to be send along with the feedback. The diagnostic data is stuff like OS version, app configuration, and logs indicating Psiphon connection info. This text should be kept short. */
+"FEEDBACK_DIAGNOSTIC_DATA_LABEL" = "ထူးခြားသည့်ဝိသေသပါသည့်အချက်အလက်တင်ရန်";
+
+/* Settings sub-group text. The group contains 'Disable timeouts'. Refers to network request timeouts. Text should be kept short. */
+"PSIPHON_SETTINGS_TIMEOUTS_SECTION" = "ခေတ္တရပ်ဆိုင်းခြင်း";
+
+/* Settings sub-group text. The group contains 'Use upstream proxy'. Text should be kept short. */
+"PSIPHON_SETTINGS_PROXY_SECTION" = "ကြားခံ";
+
+/* Settings item text. User can configure Psiphon to a server connect through another proxy. So the proxy is 'upstream' of the client -- between the client and the server. Text should be kept short. */
+"PSIPHON_SETTINGS_USE_UPSTREAM_LABEL" = "ဆန့်ကျင်ဘက်ကြားခံအင်တာနက်စာမျက်နှာကိုအသုံးပြုပါ";
+
+/* Settings item text. The host name or address for the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_HOST" = "လက်ခံသိမ်းဆည်းမှု၏လိပ်စာ";
+
+/*[UNTRANSLATED] Settings item text. The network port number for the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_PORT" = "Port";
+
+/* Settings item text. Some upstream proxies will require authentication (like username and password) to use. This enables that authentication. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_USE_AUTH" = "ကြားခံအတည်ပြုမှုအား အသုံးပြုရန်";
+
+/* Settings item text for upstream proxy authentication username. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_AUTH_USERNAME" = "ကြားခံ၏ အမည်";
+
+/* Placeholder text for the upstream proxy authentication username. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_AUTH_USERNAME_PLACEHOLDER" = "အသုံးပြုသူအမည်";
+
+/* Settings item text for upstream proxy authentication password. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_AUTH_PASSWORD" = "ကြားခံ၏စကားဝှက်";
+
+/* Placeholder text for the upstream proxy authentication password. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_AUTH_PASSWORD_PLACEHOLDER" = "စကားဝှက်";
+
+/* Settings item text for upstream proxy authentication domain. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_AUTH_DOMAIN" = "ကြားခံ ဒိုမိန်း";
+
+/*[UNTRANSLATED] Placeholder text for the upstream proxy authentication domain. This should convey to the user that a domain name should be used in this field. Text should be kept short. */
+"EXAMPLE_HOSTNAME" = "example.com";
+
+/* Settings item text. Leads to settings specific to the custom headers. */
+"PSIPHON_CUSTOM_HEADERS_SUBSETTINGS_LABEL" = "စိတ်ကြိုက် HTTP အပေါ်စာတမ်း";
+
+/* Explanatory text for the "Use custom headers" setting. */
+"CUSTOM_HEADERS_FOOTER" = "အချို့ချိတ်ဆက်မှုလိုင်း စီစဥ်ရာ ဖွဲ့စည်းမှုများတွင်အောင်မြင်စွာဆက်သွယ်နိုင်ရန်အတွက်စိတ်ကြိုက် HTTP အပေါ်စာတမ်းများ လိုအပ်ပါသည်။";
+
+/* Settings item text. Some users will need to set custom HTTP headers to authenticate or convey other information to the upstream proxy. Enabling the switch beside this text will allow users to configure the headers they want passed along to the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_USE_CUSTOM_HEADERS_LABEL" = "ကိုယ်ပိုင် သတ်မှတ်သော အပေါ်စာတမ်း များသုံးမယ်";
+
+/* Settings item text. Header text above the text boxes where the user configures the first of six custom headers to be passed along to the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_HEADER_1" = "အပေါ်စာတမ်း ၁";
+
+/* Placeholder text for the name of an HTTP header which should be set and passed along to the upstream proxy. This should convey to the user that a header name should be used in this field. Text should be kept short. */
+"PSIPHON_SETTINGS_ENTER_HEADER_NAME" = "အပေါ်စာတမ်း အမည်ရိုက်ထည့်ပေးပါ";
+
+/* Placeholder text for the value of an HTTP header which should be set and passed along to the upstream proxy. This should convey to the user that a header value should be used in this field. Text should be kept short. */
+"PSIPHON_SETTINGS_ENTER_HEADER_VALUE" = "အပေါ်စာတမ်း စာသားရိုက်ထည့်ပေးပါ";
+
+/* Settings item text. Header text above the text boxes where the user configures the second of six custom headers to be passed along to the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_HEADER_2" = "အပေါ်စာတမ်း ၂";
+
+/* Settings item text. Header text above the text boxes where the user configures the third of six custom headers to be passed along to the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_HEADER_3" = "အပေါ်စာတမ်း ၃";
+
+/* Settings item text. Header text above the text boxes where the user configures the fourth of six custom headers to be passed along to the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_HEADER_4" = "အပေါ်စာတမ်း ၄";
+
+/* Settings item text. Header text above the text boxes where the user configures the fifth of six custom headers to be passed along to the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_HEADER_5" = "အပေါ်စာတမ်း ၅";
+
+/* Settings item text. Header text above the text boxes where the user configures the sixth of six custom headers to be passed along to the upstream proxy. Text should be kept short. */
+"PSIPHON_SETTINGS_UPSTREAM_HEADER_6" = "အပေါ်စာတမ်း ၆";
+

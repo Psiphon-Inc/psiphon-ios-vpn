@@ -1,0 +1,6 @@
+module PsiphonClientCommonLibrary {
+  umbrella header "PsiphonClientCommonLibrary-umbrella.h"
+
+  export *
+  module * { export * }
+}
