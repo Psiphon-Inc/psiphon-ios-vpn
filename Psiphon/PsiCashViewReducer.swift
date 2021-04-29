@@ -146,25 +146,29 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
             state.viewState.psiCashIAPPurchaseRequestState = .confirmAccountLogin(product)
 
             return [
-                Effect.deferred { fulfill in
+                
+                Effect { observer, _ in
 
                     let topVC = environment.getTopPresentedViewController()
 
                     let vc = ViewBuilderViewController(
                         viewBuilder: PsiCashPurchasingConfirmViewBuilder(
-                            closeButtonHandler: {
-                                fulfill(.purchaseAccountConfirmationDismissed)
+                            closeButtonHandler: { [observer] in
+                                observer.send(value: .purchaseAccountConfirmationDismissed)
                             },
-                            signUpButtonHandler: {
-                                fulfill(.signupOrLoginTapped)
+                            signUpButtonHandler: { [observer] in
+                                observer.send(value: .signupOrLoginTapped)
                             },
-                            continueWithoutAccountHandler: {
-                                fulfill(.continuePurchaseWithoutAccountTapped)
+                            continueWithoutAccountHandler: { [observer] in
+                                observer.send(value: .continuePurchaseWithoutAccountTapped)
                             }
                         ),
                         modalPresentationStyle: .overFullScreen,
-                        onDismissed: {
-                            fulfill(.purchaseAccountConfirmationDismissed)
+                        onDismissed: { [observer] in
+                            // Sends 'onCompleted' event.
+                            // Note: This effect will never complete if onDismissed
+                            // is never called.
+                            observer.fulfill(value: .purchaseAccountConfirmationDismissed)
                         }
                     )
 
