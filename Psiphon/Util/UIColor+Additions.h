@@ -35,6 +35,8 @@
 
 + (UIColor * _Nonnull)lightishBlueTwo;
 
++ (UIColor * _Nonnull)vividBlue;
+
 + (UIColor * _Nonnull)greyishBrown;
 
 + (UIColor * _Nonnull)offWhite;
