@@ -546,14 +546,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             )
             .send(store: self.store)
         
-        // Forwards `PsiCashState` updates to ObjCBridgeDelegate.
-        self.lifetime += self.store.$value.signalProducer
-            .map(\.psiCashBalanceViewModel)
-            .skipRepeats()
-            .startWithValues { [unowned objcBridge] viewModel in
-                objcBridge!.onPsiCashBalanceUpdate(.init(swiftState: viewModel))
-            }
-        
         // Forwards `SubscriptionStatus` updates to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer
             .map(\.subscription.status)
@@ -642,17 +634,36 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // Forwards SpeedBoost purchase expiry date (if the user is not subscribed)
         // to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer
-            .map { [unowned self] appState -> Date? in
+            .map { [unowned self] appState -> SpeedBoostButton.SpeedBoostButtonViewModel in
                 if case .subscribed(_) = appState.subscription.status {
-                    return nil
+                    return .inactive
                 } else {
                     let activeSpeedBoost = appState.psiCashState.activeSpeedBoost(self.dateCompare)
-                    return activeSpeedBoost?.transaction.localTimeExpiry
+                    if let expiry = activeSpeedBoost?.transaction.localTimeExpiry {
+                        return .active(expiry)
+                    } else {
+                        return .inactive
+                    }
                 }
             }
             .skipRepeats()
-            .startWithValues{ [unowned objcBridge] speedBoostExpiry in
-                objcBridge!.onSpeedBoostActivePurchase(speedBoostExpiry)
+            .combineLatest(
+                with: self.store.$value.signalProducer.map(\.psiCashBalanceViewModel).skipRepeats()
+            )
+            .combineLatest(
+                with: self.store.$value.signalProducer.map(\.psiCashState.libData?.accountType).skipRepeats()
+            )
+            .startWithValues { [unowned objcBridge] (tuple: ((SpeedBoostButton.SpeedBoostButtonViewModel, PsiCashBalanceViewModel), PsiCashAccountType?)) in
+                
+                let newValue = PsiCashWidgetView.ViewModel(
+                    balanceViewModel: tuple.0.1,
+                    speedBoostButtonModel: tuple.0.0,
+                    accountType: tuple.1
+                )
+                
+                objcBridge!.onPsiCashWidgetViewModelUpdate(
+                    BridgedPsiCashWidgetBindingType(swiftValue: newValue))
+                
             }
         
         self.lifetime += self.store.$value.signalProducer

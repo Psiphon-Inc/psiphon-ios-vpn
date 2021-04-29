@@ -19,8 +19,17 @@
 
 import Foundation
 import UIKit
+import PsiCashClient
 
-@objc final class PsiCashWidgetView: UIView {
+@objc final class PsiCashWidgetView: UIView, Bindable {
+    
+    typealias BindingType = ViewModel
+    
+    struct ViewModel: Equatable {
+        let balanceViewModel: PsiCashBalanceViewWrapper.BindingType
+        let speedBoostButtonModel: SpeedBoostButton.BindingType
+        let accountType: PsiCashAccountType?
+    }
 
     @objc let balanceViewWrapper = PsiCashBalanceViewWrapper()
     @objc let speedBoostButton = SpeedBoostButton()
@@ -30,6 +39,7 @@ import UIKit
     // Horizonal stack containing the top row items.
     private let topRowHStack: UIStackView
     
+    private var accountButtonDisplayed: Bool = false
 
     override init(frame: CGRect) {
         
@@ -52,10 +62,10 @@ import UIKit
         
         speedBoostButton.contentEdgeInset(.normal)
 
+        // Adds permanent views to the stack view.
         topRowHStack.addArrangedSubviews(
             balanceViewWrapper.view,
-            addPsiCashButton,
-            psiCashAccountButton
+            addPsiCashButton
         )
         
         self.addSubviews(
@@ -65,13 +75,6 @@ import UIKit
         
         topRowHStack.activateConstraints {
             $0.constraintToParent(.top(), .centerX())
-        }
-        
-        psiCashAccountButton.activateConstraints {
-            [
-              $0.widthAnchor.constraint(equalTo: addPsiCashButton.widthAnchor),
-              $0.heightAnchor.constraint(equalTo: addPsiCashButton.heightAnchor)
-            ]
         }
         
         speedBoostButton.activateConstraints {
@@ -86,4 +89,38 @@ import UIKit
         fatalError("init(coder:) has not been implemented")
     }
 
+    func bind(_ newValue: BindingType) {
+        
+        balanceViewWrapper.bind(newValue.balanceViewModel)
+        speedBoostButton.bind(newValue.speedBoostButtonModel)
+        
+        switch newValue.accountType {
+        case .none, .noTokens, .tracker, .account(loggedIn: false):
+            // Shows psiCashAccountButton, if not displayed already.
+            if !accountButtonDisplayed {
+                topRowHStack.addArrangedSubview(psiCashAccountButton)
+                psiCashAccountButton.activateConstraints {
+                    [
+                      $0.widthAnchor.constraint(equalTo: addPsiCashButton.widthAnchor),
+                      $0.heightAnchor.constraint(equalTo: addPsiCashButton.heightAnchor)
+                    ]
+                }
+                accountButtonDisplayed = true
+            }
+            
+        case .account(loggedIn: true):
+            // Hides psiCashAccountButton, if not removed already.
+            if accountButtonDisplayed {
+                topRowHStack.removeArrangedSubview(psiCashAccountButton)
+                accountButtonDisplayed = false
+            }
+
+        }
+        
+    }
+    
+    @objc func objcBind(_ newValue: BridgedPsiCashWidgetBindingType) {
+        self.bind(newValue.swiftValue)
+    }
+    
 }
