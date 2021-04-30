@@ -159,22 +159,25 @@ import UIKit
     private func updateUIState(timerState: SpeedBoostButtonViewModel) {
         switch timerState {
         case .active(_):
-            layer.borderWidth = 2.0
-
-            // Sets colors
-            gradientColors = [UIColor.clear].cgColors
+            
+            self.setClearBackground()
+            
             layer.borderColor = activeTint.cgColor
+            layer.borderWidth = 2.0
+            
             setTitleColor(activeTint, for: .normal)
             setTitleColor(activeTint, for: .highlighted)
             imageView!.tintColor = activeTint
 
         case .inactive:
+            
+            self.setGradientBackground()
+            
+            layer.borderWidth = 0.0
+            
             setTitle(UserStrings.Speed_boost(), for: .normal)
             setTitle(UserStrings.Speed_boost(), for: .highlighted)
-            layer.borderWidth = 0.0
-
-            // Resets colors
-            gradientColors = Gradients.blue.colors
+            
             setTitleColor(UIColor.white, for: .normal)
             setTitleColor(UIColor.white, for: .highlighted)
             imageView!.tintColor = UIColor.white

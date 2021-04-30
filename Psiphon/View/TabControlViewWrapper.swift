@@ -103,7 +103,7 @@ final class TabControlViewWrapper<Tabs: TabControlViewTabType>: ViewWrapper, Bin
 }
 
 fileprivate func createControlButton(title: String) -> GradientButton {
-    let control = GradientButton(gradient: .blue)
+    let control = GradientButton(shadow: .none, contentShadow: true, cornerRadius: false, gradient: .blue)
     control.setTitle(title, for: .normal)
     control.setTitle(title, for: .highlighted)
     control.setTitleColor(.white, for: .normal)
