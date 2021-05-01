@@ -97,10 +97,7 @@ final class PsiCashViewController: ReactiveViewController {
     private let tabControl = TabControlViewWrapper<PsiCashScreenTab>()
     private let signupOrLogInView = PsiCashAccountSignupOrLoginView()
     
-    
-    private let container: ContainerViewType
-    private let containerView = UIView(frame: .zero)
-    private let containerBindable: ContainerViewType.BuildType
+    private let containerView: ViewBuilderContainerView<ContainerViewType>
     
     init(
         platform: Platform,
@@ -133,33 +130,33 @@ final class PsiCashViewController: ReactiveViewController {
         self.store = store
         self.productRequestStore = productRequestStore
         
-        self.container = .init(
-            AddPsiCashViewType(
-                PsiCashCoinPurchaseTable(purchaseHandler: {
-                    switch $0 {
-                    case .rewardedVideoAd:
-                        adStore.send(.loadRewardedVideo(presentAfterLoad: true))
-                    case .product(let product):
-                        store.send(.mainViewAction(.psiCashViewAction(
-                                                    .purchaseTapped(product: product))))
-                    }
-                }),
-                .init(Spinner(style: .whiteLarge),
-                      .init(PsiCashMessageViewUntunneled(action: {
-                      store.send(.psiCashAction(.connectToPsiphonTapped))
-                      }), .init(PsiCashMessageWithRetryView(),
-                                PsiCashMessageView())))),
-            SpeedBoostViewType(
-                SpeedBoostPurchaseTable(purchaseHandler: {
-                    store.send(.psiCashAction(.buyPsiCashProduct(.speedBoost($0))))
-                }),
-                .init(Spinner(style: .whiteLarge),
-                      .init(PsiCashMessageViewUntunneled(action: {
-                      store.send(.psiCashAction(.connectToPsiphonTapped))
-                      }), PsiCashMessageView()))))
-        
-        self.containerBindable = self.container.build(self.containerView)
-        
+        self.containerView = ViewBuilderContainerView(
+            EitherView(
+                AddPsiCashViewType(
+                    PsiCashCoinPurchaseTable(purchaseHandler: {
+                        switch $0 {
+                        case .rewardedVideoAd:
+                            adStore.send(.loadRewardedVideo(presentAfterLoad: true))
+                        case .product(let product):
+                            store.send(.mainViewAction(.psiCashViewAction(
+                                                        .purchaseTapped(product: product))))
+                        }
+                    }),
+                    EitherView(Spinner(style: .whiteLarge),
+                               EitherView(PsiCashMessageViewUntunneled(action: {
+                            store.send(.psiCashAction(.connectToPsiphonTapped))
+                          }), EitherView(PsiCashMessageWithRetryView(),
+                                    PsiCashMessageView())))),
+                SpeedBoostViewType(
+                    SpeedBoostPurchaseTable(purchaseHandler: {
+                        store.send(.psiCashAction(.buyPsiCashProduct(.speedBoost($0))))
+                    }),
+                    EitherView(Spinner(style: .whiteLarge),
+                               EitherView(PsiCashMessageViewUntunneled(action: {
+                            store.send(.psiCashAction(.connectToPsiphonTapped))
+                          }), PsiCashMessageView()))))
+        )
+                
         super.init(onDismissed: onDismissed)
         
         // Handler for "Sign Up or Log In" button.
@@ -288,7 +285,7 @@ final class PsiCashViewController: ReactiveViewController {
                 self.balanceViewWrapper.view.isHidden = true
                 self.tabControl.view.isHidden = true
                 self.signupOrLogInView.isHidden = true
-                self.containerBindable.bind(
+                self.containerView.bind(
                     .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
                 )
                 return
@@ -299,7 +296,7 @@ final class PsiCashViewController: ReactiveViewController {
                 self.tabControl.view.isHidden = true
                 self.signupOrLogInView.isHidden = true
                 self.balanceViewWrapper.bind(observed.readerState.psiCashBalanceViewModel)
-                self.containerBindable.bind(
+                self.containerView.bind(
                     .left(.right(.right(.right(.right(.userSubscribed)))))
                 )
                 return
@@ -312,7 +309,7 @@ final class PsiCashViewController: ReactiveViewController {
                     self.balanceViewWrapper.view.isHidden = true
                     self.tabControl.view.isHidden = true
                     self.signupOrLogInView.isHidden = true
-                    self.containerBindable.bind(
+                    self.containerView.bind(
                         .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
                     )
                     return
@@ -325,7 +322,7 @@ final class PsiCashViewController: ReactiveViewController {
 
                     self.signupOrLogInView.isHidden = false
 
-                    self.containerBindable.bind(
+                    self.containerView.bind(
                         .left(.right(.right(.right(.right(.signupOrLoginToPsiCash)))))
                     )
                     return
@@ -358,11 +355,11 @@ final class PsiCashViewController: ReactiveViewController {
                 
                 switch (observed.tunneled, psiCashViewState.activeTab) {
                 case (.connecting, _):
-                    self.containerBindable.bind(
+                    self.containerView.bind(
                         .left(.right(.right(.right(.right(.unavailableWhileConnecting))))))
                     
                 case (.disconnecting, _):
-                    self.containerBindable.bind(
+                    self.containerView.bind(
                         .left(.right(.right(.right(.right(.unavailableWhileDisconnecting))))))
                     
                 case (.notConnected, .addPsiCash),
@@ -376,7 +373,7 @@ final class PsiCashViewController: ReactiveViewController {
                             // unverified PsiCash IAP transaction.
                             switch unverifiedPsiCashTx.verification {
                             case .notRequested, .pendingResponse:
-                                self.containerBindable.bind(
+                                self.containerView.bind(
                                     .left(.right(.right(.right(.right(
                                                                 .pendingPsiCashVerification)))))
                                 )
@@ -384,14 +381,14 @@ final class PsiCashViewController: ReactiveViewController {
                             case .requestError(_):
                                 // Shows failed to verify purchase message with,
                                 // tap to retry button.
-                                self.containerBindable.bind(
+                                self.containerView.bind(
                                     .left(.right(.right(.right(.left(
                                                                 .failedToVerifyPsiCashIAPPurchase(retryAction: {
                                                                     iapStore.send(.checkUnverifiedTransaction)
                                                                 })))))))
                                 
                             case .purchaseNotRecordedByAppStore:
-                                self.containerBindable.bind(.left(.right(.right(.right(.left(.transactionNotRecordedByAppStore(
+                                self.containerView.bind(.left(.right(.right(.right(.left(.transactionNotRecordedByAppStore(
                                     isRefreshingReceipt: observed.readerState.isRefreshingAppStoreReceipt,
                                     retryAction: {
                                         appStoreReceiptStore.send(
@@ -403,7 +400,7 @@ final class PsiCashViewController: ReactiveViewController {
                         case .notConnected:
                             // If tunnel is not connected and there is a pending PsiCash IAP,
                             // then shows the "pending psicash purchase" screen.
-                            self.containerBindable.bind(
+                            self.containerView.bind(
                                 .left(.right(.right(.left(.pendingPsiCashPurchase))))
                             )
                         case .connecting, .disconnecting:
@@ -438,21 +435,21 @@ final class PsiCashViewController: ReactiveViewController {
                             // Product list is being retrieved from the
                             // App Store for the first time.
                             // A spinner is shown.
-                            self.containerBindable.bind(.left(.right(.left(true))))
+                            self.containerView.bind(.left(.right(.left(true))))
                         case .pending(let lastSuccess):
                             // Displays product list from previous retrieval.
 
-                            self.containerBindable.bind(.left(.left(.makeViewModel(purchasables: lastSuccess, accountType: psiCashLibData.accountType))))
+                            self.containerView.bind(.left(.left(.makeViewModel(purchasables: lastSuccess, accountType: psiCashLibData.accountType))))
                             
                         case .completed(let productRequestResult):
                             // Product list retrieved from App Store.
                             switch productRequestResult {
                             case .success(let psiCashCoinProducts):
-                                self.containerBindable.bind(.left(.left(.makeViewModel(purchasables: psiCashCoinProducts, accountType: psiCashLibData.accountType))))
+                                self.containerView.bind(.left(.left(.makeViewModel(purchasables: psiCashCoinProducts, accountType: psiCashLibData.accountType))))
                                 
                             case .failure(_):
                                 // Shows failed to load message with tap to retry button.
-                                self.containerBindable.bind(
+                                self.containerView.bind(
                                     .left(.right(.right(.right(.left(
                                                                 .failedToLoadProductList(retryAction: {
                                                                     productRequestStore.send(.getProductList)
@@ -472,12 +469,12 @@ final class PsiCashViewController: ReactiveViewController {
                             PsiCashMessageViewUntunneled.Message
                             .speedBoostUnavailable(subtitle: .connectToPsiphon)
                         
-                        self.containerBindable.bind(
+                        self.containerView.bind(
                             .right(.right(.right(.left(connectToPsiphonMessage)))))
                         
                     case .some(_):
                         // There is an active speed boost.
-                        self.containerBindable.bind(
+                        self.containerView.bind(
                             .right(.right(.right(.left(.speedBoostAlreadyActive)))))
                     }
                     
@@ -507,17 +504,17 @@ final class PsiCashViewController: ReactiveViewController {
                         let viewModel = NonEmpty(array: speedBoostPurchasables)
                         
                         if let viewModel = viewModel {
-                            self.containerBindable.bind(.right(.left(viewModel)))
+                            self.containerView.bind(.right(.left(viewModel)))
                         } else {
                             let tryAgainLater = PsiCashMessageViewUntunneled.Message
                                 .speedBoostUnavailable(subtitle: .tryAgainLater)
-                            self.containerBindable.bind(
+                            self.containerView.bind(
                                 .right(.right(.right(.left(tryAgainLater)))))
                         }
                         
                     case .some(_):
                         // There is an active speed boost.
-                        self.containerBindable.bind(
+                        self.containerView.bind(
                             .right(.right(.right(.right(.speedBoostAlreadyActive)))))
                     }
                 }
@@ -550,7 +547,7 @@ final class PsiCashViewController: ReactiveViewController {
         hStack.addArrangedSubviews(
             signupOrLogInView,
             tabControl.view,
-            containerView
+            containerView.view
         )
         
         // Add subviews
