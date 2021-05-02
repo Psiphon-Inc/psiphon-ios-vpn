@@ -22,7 +22,6 @@ import UIKit
 import PsiApi
 import Utilities
 import PsiCashClient
-import SafariServices
 import ReactiveSwift
 
 final class PsiCashAccountViewController: ReactiveViewController {
@@ -60,6 +59,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
     private let store: Store<ReaderState, ViewControllerAction>
     
     private let feedbackLogger: FeedbackLogger
+    private let tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
     private let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
     private let createNewAccountURL: URL
     private let forgotPasswordURL: URL
@@ -85,6 +85,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
     init(
         store: Store<ReaderState, ViewControllerAction>,
         feedbackLogger: FeedbackLogger,
+        tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
         tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
         createNewAccountURL: URL,
         forgotPasswordURL: URL,
@@ -103,6 +104,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
         self.loginButtonSpinner = .init(style: .gray)
         self.loginButton = GradientButton(gradient: .grey)
         
+        self.tunnelStatusSignal = tunnelStatusSignal
         self.tunnelConnectionRefSignal = tunnelConnectionRefSignal
         
         super.init(onDismissed: onDismissed)
@@ -557,6 +559,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
     }
     
     private func makeViewController(screen: Screen) -> UIViewController {
+        
         let url: URL
         switch screen {
         case .createNewAccount:
@@ -565,10 +568,20 @@ final class PsiCashAccountViewController: ReactiveViewController {
             url = self.forgotPasswordURL
         }
         
-        let safari = SFSafariViewController(url: url)
-        safari.delegate = self
+        let webViewViewController = WebViewController(
+            baseURL: url,
+            feedbackLogger: self.feedbackLogger,
+            tunnelStatusSignal: self.tunnelStatusSignal,
+            tunnelProviderRefSignal: self.tunnelConnectionRefSignal,
+            onDismissed: {
+                let _ = self.display(screenToPresent: .mainScreen)
+            }
+        )
         
-        return safari
+        webViewViewController.title = UserStrings.Psicash_account()
+        
+        return UINavigationController(rootViewController: webViewViewController)
+        
     }
     
 }
@@ -587,14 +600,6 @@ extension PsiCashAccountViewController: UITextFieldDelegate {
         }
         
         return true
-    }
-    
-}
-
-extension PsiCashAccountViewController: SFSafariViewControllerDelegate {
-    
-    func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
-        let _ = self.display(screenToPresent: .mainScreen)
     }
     
 }

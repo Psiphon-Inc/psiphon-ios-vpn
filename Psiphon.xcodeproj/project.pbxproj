@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		2911A793263D5DED001A0A4D /* ViewBuilderContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2911A792263D5DED001A0A4D /* ViewBuilderContainerView.swift */; };
+		2911A795263D6C6D001A0A4D /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2911A794263D6C6D001A0A4D /* WebViewController.swift */; };
+		2911A797263F1941001A0A4D /* BlockerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2911A796263F1941001A0A4D /* BlockerView.swift */; };
 		2913641F25DF06C800C79880 /* AdMobInterstitialAdController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2913641E25DF06C800C79880 /* AdMobInterstitialAdController.swift */; };
 		2913642125DF1E5700C79880 /* AdControllerStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2913642025DF1E5700C79880 /* AdControllerStatus.swift */; };
 		292B531E2620DFCB00C0C44A /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */; };
@@ -387,6 +389,8 @@
 		1CF6F36D51088259B2AC450E /* Pods-PsiApi-Testing.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing/Pods-PsiApi-Testing.release.xcconfig"; sourceTree = "<group>"; };
 		1FE4700126FC2AD287FCB45B /* Pods-PsiphonTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiphonTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiphonTests/Pods-PsiphonTests.release.xcconfig"; sourceTree = "<group>"; };
 		2911A792263D5DED001A0A4D /* ViewBuilderContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewBuilderContainerView.swift; sourceTree = "<group>"; };
+		2911A794263D6C6D001A0A4D /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
+		2911A796263F1941001A0A4D /* BlockerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockerView.swift; sourceTree = "<group>"; };
 		2913641E25DF06C800C79880 /* AdMobInterstitialAdController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdMobInterstitialAdController.swift; sourceTree = "<group>"; };
 		2913642025DF1E5700C79880 /* AdControllerStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdControllerStatus.swift; sourceTree = "<group>"; };
 		292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
@@ -1133,6 +1137,7 @@
 				8DEEE136252FB4C900B0A9EC /* LanguageSelectionViewController.swift */,
 				296622B425E8A554004635A1 /* LaunchScreenViewController.swift */,
 				8D2CBAF42540D67C006822A2 /* AlertTypes.swift */,
+				2911A794263D6C6D001A0A4D /* WebViewController.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -1309,6 +1314,7 @@
 				524B4E6A2316F0E3004E9891 /* BorderedSubtitleButton.m */,
 				524B4E6C2316F27F004E9891 /* AnimatedControl.h */,
 				524B4E6D2316F27F004E9891 /* AnimatedControl.m */,
+				2911A796263F1941001A0A4D /* BlockerView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -2100,6 +2106,7 @@
 				445F24E520E1A5BA00D004E9 /* asn_SET_OF.c in Sources */,
 				2913642125DF1E5700C79880 /* AdControllerStatus.swift in Sources */,
 				9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */,
+				2911A795263D6C6D001A0A4D /* WebViewController.swift in Sources */,
 				4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */,
 				4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */,
 				52A2466D23A172A800A01FF1 /* ViewBuilderViewController.swift in Sources */,
@@ -2162,6 +2169,7 @@
 				CED6795924A4FA1200C4CA81 /* FileRegistry.m in Sources */,
 				52DF5E9E23D0D01F00A1B067 /* BridgingTypes.swift in Sources */,
 				9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */,
+				2911A797263F1941001A0A4D /* BlockerView.swift in Sources */,
 				8D4EEA9624F761630057E32D /* ApplicationSupportFileStore.swift in Sources */,
 				521FD0F9219E0DDF00F748EC /* AppStats.m in Sources */,
 				8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */,
