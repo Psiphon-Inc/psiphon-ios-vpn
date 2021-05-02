@@ -473,7 +473,8 @@ final class PsiCashAccountViewController: ReactiveViewController {
             
             // Dismisses the presented view controller.
             guard let presentedViewController = self.presentedViewController else {
-                // There is no presentation to dismiss.
+                // There is no presentation to dismiss, sets `self.navigation` to the main screen.
+                self.navigation = .completed(.mainScreen)
                 return true
             }
             
