@@ -189,6 +189,12 @@ import Foundation
                                  value: "Psiphon is not connected",
                                  comment: "Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon'")
     }
+    
+    static func Connecting_to_psiphon() -> String {
+        return NSLocalizedString("CONNECTING_TO_PSIPHON", tableName: nil, bundle: Bundle.main,
+                                 value: "Connecting to Psiphon",
+                                 comment: "Label text shown to user when the VPN is connecting to a Psiphon server. Do not translate or transliterate 'Psiphon'")
+    }
 
     static func Free() -> String {
         return NSLocalizedString("FREE_PSICASH_COIN", tableName: nil, bundle: Bundle.main,
@@ -196,10 +202,10 @@ import Foundation
                                  comment: "Button title for a product that is free. There is no cost or payment associated.")
     }
     
-    static func Failed_to_load() -> String {
-        return NSLocalizedString("FAILED_TO_LOAD", tableName: nil, bundle: Bundle.main,
-                                 value: "Failed to load",
-                                 comment: "Message shown when something fails to load")
+    static func Loading_failed() -> String {
+        return NSLocalizedString("LOADING_FAILED", tableName: nil, bundle: Bundle.main,
+                                 value: "Loading failed",
+                                 comment: "Message shown when a resource (online or offline) fails to load.")
     }
     
     static func Product_list_could_not_be_retrieved() -> String {
@@ -547,6 +553,12 @@ extension UserStrings {
         return NSLocalizedString("DISMISS_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
                                  value: "Dismiss",
                                  comment: "Dismiss button title. Dismisses pop-up alert when the user clicks on the button")
+    }
+    
+    @objc static func Close_button_title() -> String {
+        return  NSLocalizedString("CLOSE_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
+                                  value: "Close",
+                                  comment: "Title for a button that closes current screen.")
     }
 
     @objc static func Cancel_button_title() -> String {

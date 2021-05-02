@@ -39,6 +39,9 @@
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "You have configured Psiphon to use an upstream proxy.\nHowever, we seem to be unable to connect to a Psiphon server through that proxy.\nPlease fix the settings and try again.";
 
+/* Title for a button that closes current screen. */
+"CLOSE_BUTTON_TITLE" = "Close";
+
 /* Button text telling the user that if they click it, Psiphon will start trying to connect to the network. This is shown to the user while Psiphon is disconnected. */
 "CONNECT_BUTTON" = "Connect";
 
@@ -53,6 +56,9 @@
 
 /* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "CONNECT_TO_USE_SPEED_BOOST" = "Connect to Psiphon to use Speed Boost";
+
+/* Label text shown to user when the VPN is connecting to a Psiphon server. Do not translate or transliterate 'Psiphon' */
+"CONNECTING_TO_PSIPHON" = "Connecting to Psiphon";
 
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.";
@@ -99,9 +105,6 @@
 /* No comment provided by engineer. */
 "EXTENSION_EXPIRED_SUBSCRIPTION_ALERT" = "Your Psiphon subscription has expired.\n\n Please open Psiphon app to renew your subscription.";
 
-/* Message shown when something fails to load */
-"FAILED_TO_LOAD" = "Failed to load";
-
 /* Message shown when verification of a product already purchased fails. */
 "FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Failed to verify purchase";
 
@@ -128,6 +131,9 @@
 
 /* Text displayed while app loads */
 "LOADING" = "Loading...";
+
+/* Message shown when a resource (online or offline) fails to load. */
+"LOADING_FAILED" = "Loading failed";
 
 /* Title on a button that lets users login to their account with the username and password they have entered. */
 "LOG_IN_BUTTON_TITLE" = "Log In";

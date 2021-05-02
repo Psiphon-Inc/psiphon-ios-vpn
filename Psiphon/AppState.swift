@@ -230,6 +230,9 @@ func makeEnvironment(
     
     let httpClient = HTTPClient.default(urlSession: urlSession)
     
+    let tunnelStatusSignal = store.$value.signalProducer
+        .map(\.vpnState.value.providerVPNStatus)
+    
     let environment = AppEnvironment(
         platform: platform,
         appBundle: PsiphonBundle.from(bundle: Bundle.main),
@@ -247,8 +250,7 @@ func makeEnvironment(
         standardUserDefaults: standardUserDefaults,
         notifier: NotifierObjC(notifier:Notifier.sharedInstance()),
         internetReachabilityStatusSignal: store.$value.signalProducer.map(\.internetReachability.networkStatus),
-        tunnelStatusSignal: store.$value.signalProducer
-            .map(\.vpnState.value.providerVPNStatus),
+        tunnelStatusSignal: tunnelStatusSignal,
         psiCashAccountTypeSignal: store.$value.signalProducer.map(\.psiCashState.libData?.accountType),
         tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
         subscriptionStatusSignal: store.$value.signalProducer.map(\.subscription.status),
@@ -430,6 +432,7 @@ func makeEnvironment(
                     }
                 ),
                 feedbackLogger: feedbackLogger,
+                tunnelStatusSignal: tunnelStatusSignal,
                 tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
                 createNewAccountURL: psiCashClient.getUserSiteURL(.accountSignup,
                                                                   platform: platform.current),
