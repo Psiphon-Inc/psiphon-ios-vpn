@@ -369,9 +369,6 @@
 /* This alert message informs the user that the purchase they made has not been recorded and that they can tap the button 'Refresh Receipt' to try again. */
 "REFRESH_APP_RECEIPT_TO_TRY_AGAIN" = "Refresh the app receipt to try again.";
 
-/* Title for a confirmation button that resets a user's previous consent. */
-"RESET_IDENTIFIER_BUTTON_TITLE" = "Reset Consent";
-
 /* Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "Restore Subscription";
 
@@ -395,9 +392,6 @@
 
 /* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Reinstall VPN profile";
-
-/* (Do not translate 'AdMob') Title of cell in settings menu which indicates the user can change or revoke the consent they've given to admob */
-"SETTINGS_RESET_ADMOB_CONSENT" = "Reset AdMob Consent";
 
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Subscriptions";

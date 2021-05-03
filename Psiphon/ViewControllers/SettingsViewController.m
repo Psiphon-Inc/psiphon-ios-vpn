@@ -35,7 +35,6 @@
 // These keys are defined in Psiphon/InAppSettings.bundle/Root.inApp.plist
 NSString * const SettingsSubscriptionCellSpecifierKey = @"settingsSubscription";
 NSString * const SettingsReinstallVPNConfigurationKey = @"settingsReinstallVPNConfiguration";
-NSString * const SettingsResetAdConsentCellSpecifierKey = @"settingsResetAdConsent";
 
 // PsiCash group
 NSString * const SettingsPsiCashGroupHeaderTitleKey = @"settingsPsiCashGroupTitle";
@@ -66,7 +65,6 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
         _customKeys = @[
           SettingsSubscriptionCellSpecifierKey,
           SettingsReinstallVPNConfigurationKey,
-          SettingsResetAdConsentCellSpecifierKey,
           SettingsPsiCashGroupHeaderTitleKey,
           SettingsPsiCashCellSpecifierKey,
           SettingsPsiCashAccountManagementSpecifierKey,
@@ -215,12 +213,6 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
         cell.textLabel.enabled = enabled;
         cell.detailTextLabel.enabled = enabled;
 
-    } else if ([specifier.key isEqualToString:SettingsResetAdConsentCellSpecifierKey]) {
-        
-        cell.textLabel.textAlignment = NSTextAlignmentCenter;
-        cell.textLabel.textColor = self.view.tintColor;
-        cell.textLabel.text = [UserStrings Reset_admob_consent];
-        
     } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
         // PsiCash button.
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
@@ -290,11 +282,6 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
         [SwiftDelegate.bridge reinstallVPNConfig];
         [self settingsViewControllerDidEnd:nil];
 
-    } else if ([specifier.key isEqualToString:SettingsResetAdConsentCellSpecifierKey]) {
-
-        // Reset Ad Consent button
-        [self onResetConsentWithSourceView:cell];
-        
     } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
         
         // PsiCash button
@@ -328,28 +315,6 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
     IAPViewController *iapViewController = [[IAPViewController alloc]init];
     iapViewController.openedFromSettings = YES;
     [self.navigationController pushViewController:iapViewController animated:YES];
-}
-
-- (void)onResetConsentWithSourceView:(UIView *_Nonnull)sourceView {
-    UIAlertController *alert = [UIAlertController alertControllerWithTitle:nil
-                                                                     message:nil
-                                                  preferredStyle:UIAlertControllerStyleActionSheet];
-
-    UIAlertAction *resetAction = [UIAlertAction actionWithTitle:[Strings resetConsentButtonTitle]
-        style:UIAlertActionStyleDestructive
-      handler:^(UIAlertAction *action) {
-          [SwiftDelegate.bridge resetAdConsent];
-      }];
-
-    [alert addAction:resetAction];
-    [alert addCancelAction:nil];
-
-    [[alert popoverPresentationController] setSourceView:sourceView];
-    [[alert popoverPresentationController] setSourceRect:CGRectMake(0,0,1,1)];
-    [[alert popoverPresentationController]
-     setPermittedArrowDirections:UIPopoverArrowDirectionDown];
-
-    [alert presentFromTopController];
 }
 
 - (void)onPsiCashAccountLogOutWithSourceView:(UIView *_Nonnull)sourceView {

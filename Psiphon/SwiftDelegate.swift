@@ -454,7 +454,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     userDefaultsConfig: self.userDefaultsConfig,
                     standardUserDefaults: UserDefaults.standard,
                     objcBridgeDelegate: objcBridge,
-                    adConsent: AdConsent(),
                     dateCompare: self.dateCompare,
                     addToDate: { calendarComponent, value, date -> Date? in
                         Calendar.current.date(byAdding: calendarComponent, value: value, to: date)
@@ -1252,10 +1251,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             self.feedbackLogger.fatalError("Unexpected state '\(value.switchedIntent)'")
             return
         }
-    }
-    
-    @objc func resetAdConsent() {
-        self.store.send(.adAction(.resetUserConsent))
     }
     
     @objc func presentInterstitial(_ completionHandler: @escaping () -> Void) {

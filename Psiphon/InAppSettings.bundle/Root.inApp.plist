@@ -499,20 +499,6 @@
             <key>Key</key>
             <string>about</string>
         </dict>
-		<dict>
-            <key>Title</key>
-            <string>Ad</string>
-			<key>Type</key>
-			<string>PSGroupSpecifier</string>
-		</dict>
-		<dict>
-			<key>Title</key>
-			<string>!!! Not in the Root.strings, this title is set from SettingsViewController!!!</string>
-			<key>Key</key>
-			<string>settingsResetAdConsent</string>
-            <key>Type</key>
-            <string>IASKCustomViewSpecifier</string>
-		</dict>
 	</array>
 	<key>StringsTable</key>
 	<string>Root</string>

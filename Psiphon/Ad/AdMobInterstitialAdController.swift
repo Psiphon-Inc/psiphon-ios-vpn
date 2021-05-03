@@ -47,13 +47,13 @@ final class AdMobInterstitialAdController: StoreDelegate<AdAction> {
         super.init(store: store)
     }
     
-    func load(adConsent: AdConsent) {
+    func load() {
         
         precondition(Thread.isMainThread, "load(request:) must be called on the main thread")
         
         self.status = .loading
         
-        let request = adConsent.makeGADRequestWithNPA()
+        let request = GADRequest.makeGADRequestWithNPA()
         
         GADInterstitialAd.load(withAdUnitID: adUnitID, request: request) { maybeInterstitial, maybeError in
             
