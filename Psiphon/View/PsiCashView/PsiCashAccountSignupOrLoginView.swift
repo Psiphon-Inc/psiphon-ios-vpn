@@ -27,6 +27,7 @@ final class PsiCashAccountSignupOrLoginView: UIView {
     }
     
     private let title: UILabel
+    private let subtitle: UILabel
     private let button: GradientButton
     
     init() {
@@ -34,10 +35,18 @@ final class PsiCashAccountSignupOrLoginView: UIView {
         title = UILabel.make(
             text: UserStrings.Psicash_account(),
             fontSize: .normal,
-            typeface: .bold,
-            numberOfLines: 0)
+            typeface: .bold
+        )
         
-        button = GradientButton(gradient: .grey)
+        subtitle = UILabel.make(
+            text: UserStrings.Protect_your_purchases(),
+            fontSize: .normal,
+            typeface: .mediumItalic,
+            numberOfLines: 0
+        )
+        
+        button = GradientButton(shadow: .strong, contentShadow: false, gradient: .vividBlue)
+        
         super.init(frame: .zero)
         
         // View properties
@@ -46,31 +55,53 @@ final class PsiCashAccountSignupOrLoginView: UIView {
         backgroundColor = .white(withAlpha: 0.42)
         
         mutate(button) {
-            $0.setTitle(UserStrings.Sign_up_or_log_in(), for: .normal)
-            $0.setTitleColor(.darkBlue(), for: .normal)
-            $0.titleLabel?.font = UIFont.avenirNextBold(CGFloat(FontSize.h3.rawValue))
-            $0.contentEdgeInsets = Style.default.buttonMinimumContentEdgeInsets
+            $0.setTitle(UserStrings.Log_in_or_sign_up(), for: .normal)
+            $0.setTitleColor(.white, for: .normal)
+            $0.titleLabel?.font = UIFont.avenirNextBold(CGFloat(FontSize.normal.rawValue))
+            $0.contentEdgeInsets = UIEdgeInsets(top: 10, left: 10, bottom: 10, right: 10)
         }
         
         // Adds subviews.
-        addSubviews(title, button)
+        addSubviews(title, subtitle, button)
         
         // Sets up AutoLayout.
+        
+        // Padding between both titles and the button.
+        let titleButtonConstant = CGFloat(-10.0)
+        
         title.activateConstraints {
-            $0.constraintToParent(.leading(Float(Style.default.padding)), .centerY(0)) + [
-                $0.trailingAnchor.constraint(equalTo: button.leadingAnchor, constant: -20.0)
+            $0.constraintToParent(
+                .leading(Float(Style.default.padding)),
+                .top(Float(Style.default.padding))
+            ) + [
+                // Title should not overlap with the button
+                $0.trailingAnchor.constraint(lessThanOrEqualTo: button.leadingAnchor,
+                                             constant: titleButtonConstant)
             ]
         }
         
+        subtitle.activateConstraints {
+            $0.constraintToParent(.bottom(Float(-Style.default.padding))) +
+                $0.constraint(to: title, .leading()) +
+                [
+                    $0.topAnchor.constraint(equalTo: title.bottomAnchor),
+                    // Subtitle should not overlap with the button
+                    $0.trailingAnchor.constraint(lessThanOrEqualTo: button.leadingAnchor,
+                                                 constant: titleButtonConstant)
+                ]
+        }
+        
         button.activateConstraints {
-            $0.constraintToParent(.centerY(0), .trailing(-12)) +
-                $0.widthAnchor.constraint(default: 80, max: 150)
+                $0.constraintToParent(
+                    .centerY(0),
+                    .trailing(Float(-Style.default.padding))
+                )
+                + [
+                    // Set width to half of parent's width.
+                    $0.widthAnchor.constraint(equalTo: self.widthAnchor, multiplier: 0.45)
+                ]
         }
 
-    }
-    
-    override var intrinsicContentSize: CGSize {
-        CGSize(width: UIView.noIntrinsicMetric, height: Style.default.buttonHeight)
     }
     
     func onLogInTapped(_ handler: @escaping () -> Void) {

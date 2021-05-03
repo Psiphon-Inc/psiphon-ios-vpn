@@ -52,8 +52,10 @@ struct Styling {
 }
 
 enum Gradients: Int {
+    
     case grey
     case blue
+    case vividBlue
 
     var colors: [CGColor] {
         switch self {
@@ -61,6 +63,8 @@ enum Gradients: Int {
             return [.white, .softGrey1()].cgColors
         case .blue:
             return [UIColor.lightishBlue(), UIColor.lightRoyalBlueTwo()].cgColors
+        case .vividBlue:
+            return [UIColor.lightishBlue(), UIColor.vividBlue()].cgColors
         }
     }
 }
@@ -88,6 +92,7 @@ enum AvenirFont: String {
     case medium = "AvenirNext-Medium"
     case demiBold = "AvenirNext-DemiBold"
     case bold = "AvenirNext-Bold"
+    case mediumItalic = "AvenirNext-MediumItalic"
 
     func font(_ size: FontSize = .normal) -> UIFont {
         return UIFont(name: self.rawValue, size: CGFloat(size.rawValue))!
@@ -324,9 +329,10 @@ func addShadow(toLayer layer: CALayer?) {
     }
 
     layer.shadowColor = UIColor.black.cgColor
-    layer.shadowOffset = CGSize(width: 0.0, height: 1.0)
-    layer.shadowOpacity = 0.22
+    layer.shadowOffset = CGSize(width: 0.0, height: 2.0)
+    layer.shadowOpacity = 0.3
     layer.shadowRadius = 2.0
+    layer.masksToBounds = false
 }
 
 

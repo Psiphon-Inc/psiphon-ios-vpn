@@ -39,12 +39,9 @@ public extension UIViewController {
         
         self.present(viewControllerToPresent, animated: flag, completion: viewDidAppearHandler)
 
-        // `isBeingPresented` value here is interpreted as meaning that
-        // the view controller will be presented soon and that the operation
-        // has not failed (e.g. if `self` is already presenting another view controller).
-        // Documentation is sparse on this, and this interpretation might need to be
-        // re-evaluated at some point in the future.
-        return viewControllerToPresent.isBeingPresented
+        // Assumes that presentation succeeded.
+        // TODO: Is there a better way of detecting if presentation succeeded?
+        return true
     }
 
     /// This method is an attempt to organize dismissal of view controller's in order

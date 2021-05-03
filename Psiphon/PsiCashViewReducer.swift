@@ -35,7 +35,7 @@ enum PsiCashViewAction: Equatable {
     
     case signupOrLoginTapped
 
-    case _signupOrLoginTapped
+    case presentPsiCashAccountScreen(animated: Bool = true)
 
     case dismissedPsiCashAccountScreen
     
@@ -78,16 +78,20 @@ struct PsiCashViewState: Equatable {
 struct PsiCashViewReducerState: Equatable {
     var viewState: PsiCashViewState
     let psiCashAccountType: PsiCashAccountType?
+    let tunnelConnectedStatus: TunnelConnectedStatus
 }
 
 struct PsiCashViewEnvironment {
     let feedbackLogger: FeedbackLogger
     let iapStore: (IAPAction) -> Effect<Never>
+    let mainViewStore: (MainViewAction) -> Effect<Never>
 
     let getTopPresentedViewController: () -> UIViewController
 
     /// Makes `PsiCashAccountViewController` as root of UINavigationController.
     let makePsiCashAccountViewController: () -> UIViewController
+    
+    let dateCompare: DateCompare
 }
 
 let psiCashViewReducer = Reducer<PsiCashViewReducerState,
@@ -142,25 +146,29 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
             state.viewState.psiCashIAPPurchaseRequestState = .confirmAccountLogin(product)
 
             return [
-                Effect.deferred { fulfill in
+                
+                Effect { observer, _ in
 
                     let topVC = environment.getTopPresentedViewController()
 
                     let vc = ViewBuilderViewController(
                         viewBuilder: PsiCashPurchasingConfirmViewBuilder(
-                            closeButtonHandler: {
-                                fulfill(.purchaseAccountConfirmationDismissed)
+                            closeButtonHandler: { [observer] in
+                                observer.send(value: .purchaseAccountConfirmationDismissed)
                             },
-                            signUpButtonHandler: {
-                                fulfill(.signupOrLoginTapped)
+                            signUpButtonHandler: { [observer] in
+                                observer.send(value: .signupOrLoginTapped)
                             },
-                            continueWithoutAccountHandler: {
-                                fulfill(.continuePurchaseWithoutAccountTapped)
+                            continueWithoutAccountHandler: { [observer] in
+                                observer.send(value: .continuePurchaseWithoutAccountTapped)
                             }
                         ),
                         modalPresentationStyle: .overFullScreen,
-                        onDismissed: {
-                            fulfill(.purchaseAccountConfirmationDismissed)
+                        onDismissed: { [observer] in
+                            // Sends 'onCompleted' event.
+                            // Note: This effect will never complete if onDismissed
+                            // is never called.
+                            observer.fulfill(value: .purchaseAccountConfirmationDismissed)
                         }
                     )
 
@@ -201,8 +209,27 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
         ]
         
     case .signupOrLoginTapped:
+        
         guard state.viewState.isPsiCashAccountScreenShown == false else {
             return []
+        }
+        
+        // Skips presenting PsiCash Account screen if tunnel is not connected.
+        // Note that this is a quick check for informing the user,
+        // and PsiCash Account screen performs it's own last second tunnel checks
+        // before making any API requests.
+        guard case .connected = state.tunnelConnectedStatus else {
+
+            // Informs user that tunnel is not connected.
+            let alertEvent = AlertEvent(
+                .psiCashAccountAlert(.tunnelNotConnectedAlert),
+                date: environment.dateCompare.getCurrentTime()
+            )
+            
+            return [
+                environment.mainViewStore(.presentAlert(alertEvent)).mapNever()
+            ]
+            
         }
 
         if case .confirmAccountLogin(_) = state.viewState.psiCashIAPPurchaseRequestState {
@@ -221,28 +248,49 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
 
                     case .presentInStack(let viewController):
                         viewController.dismiss(animated: false, completion: {
-                            observer.send(value: ._signupOrLoginTapped)
+                            observer.send(value: .presentPsiCashAccountScreen())
                             observer.sendCompleted()
                         })
 
                     case .presentTopOfStack(let viewController):
                         viewController.dismiss(animated: false, completion: {
-                            observer.send(value: ._signupOrLoginTapped)
+                            observer.send(value: .presentPsiCashAccountScreen())
                             observer.sendCompleted()
                         })
                     }
                 }
             ]
         } else {
-            return [ Effect(value: ._signupOrLoginTapped) ]
+            return [ Effect(value: .presentPsiCashAccountScreen()) ]
         }
 
 
-    case ._signupOrLoginTapped:
+    case .presentPsiCashAccountScreen(let animated):
 
+        // Presents PsiCash Account screen if not already shown.
         guard state.viewState.isPsiCashAccountScreenShown == false else {
-            environment.feedbackLogger.fatalError("unexpected state")
             return []
+        }
+        
+        // Skips presenting PsiCash Account screen if tunnel is not connected.
+        // Note that this is a quick check for informing the user,
+        // and PsiCash Account screen performs it's own last second tunnel checks
+        // before making any API requests.
+        //
+        // Note this this check is independent of the check performed when
+        // handling other actions such as `.signupOrLoginTapped`.
+        guard case .connected = state.tunnelConnectedStatus else {
+
+            // Informs user that tunnel is not connected.
+            let alertEvent = AlertEvent(
+                .psiCashAccountAlert(.tunnelNotConnectedAlert),
+                date: environment.dateCompare.getCurrentTime()
+            )
+            
+            return [
+                environment.mainViewStore(.presentAlert(alertEvent)).mapNever()
+            ]
+            
         }
 
         state.viewState.isPsiCashAccountScreenShown = true
@@ -257,7 +305,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
                 case .notPresent:
                     let accountsViewController = environment.makePsiCashAccountViewController()
                     topVC.safePresent(accountsViewController,
-                                      animated: true,
+                                      animated: animated,
                                       viewDidAppearHandler: nil)
 
                 case .presentInStack(_),

@@ -49,6 +49,10 @@
     return [UIColor colorWithRed:87.0f / 255.0f green:93.0f / 255.0f blue:1.0f alpha:1.0f];
 }
 
++ (UIColor * _Nonnull)vividBlue {
+    return [UIColor colorWithRed:27.0f / 255.0f green:31.0f / 255.0f blue:1.0f alpha:1.0f];
+}
+
 + (UIColor * _Nonnull)greyishBrown {
     return [UIColor colorWithWhite:74.0f / 255.0f alpha:1.0f];
 }

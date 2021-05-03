@@ -162,19 +162,9 @@ final class PsiCashViewController: ReactiveViewController {
         
         super.init(onDismissed: onDismissed)
         
+        // Handler for "Sign Up or Log In" button.
         self.signupOrLogInView.onLogInTapped { [unowned self] in
-            // Last minute check for tunnel status.
-            if case .success(.connected) = tunnelConnectedSignal.first() {
-                self.store.send(.mainViewAction(.psiCashViewAction(.signupOrLoginTapped)))
-
-            } else {
-                let alertEvent = AlertEvent(
-                    .psiCashAccountAlert(.tunnelNotConnectedAlert),
-                    date: dateCompare.getCurrentTime()
-                )
-
-                self.store.send(.mainViewAction(.presentAlert(alertEvent)))
-            }
+            self.store.send(.mainViewAction(.psiCashViewAction(.presentPsiCashAccountScreen())))
         }
 
         // Updates UI by merging all necessary signals.

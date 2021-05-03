@@ -293,15 +293,21 @@ import Foundation
                           comment: "Button text telling the user that if they click it, Psiphon will start trying to connect to the network. This is shown to the user while Psiphon is disconnected.")
     }
     
-    static func Sign_up_or_log_in() -> String {
-        return NSLocalizedString("SIGN_UP_OR_LOG_IN", tableName: nil, bundle: Bundle.main,
-                                 value: "Sign Up or Log In",
+    static func Protect_your_purchases() -> String {
+        return NSLocalizedString("PROTECT_YOUR_PURCHASES", tableName: nil, bundle: Bundle.main,
+                                 value: "Protect Your Purchases",
+                                 comment: "Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated.")
+    }
+    
+    static func Log_in_or_sign_up() -> String {
+        return NSLocalizedString("LOG_IN_OR_SIGN_UP", tableName: nil, bundle: Bundle.main,
+                                 value: "Log In or Sign Up",
                                  comment: "Message title informing the user that they must sign up for an account or log in to their account")
     }
     
     static func Sign_up_or_login_to_psicash_account_to_continue() -> String {
-        return NSLocalizedString("SIGN_UP_LOG_IN_TO_PSICASH_ACCOUNT_TO_CONTINUE", tableName: nil, bundle: Bundle.main,
-                                 value: "Sign Up or Log In to your PsiCash account to continue",
+        return NSLocalizedString("LOG_IN_OR_SIGNUP_TO_CONTINUE", tableName: nil, bundle: Bundle.main,
+                                 value: "Log In or Sign Up to continue using PsiCash",
                                  comment: "Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features.")
     }
     
