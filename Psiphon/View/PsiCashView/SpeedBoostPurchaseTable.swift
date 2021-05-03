@@ -297,7 +297,7 @@ fileprivate final class SpeedBoostPurchaseCell: UICollectionViewCell {
     
     private let backgroundImage: UIImageView
     private let title = UILabel.make(fontSize: .h3, typeface: .bold)
-    private let button = GradientButton(gradient: .grey)
+    private let button = GradientButton(shadow: .light, contentShadow: false, gradient: .grey)
     
     private var purchaseHandler: ((SpeedBoostPurchasable) -> Void)?
     

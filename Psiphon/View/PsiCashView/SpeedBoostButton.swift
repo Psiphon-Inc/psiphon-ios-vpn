@@ -21,7 +21,7 @@ import UIKit
 
 @objc final class SpeedBoostButton: GradientButton, Bindable {
 
-    enum SpeedBoostButtonState: Equatable {
+    enum SpeedBoostButtonViewModel: Equatable {
         case inactive
         case active(Date)
     }
@@ -43,7 +43,7 @@ import UIKit
         }
     }
 
-    var timerState: SpeedBoostButtonState? = .none {
+    var timerState: SpeedBoostButtonViewModel? = .none {
         // Carries out the effect of setting a new timer state.
         willSet(newState) {
             switch newState {
@@ -69,7 +69,7 @@ import UIKit
         formatter.unitsStyle = .positional
         formatter.zeroFormattingBehavior = .pad
 
-        super.init(gradient: .blue)
+        super.init(shadow: .light, contentShadow: true, gradient: .blue)
     }
 
     required init?(coder: NSCoder) {
@@ -94,7 +94,7 @@ import UIKit
         titleLabel!.font = AvenirFont.demiBold.font(.h3)
     }
 
-    func bind(_ newValue: SpeedBoostButtonState) {
+    func bind(_ newValue: SpeedBoostButtonViewModel) {
         switch newValue {
         case .inactive:
             guard self.timerState != .inactive else {
@@ -106,15 +106,6 @@ import UIKit
                 return
             }
             self.timerState = .active(expiry)
-        }
-    }
-
-    // ObjC bridging function for `bind`.
-    @objc func setExpiryTime(_ expiry: Date?) {
-        if let expiry = expiry {
-            self.bind(.active(expiry))
-        } else {
-            self.bind(.inactive)
         }
     }
 
@@ -165,25 +156,28 @@ import UIKit
         setTitle(title, for: .highlighted)
     }
 
-    private func updateUIState(timerState: SpeedBoostButtonState) {
+    private func updateUIState(timerState: SpeedBoostButtonViewModel) {
         switch timerState {
         case .active(_):
-            layer.borderWidth = 2.0
-
-            // Sets colors
-            gradientColors = [UIColor.clear].cgColors
+            
+            self.setClearBackground()
+            
             layer.borderColor = activeTint.cgColor
+            layer.borderWidth = 2.0
+            
             setTitleColor(activeTint, for: .normal)
             setTitleColor(activeTint, for: .highlighted)
             imageView!.tintColor = activeTint
 
         case .inactive:
+            
+            self.setGradientBackground()
+            
+            layer.borderWidth = 0.0
+            
             setTitle(UserStrings.Speed_boost(), for: .normal)
             setTitle(UserStrings.Speed_boost(), for: .highlighted)
-            layer.borderWidth = 0.0
-
-            // Resets colors
-            gradientColors = Gradients.blue.colors
+            
             setTitleColor(UIColor.white, for: .normal)
             setTitleColor(UIColor.white, for: .highlighted)
             imageView!.tintColor = UIColor.white

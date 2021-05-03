@@ -70,7 +70,7 @@ struct PsiCashPurchasingConfirmViewBuilder: ViewBuilder {
             alignment: .natural
         )
         
-        let signUpButton = GradientButton(addContentShadow: true, gradient: .blue)
+        let signUpButton = GradientButton(contentShadow: true, gradient: .blue)
         mutate(signUpButton) {
             $0.titleLabel!.apply(fontSize: .h3,
                                  typeface: .demiBold)

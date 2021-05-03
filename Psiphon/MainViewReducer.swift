@@ -35,7 +35,7 @@ enum MainViewAction: Equatable {
 
     case _alertButtonTapped(AlertEvent, AlertAction)
 
-    case presentPsiCashScreen(initialTab: PsiCashScreenTab)
+    case presentPsiCashScreen(initialTab: PsiCashScreenTab, animated: Bool = true)
     case dismissedPsiCashScreen
 
     case psiCashViewAction(PsiCashViewAction)
@@ -53,6 +53,7 @@ struct MainViewReducerState: Equatable {
     let subscriptionState: SubscriptionState
     let psiCashAccountType: PsiCashAccountType?
     let appLifecycle: AppLifecycle
+    let tunnelConnectedStatus: TunnelConnectedStatus
 }
 
 extension MainViewReducerState {
@@ -63,7 +64,8 @@ extension MainViewReducerState {
             }
             return PsiCashViewReducerState(
                 viewState: psiCashState,
-                psiCashAccountType: self.psiCashAccountType
+                psiCashAccountType: self.psiCashAccountType,
+                tunnelConnectedStatus: self.tunnelConnectedStatus
             )
         }
         set {
@@ -97,8 +99,20 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                 return false
             }
         }
+        
+        guard failedMessages.count > 0 else {
+            return []
+        }
+        
+        let failedMessagesAlertTypes = failedMessages.map(\.viewModel.wrapped)
 
-        return failedMessages.map {
+        return [
+            environment.feedbackLogger.log(
+                .warn, "presenting previously failed alert messages: '\(failedMessagesAlertTypes)'")
+                .mapNever()
+        ]
+        +
+        failedMessages.map {
             Effect(value: .presentAlert($0.viewModel))
         }
 
@@ -306,7 +320,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             }
         }
 
-    case let .presentPsiCashScreen(initialTab):
+    case let .presentPsiCashScreen(initialTab, animated):
         // If psiCashViewState is not nil, it implies the PsiCashViewController is presented.
         guard case .none = state.mainView.psiCashViewState else {
             return []
@@ -341,7 +355,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                     let psiCashViewController = environment.makePsiCashViewController()
 
                     topVC.safePresent(psiCashViewController,
-                                      animated: true,
+                                      animated: animated,
                                       viewDidAppearHandler: nil)
 
                 case .presentInStack(_),

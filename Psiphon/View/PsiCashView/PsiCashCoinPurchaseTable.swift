@@ -197,7 +197,7 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
         
         titleLabel = UILabel.make(fontSize: .h3, typeface: .bold)
         subtitleLabel = UILabel.make(fontSize: .subtitle, numberOfLines: 0)
-        button = GradientButton(gradient: .grey)
+        button = GradientButton(shadow: .light, contentShadow: false, gradient: .grey)
         spinner = .init(style: .gray)
         super.init(frame: .zero)
 

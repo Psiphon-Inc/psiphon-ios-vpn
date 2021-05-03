@@ -370,12 +370,8 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [self startStopVPNWithAd:TRUE];
 }
 
-- (void)onPsiCashBalanceUpdate:(BridgedBalanceViewBindingType *)balance {
-    [AppObservables.shared.psiCashBalance sendNext:balance];
-}
-
-- (void)onSpeedBoostActivePurchase:(NSDate *)expiryTime {
-    [AppObservables.shared.speedBoostExpiry sendNext:expiryTime];
+- (void)onPsiCashWidgetViewModelUpdate:(BridgedPsiCashWidgetBindingType *)balance {
+    [AppObservables.shared.psiCashWidgetViewModel sendNext:balance];
 }
 
 - (void)onSubscriptionStatus:(BridgedUserSubscription * _Nonnull)status {
