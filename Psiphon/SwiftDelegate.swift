@@ -448,7 +448,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     store: store,
                     feedbackLogger: self.feedbackLogger,
                     sharedDB: self.sharedDB,
-                    psiCashClient: self.psiCashLib,
+                    psiCashLib: self.psiCashLib,
                     psiCashFileStoreRoot: self.appSupportFileStore.psiCashFileStoreRootPath,
                     supportedAppStoreProducts: self.supportedProducts,
                     userDefaultsConfig: self.userDefaultsConfig,
@@ -688,16 +688,14 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             self.store.$value.signalProducer.map(\.subscription.status).skipRepeats(),
             self.store.$value.signalProducer.map(\.psiCashState.libData?.accountType).skipRepeats(),
             self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus).skipRepeats()
-        ).map { [unowned self] in
+        ).map {
             
             SettingsViewModel(
                 subscriptionState: $0.0,
                 psiCashAccountType: $0.1,
-                vpnStatus: $0.2,
-                psiCashAccountManagementURL: self.psiCashLib.getUserSiteURL(
-                    .accountManagement, platform: self.platform.current
-                )
+                vpnStatus: $0.2
             )
+            
         }
         .startWithValues { [unowned objcBridge] model in
             objcBridge!.onSettingsViewModelDidChange(ObjcSettingsViewModel(model))
@@ -992,6 +990,10 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     
     @objc func presentPsiCashViewController(_ initialTab: PsiCashScreenTab) {
         self.store.send(.mainViewAction(.presentPsiCashScreen(initialTab: initialTab)))
+    }
+    
+    @objc func presentPsiCashAccountManagement() {
+        self.store.send(.mainViewAction(.presentPsiCashAccountManagement))
     }
     
     @objc func loadingScreenDismissSignal(_ completionHandler: @escaping () -> Void) {

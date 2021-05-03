@@ -197,4 +197,12 @@
     return [UIColor colorWithWhite:180.0f / 255.0f alpha:1.0f];
 }
 
++ (UIColor * _Nonnull)darkGray2Color {
+    return [UIColor colorWithRed:0.17 green:0.17 blue:0.17 alpha:1.0];
+}
+
++ (UIColor * _Nonnull)whiteHighlightedColor {
+    return [UIColor colorWithWhite:1.0 alpha:0.3];
+}
+
 @end

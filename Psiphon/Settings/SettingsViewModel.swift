@@ -27,7 +27,6 @@ struct SettingsViewModel: Equatable {
     let subscriptionState: SubscriptionStatus
     let psiCashAccountType: PsiCashAccountType?
     let vpnStatus: VPNStatus
-    let psiCashAccountManagementURL: URL?
 }
 
 // ObjC wrapper around `SettingsViewModel`.
@@ -58,10 +57,6 @@ struct SettingsViewModel: Equatable {
     
     @objc var vpnStatus: VPNStatus {
         model.vpnStatus
-    }
-    
-    @objc var accountManagementURL: URL? {
-        model.psiCashAccountManagementURL
     }
     
     init(_ model: SettingsViewModel) {
