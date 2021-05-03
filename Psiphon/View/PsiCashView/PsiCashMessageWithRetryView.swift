@@ -94,7 +94,7 @@ struct PsiCashMessageWithRetryView: ViewBuilder {
                 switch msg {
                 case .failedToLoadProductList(let retryAction):
                     imageView.image = UIImage(named: "PsiCashCoinCloud")!
-                    title.text = UserStrings.Failed_to_load()
+                    title.text = UserStrings.Loading_failed()
                     subtitle.text = UserStrings.Product_list_could_not_be_retrieved()
                     retryButton.setEventHandler(retryAction)
                     retryButton.setTitle(UserStrings.Tap_to_retry(), for: .normal)

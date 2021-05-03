@@ -179,7 +179,7 @@ func makeEnvironment(
     store: Store<AppState, AppAction>,
     feedbackLogger: FeedbackLogger,
     sharedDB: PsiphonDataSharedDB,
-    psiCashClient: PsiCashLib,
+    psiCashLib: PsiCashLib,
     psiCashFileStoreRoot: String?,
     supportedAppStoreProducts: SupportedAppStoreProducts,
     userDefaultsConfig: UserDefaultsConfig,
@@ -230,12 +230,15 @@ func makeEnvironment(
     
     let httpClient = HTTPClient.default(urlSession: urlSession)
     
+    let tunnelStatusSignal = store.$value.signalProducer
+        .map(\.vpnState.value.providerVPNStatus)
+    
     let environment = AppEnvironment(
         platform: platform,
         appBundle: PsiphonBundle.from(bundle: Bundle.main),
         feedbackLogger: feedbackLogger,
         httpClient: httpClient,
-        psiCashEffects: PsiCashEffects(psiCashClient: psiCashClient,
+        psiCashEffects: PsiCashEffects(psiCashLib: psiCashLib,
                                        httpClient: httpClient,
                                        globalDispatcher: globalDispatcher,
                                        getCurrentTime: dateCompare.getCurrentTime,
@@ -247,8 +250,7 @@ func makeEnvironment(
         standardUserDefaults: standardUserDefaults,
         notifier: NotifierObjC(notifier:Notifier.sharedInstance()),
         internetReachabilityStatusSignal: store.$value.signalProducer.map(\.internetReachability.networkStatus),
-        tunnelStatusSignal: store.$value.signalProducer
-            .map(\.vpnState.value.providerVPNStatus),
+        tunnelStatusSignal: tunnelStatusSignal,
         psiCashAccountTypeSignal: store.$value.signalProducer.map(\.psiCashState.libData?.accountType),
         tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
         subscriptionStatusSignal: store.$value.signalProducer.map(\.subscription.status),
@@ -430,11 +432,10 @@ func makeEnvironment(
                     }
                 ),
                 feedbackLogger: feedbackLogger,
+                tunnelStatusSignal: tunnelStatusSignal,
                 tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
-                createNewAccountURL: psiCashClient.getUserSiteURL(.accountSignup,
-                                                                  platform: platform.current),
-                forgotPasswordURL: psiCashClient.getUserSiteURL(.forgotAccount,
-                                                                platform: platform.current),
+                createNewAccountURL: psiCashLib.getUserSiteURL(.accountSignup, webview:true),
+                forgotPasswordURL: psiCashLib.getUserSiteURL(.forgotAccount, webview:true),
                 onDismissed: { [unowned store] in
                     store.send(.mainViewAction(.psiCashViewAction(.dismissedPsiCashAccountScreen)))
                 })
@@ -636,7 +637,10 @@ fileprivate func toMainViewReducerEnvironment(env: AppEnvironment) -> MainViewEn
         makePsiCashViewController: env.makePsiCashViewController,
         makeSubscriptionViewController: env.makeSubscriptionViewController,
         dateCompare: env.dateCompare,
-        addToDate: env.addToDate
+        addToDate: env.addToDate,
+        tunnelStatusSignal: env.tunnelStatusSignal,
+        tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
+        psiCashEffects: env.psiCashEffects
     )
 }
 

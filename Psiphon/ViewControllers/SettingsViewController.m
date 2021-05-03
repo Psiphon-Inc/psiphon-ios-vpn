@@ -321,18 +321,7 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
 }
 
 - (void)openPsiCashAccountManagement {
-    
-    NSURL *url = self.viewModel.accountManagementURL;
-    if (url == nil) {
-        return;
-    }
-    
-    SFSafariViewController *ctrl = [[SFSafariViewController alloc] initWithURL:url];
-    
-    [self presentViewController:ctrl animated:TRUE completion:^{
-        // No-op.
-    }];
-    
+    [SwiftDelegate.bridge presentPsiCashAccountManagement];
 }
 
 - (void)openIAPViewController {
