@@ -96,6 +96,7 @@ extension PsiCashLibError: FeedbackDescription {}
 /// `PsiCash` is a thin wrapper around `PSIPsiCashLibWrapper`.
 /// This class is mostly concerned with translating the raw data types used by `PSIPsiCashLibWrapper`
 /// to those defined in the `PsiCashClient` module.
+/// TODO: This class should be thread-safe. Replace with an Actor once it lands in Swift.
 final class PsiCashLib {
     
     private let client: PSIPsiCashLibWrapper
@@ -345,17 +346,8 @@ final class PsiCashLib {
     }
     
     /// Returns the `my.psi.cash` URL of the give type.
-    /// - Note: On iOS `webview` is set to true, and on ARM Mac `webview` is set to false.
-    func getUserSiteURL(_ urlType: PSIUserSiteURLType, platform: Platform.SupportedPlatform) -> URL {
-       
-        // If `webview` is true, the URL will be appended to with `#!webview`.
-        let webview: Bool
-        switch platform {
-        case .iOS:
-            webview = true
-        case .iOSAppOnMac:
-            webview = false
-        }
+    /// If `webview` is true, the URL will be appended to with `?webview=true`.
+    func getUserSiteURL(_ urlType: PSIUserSiteURLType, webview: Bool) -> URL {
         
         guard let url = URL(string: client.getUserSiteURL(urlType, webview: webview)) else {
             // Programming error.

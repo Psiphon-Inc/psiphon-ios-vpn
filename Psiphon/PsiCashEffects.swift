@@ -144,23 +144,24 @@ fileprivate struct PsiCashHTTPResponse: HTTPResponse {
     
 }
 
-
+/// Reducers should only use PsiCashEffects instead of directly accessing PsiCashLib.
+/// TODO: PsiCashLib should become a service actor once that feature lands in Swift.
 final class PsiCashEffects: PsiCashEffectsProtocol {
     
-    private let psiCash: PsiCashLib
+    private let psiCashLib: PsiCashLib
     private let httpClient: HTTPClient
     private let globalDispatcher: GlobalDispatcher
     private let getCurrentTime: () -> Date
     private let feedbackLogger: FeedbackLogger
     
     init(
-        psiCashClient: PsiCashLib,
+        psiCashLib: PsiCashLib,
         httpClient: HTTPClient,
         globalDispatcher: GlobalDispatcher,
         getCurrentTime: @escaping () -> Date,
         feedbackLogger: FeedbackLogger
     ) {
-        self.psiCash = psiCashClient
+        self.psiCashLib = psiCashLib
         self.httpClient = httpClient
         self.globalDispatcher = globalDispatcher
         self.getCurrentTime = getCurrentTime
@@ -179,7 +180,7 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
                 return .failure(ErrorRepr(repr: "nil psicash file store root"))
             }
             
-            let initResult = self.psiCash.initialize(
+            let initResult = self.psiCashLib.initialize(
                 userAgent: PsiCashClientHardCodedValues.userAgent,
                 fileStoreRoot: fileStoreRoot,
                 psiCashLegacyDataStore: psiCashLegacyDataStore,
@@ -247,7 +248,7 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
             case .success(let requiredStateRefresh):
                 return .success(
                     PsiCashLibInitSuccess(
-                        libData: self.psiCash.dataModel,
+                        libData: self.psiCashLib.dataModel,
                         requiresStateRefresh: requiredStateRefresh
                     )
                 )
@@ -258,7 +259,7 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
     }
     
     func libData() -> PsiCashLibData {
-        return self.psiCash.dataModel
+        return self.psiCashLib.dataModel
     }
     
     func refreshState(
@@ -274,7 +275,7 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
             let localOnly = tunnelConnection.tunneled != .connected
             
             // Updates request metadata before sending the request.
-            let maybeError = self.psiCash.setRequestMetadata(clientMetaData)
+            let maybeError = self.psiCashLib.setRequestMetadata(clientMetaData)
             guard maybeError == nil else {
                 self.feedbackLogger.fatalError("failed to set request metadata")
                 return
@@ -283,7 +284,7 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
             let purchaseClasses = priceClasses.map(\.rawValue)
             
             // Blocking call.
-            let result = self.psiCash.refreshState(purchaseClasses: purchaseClasses,
+            let result = self.psiCashLib.refreshState(purchaseClasses: purchaseClasses,
                                               localOnly: localOnly)
             
             fulfilled(
@@ -306,7 +307,7 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
             guard case .connected = tunnelConnection.tunneled else {
                 fulfilled(
                     NewExpiringPurchaseResult(
-                        refreshedLibData: self.psiCash.dataModel,
+                        refreshedLibData: self.psiCashLib.dataModel,
                         result: .failure(ErrorEvent(.tunnelNotConnected,
                                                     date: self.getCurrentTime())))
                 )
@@ -317,18 +318,18 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
                                      "Purchase: '\(String(describing: purchasable))'")
             
             // Updates request metadata before sending the request.
-            let maybeError = self.psiCash.setRequestMetadata(clientMetaData)
+            let maybeError = self.psiCashLib.setRequestMetadata(clientMetaData)
             guard maybeError == nil else {
                 self.feedbackLogger.fatalError("failed to set request metadata")
                 return
             }
             
             // Blocking call.
-            let result = self.psiCash.newExpiringPurchase(purchasable: purchasable)
+            let result = self.psiCashLib.newExpiringPurchase(purchasable: purchasable)
             
             fulfilled(
                 NewExpiringPurchaseResult(
-                    refreshedLibData: self.psiCash.dataModel,
+                    refreshedLibData: self.psiCashLib.dataModel,
                     result: result.mapError {
                         return ErrorEvent(.requestError($0),
                                           date: self.getCurrentTime())
@@ -342,7 +343,7 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
     func modifyLandingPage(_ url: URL) -> Effect<URL> {
         
         Effect { () -> URL in
-            switch self.psiCash.modifyLandingPage(url: url.absoluteString) {
+            switch self.psiCashLib.modifyLandingPage(url: url.absoluteString) {
             case .success(let modifiedURL):
                 return URL(string: modifiedURL)!
             case .failure(let error):
@@ -353,9 +354,13 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
         
     }
     
+    func getUserSiteURL(_ urlType: PSIUserSiteURLType, webview: Bool) -> URL {
+        psiCashLib.getUserSiteURL(urlType, webview: webview)
+    }
+    
     func rewardedVideoCustomData() -> String? {
         
-        switch self.psiCash.getRewardActivityData() {
+        switch self.psiCashLib.getRewardActivityData() {
         
         case .success(let rewardActivityData):
             return rewardActivityData
@@ -383,7 +388,7 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
                     return try? decoder.decode(SignedAuthorization.self, from: data)
                 }.map(\.authorization.id)
             
-            let result = self.psiCash.removePurchases(notFoundIn: nonSubscriptionAuthIDs)
+            let result = self.psiCashLib.removePurchases(notFoundIn: nonSubscriptionAuthIDs)
             switch result {
             case .success(_):
                 return
@@ -401,7 +406,7 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
             // This may involve a network operation and so can be blocking.
             
             fulfilled(
-                self.psiCash.accountLogout()
+                self.psiCashLib.accountLogout()
                     .mapError { ErrorEvent($0, date: self.getCurrentTime()) }
             )
         }
@@ -424,7 +429,7 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
             }
             
             // This is a blocking call.
-            let result = self.psiCash.accountLogin(username: username, password: password)
+            let result = self.psiCashLib.accountLogin(username: username, password: password)
             
             fulfilled(
                 result.mapError {
@@ -438,7 +443,7 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
     func setLocale(_ locale: Locale) -> Effect<Never> {
         
         .fireAndForget {
-            guard let error = self.psiCash.setLocale(locale) else {
+            guard let error = self.psiCashLib.setLocale(locale) else {
                 return
             }
             self.feedbackLogger.immediate(.error, "setLocale failed: \(error)")

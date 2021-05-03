@@ -82,6 +82,8 @@ import PsiCashClient
     
     @objc func presentPsiCashViewController(_ initialTab: PsiCashScreenTab)
     
+    @objc func presentPsiCashAccountManagement()
+    
     @objc func loadingScreenDismissSignal(_ completionHandler: @escaping () -> Void)
     
     @objc func makeSubscriptionBarView() -> SubscriptionBarView

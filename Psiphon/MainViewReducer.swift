@@ -34,9 +34,13 @@ enum MainViewAction: Equatable {
     case _presentAlertResult(newState: PresentationState<AlertEvent>)
 
     case _alertButtonTapped(AlertEvent, AlertAction)
+    
+    // PsiCash Account Management is presented in a webview.
+    case presentPsiCashAccountManagement
 
     case presentPsiCashScreen(initialTab: PsiCashScreenTab, animated: Bool = true)
     case dismissedPsiCashScreen
+    
 
     case psiCashViewAction(PsiCashViewAction)
 }
@@ -84,6 +88,9 @@ struct MainViewEnvironment {
     let makeSubscriptionViewController: () -> UIViewController
     let dateCompare: DateCompare
     let addToDate: (Calendar.Component, Int, Date) -> Date?
+    let tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
+    let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
+    let psiCashEffects: PsiCashEffects
 }
 
 let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvironment> {
@@ -319,6 +326,46 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                 ]
             }
         }
+        
+    case .presentPsiCashAccountManagement:
+        
+        return [
+            .fireAndForget {
+                
+                let topVC = environment.getTopPresentedViewController()
+                
+                let found = topVC
+                    .traversePresentingStackFor(type: WebViewController.self, searchChildren: true)
+
+                switch found {
+                case .presentTopOfStack(_), .presentInStack(_):
+                    // NO-OP
+                    return
+                    
+                case .notPresent:
+                    
+                    let url = environment.psiCashEffects
+                        .getUserSiteURL(.accountManagement, webview: true)
+                    
+                    let webViewViewController = WebViewController(
+                        baseURL: url,
+                        feedbackLogger: environment.feedbackLogger,
+                        tunnelStatusSignal: environment.tunnelStatusSignal,
+                        tunnelProviderRefSignal: environment.tunnelConnectionRefSignal,
+                        onDismissed: {
+                            // No-op. This view controller is not tracked.
+                        }
+                    )
+    
+                    webViewViewController.title = UserStrings.Psicash_account()
+    
+                    let vc = UINavigationController(rootViewController: webViewViewController)
+                    topVC.safePresent(vc, animated: true, viewDidAppearHandler: nil)
+                    
+                }
+                
+            }
+        ]
 
     case let .presentPsiCashScreen(initialTab, animated):
         // If psiCashViewState is not nil, it implies the PsiCashViewController is presented.

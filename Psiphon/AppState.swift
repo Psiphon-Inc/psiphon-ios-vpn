@@ -179,7 +179,7 @@ func makeEnvironment(
     store: Store<AppState, AppAction>,
     feedbackLogger: FeedbackLogger,
     sharedDB: PsiphonDataSharedDB,
-    psiCashClient: PsiCashLib,
+    psiCashLib: PsiCashLib,
     psiCashFileStoreRoot: String?,
     supportedAppStoreProducts: SupportedAppStoreProducts,
     userDefaultsConfig: UserDefaultsConfig,
@@ -238,7 +238,7 @@ func makeEnvironment(
         appBundle: PsiphonBundle.from(bundle: Bundle.main),
         feedbackLogger: feedbackLogger,
         httpClient: httpClient,
-        psiCashEffects: PsiCashEffects(psiCashClient: psiCashClient,
+        psiCashEffects: PsiCashEffects(psiCashLib: psiCashLib,
                                        httpClient: httpClient,
                                        globalDispatcher: globalDispatcher,
                                        getCurrentTime: dateCompare.getCurrentTime,
@@ -434,10 +434,8 @@ func makeEnvironment(
                 feedbackLogger: feedbackLogger,
                 tunnelStatusSignal: tunnelStatusSignal,
                 tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
-                createNewAccountURL: psiCashClient.getUserSiteURL(.accountSignup,
-                                                                  platform: platform.current),
-                forgotPasswordURL: psiCashClient.getUserSiteURL(.forgotAccount,
-                                                                platform: platform.current),
+                createNewAccountURL: psiCashLib.getUserSiteURL(.accountSignup, webview:true),
+                forgotPasswordURL: psiCashLib.getUserSiteURL(.forgotAccount, webview:true),
                 onDismissed: { [unowned store] in
                     store.send(.mainViewAction(.psiCashViewAction(.dismissedPsiCashAccountScreen)))
                 })
@@ -639,7 +637,10 @@ fileprivate func toMainViewReducerEnvironment(env: AppEnvironment) -> MainViewEn
         makePsiCashViewController: env.makePsiCashViewController,
         makeSubscriptionViewController: env.makeSubscriptionViewController,
         dateCompare: env.dateCompare,
-        addToDate: env.addToDate
+        addToDate: env.addToDate,
+        tunnelStatusSignal: env.tunnelStatusSignal,
+        tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
+        psiCashEffects: env.psiCashEffects
     )
 }
 
