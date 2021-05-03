@@ -189,12 +189,15 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                 
                 return [
                     
+                    environment.feedbackLogger.log(
+                        .info, "Speed Boost purchased successfully: '\(purchasedProduct)'")
+                        .mapNever(),
+                    
                     // Updates sharedDB with new auths, and notifies
-                    // network extension of the change.
+                    // network extension of the change if required.
                     setSharedDBPsiCashAuthTokens(
                         purchaseResult.refreshedLibData,
                         sharedDB: environment.sharedDB,
-                        reconnectRequired: true,
                         notifier: environment.notifier
                     ).mapNever(),
                     
@@ -262,11 +265,10 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             return [
                 
                 // Updates sharedDB with new auths, and notifies
-                // network extension if `reconnectRequired`.
+                // network extension if required.
                 setSharedDBPsiCashAuthTokens(
-                    refreshStateResponse.libData,
+                refreshStateResponse.libData,
                     sharedDB: environment.sharedDB,
-                    reconnectRequired: refreshStateResponse.reconnectRequired,
                     notifier: environment.notifier
                 ).mapNever(),
                 
@@ -336,7 +338,6 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                 setSharedDBPsiCashAuthTokens(
                     logoutResponse.libData,
                     sharedDB: environment.sharedDB,
-                    reconnectRequired: logoutResponse.reconnectRequired,
                     notifier: environment.notifier
                 ).mapNever(),
             ]
@@ -442,12 +443,11 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
 
 /// Sets PsiphonDataSharedDB non-subscription auth tokens,
 /// to the active tokens provided by the PsiCash library.
-/// If `reconnectRequired`, then sends a message to the network extension
+/// If set of active authorizations has changed, then sends a message to the network extension
 /// to notify it of the new authorization tokens.
 fileprivate func setSharedDBPsiCashAuthTokens(
     _ libData: PsiCashLibData,
     sharedDB: PsiphonDataSharedDB,
-    reconnectRequired: Bool,
     notifier: PsiApi.Notifier
 ) -> Effect<Never> {
     
@@ -466,16 +466,22 @@ fileprivate func setSharedDBPsiCashAuthTokens(
     })
     
     return .fireAndForget {
-        
+
         // Updates PsiphonDataSharedDB with with the set of PsiCash authorizations.
         
-        sharedDB.setNonSubscriptionEncodedAuthorizations(psiCashLibAuths)
+        // If current set of authorizations stored by PsiCash library is not equal to
+        // the set of non-subscription authorizations stored by the extension
+        // sends a notification to the extension of the change.
+        let sendNotification = sharedDB.getNonSubscriptionEncodedAuthorizations() != psiCashLibAuths
         
-        if reconnectRequired {
+        // Updates set of non-susbscription authorizations stored by the extension.
+        sharedDB.setNonSubscriptionEncodedAuthorizations(psiCashLibAuths)
+
+        if sendNotification {
             // Notifies network extension of updated non-subscriptions authorizations.
             notifier.post(NotifierUpdatedNonSubscriptionAuths)
         }
-        
+
     }
     
 }
