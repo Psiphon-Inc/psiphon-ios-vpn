@@ -111,4 +111,6 @@
 
 + (UIColor * _Nonnull)darkGray2Color;
 
++ (UIColor * _Nonnull)whiteHighlightedColor;
+
 @end
