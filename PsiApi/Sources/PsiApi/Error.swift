@@ -126,6 +126,7 @@ public enum SystemError<Code: Hashable>: HashableError {
 
     /// Wraps values from an `NSError` object that we care about.
     public struct ErrorInfo: HashableError {
+        
         /// Error domain.
         public let domain: String
         /// Typed error code for the given domain.
@@ -136,6 +137,21 @@ public enum SystemError<Code: Hashable>: HashableError {
         public let localizedDescription: String?
         /// Localized failure reason of an `NSError`.
         public let localizedFailureReason: String?
+        
+        public init(
+            domain: String,
+            code: Code,
+            errorCode: Int,
+            localizedDescription: String? = nil,
+            localizedFailureReason: String? = nil
+        ) {
+            self.domain = domain
+            self.code = code
+            self.errorCode = errorCode
+            self.localizedDescription = localizedDescription
+            self.localizedFailureReason = localizedFailureReason
+        }
+        
     }
 
     /// Returns `ErrorInfo` object of the top error.
