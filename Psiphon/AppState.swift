@@ -155,7 +155,6 @@ struct AppEnvironment {
     let getAppStateFeedbackEntry: SignalProducer<DiagnosticEntry, Never>
     let getFeedbackUpload: () -> FeedbackUploadProvider
     
-    let adConsent: AdConsent
     let adMobInterstitialAdController: AdMobInterstitialAdController
     let adMobRewardedVideoAdController: AdMobRewardedVideoAdController
 
@@ -185,7 +184,6 @@ func makeEnvironment(
     userDefaultsConfig: UserDefaultsConfig,
     standardUserDefaults: UserDefaults,
     objcBridgeDelegate: ObjCBridgeDelegate,
-    adConsent: AdConsent,
     dateCompare: DateCompare,
     addToDate: @escaping (Calendar.Component, Int, Date) -> Date?,
     mainDispatcher: MainDispatcher,
@@ -370,7 +368,6 @@ func makeEnvironment(
                                               store: store)
             },
         getFeedbackUpload: { PsiphonTunnelFeedback() },
-        adConsent: adConsent,
         adMobInterstitialAdController: adMobInterstitialAdController,
         adMobRewardedVideoAdController: adMobRewardedVideoAdController,
         getTopPresentedViewController: getTopPresentedViewController,
@@ -609,7 +606,6 @@ fileprivate func toAdStateEnvironment(env: AppEnvironment) -> AdStateEnvironment
     AdStateEnvironment(
         platform: env.platform,
         feedbackLogger: env.feedbackLogger,
-        adConsent: env.adConsent,
         psiCashLib: env.psiCashEffects,
         psiCashStore: env.psiCashStore,
         tunnelStatusSignal: env.tunnelStatusSignal,

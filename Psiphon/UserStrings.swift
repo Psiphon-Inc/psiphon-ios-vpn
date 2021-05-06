@@ -262,12 +262,6 @@ import Foundation
                                  value: "SELECT LANGUAGE",
                                  comment: "Title for screen that allows user to select language. Use all capital letters in the translation only if it makes sense.")
     }
-
-    @objc static func Reset_admob_consent() -> String {
-        return NSLocalizedString("SETTINGS_RESET_ADMOB_CONSENT", tableName: nil, bundle: Bundle.main,
-                                 value: "Reset AdMob Consent",
-                                 comment: "(Do not translate 'AdMob') Title of cell in settings menu which indicates the user can change or revoke the consent they've given to admob")
-    }
     
     @objc static func PsiCash_account_management() -> String {
         return NSLocalizedString("PSICASH_ACCOUNT_MANAGEMENT", tableName: nil, bundle: Bundle.main,
