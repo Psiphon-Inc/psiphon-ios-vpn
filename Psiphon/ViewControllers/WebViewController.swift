@@ -46,9 +46,6 @@ final class WebViewController: ReactiveViewController {
     private var containerView: ViewBuilderContainerView<
         EitherView<PlaceholderView<WKWebView>, BlockerView>>!
     
-    // Close button.
-    private var closeButton: BlockerView.DisplayOption.ButtonOption!
-    
     // State model
     @State private var webViewLoading: Pending<ErrorEvent<WebViewFailure>?> = .pending
     
@@ -77,13 +74,6 @@ final class WebViewController: ReactiveViewController {
                 PlaceholderView(),
                 BlockerView()
             )
-        )
-        
-        self.closeButton = BlockerView.DisplayOption.ButtonOption(
-            title: UserStrings.Close_button_title(),
-            handler: BlockerView.Handler { [unowned self] () -> Void in
-                self.dismiss(animated: true, completion: nil)
-            }
         )
         
         // Stops the webview from loading of all resources
@@ -135,9 +125,7 @@ final class WebViewController: ReactiveViewController {
                     .right(
                         BlockerView.DisplayOption(
                             animateSpinner: false,
-                            buttonLabel: .labelAndButton(
-                                labelText: UserStrings.Psiphon_is_not_connected(),
-                                buttonOptions: [ self.closeButton ]))))
+                            viewOptions: .label(text: UserStrings.Psiphon_is_not_connected()))))
                 
             case .connecting:
                 
@@ -145,9 +133,7 @@ final class WebViewController: ReactiveViewController {
                     .right(
                         BlockerView.DisplayOption(
                             animateSpinner: true,
-                            buttonLabel: .labelAndButton(
-                                labelText: UserStrings.Connecting_to_psiphon(),
-                                buttonOptions: [ self.closeButton ]))))
+                            viewOptions: .label(text: UserStrings.Connecting_to_psiphon()))))
                 
             case .disconnecting:
                 
@@ -155,9 +141,7 @@ final class WebViewController: ReactiveViewController {
                     .right(
                         BlockerView.DisplayOption(
                             animateSpinner: false,
-                            buttonLabel: .labelAndButton(
-                                labelText: UserStrings.Psiphon_is_not_connected(),
-                                buttonOptions: [self.closeButton] ))))
+                            viewOptions: .label(text: UserStrings.Psiphon_is_not_connected()))))
                 
             case .connected:
                 
@@ -171,9 +155,7 @@ final class WebViewController: ReactiveViewController {
                         .right(
                             BlockerView.DisplayOption(
                                 animateSpinner: true,
-                                buttonLabel: .labelAndButton(
-                                    labelText: UserStrings.Loading(),
-                                    buttonOptions: [ self.closeButton ]))))
+                                viewOptions: .label(text: UserStrings.Loading()))))
                     
                 case .completed(.none):
                     
@@ -202,9 +184,9 @@ final class WebViewController: ReactiveViewController {
                         self.containerView.bind(
                             .right(
                                 .init(animateSpinner: false,
-                                      buttonLabel: .labelAndButton(
+                                      viewOptions: .labelAndButton(
                                         labelText: UserStrings.Loading_failed(),
-                                        buttonOptions: [ retryButton, self.closeButton ]
+                                        buttonOptions: [ retryButton ]
                                       ))))
                         
                     case .httpError(_):
@@ -216,9 +198,8 @@ final class WebViewController: ReactiveViewController {
                         self.containerView.bind(
                             .right(
                                 .init(animateSpinner: false,
-                                      buttonLabel: .labelAndButton(
-                                        labelText: labelText,
-                                        buttonOptions: [ self.closeButton ]))))
+                                      viewOptions: .label(text: labelText))))
+                        
                     }
                     
                 }
@@ -236,12 +217,14 @@ final class WebViewController: ReactiveViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let navigationBar = navigationController?.navigationBar {
+        if navigationController != nil {
             
-            mutate(navigationBar) {
-                $0.barStyle = .default
-                $0.titleTextAttributes = [ .font: AvenirFont.bold.customFont(FontSize.h3.rawValue) ]
-            }
+            let closeNavBtn = UIBarButtonItem(title: UserStrings.Close_button_title(),
+                                              style: .plain,
+                                              target: self,
+                                              action: #selector(onNavCloseButtonClicked))
+            
+            self.navigationItem.leftBarButtonItem = closeNavBtn
             
         }
         
@@ -263,6 +246,11 @@ final class WebViewController: ReactiveViewController {
     private func load(url: URL) {
         self.webViewLoading = .pending
         self.webView.load(URLRequest(url: url))
+    }
+    
+    // Navigation bar close button click handler.
+    @objc private func onNavCloseButtonClicked() {
+        self.dismiss(animated: true, completion: nil)
     }
     
 }
