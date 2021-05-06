@@ -50,13 +50,13 @@ struct BlockerView: ViewBuilder {
             let handler: Handler
         }
         
-        enum ButtonLabel: Equatable {
+        enum ViewOptions: Equatable {
             case label(text: String)
             case labelAndButton(labelText: String, buttonOptions: [ButtonOption])
         }
         
         let animateSpinner: Bool
-        let buttonLabel: ButtonLabel
+        let viewOptions: ViewOptions
         
     }
     
@@ -109,7 +109,7 @@ struct BlockerView: ViewBuilder {
                     spinner.stopAnimating()
                 }
                 
-                switch displayOption.buttonLabel {
+                switch displayOption.viewOptions {
                 case let .label(text: text):
                     
                     // Removes all buttons if any.
