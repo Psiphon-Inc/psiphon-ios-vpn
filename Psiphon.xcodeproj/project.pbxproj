@@ -14,9 +14,9 @@
 		2913642125DF1E5700C79880 /* AdControllerStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2913642025DF1E5700C79880 /* AdControllerStatus.swift */; };
 		292B531E2620DFCB00C0C44A /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */; };
 		296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296622B425E8A554004635A1 /* LaunchScreenViewController.swift */; };
-		2968042225F2D3FF00D04B7F /* PsiCashLib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5265B00125AFBD53006BD58C /* PsiCashLib.xcframework */; };
-		2968042325F2D3FF00D04B7F /* PsiCashLib.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 5265B00125AFBD53006BD58C /* PsiCashLib.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		296E800225D47A6300574A74 /* AdStateReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296E800125D47A6300574A74 /* AdStateReducer.swift */; };
+		29923FDA264EFC720078E8BB /* PsiCashLib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; };
+		29923FDB264EFC720078E8BB /* PsiCashLib.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		29B59CE725E48F4E0051C213 /* AdMobRewardedVideoAdController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B59CE625E48F4E0051C213 /* AdMobRewardedVideoAdController.swift */; };
 		29C8FBD52640949A0029B758 /* GADRequest+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29C8FBD42640949A0029B758 /* GADRequest+Additions.swift */; };
 		29FE979125C0C1CA00D9C09F /* HostAppProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 29FE979025C0C1CA00D9C09F /* HostAppProtocol.m */; };
@@ -374,7 +374,7 @@
 			dstSubfolderSpec = 10;
 			files = (
 				529DE74925AD039200F82936 /* PsiphonTunnel.xcframework in CopyFiles */,
-				2968042325F2D3FF00D04B7F /* PsiCashLib.xcframework in CopyFiles */,
+				29923FDB264EFC720078E8BB /* PsiCashLib.xcframework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -395,6 +395,7 @@
 		292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		296622B425E8A554004635A1 /* LaunchScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenViewController.swift; sourceTree = "<group>"; };
 		296E800125D47A6300574A74 /* AdStateReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdStateReducer.swift; sourceTree = "<group>"; };
+		29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = PsiCashLib.xcframework; path = Frameworks/PsiCashLib.xcframework; sourceTree = "<group>"; };
 		29B59CE625E48F4E0051C213 /* AdMobRewardedVideoAdController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdMobRewardedVideoAdController.swift; sourceTree = "<group>"; };
 		29C8FBD42640949A0029B758 /* GADRequest+Additions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GADRequest+Additions.swift"; sourceTree = "<group>"; };
 		29FE978F25C0C1CA00D9C09F /* HostAppProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HostAppProtocol.h; sourceTree = "<group>"; };
@@ -900,13 +901,13 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				29923FDA264EFC720078E8BB /* PsiCashLib.xcframework in Frameworks */,
 				521BD22D25D1BC4F006944D9 /* GoogleAppMeasurement.xcframework in Frameworks */,
 				8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */,
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
 				521BD23525D1BC50006944D9 /* GoogleUtilities.xcframework in Frameworks */,
 				8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */,
 				529DE74825AD039200F82936 /* PsiphonTunnel.xcframework in Frameworks */,
-				2968042225F2D3FF00D04B7F /* PsiCashLib.xcframework in Frameworks */,
 				440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */,
 				474C2778BC8FAFDB749E5DC3 /* libPods-Psiphon.a in Frameworks */,
 				521BD23125D1BC4F006944D9 /* GoogleMobileAds.xcframework in Frameworks */,
@@ -1233,6 +1234,7 @@
 		668AF9B81E92CB60008CAAAA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */,
 				521BD22825D1BC4F006944D9 /* GoogleAppMeasurement.xcframework */,
 				521BD22A25D1BC4F006944D9 /* GoogleMobileAds.xcframework */,
 				521BD22C25D1BC4F006944D9 /* GoogleUtilities.xcframework */,
