@@ -1,6 +1,0 @@
-framework module PsiCashLib {
-  umbrella header "PsiCashLib.h"
-
-  export *
-  module * { export * }
-}
