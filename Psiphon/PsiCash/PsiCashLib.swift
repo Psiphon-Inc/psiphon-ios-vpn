@@ -129,6 +129,7 @@ final class PsiCashLib {
     var dataModel: PsiCashLibData {
         PsiCashLibData(
             accountType: self.accountType,
+            accountName: self.client.accountUsername(),
             balance: PsiCashAmount(nanoPsi: self.client.balance()),
             availableProducts: self.purchasePrices(),
             activePurchases: self.activePurchases()
