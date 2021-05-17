@@ -69,17 +69,20 @@ public extension PsiCashAccountType {
 public struct PsiCashLibData: Equatable {
 
     public let accountType: PsiCashAccountType
+    public let accountUsername: String?
     public let balance: PsiCashAmount
     public let purchasePrices: [PsiCashParsed<PsiCashPurchasableType>]
     public let activePurchases: [PsiCashParsed<PsiCashPurchasedType>]
     
     public init(
         accountType: PsiCashAccountType,
+        accountName: String?,
         balance: PsiCashAmount,
         availableProducts: [PsiCashParsed<PsiCashPurchasableType>],
         activePurchases: [PsiCashParsed<PsiCashPurchasedType>]
     ) {
         self.accountType = accountType
+        self.accountUsername = accountName
         self.balance = balance
         self.purchasePrices = availableProducts
         self.activePurchases = activePurchases
