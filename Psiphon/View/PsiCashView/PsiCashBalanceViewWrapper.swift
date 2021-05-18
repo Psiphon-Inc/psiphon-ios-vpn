@@ -106,8 +106,9 @@ struct PsiCashBalanceViewModel: Equatable {
         )
         
         iconContainer.activateConstraints {[
-                $0.heightAnchor.constraint(equalToConstant: CGFloat(1.33 * fontSize.rawValue))
-                    .priority(.belowRequired)
+            $0.heightAnchor.constraint(equalToConstant: CGFloat(1.33 * fontSize.rawValue))
+                .priority(.belowRequired),
+            $0.widthAnchor.constraint(equalTo: $0.heightAnchor)
         ]}
         
         // Additional constraints so that hStack height would not grow
