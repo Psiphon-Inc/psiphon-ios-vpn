@@ -31,7 +31,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)reloadOnboardingViewController;
 
-- (void)startStopVPNWithAd:(BOOL)showAd;
+- (void)startStopVPN;
 
 /**
  Returns top most view controller in the presented stack from the app's key window.
