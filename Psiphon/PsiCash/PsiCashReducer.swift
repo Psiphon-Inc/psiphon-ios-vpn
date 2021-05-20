@@ -190,7 +190,7 @@ func psiCashReducer(
         return [
             .fireAndForget { [unowned objcBridgeDelegate = environment.objcBridgeDelegate] in
                 objcBridgeDelegate?.dismiss(screen: .psiCash, completion: {
-                    objcBridgeDelegate?.startStopVPNWithInterstitial()
+                    objcBridgeDelegate?.startStopVPN()
                 })
             }
         ]
