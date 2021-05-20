@@ -55,12 +55,6 @@
 
 PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 
-#if DEBUG
-NSTimeInterval const MaxAdLoadingTime = 1.f;
-#else
-NSTimeInterval const MaxAdLoadingTime = 10.f;
-#endif
-
 @interface MainViewController ()
 
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
@@ -311,7 +305,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
     // Calls startStopVPN if startVPNOnFirstLoad is TRUE.
     {
         if (self.startVPNOnFirstLoad == TRUE) {
-            [AppDelegate.sharedAppDelegate startStopVPNWithAd:FALSE];
+            [AppDelegate.sharedAppDelegate startStopVPN];
         }
     }
   
@@ -367,7 +361,7 @@ NSTimeInterval const MaxAdLoadingTime = 10.f;
 #pragma mark - UI callbacks
 
 - (void)onStartStopTap:(UIButton *)sender {
-    [AppDelegate.sharedAppDelegate startStopVPNWithAd:TRUE];
+    [AppDelegate.sharedAppDelegate startStopVPN];
 }
 
 - (void)onSettingsButtonTap:(UIButton *)sender {

@@ -26,7 +26,7 @@ extension PsiCash {
     static func make(flags: DebugFlags) -> PsiCash {
         let psiCashLib = PsiCash()
         if flags.devServers {
-            psiCashLib.setValue("dev-api.psi.cash", forKey: "serverHostname")
+            psiCashLib.setValue("api.dev.psi.cash", forKey: "serverHostname")
         }
         return psiCashLib
     }

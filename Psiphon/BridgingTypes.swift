@@ -31,7 +31,7 @@ import PsiCashClient
     
     @objc func updateAvailableEgressRegionsOnFirstRunOfAppVersion()
     
-    @objc func startStopVPNWithInterstitial()
+    @objc func startStopVPN()
     
     @objc func onPsiCashBalanceUpdate(_ balance: BridgedBalanceViewBindingType)
 
@@ -115,10 +115,6 @@ import PsiCashClient
         -> Promise<SwitchedVPNStartStopIntent>.ObjCPromise<SwitchedVPNStartStopIntent>
     @objc func sendNewVPNIntent(_ value: SwitchedVPNStartStopIntent)
     
-    // Ad
-    
-    @objc func presentInterstitial(_ completionHandler: @escaping () -> Void)
-    
     @objc func restartVPNIfActive()
     @objc func syncWithTunnelProvider(reason: TunnelProviderSyncReason)
     @objc func reinstallVPNConfig()
@@ -144,8 +140,7 @@ import PsiCashClient
 // MARK: Bridged Types
 
 @objc enum StartButtonAction: Int {
-    case startTunnelWithoutAds
-    case startTunnelWithAds
+    case startVPN
     case stopVPN
 }
 
@@ -163,29 +158,11 @@ import PsiCashClient
         self.startButtonAction = startButtonAction
     }
     
-    @objc func forceNoAds() {
-        if case .startTunnelWithAds = startButtonAction {
-            startButtonAction = .startTunnelWithoutAds
-        }
-    }
-    
     static func make<T: TunnelProviderManager>(
-        fromProviderManagerState state: VPNProviderManagerState<T>,
-        subscriptionStatus: SubscriptionStatus,
-        currentActiveSpeedBoost: PurchasedExpirableProduct<SpeedBoostProduct>?
+        fromProviderManagerState state: VPNProviderManagerState<T>
     ) -> SwitchedVPNStartStopIntent {
         guard case .completed(_) = state.providerSyncResult else {
             fatalError("expected no pending sync with tunnel provider")
-        }
-        
-        let userSubscribed: Bool
-        switch subscriptionStatus {
-        case .subscribed(_):
-            userSubscribed = true
-        case .notSubscribed:
-            userSubscribed = false
-        case .unknown:
-            fatalError("expected subscription status to not be unknown")
         }
 
         let intendToStart: Bool
@@ -200,18 +177,7 @@ import PsiCashClient
         
         let startButtonAction: StartButtonAction
         if (intendToStart) {
-            if (state.loadState.vpnConfigurationInstalled) {
-                // If user is subscribed, or there currently is an active Speed Boost,
-                // then start tunnel without ads.
-                if (userSubscribed || currentActiveSpeedBoost != nil) {
-                    startButtonAction = .startTunnelWithoutAds
-                } else {
-                    startButtonAction = .startTunnelWithAds
-                }
-            } else {
-                // VPN Config is not installed. Skip ads.
-                startButtonAction = .startTunnelWithoutAds
-            }
+            startButtonAction = .startVPN
         } else {
             // The intent is to stop the VPN.
             startButtonAction = .stopVPN

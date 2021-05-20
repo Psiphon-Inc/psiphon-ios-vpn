@@ -32,7 +32,6 @@ struct PsiCashViewControllerState: Equatable {
     let psiCash: PsiCashState
     let iap: IAPState
     let subscription: SubscriptionState
-    let adState: AdState
     let appStorePsiCashProducts:
         PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent<Int>>
     let isRefreshingAppStoreReceipt: Bool
@@ -68,25 +67,13 @@ extension PsiCashViewControllerState {
 
                 switch viewModels {
                 case []: return []
-                default: return [
-                    .rewardedVideoProduct(
-                        clearedForSale: rewardedVideoClearedForSale,
-                        subtitle: rewardedVideoSubtitle,
-                        adState: self.adState
-                    )
-                ] + viewModels
+                default: return viewModels
                 }
 
             }, completed: { result in
                 result.map { parsedList -> [PsiCashPurchasableViewModel] in
 
-                    return [
-                        .rewardedVideoProduct(
-                            clearedForSale: rewardedVideoClearedForSale,
-                            subtitle: rewardedVideoSubtitle,
-                            adState: self.adState
-                        )
-                    ] + parsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
+                    return parsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
                         parsed.viewModel
                     }
                 }
@@ -170,7 +157,6 @@ final class PsiCashViewController: ReactiveViewController {
         locale: Locale,
         initialTab: PsiCashViewControllerTabs,
         store: Store<PsiCashViewControllerState, PsiCashAction>,
-        adStore: Store<Utilities.Unit, AdAction>,
         iapStore: Store<Utilities.Unit, IAPAction>,
         productRequestStore: Store<Utilities.Unit, ProductRequestAction>,
         appStoreReceiptStore: Store<Utilities.Unit, ReceiptStateAction>,
@@ -187,8 +173,6 @@ final class PsiCashViewController: ReactiveViewController {
             AddPsiCashViewType(
                 PsiCashCoinPurchaseTable(purchaseHandler: {
                     switch $0 {
-                    case .rewardedVideoAd:
-                        adStore.send(.loadRewardedVideo(presentAfterLoad: true))
                     case .product(let product):
                         iapStore.send(.purchase(product: product))
                     }
@@ -232,18 +216,6 @@ final class PsiCashViewController: ReactiveViewController {
                 // is checked for whether view will or did disappear.
                 guard !self.lifeCycle.viewWillOrDidDisappear else {
                     return
-                }
-                
-                // Presents alert if rewarded video load failed.
-                if case .loadFailed(let rewardedVideoLoadFailure) =
-                    observed.state.adState.rewardedVideoAdControllerStatus {
-                    
-                    let errorDesc = ErrorEventDescription(
-                        event: rewardedVideoLoadFailure.eraseToRepr(),
-                        localizedUserDescription: UserStrings.Rewarded_video_load_failed())
-                    
-                    self.displayBasicAlert(errorDesc: errorDesc)
-                    
                 }
                 
                 

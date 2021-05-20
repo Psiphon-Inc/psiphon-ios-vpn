@@ -25,7 +25,6 @@ import PsiCashClient
 
 struct PsiCashPurchasableViewModel: Equatable {
     enum ProductType: Equatable {
-        case rewardedVideoAd(loading: Bool)
         case product(AppStoreProduct)
     }
     let product: ProductType
@@ -33,23 +32,6 @@ struct PsiCashPurchasableViewModel: Equatable {
     let subtitle: String
     let localizedPrice: LocalizedPrice
     let clearedForSale: Bool
-}
-
-extension PsiCashPurchasableViewModel {
-
-    static func rewardedVideoProduct(
-        clearedForSale: Bool, subtitle: String, adState: AdState
-    ) -> PsiCashPurchasableViewModel {
-        PsiCashPurchasableViewModel(
-            product: .rewardedVideoAd(
-                loading: adState.rewardedVideoAdControllerStatus == .loading),
-            title: PsiCashHardCodedValues.videoAdRewardTitle,
-            subtitle: subtitle,
-            localizedPrice: .free,
-            clearedForSale: clearedForSale
-        )
-    }
-
 }
 
 struct PsiCashCoinPurchaseTable: ViewBuilder {
@@ -257,17 +239,6 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
 
         button.setEventHandler { [unowned self] in
             self.clickHandler(newValue.product)
-        }
-
-        // If product is rewarded video and it is loading, then shows
-        // the spinner with no button text.
-        if case .rewardedVideoAd(loading: let loading) = newValue.product {
-            if loading {
-                spinner.isHidden = false
-                spinner.startAnimating()
-                button.setTitle("", for: .normal)
-                return
-            }
         }
         
         // Gives the button a "disabled" look when not cleared for sale.
