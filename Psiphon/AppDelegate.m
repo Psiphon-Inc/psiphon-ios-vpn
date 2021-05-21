@@ -189,27 +189,14 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 #pragma mark - VPN start stop
 
 // Emitted NSNumber is of type VPNIntent.
-- (RACSignal<RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *> *)startOrStopVPNSignalWithAd:(BOOL)showAd {
+- (RACSignal<RACTwoTuple<NSNumber*, SwitchedVPNStartStopIntent*> *> *)startOrStopVPNSignal {
     
-    return [[[[RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
+    return [[[RACSignal createSignal:^RACDisposable *(id <RACSubscriber> subscriber) {
         [[SwiftDelegate.bridge switchVPNStartStopIntent]
          then:^id _Nullable(SwitchedVPNStartStopIntent * newIntent) {
             if (newIntent == nil) {
                 [NSException raise:@"nil found"
                             format:@"expected non-nil SwitchedVPNStartStopIntent value"];
-            }
-            
-            // Mutates `newIntent` startButtonAction value if `showAd` is FALSE.
-            if (newIntent.startButtonAction == StartButtonActionStartTunnelWithAds) {
-                if (showAd == FALSE) {
-                    [newIntent forceNoAds];
-                }
-
-                // Forces no-ads if it is iOS app running on Mac.
-                if ([AppInfo isiOSAppOnMac] == TRUE) {
-                    [newIntent forceNoAds];
-                }
-
             }
             
             [subscriber sendNext:newIntent];
@@ -218,29 +205,6 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
         }];
         
         return nil;
-    }] flattenMap:^RACSignal<SwitchedVPNStartStopIntent *> *(SwitchedVPNStartStopIntent *value) {
-        
-        if (value.startButtonAction == StartButtonActionStartTunnelWithAds) {
-            
-            // Start tunnel after ad presentation signal completes.
-            // We always want to start the tunnel after the presentation signal
-            // is completed, no matter if it presented an ad or it failed.
-            
-            return [RACSignal createSignal:^RACDisposable * _Nullable(id<RACSubscriber>  _Nonnull subscriber) {
-                
-                [SwiftDelegate.bridge presentInterstitial:^{
-                    [subscriber sendNext:value];
-                    [subscriber sendCompleted];
-                }];
-                
-                return nil;
-                
-            }];
-            
-        } else {
-            return [RACSignal return:value];
-        }
-        
     }] doNext:^(SwitchedVPNStartStopIntent *value) {
         dispatch_async_main(^{
             [SwiftDelegate.bridge sendNewVPNIntent:value];
@@ -248,7 +212,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     }] deliverOnMainThread];
 }
 
-- (void)startStopVPNWithAd:(BOOL)showAd {
+- (void)startStopVPN {
     AppDelegate *__weak weakSelf = self;
     
     if (pendingStartStopSignalCompletion == TRUE) {
@@ -256,7 +220,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     }
     pendingStartStopSignalCompletion = TRUE;
 
-    __block RACDisposable *disposable = [[self startOrStopVPNSignalWithAd:showAd]
+    __block RACDisposable *disposable = [[self startOrStopVPNSignal]
       subscribeError:^(NSError *error) {
         [weakSelf.compoundDisposable removeDisposable:disposable];
       }
@@ -365,10 +329,6 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 @end
 
 @implementation AppDelegate (SwiftExtensions)
-
-- (void)startStopVPNWithInterstitial {
-    [self startStopVPNWithAd:TRUE];
-}
 
 - (void)onPsiCashWidgetViewModelUpdate:(BridgedPsiCashWidgetBindingType *)balance {
     [AppObservables.shared.psiCashWidgetViewModel sendNext:balance];
