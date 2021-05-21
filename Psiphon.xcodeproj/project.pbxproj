@@ -10,16 +10,11 @@
 		2911A793263D5DED001A0A4D /* ViewBuilderContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2911A792263D5DED001A0A4D /* ViewBuilderContainerView.swift */; };
 		2911A795263D6C6D001A0A4D /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2911A794263D6C6D001A0A4D /* WebViewController.swift */; };
 		2911A797263F1941001A0A4D /* BlockerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2911A796263F1941001A0A4D /* BlockerView.swift */; };
-		2913641F25DF06C800C79880 /* AdMobInterstitialAdController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2913641E25DF06C800C79880 /* AdMobInterstitialAdController.swift */; };
-		2913642125DF1E5700C79880 /* AdControllerStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2913642025DF1E5700C79880 /* AdControllerStatus.swift */; };
 		292B531E2620DFCB00C0C44A /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */; };
 		296054AA265307770001E72D /* PsiCashAccountNameViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296054A9265307770001E72D /* PsiCashAccountNameViewWrapper.swift */; };
 		296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296622B425E8A554004635A1 /* LaunchScreenViewController.swift */; };
-		296E800225D47A6300574A74 /* AdStateReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296E800125D47A6300574A74 /* AdStateReducer.swift */; };
 		29923FDA264EFC720078E8BB /* PsiCashLib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; };
 		29923FDB264EFC720078E8BB /* PsiCashLib.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		29B59CE725E48F4E0051C213 /* AdMobRewardedVideoAdController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29B59CE625E48F4E0051C213 /* AdMobRewardedVideoAdController.swift */; };
-		29C8FBD52640949A0029B758 /* GADRequest+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29C8FBD42640949A0029B758 /* GADRequest+Additions.swift */; };
 		29FE979125C0C1CA00D9C09F /* HostAppProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 29FE979025C0C1CA00D9C09F /* HostAppProtocol.m */; };
 		440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 440D75BD1F59E041005C603B /* StoreKit.framework */; };
 		4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4435CC261F70566000F3A809 /* SettingsViewController.m */; };
@@ -75,10 +70,6 @@
 		5202011D2360D34000D00C8E /* EitherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5202011C2360D34000D00C8E /* EitherView.swift */; };
 		52055D04230C823100244F9E /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D03230C823100244F9E /* GradientButton.swift */; };
 		52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D05230C833700244F9E /* SpeedBoostButton.swift */; };
-		521BD22D25D1BC4F006944D9 /* GoogleAppMeasurement.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 521BD22825D1BC4F006944D9 /* GoogleAppMeasurement.xcframework */; };
-		521BD22F25D1BC4F006944D9 /* nanopb.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 521BD22925D1BC4F006944D9 /* nanopb.xcframework */; };
-		521BD23125D1BC4F006944D9 /* GoogleMobileAds.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 521BD22A25D1BC4F006944D9 /* GoogleMobileAds.xcframework */; };
-		521BD23525D1BC50006944D9 /* GoogleUtilities.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 521BD22C25D1BC4F006944D9 /* GoogleUtilities.xcframework */; };
 		521FD0F9219E0DDF00F748EC /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F6219E0DDF00F748EC /* AppStats.m */; };
 		521FD0FA219E0DDF00F748EC /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F8219E0DDF00F748EC /* AppProfiler.m */; };
 		521FD0FD219E0E0F00F748EC /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0FB219E0E0E00F748EC /* DebugUtils.m */; };
@@ -391,15 +382,10 @@
 		2911A792263D5DED001A0A4D /* ViewBuilderContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewBuilderContainerView.swift; sourceTree = "<group>"; };
 		2911A794263D6C6D001A0A4D /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		2911A796263F1941001A0A4D /* BlockerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockerView.swift; sourceTree = "<group>"; };
-		2913641E25DF06C800C79880 /* AdMobInterstitialAdController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdMobInterstitialAdController.swift; sourceTree = "<group>"; };
-		2913642025DF1E5700C79880 /* AdControllerStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdControllerStatus.swift; sourceTree = "<group>"; };
 		292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		296054A9265307770001E72D /* PsiCashAccountNameViewWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashAccountNameViewWrapper.swift; sourceTree = "<group>"; };
 		296622B425E8A554004635A1 /* LaunchScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenViewController.swift; sourceTree = "<group>"; };
-		296E800125D47A6300574A74 /* AdStateReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdStateReducer.swift; sourceTree = "<group>"; };
 		29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = PsiCashLib.xcframework; path = Frameworks/PsiCashLib.xcframework; sourceTree = "<group>"; };
-		29B59CE625E48F4E0051C213 /* AdMobRewardedVideoAdController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdMobRewardedVideoAdController.swift; sourceTree = "<group>"; };
-		29C8FBD42640949A0029B758 /* GADRequest+Additions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "GADRequest+Additions.swift"; sourceTree = "<group>"; };
 		29FE978F25C0C1CA00D9C09F /* HostAppProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HostAppProtocol.h; sourceTree = "<group>"; };
 		29FE979025C0C1CA00D9C09F /* HostAppProtocol.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HostAppProtocol.m; sourceTree = "<group>"; };
 		2D1DAF6C9CAF197D05CDCFCF /* Pods-Testing-TestingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testing-TestingTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Testing-TestingTests/Pods-Testing-TestingTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -904,16 +890,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				29923FDA264EFC720078E8BB /* PsiCashLib.xcframework in Frameworks */,
-				521BD22D25D1BC4F006944D9 /* GoogleAppMeasurement.xcframework in Frameworks */,
 				8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */,
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
-				521BD23525D1BC50006944D9 /* GoogleUtilities.xcframework in Frameworks */,
 				8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */,
 				529DE74825AD039200F82936 /* PsiphonTunnel.xcframework in Frameworks */,
 				440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */,
 				474C2778BC8FAFDB749E5DC3 /* libPods-Psiphon.a in Frameworks */,
-				521BD23125D1BC4F006944D9 /* GoogleMobileAds.xcframework in Frameworks */,
-				521BD22F25D1BC4F006944D9 /* nanopb.xcframework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1361,7 +1343,6 @@
 				CE4E9BBF1BBEECF30060FF8B /* Psiphon.entitlements */,
 				CE26FC991BBDC7B800B83375 /* Info.plist */,
 				4E0774951F566ADA0097BC8C /* InAppSettings.bundle */,
-				EFFA4AB620F68CE100E35E8E /* Ad */,
 				4E5BD4F62061982C00AD4724 /* Feedback */,
 				448AD86C1F5DC89000316BA9 /* IAP */,
 				4EC5526720AB8DF1000B4BEA /* Pastel */,
@@ -1656,18 +1637,6 @@
 				A8408C3C21E6934EAE9C0977 /* RelaySubject.h */,
 			);
 			path = ReactiveExtensions;
-			sourceTree = "<group>";
-		};
-		EFFA4AB620F68CE100E35E8E /* Ad */ = {
-			isa = PBXGroup;
-			children = (
-				296E800125D47A6300574A74 /* AdStateReducer.swift */,
-				2913641E25DF06C800C79880 /* AdMobInterstitialAdController.swift */,
-				2913642025DF1E5700C79880 /* AdControllerStatus.swift */,
-				29B59CE625E48F4E0051C213 /* AdMobRewardedVideoAdController.swift */,
-				29C8FBD42640949A0029B758 /* GADRequest+Additions.swift */,
-			);
-			path = Ad;
 			sourceTree = "<group>";
 		};
 		F136C2981F62E81F000D3EAB /* Resource */ = {
@@ -2063,7 +2032,6 @@
 				8D1F62C2247DC4840028AFAF /* PsiCashEffects.swift in Sources */,
 				CEBA9C112481A5C80097D700 /* Notifier.swift in Sources */,
 				445F24E920E1A5BA00D004E9 /* ber_tlv_length.c in Sources */,
-				296E800225D47A6300574A74 /* AdStateReducer.swift in Sources */,
 				CEED7835247703DD002D9D55 /* AppReceiptReducer.swift in Sources */,
 				4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */,
 				4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */,
@@ -2076,7 +2044,6 @@
 				8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */,
 				EF90D7A9204F22C900228A63 /* FileUtils.m in Sources */,
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
-				2913641F25DF06C800C79880 /* AdMobInterstitialAdController.swift in Sources */,
 				445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */,
 				296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */,
 				52A2466F23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift in Sources */,
@@ -2106,7 +2073,6 @@
 				445F24DA20E1A5BA00D004E9 /* constr_SET_OF.c in Sources */,
 				8D417EB124147C6D00FEE587 /* LandingPage.swift in Sources */,
 				445F24E520E1A5BA00D004E9 /* asn_SET_OF.c in Sources */,
-				2913642125DF1E5700C79880 /* AdControllerStatus.swift in Sources */,
 				9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */,
 				2911A795263D6C6D001A0A4D /* WebViewController.swift in Sources */,
 				4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */,
@@ -2136,7 +2102,6 @@
 				445F24E320E1A5BA00D004E9 /* OCTET_STRING.c in Sources */,
 				445F24E120E1A5BA00D004E9 /* ReceiptAttribute.c in Sources */,
 				EF90D7A2204F22C900228A63 /* timestamp_compare.c in Sources */,
-				29C8FBD52640949A0029B758 /* GADRequest+Additions.swift in Sources */,
 				52A24659238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift in Sources */,
 				CE234A7624F46AEC0007709A /* Feedback.swift in Sources */,
 				8D9E602A24364ED2003A46D8 /* VPNStateReducer.swift in Sources */,
@@ -2147,7 +2112,6 @@
 				8DB6C638242A4D06005E2F4C /* DuskButton.swift in Sources */,
 				4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */,
 				52DF5E9223C675EC00A1B067 /* ViewController+Additions.swift in Sources */,
-				29B59CE725E48F4E0051C213 /* AdMobRewardedVideoAdController.swift in Sources */,
 				8D2CBAF52540D67C006822A2 /* AlertTypes.swift in Sources */,
 				CED6796124A4FA6D00C4CA81 /* ExtensionContainerFile.m in Sources */,
 				52C8F0AB237CA26200E5F9C0 /* ImageViewBuilder.swift in Sources */,
