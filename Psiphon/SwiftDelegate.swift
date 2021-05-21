@@ -83,7 +83,6 @@ struct AppDelegateEnvironment {
     let paymentQueue: PaymentQueue
     let mainViewStore: (MainViewAction) -> Effect<Never>
     let appReceiptStore: (ReceiptStateAction) -> Effect<Never>
-    let adStore: (AdAction) -> Effect<Never>
     let paymentTransactionDelegate: PaymentTransactionDelegate
     let mainDispatcher: MainDispatcher
     let getCurrentTime: () -> Date
@@ -121,12 +120,6 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
             return [
                 Effect(value: .checkForDisallowedTrafficAlertNotification)
             ]
-            
-        case .willEnterForeground:
-            // Loads interstitial ad on subsequent app foreground events.
-             return [
-                environment.adStore(.loadInterstitial(reason: .appForegrounded)).mapNever()
-             ]
             
         default:
             return []
@@ -500,32 +493,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
             
         }
-        
-        // Sends interstitial ad load signal when unknownValuesInitialized property
-        // of AppState becomes true.
-        self.lifetime += self.store.$value.signalProducer
-            .map(\.unknownValuesInitialized)
-            .filter { $0 == true }
-            .take(first: 1)
-            .map(value: AppAction.adAction(.loadInterstitial(reason: .appInitialized)))
-            .send(store: self.store)
-        
-        // Attempts to load an interstitial whenever the tunnel goes into a disconnected state,
-        // but only after `InterstitialDelayAfterDisconnection` seconds from when
-        // the state changed to disconnected.
-        self.lifetime += self.store.$value.signalProducer
-            .map(\.vpnState.value.providerVPNStatus)
-            .skipRepeats()
-            .combinePrevious(.invalid)
-            .filter {
-                // If the transition has been from disconnecting to disconnected,
-                // load an ad after some delay.
-                $0.0 == .disconnecting && $0.1 == .disconnected
-            }
-            .map(value: AppAction.adAction(.loadInterstitial(reason: .tunnelDisconnected)))
-            // Delays action by `InterstitialDelayAfterDisconnection` seconds.
-            .delay(InterstitialDelayAfterDisconnection, on: QueueScheduler.main)
-            .send(store: self.store)
         
         // Maps connected events to refresh state messages sent to store.
         self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
@@ -1041,23 +1008,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     return true
                 }
                 
-                if case .completed(.failure(_)) = appState.adState.appTrackingTransparencyPermission {
-                    // If ad SDK initialization failed, dismiss loading screen.
-                    return true
-                }
-                
-                switch appState.adState.interstitialAdControllerStatus {
-                
-                case .loadSucceeded(_), .loadFailed(_):
-                    // If interstitial either succeeded to failed to load, dismiss loading screen.
-                    return true
-                    
-                default:
-                    // If interstitial is not loaded yet, or is being loaded,
-                    // display loading screen.
-                    return false
-                    
-                }
+                return true
                                 
             }
             .skipRepeats()
@@ -1097,7 +1048,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
 
             case .pending:
                 if state.tunnelStatus == .notConnected {
-                    objcBridge?.startStopVPNWithInterstitial()
+                    objcBridge?.startStopVPN()
                 }
             }
         }
@@ -1198,12 +1149,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     {
         let promise = Promise<SwitchedVPNStartStopIntent>.pending()
         
-        let subscription: SignalProducer<SubscriptionStatus, Never> =
-            self.store.$value.signalProducer
-            .map(\.subscription.status)
-            .filter { $0 != .unknown }
-            .take(first: 1)
-        
         let syncedVPNState: SignalProducer<VPNProviderManagerState<PsiphonTPM>, Never> =
             self.store.$value.signalProducer
             .map(\.vpnState.value)
@@ -1216,23 +1161,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
             .take(first: 1)
         
-        let activeSpeedBoost: SignalProducer<PurchasedExpirableProduct<SpeedBoostProduct>?, Never> =
-            self.store.$value.signalProducer
-            .map { [unowned self] in
-                $0.psiCashState.activeSpeedBoost(self.dateCompare)
-            }
-            .take(first: 1)
-        
-        syncedVPNState.zip(with: subscription).zip(with: activeSpeedBoost)
-            .map {
-                SwitchedVPNStartStopIntent.make(
-                    fromProviderManagerState: $0.0.0,
-                    subscriptionStatus: $0.0.1,
-                    currentActiveSpeedBoost: $0.1
-                )
-            }.startWithValues { newIntentValue in
-                promise.fulfill(newIntentValue)
-            }
+        syncedVPNState.map {
+            SwitchedVPNStartStopIntent.make(fromProviderManagerState: $0)
+        }.startWithValues { newIntentValue in
+            promise.fulfill(newIntentValue)
+        }
         
         return promise.asObjCPromise()
     }
@@ -1252,51 +1185,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             return
         }
     }
-    
-    @objc func presentInterstitial(_ completionHandler: @escaping () -> Void) {
         
-        // An interstitial is ready, and pending presentation.
-        self.store.send(.adAction(.presentInterstitial(willPresent: { willPresentAd in
-            
-            if willPresentAd {
-                
-                // An interstitial ad is expected to be presented at this point.
-                // In order call `completionHandler` when the ad is dismissed,
-                // adState.interstitialAdControllerStatus is observed for a change
-                // in state from "not presented" or "is currently presented" to
-                // any other state.
-                self.store.$value.signalProducer
-                    .map(\.adState.interstitialAdControllerStatus)
-                    .skipRepeats()
-                    .filter { adStatus in
-                        switch adStatus {
-                        case .loadSucceeded(.notPresented),
-                             .loadSucceeded(.willPresent),
-                             .loadSucceeded(.didPresent):
-                            return false
-                        
-                        default:
-                            return true
-                        }
-                    }
-                    .take(first: 1)
-                    .startWithValues { _ in
-                        // Ad either failed to present, or was presented
-                        // successfully and is dismissed.
-                        completionHandler()
-                    }
-                
-            } else {
-                
-                // Ad will not be presented.
-                completionHandler()
-                
-            }
-            
-        })))
-        
-    }
-    
     @objc func restartVPNIfActive() {
         self.store.send(vpnAction: .tunnelStateIntent(
             intent: .start(transition: .restart), reason: .userInitiated
@@ -1376,7 +1265,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // This is a round-about way of calling into ObjC AppDelegate through Swift.
         // This is to make transition to Swift-only codebase easier in the future.
         self.objcBridge.dismiss(screen: .settings) { [unowned self] in
-            self.objcBridge.startStopVPNWithInterstitial()
+            self.objcBridge.startStopVPN()
         }
     }
     
