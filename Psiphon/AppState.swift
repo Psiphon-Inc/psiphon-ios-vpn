@@ -44,7 +44,6 @@ struct AppState: Equatable {
     var internetReachability = ReachabilityState()
     var appDelegateState = AppDelegateState()
     var queuedFeedbacks: [UserFeedback] = []
-    var adState = AdState()
     var mainView = MainViewState()
 }
 
@@ -97,7 +96,6 @@ enum AppAction {
     case productRequest(ProductRequestAction)
     case reachabilityAction(ReachabilityAction)
     case feedbackAction(FeedbackAction)
-    case adAction(AdAction)
     case mainViewAction(MainViewAction)
 }
 
@@ -136,7 +134,6 @@ struct AppEnvironment {
     let iapStore: (IAPAction) -> Effect<Never>
     let subscriptionStore: (SubscriptionAction) -> Effect<Never>
     let subscriptionAuthStateStore: (SubscriptionAuthStateAction) -> Effect<Never>
-    let adStore: (AdAction) -> Effect<Never>
     let mainViewStore: (MainViewAction) -> Effect<Never>
 
     /// `vpnStartCondition` returns true whenever the app is in such a state as to to allow
@@ -154,9 +151,6 @@ struct AppEnvironment {
     let getPsiphonConfig: () -> [AnyHashable: Any]?
     let getAppStateFeedbackEntry: SignalProducer<DiagnosticEntry, Never>
     let getFeedbackUpload: () -> FeedbackUploadProvider
-    
-    let adMobInterstitialAdController: AdMobInterstitialAdController
-    let adMobRewardedVideoAdController: AdMobRewardedVideoAdController
 
     let getTopPresentedViewController: () -> UIViewController
 
@@ -207,22 +201,6 @@ func makeEnvironment(
             action: { .iap(.transactionUpdate($0)) })
     )
     SKPaymentQueue.default().add(paymentTransactionDelegate)
-    
-    let adMobInterstitialAdController = AdMobInterstitialAdController(
-        adUnitID: AdMobAdUnitIDs.UntunneledAdMobInterstitialAdUnitID,
-        store: store.projection(
-            value: erase,
-            action: { .adAction($0) }
-        )
-    )
-    
-    let adMobRewardedVideoAdController = AdMobRewardedVideoAdController(
-        adUnitID: AdMobAdUnitIDs.UntunneledAdMobRewardedVideoAdUnitID,
-        store: store.projection(
-            value: erase,
-            action: { .adAction($0) }
-        )
-    )
     
     let reachabilityForInternetConnection = Reachability.forInternetConnection()!
     
@@ -309,19 +287,15 @@ func makeEnvironment(
                 store.send(.subscriptionAuthStateAction(action))
             }
         },
-        adStore: { [unowned store] (action: AdAction) -> Effect<Never> in
-            .fireAndForget {
-                store.send(.adAction(action))
-            }
-        },
         mainViewStore: { [unowned store] (action: MainViewAction) -> Effect<Never> in
             .fireAndForget {
                 store.send(.mainViewAction(action))
             }
         },
-        vpnStartCondition: { [unowned store] () -> Bool in
-            // VPN can be started if an ad is not being presented.
-            return !store.value.adState.isPresentingAnyAd
+        vpnStartCondition: { () -> Bool in
+            // Retruns true if the VPN can be started given the current state of the app.
+            // Legacy: It was used to disallow starting VPN if an interstitial ad is presented.
+            return true
         },
         adLoadCondition: { [unowned store] () -> ErrorMessage? in
             
@@ -368,8 +342,6 @@ func makeEnvironment(
                                               store: store)
             },
         getFeedbackUpload: { PsiphonTunnelFeedback() },
-        adMobInterstitialAdController: adMobInterstitialAdController,
-        adMobRewardedVideoAdController: adMobRewardedVideoAdController,
         getTopPresentedViewController: getTopPresentedViewController,
         makePsiCashViewController: { [unowned store] in
             PsiCashViewController(
@@ -385,9 +357,6 @@ func makeEnvironment(
                             return .psiCash(action)
                         }
                     }),
-                adStore: store.projection(
-                    value: erase,
-                    action: { .adAction($0) }),
                 iapStore: store.projection(
                     value: erase,
                     action: { .iap($0) }),
@@ -568,7 +537,6 @@ fileprivate func toAppDelegateReducerEnvironment(env: AppEnvironment) -> AppDele
         paymentQueue: env.paymentQueue,
         mainViewStore: env.mainViewStore,
         appReceiptStore: env.appReceiptStore,
-        adStore: env.adStore,
         paymentTransactionDelegate: env.paymentTransactionDelegate,
         mainDispatcher: env.mainDispatcher,
         getCurrentTime: env.dateCompare.getCurrentTime,
@@ -599,20 +567,6 @@ fileprivate func toVPNReducerEnvironment(env: AppEnvironment) -> VPNReducerEnvir
         vpnStartCondition: env.vpnStartCondition,
         vpnConnectionObserver: env.vpnConnectionObserver,
         internetReachability: env.internetReachability
-    )
-}
-
-fileprivate func toAdStateEnvironment(env: AppEnvironment) -> AdStateEnvironment {
-    AdStateEnvironment(
-        platform: env.platform,
-        feedbackLogger: env.feedbackLogger,
-        psiCashLib: env.psiCashEffects,
-        psiCashStore: env.psiCashStore,
-        tunnelStatusSignal: env.tunnelStatusSignal,
-        adMobInterstitialAdController: env.adMobInterstitialAdController,
-        adMobRewardedVideoAdController: env.adMobRewardedVideoAdController,
-        adLoadCondition: env.adLoadCondition,
-        getTopPresentedViewController: env.getTopPresentedViewController
     )
 }
 
@@ -688,10 +642,6 @@ func makeAppReducer(
                  value: \.feedbackReducerState,
                  action: \.feedbackAction,
                  environment: toFeedbackReducerEnvironment(env:)),
-        adStateReducer.pullback(
-            value: \.adReducerState,
-            action: \.adAction,
-            environment: toAdStateEnvironment(env:)),
         mainViewReducer.pullback(
             value: \.mainViewReducerState,
             action: \.mainViewAction,
