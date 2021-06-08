@@ -47,6 +47,27 @@ struct AppState: Equatable {
     var mainView = MainViewState()
 }
 
+// Fields that are added to the
+extension AppState: CustomFieldFeedbackDescription {
+    var feedbackFields: [String : CustomStringConvertible] {
+        [
+            "vpnState": String(describing: vpnState),
+            "psiCashBalance": String(describing: psiCashBalance),
+            "psiCashState": String(describing: psiCashState),
+            "appReceipt": String(describing: appReceipt),
+            "subscription": String(describing: subscription),
+            "subscriptionAuthState": String(describing: subscriptionAuthState),
+            "iapState": String(describing: iapState),
+            "products": String(describing: products),
+            "pendingLandingPageOpening": String(describing: pendingLandingPageOpening),
+            "internetReachability": String(describing: internetReachability),
+            "appDelegateState": String(describing: appDelegateState),
+            "queuedFeedbacks": String(describing: queuedFeedbacks),
+            "mainView": String(describing: mainView),
+        ]
+    }
+}
+
 extension AppState {
     
     /// True if unknown values of `AppState` have been initialized.
@@ -339,7 +360,8 @@ func makeEnvironment(
             .map { appState -> DiagnosticEntry in
                 return appState.feedbackEntry(userDefaultsConfig: userDefaultsConfig,
                                               sharedDB: sharedDB,
-                                              store: store)
+                                              store: store,
+                                              psiCashLib: psiCashLib)
             },
         getFeedbackUpload: { PsiphonTunnelFeedback() },
         getTopPresentedViewController: getTopPresentedViewController,

@@ -21,8 +21,6 @@ import Foundation
 import PsiApi
 import AppStoreIAP
 
-extension AppState: FeedbackDescription {}
-
 extension TunnelProviderVPNStatus: CustomStringFeedbackDescription {
     
     public var description: String {
