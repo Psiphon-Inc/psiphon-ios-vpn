@@ -24,19 +24,26 @@ import ReactiveSwift
 extension AppState {
 
     /// `feedbackEntry` returns a diagnostic entry which captures the current app state for logging.
-    func feedbackEntry<Value, Action>(userDefaultsConfig: UserDefaultsConfig,
-                                      sharedDB: PsiphonDataSharedDB,
-                                      store: Store<Value, Action>) -> DiagnosticEntry {
+    func feedbackEntry<Value, Action>(
+        userDefaultsConfig: UserDefaultsConfig,
+        sharedDB: PsiphonDataSharedDB,
+        store: Store<Value, Action>,
+        psiCashLib: PsiCashLib
+    ) -> DiagnosticEntry {
+        
+
         let msg =
             """
             ContainerInfo: {
             \"AppState\":\"\(makeFeedbackEntry(self))\",
+            \"PsiCashLib\":\"\(psiCashLib.getDiagnosticInfo())\",
             \"UserDefaultsConfig\":\"\(makeFeedbackEntry(UserDefaultsConfig()))\",
             \"PsiphonDataSharedDB\": \"\(makeFeedbackEntry(sharedDB))\",
             \"OutstandingEffectCount\": \(store.outstandingEffectCount)
             }
             """
         return DiagnosticEntry(msg, andTimestamp: .some(Date()))
+        
     }
 
 }

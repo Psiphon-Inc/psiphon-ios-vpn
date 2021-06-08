@@ -57,6 +57,16 @@ public struct PsiCashState: Equatable {
     
 }
 
+extension PsiCashState: CustomFieldFeedbackDescription {
+    public var feedbackFields: [String : CustomStringConvertible] {
+        [
+            "purchasing": String(describing: purchasing),
+            "pendingAccountLoginLogout": String(describing: pendingAccountLoginLogout),
+            "pendingPsiCashRefresh": String(describing: pendingPsiCashRefresh)
+        ]
+    }
+}
+
 extension PsiCashState {
     
     public init() {

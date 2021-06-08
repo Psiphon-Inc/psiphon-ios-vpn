@@ -628,6 +628,11 @@ final class PsiCashLib {
         
     }
     
+    /// Exposes PsiCash library `getDiagnosticInfo` function.
+    func getDiagnosticInfo() -> String {
+        self.client.getDiagnosticInfo()
+    }
+    
 }
 
 // MARK: Map ObjC types to equivalent Swift types
