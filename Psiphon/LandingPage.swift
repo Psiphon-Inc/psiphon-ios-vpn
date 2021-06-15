@@ -72,7 +72,12 @@ let landingPageReducer = Reducer<LandingPageReducerState
         
         state.pendingLandingPageOpening = true
         
+        #if DEV_RELEASE
+        // Hard-coded landing page for PsiCash accounts testing
+        let randomlySelectedURL = URL(string: "https://landing.dev.psi.cash/dev-index.html")!
+        #else
         let randomlySelectedURL = landingPages.randomElement()!.url
+        #endif
         
         return [
             modifyLandingPagePendingObtainingToken(
