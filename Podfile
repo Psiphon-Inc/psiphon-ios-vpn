@@ -11,7 +11,7 @@ target 'Psiphon' do
   pod "InAppSettingsKit", :git => "https://github.com/Psiphon-Inc/InAppSettingsKit.git", :commit => '8bd203c'
   #pod "InAppSettingsKit", :path => "../InAppSettingsKit"
   #pod "PsiphonClientCommonLibrary", :path => "../psiphon-ios-client-common-library"
-  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => '75012bb'
+  pod 'PsiphonClientCommonLibrary', :git => "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git", :commit => 'ecc062a'
 
   pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
   pod 'MBProgressHUD', '~> 1.1.0'

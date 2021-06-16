@@ -2,7 +2,7 @@ PODS:
   - EFCountingLabel (5.1.2)
   - InAppSettingsKit (2.15)
   - MBProgressHUD (1.1.0)
-  - PsiphonClientCommonLibrary (4.0.5):
+  - PsiphonClientCommonLibrary (4.0.6):
     - InAppSettingsKit (= 2.15)
   - ReactiveObjC (3.1.0)
   - SVProgressHUD (2.2.5)
@@ -11,7 +11,7 @@ DEPENDENCIES:
   - EFCountingLabel (~> 5.1.1)
   - InAppSettingsKit (from `https://github.com/Psiphon-Inc/InAppSettingsKit.git`, commit `8bd203c`)
   - MBProgressHUD (~> 1.1.0)
-  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `75012bb`)
+  - PsiphonClientCommonLibrary (from `https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git`, commit `ecc062a`)
   - ReactiveObjC (from `https://github.com/Psiphon-Inc/ReactiveObjC.git`, commit `8bbf9dd`)
   - SVProgressHUD (~> 2.2.5)
 
@@ -26,7 +26,7 @@ EXTERNAL SOURCES:
     :commit: 8bd203c
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: 75012bb
+    :commit: ecc062a
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: 8bbf9dd
@@ -37,7 +37,7 @@ CHECKOUT OPTIONS:
     :commit: 8bd203c
     :git: https://github.com/Psiphon-Inc/InAppSettingsKit.git
   PsiphonClientCommonLibrary:
-    :commit: 75012bb
+    :commit: ecc062a
     :git: https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git
   ReactiveObjC:
     :commit: 8bbf9dd
@@ -47,10 +47,10 @@ SPEC CHECKSUMS:
   EFCountingLabel: fb9119eff4bb20bf42538665cab8e8419083e486
   InAppSettingsKit: 4890a44f9df7a1742c632920f0ea939cbeb29ea2
   MBProgressHUD: e7baa36a220447d8aeb12769bf0585582f3866d9
-  PsiphonClientCommonLibrary: 937d9cacca232e92f4c52e7a73d6844a73ce601f
+  PsiphonClientCommonLibrary: aea3f6d77d1bc74042ae16a48553233a13596e97
   ReactiveObjC: 2a38ea15335de4119d8b17caf1db1484f61db902
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
 
-PODFILE CHECKSUM: d0fb299eafdafeca299d9beef884790b34711b2a
+PODFILE CHECKSUM: 1f56e318cdb2756e66b342ee8db38e811c44d6b5
 
 COCOAPODS: 1.10.1
