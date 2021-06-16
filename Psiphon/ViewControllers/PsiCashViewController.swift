@@ -592,6 +592,11 @@ final class PsiCashViewController: ReactiveViewController {
         
         self.accountViewWrapper.view.activateConstraints {
             $0.constraint(to: paddedLayoutGuide, .centerX()) + [
+                
+                $0.leadingAnchor.constraint(greaterThanOrEqualTo: paddedLayoutGuide.leadingAnchor),
+                
+                $0.trailingAnchor.constraint(lessThanOrEqualTo: paddedLayoutGuide.trailingAnchor),
+                
                 $0.bottomAnchor.constraint(
                     equalTo: self.balanceViewWrapper.view.topAnchor,
                     constant: -Style.default.padding)
