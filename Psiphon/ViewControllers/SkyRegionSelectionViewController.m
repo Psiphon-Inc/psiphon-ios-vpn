@@ -77,6 +77,7 @@
                              locale:appLangLocale];
     }];
 
+    // Sets `selectedIndex` property based on index of `currentRegionCode` in `regions`.
     [regions enumerateObjectsUsingBlock:^(Region *r, NSUInteger idx, BOOL *stop) {
         if ([r.code isEqualToString:currentRegionCode]) {
             self.selectedIndex = idx;
