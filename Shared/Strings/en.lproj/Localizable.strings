@@ -150,6 +150,12 @@
 /* Title of the button that lets users log out of their account */
 "LOG_OUT_BUTTON_TITLE" = "Logout";
 
+/* Label indicating to the user that they are logging into their PsiCash account. Use ellipses if it makes sense. */
+"LOGGING_IN_ELLIPSES" = "Logging in ...";
+
+/* Label indicating to the user that they are logging out of their PsiCash account. Use ellipses if it makes sense. */
+"LOGGING_OUT_ELLIPSES" = "Logging out ...";
+
 /* Button title that takes user to the next page */
 "NEXT_PAGE_BUTTON_TITLE" = "Next";
 
