@@ -179,7 +179,38 @@ struct PsiCashBalanceViewModel: Equatable {
             iconValue = .right(.right(.unit))  // Red "i" info button
         }
         
-        self.setAmount(newValue.balanceState.psiCashBalance.optimisticBalance)
+        let balance = newValue.balanceState.psiCashBalance.optimisticBalance
+        self.setAmount(balance)
+        
+        
+        // 4" iPhone SE          320x568 pt
+        // 4.7" iPhone SE        375x667 pt
+        // iPhone 6              375x667 pt
+        // iPhone 11 Pro Max     414x896 pt
+        // iPhone 12 Pro Max     428x926 pt
+        let deviceWidth = UIScreen.main.bounds.width
+        
+        // "PsiCash Balance" label does not fit on smaller for large balances,
+        // so we will hide it.
+        if deviceWidth < 375 {
+            // Empty title
+            self.title.text = ""
+            
+        } else if deviceWidth <= 428 {
+            
+            if balance < PsiCashAmount(nanoPsi: 10_000_000_000_000) /* 10,000 PsiCash */ {
+                // "PsiCash Balance" title
+                self.title.text = UserStrings.PsiCash_balance().localizedUppercase
+            } else {
+                // Empty title
+                self.title.text = ""
+            }
+            
+        } else {
+            // "PsiCash Balance" title
+            self.title.text = UserStrings.PsiCash_balance().localizedUppercase
+        }
+        
         self.iconBindable.bind(iconValue)
     }
 
