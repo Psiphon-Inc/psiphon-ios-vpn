@@ -177,7 +177,8 @@ final class PsiCashAccountViewController: ReactiveViewController {
                             else {
                                 // User was already logged in prior to display
                                 // of this view controller.
-                                fatalError("illegal state")
+                                self.dismiss(animated: true, completion: nil)
+                                return
                             }
                             
                             return
