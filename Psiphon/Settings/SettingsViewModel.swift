@@ -26,6 +26,7 @@ import PsiCashClient
 struct SettingsViewModel: Equatable {
     let subscriptionState: SubscriptionStatus
     let psiCashAccountType: PsiCashAccountType?
+    let isLoggingOut: Bool
     let vpnStatus: VPNStatus
 }
 
@@ -53,6 +54,10 @@ struct SettingsViewModel: Equatable {
              .noTokens:
             return false
         }
+    }
+    
+    @objc var isLoggingOut: Bool {
+        model.isLoggingOut
     }
     
     @objc var vpnStatus: VPNStatus {
