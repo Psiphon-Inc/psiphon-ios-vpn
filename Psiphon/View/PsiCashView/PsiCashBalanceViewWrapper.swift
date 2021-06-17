@@ -34,6 +34,7 @@ struct PsiCashBalanceViewModel: Equatable {
     private typealias IconType = EitherView<ImageViewBuilder, EitherView<Spinner, ButtonBuilder>>
 
     private let psiCashPriceFormatter = PsiCashAmountFormatter(locale: Locale.current)
+    private let vStack: UIStackView
     private let hStack: UIStackView
     private let title: UILabel
     private let iconContainer = UIView(frame: .zero)
@@ -45,13 +46,19 @@ struct PsiCashBalanceViewModel: Equatable {
     private var currentAmount: PsiCashAmount?
     
     @objc var view: UIView {
-        hStack
+        vStack
     }
 
     override init() {
         
         let titleString = UserStrings.PsiCash_balance().localizedUppercase
         let fontSize: FontSize = .normal
+        
+        vStack = UIStackView.make(
+            axis: .vertical,
+            distribution: .fill,
+            alignment: .center
+        )
         
         hStack = UIStackView.make(
             axis: .horizontal,
@@ -99,7 +106,9 @@ struct PsiCashBalanceViewModel: Equatable {
         // width and horizontal position are not ambiguous.
         iconBindable.bind(.left(.unit))
         
-        self.hStack.addArrangedSubviews(
+        vStack.addArrangedSubview(hStack)
+        
+        hStack.addArrangedSubviews(
             title,
             iconContainer,
             balanceView
