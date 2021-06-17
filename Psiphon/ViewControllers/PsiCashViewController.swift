@@ -263,105 +263,36 @@ final class PsiCashViewController: ReactiveViewController {
             // Updates active tab UI
             self.tabControl.bind(psiCashViewState.activeTab)
             
+            // Updates PsiCash balance (this does not control whether the view is hidden or not)
+            self.balanceViewWrapper.bind(observed.readerState.psiCashBalanceViewModel)
+            
+            // Sets account username if availalbe
+            if let accountName = observed.readerState.psiCash.libData?.accountUsername {
+                self.accountViewWrapper.bind(accountName)
+            }
+            
             switch observed.readerState.subscription.status {
             case .unknown:
-                // There is not PsiCash state or subscription state is unknown.
-                self.accountViewWrapper.view.isHidden = true
-                self.balanceViewWrapper.view.isHidden = true
-                self.tabControl.view.isHidden = true
-                self.signupOrLogInView.isHidden = true
-                self.containerView.bind(
-                    .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
-                )
+                self.updateUIState(.unknownSubscription)
                 return
                 
             case .subscribed(_):
-                // User is subscribed. Only shows the PsiCash balance.
-                self.accountViewWrapper.view.isHidden = true
-                self.balanceViewWrapper.view.isHidden = false
-                self.tabControl.view.isHidden = true
-                self.signupOrLogInView.isHidden = true
-                self.balanceViewWrapper.bind(observed.readerState.psiCashBalanceViewModel)
-                self.containerView.bind(
-                    .left(.right(.right(.right(.right(.userSubscribed)))))
-                )
+                self.updateUIState(.subscribed)
                 return
                 
             case .notSubscribed:
-
-                // PsiCash account type
-                switch psiCashLibData.accountType {
-                case .noTokens:
-                    self.accountViewWrapper.view.isHidden = true
-                    self.balanceViewWrapper.view.isHidden = true
-                    self.tabControl.view.isHidden = true
-                    self.signupOrLogInView.isHidden = true
-                    self.containerView.bind(
-                        .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
-                    )
+            
+                self.updateUIState(.notSubscribed(observed.tunneled, psiCashLibData.accountType))
+                
+                guard psiCashLibData.accountType.hasTokens else {
                     return
-                    
-                case .tracker:
-                    self.accountViewWrapper.view.isHidden = true
-
-                case .account(loggedIn: false):
-                    // User was previously logged in, and now they are logged out.
-
-                    self.accountViewWrapper.view.isHidden = true
-                    self.balanceViewWrapper.view.isHidden = true
-                    self.tabControl.view.isHidden = true
-
-                    self.signupOrLogInView.isHidden = false
-
-                    self.containerView.bind(
-                        .left(.right(.right(.right(.right(.signupOrLoginToPsiCash)))))
-                    )
-                    return
-
-                case .account(loggedIn: true):
-                    
-                    // Updates account name.
-                    
-                    self.accountViewWrapper.view.isHidden = false
-                    
-                    guard let accountName = observed.readerState.psiCash.libData?.accountUsername else {
-                        fatalError()
-                    }
-                    
-                    self.accountViewWrapper.bind(accountName)
-                    
-                }
-
-
-                self.balanceViewWrapper.view.isHidden = false
-                self.tabControl.view.isHidden = false
-                self.balanceViewWrapper.bind(observed.readerState.psiCashBalanceViewModel)
-
-                // Sets the visibility of tabControl and logInView
-                switch observed.tunneled {
-                case .connecting, .disconnecting:
-                    self.tabControl.view.isHidden = true
-                    self.signupOrLogInView.isHidden = true
-                    
-                case .connected, .notConnected:
-                    self.tabControl.view.isHidden = false
-                    
-                    if case .tracker = psiCashLibData.accountType {
-                        // LogIn button is displayed to encourage the user to login.
-                        self.signupOrLogInView.isHidden = false
-                    } else {
-                        self.signupOrLogInView.isHidden = true
-                    }
                 }
                 
+                // Invariant: User is not subscribed, and has tokens (is tracker or logged in):
+                
                 switch (observed.tunneled, psiCashViewState.activeTab) {
-                case (.connecting, _):
-                    self.containerView.bind(
-                        .left(.right(.right(.right(.right(.unavailableWhileConnecting))))))
-                    
-                case (.disconnecting, _):
-                    self.containerView.bind(
-                        .left(.right(.right(.right(.right(.unavailableWhileDisconnecting))))))
+                case (.connecting, _), (.disconnecting, _):
+                    return
                     
                 case (.notConnected, .addPsiCash),
                      (.connected, .addPsiCash):
@@ -410,26 +341,7 @@ final class PsiCashViewController: ReactiveViewController {
                         
                     } else {
                         
-                        // Subtitle for rewarded video product given tunneled status.
-                        let rewardedVideoClearedForSale: Bool
-                        let rewardedVideoSubtitle: String
-                        switch observed.tunneled {
-                        case .connected:
-                            rewardedVideoClearedForSale = false
-                            rewardedVideoSubtitle =
-                                UserStrings.Disconnect_from_psiphon_to_watch_and_earn_psicash()
-                        case .notConnected:
-                            rewardedVideoClearedForSale = true
-                            rewardedVideoSubtitle = UserStrings.Watch_rewarded_video_and_earn()
-                        case .connecting, .disconnecting:
-                            fatalError()
-                        }
-                        
-                        let allProducts = observed.readerState.allProducts(
-                            platform: platform,
-                            rewardedVideoClearedForSale: rewardedVideoClearedForSale,
-                            rewardedVideoSubtitle: rewardedVideoSubtitle
-                        )
+                        let allProducts = observed.readerState.allProducts()
                         
                         switch allProducts {
                         case .pending([]):
@@ -529,6 +441,102 @@ final class PsiCashViewController: ReactiveViewController {
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
         Style.default.statusBarStyle
+    }
+    
+    enum UIState: Equatable {
+        case unknownSubscription
+        case subscribed
+        case notSubscribed(TunnelConnectedStatus, PsiCashAccountType)
+    }
+    
+    func updateUIState(_ state: UIState) {
+        
+        switch state {
+        
+        case .unknownSubscription:
+            self.accountViewWrapper.view.isHidden = true
+            self.balanceViewWrapper.view.isHidden = true
+            self.tabControl.view.isHidden = true
+            self.signupOrLogInView.isHidden = true
+            
+            self.containerView.bind(
+                .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
+            )
+            
+        case .subscribed:
+            // User is subscribed. Only shows the PsiCash balance.
+            self.accountViewWrapper.view.isHidden = true
+            self.balanceViewWrapper.view.isHidden = false
+            self.tabControl.view.isHidden = true
+            self.signupOrLogInView.isHidden = true
+                        
+            self.containerView.bind(
+                .left(.right(.right(.right(.right(.userSubscribed)))))
+            )
+            
+        case let .notSubscribed(tunnelStatus, psiCashAccountType):
+            
+            switch (tunnelStatus, psiCashAccountType) {
+            case (.connecting, _):
+                
+                self.accountViewWrapper.view.isHidden = true
+                self.balanceViewWrapper.view.isHidden = true
+                self.tabControl.view.isHidden = true
+                self.signupOrLogInView.isHidden = true
+                
+                self.containerView.bind(
+                    .left(.right(.right(.right(.right(.unavailableWhileConnecting))))))
+                
+            case (.disconnecting, _):
+                
+                self.accountViewWrapper.view.isHidden = true
+                self.balanceViewWrapper.view.isHidden = true
+                self.tabControl.view.isHidden = true
+                self.signupOrLogInView.isHidden = true
+                
+                self.containerView.bind(
+                    .left(.right(.right(.right(.right(.unavailableWhileDisconnecting))))))
+                
+            case (_, .noTokens):
+                self.accountViewWrapper.view.isHidden = true
+                self.balanceViewWrapper.view.isHidden = true
+                self.tabControl.view.isHidden = true
+                self.signupOrLogInView.isHidden = true
+                
+                self.containerView.bind(
+                    .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
+                )
+                
+            case (_, .account(loggedIn: false)):
+                
+                self.accountViewWrapper.view.isHidden = true
+                self.balanceViewWrapper.view.isHidden = true
+                self.tabControl.view.isHidden = true
+                self.signupOrLogInView.isHidden = false
+                
+                self.containerView.bind(
+                    .left(.right(.right(.right(.right(.signupOrLoginToPsiCash)))))
+                )
+                
+            case (_, .account(loggedIn: true)):
+                
+                self.accountViewWrapper.view.isHidden = false
+                self.balanceViewWrapper.view.isHidden = false
+                self.tabControl.view.isHidden = false
+                self.signupOrLogInView.isHidden = true
+                
+                
+            case (_, .tracker):
+                
+                self.accountViewWrapper.view.isHidden = true
+                self.balanceViewWrapper.view.isHidden = false
+                self.tabControl.view.isHidden = false
+                self.signupOrLogInView.isHidden = false
+                
+            }
+            
+        }
+        
     }
     
     // Setup and add all the views here
@@ -767,45 +775,12 @@ fileprivate extension PsiCashCoinPurchaseTable.ViewModel {
 extension PsiCashViewController.ReaderState {
 
     /// Adds rewarded video product to list of `PsiCashPurchasableViewModel`  retrieved from AppStore.
-    func allProducts(
-        platform: Platform,
-        rewardedVideoClearedForSale: Bool,
-        rewardedVideoSubtitle: String
-    ) -> PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent<Int>> {
-
-        switch platform.current {
-
-        case .iOSAppOnMac:
-
-            return appStorePsiCashProducts.map(
-                pending: { $0.compactMap { $0.viewModel } },
-                completed: { $0.map { $0.compactMap { $0.viewModel } } }
-            )
-
-        case .iOS:
-
-            // Adds rewarded video ad as the first product if running device is iOS.
-            return appStorePsiCashProducts.map(pending: { lastParsedList -> [PsiCashPurchasableViewModel] in
-
-                let viewModels = lastParsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
-                    parsed.viewModel
-                }
-
-                switch viewModels {
-                case []: return []
-                default: return viewModels
-                }
-
-            }, completed: { result in
-                result.map { parsedList -> [PsiCashPurchasableViewModel] in
-
-                    return parsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
-                        parsed.viewModel
-                    }
-                }
-            })
-
-        }
+    func allProducts() -> PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent<Int>> {
+        
+        return appStorePsiCashProducts.map(
+            pending: { $0.compactMap { $0.viewModel } },
+            completed: { $0.map { $0.compactMap { $0.viewModel } } }
+        )
 
     }
 
