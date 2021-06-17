@@ -653,13 +653,15 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.lifetime += SignalProducer.combineLatest(
             self.store.$value.signalProducer.map(\.subscription.status).skipRepeats(),
             self.store.$value.signalProducer.map(\.psiCashState.libData?.accountType).skipRepeats(),
+            self.store.$value.signalProducer.map(\.psiCashState.isLoggingInOrOut),
             self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus).skipRepeats()
         ).map {
             
             SettingsViewModel(
                 subscriptionState: $0.0,
                 psiCashAccountType: $0.1,
-                vpnStatus: $0.2
+                isLoggingOut: $0.2 == .logout,
+                vpnStatus: $0.3
             )
             
         }
