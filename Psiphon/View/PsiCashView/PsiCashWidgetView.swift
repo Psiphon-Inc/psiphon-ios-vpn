@@ -53,7 +53,7 @@ import PsiCashClient
         addPsiCashButton.setTitle("+", for: .normal)
         addPsiCashButton.titleLabel!.font = AvenirFont.demiBold.customFont(20.0)
         addPsiCashButton.setTitleColor(.white, for: .normal)
-        addPsiCashButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 7, bottom: 0, right: 7)
+        addPsiCashButton.contentEdgeInsets = UIEdgeInsets(top: 8, left: 15, bottom: 8, right: 15)
         
         let accountIcon = UIImage(named: "AccountIcon")!
         psiCashAccountButton.setImage(accountIcon, for: .normal)
