@@ -88,7 +88,7 @@ final class PsiCashViewController: ReactiveViewController {
     private var navigation: Screen = .mainScreen
     
     // Views
-    private let accountViewWrapper = PsiCashAccountNameViewWrapper()
+    private let accountNameViewWrapper = PsiCashAccountNameViewWrapper()
     private let balanceViewWrapper = PsiCashBalanceViewWrapper()
     private let closeButton = CloseButton(frame: .zero)
     
@@ -268,7 +268,7 @@ final class PsiCashViewController: ReactiveViewController {
             
             // Sets account username if availalbe
             if let accountName = observed.readerState.psiCash.libData?.accountUsername {
-                self.accountViewWrapper.bind(accountName)
+                self.accountNameViewWrapper.bind(accountName)
             }
             
             switch observed.readerState.subscription.status {
@@ -454,7 +454,7 @@ final class PsiCashViewController: ReactiveViewController {
         switch state {
         
         case .unknownSubscription:
-            self.accountViewWrapper.view.isHidden = true
+            self.accountNameViewWrapper.view.isHidden = true
             self.balanceViewWrapper.view.isHidden = true
             self.tabControl.view.isHidden = true
             self.signupOrLogInView.isHidden = true
@@ -465,7 +465,7 @@ final class PsiCashViewController: ReactiveViewController {
             
         case .subscribed:
             // User is subscribed. Only shows the PsiCash balance.
-            self.accountViewWrapper.view.isHidden = true
+            self.accountNameViewWrapper.view.isHidden = true
             self.balanceViewWrapper.view.isHidden = false
             self.tabControl.view.isHidden = true
             self.signupOrLogInView.isHidden = true
@@ -479,7 +479,7 @@ final class PsiCashViewController: ReactiveViewController {
             switch (tunnelStatus, psiCashAccountType) {
             case (.connecting, _):
                 
-                self.accountViewWrapper.view.isHidden = true
+                self.accountNameViewWrapper.view.isHidden = true
                 self.balanceViewWrapper.view.isHidden = true
                 self.tabControl.view.isHidden = true
                 self.signupOrLogInView.isHidden = true
@@ -489,7 +489,7 @@ final class PsiCashViewController: ReactiveViewController {
                 
             case (.disconnecting, _):
                 
-                self.accountViewWrapper.view.isHidden = true
+                self.accountNameViewWrapper.view.isHidden = true
                 self.balanceViewWrapper.view.isHidden = true
                 self.tabControl.view.isHidden = true
                 self.signupOrLogInView.isHidden = true
@@ -498,7 +498,7 @@ final class PsiCashViewController: ReactiveViewController {
                     .left(.right(.right(.right(.right(.unavailableWhileDisconnecting))))))
                 
             case (_, .noTokens):
-                self.accountViewWrapper.view.isHidden = true
+                self.accountNameViewWrapper.view.isHidden = true
                 self.balanceViewWrapper.view.isHidden = true
                 self.tabControl.view.isHidden = true
                 self.signupOrLogInView.isHidden = true
@@ -509,7 +509,7 @@ final class PsiCashViewController: ReactiveViewController {
                 
             case (_, .account(loggedIn: false)):
                 
-                self.accountViewWrapper.view.isHidden = true
+                self.accountNameViewWrapper.view.isHidden = true
                 self.balanceViewWrapper.view.isHidden = true
                 self.tabControl.view.isHidden = true
                 self.signupOrLogInView.isHidden = false
@@ -520,7 +520,7 @@ final class PsiCashViewController: ReactiveViewController {
                 
             case (_, .account(loggedIn: true)):
                 
-                self.accountViewWrapper.view.isHidden = false
+                self.accountNameViewWrapper.view.isHidden = false
                 self.balanceViewWrapper.view.isHidden = false
                 self.tabControl.view.isHidden = false
                 self.signupOrLogInView.isHidden = true
@@ -528,7 +528,7 @@ final class PsiCashViewController: ReactiveViewController {
                 
             case (_, .tracker):
                 
-                self.accountViewWrapper.view.isHidden = true
+                self.accountNameViewWrapper.view.isHidden = true
                 self.balanceViewWrapper.view.isHidden = false
                 self.tabControl.view.isHidden = false
                 self.signupOrLogInView.isHidden = false
@@ -561,7 +561,7 @@ final class PsiCashViewController: ReactiveViewController {
         
         // Add subviews
         view.addSubviews(
-            accountViewWrapper.view,
+            accountNameViewWrapper.view,
             balanceViewWrapper.view,
             closeButton,
             vStack
@@ -594,35 +594,34 @@ final class PsiCashViewController: ReactiveViewController {
         self.signupOrLogInView.setContentHuggingPriority(
             higherThan: self.vStack, for: .vertical)
         
-        self.closeButton.activateConstraints {
-            $0.constraint(to: paddedLayoutGuide, .trailing(), .top(45))
-        }
-        
-        self.accountViewWrapper.view.activateConstraints {
-            $0.constraint(to: paddedLayoutGuide, .centerX()) + [
-                
+        self.accountNameViewWrapper.view.activateConstraints {
+            $0.constraint(to: paddedLayoutGuide, .centerX(), .top(Float(Style.default.padding))) +
+            [
                 $0.leadingAnchor.constraint(greaterThanOrEqualTo: paddedLayoutGuide.leadingAnchor),
-                
-                $0.trailingAnchor.constraint(lessThanOrEqualTo: paddedLayoutGuide.trailingAnchor),
-                
-                $0.bottomAnchor.constraint(
-                    equalTo: self.balanceViewWrapper.view.topAnchor,
-                    constant: -Style.default.padding)
+                $0.trailingAnchor.constraint(lessThanOrEqualTo: self.closeButton.leadingAnchor)
             ]
         }
         
+        self.closeButton.activateConstraints {
+            $0.constraint(to: paddedLayoutGuide, .trailing()) +
+                $0.constraint(to: self.balanceViewWrapper.view, .centerY())
+        }
+                
         self.balanceViewWrapper.view.activateConstraints {
             $0.constraint(to: paddedLayoutGuide, .centerX(0, .belowRequired)) +
-                $0.constraint(to: self.closeButton, .centerY()) + [
-                    $0.trailingAnchor.constraint(lessThanOrEqualTo: self.closeButton.leadingAnchor,
-                                                 constant: -5.0)
-                ]
+            [
+                $0.topAnchor.constraint(
+                    equalTo: self.accountNameViewWrapper.view.bottomAnchor,
+                    constant: 5.0),
+                $0.leadingAnchor.constraint(greaterThanOrEqualTo: paddedLayoutGuide.leadingAnchor),
+                $0.trailingAnchor.constraint(lessThanOrEqualTo: closeButton.leadingAnchor)
+            ]
         }
         
         self.vStack.activateConstraints {
             $0.constraint(to: paddedLayoutGuide, .bottom(), .leading(), .trailing()) + [
-                $0.topAnchor.constraint(equalTo: self.closeButton.bottomAnchor,
-                                        constant: Style.default.padding) ]
+                $0.topAnchor.constraint(equalTo: self.balanceViewWrapper.view.bottomAnchor,
+                                        constant: Style.default.largePadding) ]
         }
         
     }
