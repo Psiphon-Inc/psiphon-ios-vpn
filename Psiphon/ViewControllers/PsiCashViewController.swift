@@ -282,13 +282,27 @@ final class PsiCashViewController: ReactiveViewController {
                 
             case .notSubscribed:
             
-                self.updateUIState(.notSubscribed(observed.tunneled, psiCashLibData.accountType))
+                self.updateUIState(
+                    .notSubscribed(
+                        observed.tunneled,
+                        psiCashLibData.accountType,
+                        observed.readerState.psiCash.isLoggingInOrOut
+                    )
+                )
                 
-                guard psiCashLibData.accountType.hasTokens else {
+                // Invariants:
+                // - User not subscribed
+                // - Not in a tunnel transition state (connecting, disconnecting).
+                // - Has tokens, and has tokens (is tracker or logged in):
+                // - Not pending login/logout
+                guard
+                    (observed.tunneled == .connected || observed.tunneled == .notConnected),
+                    psiCashLibData.accountType.hasTokens,
+                    observed.readerState.psiCash.isLoggingInOrOut == .none
+                else
+                {
                     return
                 }
-                
-                // Invariant: User is not subscribed, and has tokens (is tracker or logged in):
                 
                 switch (observed.tunneled, psiCashViewState.activeTab) {
                 case (.connecting, _), (.disconnecting, _):
@@ -446,7 +460,7 @@ final class PsiCashViewController: ReactiveViewController {
     enum UIState: Equatable {
         case unknownSubscription
         case subscribed
-        case notSubscribed(TunnelConnectedStatus, PsiCashAccountType)
+        case notSubscribed(TunnelConnectedStatus, PsiCashAccountType, PsiCashState.LoginLogoutPendingValue?)
     }
     
     func updateUIState(_ state: UIState) {
@@ -474,11 +488,11 @@ final class PsiCashViewController: ReactiveViewController {
                 .left(.right(.right(.right(.right(.userSubscribed)))))
             )
             
-        case let .notSubscribed(tunnelStatus, psiCashAccountType):
+        case let .notSubscribed(tunnelStatus, psiCashAccountType, maybePendingPsiCashLoginLogout):
             
-            switch (tunnelStatus, psiCashAccountType) {
-            case (.connecting, _):
-                
+            // Blocks UI and displays appropriate message if tunnel is connecting or disconnecting.
+            switch tunnelStatus {
+            case .connecting:
                 self.accountNameViewWrapper.view.isHidden = true
                 self.balanceViewWrapper.view.isHidden = true
                 self.tabControl.view.isHidden = true
@@ -487,7 +501,9 @@ final class PsiCashViewController: ReactiveViewController {
                 self.containerView.bind(
                     .left(.right(.right(.right(.right(.unavailableWhileConnecting))))))
                 
-            case (.disconnecting, _):
+                return
+                
+            case .disconnecting:
                 
                 self.accountNameViewWrapper.view.isHidden = true
                 self.balanceViewWrapper.view.isHidden = true
@@ -496,8 +512,45 @@ final class PsiCashViewController: ReactiveViewController {
                 
                 self.containerView.bind(
                     .left(.right(.right(.right(.right(.unavailableWhileDisconnecting))))))
+             
+                return
                 
-            case (_, .noTokens):
+            default:
+                break
+                
+            }
+            
+            // Blocks UI and displays appropriate message if user is logging in or loggign out.
+            switch maybePendingPsiCashLoginLogout {
+            
+            case .none:
+                break
+                
+            case .login:
+                self.accountNameViewWrapper.view.isHidden = true
+                self.balanceViewWrapper.view.isHidden = true
+                self.tabControl.view.isHidden = true
+                self.signupOrLogInView.isHidden = false
+                
+                self.containerView.bind(
+                    .left(.right(.right(.right(.right(.psiCashAccountsLoggingIn))))))
+                return
+                
+            case .logout:
+                self.accountNameViewWrapper.view.isHidden = true
+                self.balanceViewWrapper.view.isHidden = true
+                self.tabControl.view.isHidden = true
+                self.signupOrLogInView.isHidden = true
+                
+                self.containerView.bind(
+                    .left(.right(.right(.right(.right(.psiCashAccountsLoggingOut))))))
+                return
+                
+            }
+            
+            
+            switch psiCashAccountType {
+            case .noTokens:
                 self.accountNameViewWrapper.view.isHidden = true
                 self.balanceViewWrapper.view.isHidden = true
                 self.tabControl.view.isHidden = true
@@ -507,7 +560,7 @@ final class PsiCashViewController: ReactiveViewController {
                     .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
                 )
                 
-            case (_, .account(loggedIn: false)):
+            case .account(loggedIn: false):
                 
                 self.accountNameViewWrapper.view.isHidden = true
                 self.balanceViewWrapper.view.isHidden = true
@@ -518,7 +571,7 @@ final class PsiCashViewController: ReactiveViewController {
                     .left(.right(.right(.right(.right(.signupOrLoginToPsiCash)))))
                 )
                 
-            case (_, .account(loggedIn: true)):
+            case .account(loggedIn: true):
                 
                 self.accountNameViewWrapper.view.isHidden = false
                 self.balanceViewWrapper.view.isHidden = false
@@ -526,7 +579,7 @@ final class PsiCashViewController: ReactiveViewController {
                 self.signupOrLogInView.isHidden = true
                 
                 
-            case (_, .tracker):
+            case .tracker:
                 
                 self.accountNameViewWrapper.view.isHidden = true
                 self.balanceViewWrapper.view.isHidden = false
