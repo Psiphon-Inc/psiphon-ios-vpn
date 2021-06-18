@@ -25,7 +25,7 @@ final class PsiCashAccountNameViewWrapper: NSObject, ViewWrapper, Bindable {
     
     private let hStack: UIStackView
     
-    private let label: UILabel
+    private let label: CopyableLabel
     
     @objc var view: UIView {
         hStack
@@ -40,9 +40,11 @@ final class PsiCashAccountNameViewWrapper: NSObject, ViewWrapper, Bindable {
             spacing: 5.0
         )
         
-        label = UILabel.make(fontSize: .normal,
-                             typeface: .demiBold,
-                             color: .white)
+        label = CopyableLabel.make(
+            fontSize: .normal,
+            typeface: .demiBold,
+            color: .white
+        )
 
         super.init()
         

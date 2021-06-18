@@ -13,6 +13,7 @@
 		292B531E2620DFCB00C0C44A /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */; };
 		296054AA265307770001E72D /* PsiCashAccountNameViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296054A9265307770001E72D /* PsiCashAccountNameViewWrapper.swift */; };
 		296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296622B425E8A554004635A1 /* LaunchScreenViewController.swift */; };
+		296A1A89267A01E70068B115 /* CopyableLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296A1A88267A01E70068B115 /* CopyableLabel.swift */; };
 		29923FDA264EFC720078E8BB /* PsiCashLib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; };
 		29923FDB264EFC720078E8BB /* PsiCashLib.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		29FE979125C0C1CA00D9C09F /* HostAppProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 29FE979025C0C1CA00D9C09F /* HostAppProtocol.m */; };
@@ -385,6 +386,7 @@
 		292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		296054A9265307770001E72D /* PsiCashAccountNameViewWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashAccountNameViewWrapper.swift; sourceTree = "<group>"; };
 		296622B425E8A554004635A1 /* LaunchScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenViewController.swift; sourceTree = "<group>"; };
+		296A1A88267A01E70068B115 /* CopyableLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyableLabel.swift; sourceTree = "<group>"; };
 		29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = PsiCashLib.xcframework; path = Frameworks/PsiCashLib.xcframework; sourceTree = "<group>"; };
 		29FE978F25C0C1CA00D9C09F /* HostAppProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HostAppProtocol.h; sourceTree = "<group>"; };
 		29FE979025C0C1CA00D9C09F /* HostAppProtocol.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HostAppProtocol.m; sourceTree = "<group>"; };
@@ -1181,6 +1183,7 @@
 				8D7F5A55252D1F6800685CC4 /* SkyTextField.swift */,
 				8D13232E25310661005F83C8 /* SecretValueTextField.swift */,
 				2911A792263D5DED001A0A4D /* ViewBuilderContainerView.swift */,
+				296A1A88267A01E70068B115 /* CopyableLabel.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2200,6 +2203,7 @@
 				8D417EDD2419DBA100FEE587 /* ProductRequest.swift in Sources */,
 				52B3C54A23DF99E8003F6B12 /* AppObservables.m in Sources */,
 				A84084C8B5C16F0EB80364FA /* Strings.m in Sources */,
+				296A1A89267A01E70068B115 /* CopyableLabel.swift in Sources */,
 				A8408FF45D08D31E102FA41F /* ContainerDB.m in Sources */,
 				5245C5C92342A6840033EE13 /* UserDefaults.swift in Sources */,
 				2911A793263D5DED001A0A4D /* ViewBuilderContainerView.swift in Sources */,

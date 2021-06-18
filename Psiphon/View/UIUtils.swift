@@ -178,7 +178,6 @@ extension UILabel {
         font = typeface.font(fontSize)
         textAlignment = alignment
         textColor = color
-        isUserInteractionEnabled = false
         clipsToBounds = false
         self.text = text
         
