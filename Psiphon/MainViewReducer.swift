@@ -37,6 +37,9 @@ enum MainViewAction: Equatable {
     
     // PsiCash Account Management is presented in a webview.
     case presentPsiCashAccountManagement
+    
+    // PsiCash Account Management screen is dismissed.
+    case _dismissedPsiCashAccountManagement
 
     case presentPsiCashScreen(initialTab: PsiCashScreenTab, animated: Bool = true)
     case dismissedPsiCashScreen
@@ -330,7 +333,8 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
     case .presentPsiCashAccountManagement:
         
         return [
-            .fireAndForget {
+            
+            Effect { observer, _ in
                 
                 let topVC = environment.getTopPresentedViewController()
                 
@@ -340,6 +344,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                 switch found {
                 case .presentTopOfStack(_), .presentInStack(_):
                     // NO-OP
+                    observer.sendCompleted()
                     return
                     
                 case .notPresent:
@@ -353,18 +358,37 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                         tunnelStatusSignal: environment.tunnelStatusSignal,
                         tunnelProviderRefSignal: environment.tunnelConnectionRefSignal,
                         onDismissed: {
-                            // No-op. This view controller is not tracked.
+                            observer.send(value: ._dismissedPsiCashAccountManagement)
+                            observer.sendCompleted()
                         }
                     )
     
                     webViewViewController.title = UserStrings.Psicash_account()
     
                     let vc = UINavigationController(rootViewController: webViewViewController)
-                    topVC.safePresent(vc, animated: true, viewDidAppearHandler: nil)
+                    let success = topVC.safePresent(vc, animated: true, viewDidAppearHandler: nil)
+                    
+                    // Immediately completes the signal if the presentation failed,
+                    // since onDimissed callback above won't be called in this case,
+                    // and this would be a memory-leak.
+                    if !success {
+                        observer.sendCompleted()
+                    }
                     
                 }
                 
             }
+            
+        ]
+        
+    case ._dismissedPsiCashAccountManagement:
+        
+        // PsiCash RefreshState after dismissal of Account Management screen.
+        // This is necessary since the user might have updated their username, or
+        // other account information.
+        return [
+            environment.psiCashStore(.refreshPsiCashState(ignoreSubscriptionState: true))
+                .mapNever()
         ]
 
     case let .presentPsiCashScreen(initialTab, animated):

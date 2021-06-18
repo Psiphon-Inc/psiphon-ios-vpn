@@ -484,6 +484,18 @@ extension UserStrings {
                                  comment: "Button label that lets users create a new account.")
     }
     
+    static func Logging_in_ellipses() -> String {
+        return NSLocalizedString("LOGGING_IN_ELLIPSES", tableName: nil, bundle: Bundle.main,
+                                 value: "Logging in ...",
+                                 comment: "Label indicating to the user that they are logging into their PsiCash account. Use ellipses if it makes sense.")
+    }
+    
+    static func Logging_out_ellipses() -> String {
+        return NSLocalizedString("LOGGING_OUT_ELLIPSES", tableName: nil, bundle: Bundle.main,
+                                 value: "Logging out ...",
+                                 comment: "Label indicating to the user that they are logging out of their PsiCash account. Use ellipses if it makes sense.")
+    }
+    
     static func Log_in() -> String {
         return NSLocalizedString("LOG_IN_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
                                  value: "Log In",

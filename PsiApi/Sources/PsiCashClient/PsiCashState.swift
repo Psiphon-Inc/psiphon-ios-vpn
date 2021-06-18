@@ -57,6 +57,29 @@ public struct PsiCashState: Equatable {
     
 }
 
+extension PsiCashState {
+    
+    /// Has value if pending PsiCash Accounts login or logout, otherwise `.none`.
+    public var isLoggingInOrOut: LoginLogoutPendingValue? {
+        
+        switch pendingAccountLoginLogout {
+        case .none:
+            return .none
+        case .some(let event):
+            switch event.wrapped {
+            case .pending(.login):
+                return .login
+            case .pending(.logout):
+                return .logout
+            case .completed(_):
+                return .none
+            }
+        }
+        
+    }
+    
+}
+
 extension PsiCashState: CustomFieldFeedbackDescription {
     public var feedbackFields: [String : CustomStringConvertible] {
         [

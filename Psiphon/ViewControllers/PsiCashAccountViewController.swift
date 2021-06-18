@@ -177,7 +177,8 @@ final class PsiCashAccountViewController: ReactiveViewController {
                             else {
                                 // User was already logged in prior to display
                                 // of this view controller.
-                                fatalError("illegal state")
+                                self.dismiss(animated: true, completion: nil)
+                                return
                             }
                             
                             return
@@ -575,6 +576,12 @@ final class PsiCashAccountViewController: ReactiveViewController {
             tunnelStatusSignal: self.tunnelStatusSignal,
             tunnelProviderRefSignal: self.tunnelConnectionRefSignal,
             onDismissed: {
+                
+                // PsiCash RefreshState after dismissal of Account Management screen.
+                // This is necessary since the user might have updated their username, or
+                // other account information.
+                self.store.send(.psiCashAction(.refreshPsiCashState(ignoreSubscriptionState: true)))
+                
                 let _ = self.display(screenToPresent: .mainScreen)
             }
         )

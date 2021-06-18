@@ -43,7 +43,7 @@ import PsiCashClient
         
         topRowHStack = UIStackView.make(
             axis: .horizontal,
-            distribution: .equalSpacing,
+            distribution: .fill,
             alignment: .center,
             spacing: 10.0
         )
@@ -53,7 +53,6 @@ import PsiCashClient
         addPsiCashButton.setTitle("+", for: .normal)
         addPsiCashButton.titleLabel!.font = AvenirFont.demiBold.customFont(20.0)
         addPsiCashButton.setTitleColor(.white, for: .normal)
-        addPsiCashButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 7, bottom: 0, right: 7)
         
         let accountIcon = UIImage(named: "AccountIcon")!
         psiCashAccountButton.setImage(accountIcon, for: .normal)
@@ -73,13 +72,24 @@ import PsiCashClient
         )
         
         topRowHStack.activateConstraints {
-            $0.constraintToParent(.top(), .centerX())
+            $0.constraintToParent(.top(), .centerX()) +
+            [
+                $0.leadingAnchor.constraint(greaterThanOrEqualTo: self.leadingAnchor),
+                $0.trailingAnchor.constraint(lessThanOrEqualTo: self.trailingAnchor)
+            ]
+        }
+
+        addPsiCashButton.activateConstraints {
+            [
+                $0.widthAnchor.constraint(equalToConstant: Style.default.buttonHeight),
+                $0.heightAnchor.constraint(equalToConstant: Style.default.buttonHeight)
+            ]
         }
         
         psiCashAccountButton.activateConstraints {
             [
-              $0.widthAnchor.constraint(equalTo: addPsiCashButton.widthAnchor),
-              $0.heightAnchor.constraint(equalTo: addPsiCashButton.heightAnchor)
+                $0.widthAnchor.constraint(equalToConstant: Style.default.buttonHeight),
+                $0.heightAnchor.constraint(equalToConstant: Style.default.buttonHeight)
             ]
         }
         

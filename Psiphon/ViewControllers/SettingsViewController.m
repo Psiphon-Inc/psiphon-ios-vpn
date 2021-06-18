@@ -124,6 +124,7 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
     // PsiCash Manage Account button:
     // - Shown when logged in account.
     // - Not allowed when disconnected (button disabled, not hidden).
+    // - Not allowed when logging out
     if (self.viewModel.isPsiCashAccountLoggedIn == TRUE) {
         [hiddenKeys removeObject:SettingsPsiCashAccountManagementSpecifierKey];
     } else {
@@ -223,8 +224,9 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
         [cell.textLabel setText:[UserStrings PsiCash_account_management]];
         
-        // PsiCash account management button hidden when not connected.
-        BOOL enabled = [VPNStateCompat isConnected:self.viewModel.vpnStatus];
+        // PsiCash account management button disabled when not connected,
+        // and when logging out.
+        BOOL enabled = ([VPNStateCompat isConnected:self.viewModel.vpnStatus] && !self.viewModel.isLoggingOut);
         cell.userInteractionEnabled = enabled;
         cell.textLabel.enabled = enabled;
         cell.detailTextLabel.enabled = enabled;
