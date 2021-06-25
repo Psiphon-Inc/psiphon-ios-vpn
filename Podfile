@@ -16,7 +16,7 @@ target 'Psiphon' do
   pod 'ReactiveObjC', :git => "https://github.com/Psiphon-Inc/ReactiveObjC.git", :commit => '8bbf9dd'
   pod 'MBProgressHUD', '~> 1.1.0'
   pod 'SVProgressHUD', '~> 2.2.5'
-  pod 'EFCountingLabel', '~> 5.1.1'
+  pod 'EFCountingLabel', '~> 5.1.3'
 end
 
 post_install do |installer|
