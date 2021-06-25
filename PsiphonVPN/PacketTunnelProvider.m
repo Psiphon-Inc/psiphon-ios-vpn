@@ -18,6 +18,7 @@
  */
 
 #import <PsiphonTunnel/PsiphonTunnel.h>
+#import "TunnelFileDescriptor.h"
 #import <NetworkExtension/NEPacketTunnelNetworkSettings.h>
 #import <NetworkExtension/NEIPv4Settings.h>
 #import <NetworkExtension/NEDNSSettings.h>
@@ -748,7 +749,23 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     NSMutableDictionary *mutableConfigCopy = [config mutableCopy];
 
     // Applying mutations to config
-    NSNumber *fd = (NSNumber*)[[self packetFlow] valueForKeyPath:@"socket.fileDescriptor"];
+    // iOS 15
+    NSOperatingSystemVersion ios15 = {.majorVersion = 15, .minorVersion = 0, .patchVersion = 0};
+    
+    NSNumber *fd;
+    if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:ios15]) {
+        // iOS >= 15 or macOS >= 12
+        fd = [TunnelFileDescriptor getTunnelFileDescriptor];
+    } else {
+        // Legacy. This method does not work on iOS >= 15, macOS >= 12.
+        fd = (NSNumber*)[[self packetFlow] valueForKeyPath:@"socket.fileDescriptor"];
+    }
+    
+    if (fd == nil) {
+        [PsiFeedbackLogger errorWithType:PsiphonTunnelDelegateLogType
+                                  format:@"Failed to locate tunnel file descriptor"];
+        [self exitGracefully];
+    }
 
     // In case of duplicate keys, value from psiphonConfigUserDefaults
     // will replace mutableConfigCopy value.
