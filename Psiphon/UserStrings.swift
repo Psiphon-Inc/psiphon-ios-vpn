@@ -141,6 +141,18 @@ import Foundation
                                  comment: "User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'.")
 
     }
+    
+    static func PsiCash_subscription_already_gives_premium_access_title() -> String {
+        return NSLocalizedString("PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Your Psiphon subscription gives you premium access!",
+                                 comment: "A title message to the premium user (a user with a subscription when they are trying to navigate to PsiCash and Speed Boost screen. Do not translate or transliterate words PsiCash or Psiphon")
+    }
+    
+    static func PsiCash_subscription_already_gives_premium_access_body() -> String {
+        return NSLocalizedString("PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY", tableName: nil, bundle: Bundle.main,
+                                 value: "Your Psiphon subscription already gives you always-on Speed Boost, so there is no reason to buy more. Your PsiCash balance will be retained should you ever decide to cancel your subscription.\n\nYou can still access your PsiCash account in the settings menu.",
+                                 comment: "A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon")
+    }
 
     static func PsiCash_is_unavailable_while_subscribed() -> String {
         return NSLocalizedString("PSICASH_UNAVAILABLE_WHILE_SUBSCRIBED", tableName: nil, bundle: Bundle.main,

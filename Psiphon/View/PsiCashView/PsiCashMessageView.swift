@@ -48,17 +48,17 @@ struct PsiCashMessageView: ViewBuilder {
         )
 
         let imageView = UIImageView.make(
-            contentMode: .center,
+            contentMode: .scaleAspectFit,
             easyToShrink: true
         )
         
         let title = UILabel.make(fontSize: .h1,
+                                 numberOfLines: 0,
                                  alignment: .center)
 
         let subtitle = UILabel.make(fontSize: .h3,
                                     typeface: .medium,
-                                    numberOfLines: 0,
-                                    alignment: .center)
+                                    numberOfLines: 0)
 
         // Add subviews
         vStack.addArrangedSubviews(
@@ -87,36 +87,43 @@ struct PsiCashMessageView: ViewBuilder {
                     imageView.image = UIImage(named: "PsiCashPendingTransaction")
                     title.text = UserStrings.PsiCash_transaction_pending()
                     subtitle.text = UserStrings.PsiCash_wait_for_transaction_to_be_verified()
+                    subtitle.textAlignment = .center
 
                 case .speedBoostAlreadyActive:
                     imageView.image = UIImage(named: "SpeedBoostActive")!
                     title.text = UserStrings.Speed_boost_active()
                     subtitle.text = UserStrings.Speed_boost_you_already_have()
+                    subtitle.textAlignment = .center
 
                 case .userSubscribed:
                     imageView.image =  UIImage(named: "PsiCashCoinCloud")!
-                    title.text = UserStrings.PsiCash_unavailable()
-                    subtitle.text = UserStrings.PsiCash_is_unavailable_while_subscribed()
+                    title.text = UserStrings.PsiCash_subscription_already_gives_premium_access_title()
+                    subtitle.text = UserStrings.PsiCash_subscription_already_gives_premium_access_body()
+                    subtitle.textAlignment = .natural
 
                 case .unavailableWhileConnecting:
                     imageView.image =  UIImage(named: "PsiCashCoinCloud")!
                     title.text = UserStrings.PsiCash_unavailable()
                     subtitle.text = UserStrings.PsiCash_is_unavailable_while_connecting_to_psiphon()
+                    subtitle.textAlignment = .center
                     
                 case .unavailableWhileDisconnecting:
                     imageView.image =  UIImage(named: "PsiCashCoinCloud")!
                     title.text = UserStrings.PsiCash_unavailable()
                     subtitle.text = UserStrings.PsiCash_is_unavailable_while_disconnecting_from_psiphon()
+                    subtitle.textAlignment = .center
                     
                 case .otherErrorTryAgain:
                     imageView.image =  UIImage(named: "PsiCashCoinCloud")!
                     title.text = UserStrings.PsiCash_unavailable()
                     subtitle.text = UserStrings.Please_try_again_later()
+                    subtitle.textAlignment = .center
                 
                 case .signupOrLoginToPsiCash:
                     imageView.image = UIImage(named: "PsiCashCoinCloud")!
                     title.text = ""
                     subtitle.text = UserStrings.Sign_up_or_login_to_psicash_account_to_continue()
+                    subtitle.textAlignment = .center
                     
                 case .psiCashAccountsLoggingIn:
                     imageView.image = UIImage(named: "RedRocket")!
