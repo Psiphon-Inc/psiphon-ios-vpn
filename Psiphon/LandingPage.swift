@@ -60,21 +60,21 @@ func landingPageReducer(
             return []
         }
         
-        guard let landingPages = NonEmpty(array: environment.sharedDB.getHomepages()) else {
-            return [
-                Effect(value: ._urlOpened(success: false)),
-                environment.feedbackLogger.log(
-                    .warn, tag: landingPageTag, "no landing pages found").mapNever()
-            ]
-        }
+//        guard let landingPages = NonEmpty(array: environment.sharedDB.getHomepages()) else {
+//            return [
+//                Effect(value: ._urlOpened(success: false)),
+//                environment.feedbackLogger.log(
+//                    .warn, tag: landingPageTag, "no landing pages found").mapNever()
+//            ]
+//        }
         
         state.pendingLandingPageOpening = true
         
-        let randomlySelectedURL = landingPages.randomElement()!.url
+//        let randomlySelectedURL = landingPages.randomElement()!.url
         
         return [
             modifyLandingPagePendingEarnerToken(
-                url: randomlySelectedURL,
+                url: URL(string: "https://landing.dev.psi.cash/dev-index.html")!,
                 authPackageSignal: environment.psiCashAuthPackageSignal,
                 psiCashEffects: environment.psiCashEffects
             ).flatMap(.latest) {
