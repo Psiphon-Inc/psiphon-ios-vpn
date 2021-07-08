@@ -368,12 +368,28 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
                 state.iap.unfinishedPsiCashTx?.verification = .requestError(
                     errorEvent.eraseToRepr())
                 
-                return [
-                    environment.feedbackLogger.log(.error, """
+                var effects = [Effect<IAPAction>]()
+                
+                // PsiCash RefreshState is most likely needed if a 4xx status code
+                // is returned from the purchase-verifier server. E.g. user's token's
+                // might have been expired.
+                if
+                    case .errorStatusCode(let responseMetadata) = errorEvent.error,
+                    case .clientError = responseMetadata.statusCode.responseType
+                {
+                    
+                    effects += environment.psiCashStore(
+                        .refreshPsiCashState(ignoreSubscriptionState: false))
+                        .mapNever()
+                    
+                }
+                
+                effects += environment.feedbackLogger.log(.error, """
                         verification failed: '\(errorEvent)'\
                         transaction: '\(requestTransaction)'
                         """).mapNever()
-                ]
+                
+                return effects
             }
         }
         
@@ -406,10 +422,9 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
                 continue
             }
             
-            effects.append(
+            effects +=
                 environment.feedbackLogger.log(
                     .info, "transactionUpdate: '\(makeFeedbackEntry(tx))'").mapNever()
-            )
             
             let iapPurchasingResult = IAPPurchasing.makeGiven(
                 productType: productType,
