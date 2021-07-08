@@ -245,7 +245,7 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
     } else if ([specifier.key isEqualToString:SettingsPsiCashAccountLogoutCellSpecifierKey]) {
         // PsiCash Account Logout button.
         cell.textLabel.textAlignment = NSTextAlignmentCenter;
-        cell.textLabel.text = [UserStrings Logout];
+        cell.textLabel.text = [UserStrings Log_Out];
         
         // Logout button is enabled when VPN state in not in a transitory state.
         BOOL enabled = ![VPNStateCompat isInTransition:self.viewModel.vpnStatus];
@@ -371,7 +371,7 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
     } else {
         
         message = [UserStrings Are_you_sure_psicash_account_logout];
-        logoutTitle = [UserStrings Logout];
+        logoutTitle = [UserStrings Log_Out];
         
     }
     

@@ -287,9 +287,9 @@ import Foundation
                                  comment: "Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account")
     }
     
-    @objc static func Logout() -> String {
-        return NSLocalizedString("LOG_OUT_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
-                                 value: "Logout",
+    @objc static func Log_Out() -> String {
+        return NSLocalizedString("LOG_OUT_BUTTON_TITLE_2", tableName: nil, bundle: Bundle.main,
+                                 value: "Log Out",
                                  comment: "Title of the button that lets users log out of their account")
     }
     
