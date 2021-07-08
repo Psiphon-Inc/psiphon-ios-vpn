@@ -508,7 +508,7 @@ extension UserStrings {
                                  comment: "Label indicating to the user that they are logging out of their PsiCash account. Use ellipses if it makes sense.")
     }
     
-    static func Log_in() -> String {
+    @objc static func Log_in() -> String {
         return NSLocalizedString("LOG_IN_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
                                  value: "Log In",
                                  comment: "Title on a button that lets users login to their account with the username and password they have entered.")
