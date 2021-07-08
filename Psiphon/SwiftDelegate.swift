@@ -886,11 +886,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         if Debugging.printAppState {
 
             self.lifetime += self.store.$value.signalProducer
+                .map(\AppState.vpnState.value.tunnelIntent)
                 .skipRepeats()
-                .startWithValues { appState in
-                    print("*", "-----")
-                    dump(appState[keyPath: \.mainView.alertMessages])
-                    print("*", "-----")
+                .startWithValues { value in
+                    var output = ""
+                    dump(value, to: &output)
+                    print("* -> \(removedCommonPackageNames(output))")
                 }
         }
 
