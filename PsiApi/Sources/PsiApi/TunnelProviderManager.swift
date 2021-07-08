@@ -312,6 +312,10 @@ public final class PsiphonTPM: TunnelProviderManager {
             // right before startPsiphonTunnel is called on the NETunnelProviderManager object.
             self.wrappedManager.isOnDemandEnabled = false
             
+            if #available(iOS 14.0, *) {
+                self.wrappedManager.protocolConfiguration!.includeAllNetworks = true
+            }
+            
         case .stopVPN:
             self.wrappedManager.isOnDemandEnabled = false
         }

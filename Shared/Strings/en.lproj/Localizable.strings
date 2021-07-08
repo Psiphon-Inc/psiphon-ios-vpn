@@ -148,7 +148,7 @@
 "LOG_OUT_ANY_WAY_BUTTON_TITLE" = "Logout anyway";
 
 /* Title of the button that lets users log out of their account */
-"LOG_OUT_BUTTON_TITLE" = "Logout";
+"LOG_OUT_BUTTON_TITLE_2" = "Log Out";
 
 /* Label indicating to the user that they are logging into their PsiCash account. Use ellipses if it makes sense. */
 "LOGGING_IN_ELLIPSES" = "Logging in ...";
@@ -326,6 +326,12 @@
 
 /* Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. */
 "PSICASH_SPEED_PORT_LIMITS_HEAD" = "Speed and Port Limits";
+
+/* A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon */
+"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY" = "Your Psiphon subscription already gives you always-on Speed Boost, so there is no reason to buy more. Your PsiCash balance will be retained should you ever decide to cancel your subscription.\n\nYou can still access your PsiCash account in the settings menu.";
+
+/* A title message to the premium user (a user with a subscription when they are trying to navigate to PsiCash and Speed Boost screen. Do not translate or transliterate words PsiCash or Psiphon */
+"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_TITLE" = "Your Psiphon subscription gives you premium access!";
 
 /* An error that signifies a state where the user has made a 'PsiCash' purchase, but extra action is needed from the user to finish the transaction. Do not translate or transliterate 'PsiCash'. */
 "PSICASH_TRANSACTION_PENDING" = "Transaction Pending";

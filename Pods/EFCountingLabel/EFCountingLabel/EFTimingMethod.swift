@@ -24,6 +24,8 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
+import UIKit
+
 public enum EFTimingFunction: EFTiming {
     case linear
     case easeIn(easingRate: CGFloat)
@@ -49,7 +51,7 @@ public enum EFTimingFunction: EFTiming {
             }
         case .easeInBounce:
             if time < 4.0 / 11.0 {
-                return 1.0 - (pow(11.0 / 4.0, 2) * pow(time, 2)) - time
+                return 1.0 - (pow(11.0 / 4.0, 2) * pow(time, CGFloat(2))) - time
             } else if time < 8.0 / 11.0 {
                 return 1.0 - (3.0 / 4.0 + pow(11.0 / 4.0, 2) * pow(time - 6.0 / 11.0, 2)) - time
             } else if time < 10.0 / 11.0 {
@@ -58,7 +60,7 @@ public enum EFTimingFunction: EFTiming {
             return 1.0 - (63.0 / 64.0 + pow(11.0 / 4.0, 2) * pow(time - 21.0 / 22.0, 2)) - time
         case .easeOutBounce:
             if time < 4.0 / 11.0 {
-                return pow(11.0 / 4.0, 2) * pow(time, 2)
+                return pow(11.0 / 4.0, 2) * pow(time, CGFloat(2))
             } else if time < 8.0 / 11.0 {
                 return 3.0 / 4.0 + pow(11.0 / 4.0, 2) * pow(time - 6.0 / 11.0, 2)
             } else if time < 10.0 / 11.0 {

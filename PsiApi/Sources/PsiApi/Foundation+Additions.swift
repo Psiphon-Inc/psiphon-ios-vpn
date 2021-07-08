@@ -388,6 +388,8 @@ extension Date: UserDefaultsPropertyListType {}
 extension Array: UserDefaultsPropertyListType {}
 extension Dictionary: UserDefaultsPropertyListType {}
 
+extension Optional: UserDefaultsPropertyListType where Wrapped: UserDefaultsPropertyListType {}
+
 @propertyWrapper
 public struct UserDefault<T: UserDefaultsPropertyListType> {
     let key: String

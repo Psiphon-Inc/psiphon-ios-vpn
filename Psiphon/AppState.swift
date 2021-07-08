@@ -425,7 +425,7 @@ func makeEnvironment(
                 createNewAccountURL: psiCashLib.getUserSiteURL(.accountSignup, webview:true),
                 forgotPasswordURL: psiCashLib.getUserSiteURL(.forgotAccount, webview:true),
                 onDismissed: { [unowned store] in
-                    store.send(.mainViewAction(.psiCashViewAction(.dismissedPsiCashAccountScreen)))
+                    store.send(.mainViewAction(.dismissedPsiCashAccountScreen))
                 })
 
             let nav = UINavigationController(rootViewController: v)
@@ -600,7 +600,6 @@ fileprivate func toMainViewReducerEnvironment(env: AppEnvironment) -> MainViewEn
             iapStore: env.iapStore,
             mainViewStore: env.mainViewStore,
             getTopPresentedViewController: env.getTopPresentedViewController,
-            makePsiCashAccountViewController: env.makePsiCashAccountViewController,
             dateCompare: env.dateCompare
         ),
         getTopPresentedViewController: env.getTopPresentedViewController,
@@ -612,7 +611,8 @@ fileprivate func toMainViewReducerEnvironment(env: AppEnvironment) -> MainViewEn
         addToDate: env.addToDate,
         tunnelStatusSignal: env.tunnelStatusSignal,
         tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
-        psiCashEffects: env.psiCashEffects
+        psiCashEffects: env.psiCashEffects,
+        makePsiCashAccountViewController: env.makePsiCashAccountViewController
     )
 }
 

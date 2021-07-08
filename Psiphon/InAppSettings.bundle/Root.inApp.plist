@@ -3,6 +3,10 @@
 <plist version="1.0">
 <dict>
 	<key>PreferenceSpecifiers</key>
+    <!--
+    Changes to the order of this array should be reflected in the SupportedLocalizations.swift
+    file (check readInAppSettingsSupportedLanguages function).
+    -->
 	<array>
 		<dict>
 			<key>Title</key>
@@ -442,6 +446,14 @@
             <string>!!! Not in the Root.strings, this title is set from SettingsViewController!!!</string>
             <key>Key</key>
             <string>settingsPsiCash</string>
+            <key>Type</key>
+            <string>IASKCustomViewSpecifier</string>
+        </dict>
+        <dict>
+            <key>Title</key>
+            <string>!!! Not in the Root.strings, this title is set from SettingsViewController!!!</string>
+            <key>Key</key>
+            <string>settingsLoginPsiCashAccount</string>
             <key>Type</key>
             <string>IASKCustomViewSpecifier</string>
         </dict>

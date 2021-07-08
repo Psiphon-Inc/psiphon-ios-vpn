@@ -36,6 +36,8 @@ public enum PsiCashAction: Equatable {
             result: NewExpiringPurchaseResult
          )
     
+    /// PsiCash RefreshState. If `ignoreSubscriptionState` is true, RefreshState action
+    /// is not taken if the user is subscribed.
     case refreshPsiCashState(ignoreSubscriptionState: Bool = false)
     case _refreshPsiCashStateResult(PsiCashEffectsProtocol.PsiCashRefreshResult)
     

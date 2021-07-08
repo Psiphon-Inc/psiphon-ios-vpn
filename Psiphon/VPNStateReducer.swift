@@ -147,13 +147,13 @@ struct VPNProviderManagerReducerState<T: TunnelProviderManager>: Equatable {
     let subscriptionTransactionsPendingAuthorization: Set<WebOrderLineItemID>
 }
 
-typealias VPNReducerEnvironment<T: TunnelProviderManager> = (
-    feedbackLogger: FeedbackLogger,
-    sharedDB: PsiphonDataSharedDB,
-    vpnStartCondition: () -> Bool,
-    vpnConnectionObserver: VPNConnectionObserver<T>,
-    internetReachability: InternetReachability
-)
+struct VPNReducerEnvironment<T: TunnelProviderManager> {
+    let feedbackLogger: FeedbackLogger
+    let sharedDB: PsiphonDataSharedDB
+    let vpnStartCondition: () -> Bool
+    let vpnConnectionObserver: VPNConnectionObserver<T>
+    let internetReachability: InternetReachability
+}
 
 func vpnStateReducer<T: TunnelProviderManager>(
     feedbackLogger: FeedbackLogger

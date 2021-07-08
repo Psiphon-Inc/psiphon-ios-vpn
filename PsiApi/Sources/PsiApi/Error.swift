@@ -125,7 +125,10 @@ public enum SystemError<Code: Hashable>: HashableError {
     indirect case error(ErrorInfo, underlyingError: SystemError<Int>)
 
     /// Wraps values from an `NSError` object that we care about.
-    public struct ErrorInfo: HashableError {
+    public struct ErrorInfo: HashableError, LocalizedError {
+        
+        // Check https://github.com/apple/swift-evolution/blob/master/proposals/0112-nserror-bridging.md
+        // for why it is necessary to conform to LocalizedError protocol as an error type.
         
         /// Error domain.
         public let domain: String
@@ -134,22 +137,22 @@ public enum SystemError<Code: Hashable>: HashableError {
         /// Integral error code for the given domain.
         public let errorCode: Int
         /// Localized description of an `NSError`.
-        public let localizedDescription: String?
+        public let errorDescription: String?
         /// Localized failure reason of an `NSError`.
-        public let localizedFailureReason: String?
+        public let failureReason: String?
         
         public init(
             domain: String,
             code: Code,
             errorCode: Int,
-            localizedDescription: String? = nil,
-            localizedFailureReason: String? = nil
+            errorDescription: String? = nil,
+            failureReason: String? = nil
         ) {
             self.domain = domain
             self.code = code
             self.errorCode = errorCode
-            self.localizedDescription = localizedDescription
-            self.localizedFailureReason = localizedFailureReason
+            self.errorDescription = errorDescription
+            self.failureReason = failureReason
         }
         
     }
@@ -187,8 +190,8 @@ public extension SystemError {
             domain: nsError.domain,
             code: nsError.code,
             errorCode: nsError.code,
-            localizedDescription: nsError.localizedDescription,
-            localizedFailureReason: nsError.localizedFailureReason
+            errorDescription: nsError.localizedDescription,
+            failureReason: nsError.localizedFailureReason
         )
 
         let maybeUnderlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError
@@ -207,8 +210,8 @@ public extension SystemError {
             domain: NEVPNError.errorDomain,
             code: nsError.code,
             errorCode: nsError.errorCode,
-            localizedDescription: nsError.localizedDescription,
-            localizedFailureReason: nil
+            errorDescription: nsError.localizedDescription,
+            failureReason: nil
         )
 
         let maybeUnderlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError
@@ -227,8 +230,8 @@ public extension SystemError {
             domain: SKError.errorDomain,
             code: nsError.code,
             errorCode: nsError.errorCode,
-            localizedDescription: nsError.localizedDescription,
-            localizedFailureReason: nil
+            errorDescription: nsError.localizedDescription,
+            failureReason: nil
         )
 
         let maybeUnderlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError
