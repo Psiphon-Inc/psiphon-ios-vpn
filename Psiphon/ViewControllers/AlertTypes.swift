@@ -34,7 +34,7 @@ enum AlertType: Hashable {
 
     case genericOperationFailedTryAgain
 
-    case error(localizedMessage: String)
+    case error(localizedTitle: String, localizedMessage: String)
 }
 
 enum PsiCashAlert: Hashable {
@@ -230,9 +230,9 @@ extension UIAlertController {
                     }
                 ])
 
-        case .error(let localizedMessage):
+        case .error(let localizedTitle, let localizedMessage):
             return .makeAlert(
-                title: UserStrings.Error_title(),
+                title: localizedTitle,
                 message: localizedMessage,
                 actions: [
                     .dismissButton {

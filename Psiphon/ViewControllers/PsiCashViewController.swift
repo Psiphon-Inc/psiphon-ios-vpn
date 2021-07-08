@@ -233,7 +233,10 @@ final class PsiCashViewController: ReactiveViewController {
 
                 default:
                     let alertEvent = AlertEvent(
-                        .error(localizedMessage: errorDesc.localizedUserDescription),
+                        .error(
+                            localizedTitle: UserStrings.Error_title(),
+                            localizedMessage: errorDesc.localizedUserDescription
+                        ),
                         date: psiCashErrorEvent.date
                     )
 
@@ -245,7 +248,10 @@ final class PsiCashViewController: ReactiveViewController {
                 if let errorDesc = iapErrorEvent.localizedErrorEventDescription {
 
                     let alertEvent = AlertEvent(
-                        .error(localizedMessage: errorDesc.localizedUserDescription),
+                        .error(
+                            localizedTitle: UserStrings.Purchase_failed(),
+                            localizedMessage: errorDesc.localizedUserDescription
+                        ),
                         date: iapErrorEvent.date
                     )
 
@@ -791,7 +797,7 @@ extension ErrorEvent where E == IAPError {
                     }
 
                     optionalDescription = """
-                        \(UserStrings.Purchase_failed())
+                        \(UserStrings.Operation_failed_please_try_again_alert_message())
                         (\(desc))
                         """
 
