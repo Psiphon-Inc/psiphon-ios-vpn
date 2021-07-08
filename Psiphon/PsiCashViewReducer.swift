@@ -34,14 +34,11 @@ enum PsiCashViewAction: Equatable {
     case purchaseAccountConfirmationDismissed
     
     case signupOrLoginTapped
-
-    case presentPsiCashAccountScreen(animated: Bool = true)
-
+    
     case dismissedPsiCashAccountScreen
     
     case continuePurchaseWithoutAccountTapped
     
-    case psiCashAccountDidChange
 }
 
 @objc enum PsiCashScreenTab: Int, TabControlViewTabType {
@@ -70,9 +67,7 @@ struct PsiCashViewState: Equatable {
     var psiCashIAPPurchaseRequestState: PurchaseRequestStateValues
 
     var activeTab: PsiCashScreenTab
-
-    /// Whether PsiCashAccountViewController should be displayed or not.
-    var isPsiCashAccountScreenShown: Bool
+    
 }
 
 struct PsiCashViewReducerState: Equatable {
@@ -87,9 +82,6 @@ struct PsiCashViewEnvironment {
     let mainViewStore: (MainViewAction) -> Effect<Never>
 
     let getTopPresentedViewController: () -> UIViewController
-
-    /// Makes `PsiCashAccountViewController` as root of UINavigationController.
-    let makePsiCashAccountViewController: () -> UIViewController
     
     let dateCompare: DateCompare
 }
@@ -210,10 +202,6 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
         
     case .signupOrLoginTapped:
         
-        guard state.viewState.isPsiCashAccountScreenShown == false else {
-            return []
-        }
-        
         // Skips presenting PsiCash Account screen if tunnel is not connected.
         // Note that this is a quick check for informing the user,
         // and PsiCash Account screen performs it's own last second tunnel checks
@@ -236,99 +224,55 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
 
             return [
                 Effect { observer, _ in
-                    let topVC = environment.getTopPresentedViewController()
-                    let searchResult = topVC.traversePresentingStackFor(
-                        type: ViewBuilderViewController<PsiCashPurchasingConfirmViewBuilder>.self)
-
-                    switch searchResult {
-                    case .notPresent:
-                        // No-op.
-                        observer.sendCompleted()
-                        return
-
-                    case .presentInStack(let viewController):
-                        viewController.dismiss(animated: false, completion: {
-                            observer.send(value: .presentPsiCashAccountScreen())
-                            observer.sendCompleted()
-                        })
-
-                    case .presentTopOfStack(let viewController):
-                        viewController.dismiss(animated: false, completion: {
-                            observer.send(value: .presentPsiCashAccountScreen())
-                            observer.sendCompleted()
-                        })
-                    }
-                }
-            ]
-        } else {
-            return [ Effect(value: .presentPsiCashAccountScreen()) ]
-        }
-
-
-    case .presentPsiCashAccountScreen(let animated):
-
-        // Presents PsiCash Account screen if not already shown.
-        guard state.viewState.isPsiCashAccountScreenShown == false else {
-            return []
-        }
-        
-        // Skips presenting PsiCash Account screen if tunnel is not connected.
-        // Note that this is a quick check for informing the user,
-        // and PsiCash Account screen performs it's own last second tunnel checks
-        // before making any API requests.
-        //
-        // Note this this check is independent of the check performed when
-        // handling other actions such as `.signupOrLoginTapped`.
-        guard case .connected = state.tunnelConnectedStatus else {
-
-            // Informs user that tunnel is not connected.
-            let alertEvent = AlertEvent(
-                .psiCashAccountAlert(.tunnelNotConnectedAlert),
-                date: environment.dateCompare.getCurrentTime()
-            )
-            
-            return [
-                environment.mainViewStore(.presentAlert(alertEvent)).mapNever()
-            ]
-            
-        }
-
-        state.viewState.isPsiCashAccountScreenShown = true
-
-        return [
-            .fireAndForget {
+                
+                // This signal emits true if PsiCash accounts screen needs to be presented,
+                // otherwise it emits false.
+                
                 let topVC = environment.getTopPresentedViewController()
                 let searchResult = topVC.traversePresentingStackFor(
-                    type: PsiCashAccountViewController.self, searchChildren: true)
-
+                    type: ViewBuilderViewController<PsiCashPurchasingConfirmViewBuilder>.self)
+                
                 switch searchResult {
                 case .notPresent:
-                    let accountsViewController = environment.makePsiCashAccountViewController()
-                    topVC.safePresent(accountsViewController,
-                                      animated: animated,
-                                      viewDidAppearHandler: nil)
-
-                case .presentInStack(_),
-                     .presentTopOfStack(_):
                     // No-op.
+                    observer.send(value: false)
+                    observer.sendCompleted()
                     return
+                    
+                case .presentInStack(let viewController):
+                    viewController.dismiss(animated: false, completion: {
+                        observer.send(value: true)
+                        observer.sendCompleted()
+                    })
+                    
+                case .presentTopOfStack(let viewController):
+                    viewController.dismiss(animated: false, completion: {
+                        observer.send(value: true)
+                        observer.sendCompleted()
+                    })
                 }
-            }
-        ]
-
-    case .dismissedPsiCashAccountScreen:
-        guard state.viewState.isPsiCashAccountScreenShown == true else {
-            return []
+            }.flatMap(.latest) { (displayPsiCashAccountsScreen: Bool) -> Effect<Never> in
+                if displayPsiCashAccountsScreen {
+                    return environment.mainViewStore(.presentPsiCashAccountScreen)
+                } else {
+                    return Effect.never
+                }
+            }.mapNever()
+            ]
+        } else {
+            return [
+                environment.mainViewStore(.presentPsiCashAccountScreen).mapNever()
+            ]
         }
-
-        state.viewState.isPsiCashAccountScreenShown = false
-
+        
+    case .dismissedPsiCashAccountScreen:
+        
         // If in a `.confirmAccountLogin` state after a the PsiCahAccountScreen
         // has been dismissed, and the user has logged in, then continues the purchase
         // since the PsiCash accounts screen has been dismisesd.
         // Otherwise, resets `viewState.psiCashIAPPurchasingState`.
         if case .confirmAccountLogin(let product) = state.viewState.psiCashIAPPurchaseRequestState {
-
+            
             if case .account(loggedIn: true) = state.psiCashAccountType {
                 state.viewState.psiCashIAPPurchaseRequestState = .none
                 return [
@@ -373,25 +317,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
                 }
             }
         ]
-
-    case .psiCashAccountDidChange:
-        guard case .account(loggedIn: true) = state.psiCashAccountType else {
-            return []
-        }
         
-        state.viewState.isPsiCashAccountScreenShown = false
-        
-        guard
-            case .confirmAccountLogin(let product) = state.viewState.psiCashIAPPurchaseRequestState
-        else {
-            return []
-        }
-
-        state.viewState.psiCashIAPPurchaseRequestState = .none
-        
-        return [
-            environment.iapStore(.purchase(product: product, resultPromise: nil)).mapNever()
-        ]
     }
     
 }

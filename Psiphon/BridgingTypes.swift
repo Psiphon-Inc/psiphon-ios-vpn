@@ -78,7 +78,7 @@ import PsiCashClient
                            options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool
 
     
-    @objc func presentPsiCashAccountViewController()
+    @objc func presentPsiCashAccountViewController(withPsiCashScreen: Bool)
     
     @objc func presentPsiCashViewController(_ initialTab: PsiCashScreenTab)
     

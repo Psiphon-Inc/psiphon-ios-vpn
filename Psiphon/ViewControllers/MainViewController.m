@@ -772,7 +772,7 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 }
 
 - (void)psiCashAccountButtonTapped {
-    [SwiftDelegate.bridge presentPsiCashAccountViewController];
+    [SwiftDelegate.bridge presentPsiCashAccountViewControllerWithPsiCashScreen:TRUE];
 }
 
 - (void)speedBoostButtonTapped {

@@ -949,11 +949,15 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         return deepLinkingNavigator.handle(url: url)
     }
 
-    @objc func presentPsiCashAccountViewController() {
-        self.store.send(.mainViewAction(
-                            .presentPsiCashScreen(initialTab: .speedBoost, animated: true)))
-        self.store.send(.mainViewAction(
-                            .psiCashViewAction(.presentPsiCashAccountScreen(animated: false))))
+    @objc func presentPsiCashAccountViewController(withPsiCashScreen: Bool) {
+        
+        if withPsiCashScreen {
+            self.store.send(.mainViewAction(
+                                .presentPsiCashScreen(initialTab: .speedBoost, animated: true)))
+        }
+        
+        self.store.send(.mainViewAction(.presentPsiCashAccountScreen))
+        
     }
     
     @objc func presentPsiCashViewController(_ initialTab: PsiCashScreenTab) {

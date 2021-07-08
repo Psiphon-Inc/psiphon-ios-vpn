@@ -158,7 +158,7 @@ final class PsiCashViewController: ReactiveViewController {
         
         // Handler for "Sign Up or Log In" button.
         self.signupOrLogInView.onLogInTapped { [unowned self] in
-            self.store.send(.mainViewAction(.psiCashViewAction(.presentPsiCashAccountScreen())))
+            self.store.send(.mainViewAction(.presentPsiCashAccountScreen))
         }
 
         // Updates UI by merging all necessary signals.
