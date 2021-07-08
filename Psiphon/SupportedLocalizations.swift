@@ -86,9 +86,9 @@ final class SupportedLocalizations {
         ) as! [String: Any]
         
         // Traverses InAppSettings.bundle/Root.inApp.plist to get to
-        // the "SETTINGS_LANGUAGE" dict (4th index of array under key "PreferenceSpecifiers").
+        // the "SETTINGS_LANGUAGE" dict (3rd index of array under key "PreferenceSpecifiers").
         let preferenceSpecifiers = plistData["PreferenceSpecifiers"] as! [Any]
-        let settingsLanguage = preferenceSpecifiers[4] as! [String: Any]
+        let settingsLanguage = preferenceSpecifiers[3] as! [String: Any]
         let titles = settingsLanguage["Titles"] as! [[String: String]]
         let langCodes = settingsLanguage["Values"] as! [String]
         let langDisplayName = titles.map { $0["Title"]! }

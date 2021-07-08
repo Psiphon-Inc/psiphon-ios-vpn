@@ -84,6 +84,10 @@ extension Signal.Observer: EffectObserver {
 
 public typealias Effect<A> = SignalProducer<A, Never>
 
+public func += <A> (_ lhs: inout [Effect<A>], _ rhs: Effect<A>) {
+    lhs = lhs + [rhs]
+}
+
 extension Effect where Value == Never {
     
     public func mapNever<Mapped>() -> Effect<Mapped> {

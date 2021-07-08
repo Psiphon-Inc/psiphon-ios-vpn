@@ -695,6 +695,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .filter { (combined: Combined<TunnelStartStopIntent?>) -> Bool in
                 
                 switch (previous: combined.previous, current: combined.current) {
+                case (previous: .none, current: .start(transition: .none)):
+                    // First connection of the first launch of the app should
+                    // not present the landing page.
+                    // NOTE: This method has a minor false-positive where `tunnelIntent` is nil
+                    // after launch if a VPN config is not installed.
+                    return false
                 case (previous: .stop, current: .start(transition: .none)):
                     return true
                 case (previous: .start(transition: .restart), current: .start(transition: .none)):
@@ -886,11 +892,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         if Debugging.printAppState {
 
             self.lifetime += self.store.$value.signalProducer
+                .map(\AppState.vpnState.value.tunnelIntent)
                 .skipRepeats()
-                .startWithValues { appState in
-                    print("*", "-----")
-                    dump(appState[keyPath: \.mainView.alertMessages])
-                    print("*", "-----")
+                .startWithValues { value in
+                    var output = ""
+                    dump(value, to: &output)
+                    print("* -> \(removedCommonPackageNames(output))")
                 }
         }
 
@@ -949,11 +956,15 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         return deepLinkingNavigator.handle(url: url)
     }
 
-    @objc func presentPsiCashAccountViewController() {
-        self.store.send(.mainViewAction(
-                            .presentPsiCashScreen(initialTab: .speedBoost, animated: true)))
-        self.store.send(.mainViewAction(
-                            .psiCashViewAction(.presentPsiCashAccountScreen(animated: false))))
+    @objc func presentPsiCashAccountViewController(withPsiCashScreen: Bool) {
+        
+        if withPsiCashScreen {
+            self.store.send(.mainViewAction(
+                                .presentPsiCashScreen(initialTab: .speedBoost, animated: true)))
+        }
+        
+        self.store.send(.mainViewAction(.presentPsiCashAccountScreen))
+        
     }
     
     @objc func presentPsiCashViewController(_ initialTab: PsiCashScreenTab) {

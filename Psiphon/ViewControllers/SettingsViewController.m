@@ -41,6 +41,7 @@ NSString * const SettingsPsiCashGroupHeaderTitleKey = @"settingsPsiCashGroupTitl
 NSString * const SettingsPsiCashCellSpecifierKey = @"settingsPsiCash";
 NSString * const SettingsPsiCashAccountLogoutCellSpecifierKey = @"settingsLogOutPsiCashAccount";
 NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManagePsiCashAccount";
+NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPsiCashAccount";
 
 @interface SettingsViewController ()
  
@@ -68,7 +69,8 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
           SettingsPsiCashGroupHeaderTitleKey,
           SettingsPsiCashCellSpecifierKey,
           SettingsPsiCashAccountManagementSpecifierKey,
-          SettingsPsiCashAccountLogoutCellSpecifierKey
+          SettingsPsiCashAccountLogoutCellSpecifierKey,
+          SettingspsiCashAccountLoginCellSpecifierKey
         ];
            
     }
@@ -138,6 +140,15 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
         [hiddenKeys removeObject:SettingsPsiCashAccountLogoutCellSpecifierKey];
     } else {
         [hiddenKeys addObject:SettingsPsiCashAccountLogoutCellSpecifierKey];
+    }
+    
+    // PsiCash Login button:
+    // - Shown when not logged in (no tokens, trackers, logged out state)
+    // - Not allowed when disconnected (button disabled, not hidden).
+    if (self.viewModel.isPsiCashAccountLoggedIn == TRUE) {
+        [hiddenKeys addObject:SettingspsiCashAccountLoginCellSpecifierKey];
+    } else {
+        [hiddenKeys removeObject:SettingspsiCashAccountLoginCellSpecifierKey];
     }
     
     [self setHiddenKeys:hiddenKeys animated:FALSE];
@@ -234,13 +245,25 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
     } else if ([specifier.key isEqualToString:SettingsPsiCashAccountLogoutCellSpecifierKey]) {
         // PsiCash Account Logout button.
         cell.textLabel.textAlignment = NSTextAlignmentCenter;
-        cell.textLabel.text = [UserStrings Logout];
+        cell.textLabel.text = [UserStrings Log_Out];
         
         // Logout button is enabled when VPN state in not in a transitory state.
         BOOL enabled = ![VPNStateCompat isInTransition:self.viewModel.vpnStatus];
         cell.userInteractionEnabled = enabled;
         cell.textLabel.enabled = enabled;
         cell.detailTextLabel.enabled = enabled;
+        
+    } else if ([specifier.key isEqualToString:SettingspsiCashAccountLoginCellSpecifierKey]) {
+        // PsiCash Account Login button.
+        cell.textLabel.textAlignment = NSTextAlignmentCenter;
+        cell.textLabel.text = [UserStrings Log_in];
+        
+        // Login button is enabled when VPN state in not in a transitory state.
+        BOOL enabled = ![VPNStateCompat isInTransition:self.viewModel.vpnStatus];
+        cell.userInteractionEnabled = enabled;
+        cell.textLabel.enabled = enabled;
+        cell.detailTextLabel.enabled = enabled;
+        
     }
 
     PSIAssert(cell != nil);
@@ -299,6 +322,11 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
         // PsiCash Account Logout button
         [self onPsiCashAccountLogOutWithSourceView:cell];
         
+    } else if ([specifier.key isEqualToString:SettingspsiCashAccountLoginCellSpecifierKey]) {
+        
+        //PsiCash Account Login button
+        [self onPsiCashAccountLoginTapped];
+        
     }
     
 }
@@ -311,6 +339,10 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
 
 - (void)openPsiCashAccountManagement {
     [SwiftDelegate.bridge presentPsiCashAccountManagement];
+}
+
+- (void)onPsiCashAccountLoginTapped {
+    [SwiftDelegate.bridge presentPsiCashAccountViewControllerWithPsiCashScreen:FALSE];
 }
 
 - (void)openIAPViewController {
@@ -339,7 +371,7 @@ NSString * const SettingsPsiCashAccountManagementSpecifierKey = @"settingsManage
     } else {
         
         message = [UserStrings Are_you_sure_psicash_account_logout];
-        logoutTitle = [UserStrings Logout];
+        logoutTitle = [UserStrings Log_Out];
         
     }
     

@@ -44,8 +44,10 @@ enum MainViewAction: Equatable {
     case presentPsiCashScreen(initialTab: PsiCashScreenTab, animated: Bool = true)
     case dismissedPsiCashScreen
     
-
     case psiCashViewAction(PsiCashViewAction)
+    
+    case presentPsiCashAccountScreen
+    case dismissedPsiCashAccountScreen
 }
 
 struct MainViewState: Equatable {
@@ -53,6 +55,7 @@ struct MainViewState: Equatable {
     /// - Note: Two elements of`alertMessages` are equal if their `AlertEvent` values are equal.
     var alertMessages = Set<PresentationState<AlertEvent>>()
     var psiCashViewState: PsiCashViewState? = nil
+    var isPsiCashAccountScreenShown: Bool = false
 }
 
 struct MainViewReducerState: Equatable {
@@ -94,6 +97,10 @@ struct MainViewEnvironment {
     let tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
     let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
     let psiCashEffects: PsiCashEffects
+    
+    /// Makes `PsiCashAccountViewController` as root of UINavigationController.
+    let makePsiCashAccountViewController: () -> UIViewController
+    
 }
 
 let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvironment> {
@@ -399,8 +406,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
 
         state.mainView.psiCashViewState = PsiCashViewState(
             psiCashIAPPurchaseRequestState: .none,
-            activeTab: initialTab,
-            isPsiCashAccountScreenShown: false
+            activeTab: initialTab
         )
 
         var effects = [Effect<MainViewAction>]()
@@ -457,6 +463,76 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             let effects = psiCashViewReducer(
                 &state.psiCashViewReducerState!, psiCashAction, environment.psiCashViewEnvironment
             )
+            
+            return effects.map { $0.map { MainViewAction.psiCashViewAction($0) } }
+        }
+        
+    case .presentPsiCashAccountScreen:
+        // Presents PsiCash Account screen if not already shown.
+        guard state.mainView.isPsiCashAccountScreenShown == false else {
+            return []
+        }
+        
+        // Skips presenting PsiCash Account screen if tunnel is not connected.
+        // Note that this is a quick check for informing the user,
+        // and PsiCash Account screen performs it's own last second tunnel checks
+        // before making any API requests.
+        //
+        // Note this this check is independent of the check performed when
+        // handling other actions such as `.signupOrLoginTapped`.
+        guard case .connected = state.tunnelConnectedStatus else {
+
+            // Informs user that tunnel is not connected.
+            let alertEvent = AlertEvent(
+                .psiCashAccountAlert(.tunnelNotConnectedAlert),
+                date: environment.dateCompare.getCurrentTime()
+            )
+            
+            return [
+                Effect(value: .presentAlert(alertEvent))
+            ]
+            
+        }
+
+        state.mainView.isPsiCashAccountScreenShown = true
+
+        return [
+            .fireAndForget {
+                let topVC = environment.getTopPresentedViewController()
+                let searchResult = topVC.traversePresentingStackFor(
+                    type: PsiCashAccountViewController.self, searchChildren: true)
+
+                switch searchResult {
+                case .notPresent:
+                    let accountsViewController = environment.makePsiCashAccountViewController()
+                    topVC.safePresent(accountsViewController,
+                                      animated: true,
+                                      viewDidAppearHandler: nil)
+
+                case .presentInStack(_),
+                     .presentTopOfStack(_):
+                    // No-op.
+                    return
+                }
+            }
+        ]
+        
+    case .dismissedPsiCashAccountScreen:
+        guard state.mainView.isPsiCashAccountScreenShown == true else {
+            return []
+        }
+
+        state.mainView.isPsiCashAccountScreenShown = false
+        
+        // if psiCashViewReducerState has value,then forwards
+        // the PsiCash account dismissed event to psiCashViewReducer.
+        switch state.psiCashViewReducerState {
+        case .none:
+            return []
+        case .some(_):
+            let effects = psiCashViewReducer(&state.psiCashViewReducerState!,
+                                             .dismissedPsiCashAccountScreen,
+                                             environment.psiCashViewEnvironment)
             
             return effects.map { $0.map { MainViewAction.psiCashViewAction($0) } }
         }
