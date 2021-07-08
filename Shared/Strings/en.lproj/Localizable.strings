@@ -148,7 +148,7 @@
 "LOG_OUT_ANY_WAY_BUTTON_TITLE" = "Logout anyway";
 
 /* Title of the button that lets users log out of their account */
-"LOG_OUT_BUTTON_TITLE" = "Logout";
+"LOG_OUT_BUTTON_TITLE_2" = "Log Out";
 
 /* Label indicating to the user that they are logging into their PsiCash account. Use ellipses if it makes sense. */
 "LOGGING_IN_ELLIPSES" = "Logging in ...";
