@@ -695,6 +695,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .filter { (combined: Combined<TunnelStartStopIntent?>) -> Bool in
                 
                 switch (previous: combined.previous, current: combined.current) {
+                case (previous: .none, current: .start(transition: .none)):
+                    // First connection of the first launch of the app should
+                    // not present the landing page.
+                    // NOTE: This method has a minor false-positive where `tunnelIntent` is nil
+                    // after launch if a VPN config is not installed.
+                    return false
                 case (previous: .stop, current: .start(transition: .none)):
                     return true
                 case (previous: .start(transition: .restart), current: .start(transition: .none)):
