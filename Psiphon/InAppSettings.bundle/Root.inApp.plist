@@ -3,6 +3,10 @@
 <plist version="1.0">
 <dict>
 	<key>PreferenceSpecifiers</key>
+    <!--
+    Changes to the order of this array should be reflected in the SupportedLocalizations.swift
+    file (check readInAppSettingsSupportedLanguages function).
+    -->
 	<array>
 		<dict>
 			<key>Title</key>
