@@ -185,9 +185,7 @@ let productRequestReducer = Reducer<PsiCashAppStoreProductsState
                 ).mapNever()
             }
         case let .failure(errorEvent):
-            effects.append(
-                environment.feedbackLogger.log(.error, errorEvent).mapNever()
-            )
+            effects += environment.feedbackLogger.log(.error, errorEvent).mapNever()
         }
         
         state.psiCashProducts = .completed(
