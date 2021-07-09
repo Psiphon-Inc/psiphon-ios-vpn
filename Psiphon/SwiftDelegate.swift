@@ -145,26 +145,23 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
 
         var effects = [Effect<AppDelegateAction>]()
 
-        effects.append(
-            // Updates disallowed traffic alert read seq number.
-            .fireAndForget {
-                environment.sharedDB.setContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum(
-                    environment.sharedDB.getDisallowedTrafficAlertWriteSequenceNum())
-            }
-        )
+        // Updates disallowed traffic alert read seq number.
+        effects += .fireAndForget {
+            environment.sharedDB.setContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum(
+                environment.sharedDB.getDisallowedTrafficAlertWriteSequenceNum())
+        }
 
         // Presents disallowed traffic alert only if the user is not subscribed.
         if case .subscribed(_) = state.subscriptionState.status {
-            effects.append(
-                environment.feedbackLogger.log(.info, "Disallowed traffic alert not presented.")
-                    .mapNever()
-            )
+            effects += environment.feedbackLogger
+                .log(.info, "Disallowed traffic alert not presented.")
+                .mapNever()
         } else {
-            effects.append(contentsOf: [
+            effects += [
                 environment.feedbackLogger.log(.info, "Presenting disallowed traffic alert")
                     .mapNever(),
                 environment.mainViewStore(.presentAlert(alertEvent)).mapNever(),
-            ])
+            ]
         }
 
         return effects

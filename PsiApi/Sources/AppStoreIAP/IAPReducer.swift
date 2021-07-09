@@ -363,7 +363,7 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
                 ]
                 
             case .failure(let errorEvent):
-                // Non-200 OK response.
+                // Request failed or received a non-200 OK response.
                 
                 state.iap.unfinishedPsiCashTx?.verification = .requestError(
                     errorEvent.eraseToRepr())
@@ -414,10 +414,8 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
             guard let productType = environment.isSupportedProduct(tx.productID()) else {
                 // Transactions with unknown product ID should not happen in production,
                 // and hence `finishTransaction(_:)` is not called on them.
-                effects.append(
-                    environment.feedbackLogger.log(
-                        .error, "unknown product id '\(tx.productID())'") .mapNever()
-                )
+                effects += environment.feedbackLogger
+                    .log(.error, "unknown product id '\(tx.productID())'") .mapNever()
                 
                 continue
             }
@@ -460,20 +458,18 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
                         persisted: environment.psiCashPersistedValues
                     )
                     
-                    effects.append(
-                        environment.feedbackLogger.log(.info, """
+                    effects += environment.feedbackLogger.log(.info, """
                             new IAP transaction: '\(makeFeedbackEntry(tx))'
-                            """).mapNever()
-                    )
+                            """)
+                        .mapNever()
                 }
                 
             case .success(.duplicate):
                 // There is already an existing unfinished consumable transaction.
-                effects.append(
-                    environment.feedbackLogger.log(.warn, """
+                effects += environment.feedbackLogger.log(.warn, """
                         Transaction is a duplicate: '\(makeFeedbackEntry(tx))'
-                        """).mapNever()
-                )
+                        """)
+                    .mapNever()
                 
             case let .failure(fatalError):
                 environment.feedbackLogger.fatalError(fatalError.message)
@@ -503,19 +499,17 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
             case .nop, .afterDeliverablesDelivered:
                 break
             case .immediately:
-                effects.append(
-                    environment.paymentQueue.finishTransaction(tx).mapNever()
-                )
+                effects += environment.paymentQueue.finishTransaction(tx).mapNever()
             }
         }
         
         // Calls `environment.appReceiptStore` if the receipt has been updated
         // (i.e. a purchase was successful).
         if updatedTransactions.map({$0.transactionState().appReceiptUpdated}).contains(true) {
-            effects.append(
-                environment.appReceiptStore(
-                    ._remoteReceiptRefreshResult(.success(.unit))).mapNever()
-            )
+            
+            effects += environment
+                .appReceiptStore(._remoteReceiptRefreshResult(.success(.unit)))
+                .mapNever()
         }
         
         return effects
