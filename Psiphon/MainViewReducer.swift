@@ -416,33 +416,29 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         // This is useful not show latest PsiCash state, since
         // for a subscribed user the PsiCash balance will not get updatd otherwise.
         if case .subscribed(_) = state.subscriptionState.status {
-            effects.append(
-                environment.psiCashStore(.refreshPsiCashState(ignoreSubscriptionState: true))
-                    .mapNever()
-            )
+            effects += environment.psiCashStore(.refreshPsiCashState(ignoreSubscriptionState: true))
+                .mapNever()
         }
 
-        effects.append(
-            .fireAndForget {
-                let topVC = environment.getTopPresentedViewController()
-                let searchResult = topVC.traversePresentingStackFor(type: PsiCashViewController.self)
-
-                switch searchResult {
-                case .notPresent:
-                    let psiCashViewController = environment.makePsiCashViewController()
-
-                    topVC.safePresent(psiCashViewController,
-                                      animated: animated,
-                                      viewDidAppearHandler: nil)
-
-                case .presentInStack(_),
-                     .presentTopOfStack(_):
-                    // No-op.
-                    break
-                }
+        effects += .fireAndForget {
+            let topVC = environment.getTopPresentedViewController()
+            let searchResult = topVC.traversePresentingStackFor(type: PsiCashViewController.self)
+            
+            switch searchResult {
+            case .notPresent:
+                let psiCashViewController = environment.makePsiCashViewController()
+                
+                topVC.safePresent(psiCashViewController,
+                                  animated: animated,
+                                  viewDidAppearHandler: nil)
+                
+            case .presentInStack(_),
+                    .presentTopOfStack(_):
+                // No-op.
+                break
             }
-        )
-
+        }
+        
         return effects
 
     case .dismissedPsiCashScreen:

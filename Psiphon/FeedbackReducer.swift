@@ -115,11 +115,11 @@ public let feedbackReducer = Reducer<FeedbackReducerState,
     case ._feedbackUploadProviderCompleted(let error):
         state.queuedFeedbacks.removeFirst()
 
-        var effects: [Effect<FeedbackAction>] = []
+        var effects = [Effect<FeedbackAction>]()
 
         if state.queuedFeedbacks.count > 0 {
             // Start next upload.
-            effects.append(SignalProducer(value:FeedbackAction._sendNextFeedback))
+            effects += Effect(value: ._sendNextFeedback)
         } else {
             // Allow upload provider to be deallocated
             state.feedbackUpload = .none;
