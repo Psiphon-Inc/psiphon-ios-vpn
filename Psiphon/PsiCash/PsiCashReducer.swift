@@ -81,24 +81,19 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                 .getNonSubscriptionEncodedAuthorizations()
 
             var effects = [Effect<PsiCashAction>]()
-            effects.append(
-                environment.psiCashEffects
-                    .removePurchasesNotIn(psiCashAuthorizations: nonSubscriptionAuths)
-                    .mapNever()
-            )
+            effects += environment.psiCashEffects
+                .removePurchasesNotIn(psiCashAuthorizations: nonSubscriptionAuths)
+                .mapNever()
 
             if libInitSuccess.requiresStateRefresh {
 
                 state.psiCashBalance.balanceOutOfDate(reason: .psiCashDataStoreMigration)
 
-                effects.append(
-                    Effect(value: .refreshPsiCashState())
-                )
+                effects += Effect(value: .refreshPsiCashState())
             }
+            
             // Sets locale after initialization.
-            effects.append(
-                Effect(value: .setLocale(environment.userConfigs.localeForAppLanguage))
-            )
+            effects += Effect(value: .setLocale(environment.userConfigs.localeForAppLanguage))
 
             return effects
             
