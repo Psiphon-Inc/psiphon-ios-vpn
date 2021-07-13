@@ -230,7 +230,10 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
         #if DEBUG
         Debugging = DebugFlags(buildConfig: .debug)
         #elseif DEV_RELEASE
-        Debugging = DebugFlags(buildConfig: .devRelease)
+        Debugging = DebugFlags(
+            buildConfig: .devRelease,
+            devServers: true
+        )
         #else
         Debugging = DebugFlags.disabled(buildConfig: .release)
         #endif
