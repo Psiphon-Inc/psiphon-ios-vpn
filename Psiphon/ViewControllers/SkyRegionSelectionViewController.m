@@ -34,7 +34,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
 
-    self.title = [Strings selectServerRegionTitle];
+    self.title = [[Strings selectServerRegionTitle] localizedUppercaseString];
     [self populateRegionsArray];
 
     // Listen to notification from client common library for when regions are updated.
