@@ -966,4 +966,47 @@ extension UINavigationBar {
         self.setValue(true, forKey: "hidesShadow")
     }
     
+    /// Applies the following appearance changes to UINavigationBar
+    /// - Opaque dark blue background
+    /// - Sets title color and font
+    /// - Removes iOS default bottom border line
+    @objc func applyPsiphonNavigationBarStyling() {
+        
+        if #available(iOS 13.0, *) {
+            
+            let appearance = UINavigationBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = .darkBlue()
+            
+            // Removes bottom border line
+            appearance.shadowColor = .clear
+            
+            appearance.titleTextAttributes = [
+                NSAttributedString.Key.foregroundColor: UIColor.blueGrey(),
+                NSAttributedString.Key.font: UIFont.avenirNextBold(15.0)
+            ]
+            
+            self.standardAppearance = appearance
+            self.scrollEdgeAppearance = self.standardAppearance
+            
+        } else {
+            
+            // Fallback on earlier versions
+            
+            self.barStyle = .black
+            self.barTintColor = .darkBlue()
+            self.isTranslucent = false
+            
+            // Removes the default iOS bottom border.
+            self.setValue(NSNumber(value: true), forKey: "hidesShadow")
+            
+            self.titleTextAttributes = [
+                NSAttributedString.Key.foregroundColor: UIColor.blueGrey(),
+                NSAttributedString.Key.font: UIFont.avenirNextBold(15.0)
+            ]
+            
+        }
+        
+    }
+    
 }
