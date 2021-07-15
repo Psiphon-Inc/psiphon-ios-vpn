@@ -376,8 +376,8 @@ final class PsiCashAccountViewController: ReactiveViewController {
             divider,
             usernameTextField,
             passwordTextField,
-            forgotPasswordButton,
-            loginButton
+            loginButton,
+            forgotPasswordButton
         )
         
         vStack.addSubview(orTitle)

@@ -283,7 +283,7 @@
 "PSICASH_ACCOUNT_MANAGEMENT" = "Manage Account";
 
 /* An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY" = "PsiCash login expired. Please log back in.";
+"PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "Your PsiCash login has expired. Please log back in.";
 
 /* Body text of a modal dialog shown when a PsiCash login succeeds. There is a fixed number of times that a user can merge a pre-account balance into a PsiCash account. This message indicates that the user has hit that limit and the merge that occurred is the last one allowed. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNTS_LAST_MERGE_WARNING_BODY" = "You are logged into your PsiCash account. The preexisting balance from this device has been transferred into your account, but this is the last time a balance merge will occur.";
@@ -320,6 +320,9 @@
 
 /* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
 "PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon, unless you have created a PsiCash account and are logged into your PsiCash account.";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_PRODUCT_NOT_FOUND_MESSAGE" = "Speed Boost product not found. Your app may be out of date. Please check for updates.";
 
 /* Body of an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. The word 'PsiCash' must not be translated or transliterated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "PSICASH_SPEED_PORT_LIMITS_BODY" = "Without active Speed Boost, your speed is limited and some internet traffic is not supported. Activate Speed Boost with PsiCash to unlock the full potential of your Psiphon experience.";

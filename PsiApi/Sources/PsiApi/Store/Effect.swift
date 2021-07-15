@@ -88,6 +88,14 @@ public func += <A> (_ lhs: inout [Effect<A>], _ rhs: Effect<A>) {
     lhs = lhs + [rhs]
 }
 
+public func += <A> (_ lhs: inout [Effect<A>], _ rhs: [Effect<A>]) {
+    lhs = lhs + rhs
+}
+
+public func + <A> (_ lhs: [Effect<A>], _ rhs: Effect<A>) -> [Effect<A>] {
+    lhs + [ rhs ]
+}
+
 extension Effect where Value == Never {
     
     public func mapNever<Mapped>() -> Effect<Mapped> {

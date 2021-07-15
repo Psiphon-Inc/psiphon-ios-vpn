@@ -212,12 +212,11 @@ public let subscriptionAuthStateReducer = Reducer<SubscriptionReducerState
                             givenRejectedAuthIDs: rejectedAuthIDsSeqTuple.rejectedValues
                         )
                         
-                        effects.append(
-                            StoredRejectedSubscriptionAuthIDs.setContainerReadRejectedAuthIDs(
+                        effects += StoredRejectedSubscriptionAuthIDs
+                            .setContainerReadRejectedAuthIDs(
                                 atLeastUpToSequenceNumber: rejectedAuthIDsSeqTuple.writeSeqNumber,
-                                sharedDB: environment.sharedDB
-                            ).fireAndForget()
-                        )
+                                sharedDB: environment.sharedDB)
+                            .fireAndForget()
                         
                         return (newValue, effects)
                     }
@@ -229,16 +228,14 @@ public let subscriptionAuthStateReducer = Reducer<SubscriptionReducerState
         case .success(let loadedValue):
             var effects = [Effect<SubscriptionAuthStateAction>]()
             
-            effects.append(
-                state.subscription.setPurchasesAuthState(
-                    newValue: loadedValue,
-                    environment: environment
-                ).mapNever()
-            )
+            effects += state.subscription
+                .setPurchasesAuthState(newValue: loadedValue,
+                                       environment: environment)
+                .mapNever()
             
             // Replays `localDataUpdate(type:)` action if not nil.
             if let updateType = updateType {
-                effects.append(Effect(value: .localDataUpdate(type: updateType)))
+                effects += Effect(value: .localDataUpdate(type: updateType))
             }
             
             return effects
@@ -419,9 +416,9 @@ public let subscriptionAuthStateReducer = Reducer<SubscriptionReducerState
             // Authorization request finished in failure.
             
             var effects = [Effect<SubscriptionAuthStateAction>]()
-            effects.append(
-                environment.feedbackLogger.log(.error, "authorization request failed '\(errorEvent)'").mapNever()
-            )
+            
+            effects += environment.feedbackLogger
+                .log(.error, "authorization request failed '\(errorEvent)'").mapNever()
             
             // Authorization request for this purchase is no longer pending.
             state.subscription.transactionsPendingAuthRequest.remove(purchase.webOrderLineItemID)
@@ -432,9 +429,7 @@ public let subscriptionAuthStateReducer = Reducer<SubscriptionReducerState
                 environment: environment
             )
             
-            effects.append(
-                stateUpdateEffect.mapNever()
-            )
+            effects += stateUpdateEffect.mapNever()
             
             return effects
             
@@ -533,12 +528,10 @@ public let subscriptionAuthStateReducer = Reducer<SubscriptionReducerState
                 // Non-200 OK response from the purchase verifier server.
                 var effects = [Effect<SubscriptionAuthStateAction>]()
                 
-                effects.append(
-                    environment.feedbackLogger.log(.error, """
+                effects += environment.feedbackLogger.log(.error, """
                         authorization request failed for webOrderLineItemID \
                         '\(purchase.webOrderLineItemID)': error: '\(failureEvent)'
                         """).mapNever()
-                )
                 
                 if case .badRequest = failureEvent.error {
                     let stateUpdateEffect = state.subscription.setAuthorizationState(
@@ -547,7 +540,7 @@ public let subscriptionAuthStateReducer = Reducer<SubscriptionReducerState
                         environment: environment
                     )
                     
-                    effects.append(stateUpdateEffect.mapNever())
+                    effects += stateUpdateEffect.mapNever()
                     
                 } else {
                     let stateUpdateEffect = state.subscription.setAuthorizationState(
@@ -556,7 +549,7 @@ public let subscriptionAuthStateReducer = Reducer<SubscriptionReducerState
                         environment: environment
                     )
                     
-                    effects.append(stateUpdateEffect.mapNever())
+                    effects += stateUpdateEffect.mapNever()
                 }
                 
                 return effects
