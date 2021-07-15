@@ -134,6 +134,12 @@ import Foundation
                                  value: "Connect to Psiphon to use Speed Boost",
                                  comment: "User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.")
     }
+    
+    static func PsiCash_speed_boost_product_not_found_update_app_message() -> String {
+        return NSLocalizedString("PSICASH_SPEED_BOOST_PRODUCT_NOT_FOUND_MESSAGE", tableName: nil, bundle: Bundle.main,
+                                 value: "Speed Boost product not found. Your app may be out of date. Please check for updates.",
+                                 comment: "Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.")
+    }
 
     static func Insufficient_psiCash_balance() -> String {
         return NSLocalizedString("INSUFFICIENT_PSICASH_BALANCE", tableName: nil, bundle: Bundle.main,
@@ -396,8 +402,8 @@ import Foundation
     }
     
     static func Psicash_account_tokens_expired_body() -> String {
-        return NSLocalizedString("PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY", tableName: nil, bundle: .main,
-                                 value: "PsiCash login expired. Please log back in.",
+        return NSLocalizedString("PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2", tableName: nil, bundle: .main,
+                                 value: "Your PsiCash login has expired. Please log back in.",
                                  comment: "An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated.")
     }
     
