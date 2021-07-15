@@ -283,7 +283,7 @@
 "PSICASH_ACCOUNT_MANAGEMENT" = "Manage Account";
 
 /* An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY" = "PsiCash login expired. Please log back in.";
+"PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "Your PsiCash login has expired. Please log back in.";
 
 /* Body text of a modal dialog shown when a PsiCash login succeeds. There is a fixed number of times that a user can merge a pre-account balance into a PsiCash account. This message indicates that the user has hit that limit and the merge that occurred is the last one allowed. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNTS_LAST_MERGE_WARNING_BODY" = "You are logged into your PsiCash account. The preexisting balance from this device has been transferred into your account, but this is the last time a balance merge will occur.";

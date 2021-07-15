@@ -396,8 +396,8 @@ import Foundation
     }
     
     static func Psicash_account_tokens_expired_body() -> String {
-        return NSLocalizedString("PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY", tableName: nil, bundle: .main,
-                                 value: "PsiCash login expired. Please log back in.",
+        return NSLocalizedString("PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2", tableName: nil, bundle: .main,
+                                 value: "Your PsiCash login has expired. Please log back in.",
                                  comment: "An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated.")
     }
     
