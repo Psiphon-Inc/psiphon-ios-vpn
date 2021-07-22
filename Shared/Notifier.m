@@ -44,8 +44,8 @@ NotifierMessage const NotifierIsHostAppProcessRunning = PSIPHON_VPN_GROUP @".IsH
 // Messages sent by the container.
 NotifierMessage const NotifierStartVPN               = PSIPHON_GROUP @".StartVPN";
 NotifierMessage const NotifierAppEnteredBackground   = PSIPHON_GROUP @".AppEnteredBackground";
-NotifierMessage const NotifierUpdatedNonSubscriptionAuths  = PSIPHON_GROUP @".UpdatedNonSubscriptionAuths";
-NotifierMessage const NotifierUpdatedSubscriptionAuths  = PSIPHON_GROUP @".UpdatedSubscriptionAuths";
+
+NotifierMessage const NotifierUpdatedAuthorizations = PSIPHON_GROUP @".UpdatedAuthorizations";
 NotifierMessage const NotifierHostAppProcessRunning  = PSIPHON_GROUP @".HostAppProcessRunning";
 
 #if DEBUG
@@ -117,8 +117,7 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
     // Listens to all messages sent by the container.
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierStartVPN);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAppEnteredBackground);
-    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierUpdatedNonSubscriptionAuths);
-    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierUpdatedSubscriptionAuths);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierUpdatedAuthorizations);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierHostAppProcessRunning);
 
 #if DEBUG

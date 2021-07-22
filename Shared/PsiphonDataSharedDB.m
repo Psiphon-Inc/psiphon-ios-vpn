@@ -23,10 +23,6 @@
 #import "SharedConstants.h"
 #import <PsiphonTunnel/PsiphonTunnel.h>
 
-#if TARGET_IS_EXTENSION
-#import "Authorization.h"
-#endif
-
 // File operations parameters
 #define MAX_RETRIES 3
 #define RETRY_SLEEP_TIME 0.1f  // Sleep for 100 milliseconds.
@@ -43,24 +39,9 @@ UserDefaultsKey const TunnelSponsorIDStringKey = @"current_sponsor_id";
 
 UserDefaultsKey const ServerTimestampStringKey = @"server_timestamp";
 
-UserDefaultsKey const ContainerAuthorizationSetKey = @"authorizations_container_key";
-
 UserDefaultsKey const ExtensionIsZombieBoolKey = @"extension_zombie";
 
-UserDefaultsKey const ContainerSubscriptionAuthorizationsDictKey =
-    @"subscription_authorizations_dict";
-
-UserDefaultsKey const ExtensionRejectedSubscriptionAuthorizationIDsArrayKey =
-    @"extension_rejected_subscription_authorization_ids";
-
-UserDefaultsKey const ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey =
-@"extension_rejected_subscription_authorization_ids_write_seq_int";
-
-UserDefaultsKey const ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey =
-    @"container_read_rejected_subscription_authorization_ids_read_at_least_up_to_seq_int";
-
-UserDefaultsKey const ContainerForegroundStateBoolKey =
-@"container_foreground_state_bool_key";
+UserDefaultsKey const ContainerForegroundStateBoolKey = @"container_foreground_state_bool_key";
 
 UserDefaultsKey const ContainerTunnelIntentStatusIntKey = @"container_tunnel_intent_status_key";
 
@@ -69,9 +50,6 @@ UserDefaultsKey const ExtensionDisallowedTrafficAlertWriteSeqIntKey =
 
 UserDefaultsKey const ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey =
 @"container_disallowed_traffic_alert_read_at_least_up_to_seq_int";
-
-UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate =
-@"Container-Latest-Subscription-Expiry-Date";
 
 /**
  * Key for boolean value that when TRUE indicates that the extension crashed before stop was called.
@@ -88,6 +66,25 @@ UserDefaultsKey const DebugMemoryProfileBoolKey = @"PsiphonDataSharedDB.DebugMem
 UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataSharedDB.DebugPsiphonConnectionStateStringKey";
 
 #endif
+
+#pragma mark - Unused legacy keys
+UserDefaultsKey const ContainerAuthorizationSetKey_Legacy = @"authorizations_container_key";
+
+UserDefaultsKey const ContainerSubscriptionAuthorizationsDictKey_Legacy=
+    @"subscription_authorizations_dict";
+
+UserDefaultsKey const ExtensionRejectedSubscriptionAuthorizationIDsArrayKey_Legacy =
+    @"extension_rejected_subscription_authorization_ids";
+
+UserDefaultsKey const ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey_Legacy =
+@"extension_rejected_subscription_authorization_ids_write_seq_int";
+
+UserDefaultsKey const ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey_Legacy =
+    @"container_read_rejected_subscription_authorization_ids_read_at_least_up_to_seq_int";
+
+UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
+@"Container-Latest-Subscription-Expiry-Date";
+
 
 #pragma mark -
 
@@ -328,16 +325,6 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 
 #pragma mark - Container Data (Data originating in the container)
 
-- (NSDate *_Nullable)getAppReceiptLatestSubscriptionExpiryDate {
-    return (NSDate *)[sharedDefaults objectForKey:ContainerAppReceiptLatestSubscriptionExpiryDate];
-}
-
-#if !(TARGET_IS_EXTENSION)
-- (void)setAppReceiptLatestSubscriptionExpiryDate:(NSDate *_Nullable)date {
-    [sharedDefaults setObject:date forKey:ContainerAppReceiptLatestSubscriptionExpiryDate];
-}
-#endif
-
 - (BOOL)getAppForegroundState {
     return [sharedDefaults boolForKey:ContainerForegroundStateBoolKey];
 }
@@ -475,123 +462,6 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 - (NSString*)getServerTimestamp {
     return [sharedDefaults stringForKey:ServerTimestampStringKey];
 }
-
-
-#pragma mark - Authorizations
-
-#if TARGET_IS_EXTENSION
-- (void)removeNonSubscriptionAuthorizationsNotAccepted:(NSSet<NSString *> *_Nullable)authIdsToRemove {
-
-    NSMutableSet<NSString *> *newEncodedAuths = [NSMutableSet set];
-
-    [[self getNonSubscriptionEncodedAuthorizations]
-     enumerateObjectsUsingBlock:^(NSString * _Nonnull encoded, BOOL * _Nonnull stop) {
-        Authorization *_Nullable storedAuthorization = [[Authorization alloc]
-                                                        initWithEncodedAuthorization:encoded];
-        if (storedAuthorization == nil) {
-            return;
-        }
-        
-        if (![authIdsToRemove containsObject:storedAuthorization.ID]) {
-            // storedAuthorization.ID doesn't match any of `authIdsToRemove`.
-            [newEncodedAuths addObject:storedAuthorization.base64Representation];
-        }
-
-    }];
-
-    [self setNonSubscriptionEncodedAuthorizations:newEncodedAuths];
-}
-#endif
-
-- (void)setNonSubscriptionEncodedAuthorizations:(NSSet<NSString*>*_Nullable)encodedAuthorizations {
-    // Persists Base64 representation of the Authorizations.
-    [sharedDefaults setObject:encodedAuthorizations.allObjects
-                       forKey:ContainerAuthorizationSetKey];
-    [sharedDefaults synchronize];
-}
-
-- (NSSet<NSString *> *_Nonnull)getNonSubscriptionEncodedAuthorizations {
-    NSArray<NSString *> *_Nullable encodedAuths = [sharedDefaults
-                                                   stringArrayForKey:ContainerAuthorizationSetKey];
-    if (encodedAuths == nil) {
-        return [NSSet set];
-    } else {
-        return [NSSet setWithArray:encodedAuths];
-    }
-}
-
-#pragma mark - Subscription
-
-#if !(TARGET_IS_EXTENSION)
-/// Encoded object must JSON representation of type `[SubscriptionPurchaseAuth]`.
-- (void)setSubscriptionAuths:(NSData *_Nullable)purchaseAuths {
-    [sharedDefaults setObject:purchaseAuths forKey:ContainerSubscriptionAuthorizationsDictKey];
-}
-#endif
-
-- (NSData *_Nullable)getSubscriptionAuths {
-    return [sharedDefaults dataForKey:ContainerSubscriptionAuthorizationsDictKey];
-}
-
--(NSArray<NSString *> *_Nonnull)getRejectedSubscriptionAuthorizationIDs {
-    NSArray<NSString *> *_Nullable storedValue =
-        [sharedDefaults stringArrayForKey:ExtensionRejectedSubscriptionAuthorizationIDsArrayKey];
-    
-    if (storedValue == nil) {
-        return [NSArray array];
-    } else {
-        return storedValue;
-    }
-}
-
-#if TARGET_IS_EXTENSION
-- (void)insertRejectedSubscriptionAuthorizationID:(NSString *)authorizationID {
-    NSInteger extensionSeq = [self getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber];
-    NSInteger containerReadAtLeastToSeq =
-      [self getContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber];
-    
-    NSMutableArray<NSString *> *rejectedAuthIDs;
-    
-    if (containerReadAtLeastToSeq < extensionSeq) {
-        rejectedAuthIDs = [NSMutableArray arrayWithArray:[self getRejectedSubscriptionAuthorizationIDs]];
-    } else {
-        // Container is up-to-date with the extension.
-        // Currently stored values for rejected subscription authorization ids can be removed.
-        rejectedAuthIDs = [NSMutableArray array];
-    }
-    
-    [rejectedAuthIDs addObject:authorizationID];
-    
-    // Updates the rejection authorization IDs before sequence number.
-    // This guarantees that there is no data loss, and at most sequence number
-    // will be out-of-sync.
-    
-    [sharedDefaults setObject:rejectedAuthIDs
-                       forKey:ExtensionRejectedSubscriptionAuthorizationIDsArrayKey];
-    
-    [sharedDefaults setInteger:(extensionSeq + 1)
-                        forKey:ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey];
-}
-#endif
-
-- (NSInteger)getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber {
-    NSInteger seq = [sharedDefaults
-                     integerForKey:ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey];
-    return seq;
-}
-
-- (NSInteger)getContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber {
-    NSInteger seq = [sharedDefaults
-               integerForKey:ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey];
-    return seq;
-}
-
-#if !(TARGET_IS_EXTENSION)
-- (void)setContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber:(NSInteger)seq {
-    [sharedDefaults setInteger:seq
-                      forKey:ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey];
-}
-#endif
 
 #pragma mark - Jetsam counter
 

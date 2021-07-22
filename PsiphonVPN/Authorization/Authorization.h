@@ -18,31 +18,18 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "SharedAuthorization+CoreDataClass.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSInteger, AuthorizationAccessType) {
-    AuthorizationAccessTypeUnknown = 0,
-    AuthorizationAccessTypeAppleSubscription = 1,
-    AuthorizationAccessTypeAppleSubscriptionTest = 2,
-    AuthorizationAccessTypeSpeedBoost = 3,
-    AuthorizationAccessTypeSpeedBoostTest = 4
-};
-
 @interface Authorization : NSObject
 
-@property (nonatomic, readonly, nonnull) NSString *base64Representation;
+@property (nonatomic, readonly, nonnull) NSString *rawValue;
 @property (nonatomic, readonly, nonnull) NSString *ID;
 @property (nonatomic, readonly, nonnull) NSString *accessType;
 @property (nonatomic, readonly, nonnull) NSDate *expires;
 
-+ (NSSet<Authorization *> *_Nonnull)createFromEncodedAuthorizations:(NSArray<NSString *> *_Nullable)encodedAuthorizations;
-
-+ (NSArray<NSString *> *_Nonnull)encodeAuthorizations:(NSSet<Authorization *> *_Nullable)auths;
-
-+ (NSSet<NSString *> *_Nonnull)authorizationIDsFrom:(NSSet<Authorization *> *_Nullable)authorizations;
-
-- (instancetype _Nullable)initWithEncodedAuthorization:(NSString *_Nullable)encodedAuthorization;
++ (Authorization *_Nullable)makeFromSharedAuthorization:(SharedAuthorization *_Nullable)sharedAuth;
 
 - (AuthorizationAccessType)accessTypeValue;
 

@@ -50,7 +50,10 @@ public typealias SubscriptionReducerEnvironment = (
     (_ interval: TimeInterval, _ leeway: DispatchTimeInterval) -> Effect<()>
 )
 
-public let subscriptionReducer = Reducer<SubscriptionState
+/// Note that `subscriptionTimerReducer` bases it's timer on the latest subscription
+/// transaction available in the receipt, and it's state is currently
+/// independent of `subscriptionAuthStateReducer`.
+public let subscriptionTimerReducer = Reducer<SubscriptionState
                                          , SubscriptionAction
                                          , SubscriptionReducerEnvironment> {
     state, action, environment in

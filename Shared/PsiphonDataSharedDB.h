@@ -24,8 +24,6 @@
 #import "PsiphonData.h"
 #endif
 
-@class Authorization;
-
 #pragma mark - NSUserDefaults Keys
 
 extern UserDefaultsKey const _Nonnull EgressRegionsStringArrayKey;
@@ -33,12 +31,7 @@ extern UserDefaultsKey const _Nonnull ClientRegionStringKey;
 extern UserDefaultsKey const _Nonnull TunnelStartTimeStringKey;
 extern UserDefaultsKey const _Nonnull TunnelSponsorIDStringKey;
 extern UserDefaultsKey const _Nonnull ServerTimestampStringKey;
-extern UserDefaultsKey const _Nonnull ContainerAuthorizationSetKey;
 extern UserDefaultsKey const _Nonnull ExtensionIsZombieBoolKey;
-extern UserDefaultsKey const _Nonnull ContainerSubscriptionAuthorizationsDictKey;
-extern UserDefaultsKey const _Nonnull ExtensionRejectedSubscriptionAuthorizationIDsArrayKey;
-extern UserDefaultsKey const _Nonnull ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey;
-extern UserDefaultsKey const _Nonnull ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey;
 extern UserDefaultsKey const _Nonnull ContainerForegroundStateBoolKey;
 extern UserDefaultsKey const _Nonnull ContainerTunnelIntentStatusIntKey;
 extern UserDefaultsKey const _Nonnull ExtensionDisallowedTrafficAlertWriteSeqIntKey;
@@ -129,18 +122,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 #pragma mark - Container Data (Data originating in the container)
-
-/**
- Returns the latest subscription expiry date present in the app receipt, set by `-setAppReceiptLatestSubscriptionExpiryDate:`.
- */
-- (NSDate *_Nullable)getAppReceiptLatestSubscriptionExpiryDate;
-
-#if !(TARGET_IS_EXTENSION)
-/**
- Sets the app receipts latest subscription expiry date. Value can be nil if state is unknown, or already expired.
- */
-- (void)setAppReceiptLatestSubscriptionExpiryDate:(NSDate *_Nullable)date;
-#endif
 
 /** Returns last foreground state value written by the container.
  * - Note: The value is not ground truth and might be stale if e.g. the container crashes.
@@ -247,46 +228,6 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 #endif
 
 - (NSInteger)getDisallowedTrafficAlertWriteSequenceNum;
-
-#pragma mark - Authorizations
-
-#if TARGET_IS_EXTENSION
-
-- (void)removeNonSubscriptionAuthorizationsNotAccepted:(NSSet<NSString*>*_Nullable)authIdsToRemove;
-
-#else
-
-- (void)setNonSubscriptionEncodedAuthorizations:(NSSet<NSString*>*_Nullable)encodedAuthorizations;
-
-#endif
-
-- (NSSet<NSString *> *)getNonSubscriptionEncodedAuthorizations;
-
-#pragma mark - Subscription Authorizations
-
-#if !(TARGET_IS_EXTENSION)
-/// Encoded object must JSON representation of type `[TransactionID: SubscriptionPurchaseAuth]`.
-/// This method does no validation on the given `purchaseAuths`.
-- (void)setSubscriptionAuths:(NSData *_Nullable)purchaseAuths;
-#endif
-
-/// Encoded object has JSON representation of type `[TransactionID: SubscriptionPurchaseAuth]`.
-/// This method does no validation on the stored data.
-- (NSData *_Nullable)getSubscriptionAuths;
-
--(NSArray<NSString *> *_Nonnull)getRejectedSubscriptionAuthorizationIDs;
-
-#if TARGET_IS_EXTENSION
-- (void)insertRejectedSubscriptionAuthorizationID:(NSString *)authorizationID;
-#endif
-
-- (NSInteger)getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber;
-
-- (NSInteger)getContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber;
-
-#if !(TARGET_IS_EXTENSION)
-- (void)setContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber:(NSInteger)seq;
-#endif
 
 #pragma mark - Jetsam counter
 

@@ -88,6 +88,7 @@ extension ReceiptData {
                         parsedIAP.webOrderLineItemID!)!,
                     purchaseDate: parsedIAP.purchaseDate,
                     expires: parsedIAP.expiresDate!,
+                    cancellationDate: parsedIAP.cancellationDate,
                     isInIntroOfferPeriod: parsedIAP.isInIntroPeriod,
                     hasBeenInIntroOfferPeriod: hasSubscriptionBeenInIntroOfferPeriod
                 )

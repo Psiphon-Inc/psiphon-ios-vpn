@@ -359,13 +359,10 @@ public struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equ
         /// Request will be retried according to RetryCondition.
         case willRetry(RetryCondition)
         
-        /// Request failed and will not be retried.
-        /// This is a terminal value.
-        case failed(ErrorEvent<Response.Failure>)
-        
         /// Request is completed and will not be retried.
         /// This is a terminal value.
         case completed(Response.ResultType)
+        
     }
     
     /// RetryError represents errors that can be retried automatically.
@@ -477,9 +474,8 @@ public struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equ
         }
         .flatMapError { (responseError: ErrorEvent<Response.Failure>)
             -> Effect<SignalTermination<RequestResult>> in
-            // Maps failure response error after all retries from a signal failure
-            // to a signal value event.
-            return SignalProducer(value: .value(.failed(responseError)))
+            // Forwards failure respose error after all automatic retries.
+            return SignalProducer(value: .value(.completed(.failure(responseError))))
         }
         .take(while: { (signalTermination: SignalTermination) -> Bool in
             // Forwards values while the `.terminate` value has not been emitted.

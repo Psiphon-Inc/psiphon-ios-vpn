@@ -131,6 +131,7 @@ struct AppEnvironment {
     let psiCashFileStoreRoot: String?
     let appInfo: () -> AppInfoProvider
     let sharedDB: PsiphonDataSharedDB
+    let sharedAuthCoreData: SharedAuthCoreData
     let userConfigs: UserDefaultsConfig
     let standardUserDefaults: UserDefaults
     let notifier: PsiApi.Notifier
@@ -193,6 +194,7 @@ func makeEnvironment(
     store: Store<AppState, AppAction>,
     feedbackLogger: FeedbackLogger,
     sharedDB: PsiphonDataSharedDB,
+    sharedAuthCoreData: SharedAuthCoreData,
     psiCashLib: PsiCashLib,
     psiCashFileStoreRoot: String?,
     supportedAppStoreProducts: SupportedAppStoreProducts,
@@ -243,6 +245,7 @@ func makeEnvironment(
         psiCashFileStoreRoot: psiCashFileStoreRoot,
         appInfo: { AppInfoObjC() },
         sharedDB: sharedDB,
+        sharedAuthCoreData: sharedAuthCoreData,
         userConfigs: userDefaultsConfig,
         standardUserDefaults: standardUserDefaults,
         notifier: NotifierObjC(notifier:Notifier.sharedInstance()),
@@ -352,7 +355,7 @@ func makeEnvironment(
         mainDispatcher: mainDispatcher,
         globalDispatcher: globalDispatcher,
         getPsiphonConfig: {
-            return PsiphonConfigReader.fromConfigFile()?.config
+            return PsiphonConfigReader.load()?.config
         },
         getAppStateFeedbackEntry:
             store.$value.signalProducer
@@ -446,16 +449,18 @@ fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment
         feedbackLogger: env.feedbackLogger,
         psiCashFileStoreRoot: env.psiCashFileStoreRoot,
         psiCashEffects: env.psiCashEffects,
-        sharedDB: env.sharedDB,
+        sharedAuthCoreData: env.sharedAuthCoreData,
         psiCashPersistedValues: env.userConfigs,
         notifier: env.notifier,
+        notifierUpdatedAuthorizationsMessage: NotifierUpdatedAuthorizations,
         vpnActionStore: env.vpnActionStore,
         tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
         objcBridgeDelegate: env.objcBridgeDelegate,
         metadata: { ClientMetaData(env.appInfo()) },
         getCurrentTime: env.dateCompare.getCurrentTime,
         psiCashLegacyDataStore: env.standardUserDefaults,
-        userConfigs: env.userConfigs
+        userConfigs: env.userConfigs,
+        mainDispatcher: env.mainDispatcher
     )
 }
 
@@ -531,12 +536,13 @@ fileprivate func toSubscriptionAuthStateReducerEnvironment(
         httpRequestRetryCount: 5,
         httpRequestRetryInterval: DispatchTimeInterval.seconds(1),
         notifier: env.notifier,
-        notifierUpdatedSubscriptionAuthsMessage: NotifierUpdatedSubscriptionAuths,
-        sharedDB: SharedDBContainerObjC(sharedDB:env.sharedDB),
+        notifierUpdatedAuthorizationsMessage: NotifierUpdatedAuthorizations,
+        sharedAuthCoreData: env.sharedAuthCoreData,
         tunnelStatusSignal: env.tunnelStatusSignal,
         tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
         clientMetaData: { ClientMetaData(env.appInfo()) },
-        dateCompare: env.dateCompare
+        dateCompare: env.dateCompare,
+        mainDispatcher: env.mainDispatcher
     )
 }
 
@@ -644,12 +650,12 @@ func makeAppReducer(
                  value: \.appReceipt,
                  action: \.appReceipt,
                  environment: toReceiptReducerEnvironment(env:)),
-        subscriptionReducer.pullback(
+        subscriptionTimerReducer.pullback(
                  value: \.subscription,
                  action: \.subscription,
                  environment: toSubscriptionReducerEnvironment(env:)),
         subscriptionAuthStateReducer.pullback(
-                 value: \.subscriptionAuthReducerState,
+                 value: \.subscriptionAuthState,
                  action: \.subscriptionAuthStateAction,
                  environment: toSubscriptionAuthStateReducerEnvironment(env:)),
         productRequestReducer.pullback(

@@ -336,18 +336,6 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
                 return [ environment.feedbackLogger.log(.error, retryCondition).mapNever() ]
             }
             
-        case .failed(let errorEvent):
-            // Authorization request finished in failure, and will not be retried automatically.
-            
-            state.iap.unfinishedPsiCashTx?.verification = .requestError(errorEvent.eraseToRepr())
-            
-            return [
-                environment.feedbackLogger.log(.error, """
-                    verification request failed: '\(errorEvent)'\
-                    transaction: '\(makeFeedbackEntry(requestTransaction))'
-                    """).mapNever()
-            ]
-            
         case .completed(let psiCashValidationResponse):
             switch psiCashValidationResponse {
             case .success(.unit):

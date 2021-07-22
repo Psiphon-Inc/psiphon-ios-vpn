@@ -26,6 +26,7 @@ import Utilities
 import PsiApi
 import AppStoreIAP
 import PsiCashClient
+import PsiphonClientCommonLibrary
 
 enum AppLifecycle: Equatable {
     case inited
@@ -108,8 +109,6 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
                 completedStages: environment.userDefaultsConfig.onboardingStagesCompletedTyped)
             
             state.appDelegateState.onboardingCompleted = stagesNotCompleted.isEmpty
-            
-            let nonSubscriptionAuths = environment.sharedDB.getNonSubscriptionEncodedAuthorizations()
             
             return [
                 environment.paymentQueue.addObserver(environment.paymentTransactionDelegate).mapNever(),
@@ -196,6 +195,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
     private let appUpgrade = AppUpgrade()
     private let dateCompare: DateCompare
     private let appSupportFileStore: ApplicationSupportFileStore
+    private let sharedAuthCoreData: SharedAuthCoreData
     
     private var (lifetime, token) = Lifetime.make()
     private var objcBridge: ObjCBridgeDelegate!
@@ -215,6 +215,8 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
             compareDates: { Calendar.current.compare($0, to: $1, toGranularity: $2) })
         
         appSupportFileStore = ApplicationSupportFileStore(fileManager: FileManager.default)
+        
+        sharedAuthCoreData = SharedCoreData_Impl()
         
         platform = Platform(ProcessInfo.processInfo)
         
@@ -438,6 +440,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     store: store,
                     feedbackLogger: self.feedbackLogger,
                     sharedDB: self.sharedDB,
+                    sharedAuthCoreData: SharedCoreData_Impl(),
                     psiCashLib: self.psiCashLib,
                     psiCashFileStoreRoot: self.appSupportFileStore.psiCashFileStoreRootPath,
                     supportedAppStoreProducts: self.supportedProducts,
@@ -491,23 +494,22 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             
         }
         
-        // Maps connected events to refresh state messages sent to store.
+        // Observes VPN connected state, and sends actions that need to be performed.
         self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
             .skipRepeats()
             .filter { $0 == .connected }
-            .map(value: AppAction.psiCash(.refreshPsiCashState()))
-            .send(store: self.store)
-        
-        // Maps connected events to rejected authorization ID data update.
-        // This is true as long as rejected authorization IDs are updated in tunnel provider
-        // during `onActiveAuthorizationIDs:` callback, before the `onConnected` callback.
-        self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
-            .skipRepeats()
-            .filter { $0 == .connected }
-            .map(value: AppAction.subscriptionAuthStateAction(
-                    .localDataUpdate(type: .didUpdateRejectedSubscriptionAuthIDs))
-            )
-            .send(store: self.store)
+            .startWithValues { _ in
+                
+                // PsiCash RefreshState
+                self.store.send(.psiCash(.refreshPsiCashState()))
+                
+                // Validity of subscription authorization is determined by Psiphon servers
+                // when the VPN connects.
+                // Performs a local receipt refersh in case there is a new
+                // that can be retrieved. (e.g. server authorization rekey.)
+                self.store.send(.appReceipt(.localReceiptRefresh))
+                
+            }
         
         // Forwards `SubscriptionStatus` updates to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer
@@ -525,7 +527,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 .map(\.vpnState.value.providerVPNStatus.tunneled).skipRepeats()
         ).map {
             SubscriptionBarView.SubscriptionBarState.make(
-                authState: $0.0, subscriptionStatus: $0.1, tunnelStatus: $0.2
+                subscriptionAuthState: $0.0, subscriptionStatus: $0.1, tunnelStatus: $0.2
             )
         }
         .skipRepeats()
@@ -666,20 +668,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             objcBridge!.onSettingsViewModelDidChange(ObjcSettingsViewModel(model))
         }
 
-        // Updates PsiphonDateSharedDB `ContainerAppReceiptLatestSubscriptionExpiryDate`
-        // based on the app's receipt's latest subscription state.
-        self.lifetime += self.store.$value.signalProducer
-            .map(\.subscription.status)
-            .skipRepeats()
-            .startWithValues { [unowned sharedDB] subscriptionStatus in
-                switch subscriptionStatus {
-                case .notSubscribed, .unknown:
-                    sharedDB.setAppReceiptLatestSubscriptionExpiryDate(nil)
-                case let .subscribed(purchase):
-                    sharedDB.setAppReceiptLatestSubscriptionExpiryDate(purchase.expires)
-                }
-            }
-        
         // Opens landing page whenever Psiphon tunnel is connected, with
         // change in value of `VPNState` tunnel intent.
         // Landing page should not be opened after a reconnection due to an In-App purchase.
@@ -896,8 +884,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     dump(value, to: &output)
                     print("* -> \(removedCommonPackageNames(output))")
                 }
+            
         }
-
+        
     }
     
     @objc func applicationDidBecomeActive(_ application: UIApplication) {
@@ -1150,10 +1139,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         return self.supportedProducts.supported[.subscription]!.rawValues
     }
     
-    @objc func disallowedTrafficAlertNotification() {
-        self.store.send(.appDelegateAction(.checkForDisallowedTrafficAlertNotification))
-    }
-    
     @objc func switchVPNStartStopIntent()
     -> Promise<SwitchedVPNStartStopIntent>.ObjCPromise<SwitchedVPNStartStopIntent>
     {
@@ -1200,10 +1185,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.store.send(vpnAction: .tunnelStateIntent(
             intent: .start(transition: .restart), reason: .userInitiated
         ))
-    }
-    
-    @objc func syncWithTunnelProvider(reason: TunnelProviderSyncReason) {
-        self.store.send(vpnAction: .syncWithProvider(reason: reason))
     }
     
     @objc func reinstallVPNConfig() {
@@ -1277,6 +1258,43 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.objcBridge.dismiss(screen: .settings) { [unowned self] in
             self.objcBridge.startStopVPN()
         }
+    }
+    
+    // Handles Darwin notifications sent to the host app from the Network Extension process.
+    @objc func networkExtensionNotification(_ message: String) {
+        
+        // Maps the string message type to an enumerable value.
+        let typedMessage = NotifierNetworkExtensionMessage(rawValue: message)
+        
+        switch typedMessage {
+            
+        case .tunnelConnected:
+            self.store.send(vpnAction: .syncWithProvider(
+                reason: .providerNotificationPsiphonTunnelConnected))
+            
+        case .availableEgressRegions:
+            let regions = self.sharedDB.emittedEgressRegions()
+            RegionAdapter.sharedInstance().onAvailableEgressRegions(regions)
+            
+        case .networkConnectivityFailed, .networkConnectivityResolved:
+            break
+            
+        case .disallowedTrafficAlert:
+            self.store.send(.appDelegateAction(.checkForDisallowedTrafficAlertNotification))
+            
+        case .isHostAppProcessRunning:
+            Notifier.sharedInstance().post(NotifierHostAppProcessRunning)
+
+        default:
+            feedbackLogger.immediate(.error, "Unknown Notifier message: '\(message)'")
+            
+        }
+        
+    }
+    
+    // Core Data
+    @objc func sharedCoreData() -> SharedCoreData {
+        self.sharedAuthCoreData
     }
     
 }
