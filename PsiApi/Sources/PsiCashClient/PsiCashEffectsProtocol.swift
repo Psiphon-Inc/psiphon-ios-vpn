@@ -99,9 +99,8 @@ public protocol PsiCashEffectsProtocol {
     
     func rewardedVideoCustomData() -> String?
     
-    func removePurchasesNotIn(
-        psiCashAuthorizations: Set<String>
-    ) -> Effect<Never>
+    func removePurchases(withTransactionIDs: [String]) ->
+    Effect<Result<[PsiCashParsed<PsiCashPurchasedType>], PsiCashLibError>>
     
     func accountLogout() -> Effect<PsiCashAccountLogoutResult>
     

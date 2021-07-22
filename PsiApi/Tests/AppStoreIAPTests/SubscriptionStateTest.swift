@@ -409,7 +409,7 @@ fileprivate func runSubscriptionReducer(
     subscriptionState.status = subscriptionStatus
     
     let (nextSubscriptionState, effectsResults) =
-        testReducer(subscriptionState, subscriptionAction, env, subscriptionReducer, effectsTimeout)
+        testReducer(subscriptionState, subscriptionAction, env, subscriptionTimerReducer, effectsTimeout)
     
     return ReducerOutputs(subscriptionState: nextSubscriptionState,
                           subscriptionActions: effectsResults,

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2021, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,25 +21,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/** Container object for sponsor Ids */
-@interface PsiphonConfigSponsorIds : NSObject
+@interface AppFiles : NSObject
 
-@property (nonatomic, readonly) NSString *defaultSponsorId;
-@property (nonatomic, readonly) NSString *subscriptionSponsorId;
-@property (nonatomic, readonly) NSString *checkSubscriptionSponsorId;
+// App Group Container shared between the host app and the Network Extension.
++ (NSURL *_Nullable)appGroupContaier;
 
-@end
-
-/** Wrapper class for reading Psiphon config file */
-@interface PsiphonConfigReader : NSObject
-
-@property (class, nonatomic, readonly) NSString *embeddedServerEntriesPath;
-@property (class, nonatomic, readonly) NSString *psiphonConfigPath;
-
-@property (nonatomic, readonly) NSDictionary *config;
-@property (nonatomic, readonly) PsiphonConfigSponsorIds *sponsorIds;
-
-+ (PsiphonConfigReader *_Nullable)load;
+// Shared sqlite DB between the host app and the Network Extensin.
++ (NSURL *_Nullable)sharedSqliteDB;
 
 @end
 

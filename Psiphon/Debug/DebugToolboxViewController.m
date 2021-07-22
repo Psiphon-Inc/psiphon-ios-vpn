@@ -24,6 +24,11 @@
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "DebugDirectoryViewerViewController.h"
+#import "PersistentContainerWrapper.h"
+#import "Logging.h"
+#import "Psiphon-Swift.h"
+#import "UIAlertController+Additions.h"
+#import "AppFiles.h"
 
 #if DEBUG
 
@@ -100,7 +105,7 @@ NSString * const StateCellIdentifier = @"StateCell";
         case 0: return 2; // PPROF
         case 1: return 3; // EXTENSION
         case 2: return 1; // PSIPHON TUNNEL
-        case 3: return 2; // CONTAINER
+        case 3: return 3;// CONTAINER
         default:
             PSIAssert(FALSE)
             return 0;
@@ -203,6 +208,11 @@ NSString * const StateCellIdentifier = @"StateCell";
                 action = @selector(onResetPsiphonDataSharedDB);
                 break;
             }
+            case 2: {
+                cell.textLabel.text = @"Delete Core Data persistent store";
+                action = @selector(onDeleteCoreDataPersistentStores);
+                break;
+            }
         }
     }
 
@@ -248,6 +258,34 @@ NSString * const StateCellIdentifier = @"StateCell";
 - (void)onResetPsiphonDataSharedDB {
     NSUserDefaults *sharedDB = [[NSUserDefaults alloc] initWithSuiteName:PsiphonAppGroupIdentifier];
     [self clearUserDefaults:sharedDB];
+}
+
+- (void)onDeleteCoreDataPersistentStores {
+    
+    // Deletes SharedModel persistent store.
+    NSError *error = nil;
+    [[SwiftDelegate.bridge sharedCoreData] destroyPersistentStoreAndReturnError:&error];
+    
+    if (error != nil) {
+        
+        LOG_DEBUG(@"Failed to delete SharedModel persistent store: %@", error);
+        
+        [UIAlertController presentSimpleAlertWithTitle:@"Error"
+                                               message:@"Failed to delete persistent store"
+                                        preferredStyle:UIAlertControllerStyleAlert
+                                             okHandler:nil];
+        
+    } else {
+        
+        [UIAlertController presentSimpleAlertWithTitle:@"Success"
+                                               message:@"Deleted persistent store"
+                                        preferredStyle:UIAlertControllerStyleAlert
+                                             okHandler:nil];
+        
+    }
+    
+    LOG_DEBUG(@"SharedModel sql URL: %@", [AppFiles sharedSqliteDB]);
+    
 }
 
 #pragma mark - Connection state

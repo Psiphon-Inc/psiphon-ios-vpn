@@ -47,7 +47,7 @@ let receiptReducer = Reducer<ReceiptState, ReceiptStateAction, ReceiptReducerEnv
 
         state.receiptData = refreshedData
 
-        return notifyRefreshedReceiptEffects(
+        return notifyUpdatedReceiptData(
             receiptData: refreshedData,
             reason: .localRefresh,
             environment: environment
@@ -103,18 +103,24 @@ extension ReceiptData {
 
 }
 
-fileprivate func notifyRefreshedReceiptEffects<NeverAction>(
+/// Notifies all relevant services of updated receipt.
+fileprivate func notifyUpdatedReceiptData<NeverAction>(
     receiptData: ReceiptData?, reason: ReceiptReadReason, environment: ReceiptReducerEnvironment
 ) -> [Effect<NeverAction>] {
     return [
+        
         environment.subscriptionStore(.updatedReceiptData(receiptData)).mapNever(),
+        
         environment.subscriptionAuthStateStore(
-            .localDataUpdate(type: .didRefreshReceiptData(reason))
+            .appReceiptDataUpdated(receiptData, reason)
         ).mapNever(),
+        
         environment.iapStore(.receiptUpdated(receiptData)).mapNever(),
+        
         environment.feedbackLogger.log(
             .info, LogMessage(stringLiteral: makeFeedbackEntry(receiptData))
         ).mapNever()
+        
     ]
 }
 

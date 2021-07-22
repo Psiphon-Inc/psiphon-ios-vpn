@@ -40,8 +40,7 @@ extern NotifierMessage const NotifierIsHostAppProcessRunning;
 // Messages sent by the container.
 extern NotifierMessage const NotifierStartVPN;
 extern NotifierMessage const NotifierAppEnteredBackground;
-extern NotifierMessage const NotifierUpdatedNonSubscriptionAuths;
-extern NotifierMessage const NotifierUpdatedSubscriptionAuths;
+extern NotifierMessage const NotifierUpdatedAuthorizations;
 extern NotifierMessage const NotifierHostAppProcessRunning;
 
 // Messages allowed only in debug build.

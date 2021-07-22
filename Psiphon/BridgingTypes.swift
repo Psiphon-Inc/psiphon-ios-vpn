@@ -105,7 +105,6 @@ import PsiCashClient
         _ skProduct: SKProduct
     ) -> Promise<ObjCIAPResult>.ObjCPromise<ObjCIAPResult>
     @objc func getAppStoreSubscriptionProductIDs() -> Set<String>
-    @objc func disallowedTrafficAlertNotification()
     
     // VPN
     
@@ -114,7 +113,6 @@ import PsiCashClient
     @objc func sendNewVPNIntent(_ value: SwitchedVPNStartStopIntent)
     
     @objc func restartVPNIfActive()
-    @objc func syncWithTunnelProvider(reason: TunnelProviderSyncReason)
     @objc func reinstallVPNConfig()
     @objc func installVPNConfigWithPromise()
         -> Promise<VPNConfigInstallResultWrapper>.ObjCPromise<VPNConfigInstallResultWrapper>
@@ -137,6 +135,12 @@ import PsiCashClient
     @objc func versionLabelText() -> String
     
     @objc func connectButtonTappedFromSettings()
+    
+    // Network Extension notification
+    @objc func networkExtensionNotification(_ message: String)
+    
+    // Core Data
+    @objc func sharedCoreData() -> SharedCoreData
     
 }
 
@@ -314,4 +318,36 @@ import PsiCashClient
     init(swiftValue: PsiCashWidgetView.BindingType) {
         self.swiftValue = swiftValue
     }
+}
+
+/// Wraps Notifier message types that can be send from the Network Extension to the host app.
+/// Source: `Notifier.h`
+enum NotifierNetworkExtensionMessage {
+    
+    case tunnelConnected
+    case availableEgressRegions
+    case networkConnectivityFailed
+    case networkConnectivityResolved
+    case disallowedTrafficAlert
+    case isHostAppProcessRunning
+    
+    init?(rawValue: String) {
+        switch rawValue {
+        case NotifierTunnelConnected:
+            self = .tunnelConnected
+        case NotifierAvailableEgressRegions:
+            self = .availableEgressRegions
+        case NotifierNetworkConnectivityFailed:
+            self = .networkConnectivityFailed
+        case NotifierNetworkConnectivityResolved:
+            self = .networkConnectivityResolved
+        case NotifierDisallowedTrafficAlert:
+            self = .disallowedTrafficAlert
+        case NotifierIsHostAppProcessRunning:
+            self = .isHostAppProcessRunning
+        default:
+            return nil
+        }
+    }
+    
 }

@@ -181,7 +181,6 @@ extension AppState {
     }
     
     var vpnReducerState: VPNReducerState<PsiphonTPM> {
-        // TODO: This can be simplified by a new `SerialEffectState` constructor.
         get {
             VPNReducerState(
                 pendingActionQueue: self.vpnState.pendingActionQueue,
@@ -189,8 +188,8 @@ extension AppState {
                 pendingEffectCompletion: self.vpnState.pendingEffectCompletion,
                 value: VPNProviderManagerReducerState (
                     vpnState: self.vpnState.value,
-                    subscriptionTransactionsPendingAuthorization:
-                        self.subscriptionAuthState .transactionsPendingAuthRequest
+                    anySubscriptionTxPendingAuthorization:
+                        self.subscriptionAuthState.anyPendingAuthRequests
                 )
             )
         }
@@ -252,18 +251,6 @@ extension AppState {
         }
         set {
             self.pendingLandingPageOpening = newValue.pendingLandingPageOpening
-        }
-    }
-    
-    var subscriptionAuthReducerState: SubscriptionReducerState {
-        get {
-            SubscriptionReducerState(
-                subscription: self.subscriptionAuthState,
-                receiptData: self.appReceipt.receiptData
-            )
-        }
-        set {
-            self.subscriptionAuthState = newValue.subscription
         }
     }
     
