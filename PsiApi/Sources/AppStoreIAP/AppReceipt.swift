@@ -75,9 +75,17 @@ extension ReceiptState {
 }
 
 public enum ReceiptStateAction: Equatable {
-    case localReceiptRefresh
-    case _localReceiptDidRefresh(refreshedData: ReceiptData?)
-    /// A remote receipt refresh can open a dialog box to
+    
+    /// Reads local app receipt.
+    case readLocalReceiptFile
+    
+    /// Result of reading local app receipt.
+    case _readLocalReceiptFile(refreshedData: ReceiptData?)
+    
+    /// Sends a request to refresh the app receipt.
     case remoteReceiptRefresh(optionalPromise: Promise<Result<Utilities.Unit, SystemErrorEvent<Int>>>?)
+    
+    /// Result of receipt refresh.
     case _remoteReceiptRefreshResult(Result<Utilities.Unit, SystemErrorEvent<Int>>)
+    
 }
