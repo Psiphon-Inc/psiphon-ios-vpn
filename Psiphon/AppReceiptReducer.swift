@@ -37,13 +37,13 @@ let receiptReducer = Reducer<ReceiptState, ReceiptStateAction, ReceiptReducerEnv
     state, action, environment in
     
     switch action {
-    case .localReceiptRefresh:
+    case .readLocalReceiptFile:
          return [
             ReceiptData.fromLocalReceipt(environment: environment)
-                .map(ReceiptStateAction._localReceiptDidRefresh(refreshedData:))
+                .map(ReceiptStateAction._readLocalReceiptFile(refreshedData:))
         ]
 
-    case ._localReceiptDidRefresh(let refreshedData):
+    case ._readLocalReceiptFile(let refreshedData):
 
         state.receiptData = refreshedData
 

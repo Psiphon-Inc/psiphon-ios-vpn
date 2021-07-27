@@ -128,7 +128,7 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
         }
         
         return [
-            environment.appReceiptStore(.localReceiptRefresh).mapNever()
+            environment.appReceiptStore(.readLocalReceiptFile).mapNever()
         ]
         
     case let .purchase(product: product, resultPromise: maybeObjcSubscriptionPromise):

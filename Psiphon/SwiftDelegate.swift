@@ -112,7 +112,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
             
             return [
                 environment.paymentQueue.addObserver(environment.paymentTransactionDelegate).mapNever(),
-                environment.appReceiptStore(.localReceiptRefresh).mapNever()
+                environment.appReceiptStore(.readLocalReceiptFile).mapNever()
             ]
         
         case .didBecomeActive:
@@ -507,7 +507,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 // when the VPN connects.
                 // Performs a local receipt refersh in case there is a new
                 // that can be retrieved. (e.g. server authorization rekey.)
-                self.store.send(.appReceipt(.localReceiptRefresh))
+                self.store.send(.appReceipt(.readLocalReceiptFile))
                 
             }
         
@@ -1043,7 +1043,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 objcBridge?.presentSubscriptionIAPViewController()
 
             case .failedRetry:
-                store?.send(.appReceipt(.localReceiptRefresh))
+                store?.send(.appReceipt(.readLocalReceiptFile))
 
             case .pending:
                 if state.tunnelStatus == .notConnected {
