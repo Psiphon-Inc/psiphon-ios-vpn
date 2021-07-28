@@ -21,11 +21,8 @@
 #import "Logging.h"
 #import "NSDate+PSIDateExtension.h"
 #import "SharedConstants.h"
+#import "FileUtils.h"
 #import <PsiphonTunnel/PsiphonTunnel.h>
-
-// File operations parameters
-#define MAX_RETRIES 3
-#define RETRY_SLEEP_TIME 0.1f  // Sleep for 100 milliseconds.
 
 #pragma mark - NSUserDefaults Keys
 
@@ -150,68 +147,6 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
     return [PsiphonTunnel olderNoticesFilePath:[PsiphonDataSharedDB dataRootDirectory]].path;
 }
 
-+ (NSString *_Nullable)tryReadingFile:(NSString *_Nonnull)filePath {
-    NSFileHandle *fileHandle;
-    // NSFileHandle will close automatically when deallocated.
-    return [PsiphonDataSharedDB tryReadingFile:filePath
-                               usingFileHandle:&fileHandle
-                                readFromOffset:0
-                                  readToOffset:nil];
-}
-
-+ (NSString *_Nullable)tryReadingFile:(NSString *_Nonnull)filePath
-                      usingFileHandle:(NSFileHandle *_Nullable __strong *_Nonnull)fileHandlePtr
-                       readFromOffset:(unsigned long long)bytesOffset
-                         readToOffset:(unsigned long long *_Nullable)readToOffset {
-
-    NSData *fileData;
-    NSError *err;
-
-    for (int i = 0; i < MAX_RETRIES; ++i) {
-
-        if (!(*fileHandlePtr)) {
-            // NOTE: NSFileHandle created with fileHandleForReadingFromURL
-            //       the handle owns its associated file descriptor, and will
-            //       close it automatically when deallocated.
-            (*fileHandlePtr) = [NSFileHandle fileHandleForReadingFromURL:[NSURL fileURLWithPath:filePath]
-                                                                error:&err];
-            if (err) {
-                LOG_WARN(@"Error opening file handle for %@: Error: %@", filePath, err);
-                // On failure explicitly setting fileHandlePtr to point to nil.
-                (*fileHandlePtr) = nil;
-            }
-        }
-
-        if ((*fileHandlePtr)) {
-            @try {
-                // From https://developer.apple.com/documentation/foundation/nsfilehandle/1413916-readdataoflength?language=objc
-                // readDataToEndOfFile raises NSFileHandleOperationException if attempts
-                // to determine file-handle type fail or if attempts to read from the file
-                // or channel fail.
-                [(*fileHandlePtr) seekToFileOffset:bytesOffset];
-                fileData = [(*fileHandlePtr) readDataToEndOfFile];
-
-                if (fileData) {
-                    if (readToOffset) {
-                        (*readToOffset) = [(*fileHandlePtr) offsetInFile];
-                    }
-                    return [[NSString alloc] initWithData:fileData encoding:NSUTF8StringEncoding];
-                } else {
-                    (*readToOffset) = (unsigned long long) 0;
-                }
-            }
-            @catch (NSException *e) {
-                [PsiFeedbackLogger error:@"Error reading file: %@", [e debugDescription]];
-
-            }
-        }
-
-        // Put thread to sleep for 100 ms and try again.
-        [NSThread sleepForTimeInterval:RETRY_SLEEP_TIME];
-    }
-
-    return nil;
-}
 
 // readLogsData tries to parse logLines, and for each JSON formatted line creates
 // a DiagnosticEntry which is appended to entries.
@@ -275,9 +210,9 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
 // This method is not meant to handle large files.
 #if !(TARGET_IS_EXTENSION)
 - (NSArray<DiagnosticEntry*> *_Nonnull)getAllLogs {
-
-    LOG_DEBUG(@"Log filesize:%@", [self getFileSize:[self rotatingLogNoticesPath]]);
-    LOG_DEBUG(@"Log backup filesize:%@", [self getFileSize:[self rotatingOlderLogNoticesPath]]);
+    
+    LOG_DEBUG(@"Log filesize:%@", [FileUtils getFileSize:[self rotatingLogNoticesPath]]);
+    LOG_DEBUG(@"Log backup filesize:%@", [FileUtils getFileSize:[self rotatingOlderLogNoticesPath]]);
 
     NSMutableArray<NSArray<DiagnosticEntry *> *> *entriesArray = [[NSMutableArray alloc] initWithCapacity:3];
 
@@ -287,8 +222,8 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
 
    NSArray<DiagnosticEntry *> *(^readRotatedLogs)(NSString *, NSString *) = ^(NSString *olderPath, NSString *newPath){
        NSMutableArray<DiagnosticEntry *> *entries = [[NSMutableArray alloc] init];
-       NSString *tunnelCoreOlderLogs = [PsiphonDataSharedDB tryReadingFile:olderPath];
-       NSString *tunnelCoreLogs = [PsiphonDataSharedDB tryReadingFile:newPath];
+       NSString *tunnelCoreOlderLogs = [FileUtils tryReadingFile:olderPath];
+       NSString *tunnelCoreLogs = [FileUtils tryReadingFile:newPath];
        [self readLogsData:tunnelCoreOlderLogs intoArray:entries];
        [self readLogsData:tunnelCoreLogs intoArray:entries];
        return entries;
@@ -413,7 +348,7 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
     NSMutableArray<Homepage *> *homepages = nil;
     NSError *err;
 
-    NSString *data = [PsiphonDataSharedDB tryReadingFile:[self homepageNoticesPath]];
+    NSString *data = [FileUtils tryReadingFile:[self homepageNoticesPath]];
 
     if (!data) {
         [PsiFeedbackLogger error:@"Failed reading homepage notices file. Error:%@", err];
@@ -496,14 +431,6 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
 #pragma mark - Debug Preferences
 
 #if DEBUG
-
-- (NSString *)getFileSize:(NSString *)filePath {
-    NSError *err;
-    unsigned long long byteCount = [[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&err] fileSize];
-    if (err) { return nil;
-    }
-    return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleBinary];
-}
 
 - (void)setDebugMemoryProfiler:(BOOL)enabled {
     [sharedDefaults setBool:enabled forKey:DebugMemoryProfileBoolKey];
