@@ -57,7 +57,7 @@ UserDefaultsKey const ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey =
  */
 UserDefaultsKey const SharedDataExtensionCrashedBeforeStopBoolKey = @"PsiphonDataSharedDB.ExtensionCrashedBeforeStopBoolKey";
 
-#if DEBUG
+#if DEBUG || DEV_RELEASE
 
 UserDefaultsKey const DebugMemoryProfileBoolKey = @"PsiphonDataSharedDB.DebugMemoryProfilerBoolKey";
 UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataSharedDB.DebugPsiphonConnectionStateStringKey";
@@ -430,7 +430,7 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
 
 #pragma mark - Debug Preferences
 
-#if DEBUG
+#if DEBUG || DEV_RELEASE
 
 - (void)setDebugMemoryProfiler:(BOOL)enabled {
     [sharedDefaults setBool:enabled forKey:DebugMemoryProfileBoolKey];

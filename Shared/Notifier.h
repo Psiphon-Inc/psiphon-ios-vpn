@@ -44,7 +44,7 @@ extern NotifierMessage const NotifierUpdatedAuthorizations;
 extern NotifierMessage const NotifierHostAppProcessRunning;
 
 // Messages allowed only in debug build.
-#if DEBUG
+#if DEBUG || DEV_RELEASE
 extern NotifierMessage const NotifierDebugCustomFunction;
 extern NotifierMessage const NotifierDebugForceJetsam;
 extern NotifierMessage const NotifierDebugGoProfile;

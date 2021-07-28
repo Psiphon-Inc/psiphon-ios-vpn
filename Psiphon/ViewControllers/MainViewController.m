@@ -387,7 +387,7 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
     [self presentViewController:navController animated:YES completion:nil];
 }
 
-#if DEBUG
+#if DEBUG || DEV_RELEASE
 - (void)onVersionLabelTap:(UIButton *)sender {
     DebugViewController *viewController = [[DebugViewController alloc] init];
     [self presentViewController:viewController animated:YES completion:nil];
@@ -603,7 +603,7 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
     versionLabel.userInteractionEnabled = FALSE;
     versionLabel.contentEdgeInsets = UIEdgeInsetsMake(padding, padding, padding, padding);
 
-#if DEBUG
+#if DEBUG || DEV_RELEASE
     versionLabel.userInteractionEnabled = TRUE;
     [versionLabel addTarget:self
                      action:@selector(onVersionLabelTap:)
@@ -614,6 +614,7 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
         versionLabel.hidden = YES;
     }
 #endif
+    
     // Setup autolayout
     [NSLayoutConstraint activateConstraints:@[
       [versionLabel.trailingAnchor constraintEqualToAnchor:psiCashWidget.trailingAnchor

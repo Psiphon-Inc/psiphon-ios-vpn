@@ -48,7 +48,7 @@ NotifierMessage const NotifierAppEnteredBackground   = PSIPHON_GROUP @".AppEnter
 NotifierMessage const NotifierUpdatedAuthorizations = PSIPHON_GROUP @".UpdatedAuthorizations";
 NotifierMessage const NotifierHostAppProcessRunning  = PSIPHON_GROUP @".HostAppProcessRunning";
 
-#if DEBUG
+#if DEBUG || DEV_RELEASE
 NotifierMessage const NotifierDebugCustomFunction    = PSIPHON_GROUP @".DebugCustomFunction";
 NotifierMessage const NotifierDebugForceJetsam    = PSIPHON_GROUP @".DebugForceJetsam";
 NotifierMessage const NotifierDebugGoProfile      = PSIPHON_GROUP @".DebugGoProfile";

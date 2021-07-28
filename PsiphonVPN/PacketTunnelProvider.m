@@ -454,7 +454,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     }
 
-#if DEBUG
+#if DEBUG || DEV_RELEASE
 
     if ([NotifierDebugForceJetsam isEqualToString:message]) {
         [DebugUtils jetsamWithAllocationInterval:1 withNumberOfPages:15];
@@ -858,17 +858,17 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (void)onConnectionStateChangedFrom:(PsiphonConnectionState)oldState to:(PsiphonConnectionState)newState {
-    // Do not block PsiphonTunnel callback queue.
-    // Note: ReactiveObjC subjects block until all subscribers have received to the events,
-    //       and also ReactiveObjC `subscribeOn` operator does not behave similar to RxJava counterpart for example.
+    
+#if DEBUG || DEV_RELEASE
+    
     PacketTunnelProvider *__weak weakSelf = self;
 
-#if DEBUG
-    dispatch_async_global(^{
+    dispatch_async(self->workQueue, ^{
         NSString *stateStr = [PacketTunnelUtils textPsiphonConnectionState:newState];
         [weakSelf.sharedDB setDebugPsiphonConnectionState:stateStr];
         [[Notifier sharedInstance] post:NotifierDebugPsiphonTunnelState];
     });
+    
 #endif
 
 }
