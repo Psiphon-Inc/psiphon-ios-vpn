@@ -379,7 +379,6 @@ public let subscriptionAuthStateReducer = Reducer<SubscriptionAuthState,
             case .whenResolved(tunnelError: .nilTunnelProviderManager):
                 // VPN config is not installed, request will be retired once VPN config
                 // is installed and loaded successfully.
-                // TODO! test this condition when VPN config is not installed.
                 return [ environment.feedbackLogger.log(.error, retryCondition).mapNever() ]
                 
             case .whenResolved(tunnelError: .tunnelNotConnected):

@@ -157,7 +157,6 @@ PsiFeedbackLogType const AuthorizationStoreLogType = @"AuthorizationStore";
             //     `authorizationsChanged = TRUE`
             //
             
-            
             // Case 1
             if ([fetchResult count] == 0 && selectedAuthorizations[accessType] == nil) {
                 [PsiFeedbackLogger
