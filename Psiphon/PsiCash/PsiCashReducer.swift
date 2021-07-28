@@ -94,8 +94,6 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                 let rejectedAuthIDs = rejectsAuthsResult.successToOptional()?
                     .map(\.authorization.decoded.authorization.id)
                 
-                // TODO!! confirm that this whole effect is working properly.
-                
                 // List of Transaction ID of PsiCash purchases to remove.
                 let transactionsToRemove = psiCashStateCopy
                     .getPurchases(forAuthorizaitonIDs: rejectedAuthIDs ?? [])
@@ -233,8 +231,38 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             }
             
         case let .failure(errorEvent):
+            
             state.psiCash.purchasing = .error(errorEvent)
-            return [ environment.feedbackLogger.log(.error, errorEvent).mapNever() ]
+            
+            var effects = [Effect<PsiCashAction>]()
+            
+            // Refreshes PsiCash state if any of these conditions is true:
+            // - InsufficientBalance: User's balance may not have been updated
+            // - TransactionAmountMismatch: Local state maybe out of sync with the server.
+            // - TransactionTypeNotFound: Transaction type not found, local state maybe out of sync.
+            // - InvalidTokens: Current tokens are invalid (e.g. user needs to log back in).
+            switch errorEvent.error {
+            case .requestError(.errorStatus(let responseErrorStatus)):
+                switch responseErrorStatus {
+                case .invalidTokens,
+                        .insufficientBalance,
+                        .transactionAmountMismatch,
+                        .transactionTypeNotFound:
+                    
+                    effects += Effect(value: .refreshPsiCashState(ignoreSubscriptionState: false))
+                    
+                case .existingTransaction, .serverError:
+                    // No RefreshState required.
+                    break
+                }
+            case .tunnelNotConnected, .requestError(.requestCatastrophicFailure(_)):
+                // Not RefreshState required.
+                break
+            }
+            
+            effects += environment.feedbackLogger.log(.error, errorEvent).mapNever()
+
+            return effects
         }
         
     case let .refreshPsiCashState(ignoreSubscriptionState):

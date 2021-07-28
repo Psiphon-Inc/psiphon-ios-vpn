@@ -78,6 +78,8 @@ import AppStoreIAP
         }
     }
     
+
+    
     func getPersistedAuthorizations(
         psiphondRejected: Bool?,
         _ accessTypes: Set<Authorization.AccessType>,
@@ -201,12 +203,7 @@ import AppStoreIAP
                 // Registers new SharedAuthorization objects with the given Core Data context,
                 // for all the authorizations in signedAuthorizations that are not persisted already.
                 for sharedAuthModel in valuesNotPersisted {
-                    
-                    let sharedAuthObj = sharedAuthModel.makeSharedAuthorizationObj(context: context)
-                    
-                    // Registers sharedAuthObj with the NSManagedObjectContext.
-                    context.insert(sharedAuthObj)
-                    
+                    let _ = sharedAuthModel.makeSharedAuthorizationObj(context: context)
                 }
                 
                 // Commits any changes that have been made.
@@ -228,6 +225,24 @@ import AppStoreIAP
         }
         
     }
+    
+    #if DEBUG
+    func printAllAuthorizations() {
+        guard let context = self.viewContext else {
+            print("* nil context")
+            return
+        }
+        let allData = SharedAuthorization.fetchRequest() as! NSFetchRequest<SharedAuthorization>
+        do {
+            let allData = try context.fetch(allData)
+            for (i, data) in allData.enumerated() {
+                print("* row \(i): \(data.id!) - \(data.accessType!) - \(data.psiphondRejected) - \(String(describing: data.webOrderLineItemId))")
+            }
+        } catch {
+            print("* failed: \(error)")
+        }
+    }
+    #endif
     
     
 }
