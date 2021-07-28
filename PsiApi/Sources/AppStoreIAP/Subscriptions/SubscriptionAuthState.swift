@@ -608,7 +608,7 @@ func makeTransactionsAuthState(
             
             if let value = currentAuthRequestStates?[key] {
                 
-                if case .remoteRefresh = receiptReadReason,
+                if case .remoteReceiptRefresh = receiptReadReason,
                    case .completed(.failure(.requestRejected(.badRequestError))) = value.authorization {
                     
                        // Last request resulted in bad request error.

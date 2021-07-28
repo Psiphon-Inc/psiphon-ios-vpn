@@ -28,7 +28,7 @@ import PsiCashClient
 public enum IAPAction: Equatable {
     case checkUnverifiedTransaction
     case purchase(product: AppStoreProduct, resultPromise: Promise<ObjCIAPResult>? = nil)
-    case receiptUpdated(ReceiptData?)
+    case appReceiptDataUpdated(ReceiptData?)
     case _psiCashConsumableVerificationRequestResult(
             result: RetriableTunneledHttpRequest<PsiCashValidationResponse>.RequestResult,
             forTransaction: PaymentTransaction)
@@ -191,7 +191,7 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
                 .info, "request to purchase: '\(makeFeedbackEntry(product))'").mapNever()
         ]
         
-    case .receiptUpdated(let maybeReceiptData):
+    case .appReceiptDataUpdated(let maybeReceiptData):
         guard let unfinishedPsiCashTx = state.iap.unfinishedPsiCashTx else {
             return []
         }

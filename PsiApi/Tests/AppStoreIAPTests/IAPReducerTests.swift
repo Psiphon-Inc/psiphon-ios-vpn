@@ -301,7 +301,7 @@ final class IAPReducerTests: XCTestCase {
                 
                 // Act
                 let (nextState, effectsResults) = testReducer(initState,
-                                                              .receiptUpdated(receipt),
+                                                              .appReceiptDataUpdated(receipt),
                                                               env, iapReducer)
                 
                 return conjoin(
