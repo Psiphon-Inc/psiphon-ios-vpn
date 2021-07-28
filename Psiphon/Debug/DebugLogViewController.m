@@ -22,6 +22,7 @@
 #import "SharedConstants.h"
 #import "Logging.h"
 #import "PsiFeedbackLogger.h"
+#import "FileUtils.h"
 
 // Initial maximum number of logs to load.
 #define MAX_LOGS_LOAD 250
@@ -135,10 +136,10 @@
 
         BOOL isFirstLogRead = (self->bytesReadFileOffset == 0);
 
-        NSString *logData = [PsiphonDataSharedDB tryReadingFile:self->logFilePath
-                                                usingFileHandle:&self->logFileHandle
-                                                 readFromOffset:self->bytesReadFileOffset
-                                                   readToOffset:&newBytesReadFileOffset];
+        NSString *logData = [FileUtils tryReadingFile:self->logFilePath
+                                      usingFileHandle:&self->logFileHandle
+                                       readFromOffset:self->bytesReadFileOffset
+                                         readToOffset:&newBytesReadFileOffset];
 
         LOG_DEBUG(@"Log old file offset %llu", self->bytesReadFileOffset);
         LOG_DEBUG(@"Log new file offset %llu", newBytesReadFileOffset);

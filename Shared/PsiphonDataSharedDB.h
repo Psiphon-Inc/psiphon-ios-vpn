@@ -94,26 +94,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 #if !(TARGET_IS_EXTENSION)
 
-+ (NSString *_Nullable)tryReadingFile:(NSString *)filePath;
-
-/*!
- * If fileHandlePtr points to nil, then a new NSFileHandle for
- * reading filePath is created and fileHandlePtr is set to point to the new object.
- * If fileHandlePtr points to a NSFileHandle, it will be used for reading.
- * Reading operation is retried MAX_RETRIES more times if it fails for any reason,
- * while putting the thread to sleep for an amount of time defined by RETRY_SLEEP_TIME.
- * No errors are thrown if opening the file/reading operations fail.
- * @param filePath Path used to create a NSFileHandle if fileHandlePtr points to nil.
- * @param fileHandlePtr Pointer to existing NSFileHandle or nil.
- * @param bytesOffset The byte offset to seek to before reading.
- * @param readToOffset Populated with the file offset that was read to.
- * @return UTF8 string of read file content.
- */
-+ (NSString *_Nullable)tryReadingFile:(NSString *)filePath
-                      usingFileHandle:(NSFileHandle *_Nullable __strong *_Nonnull)fileHandlePtr
-                       readFromOffset:(unsigned long long)bytesOffset
-                         readToOffset:(unsigned long long *_Nullable)readToOffset;
-
 - (void)readLogsData:(NSString *)logLines intoArray:(NSMutableArray<DiagnosticEntry *> *)entries;
 
 - (NSArray<DiagnosticEntry*>*)getAllLogs;
