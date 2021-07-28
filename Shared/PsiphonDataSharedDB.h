@@ -231,7 +231,7 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 
 #pragma mark - Debug Preferences
 
-#if DEBUG
+#if DEBUG || DEV_RELEASE
 
 - (void)setDebugMemoryProfiler:(BOOL)enabled;
 

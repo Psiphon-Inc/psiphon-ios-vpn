@@ -30,7 +30,7 @@
 #import "UIAlertController+Additions.h"
 #import "AppFiles.h"
 
-#if DEBUG
+#if DEBUG || DEV_RELEASE
 
 NSString * const ActionCellIdentifier = @"ActionCell";
 NSString * const SwitchCellIdentifier = @"SwitchCell";
