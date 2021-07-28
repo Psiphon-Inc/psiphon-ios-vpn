@@ -36,7 +36,7 @@ public struct SubscriptionState: Equatable {
 }
 
 public enum SubscriptionAction {
-    case updatedReceiptData(ReceiptData?)
+    case appReceiptDataUpdated(ReceiptData?)
     case _timerFinished(withExpiry:Date)
 }
 
@@ -59,7 +59,7 @@ public let subscriptionTimerReducer = Reducer<SubscriptionState
     state, action, environment in
     
     switch action {
-    case .updatedReceiptData(let receipt):
+    case .appReceiptDataUpdated(let receipt):
         guard let subscriptionPurchases = receipt?.subscriptionInAppPurchases else {
             state.status = .notSubscribed
             return []

@@ -43,15 +43,42 @@ let receiptReducer = Reducer<ReceiptState, ReceiptStateAction, ReceiptReducerEnv
                 .map(ReceiptStateAction._readLocalReceiptFile(refreshedData:))
         ]
 
-    case ._readLocalReceiptFile(let refreshedData):
-
-        state.receiptData = refreshedData
-
-        return notifyUpdatedReceiptData(
-            receiptData: refreshedData,
-            reason: .localRefresh,
-            environment: environment
-        )
+    case ._readLocalReceiptFile(let updatedReceipt):
+        
+        switch state.receiptData {
+        case .none:
+            
+            // First time the receipt is read.
+            state.receiptData = .some(updatedReceipt)
+            
+            return notifyUpdatedReceiptData(
+                receiptData: updatedReceipt,
+                reason: .localUpdate,
+                environment: environment
+            )
+            
+        case .some(let current):
+            
+            if current != updatedReceipt {
+                // Content of the receipt have changed.
+                
+                state.receiptData = .some(updatedReceipt)
+                
+                return notifyUpdatedReceiptData(
+                    receiptData: updatedReceipt,
+                    reason: .localUpdate,
+                    environment: environment
+                )
+                
+            } else {
+                // Content of receipt file have not changed since last read.
+                return [
+                    environment.feedbackLogger.log(
+                        .info, "Receipt file not updated").mapNever()
+                ]
+            }
+            
+        }
 
     case .remoteReceiptRefresh(optionalPromise: let optionalPromise):
         if let promise = optionalPromise {
@@ -78,7 +105,7 @@ let receiptReducer = Reducer<ReceiptState, ReceiptStateAction, ReceiptReducerEnv
         return [
             state.fulfillRefreshPromises(result).mapNever(),
             ReceiptData.fromLocalReceipt(environment: environment)
-                .map(ReceiptStateAction._localReceiptDidRefresh(refreshedData:))
+                .map(ReceiptStateAction._readLocalReceiptFile(refreshedData:))
         ]
 
     }
@@ -109,13 +136,13 @@ fileprivate func notifyUpdatedReceiptData<NeverAction>(
 ) -> [Effect<NeverAction>] {
     return [
         
-        environment.subscriptionStore(.updatedReceiptData(receiptData)).mapNever(),
+        environment.subscriptionStore(.appReceiptDataUpdated(receiptData)).mapNever(),
         
         environment.subscriptionAuthStateStore(
             .appReceiptDataUpdated(receiptData, reason)
         ).mapNever(),
         
-        environment.iapStore(.receiptUpdated(receiptData)).mapNever(),
+        environment.iapStore(.appReceiptDataUpdated(receiptData)).mapNever(),
         
         environment.feedbackLogger.log(
             .info, LogMessage(stringLiteral: makeFeedbackEntry(receiptData))
