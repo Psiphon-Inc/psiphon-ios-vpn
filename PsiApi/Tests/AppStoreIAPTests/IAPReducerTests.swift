@@ -51,7 +51,7 @@ final class IAPReducerTests: XCTestCase {
         let env = IAPEnvironment.mock(
             self.feedbackLogger,
             appReceiptStore: { action in
-                guard case .localReceiptRefresh = action else { XCTFatal() }
+                guard case .readLocalReceiptFile = action else { XCTFatal() }
                 return .empty
         })
         
@@ -301,7 +301,7 @@ final class IAPReducerTests: XCTestCase {
                 
                 // Act
                 let (nextState, effectsResults) = testReducer(initState,
-                                                              .receiptUpdated(receipt),
+                                                              .appReceiptDataUpdated(receipt),
                                                               env, iapReducer)
                 
                 return conjoin(

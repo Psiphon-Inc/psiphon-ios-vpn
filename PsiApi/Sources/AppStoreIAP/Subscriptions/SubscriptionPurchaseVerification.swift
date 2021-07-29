@@ -51,10 +51,21 @@ public struct SubscriptionValidationRequest: Codable {
 public struct SubscriptionValidationResponse: RetriableHTTPResponse {
     
     public enum ResponseError: HashableError {
+        
+        /// HTTP request failed.
         case failedRequest(SystemError<Int>)
+        
+        /// Received 400 Bad Request from purchse-verifier server.
         case badRequest
-        case otherErrorStatusCode(HTTPStatusCode)
-        case responseParseError(SystemError<Int>)
+        
+        /// Received 5xx server error.
+        case serverError(HTTPStatusCode)
+        
+        /// Received unsupported/unknown status code.
+        case unknownStatusCode(HTTPStatusCode)
+        
+        /// Failed to parse responsy body.
+        case responseBodyParseError(SystemError<Int>)
     }
     
     // 200 OK response type
@@ -141,14 +152,22 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
                     let decodedBody = try decoder.decode(SuccessResult.self, from: r.data)
                     self.result = .success(decodedBody)
                 } catch {
-                    self.result = .failure(ErrorEvent(.responseParseError(SystemError<Int>.make(error as NSError)),
+                    self.result = .failure(ErrorEvent(.responseBodyParseError(SystemError<Int>.make(error as NSError)),
                                                       date: urlSessionResult.date))
                 }
             case .badRequest:
                 self.result = .failure(ErrorEvent(.badRequest, date: urlSessionResult.date))
+            
             default:
-                self.result = .failure(ErrorEvent(.otherErrorStatusCode(r.metadata.statusCode),
-                                                  date: urlSessionResult.date))
+                // If the status code is not 200 OK or 400 Bad Request Error,
+                // it is either a 5xx server error, or an uknown/unsupported status code.
+                if case .serverError = r.metadata.statusCode.responseType {
+                    self.result = .failure(ErrorEvent(.serverError(r.metadata.statusCode),
+                                                      date: urlSessionResult.date))
+                } else {
+                    self.result = .failure(ErrorEvent(.unknownStatusCode(r.metadata.statusCode),
+                                                      date: urlSessionResult.date))
+                }
             }
         case let .failure(httpRequestError):
             self.result = .failure(ErrorEvent(.failedRequest(httpRequestError.error),
@@ -164,15 +183,16 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
             return (result: result, retryDueToError: .none)
             
         case .failure(let errorEvent):
+            
+            // Request is automatically retried if network failed, there was a 5xx server error,
+            // parsing of the respose body failed (probably network failure).
             switch errorEvent.error {
-            case .otherErrorStatusCode(.internalServerError),
-                 .otherErrorStatusCode(.serviceUnavailable),
-                 .failedRequest(_),
-                 .responseParseError(_):
+            case .failedRequest(_),
+                    .responseBodyParseError(_),
+                    .serverError(_):
                 return (result: result, retryDueToError: errorEvent)
                 
-            case .badRequest,
-                 .otherErrorStatusCode:
+            case .badRequest, .unknownStatusCode(_):
                 return (result: result, retryDueToError: .none)
             }
         }

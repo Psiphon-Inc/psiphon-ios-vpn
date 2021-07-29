@@ -51,6 +51,14 @@ public enum PsiCashAction: Equatable {
     
     case connectToPsiphonTapped
     case dismissedAlert(PsiCashAlertDismissAction)
+    
+    /// Represents result of syncing authorizations with Core Data.
+    /// Boolean success result represents whether any changes have been made to the persistent store.
+    case _coreDataSyncResult(Result<Bool, CoreDataError>)
+    
+    /// Result of force removal of PsiCash purchases from the PsiCash library.
+    case _forceRemovedPurchases(Result<[PsiCashParsed<PsiCashPurchasedType>], PsiCashLibError>)
+    
 }
 
 public enum PsiCashAlertDismissAction: Equatable {

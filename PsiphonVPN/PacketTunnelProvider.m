@@ -45,8 +45,7 @@
 #import "DebugUtils.h"
 #import "FileUtils.h"
 #import "Strings.h"
-#import "SubscriptionAuthCheck.h"
-#import "SessionConfigValues.h"
+#import "AuthorizationStore.h"
 #import "FeedbackUtils.h"
 #import "VPNStrings.h"
 #import "NSUserDefaults+KeyedDataStore.h"
@@ -69,7 +68,9 @@ PsiFeedbackLogType const PsiphonTunnelDelegateLogType = @"PsiphonTunnelDelegate"
 PsiFeedbackLogType const PacketTunnelProviderLogType = @"PacketTunnelProvider";
 PsiFeedbackLogType const ExitReasonLogType = @"ExitReason";
 
-// AlertId values are persisted, do not use re-use values.
+// AlertId values are persisted.
+// When adding new alerts do not use re-use integer values
+// since they are persisted across app updates.
 typedef NS_ENUM(NSInteger, AlertId) {
     AlertIdOpenContainerToFinishConnecting = 1,
     AlertIdCorruptSettingsFile = 2,
@@ -107,6 +108,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 // Notifier message state management.
 @property (atomic) BOOL postedNetworkConnectivityFailed;
 
+// Represents if the first tunnel should use subscription check sponsor ID.
 @property (atomic) BOOL startWithSubscriptionCheckSponsorID;
 
 @property (nonatomic) HostAppProtocol *hostAppProtocol;
@@ -121,10 +123,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     AppProfiler *_Nullable appProfiler;
     
     // sessionConfigValues should only be accessed through the `workQueue`.
-    SessionConfigValues *_Nonnull sessionConfigValues;
+    AuthorizationStore *_Nonnull authorizationStore;
     
     // localDataStore should only be accessed through the `workQueue`.
     ExtensionDataStore *_Nonnull localDataStore;
+    
+    PsiphonConfigSponsorIds *_Nullable psiphonConfigSponsorIds;
 }
 
 - (id)init {
@@ -142,7 +146,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         _postedNetworkConnectivityFailed = FALSE;
         _startWithSubscriptionCheckSponsorID = FALSE;
         
-        sessionConfigValues = [[SessionConfigValues alloc] initWithSharedDB:self.sharedDB];
+        authorizationStore = [[AuthorizationStore alloc] init];
+        
+        psiphonConfigSponsorIds = nil;
         
         localDataStore = [ExtensionDataStore standard];
         
@@ -172,7 +178,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
 }
 
-- (void)checkAuthorizationsChangeAndReconnectIfNeeded {
+/// If no authorization is currently in use, gets a new persisted authorization value and
+/// reconnects the Psiphon tunnel if any are found.
+- (void)checkAuthorizationAndReconnectIfNeeded {
     dispatch_async(self->workQueue, ^{
         
         // Guards that Psiphon tunnel is connected.
@@ -180,32 +188,24 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             return;
         }
         
-        // If authorizations stored by the container have been updated,
-        // reconnects with the updated values.
+        NSSet<NSString *> *_Nullable newAuthorizations = [self->authorizationStore
+                                                          getNewAuthorizations];
         
-        AuthorizationUpdateResult result = [self->sessionConfigValues updateStoredAuthorizations];
-        switch (result) {
-            case AuthorizationUpdateResultNoChange:
-                return;
-                
-            case AuthorizationUpdateResultNoNewAuths:
-                return;
-                
-            case AuthorizationUpdateResultNewAuthsAvailable: {
-                // Updates PacketTunnelProvider state to indicate a new session.
-                
-                [self->localDataStore removeAllSessionAlerts];
-                
-                NSString *sponsorID = nil;
-                NSArray<NSString *> *_Nonnull auths =
-                [self->sessionConfigValues newSessionEncodedAuthsWithSponsorID:&sponsorID];
-                
-                
-                [AppProfiler logMemoryReportWithTag:@"reconnectWithConfig"];
-                [self.psiphonTunnel reconnectWithConfig:sponsorID :auths];
-                break;
-            }
+        // Reconnects the Psiphon tunnel if there are new authorization values.
+        if (newAuthorizations != nil) {
+            
+            [AppProfiler logMemoryReportWithTag:@"reconnectWithConfig"];
+            
+            [self->localDataStore removeAllSessionAlerts];
+            
+            NSString *sponsorId = [self->authorizationStore
+                                   getSponsorId:self->psiphonConfigSponsorIds
+                                   updatedSharedDB:self.sharedDB];
+            
+            [self.psiphonTunnel reconnectWithConfig:sponsorId :[newAuthorizations allObjects]];
+            
         }
+        
     });
 }
 
@@ -246,9 +246,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 // This method is not thread-safe.
 - (NSError *_Nullable)startPsiphonTunnel {
-    
-    // Indicates that a new tunnel session is about to begin.
-    [self->sessionConfigValues explicitlySetNewSession];
     
     BOOL success = [self.psiphonTunnel start:FALSE];
 
@@ -298,17 +295,19 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     if (self.extensionStartMethod != ExtensionStartMethodFromCrash) {
         [self->localDataStore removeAllSessionAlerts];
     }
+    
+    BOOL hasSubscriptionAuth = [authorizationStore hasSubscriptionAuth];
 
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
         self.extensionStartMethod == ExtensionStartMethodFromBoot ||
         self.extensionStartMethod == ExtensionStartMethodFromCrash ||
-        [sessionConfigValues hasSubscriptionAuth] == TRUE) {
+        hasSubscriptionAuth == TRUE) {
 
         [self.sharedDB setExtensionIsZombie:FALSE];
 
         // Sets values of waitForContainerStartVPNCommand.
         {
-            if ([sessionConfigValues hasSubscriptionAuth] == FALSE &&
+            if (hasSubscriptionAuth == FALSE &&
                 self.extensionStartMethod == ExtensionStartMethodFromContainer) {
                 self.waitForContainerStartVPNCommand = TRUE;
             }
@@ -448,22 +447,16 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             
         }
 
-    } else if ([NotifierUpdatedNonSubscriptionAuths isEqualToString:message]) {
+    } else if ([NotifierUpdatedAuthorizations isEqualToString:message]) {
 
         // Restarts the tunnel only if the persisted authorizations have changed from the
         // last set of authorizations supplied to tunnel-core.
-        [self checkAuthorizationsChangeAndReconnectIfNeeded];
-
-    } else if ([NotifierUpdatedSubscriptionAuths isEqualToString:message]) {
-        
         // Checks for updated subscription authorizations.
-        // Reconnects the tunnel if there is a new authorization to be used,
-        // or if the currently used authorization is no longer available.
-        [self checkAuthorizationsChangeAndReconnectIfNeeded];
-        
+        [self checkAuthorizationAndReconnectIfNeeded];
+
     }
 
-#if DEBUG
+#if DEBUG || DEV_RELEASE
 
     if ([NotifierDebugForceJetsam isEqualToString:message]) {
         [DebugUtils jetsamWithAllocationInterval:1 withNumberOfPages:15];
@@ -736,9 +729,14 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (NSDictionary * _Nullable)getPsiphonConfig {
+    
+    // Loads Psiphon config into memory.
+    PsiphonConfigReader *psiphonConfigReader = [PsiphonConfigReader load];
+    
+    // Sponsor IDs present in the Psiphon config are cached.
+    self->psiphonConfigSponsorIds = psiphonConfigReader.sponsorIds;
 
-    NSDictionary *config = [PsiphonConfigReader fromConfigFile].config;
-    if (config == nil) {
+    if (psiphonConfigReader.config == nil) {
         [PsiFeedbackLogger errorWithType:PsiphonTunnelDelegateLogType
                                   format:@"Failed to get config"];
         [self displayCorruptSettingsFileMessage];
@@ -746,7 +744,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
 
     // Get a mutable copy of the Psiphon configs.
-    NSMutableDictionary *mutableConfigCopy = [config mutableCopy];
+    NSMutableDictionary *mutableConfigCopy = [psiphonConfigReader.config mutableCopy];
 
     // Applying mutations to config
     // iOS 15
@@ -831,23 +829,25 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     mutableConfigCopy[@"UseNoticeFiles"] = noticeFiles;
     
-    // Provide auth tokens
-    NSString *sponsorID;
-    NSArray *authorizations = [self->sessionConfigValues
-                               newSessionEncodedAuthsWithSponsorID:&sponsorID];
-    if ([authorizations count] > 0) {
-        mutableConfigCopy[@"Authorizations"] = [authorizations copy];
+    // Selects an authorization for use by Psiphon tunnel.
+    //
+    // NOTE: Clients should not submit multiple authorizations of the same type.
+    //       Extra authorizations of the same type will not be included
+    //       in the onActiveAuthorizationIDs callback.
+    
+    NSArray<NSString *> *authorizations = [[self->authorizationStore getNewAuthorizations] allObjects];
+    if (authorizations != nil) {
+        mutableConfigCopy[@"Authorizations"] = authorizations;
     }
     
     if (self.startWithSubscriptionCheckSponsorID) {
-        mutableConfigCopy[@"SponsorId"] = self->sessionConfigValues.cachedSponsorIDs.checkSubscriptionSponsorId;
-        self.startWithSubscriptionCheckSponsorID = FALSE;
+        mutableConfigCopy[@"SponsorId"] = self->psiphonConfigSponsorIds.checkSubscriptionSponsorId;
     } else {
-        mutableConfigCopy[@"SponsorId"] = sponsorID;
+        // Determines SponsorId given the selected authorization.
+        mutableConfigCopy[@"SponsorId"] = [self->authorizationStore
+                                           getSponsorId:self->psiphonConfigSponsorIds
+                                           updatedSharedDB:self.sharedDB];
     }
-
-    // Store current sponsor ID used for use by container.
-    [self.sharedDB setCurrentSponsorId:mutableConfigCopy[@"SponsorId"]];
 
     // Specific config changes for iOS VPN app on Mac.
     if ([AppInfo isiOSAppOnMac] == TRUE) {
@@ -860,17 +860,17 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (void)onConnectionStateChangedFrom:(PsiphonConnectionState)oldState to:(PsiphonConnectionState)newState {
-    // Do not block PsiphonTunnel callback queue.
-    // Note: ReactiveObjC subjects block until all subscribers have received to the events,
-    //       and also ReactiveObjC `subscribeOn` operator does not behave similar to RxJava counterpart for example.
+    
+#if DEBUG || DEV_RELEASE
+    
     PacketTunnelProvider *__weak weakSelf = self;
 
-#if DEBUG
-    dispatch_async_global(^{
+    dispatch_async(self->workQueue, ^{
         NSString *stateStr = [PacketTunnelUtils textPsiphonConnectionState:newState];
         [weakSelf.sharedDB setDebugPsiphonConnectionState:stateStr];
         [[Notifier sharedInstance] post:NotifierDebugPsiphonTunnelState];
     });
+    
 #endif
 
 }
@@ -881,31 +881,24 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 - (void)onActiveAuthorizationIDs:(NSArray * _Nonnull)authorizationIds {
     PacketTunnelProvider *__weak weakSelf = self;
-
+    
     dispatch_async(self->workQueue, ^{
         PacketTunnelProvider *__strong strongSelf = weakSelf;
         if (!strongSelf) {
             return;
         }
         
-        ActiveAuthorizationResult result = [strongSelf->sessionConfigValues
-                                            setActiveAuthorizationIDs:authorizationIds];
+        BOOL subscriptionRejected = [strongSelf->authorizationStore
+                                     setActiveAuthorizations:authorizationIds];
         
-        switch (result) {
-            case ActiveAuthorizationResultNone:
-                return;
-                
-            case ActiveAuthorizationResultInactiveSubscription: {
-
-                // Displays an alert to the user for the expired subscription,
-                // only if the container is in background.
-                if ([self.sharedDB getAppForegroundState] == FALSE) {
-                    [strongSelf displayMessageOnce:VPNStrings.subscriptionExpiredAlertMessage
-                                        identifier:AlertIdSubscriptionExpired];
-                }
-                break;
-            }
+        // Displays an alert to the user for the expired subscription,
+        // only if the container is in background.
+        if (subscriptionRejected && [strongSelf.sharedDB getAppForegroundState] == FALSE) {
+            [strongSelf displayMessageOnce:VPNStrings.subscriptionExpiredAlertMessage
+                                identifier:AlertIdSubscriptionExpired];
+            
         }
+        
     });
 }
 
@@ -923,7 +916,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         [self tryStartVPN];
         
         // Reconnect if authorizations have changed.
-        [self checkAuthorizationsChangeAndReconnectIfNeeded];
+        [self checkAuthorizationAndReconnectIfNeeded];
     });
 }
 
@@ -936,9 +929,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 - (void)onServerAlert:(NSString *)reason :(NSString *)subject {
     dispatch_async(self->workQueue, ^{
         if ([reason isEqualToString:@"disallowed-traffic"] && [subject isEqualToString:@""]) {
-
-            BOOL canDisplayAlert = [self->sessionConfigValues canDisplayDisallowedTrafficAlert];
-
+            
+            // Alert can be displayed if the user has a subscription (verified or not),
+            // or an active Speed Boost.
+            BOOL canDisplayAlert = !self.startWithSubscriptionCheckSponsorID &&
+            ![self->authorizationStore hasActiveSubscriptionOrSpeedBoost];
+            
             [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
                                      format:@"disallowed-traffic server alert: notify user: %@",
              NSStringFromBOOL(canDisplayAlert)];

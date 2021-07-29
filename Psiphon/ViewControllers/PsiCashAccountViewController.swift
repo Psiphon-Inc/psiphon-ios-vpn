@@ -67,7 +67,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
     
     private let backgroundColour = UIColor.darkBlue()
     private let divider = DividerView(colour: .white(withAlpha: 0.25))
-    private let createNewAccountButton = GradientButton(gradient: .grey)
+    private let createAccountButton = GradientButton(gradient: .grey)
     private let usernameTextField: SkyTextField<UITextField>
     private let passwordTextField: SkyTextField<SecretValueTextField>
     private let loginButtonSpinner: UIActivityIndicatorView
@@ -310,13 +310,13 @@ final class PsiCashAccountViewController: ReactiveViewController {
             padding: Padding(top: 0, bottom: 0, leading: 10, trailing: 10)
         )
         
-        mutate(createNewAccountButton) {
+        mutate(createAccountButton) {
             $0.titleLabel!.apply(fontSize: .h3,
                                  typeface: .demiBold)
             
             $0.setTitleColor(.darkBlue(), for: .normal)
 
-            $0.setTitle(UserStrings.Create_new_account_button_title(), for: .normal)
+            $0.setTitle(UserStrings.Create_account_button_title(), for: .normal)
             
             $0.contentEdgeInsets = Style.default.buttonMinimumContentEdgeInsets
         }
@@ -336,6 +336,12 @@ final class PsiCashAccountViewController: ReactiveViewController {
             $0.delegate = self
             $0.clearButtonMode = .whileEditing
             $0.enablesReturnKeyAutomatically = true  // Disables "enter" key if textfield is empty
+            
+            // UITextField seems to not set correct textAlignment when a RTL language is selected
+            // (although if isSecureTextEntry is set to true, it does work as expected.)
+            if case .rightToLeft = UIApplication.shared.userInterfaceLayoutDirection {
+                $0.textAlignment = .right
+            }
         }
         
         let forgotPasswordButton = UIButton()
@@ -372,12 +378,12 @@ final class PsiCashAccountViewController: ReactiveViewController {
         }
         
         vStack.addArrangedSubviews(
-            createNewAccountButton,
-            divider,
             usernameTextField,
             passwordTextField,
             loginButton,
-            forgotPasswordButton
+            forgotPasswordButton,
+            divider,
+            createAccountButton
         )
         
         vStack.addSubview(orTitle)
@@ -390,7 +396,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
             $0.constraint(to: paddedLayoutGuide, .top(), .leading(), .trailing())
         }
         
-        createNewAccountButton.activateConstraints {
+        createAccountButton.activateConstraints {
             $0.heightAnchor.constraint(default: Style.default.buttonHeight, max: nil)
         }
         
@@ -402,12 +408,12 @@ final class PsiCashAccountViewController: ReactiveViewController {
             $0.constraint(to: loginButton, [.centerX(0), .centerY(0)])
         }
         
-        createNewAccountButton.setEventHandler(self.onCreateNewAccount)
+        createAccountButton.setEventHandler(self.onCreateNewAccount)
         loginButton.setEventHandler(self.onLogIn)
 
         // Sets UIControls variables
         self.controls = [
-            createNewAccountButton,
+            createAccountButton,
             usernameTextField.textField,
             passwordTextField.textField,
             forgotPasswordButton,
@@ -418,7 +424,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        mutate(self.createNewAccountButton, self.divider) {
+        mutate(self.createAccountButton, self.divider) {
             $0.isHidden = self.loginOnly
         }
     }

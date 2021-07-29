@@ -56,7 +56,7 @@ PsiFeedbackLogType const PsiphonConfigLogType = @"PsiphonConfigReader";
     return [[[NSBundle mainBundle] resourcePath] stringByAppendingPathComponent:PSIPHON_CONFIG];
 }
 
-+ (PsiphonConfigReader *_Nullable)fromConfigFile {
++ (PsiphonConfigReader *_Nullable)load {
 
     PsiphonConfigReader *instance = [[PsiphonConfigReader alloc] init];
 
