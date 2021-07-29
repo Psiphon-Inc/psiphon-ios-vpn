@@ -112,7 +112,7 @@
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Thank you for helping improve Psiphon!";
 
 /* Button title that lets users reset their password if they forgot their account's password. */
-"FORGOT_PASSWORD" = "Forgot Password?";
+"FORGOT_PASSWORD" = "Forgot password?";
 
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "Free";
@@ -136,19 +136,19 @@
 "LOADING_FAILED" = "Loading failed";
 
 /* Title on a button that lets users login to their account with the username and password they have entered. */
-"LOG_IN_BUTTON_TITLE" = "Log In";
+"LOG_IN_BUTTON_TITLE" = "Log in";
 
 /* Message title informing the user that they must sign up for an account or log in to their account */
-"LOG_IN_OR_SIGN_UP" = "Log In or Sign Up";
+"LOG_IN_OR_SIGN_UP" = "Log in or sign up";
 
 /* Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
-"LOG_IN_OR_SIGNUP_TO_CONTINUE" = "Log In or Sign Up to continue using PsiCash";
+"LOG_IN_OR_SIGNUP_TO_CONTINUE" = "Log in or create account to continue using PsiCash";
 
 /* Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed. */
 "LOG_OUT_ANY_WAY_BUTTON_TITLE" = "Logout anyway";
 
 /* Title of the button that lets users log out of their account */
-"LOG_OUT_BUTTON_TITLE_2" = "Log Out";
+"LOG_OUT_BUTTON_TITLE_2" = "Log out";
 
 /* Label indicating to the user that they are logging into their PsiCash account. Use ellipses if it makes sense. */
 "LOGGING_IN_ELLIPSES" = "Logging in ...";
