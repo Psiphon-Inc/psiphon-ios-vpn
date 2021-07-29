@@ -236,26 +236,29 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             
             var effects = [Effect<PsiCashAction>]()
             
-            // Refreshes PsiCash state if any of these conditions is true:
-            // - InsufficientBalance: User's balance may not have been updated
-            // - TransactionAmountMismatch: Local state maybe out of sync with the server.
-            // - TransactionTypeNotFound: Transaction type not found, local state maybe out of sync.
-            // - InvalidTokens: Current tokens are invalid (e.g. user needs to log back in).
+            // Refreshes PsiCash state if any of these conditions is true, followed by reasoning:
+            // - Catastrphic network error:
+            //     The purchase succeeded on the server side but wasn't retrieved.
+            // - TransactionAmountMismatch:
+            //     The price list should be updated immediately.
+            // - TransactionTypeNotFound:
+            //     The price list should be updated immediately, but it might also
+            //     indicate an out-of-date app.
+            // - InvalidTokens:
+            //     Current tokens are invalid (e.g. user needs to log back in).
+            
             switch errorEvent.error {
-            case .requestError(.errorStatus(let responseErrorStatus)):
-                switch responseErrorStatus {
-                case .invalidTokens,
-                        .insufficientBalance,
-                        .transactionAmountMismatch,
-                        .transactionTypeNotFound:
-                    
-                    effects += Effect(value: .refreshPsiCashState(ignoreSubscriptionState: false))
-                    
-                case .existingTransaction, .serverError:
-                    // No RefreshState required.
-                    break
-                }
-            case .tunnelNotConnected, .requestError(.requestCatastrophicFailure(_)):
+            case .requestError(.requestCatastrophicFailure(_)),
+                    .requestError(.errorStatus(.transactionAmountMismatch)),
+                    .requestError(.errorStatus(.transactionTypeNotFound)),
+                    .requestError(.errorStatus(.invalidTokens)):
+                
+                effects += Effect(value: .refreshPsiCashState(ignoreSubscriptionState: false))
+                
+            case .tunnelNotConnected,
+                    .requestError(.errorStatus(.existingTransaction)),
+                    .requestError(.errorStatus(.insufficientBalance)),
+                    .requestError(.errorStatus(.serverError)):
                 // Not RefreshState required.
                 break
             }
