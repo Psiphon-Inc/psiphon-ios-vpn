@@ -295,7 +295,7 @@ import Foundation
     
     @objc static func Log_Out() -> String {
         return NSLocalizedString("LOG_OUT_BUTTON_TITLE_2", tableName: nil, bundle: Bundle.main,
-                                 value: "Log Out",
+                                 value: "Log out",
                                  comment: "Title of the button that lets users log out of their account")
     }
     
@@ -319,13 +319,13 @@ import Foundation
     
     static func Log_in_or_sign_up() -> String {
         return NSLocalizedString("LOG_IN_OR_SIGN_UP", tableName: nil, bundle: Bundle.main,
-                                 value: "Log In or Sign Up",
+                                 value: "Log in or sign up",
                                  comment: "Message title informing the user that they must sign up for an account or log in to their account")
     }
     
     static func Sign_up_or_login_to_psicash_account_to_continue() -> String {
         return NSLocalizedString("LOG_IN_OR_SIGNUP_TO_CONTINUE", tableName: nil, bundle: Bundle.main,
-                                 value: "Log In or Sign Up to continue using PsiCash",
+                                 value: "Log in or create account to continue using PsiCash",
                                  comment: "Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features.")
     }
     
@@ -516,7 +516,7 @@ extension UserStrings {
     
     @objc static func Log_in() -> String {
         return NSLocalizedString("LOG_IN_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
-                                 value: "Log In",
+                                 value: "Log in",
                                  comment: "Title on a button that lets users login to their account with the username and password they have entered.")
     }
     
@@ -534,7 +534,7 @@ extension UserStrings {
     
     static func Forgot_password_button_title() -> String {
         return NSLocalizedString("FORGOT_PASSWORD", tableName: nil, bundle: Bundle.main,
-                                 value: "Forgot Password?",
+                                 value: "Forgot password?",
                                  comment: "Button title that lets users reset their password if they forgot their account's password.")
     }
     
