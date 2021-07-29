@@ -542,20 +542,39 @@ fileprivate func tunnelProviderReducer<T: TunnelProviderManager>(
                 ]
             }
             
-        case .unknown(_):
-            return firstEffects + [
-                Effect { () -> Bool in
-                    environment.sharedDB.getExtensionIsZombie()
-                }.flatMap(.latest) { (isZombie: Bool) -> Effect<VPNProviderManagerStateAction<T>> in
-                    if isZombie {
-                        return Effect(value: .public(
-                            .tunnelStateIntent(intent: .stop, reason: .providerIsZombie))
-                        )
-                    } else {
-                        return Effect.empty
+        case .unknown(let errorEvent):
+            
+            // If IPC timedout, but the extension is in the connecting state (but not zombie)
+            // we will try to start the VPN regardless.
+            // TODO: Fix this condition. IPC failure is far too common.
+            
+            if case .timedout(_) = errorEvent.error,
+               case .connecting = state.loadState.connectionStatus,
+               environment.vpnStartCondition(),
+               !environment.sharedDB.getExtensionIsZombie()
+            {
+                
+                return firstEffects + [
+                    notifyStartVPN().mapNever(),
+                    environment.feedbackLogger.log(.warn, "Starting VPN anyways since IPC failed")
+                        .mapNever()
+                ]
+                
+            } else {
+                return firstEffects + [
+                    Effect { () -> Bool in
+                        environment.sharedDB.getExtensionIsZombie()
+                    }.flatMap(.latest) { (isZombie: Bool) -> Effect<VPNProviderManagerStateAction<T>> in
+                        if isZombie {
+                            return Effect(value: .public(
+                                .tunnelStateIntent(intent: .stop, reason: .providerIsZombie))
+                            )
+                        } else {
+                            return Effect.empty
+                        }
                     }
-                }
-            ]
+                ]
+            }
             
         case .active(.psiphonTunnelConnecting):
             return firstEffects
