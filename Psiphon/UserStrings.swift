@@ -496,9 +496,9 @@ extension UserStrings {
                                  comment: "Generic alert shown when purchase of a product fails.")
     }
     
-    static func Create_new_account_button_title() -> String {
-        return NSLocalizedString("CREATE_NEW_ACCOUNT_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
-                                 value: "Create New Account",
+    static func Create_account_button_title() -> String {
+        return NSLocalizedString("CREATE_ACCOUNT_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Create account",
                                  comment: "Button label that lets users create a new account.")
     }
     

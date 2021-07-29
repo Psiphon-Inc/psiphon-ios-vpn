@@ -64,7 +64,7 @@
 "CORRUPT_SETTINGS_MESSAGE" = "Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.";
 
 /* Button label that lets users create a new account. */
-"CREATE_NEW_ACCOUNT_BUTTON_TITLE" = "Create New Account";
+"CREATE_ACCOUNT_BUTTON_TITLE" = "Create account";
 
 /* Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
 "CREATE_PSICASH_ACCOUNT_BODY" = "We strongly encourage you to make a PsiCash account before buying PsiCash. Having an account allows you to share your balance between devices and protect your purchases.";
