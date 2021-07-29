@@ -29,7 +29,7 @@ PsiFeedbackLogType const AuthorizationStoreLogType = @"AuthorizationStore";
     
     // Authorizations selected for use by Psiphon tunnel.
     // Key is accessType value.
-    // Thread-safety: This object should onyl be accessed through NSManagedObjectContext's queue.
+    // Thread-safety: Access to this object should be synchronized.
     NSMutableDictionary<NSString *, Authorization *> *_Nonnull selectedAuthorizations;
     
 }
@@ -62,7 +62,9 @@ PsiFeedbackLogType const AuthorizationStoreLogType = @"AuthorizationStore";
         return nil;
     }
     
-    return containerWrapper.container.viewContext;
+    // viewContext uses main-thread which should only be used for networking operations
+    // in the Network Extension.
+    return [containerWrapper.container newBackgroundContext];
 }
 
 #pragma mark - Public
@@ -70,53 +72,198 @@ PsiFeedbackLogType const AuthorizationStoreLogType = @"AuthorizationStore";
 - (NSString *)getSponsorId:(PsiphonConfigSponsorIds *)psiphonConfigSponsorIds
            updatedSharedDB:(PsiphonDataSharedDB *)sharedDB {
     
-    __block NSString *result = psiphonConfigSponsorIds.defaultSponsorId;
-    
-    NSManagedObjectContext *context = [self getManagedObjectContext];
-    
-    if (context == nil) {
-        return result;
-    }
-    
-    [context performBlockAndWait:^{
+    @synchronized (self) {
+        
+        NSString *sponsorId = nil;
+        
         if (selectedAuthorizations[SubscriptionAccessType] != nil) {
-            result = psiphonConfigSponsorIds.subscriptionSponsorId;
+            sponsorId = psiphonConfigSponsorIds.subscriptionSponsorId;
+        } else {
+            sponsorId = psiphonConfigSponsorIds.defaultSponsorId;
         }
-    }];
-    
-    // Store current sponsor ID used for use by container.
-    [sharedDB setCurrentSponsorId:result];
-
-    return result;
+        
+        // Store current sponsor ID used for use by container.
+        [sharedDB setCurrentSponsorId:sponsorId];
+        
+        return sponsorId;
+        
+    }
     
 }
 
 - (NSSet<NSString *> *_Nullable)getNewAuthorizations {
     
-    // Loads Core Data persistent container.
-    NSManagedObjectContext *context = [self getManagedObjectContext];
-    
-    if (context == nil) {
-        return nil;
+    @synchronized (self) {
+        
+        // Loads Core Data persistent container.
+        NSManagedObjectContext *context = [self getManagedObjectContext];
+        
+        if (context == nil) {
+            return nil;
+        }
+        
+        // Tracks if set of authorizations have changed since last call to this function.
+        // If authorizations have not changed, this function returns nil.
+        __block BOOL authorizationsChanged = FALSE;
+        
+        __block NSSet<NSString *> *result = nil;
+        
+        [context performBlockAndWait:^{
+            
+            for (NSString *accessType in @[SubscriptionAccessType, SpeedBoostAccessType]) {
+                
+                // Requests all authorization from Core Data for the given accessType, that are not
+                // already rejected by Psiphon servers.
+                
+                NSFetchRequest<SharedAuthorization *> *request = [SharedAuthorization fetchRequest];
+                request.predicate = [NSPredicate predicateWithFormat:
+                                     @"accessType == %@ AND psiphondRejected == 0",
+                                     accessType];
+                
+                NSError *error = nil;
+                NSArray<SharedAuthorization *> *fetchResult = [context executeFetchRequest:request
+                                                                                     error:&error];
+                
+                if (error != nil) {
+                    [PsiFeedbackLogger errorWithType:AuthorizationStoreLogType
+                                             message:@"Failed to execute authorization fetch request"
+                                              object:error];
+                    return;
+                }
+                
+                // Updates selectedAuthorizations dictionary based on fetched results.
+                //
+                // Possible cases:
+                //
+                // - Case 1: selectedAuthorizations[accessType] == nil and fetchResult is empty:
+                //   No authorization was selected before, and no authorization are persisted.
+                //   `authorizationsChanged = FALSE`
+                //
+                // - Case 2: selectedAuthorizations[accessType] != nil and fetchResult is empty:
+                //   An authorization was selected before, but no authorizations are persisted.
+                //   Authorization was then removed by the host app.
+                //   `authorizationsChanged = TRUE`
+                //
+                // - Case 3: selectedAuthorizations[accessType] == nil and fetchResult != empty:
+                //   There is a new persisted authorization.
+                //   `authorizationsChanged = TRUE`
+                //
+                // - Case 4: selectedAuthorizations[accessType] != nil and fetchResult != empty:
+                //
+                //   - Case 4.1: If the authorizations are equal:
+                //     Previously selected authorization is not removed from persistence store.
+                //     `authorizationsChanged = FALSE`
+                //
+                //   - Case 4.2: If the authorizations are not equal:
+                //     Authorization value has changed, and the new authorization should be used.
+                //     `authorizationsChanged = TRUE`
+                //
+                
+                // Case 1
+                if ([fetchResult count] == 0 && selectedAuthorizations[accessType] == nil) {
+                    [PsiFeedbackLogger
+                     infoWithType:AuthorizationStoreLogType
+                     format:@"No authorizations for accessType '%@'", accessType];
+                    continue;
+                }
+                
+                BOOL alreadySelected = FALSE;
+                
+                // Sets alreadySelected to TRUE if selectedAuthorizations[accessType] value
+                // is already contained in fetchResult.
+                if (selectedAuthorizations[accessType] != nil) {
+                    for (SharedAuthorization *persisted in fetchResult) {
+                        if ([persisted.id isEqualToString:selectedAuthorizations[accessType].ID]) {
+                            alreadySelected = TRUE;
+                            break;
+                        }
+                    }
+                }
+                
+                // Case 4.1
+                if (alreadySelected) {
+                    continue;
+                }
+                
+                // Case 2, 3, 4.2
+                SharedAuthorization *selected = [fetchResult firstObject];
+                selectedAuthorizations[accessType] = [Authorization makeFromSharedAuthorization:selected];
+                
+                authorizationsChanged = TRUE;
+                
+            }
+            
+            if (!authorizationsChanged) {
+                [PsiFeedbackLogger infoWithType:AuthorizationStoreLogType
+                                        message:@"No new authorizations found."];
+                result = nil;
+                return;
+            }
+            
+            NSMutableArray<NSString *> *rawValues = [NSMutableArray array];
+            for (Authorization *authorization in [selectedAuthorizations allValues]) {
+                [rawValues addObject:authorization.rawValue];
+                [PsiFeedbackLogger infoWithType:AuthorizationStoreLogType
+                                         format:@"New Authorization with ID: %@", authorization.ID];
+            }
+            
+            result = [NSSet setWithArray:rawValues];
+        }];
+        
+        return result;
+        
     }
     
-    // Tracks if set of authorizations have changed since last call to this function.
-    // If authorizations have not changed, this function returns nil.
-    __block BOOL authorizationsChanged = FALSE;
+}
+
+- (BOOL)setActiveAuthorizations:(NSArray<NSString *> *_Nonnull)activeAuthorizationIds {
     
-    __block NSSet<NSString *> *result = nil;
-    
-    [context performBlockAndWait:^{
+    @synchronized (self) {
         
-        for (NSString *accessType in @[SubscriptionAccessType, SpeedBoostAccessType]) {
+        // Sets "psiphondRejected" field to TRUE for rejected authorizations,
+        // and sets selectedAuthorizations values to nil for the rejected authorizations.
+        
+        // Loads Core Data persistent container.
+        NSManagedObjectContext *context = [self getManagedObjectContext];
+        
+        if (context == nil) {
+            return FALSE;
+        }
+        
+        // This flag indicates if one of the rejected authorization was an
+        // apple-subscription authorization.
+        __block BOOL subscriptionRejected = FALSE;
+        
+        [context performBlockAndWait:^{
             
-            // Requests all authorization from Core Data for the given accessType, that are not
-            // already rejected by Psiphon servers.
+            NSMutableArray<NSString *> *rejectedAuthIDs = [NSMutableArray array];
+            
+            // If an authorization has not been rejected, it is expected
+            // for activeAuthorizationIds array to contain it's ID.
+            for (Authorization *auth in [selectedAuthorizations allValues]) {
+                if ([activeAuthorizationIds containsObject:auth.ID] == FALSE) {
+                    [rejectedAuthIDs addObject:auth.ID];
+                    // Authorization is removed from selectedAuthorizations dictionary.
+                    // This ensures the next call to -getNewAuthorizations does not return
+                    // any results.
+                    selectedAuthorizations[auth.accessType] = nil;
+                }
+            }
+            
+            if ([rejectedAuthIDs count] == 0) {
+                return;
+            }
+            
+            [PsiFeedbackLogger warnWithType:AuthorizationStoreLogType
+                                     format:@"Rejected Authorization IDs: %@", rejectedAuthIDs];
+            
+            NSMutableArray<NSPredicate *> *sub = [NSMutableArray array];
+            for (NSString *rejectedAuthID in rejectedAuthIDs) {
+                [sub addObject:[NSPredicate predicateWithFormat:@"id == %@", rejectedAuthID]];
+            }
             
             NSFetchRequest<SharedAuthorization *> *request = [SharedAuthorization fetchRequest];
-            request.predicate = [NSPredicate predicateWithFormat:
-                                 @"accessType == %@ AND psiphondRejected == 0",
-                                 accessType];
+            request.predicate = [NSCompoundPredicate orPredicateWithSubpredicates:sub];
             
             NSError *error = nil;
             NSArray<SharedAuthorization *> *fetchResult = [context executeFetchRequest:request
@@ -129,226 +276,81 @@ PsiFeedbackLogType const AuthorizationStoreLogType = @"AuthorizationStore";
                 return;
             }
             
-            // Updates selectedAuthorizations dictionary based on fetched results.
-            //
-            // Possible cases:
-            //
-            // - Case 1: selectedAuthorizations[accessType] == nil and fetchResult is empty:
-            //   No authorization was selected before, and no authorization are persisted.
-            //   `authorizationsChanged = FALSE`
-            //
-            // - Case 2: selectedAuthorizations[accessType] != nil and fetchResult is empty:
-            //   An authorization was selected before, but no authorizations are persisted.
-            //   Authorization was then removed by the host app.
-            //   `authorizationsChanged = TRUE`
-            //
-            // - Case 3: selectedAuthorizations[accessType] == nil and fetchResult != empty:
-            //   There is a new persisted authorization.
-            //   `authorizationsChanged = TRUE`
-            //
-            // - Case 4: selectedAuthorizations[accessType] != nil and fetchResult != empty:
-            //
-            //   - Case 4.1: If the authorizations are equal:
-            //     Previously selected authorization is not removed from persistence store.
-            //     `authorizationsChanged = FALSE`
-            //
-            //   - Case 4.2: If the authorizations are not equal:
-            //     Authorization value has changed, and the new authorization should be used.
-            //     `authorizationsChanged = TRUE`
-            //
-            
-            // Case 1
-            if ([fetchResult count] == 0 && selectedAuthorizations[accessType] == nil) {
-                [PsiFeedbackLogger
-                 infoWithType:AuthorizationStoreLogType
-                 format:@"No authorizations for accessType '%@'", accessType];
-                continue;
-            }
-
-            BOOL alreadySelected = FALSE;
-            
-            // Sets alreadySelected to TRUE if selectedAuthorizations[accessType] value
-            // is already contained in fetchResult.
-            if (selectedAuthorizations[accessType] != nil) {
-                for (SharedAuthorization *persisted in fetchResult) {
-                    if ([persisted.id isEqualToString:selectedAuthorizations[accessType].ID]) {
-                        alreadySelected = TRUE;
-                        break;
-                    }
+            // Sets value of "psiphondRejected" field to true.
+            for (SharedAuthorization *obj in fetchResult) {
+                obj.psiphondRejected = TRUE;
+                if (obj.accessTypeValue == AuthorizationAccessTypeAppleSubscription ||
+                    obj.accessTypeValue == AuthorizationAccessTypeAppleSubscriptionTest) {
+                    subscriptionRejected = TRUE;
                 }
             }
             
-            // Case 4.1
-            if (alreadySelected) {
-                continue;
+            // Saves any changes that have been made.
+            if ([context hasChanges]) {
+                [context save:&error];
+                if (error != nil) {
+                    [PsiFeedbackLogger errorWithType:AuthorizationStoreLogType
+                                             message:@"Failed to execute authorization deletions"
+                                              object:error];
+                    return;
+                }
             }
-
-            // Case 2, 3, 4.2
-            SharedAuthorization *selected = [fetchResult firstObject];
-            selectedAuthorizations[accessType] = [Authorization makeFromSharedAuthorization:selected];
             
-            authorizationsChanged = TRUE;
-            
-        }
+        }];
         
-        if (!authorizationsChanged) {
-            [PsiFeedbackLogger infoWithType:AuthorizationStoreLogType
-                                     message:@"No new authorizations found."];
-            result = nil;
-            return;
-        }
+        return subscriptionRejected;
         
-        NSMutableArray<NSString *> *rawValues = [NSMutableArray array];
-        for (Authorization *authorization in [selectedAuthorizations allValues]) {
-            [rawValues addObject:authorization.rawValue];
-            [PsiFeedbackLogger infoWithType:AuthorizationStoreLogType
-                                     format:@"New Authorization with ID: %@", authorization.ID];
-        }
-        
-        result = [NSSet setWithArray:rawValues];
-    }];
-    
-    return result;
-    
-}
-
-- (BOOL)setActiveAuthorizations:(NSArray<NSString *> *_Nonnull)activeAuthorizationIds {
-    
-    // Sets "psiphondRejected" field to TRUE for rejected authorizations,
-    // and sets selectedAuthorizations values to nil for the rejected authorizations.
-    
-    // Loads Core Data persistent container.
-    NSManagedObjectContext *context = [self getManagedObjectContext];
-    
-    if (context == nil) {
-        return FALSE;
     }
-    
-    // This flag indicates if one of the rejected authorization was an
-    // apple-subscription authorization.
-    __block BOOL subscriptionRejected = FALSE;
-    
-    [context performBlockAndWait:^{
-    
-        NSMutableArray<NSString *> *rejectedAuthIDs = [NSMutableArray array];
-        
-        // If an authorization has not been rejected, it is expected
-        // for activeAuthorizationIds array to contain it's ID.
-        for (Authorization *auth in [selectedAuthorizations allValues]) {
-            if ([activeAuthorizationIds containsObject:auth.ID] == FALSE) {
-                [rejectedAuthIDs addObject:auth.ID];
-                // Authorization is removed from selectedAuthorizations dictionary.
-                // This ensures the next call to -getNewAuthorizations does not return
-                // any results.
-                selectedAuthorizations[auth.accessType] = nil;
-            }
-        }
-        
-        if ([rejectedAuthIDs count] == 0) {
-            return;
-        }
-        
-        [PsiFeedbackLogger warnWithType:AuthorizationStoreLogType
-                                 format:@"Rejected Authorization IDs: %@", rejectedAuthIDs];
-        
-        NSMutableArray<NSPredicate *> *sub = [NSMutableArray array];
-        for (NSString *rejectedAuthID in rejectedAuthIDs) {
-            [sub addObject:[NSPredicate predicateWithFormat:@"id == %@", rejectedAuthID]];
-        }
-        
-        NSFetchRequest<SharedAuthorization *> *request = [SharedAuthorization fetchRequest];
-        request.predicate = [NSCompoundPredicate orPredicateWithSubpredicates:sub];
-        
-        NSError *error = nil;
-        NSArray<SharedAuthorization *> *fetchResult = [context executeFetchRequest:request
-                                                                             error:&error];
-        
-        if (error != nil) {
-            [PsiFeedbackLogger errorWithType:AuthorizationStoreLogType
-                                     message:@"Failed to execute authorization fetch request"
-                                      object:error];
-            return;
-        }
-        
-        // Sets value of "psiphondRejected" field to true.
-        for (SharedAuthorization *obj in fetchResult) {
-            obj.psiphondRejected = TRUE;
-            if (obj.accessTypeValue == AuthorizationAccessTypeAppleSubscription ||
-                obj.accessTypeValue == AuthorizationAccessTypeAppleSubscriptionTest) {
-                subscriptionRejected = TRUE;
-            }
-        }
-        
-        // Saves any changes that have been made.
-        if ([context hasChanges]) {
-            [context save:&error];
-            if (error != nil) {
-                [PsiFeedbackLogger errorWithType:AuthorizationStoreLogType
-                                         message:@"Failed to execute authorization deletions"
-                                          object:error];
-                return;
-            }
-        }
-        
-    }];
-    
-    return subscriptionRejected;
     
 }
 
 - (BOOL)hasActiveSubscriptionOrSpeedBoost {
     
-    NSManagedObjectContext *context = [self getManagedObjectContext];
-
-    if (context == nil) {
-        return FALSE;
-    }
-    
-    __block BOOL result = FALSE;
-    
-    [context performBlockAndWait:^{
+    @synchronized (self) {
         // Currently there are only Subscription and Speed Boost authorizations
         // so checking if selectedAuthorizations is empty is correct.
-        result = [selectedAuthorizations count] != 0;
-    }];
-    
-    return result;
+        return [selectedAuthorizations count] != 0;
+    }
     
 }
 
 - (BOOL)hasSubscriptionAuth {
-
-    // Loads Core Data persistent container.
-    NSManagedObjectContext *context = [self getManagedObjectContext];
     
-    if (context == nil) {
-        return FALSE;
-    }
-    
-    __block BOOL result = FALSE;
-    
-    [context performBlockAndWait:^{
+    @synchronized (self) {
         
-        NSFetchRequest<SharedAuthorization *> *request = [SharedAuthorization fetchRequest];
-        request.predicate = [NSPredicate predicateWithFormat:
-                             @"accessType == %@ AND psiphondRejected == 0", SubscriptionAccessType];
+        // Loads Core Data persistent container.
+        NSManagedObjectContext *context = [self getManagedObjectContext];
         
-        NSError *error = nil;
-        NSUInteger count = [context countForFetchRequest:request error:&error];
-        
-        if (error != nil) {
-            [PsiFeedbackLogger errorWithType:AuthorizationStoreLogType
-                                     message:@"Failed to execute subscription count request"
-                                      object:error];
-            result = FALSE;
-            return;
+        if (context == nil) {
+            return FALSE;
         }
         
-        result = count != 0;
+        __block BOOL result = FALSE;
         
-    }];
-    
-    return result;
+        [context performBlockAndWait:^{
+            
+            NSFetchRequest<SharedAuthorization *> *request = [SharedAuthorization fetchRequest];
+            request.predicate = [NSPredicate predicateWithFormat:
+                                 @"accessType == %@ AND psiphondRejected == 0", SubscriptionAccessType];
+            
+            NSError *error = nil;
+            NSUInteger count = [context countForFetchRequest:request error:&error];
+            
+            if (error != nil) {
+                [PsiFeedbackLogger errorWithType:AuthorizationStoreLogType
+                                         message:@"Failed to execute subscription count request"
+                                          object:error];
+                result = FALSE;
+                return;
+            }
+            
+            result = count != 0;
+            
+        }];
+        
+        return result;
+        
+    }
     
 }
 

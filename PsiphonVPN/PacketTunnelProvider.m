@@ -123,7 +123,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     AppProfiler *_Nullable appProfiler;
     
     // sessionConfigValues should only be accessed through the `workQueue`.
-    AuthorizationStore *_Nonnull sessionConfigValues;
+    AuthorizationStore *_Nonnull authorizationStore;
     
     // localDataStore should only be accessed through the `workQueue`.
     ExtensionDataStore *_Nonnull localDataStore;
@@ -146,7 +146,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         _postedNetworkConnectivityFailed = FALSE;
         _startWithSubscriptionCheckSponsorID = FALSE;
         
-        sessionConfigValues = [[AuthorizationStore alloc] init];
+        authorizationStore = [[AuthorizationStore alloc] init];
         
         psiphonConfigSponsorIds = nil;
         
@@ -188,7 +188,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             return;
         }
         
-        NSSet<NSString *> *_Nullable newAuthorizations = [self->sessionConfigValues
+        NSSet<NSString *> *_Nullable newAuthorizations = [self->authorizationStore
                                                           getNewAuthorizations];
         
         // Reconnects the Psiphon tunnel if there are new authorization values.
@@ -198,7 +198,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             
             [self->localDataStore removeAllSessionAlerts];
             
-            NSString *sponsorId = [self->sessionConfigValues
+            NSString *sponsorId = [self->authorizationStore
                                    getSponsorId:self->psiphonConfigSponsorIds
                                    updatedSharedDB:self.sharedDB];
             
@@ -295,17 +295,19 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     if (self.extensionStartMethod != ExtensionStartMethodFromCrash) {
         [self->localDataStore removeAllSessionAlerts];
     }
+    
+    BOOL hasSubscriptionAuth = [authorizationStore hasSubscriptionAuth];
 
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
         self.extensionStartMethod == ExtensionStartMethodFromBoot ||
         self.extensionStartMethod == ExtensionStartMethodFromCrash ||
-        [sessionConfigValues hasSubscriptionAuth] == TRUE) {
+        hasSubscriptionAuth == TRUE) {
 
         [self.sharedDB setExtensionIsZombie:FALSE];
 
         // Sets values of waitForContainerStartVPNCommand.
         {
-            if ([sessionConfigValues hasSubscriptionAuth] == FALSE &&
+            if (hasSubscriptionAuth == FALSE &&
                 self.extensionStartMethod == ExtensionStartMethodFromContainer) {
                 self.waitForContainerStartVPNCommand = TRUE;
             }
@@ -833,7 +835,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     //       Extra authorizations of the same type will not be included
     //       in the onActiveAuthorizationIDs callback.
     
-    NSArray<NSString *> *authorizations = [[self->sessionConfigValues getNewAuthorizations] allObjects];
+    NSArray<NSString *> *authorizations = [[self->authorizationStore getNewAuthorizations] allObjects];
     if (authorizations != nil) {
         mutableConfigCopy[@"Authorizations"] = authorizations;
     }
@@ -842,7 +844,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         mutableConfigCopy[@"SponsorId"] = self->psiphonConfigSponsorIds.checkSubscriptionSponsorId;
     } else {
         // Determines SponsorId given the selected authorization.
-        mutableConfigCopy[@"SponsorId"] = [self->sessionConfigValues
+        mutableConfigCopy[@"SponsorId"] = [self->authorizationStore
                                            getSponsorId:self->psiphonConfigSponsorIds
                                            updatedSharedDB:self.sharedDB];
     }
@@ -886,7 +888,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             return;
         }
         
-        BOOL subscriptionRejected = [strongSelf->sessionConfigValues
+        BOOL subscriptionRejected = [strongSelf->authorizationStore
                                      setActiveAuthorizations:authorizationIds];
         
         // Displays an alert to the user for the expired subscription,
@@ -931,7 +933,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             // Alert can be displayed if the user has a subscription (verified or not),
             // or an active Speed Boost.
             BOOL canDisplayAlert = !self.startWithSubscriptionCheckSponsorID &&
-            ![self->sessionConfigValues hasActiveSubscriptionOrSpeedBoost];
+            ![self->authorizationStore hasActiveSubscriptionOrSpeedBoost];
             
             [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
                                      format:@"disallowed-traffic server alert: notify user: %@",
