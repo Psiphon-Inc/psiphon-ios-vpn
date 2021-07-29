@@ -142,6 +142,10 @@ import PsiCashClient
     // Core Data
     @objc func sharedCoreData() -> SharedCoreData
     
+    #if DEBUG || DEV_RELEASE
+    @objc func getPsiCashStoreDir() -> String?
+    #endif
+    
 }
 
 // MARK: Bridged Types
