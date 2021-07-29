@@ -1300,4 +1300,10 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.sharedAuthCoreData
     }
     
+#if DEBUG || DEV_RELEASE
+    @objc func getPsiCashStoreDir() -> String? {
+        self.appSupportFileStore.psiCashFileStoreRootPath
+    }
+#endif
+    
 }
