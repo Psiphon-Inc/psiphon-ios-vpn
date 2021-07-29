@@ -23,13 +23,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-/// Thread-safety: This class performs it's wotk NSManagedObjectContext queue, and all of it's methods
-/// are blocking methods.
+/// Thread-safety: This class is thread-safe.
 @interface AuthorizationStore : NSObject
 
 /// Returns Sponsor ID based on the selected authorizations (if any).
 /// - Parameter sharedDB: Updates PsiphonDataSharedDB with the SponsorID value used.
-/// This method performs it's work on the main-thread.
 - (NSString *)getSponsorId:(PsiphonConfigSponsorIds *)psiphonConfigSponsorIds
            updatedSharedDB:(PsiphonDataSharedDB *)sharedDB;
 
@@ -39,24 +37,18 @@ NS_ASSUME_NONNULL_BEGIN
 ///
 /// Returns nil if there has been no changes to authorizations since last call.
 /// Returns empty set, if all teh authorizations since last call have been removed.
-///
-/// This method performs it's work on the main-thread.
 - (NSSet<NSString *> *_Nullable)getNewAuthorizations;
 
 /// Flags authorization that are rejected by the Psiphon server.
 /// Should be called in onActiveAuthorizationIDs.
 ///
 /// - Returns: TRUE if an apple-subscription authorization was rejected.
-///
-/// This method performs it's work on the main-thread.
 - (BOOL)setActiveAuthorizations:(NSArray<NSString *> *)activeAuthorizationIds;
 
 /// Returns TRUE if either a subscription or speed-boost authorization have been used.
-/// This method performs it's work on the main-thread.
 - (BOOL)hasActiveSubscriptionOrSpeedBoost;
 
 /// Returns TRUE if there is a subscription authorization persisted.
-/// This method performs it's work on the main-thread.
 - (BOOL)hasSubscriptionAuth;
 
 @end
