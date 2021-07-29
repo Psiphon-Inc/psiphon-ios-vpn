@@ -378,7 +378,7 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
     UIAlertController *alert = [UIAlertController
                                 alertControllerWithTitle:[UserStrings Psicash_account_logout_title]
                                 message:message
-                                preferredStyle:UIAlertControllerStyleActionSheet];
+                                preferredStyle:UIAlertControllerStyleAlert];
     
     UIAlertAction *logoutAction = [UIAlertAction actionWithTitle:logoutTitle
                                                            style:UIAlertActionStyleDestructive
@@ -405,11 +405,6 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
     [alert addAction:logoutAction];
     [alert addCancelAction:nil];
     
-    [[alert popoverPresentationController] setSourceView:sourceView];
-    [[alert popoverPresentationController] setSourceRect:CGRectMake(0,0,1,1)];
-    [[alert popoverPresentationController]
-     setPermittedArrowDirections:UIPopoverArrowDirectionDown];
-
     [alert presentFromTopController];
 }
 
