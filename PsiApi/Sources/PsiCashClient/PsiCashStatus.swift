@@ -23,42 +23,52 @@ import typealias PsiApi.HashableError
 /// Represents a PsiCash client lib status value.
 public protocol PsiCashErrorStatusProtocol: HashableError {}
 
+/// Defines PsiCashStatusInvalid type for PsiCash library "invalid" status code.
 public protocol PsiCashStatusInvalid: PsiCashErrorStatusProtocol {
     static var invalid: Self { get }
 }
 
+/// Defines PsiCashStatusExistingTransaction type for PsiCash library "ExistingTransaction" status code.
 public protocol PsiCashStatusExistingTransaction: PsiCashErrorStatusProtocol {
     static var existingTransaction: Self { get }
 }
 
+/// Defines PsiCashStatusInsufficientBalance type for PsiCash library "InsufficientBalance" status code.
 public protocol PsiCashStatusInsufficientBalance: PsiCashErrorStatusProtocol {
     static var insufficientBalance: Self { get }
 }
 
+/// Defines PsiCashStatusTransactionAmountMismatch type for PsiCash library "TransactionAmountMismatch" status code.
 public protocol PsiCashStatusTransactionAmountMismatch: PsiCashErrorStatusProtocol {
     static var transactionAmountMismatch: Self { get }
 }
 
+/// Defines PsiCashStatusTransactionTypeNotFound type for PsiCash library "TransactionAmountMismatch" status code.
 public protocol PsiCashStatusTransactionTypeNotFound: PsiCashErrorStatusProtocol {
     static var transactionTypeNotFound: Self { get }
 }
 
+/// Defines PsiCashStatusInvalidTokens type for PsiCash library "InvalidTokens" status code.
 public protocol PsiCashStatusInvalidTokens: PsiCashErrorStatusProtocol {
     static var invalidTokens: Self { get }
 }
 
+/// Defines PsiCashStatusInvalidCredentials for PsiCash library "InvalidCredentials" status code.
 public protocol PsiCashStatusInvalidCredentials: PsiCashErrorStatusProtocol {
     static var invalidCredentials: Self { get }
 }
 
+/// Defines PsiCashStatusBadRequest type for PsiCash library "BadRequest" status code.
 public protocol PsiCashStatusBadRequest: PsiCashErrorStatusProtocol {
     static var badRequest: Self { get }
 }
 
+/// Defines PsiCashStatusServerError type for PsiCash library "Server" status code.
 public protocol PsiCashStatusServerError: PsiCashErrorStatusProtocol {
     static var serverError: Self { get }
 }
 
+/// Represents set of possible error status codes from PsiCash library for refresh state action.
 public enum PsiCashRefreshErrorStatus:
     PsiCashStatusServerError
     , PsiCashStatusInvalidTokens {
@@ -69,6 +79,7 @@ public enum PsiCashRefreshErrorStatus:
     
 }
 
+/// Represents set of possible error status codes from PsiCash library for a "expiring-purchase" transaction class.
 public enum PsiCashNewExpiringPurchaseErrorStatus:
     PsiCashStatusExistingTransaction
     , PsiCashStatusInsufficientBalance
@@ -91,6 +102,7 @@ public enum PsiCashNewExpiringPurchaseErrorStatus:
     
 }
 
+/// Represents set of possible error status codes from the PsiCash library for account login.
 public enum PsiCashAccountLoginErrorStatus:
     PsiCashStatusInvalidCredentials
     , PsiCashStatusBadRequest
