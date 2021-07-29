@@ -123,26 +123,14 @@ fileprivate struct PsiCashHTTPResponse: HTTPResponse {
             result = .success(psiHttpResult)
             
         case let .failure(httpRequestError):
-            if let partialResponse = httpRequestError.partialResponseMetadata {
-                let statusCode = Int32(partialResponse.statusCode.rawValue)
-                
-                let psiHttpResult = PSIHttpResult(
-                    code: statusCode,
-                    headers: partialResponse.headers.mapValues { [$0] },
-                    body: "",
-                    error: "")
-                
-                result = .success(psiHttpResult)
-                
-            } else {
-                let psiHttpResult = PSIHttpResult(
-                    code: PSIHttpResult.recoverable_ERROR(),
-                    headers: [String: [String]](),
-                    body: "",
-                    error: "")
-                
-                result = .success(psiHttpResult)
-            }
+            // In the case of a partial response, a `RECOVERABLE_ERROR` should be returned.
+            let psiHttpResult = PSIHttpResult(
+                code: PSIHttpResult.recoverable_ERROR(),
+                headers: [String: [String]](),
+                body: "",
+                error: "")
+            
+            result = .success(psiHttpResult)
         }
     }
     
