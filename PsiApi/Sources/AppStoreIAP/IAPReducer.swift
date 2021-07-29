@@ -28,7 +28,7 @@ import PsiCashClient
 public enum IAPAction: Equatable {
     case checkUnverifiedTransaction
     case purchase(product: AppStoreProduct, resultPromise: Promise<ObjCIAPResult>? = nil)
-    case receiptUpdated(ReceiptData?)
+    case appReceiptDataUpdated(ReceiptData?)
     case _psiCashConsumableVerificationRequestResult(
             result: RetriableTunneledHttpRequest<PsiCashValidationResponse>.RequestResult,
             forTransaction: PaymentTransaction)
@@ -128,7 +128,7 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
         }
         
         return [
-            environment.appReceiptStore(.localReceiptRefresh).mapNever()
+            environment.appReceiptStore(.readLocalReceiptFile).mapNever()
         ]
         
     case let .purchase(product: product, resultPromise: maybeObjcSubscriptionPromise):
@@ -191,7 +191,7 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
                 .info, "request to purchase: '\(makeFeedbackEntry(product))'").mapNever()
         ]
         
-    case .receiptUpdated(let maybeReceiptData):
+    case .appReceiptDataUpdated(let maybeReceiptData):
         guard let unfinishedPsiCashTx = state.iap.unfinishedPsiCashTx else {
             return []
         }
@@ -335,18 +335,6 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
             case .afterTimeInterval:
                 return [ environment.feedbackLogger.log(.error, retryCondition).mapNever() ]
             }
-            
-        case .failed(let errorEvent):
-            // Authorization request finished in failure, and will not be retried automatically.
-            
-            state.iap.unfinishedPsiCashTx?.verification = .requestError(errorEvent.eraseToRepr())
-            
-            return [
-                environment.feedbackLogger.log(.error, """
-                    verification request failed: '\(errorEvent)'\
-                    transaction: '\(makeFeedbackEntry(requestTransaction))'
-                    """).mapNever()
-            ]
             
         case .completed(let psiCashValidationResponse):
             switch psiCashValidationResponse {

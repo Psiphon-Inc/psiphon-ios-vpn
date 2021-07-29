@@ -308,20 +308,15 @@ final class PsiCashLib {
         }
     }
     
-    /// This function takes a source-of-truth for authorizations and explicitly expires
-    /// any  authorization stored by PsiCash library that is not in `sourceOfTruth`.
+    /// Force removal of purchases with the given transaction IDs.
+    /// This is to be called when the Psiphon server indicates that a purchase has
+    /// expired (even if the local clock hasn't yet indicated it).
+    /// No error results if some or all of the transaction IDs are not found.
     func removePurchases(
-        notFoundIn sourceOfTruth: [AuthorizationID]
+        withTransactionIDs transactionIds: [String]
     ) -> Result<[PsiCashParsed<PsiCashPurchasedType>], PsiCashLibError> {
         
-        let activePurchasesAuthIds = Set(
-            self.client.getPurchases().compactMap(\.authorization?.id))
-        
-        // authIdsToExpire is auth ids in PsiCash library not found in `sourceOfTruth`.
-        // These are the authorizations that will be removed.
-        let authIdsToExpire = activePurchasesAuthIds.subtracting(sourceOfTruth)
-        
-        let psiResult = self.client.removePurchases(withTransactionID: Array(authIdsToExpire))
+        let psiResult = self.client.removePurchases(withTransactionID: transactionIds)
         
         let result: Result<[PsiCashParsed<PsiCashPurchasedType>], PsiCashLibError>
         if let purchases = psiResult.success {

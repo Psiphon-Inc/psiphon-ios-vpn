@@ -35,9 +35,10 @@ struct PsiCashEnvironment {
     let feedbackLogger: FeedbackLogger
     let psiCashFileStoreRoot: String?
     let psiCashEffects: PsiCashEffectsProtocol
-    let sharedDB: PsiphonDataSharedDB
+    let sharedAuthCoreData: SharedAuthCoreData
     let psiCashPersistedValues: PsiCashPersistedValues
     let notifier: PsiApi.Notifier
+    let notifierUpdatedAuthorizationsMessage: String
     let vpnActionStore: (VPNPublicAction) -> Effect<Never>
     let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
     // TODO: Remove this dependency from reducer's environment. UI-related effects
@@ -47,6 +48,7 @@ struct PsiCashEnvironment {
     let getCurrentTime: () -> Date
     let psiCashLegacyDataStore: UserDefaults
     let userConfigs: UserDefaultsConfig
+    let mainDispatcher: MainDispatcher
 }
 
 let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironment> {
@@ -77,13 +79,30 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             state.psiCashBalance = .fromStoredExpectedReward(
                 libData: libInitSuccess.libData, persisted: environment.psiCashPersistedValues)
             
-            let nonSubscriptionAuths = environment.sharedDB
-                .getNonSubscriptionEncodedAuthorizations()
-
             var effects = [Effect<PsiCashAction>]()
-            effects += environment.psiCashEffects
-                .removePurchasesNotIn(psiCashAuthorizations: nonSubscriptionAuths)
-                .mapNever()
+            
+            let psiCashStateCopy = state.psiCash
+            
+            // Force-removes purchases in the PsiCash library that have their
+            // authorization rejected by Psiphon servers.
+            effects += environment.sharedAuthCoreData.getPersistedAuthorizations(
+                psiphondRejected: true,
+                Authorization.AccessType.speedBoostTypes,
+                environment.mainDispatcher
+            ).flatMap(.latest) { rejectsAuthsResult in
+                
+                let rejectedAuthIDs = rejectsAuthsResult.successToOptional()?
+                    .map(\.authorization.decoded.authorization.id)
+                
+                // List of Transaction ID of PsiCash purchases to remove.
+                let transactionsToRemove = psiCashStateCopy
+                    .getPurchases(forAuthorizaitonIDs: rejectedAuthIDs ?? [])
+                    .map(\.transaction.transactionId)
+                
+                return environment.psiCashEffects
+                    .removePurchases(withTransactionIDs: transactionsToRemove)
+                
+            }.map { ._forceRemovedPurchases($0) }
 
             if libInitSuccess.requiresStateRefresh {
 
@@ -175,32 +194,34 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             
             case let .success(purchasedType):
                 
-                guard case .speedBoost(let purchasedProduct) = purchasedType else {
-                    environment.feedbackLogger.fatalError("Expected '.speedBoost' purchased type")
-                    return []
+                switch purchasedType {
+                    
+                case .speedBoost(let purchasedProduct):
+                    
+                    state.psiCash.purchasing = .none
+                    
+                    return [
+                        
+                        // Persists Speed Boost authorization with Core Data.
+                        environment.sharedAuthCoreData
+                            .syncAuthorizationsWithSharedCoreData(
+                                Authorization.AccessType.speedBoostTypes,
+                                state.psiCash.getSharedAuthorizationModels(),
+                                environment.mainDispatcher)
+                            .map { ._coreDataSyncResult($0) },
+                        
+                        environment.feedbackLogger.log(
+                            .info, "Speed Boost purchased successfully: '\(purchasedProduct)'")
+                            .mapNever(),
+                        
+                        .fireAndForget {
+                            environment.objcBridgeDelegate?.dismiss(screen: .psiCash,
+                                                                    completion: nil)
+                        }
+                        
+                    ]
+                    
                 }
-                
-                state.psiCash.purchasing = .none
-                
-                return [
-                    
-                    environment.feedbackLogger.log(
-                        .info, "Speed Boost purchased successfully: '\(purchasedProduct)'")
-                        .mapNever(),
-                    
-                    // Updates sharedDB with new auths, and notifies
-                    // network extension of the change if required.
-                    setSharedDBPsiCashAuthTokens(
-                        purchaseResult.refreshedLibData,
-                        sharedDB: environment.sharedDB,
-                        notifier: environment.notifier
-                    ).mapNever(),
-                    
-                    .fireAndForget {
-                        environment.objcBridgeDelegate?.dismiss(screen: .psiCash, completion: nil)
-                    }
-                    
-                ]
                 
             case let .failure(parseError):
                 // Programming error
@@ -210,8 +231,41 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             }
             
         case let .failure(errorEvent):
+            
             state.psiCash.purchasing = .error(errorEvent)
-            return [ environment.feedbackLogger.log(.error, errorEvent).mapNever() ]
+            
+            var effects = [Effect<PsiCashAction>]()
+            
+            // Refreshes PsiCash state if any of these conditions is true, followed by reasoning:
+            // - Catastrphic network error:
+            //     The purchase succeeded on the server side but wasn't retrieved.
+            // - TransactionAmountMismatch:
+            //     The price list should be updated immediately.
+            // - TransactionTypeNotFound:
+            //     The price list should be updated immediately, but it might also
+            //     indicate an out-of-date app.
+            // - InvalidTokens:
+            //     Current tokens are invalid (e.g. user needs to log back in).
+            
+            switch errorEvent.error {
+            case .requestError(.requestCatastrophicFailure(_)),
+                    .requestError(.errorStatus(.transactionAmountMismatch)),
+                    .requestError(.errorStatus(.transactionTypeNotFound)),
+                    .requestError(.errorStatus(.invalidTokens)):
+                
+                effects += Effect(value: .refreshPsiCashState(ignoreSubscriptionState: false))
+                
+            case .tunnelNotConnected,
+                    .requestError(.errorStatus(.existingTransaction)),
+                    .requestError(.errorStatus(.insufficientBalance)),
+                    .requestError(.errorStatus(.serverError)):
+                // Not RefreshState required.
+                break
+            }
+            
+            effects += environment.feedbackLogger.log(.error, errorEvent).mapNever()
+
+            return effects
         }
         
     case let .refreshPsiCashState(ignoreSubscriptionState):
@@ -259,13 +313,13 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             
             return [
                 
-                // Updates sharedDB with new auths, and notifies
-                // network extension if required.
-                setSharedDBPsiCashAuthTokens(
-                refreshStateResponse.libData,
-                    sharedDB: environment.sharedDB,
-                    notifier: environment.notifier
-                ).mapNever(),
+                // If there is any Speed Boost authoriztions, it is persisted with Core Data.
+                environment.sharedAuthCoreData
+                    .syncAuthorizationsWithSharedCoreData(
+                        Authorization.AccessType.speedBoostTypes,
+                        state.psiCash.getSharedAuthorizationModels(),
+                        environment.mainDispatcher)
+                    .map { ._coreDataSyncResult($0) },
                 
                 environment.feedbackLogger.log(.info, "PsiCash: refresh state success").mapNever()
             ]
@@ -328,13 +382,13 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                                               persisted: environment.psiCashPersistedValues)
 
             return [
-                // Updates sharedDB with new auths, and notifies
-                // network extension if `reconnectRequired`.
-                setSharedDBPsiCashAuthTokens(
-                    logoutResponse.libData,
-                    sharedDB: environment.sharedDB,
-                    notifier: environment.notifier
-                ).mapNever(),
+                // Updates persisted authorizations with Core Data (i.e. they are removed).
+                environment.sharedAuthCoreData
+                    .syncAuthorizationsWithSharedCoreData(
+                        Authorization.AccessType.speedBoostTypes,
+                        state.psiCash.getSharedAuthorizationModels(),
+                        environment.mainDispatcher)
+                    .map { ._coreDataSyncResult($0) }
             ]
             
         case .failure(let error):
@@ -433,50 +487,111 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                 })
             }
         ]
+        
+    case ._coreDataSyncResult(let syncResult):
+        
+        // Notifies the Network Extension of any changes to persisted authorization in Core Data.
+        // Errors with Core Data are only logged, and no further action is taken at this point.
+        
+        switch syncResult {
+            
+        case .success(let changed):
+            
+            var effects = [Effect<PsiCashAction>]()
+            
+            if changed {
+                // Notifies Network Extension if any changes have been made to the peristent store.
+                effects += .fireAndForget {
+                    environment.notifier.post(environment.notifierUpdatedAuthorizationsMessage)
+                }
+            }
+            
+            effects += environment.feedbackLogger.log(
+                .info, "Synced PsiCash authorizations with Core Data")
+                .mapNever()
+            
+            return effects
+            
+        case .failure(let error):
+            
+            return [
+                environment.feedbackLogger.log(
+                    .error, "Failed to sync PsiCash authorization with Core Data: \(error)"
+                ).mapNever()
+            ]
+        }
+        
+    case ._forceRemovedPurchases(let result):
+        
+        // Logs result of force removal of PsiCash purchases.
+        
+        switch result {
+            
+        case .success(let products):
+            
+            return [
+                environment.feedbackLogger.log(
+                    .info, "Force removed PsiCash transactions: \(products)")
+                    .mapNever()
+            ]
+            
+        case .failure(let error):
+            
+            return [
+                environment.feedbackLogger.log(
+                    .error, "Failed to force-remove PsiCash transactions: \(error)")
+                    .mapNever()
+            ]
+            
+        }
+        
     }
 }
 
-/// Sets PsiphonDataSharedDB non-subscription auth tokens,
-/// to the active tokens provided by the PsiCash library.
-/// If set of active authorizations has changed, then sends a message to the network extension
-/// to notify it of the new authorization tokens.
-fileprivate func setSharedDBPsiCashAuthTokens(
-    _ libData: PsiCashLibData,
-    sharedDB: PsiphonDataSharedDB,
-    notifier: PsiApi.Notifier
-) -> Effect<Never> {
+// MARK: Helper functions
+
+extension PsiCashState {
     
-    // Set of all authorizations from PsiCash library.
-    let psiCashLibAuths = Set(libData.activePurchases.compactMap { parsedPurchase -> String? in
-        
-        switch parsedPurchase {
-        
-        case .success(.speedBoost(let product)):
-            return product.transaction.authorization.rawData
-            
-        case .failure(_):
-            return .none
-        }
-        
-    })
+    /// Set of SharedAuthorizationModel values for all  in `transactionsAuthState`
+    /// that have an authorization.
+    /// - Note: `psiphondRejected` is set to `false`.
+    func getSharedAuthorizationModels() -> Set<SharedAuthorizationModel> {
+        Set(
+            libData?.activePurchases.compactMap {
+                switch $0 {
+                case .success(.speedBoost(let product)):
+                    return SharedAuthorizationModel(
+                        authorization: product.transaction.authorization,
+                        webOrderLineItemID: .none,
+                        psiphondRejected: false
+                    )
+                case .failure(_):
+                    return nil
+                }
+            } ?? []
+        )
+    }
     
-    return .fireAndForget {
-
-        // Updates PsiphonDataSharedDB with with the set of PsiCash authorizations.
-        
-        // If current set of authorizations stored by PsiCash library is not equal to
-        // the set of non-subscription authorizations stored by the extension
-        // sends a notification to the extension of the change.
-        let sendNotification = sharedDB.getNonSubscriptionEncodedAuthorizations() != psiCashLibAuths
-        
-        // Updates set of non-susbscription authorizations stored by the extension.
-        sharedDB.setNonSubscriptionEncodedAuthorizations(psiCashLibAuths)
-
-        if sendNotification {
-            // Notifies network extension of updated non-subscriptions authorizations.
-            notifier.post(NotifierUpdatedNonSubscriptionAuths)
-        }
-
+    /// For PsiCash purchases that have an authorization, return the list of purchases
+    /// that matches the provded authorization ids.
+    func getPurchases(
+        forAuthorizaitonIDs authIds: [AuthorizationID]
+    ) -> [PurchasedExpirableProduct<SpeedBoostProduct>] {
+        libData?.activePurchases.compactMap { purchase -> PurchasedExpirableProduct<SpeedBoostProduct>? in
+            switch purchase {
+            case .success(.speedBoost(let product)):
+                let found = authIds.contains {
+                    $0 == product.transaction.authorization.decoded.authorization.id
+                }
+                if found {
+                    return product
+                } else {
+                    return nil
+                }
+            case .failure(_):
+                return nil
+            }
+        } ?? []
     }
     
 }

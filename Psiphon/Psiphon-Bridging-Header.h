@@ -28,6 +28,7 @@
 
 // Utilities
 #import "AppInfo.h"
+#import "AppFiles.h"
 #import "SharedConstants.h"
 #import "Notifier.h"
 #import "AppDelegate.h"
@@ -54,6 +55,9 @@
 #import "PsiphonConfigReader.h"
 #import "PsiphonDataSharedDB.h"
 #import "PsiphonConfigUserDefaults.h"
+#import "PersistentContainerWrapper.h"
+
+#import "SharedAuthorization+CoreDataProperties.h"
 
 // Feedback
 #import "Feedback.h"

@@ -39,7 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) NSDictionary *config;
 @property (nonatomic, readonly) PsiphonConfigSponsorIds *sponsorIds;
 
-+ (PsiphonConfigReader *_Nullable)fromConfigFile;
++ (PsiphonConfigReader *_Nullable)load;
 
 @end
 

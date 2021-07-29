@@ -144,7 +144,9 @@ struct VPNProviderManagerState<T: TunnelProviderManager>: Equatable {
 
 struct VPNProviderManagerReducerState<T: TunnelProviderManager>: Equatable {
     var vpnState: VPNProviderManagerState<T>
-    let subscriptionTransactionsPendingAuthorization: Set<WebOrderLineItemID>
+    
+    /// Represents whether any subscription purchases are pending authorization
+    let anySubscriptionTxPendingAuthorization: Bool
 }
 
 struct VPNReducerEnvironment<T: TunnelProviderManager> {
@@ -692,7 +694,7 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
     
     // Adds subscription check sponsor id to tunnel provider start options if there are
     // subscription transaction pending authorization.
-    if !state.subscriptionTransactionsPendingAuthorization.isEmpty {
+    if state.anySubscriptionTxPendingAuthorization {
         startOptions[EXTENSION_OPTION_SUBSCRIPTION_CHECK_SPONSOR_ID] = EXTENSION_OPTION_TRUE
     }
     

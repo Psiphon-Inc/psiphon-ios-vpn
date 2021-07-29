@@ -70,6 +70,9 @@ public struct WebOrderLineItemID: TypedIdentifier {
     private let value: String
     
     public init?(rawValue: String) {
+        guard !rawValue.isEmpty else {
+            return nil
+        }
         self.value = rawValue
     }
 }
@@ -250,6 +253,12 @@ public struct SubscriptionIAPPurchase: RecordedIAPPurchase, Codable {
     /// - JSON Field Name: `expires_date`
     public let expires: Date
     
+    /// For a transaction that was canceled by Apple customer support, the time and date of the cancellation.
+    /// For an auto-renewable subscription plan that was upgraded, the time and date of the upgrade transaction.
+    /// - ASN.1 Field Type: 1712
+    /// - JSON Field Name: `cancellation_date`
+    public let cancellationData: Date?
+    
     /// For an auto-renewable subscription, whether or not it is in the introductory price period.
     /// - ASN.1 Field Type: 1719
     /// - JSON Field Name: `is_in_intro_offer_period`
@@ -266,6 +275,7 @@ public struct SubscriptionIAPPurchase: RecordedIAPPurchase, Codable {
         webOrderLineItemID: WebOrderLineItemID,
         purchaseDate: Date,
         expires: Date,
+        cancellationDate: Date?,
         isInIntroOfferPeriod: Bool,
         hasBeenInIntroOfferPeriod: Bool
     ) {
@@ -275,6 +285,7 @@ public struct SubscriptionIAPPurchase: RecordedIAPPurchase, Codable {
         self.webOrderLineItemID = webOrderLineItemID
         self.purchaseDate = purchaseDate
         self.expires = expires
+        self.cancellationData = cancellationDate
         self.isInIntroOfferPeriod = isInIntroOfferPeriod
         self.hasBeenInIntroOfferPeriod = hasBeenInIntroOfferPeriod
     }

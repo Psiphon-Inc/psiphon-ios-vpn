@@ -47,7 +47,7 @@ UserDefaultsKey const AppInfoFastLaneSnapShotBoolKey = @"FASTLANE_SNAPSHOT";
 }
 
 + (NSString*)propagationChannelId {
-    NSDictionary *config = [PsiphonConfigReader fromConfigFile].config;
+    NSDictionary *config = [PsiphonConfigReader load].config;
     if (!config) {
         // PsiphonConfigReader has logged an error
         return nil;

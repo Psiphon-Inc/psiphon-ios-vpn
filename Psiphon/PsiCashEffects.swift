@@ -123,26 +123,14 @@ fileprivate struct PsiCashHTTPResponse: HTTPResponse {
             result = .success(psiHttpResult)
             
         case let .failure(httpRequestError):
-            if let partialResponse = httpRequestError.partialResponseMetadata {
-                let statusCode = Int32(partialResponse.statusCode.rawValue)
-                
-                let psiHttpResult = PSIHttpResult(
-                    code: statusCode,
-                    headers: partialResponse.headers.mapValues { [$0] },
-                    body: "",
-                    error: "")
-                
-                result = .success(psiHttpResult)
-                
-            } else {
-                let psiHttpResult = PSIHttpResult(
-                    code: PSIHttpResult.recoverable_ERROR(),
-                    headers: [String: [String]](),
-                    body: "",
-                    error: "")
-                
-                result = .success(psiHttpResult)
-            }
+            // In the case of a partial response, a `RECOVERABLE_ERROR` should be returned.
+            let psiHttpResult = PSIHttpResult(
+                code: PSIHttpResult.recoverable_ERROR(),
+                headers: [String: [String]](),
+                body: "",
+                error: "")
+            
+            result = .success(psiHttpResult)
         }
     }
     
@@ -377,28 +365,12 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
         
     }
     
-    func removePurchasesNotIn(
-        psiCashAuthorizations: Set<String>
-    ) -> Effect<Never> {
+    func removePurchases(
+        withTransactionIDs transactionIds: [String]
+    ) -> Effect<Result<[PsiCashParsed<PsiCashPurchasedType>], PsiCashLibError>> {
         
-        .fireAndForget {
-            let decoder = JSONDecoder.makeRfc3339Decoder()
-            
-            let nonSubscriptionAuthIDs = psiCashAuthorizations
-                .compactMap { encodedAuth -> SignedAuthorization? in
-                    guard let data = encodedAuth.data(using: .utf8) else {
-                        return nil;
-                    }
-                    return try? decoder.decode(SignedAuthorization.self, from: data)
-                }.map(\.authorization.id)
-            
-            let result = self.psiCashLib.removePurchases(notFoundIn: nonSubscriptionAuthIDs)
-            switch result {
-            case .success(_):
-                return
-            case .failure(let error):
-                self.feedbackLogger.immediate(.error, "removePurchasesNotIn failed: \(error)")
-            }
+        Effect.deferred(dispatcher: globalDispatcher) { fulfill in
+            fulfill(self.psiCashLib.removePurchases(withTransactionIDs: transactionIds))
         }
         
     }

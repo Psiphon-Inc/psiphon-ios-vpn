@@ -10,6 +10,14 @@
 		2911A793263D5DED001A0A4D /* ViewBuilderContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2911A792263D5DED001A0A4D /* ViewBuilderContainerView.swift */; };
 		2911A795263D6C6D001A0A4D /* WebViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2911A794263D6C6D001A0A4D /* WebViewController.swift */; };
 		2911A797263F1941001A0A4D /* BlockerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2911A796263F1941001A0A4D /* BlockerView.swift */; };
+		291C0B8E269CBF720075FAB7 /* SharedModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 291C0B8C269CBF720075FAB7 /* SharedModel.xcdatamodeld */; };
+		291C0B8F269CBF720075FAB7 /* SharedModel.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 291C0B8C269CBF720075FAB7 /* SharedModel.xcdatamodeld */; };
+		291C0B9F269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 291C0B9D269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.m */; };
+		291C0BA0269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 291C0B9D269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.m */; };
+		291C0BA1269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = 291C0B9E269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m */; };
+		291C0BA2269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = 291C0B9E269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m */; };
+		291C0BA5269CC21F0075FAB7 /* PersistentContainerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 291C0BA4269CC21F0075FAB7 /* PersistentContainerWrapper.m */; };
+		291C0BA6269CC21F0075FAB7 /* PersistentContainerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 291C0BA4269CC21F0075FAB7 /* PersistentContainerWrapper.m */; };
 		292B531E2620DFCB00C0C44A /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */; };
 		296054AA265307770001E72D /* PsiCashAccountNameViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296054A9265307770001E72D /* PsiCashAccountNameViewWrapper.swift */; };
 		296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296622B425E8A554004635A1 /* LaunchScreenViewController.swift */; };
@@ -17,6 +25,9 @@
 		29923FDA264EFC720078E8BB /* PsiCashLib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; };
 		29923FDB264EFC720078E8BB /* PsiCashLib.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		29BA6DA1268630A9001445EA /* TunnelFileDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 29BA6DA0268630A9001445EA /* TunnelFileDescriptor.m */; };
+		29C3220A26B1C17D0075BB34 /* AppInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920720F3DA190033114B /* AppInfo.m */; };
+		29EE50B726ACDC0E00DB8A60 /* AppFiles.m in Sources */ = {isa = PBXBuildFile; fileRef = 29EE50B626ACDC0E00DB8A60 /* AppFiles.m */; };
+		29EE50B826ACDC0E00DB8A60 /* AppFiles.m in Sources */ = {isa = PBXBuildFile; fileRef = 29EE50B626ACDC0E00DB8A60 /* AppFiles.m */; };
 		29FE979125C0C1CA00D9C09F /* HostAppProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 29FE979025C0C1CA00D9C09F /* HostAppProtocol.m */; };
 		440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 440D75BD1F59E041005C603B /* StoreKit.framework */; };
 		4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4435CC261F70566000F3A809 /* SettingsViewController.m */; };
@@ -60,7 +71,6 @@
 		4E0DCB1A1F28481E00495781 /* PsiphonDataSharedDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */; };
 		4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */; };
 		4E10920820F3DA190033114B /* AppInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920720F3DA190033114B /* AppInfo.m */; };
-		4E10920920F3DC670033114B /* AppInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920720F3DA190033114B /* AppInfo.m */; };
 		4E1FE1CB1FB213860031211C /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1FE1CA1FB213860031211C /* SnapshotHelper.swift */; };
 		4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */; };
 		4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */; };
@@ -135,7 +145,7 @@
 		8D417EDD2419DBA100FEE587 /* ProductRequest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D417EDC2419DBA100FEE587 /* ProductRequest.swift */; };
 		8D4ACD32247E3626008E404C /* AppStoreIAP+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */; };
 		8D4EEA9624F761630057E32D /* ApplicationSupportFileStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D4EEA9524F761620057E32D /* ApplicationSupportFileStore.swift */; };
-		8D53C6A824C5EED8001E4E2D /* SessionConfigValues.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D53C6A724C5EED8001E4E2D /* SessionConfigValues.m */; };
+		8D53C6A824C5EED8001E4E2D /* AuthorizationStore.m in Sources */ = {isa = PBXBuildFile; fileRef = 8D53C6A724C5EED8001E4E2D /* AuthorizationStore.m */; };
 		8D75EF6125264A7600D44101 /* ContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D75EF6025264A7600D44101 /* ContainerView.swift */; };
 		8D75EF6625265F3C00D44101 /* SpacerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D75EF6525265F3B00D44101 /* SpacerView.swift */; };
 		8D778978247469FE0038BFDA /* AppInfo.h in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920620F3DA190033114B /* AppInfo.h */; };
@@ -159,8 +169,6 @@
 		8DB6C638242A4D06005E2F4C /* DuskButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DB6C637242A4D06005E2F4C /* DuskButton.swift */; };
 		8DCA6864247C7CF8001D026E /* Bindable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DCA6863247C7CF8001D026E /* Bindable.swift */; };
 		8DD642C1248AAD8A006C94D2 /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DD642C0248AAD8A006C94D2 /* Utils.swift */; };
-		8DD6E7E524591E270041DAC5 /* SubscriptionAuthCheck.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DD6E7E424591E270041DAC5 /* SubscriptionAuthCheck.m */; };
-		8DD6E7E82459C83B0041DAC5 /* StoredAuthorizations.m in Sources */ = {isa = PBXBuildFile; fileRef = 8DD6E7E72459C83B0041DAC5 /* StoredAuthorizations.m */; };
 		8DDA60292425BB4800DBA8EC /* DebugStrings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DDA60282425BB4800DBA8EC /* DebugStrings.swift */; };
 		8DE4E6D2244E97D000275362 /* Result+Codable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DE4E6D1244E97D000275362 /* Result+Codable.swift */; };
 		8DEEE12F252F757600B0A9EC /* SupportedLocalizations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DEEE12E252F757600B0A9EC /* SupportedLocalizations.swift */; };
@@ -223,7 +231,7 @@
 		CEA1B78A249AB3EF006D9853 /* NSError+Convenience.m in Sources */ = {isa = PBXBuildFile; fileRef = EF90D79A204F22C900228A63 /* NSError+Convenience.m */; };
 		CEA1B78B249AB959006D9853 /* embedded_server_entries in Resources */ = {isa = PBXBuildFile; fileRef = EF6C1F501F59E46500709554 /* embedded_server_entries */; };
 		CEBA9C112481A5C80097D700 /* Notifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBA9C102481A5C80097D700 /* Notifier.swift */; };
-		CEBA9C132481AA9F0097D700 /* SharedDB.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBA9C122481AA9F0097D700 /* SharedDB.swift */; };
+		CEBA9C132481AA9F0097D700 /* SharedCoreData_Impl.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBA9C122481AA9F0097D700 /* SharedCoreData_Impl.swift */; };
 		CED6790E24A4F82400C4CA81 /* JetsamTracking.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6790424A4F82300C4CA81 /* JetsamTracking.m */; };
 		CED6790F24A4F82400C4CA81 /* JetsamTracking.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6790424A4F82300C4CA81 /* JetsamTracking.m */; };
 		CED6791024A4F82400C4CA81 /* JetsamEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = CED6790624A4F82400C4CA81 /* JetsamEvent.m */; };
@@ -384,6 +392,13 @@
 		2911A792263D5DED001A0A4D /* ViewBuilderContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewBuilderContainerView.swift; sourceTree = "<group>"; };
 		2911A794263D6C6D001A0A4D /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		2911A796263F1941001A0A4D /* BlockerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockerView.swift; sourceTree = "<group>"; };
+		291C0B8D269CBF720075FAB7 /* SharedModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedModel.xcdatamodel; sourceTree = "<group>"; };
+		291C0B9B269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SharedAuthorization+CoreDataProperties.h"; sourceTree = SOURCE_ROOT; };
+		291C0B9C269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SharedAuthorization+CoreDataClass.h"; sourceTree = SOURCE_ROOT; };
+		291C0B9D269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "SharedAuthorization+CoreDataClass.m"; sourceTree = SOURCE_ROOT; };
+		291C0B9E269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "SharedAuthorization+CoreDataProperties.m"; sourceTree = SOURCE_ROOT; };
+		291C0BA3269CC21F0075FAB7 /* PersistentContainerWrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PersistentContainerWrapper.h; sourceTree = "<group>"; };
+		291C0BA4269CC21F0075FAB7 /* PersistentContainerWrapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PersistentContainerWrapper.m; sourceTree = "<group>"; };
 		292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		296054A9265307770001E72D /* PsiCashAccountNameViewWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashAccountNameViewWrapper.swift; sourceTree = "<group>"; };
 		296622B425E8A554004635A1 /* LaunchScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenViewController.swift; sourceTree = "<group>"; };
@@ -391,6 +406,8 @@
 		29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = PsiCashLib.xcframework; path = Frameworks/PsiCashLib.xcframework; sourceTree = "<group>"; };
 		29BA6D9F268630A9001445EA /* TunnelFileDescriptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TunnelFileDescriptor.h; sourceTree = "<group>"; };
 		29BA6DA0268630A9001445EA /* TunnelFileDescriptor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TunnelFileDescriptor.m; sourceTree = "<group>"; };
+		29EE50B526ACDC0E00DB8A60 /* AppFiles.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppFiles.h; sourceTree = "<group>"; };
+		29EE50B626ACDC0E00DB8A60 /* AppFiles.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppFiles.m; sourceTree = "<group>"; };
 		29FE978F25C0C1CA00D9C09F /* HostAppProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HostAppProtocol.h; sourceTree = "<group>"; };
 		29FE979025C0C1CA00D9C09F /* HostAppProtocol.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HostAppProtocol.m; sourceTree = "<group>"; };
 		2D1DAF6C9CAF197D05CDCFCF /* Pods-Testing-TestingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testing-TestingTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Testing-TestingTests/Pods-Testing-TestingTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -621,8 +638,8 @@
 		8D417EDC2419DBA100FEE587 /* ProductRequest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductRequest.swift; sourceTree = "<group>"; };
 		8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppStoreIAP+Additions.swift"; sourceTree = "<group>"; };
 		8D4EEA9524F761620057E32D /* ApplicationSupportFileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationSupportFileStore.swift; sourceTree = "<group>"; };
-		8D53C6A624C5EED8001E4E2D /* SessionConfigValues.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SessionConfigValues.h; sourceTree = "<group>"; };
-		8D53C6A724C5EED8001E4E2D /* SessionConfigValues.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SessionConfigValues.m; sourceTree = "<group>"; };
+		8D53C6A624C5EED8001E4E2D /* AuthorizationStore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AuthorizationStore.h; sourceTree = "<group>"; };
+		8D53C6A724C5EED8001E4E2D /* AuthorizationStore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AuthorizationStore.m; sourceTree = "<group>"; };
 		8D5D8494247CE6420018A35B /* libPromisesObjC.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libPromisesObjC.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5F08A5247DB21700F51A42 /* Testing */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Testing; sourceTree = SOURCE_ROOT; };
 		8D5F08A6247DB23A00F51A42 /* Utilities */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Utilities; sourceTree = SOURCE_ROOT; };
@@ -653,10 +670,6 @@
 		8DCA6863247C7CF8001D026E /* Bindable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bindable.swift; sourceTree = "<group>"; };
 		8DCA686B247CC383001D026E /* libReactiveSwift.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = libReactiveSwift.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8DD642C0248AAD8A006C94D2 /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
-		8DD6E7E324591E270041DAC5 /* SubscriptionAuthCheck.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SubscriptionAuthCheck.h; sourceTree = "<group>"; };
-		8DD6E7E424591E270041DAC5 /* SubscriptionAuthCheck.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SubscriptionAuthCheck.m; sourceTree = "<group>"; };
-		8DD6E7E62459C83B0041DAC5 /* StoredAuthorizations.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StoredAuthorizations.h; sourceTree = "<group>"; };
-		8DD6E7E72459C83B0041DAC5 /* StoredAuthorizations.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = StoredAuthorizations.m; sourceTree = "<group>"; };
 		8DDA60282425BB4800DBA8EC /* DebugStrings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugStrings.swift; sourceTree = "<group>"; };
 		8DE4E6D1244E97D000275362 /* Result+Codable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Result+Codable.swift"; sourceTree = "<group>"; };
 		8DEEE12E252F757600B0A9EC /* SupportedLocalizations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SupportedLocalizations.swift; sourceTree = "<group>"; };
@@ -778,7 +791,7 @@
 		CEA1B778249AA9A0006D9853 /* PsiphonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PsiphonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEA1B786249AAA13006D9853 /* EmbeddedServerEntriesTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EmbeddedServerEntriesTest.m; sourceTree = "<group>"; };
 		CEBA9C102481A5C80097D700 /* Notifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifier.swift; sourceTree = "<group>"; };
-		CEBA9C122481AA9F0097D700 /* SharedDB.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedDB.swift; sourceTree = "<group>"; };
+		CEBA9C122481AA9F0097D700 /* SharedCoreData_Impl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedCoreData_Impl.swift; sourceTree = "<group>"; };
 		CED6790424A4F82300C4CA81 /* JetsamTracking.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JetsamTracking.m; sourceTree = "<group>"; };
 		CED6790524A4F82300C4CA81 /* JetsamMetrics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JetsamMetrics.h; sourceTree = "<group>"; };
 		CED6790624A4F82400C4CA81 /* JetsamEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JetsamEvent.m; sourceTree = "<group>"; };
@@ -923,6 +936,28 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		291C0B8B269CBF5D0075FAB7 /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				291C0B96269CC06B0075FAB7 /* Model */,
+				291C0B8C269CBF720075FAB7 /* SharedModel.xcdatamodeld */,
+				291C0BA3269CC21F0075FAB7 /* PersistentContainerWrapper.h */,
+				291C0BA4269CC21F0075FAB7 /* PersistentContainerWrapper.m */,
+			);
+			path = CoreData;
+			sourceTree = "<group>";
+		};
+		291C0B96269CC06B0075FAB7 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				291C0B9C269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.h */,
+				291C0B9D269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.m */,
+				291C0B9B269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.h */,
+				291C0B9E269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m */,
+			);
+			path = Model;
+			sourceTree = "<group>";
+		};
 		292B531C2620DFC000C0C44A /* Settings */ = {
 			isa = PBXGroup;
 			children = (
@@ -937,6 +972,14 @@
 				5265B00125AFBD53006BD58C /* PsiCashLib.xcframework */,
 			);
 			name = "Recovered References";
+			sourceTree = "<group>";
+		};
+		299177FD26A08F890063AED8 /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				CEBA9C122481AA9F0097D700 /* SharedCoreData_Impl.swift */,
+			);
+			path = CoreData;
 			sourceTree = "<group>";
 		};
 		445F249720E1A5BA00D004E9 /* asn1c */ = {
@@ -1043,6 +1086,7 @@
 		4E0DCB101F28458100495781 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				291C0B8B269CBF5D0075FAB7 /* CoreData */,
 				4E10920620F3DA190033114B /* AppInfo.h */,
 				4E10920720F3DA190033114B /* AppInfo.m */,
 				CED6791824A4F82A00C4CA81 /* JetsamMetrics */,
@@ -1071,10 +1115,11 @@
 				4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */,
 				EF652CDB1F365B8C002AFB48 /* SharedConstants.h */,
 				CE93EE5424F55B92001F4EC9 /* SharedConstants.m */,
-				CEBA9C122481AA9F0097D700 /* SharedDB.swift */,
 				9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */,
 				A84083974C8CF9DDFE7A341D /* Strings.m */,
 				A8408AAD421C096147E3FC8B /* Strings.h */,
+				29EE50B526ACDC0E00DB8A60 /* AppFiles.h */,
+				29EE50B626ACDC0E00DB8A60 /* AppFiles.m */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -1342,6 +1387,7 @@
 		CE26FC8C1BBDC7B800B83375 /* Psiphon */ = {
 			isa = PBXGroup;
 			children = (
+				299177FD26A08F890063AED8 /* CoreData */,
 				292B531C2620DFC000C0C44A /* Settings */,
 				EF90D79E204F22C900228A63 /* ReactiveExtensions */,
 				52055D02230C821200244F9E /* View */,
@@ -1404,7 +1450,7 @@
 			children = (
 				CE4E9BC11BBEECFC0060FF8B /* PsiphonVPN.entitlements */,
 				CE26FCA91BBDC85900B83375 /* Info.plist */,
-				EF743FC11F99546B00AC89A2 /* IAP */,
+				EF743FC11F99546B00AC89A2 /* Authorization */,
 				CED6796324A4FAA700C4CA81 /* LocalDatastore */,
 				CED6796C24A4FAF400C4CA81 /* Utils */,
 				9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */,
@@ -1414,8 +1460,6 @@
 				EFC2F5B520226758007B52F9 /* PacketTunnelUtils.h */,
 				EFC2F5B420226757007B52F9 /* PacketTunnelUtils.m */,
 				9BFEC1C9F506CE1DF07306D2 /* NEBridge.h */,
-				8D53C6A624C5EED8001E4E2D /* SessionConfigValues.h */,
-				8D53C6A724C5EED8001E4E2D /* SessionConfigValues.m */,
 				8D0017D524DB233200EC3409 /* VPNStrings.h */,
 				8D0017D624DB233200EC3409 /* VPNStrings.m */,
 				29BA6D9F268630A9001445EA /* TunnelFileDescriptor.h */,
@@ -1566,17 +1610,15 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		EF743FC11F99546B00AC89A2 /* IAP */ = {
+		EF743FC11F99546B00AC89A2 /* Authorization */ = {
 			isa = PBXGroup;
 			children = (
 				9BFEC673CE5EA236279F07BD /* Authorization.h */,
 				9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */,
-				8DD6E7E324591E270041DAC5 /* SubscriptionAuthCheck.h */,
-				8DD6E7E424591E270041DAC5 /* SubscriptionAuthCheck.m */,
-				8DD6E7E62459C83B0041DAC5 /* StoredAuthorizations.h */,
-				8DD6E7E72459C83B0041DAC5 /* StoredAuthorizations.m */,
+				8D53C6A624C5EED8001E4E2D /* AuthorizationStore.h */,
+				8D53C6A724C5EED8001E4E2D /* AuthorizationStore.m */,
 			);
-			path = IAP;
+			path = Authorization;
 			sourceTree = "<group>";
 		};
 		EF90D78B204F22C900228A63 /* External */ = {
@@ -2029,9 +2071,11 @@
 				EF90D7A6204F22C900228A63 /* NSDate+Comparator.m in Sources */,
 				CED6791424A4F82400C4CA81 /* JetsamPerAppVersionStat.m in Sources */,
 				4EB846422151830600687344 /* AvailableServerRegions.m in Sources */,
+				291C0B8E269CBF720075FAB7 /* SharedModel.xcdatamodeld in Sources */,
 				8D7789CA247499110038BFDA /* Reachability+Additions.swift in Sources */,
 				5246800922D51CE4009AEC6E /* PsiCashBalanceViewWrapper.swift in Sources */,
 				8DD642C1248AAD8A006C94D2 /* Utils.swift in Sources */,
+				291C0B9F269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.m in Sources */,
 				52D363CF230F112E002C2221 /* TabControlViewWrapper.swift in Sources */,
 				292B531E2620DFCB00C0C44A /* SettingsViewModel.swift in Sources */,
 				445F24D620E1A5BA00D004E9 /* xer_decoder.c in Sources */,
@@ -2059,6 +2103,7 @@
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
 				EF90D7A5204F22C900228A63 /* timestamp_parse.c in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
+				291C0BA5269CC21F0075FAB7 /* PersistentContainerWrapper.m in Sources */,
 				445F24EB20E1A5BA00D004E9 /* xer_support.c in Sources */,
 				4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */,
 				EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */,
@@ -2071,7 +2116,7 @@
 				445F239620E1817C00D004E9 /* AppStoreParsedReceiptData.m in Sources */,
 				8D0017DB24DDD99A00EC3409 /* AppUpgrade.swift in Sources */,
 				445F24E420E1A5BA00D004E9 /* constr_SEQUENCE.c in Sources */,
-				CEBA9C132481AA9F0097D700 /* SharedDB.swift in Sources */,
+				CEBA9C132481AA9F0097D700 /* SharedCoreData_Impl.swift in Sources */,
 				EF652CD61F35224C002AFB48 /* AppDelegate.m in Sources */,
 				EFC2F5C720226782007B52F9 /* UIAlertController+Additions.m in Sources */,
 				8DEEE137252FB4C900B0A9EC /* LanguageSelectionViewController.swift in Sources */,
@@ -2090,6 +2135,7 @@
 				9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */,
 				4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */,
 				8D7789B9247491CA0038BFDA /* PsiphonBundle.swift in Sources */,
+				291C0BA1269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m in Sources */,
 				445F24D720E1A5BA00D004E9 /* per_support.c in Sources */,
 				8D82F0E625420E21002D37E7 /* PsiCashViewReducer.swift in Sources */,
 				EF90D7AA204F22C900228A63 /* NSError+Convenience.m in Sources */,
@@ -2227,6 +2273,7 @@
 				A84080E9FC63E29F71A79A63 /* RelaySubject.m in Sources */,
 				CED6794F24A4F9D400C4CA81 /* DelimitedFile.m in Sources */,
 				CED6795524A4F9F100C4CA81 /* Archiver.m in Sources */,
+				29EE50B726ACDC0E00DB8A60 /* AppFiles.m in Sources */,
 				8D9D9BD0247C6B910093220E /* HardCodedValues.swift in Sources */,
 				A840803A0733D9FCA5410796 /* ActivityIndicatorRoyalSkyButton.m in Sources */,
 			);
@@ -2239,6 +2286,7 @@
 				CE93EE5624F55B92001F4EC9 /* SharedConstants.m in Sources */,
 				EFC2F5CC20226835007B52F9 /* PsiphonConfigReader.m in Sources */,
 				29BA6DA1268630A9001445EA /* TunnelFileDescriptor.m in Sources */,
+				29EE50B826ACDC0E00DB8A60 /* AppFiles.m in Sources */,
 				CED6794524A4F95D00C4CA81 /* RunningStat.m in Sources */,
 				CED6795224A4F9D400C4CA81 /* DiskBackedFile.m in Sources */,
 				CED6791324A4F82400C4CA81 /* JetsamMetrics.m in Sources */,
@@ -2246,9 +2294,9 @@
 				CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */,
 				EF90D7B1204F231E00228A63 /* timestamp_tm.c in Sources */,
 				8D90FD5724C748E000E11C66 /* FeedbackUtils.m in Sources */,
-				8DD6E7E524591E270041DAC5 /* SubscriptionAuthCheck.m in Sources */,
 				8D0017D724DB233200EC3409 /* VPNStrings.m in Sources */,
-				8DD6E7E82459C83B0041DAC5 /* StoredAuthorizations.m in Sources */,
+				291C0B8F269CBF720075FAB7 /* SharedModel.xcdatamodeld in Sources */,
+				291C0BA2269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m in Sources */,
 				EF90D7B3204F232300228A63 /* timestamp_parse.c in Sources */,
 				CED6795024A4F9D400C4CA81 /* DelimitedFile.m in Sources */,
 				CED6796924A4FAA700C4CA81 /* ExtensionDataStore.m in Sources */,
@@ -2258,7 +2306,6 @@
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,
 				521FD0FF219E0E2600F748EC /* AppStats.m in Sources */,
 				4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */,
-				4E10920920F3DC670033114B /* AppInfo.m in Sources */,
 				CED6795E24A4FA3200C4CA81 /* RotatingFile.m in Sources */,
 				9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */,
 				EF90D7AF204F231900228A63 /* timestamp_valid.c in Sources */,
@@ -2276,6 +2323,7 @@
 				EF90D7B0204F231B00228A63 /* timestamp_compare.c in Sources */,
 				9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */,
 				CED6796224A4FA6D00C4CA81 /* ExtensionContainerFile.m in Sources */,
+				29C3220A26B1C17D0075BB34 /* AppInfo.m in Sources */,
 				521FD0FE219E0E1900F748EC /* AppProfiler.m in Sources */,
 				29FE979125C0C1CA00D9C09F /* HostAppProtocol.m in Sources */,
 				EF90D7B4204F234100228A63 /* NSDate+Comparator.m in Sources */,
@@ -2283,8 +2331,10 @@
 				9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */,
 				CED6796B24A4FAA700C4CA81 /* ExtensionDataStoreKeys.m in Sources */,
 				CED6794324A4F95D00C4CA81 /* RunningStdev.m in Sources */,
-				8D53C6A824C5EED8001E4E2D /* SessionConfigValues.m in Sources */,
+				8D53C6A824C5EED8001E4E2D /* AuthorizationStore.m in Sources */,
 				CED6791124A4F82400C4CA81 /* JetsamEvent.m in Sources */,
+				291C0BA0269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.m in Sources */,
+				291C0BA6269CC21F0075FAB7 /* PersistentContainerWrapper.m in Sources */,
 				CED6790F24A4F82400C4CA81 /* JetsamTracking.m in Sources */,
 				521FD100219E0E3800F748EC /* DebugUtils.m in Sources */,
 				A8408F5F45CDBDF42701063E /* Strings.m in Sources */,
@@ -2584,8 +2634,6 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				STRIP_BITCODE_FROM_COPIED_FILES = NO;
-				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon-Bridging-Header.h";
-				SWIFT_VERSION = 3.0;
 			};
 			name = DevRelease;
 		};
@@ -2888,8 +2936,6 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				STRIP_BITCODE_FROM_COPIED_FILES = NO;
-				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon-Bridging-Header.h";
-				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -2920,8 +2966,6 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				STRIP_BITCODE_FROM_COPIED_FILES = NO;
-				SWIFT_OBJC_BRIDGING_HEADER = "Psiphon-Bridging-Header.h";
-				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -3058,6 +3102,19 @@
 			productName = PsiApi;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		291C0B8C269CBF720075FAB7 /* SharedModel.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				291C0B8D269CBF720075FAB7 /* SharedModel.xcdatamodel */,
+			);
+			currentVersion = 291C0B8D269CBF720075FAB7 /* SharedModel.xcdatamodel */;
+			path = SharedModel.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = CE26FC821BBDC7B700B83375 /* Project object */;
 }

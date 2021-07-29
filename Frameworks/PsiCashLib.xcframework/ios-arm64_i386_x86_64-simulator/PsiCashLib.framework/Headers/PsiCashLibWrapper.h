@@ -202,6 +202,9 @@ typedef NS_ENUM(NSInteger, PSIStatus) {
 /// will be available. Should only be used for testing.
 /// When uninitialized, data accessors will return zero values, and operations (e.g.,
 /// RefreshState and NewExpiringPurchase) will return errors.
+///
+/// httpRequestFunc: The requester _must_ do HTTPS certificate validation.
+/// In the case of a partial response, a `RECOVERABLE_ERROR` should be returned.
 - (PSIError *_Nullable)initializeWithUserAgent:(NSString *)userAgent
                                  fileStoreRoot:(NSString *)fileStoreRoot
                                httpRequestFunc:(PSIHttpResult * (^_Nullable)(PSIHttpRequest *))httpRequestFunc
@@ -391,7 +394,9 @@ localOnly:(BOOL)localOnly WARN_UNUSED_RESULT;
  
  Result fields:
  
- • error: If set, the request failed utterly and no other params are valid.
+ • error: If set, the request failed utterly and no other params are valid. An error
+   result should be followed by a RefreshState call, in case the purchase succeeded on
+   the server side but wasn't retrieved; RefreshState will synchronize state.
  
  • status: Request success indicator. See below for possible values.
  

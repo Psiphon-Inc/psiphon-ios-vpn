@@ -24,8 +24,13 @@
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "DebugDirectoryViewerViewController.h"
+#import "PersistentContainerWrapper.h"
+#import "Logging.h"
+#import "Psiphon-Swift.h"
+#import "UIAlertController+Additions.h"
+#import "AppFiles.h"
 
-#if DEBUG
+#if DEBUG || DEV_RELEASE
 
 NSString * const ActionCellIdentifier = @"ActionCell";
 NSString * const SwitchCellIdentifier = @"SwitchCell";
@@ -100,7 +105,7 @@ NSString * const StateCellIdentifier = @"StateCell";
         case 0: return 2; // PPROF
         case 1: return 3; // EXTENSION
         case 2: return 1; // PSIPHON TUNNEL
-        case 3: return 2; // CONTAINER
+        case 3: return 4; // CONTAINER
         default:
             PSIAssert(FALSE)
             return 0;
@@ -203,6 +208,16 @@ NSString * const StateCellIdentifier = @"StateCell";
                 action = @selector(onResetPsiphonDataSharedDB);
                 break;
             }
+            case 2: {
+                cell.textLabel.text = @"Delete Core Data persistent store";
+                action = @selector(onDeleteCoreDataPersistentStores);
+                break;
+            }
+            case 3: {
+                cell.textLabel.text = @"Delete PsiCash store directory";
+                action = @selector(onDeletePsiCashStore);
+                break;
+            }
         }
     }
 
@@ -243,11 +258,58 @@ NSString * const StateCellIdentifier = @"StateCell";
 
 - (void)onResetStandardUserDefaults {
     [self clearUserDefaults:[NSUserDefaults standardUserDefaults]];
+    [self presentAlertWithTitle:@"NSUserDefaults" andMessage:@"Cleared standardUserDefaults"];
 }
 
 - (void)onResetPsiphonDataSharedDB {
     NSUserDefaults *sharedDB = [[NSUserDefaults alloc] initWithSuiteName:PsiphonAppGroupIdentifier];
     [self clearUserDefaults:sharedDB];
+    [self presentAlertWithTitle:@"NSUserDefaults" andMessage:@"Cleared PsiphonDataSharedDB"];
+}
+
+- (void)onDeleteCoreDataPersistentStores {
+    
+    // Deletes SharedModel persistent store.
+    NSError *error = nil;
+    [[SwiftDelegate.bridge sharedCoreData] destroyPersistentStoreAndReturnError:&error];
+    
+    if (error != nil) {
+        LOG_DEBUG(@"Failed to delete SharedModel persistent store: %@", error);
+        [self presentAlertWithTitle:@"Error" andMessage:@"Failed to delete persistent store"];
+    } else {
+        [self presentAlertWithTitle:@"Success" andMessage:@"Deleted persistent store"];
+    }
+    
+    LOG_DEBUG(@"SharedModel sql URL: %@", [AppFiles sharedSqliteDB]);
+    
+}
+
+- (void)onDeletePsiCashStore {
+    
+    NSString *_Nullable dirPath = [SwiftDelegate.bridge getPsiCashStoreDir];
+    
+    if (dirPath == nil) {
+        [self presentAlertWithTitle:@"Error" andMessage:@"PsiCash store dir not defined"];
+        return;
+    }
+    
+    NSError *error = nil;
+    [NSFileManager.defaultManager removeItemAtPath:dirPath error:&error];
+    
+    if (error != nil) {
+        LOG_DEBUG(@"Failed to delete PsiCash store dir: %@", error.description);
+        [self presentAlertWithTitle:@"Error" andMessage:@"Failed to delete PsiCash store dir"];
+    } else {
+        [self presentAlertWithTitle:@"Success" andMessage:@"Deleted PsiCash store dir"];
+    }
+    
+}
+
+- (void)presentAlertWithTitle:(NSString *)title andMessage:(NSString *)message {
+    [UIAlertController presentSimpleAlertWithTitle:title
+                                           message:message
+                                    preferredStyle:UIAlertControllerStyleAlert
+                                         okHandler:nil];
 }
 
 #pragma mark - Connection state

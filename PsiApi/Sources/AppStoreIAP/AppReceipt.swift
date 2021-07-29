@@ -25,8 +25,10 @@ import PsiApi
 
 /// `ReceiptReadReason` represents the event that caused the receipt file to be read.
 public enum ReceiptReadReason: Equatable, CaseIterable {
-    case remoteRefresh
-    case localRefresh
+    /// Receipt was refreshed after a receipt refresh request was sent to Apple.
+    case remoteReceiptRefresh
+    /// Local receipt file was updated since last read (e.g. after an in-app purchase)
+    case localUpdate
 }
 
 public struct ReceiptState: Equatable {
@@ -34,7 +36,10 @@ public struct ReceiptState: Equatable {
     public typealias ReceiptRefreshState = PendingValue<SKReceiptRefreshRequest,
                                                         Result<Utilities.Unit, SystemErrorEvent<Int>>>
     
-    public var receiptData: ReceiptData?
+    /// Content of local app receipt since last read.
+    /// Value is `.none` if the receipt file has never been read.
+    /// Value is `.some(.none)`, if the receipt file does not exist.
+    public var receiptData: ReceiptData??
     
     // remoteReceiptRefreshState holds a strong reference to the `SKReceiptRefreshRequest`
     // object while the request is in progress.
@@ -58,7 +63,7 @@ extension ReceiptState {
 extension ReceiptState {
     
     public init() {
-        receiptData = .none
+        receiptData = .none // Receipt file not read yet.
         remoteReceiptRefreshState = .completed(.success(.unit))
         remoteRefreshAppReceiptPromises = []
     }
@@ -75,9 +80,17 @@ extension ReceiptState {
 }
 
 public enum ReceiptStateAction: Equatable {
-    case localReceiptRefresh
-    case _localReceiptDidRefresh(refreshedData: ReceiptData?)
-    /// A remote receipt refresh can open a dialog box to
+    
+    /// Reads local app receipt.
+    case readLocalReceiptFile
+    
+    /// Result of reading local app receipt.
+    case _readLocalReceiptFile(refreshedData: ReceiptData?)
+    
+    /// Sends a request to refresh the app receipt.
     case remoteReceiptRefresh(optionalPromise: Promise<Result<Utilities.Unit, SystemErrorEvent<Int>>>?)
+    
+    /// Result of receipt refresh.
     case _remoteReceiptRefreshResult(Result<Utilities.Unit, SystemErrorEvent<Int>>)
+    
 }

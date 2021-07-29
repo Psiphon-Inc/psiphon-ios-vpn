@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Psiphon Inc.
+ * Copyright (c) 2021, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -20,388 +20,365 @@
 import Foundation
 import ReactiveSwift
 import PsiApi
+import StoreKit
 
-/// Represents authorization state for subscription purchase.
-public struct SubscriptionPurchaseAuthState: Hashable, Codable {
+
+// TODO: Handle subscription cancellations
+// https://developer.apple.com/documentation/xcode/setting-up-storekit-testing-in-xcode
+
+/// Represents state of requesting an authorization for a subscription transaction.
+public struct SubscriptionTransactionAuthRequestState: Hashable {
     
-    public enum AuthorizationState: Hashable {
-
-        public enum RequestRejectedReason: String, Codable, CaseIterable {
-            /// Received 400-Bad Request error from the purchase verifier server.
+    /// Represents all possible failure cases of retrieving an authorization for a subscription transaction.
+    public enum AuthorizationRequestFailure: HashableError {
+        
+        /// Represents set of reasons for which an authorization request was rejected
+        /// by the purchase verifier servers. Retrying is unlikely to change the outcome.
+        public enum RequestRejectedReason: Hashable {
+            /// Received 400 Bad Request error from the purchase verifier servers.
+            /// The request can be retried again only after a app receipt refresh.
             case badRequestError
-            /// Transaction had expired.
+            /// Subscription expiry date has passed.
+            /// Request should not be retried.
             case transactionExpired
-            /// Transaction has been cancelled by Apple customer service.
+            /// Purchase has been cancelled by Apple customer support.
+            /// Request should not be retried.
             case transactionCancelled
         }
         
-        /// Authorization not requested for the current transaction.
-        case notRequested
-        
-        /// Authorization request failed. Authorization request can be retried again later.
+        /// Authorization request failed. Request can be retried again later.
         case requestError(ErrorEvent<ErrorRepr>)
         
         /// Authorization request rejected by the purchase verifier server.
-        /// Authorization request should **not** be retried for this transaction anymore.
-        /// If receipt is refreshed by the App Store, the transaction can be retried.
+        /// Authorization request should **not** be retried for this transaction anymore,
+        /// unless the receipt file is refreshed by App Store depending on the `RequestRejectedReason`.
         case requestRejected(RequestRejectedReason)
         
-        /// Retrieved an authorization successfully.
-        case authorization(SignedData<SignedAuthorization>)
-        
-        /// Authorization rejected by the Psiphon servers.
-        /// If the transaction has not expired, another authorization can be requested from the purchase verifier server.
-        case rejectedByPsiphon(SignedData<SignedAuthorization>)
     }
     
-    /// Subscription purchase contained in the app receipt.
+    /// Subscirption transaction contained in the local app receipt.
     public let purchase: SubscriptionIAPPurchase
     
-    /// State of authorization for the `purchase`.
-    public var signedAuthorization: AuthorizationState
+    /// Authorization request result.
+    /// `nil` implies a request has not been made.
+    /// `.pending` value implies that the authorization request is either in-flight or pending tunnel connected event.
+    public var authorization: Optional<Pending<Result<SignedData<SignedAuthorization>,
+                                             AuthorizationRequestFailure>>>
+    
+}
 
+extension SubscriptionTransactionAuthRequestState {
+    
+    /// Returns `true` if a request can be made to the purchase verifier server,
+    /// based on the current authorization state.
+    /// - Note: In the case of retries, `true` only means the request can be retried after some
+    ///         reasonable delay, and probably not immediately.
+    var canRequestAuthorization: Bool {
+        switch authorization {
+        case .none:
+            return true
+        case .pending:
+            return false
+        case .completed(let result):
+            switch result {
+            case .success(_):
+                return false
+            case .failure(.requestError(_)):
+                // Authorization request failed probably due to a network error.
+                // Request can be retried again later.
+                return true
+            case .failure(.requestRejected(_)):
+                // Request should probably not be retried, at least
+                // until the local app receipt is refreshed.
+                return false
+            }
+        }
+    }
+    
 }
 
 public enum SubscriptionAuthStateAction {
     
-    public enum StoredDataUpdateType {
-        case didUpdateRejectedSubscriptionAuthIDs
-        case didRefreshReceiptData(ReceiptReadReason)
-    }
-
-    case localDataUpdate(type: StoredDataUpdateType)
+    /// Represents the event where the local app receipt data is read and
+    /// it's in-memory representation in the app is updated.
+    /// Consecutive firing of this event does not need to imply the receipt data
+    /// has necessarily changed, however it will prevent redundant work.
+    case appReceiptDataUpdated(ReceiptData?, ReceiptReadReason)
     
-    case _didLoadStoredPurchaseAuthState(
-        loadResult: Result<SubscriptionAuthState.PurchaseAuthStateDict, SystemErrorEvent<Int>>,
-        replayDataUpdate: StoredDataUpdateType?
-    )
+    /// Action to update transactions' authorization state, given updated
+    /// receipt data (along with the reason receipt was read),
+    /// and current persisted subscription authorizations.
+    case _updateTransactionsAuthState(ReceiptData,
+                                      ReceiptReadReason,
+                                      Result<Set<SharedAuthorizationModel>, CoreDataError>)
     
-    case _requestAuthorizationForPurchases
+    /// Represents result of syncing authorizations with Core Data.
+    /// Boolean success result represents whether any changes have been made to the persistent store.
+    case _coreDataSyncResult(Result<Bool, CoreDataError>)
     
-    case _localDataUpdateResult(
-        transformer: (SubscriptionAuthState.PurchaseAuthStateDict) ->
-            (SubscriptionAuthState.PurchaseAuthStateDict, [Effect<SubscriptionAuthStateAction>])
-    )
-    
+    /// Result of an authorization HTTP request for a given subscription transaction.
     case _authorizationRequestResult(
         result: RetriableTunneledHttpRequest<SubscriptionValidationResponse>.RequestResult,
-        forPurchase: SubscriptionIAPPurchase
+        forTransaction: SubscriptionIAPPurchase
     )
+    
 }
 
-public struct SubscriptionAuthStateReducerEnvironment {
-    public let feedbackLogger: FeedbackLogger
-    public let httpClient: HTTPClient
-    public let httpRequestRetryCount: Int
-    public let httpRequestRetryInterval: DispatchTimeInterval
-    public let notifier: Notifier
-    public let notifierUpdatedSubscriptionAuthsMessage: String
-    public let sharedDB: SharedDBContainer
-    public let tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
-    public let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
-    public let clientMetaData: () -> ClientMetaData
-    public let dateCompare: DateCompare
-
-    public init(feedbackLogger: FeedbackLogger, httpClient: HTTPClient,
-               httpRequestRetryCount: Int, httpRequestRetryInterval: DispatchTimeInterval,
-               notifier: Notifier, notifierUpdatedSubscriptionAuthsMessage: String,
-               sharedDB: SharedDBContainer,
-               tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
-               tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
-               clientMetaData: @escaping () -> ClientMetaData,
-               dateCompare: DateCompare) {
-
-        self.feedbackLogger = feedbackLogger
-        self.httpClient = httpClient
-        self.httpRequestRetryCount = httpRequestRetryCount
-        self.httpRequestRetryInterval = httpRequestRetryInterval
-        self.notifier = notifier
-        self.notifierUpdatedSubscriptionAuthsMessage = notifierUpdatedSubscriptionAuthsMessage
-        self.sharedDB = sharedDB
-        self.tunnelStatusSignal = tunnelStatusSignal
-        self.tunnelConnectionRefSignal = tunnelConnectionRefSignal
-        self.clientMetaData = clientMetaData
-        self.dateCompare = dateCompare
-    }
-}
 
 public struct SubscriptionAuthState: Equatable {
-
+    
+    public typealias TransactionsAuthState =
+    [WebOrderLineItemID: SubscriptionTransactionAuthRequestState]
+    
+    /// Represents authorization request for all subscription transactions present in the local app receipt.
+    ///
+    /// Value is `nil` if not initialized yet. Initialization here means that local receipt, and persisted
+    /// authorization in `SharedCoreData` were both loaded and merged to produce a value here.
+    public var transactionsAuthState: TransactionsAuthState? = .none
+    
     public init() {}
     
-    public typealias PurchaseAuthStateDict = [WebOrderLineItemID: SubscriptionPurchaseAuthState]
-
-    /// Set of transactions that either have a pending authorization request (either in-flight or pending tunnel connected).
-    public var transactionsPendingAuthRequest = Set<WebOrderLineItemID>()
-    
-    /// `nil` represents that subscription auths have not been restored from previously stored value.
-    /// This value is in  sync with stored value in  `PsiphonDataSharedDBContainer`
-    /// with key `subscription_authorizations_dict`.
-    public var purchasesAuthState: PurchaseAuthStateDict? = .none
 }
 
-public struct SubscriptionReducerState: Equatable {
-
-    public var subscription: SubscriptionAuthState
-
-    let receiptData: ReceiptData?
-
-    public init(subscription: SubscriptionAuthState, receiptData: ReceiptData?)  {
-        self.subscription = subscription
-        self.receiptData = receiptData
+extension SubscriptionAuthState {
+    
+    /// True if there are any transactions with pending authorization request.
+    public var anyPendingAuthRequests: Bool {
+        guard let transactionsAuthState = self.transactionsAuthState else {
+            return false
+        }
+        let pendingAuths = transactionsAuthState.values.filter {
+            switch $0.authorization {
+            case .none, .pending:
+                return true
+            case .completed(_):
+                return false
+            }
+        }
+        return !pendingAuths.isEmpty
     }
-
+    
+    /// Set of SharedAuthorizationModel values for all subscriptions in `transactionsAuthState`
+    /// that have an authorization.
+    /// - Note: `psiphondRejected` is set to `false`.
+    func getSharedAuthorizationModels() -> Set<SharedAuthorizationModel> {
+        guard let transactionsAuthState = self.transactionsAuthState else {
+            return Set()
+        }
+        return Set(transactionsAuthState.compactMap { (key, value) in
+            guard case .completed(.success(let signedAuth)) = value.authorization else {
+                return nil
+            }
+            return SharedAuthorizationModel(
+                authorization: signedAuth,
+                webOrderLineItemID: key,
+                psiphondRejected: false
+            )
+        })
+    }
+        
 }
 
-public let subscriptionAuthStateReducer = Reducer<SubscriptionReducerState
-                                                  , SubscriptionAuthStateAction
-                                                  , SubscriptionAuthStateReducerEnvironment> {
-    state, action, environment in
-
-    switch action {
+public let subscriptionAuthStateReducer = Reducer<SubscriptionAuthState,
+                                                  SubscriptionAuthStateAction,
+                                                  SubscriptionAuthStateReducerEnvironment>
+{ state, action, environment in
     
-    case .localDataUpdate(type: let updateType):
-        guard let receiptData = state.receiptData else {
+    switch action {
+        
+    case let .appReceiptDataUpdated(receiptData, receiptReadReason):
+        
+        // state.transactionsAuthState should be empty if there is no local app receipt.
+        guard let receiptData = receiptData else {
+            
+            state.transactionsAuthState = [:]
+            
             return [
-                Effect(value:
-                    ._didLoadStoredPurchaseAuthState(
-                        loadResult: .success([:]),
-                        replayDataUpdate: .none
-                    )
-                )
+                // Syncs with Core Data.
+                environment.sharedAuthCoreData
+                    .syncAuthorizationsWithSharedCoreData(
+                        Authorization.AccessType.subscriptionTypes,
+                        Set(),
+                        environment.mainDispatcher)
+                    .map { ._coreDataSyncResult($0) }
             ]
         }
         
-        guard state.subscription.purchasesAuthState != nil else {
-            return [
-                StoredSubscriptionPurchasesAuthState.getValue(sharedDB: environment.sharedDB)
-                    .map {
-                        ._didLoadStoredPurchaseAuthState(
-                            loadResult: $0,
-                            replayDataUpdate: updateType
-                        )
-                }
-            ]
-        }
-        
-        let receiptInAppPurchases = receiptData.subscriptionInAppPurchases
-        
+        // Emits `_updateTransactionsAuthState` with current app receipt subscription
+        // transactions, and persisted authorization data.
         return [
-            StoredRejectedSubscriptionAuthIDs.getValue(sharedDB: environment.sharedDB)
-                .map { rejectedAuthIDsSeqTuple -> SubscriptionAuthStateAction in
-                    ._localDataUpdateResult { current in
-                        
-                        var effects = [Effect<SubscriptionAuthStateAction>]()
-                        
-                        // Merges subscription purchases present in the receipt,
-                        // with `current` data for the given purchases.
-                        var newValue = current.merge(withUpdatedPurchases: receiptInAppPurchases)
-                        
-                        // If the receipt is refreshed from the App Store,
-                        // resets authorization state to `.notRequested`, for any
-                        // purchase whose authorization request result in 400-Bad request error.
-                        if case .didRefreshReceiptData(let readReason) = updateType {
-                            newValue = newValue.resetAuthorizationBadRequest(
-                                forReceiptUpdateType: readReason
-                            )
-                        }
-                        
-                        // Updates authorization state for any purchase that had it's authorization
-                        // rejected by Psiphon servers.
-                        newValue = newValue.updateAuthorizationState(
-                            givenRejectedAuthIDs: rejectedAuthIDsSeqTuple.rejectedValues
-                        )
-                        
-                        effects += StoredRejectedSubscriptionAuthIDs
-                            .setContainerReadRejectedAuthIDs(
-                                atLeastUpToSequenceNumber: rejectedAuthIDsSeqTuple.writeSeqNumber,
-                                sharedDB: environment.sharedDB)
-                            .fireAndForget()
-                        
-                        return (newValue, effects)
-                    }
-                }
+            environment.sharedAuthCoreData
+                .getPersistedAuthorizations(psiphondRejected: nil,
+                                            Authorization.AccessType.subscriptionTypes,
+                                            environment.mainDispatcher)
+                .map { ._updateTransactionsAuthState(receiptData, receiptReadReason, $0) }
         ]
+    
+    case let ._updateTransactionsAuthState(receiptData,
+                                           receiptReadReason,
+                                           persistedAuthResult):
         
-    case let ._didLoadStoredPurchaseAuthState(loadResult: loadResult, replayDataUpdate: updateType):
-        switch loadResult {
-        case .success(let loadedValue):
+        // Updates subscription transaction's authorization state,
+        // given the receiptData, and persisted subscription authorizations.
+        
+        switch persistedAuthResult {
+            
+        case .success(let persistedAuthorizations):
+            
+            let nonExpiredPurchases = receiptData.subscriptionInAppPurchases.filter { purchase in
+                !purchase.isApproximatelyExpired(environment.dateCompare)
+            }
+            
+            // Checks if there are any active (non-expired) subscription transactions.
+            guard nonExpiredPurchases.count > 0 else {
+                
+                state.transactionsAuthState = [:]
+                
+                return [
+                    // Syncs updated authorizations with Core Data.
+                    environment.sharedAuthCoreData
+                        .syncAuthorizationsWithSharedCoreData(
+                            Authorization.AccessType.subscriptionTypes,
+                            Set(),
+                            environment.mainDispatcher)
+                        .map { ._coreDataSyncResult($0) }
+                ]
+                
+            }
+            
+            // Constructs new subscriptions auth state given it's current state,
+            // transactions found in the local receipt and authorizations already persisted.
+            state.transactionsAuthState = makeTransactionsAuthState(
+                currentAuthRequestStates: state.transactionsAuthState,
+                nonExpiredPurchases: nonExpiredPurchases,
+                receiptReadReason: receiptReadReason,
+                persistedAuthorizations: persistedAuthorizations)
+            
             var effects = [Effect<SubscriptionAuthStateAction>]()
             
-            effects += state.subscription
-                .setPurchasesAuthState(newValue: loadedValue,
-                                       environment: environment)
-                .mapNever()
+            // We only ever expect a single (non-expired) subscription purchase which doesn't have
+            // an authorization at a time. So the first subscription transaction without
+            // authorization is selected. Even if this is not always true, it would not cause
+            // any issues.
+            let txWithoutAuth = (state.transactionsAuthState ?? [:])
+                .values
+                .filter { $0.canRequestAuthorization }
+                .first
             
-            // Replays `localDataUpdate(type:)` action if not nil.
-            if let updateType = updateType {
-                effects += Effect(value: .localDataUpdate(type: updateType))
+            if let txWithoutAuth = txWithoutAuth {
+                
+                // Updates transaction's authorization state to pending.
+                state.transactionsAuthState![txWithoutAuth.purchase.webOrderLineItemID] =
+                SubscriptionTransactionAuthRequestState(
+                    purchase: txWithoutAuth.purchase,
+                    authorization: .pending
+                )
+                
+                // Authorization request effect to purchase verifier server for `txWithoutAuth`.
+                effects += makeAuthorizationRequest(
+                    purchase: txWithoutAuth.purchase,
+                    receiptData: receiptData,
+                    clientMetaData: environment.clientMetaData,
+                    retryCount: environment.httpRequestRetryCount,
+                    retryInterval: environment.httpRequestRetryInterval,
+                    getCurrentTime: environment.dateCompare.getCurrentTime,
+                    tunnelStatusSignal: environment.tunnelStatusSignal,
+                    tunnelConnectionRefSignal: environment.tunnelConnectionRefSignal,
+                    httpClient: environment.httpClient
+                ).map {
+                    ._authorizationRequestResult(result: $0,
+                                                 forTransaction: txWithoutAuth.purchase)
+                }
+                
+                effects += environment.feedbackLogger.log(.info, """
+                    Initiated auth request for subscription purchase \
+                    WebOrderLineItemID(\(txWithoutAuth.purchase.webOrderLineItemID))
+                    """).mapNever()
+                
             }
+            
+            // Syncs updated authorizations with Core Data.
+            effects += environment.sharedAuthCoreData
+                .syncAuthorizationsWithSharedCoreData(
+                    Authorization.AccessType.subscriptionTypes,
+                    state.getSharedAuthorizationModels(),
+                    environment.mainDispatcher)
+                .map { ._coreDataSyncResult($0) }
             
             return effects
             
-        case .failure(let errorEvent):
-            // Reading from PsiphonDataSharedDBContainer failed.
-            // Resets value of stored subscription purchase auth state.
+        case .failure(let error):
+            // Failed to read subscription authorization data from Core Data.
+            // Currently this failure event is only logged.
+            return [
+                environment.feedbackLogger.log(
+                    .error, "Failed to get auth data from Core Data: \(error)"
+                ).mapNever()
+            ]
+        }
+        
+    case ._coreDataSyncResult(let syncResult):
+        
+        // Notifies the Network Extension of any changes to persisted authorization in Core Data.
+        // Errors with Core Data are only logged, and no further action is taken at this point.
+        
+        switch syncResult {
             
-            let stateUpdateEffect = state.subscription.setPurchasesAuthState(
-                newValue: [:],
-                environment: environment
-            )
+        case .success(let changed):
+            
+            var effects = [Effect<SubscriptionAuthStateAction>]()
+            
+            if changed {
+                // Notifies Network Extension if any changes have been made to the peristent store.
+                effects += .fireAndForget {
+                    environment.notifier.post(environment.notifierUpdatedAuthorizationsMessage)
+                }
+            }
+            
+            effects += environment.feedbackLogger.log(
+                .info, "Synced subscription authorizations with Core Data")
+                .mapNever()
+            
+            return effects
+            
+        case .failure(let error):
             
             return [
-                stateUpdateEffect.then(
-                    Effect(value: .localDataUpdate(type: .didRefreshReceiptData(.localRefresh)))
-                ),
-                
-                environment.feedbackLogger.log(.error, "failed reading stored subscription auth state '\(errorEvent)'")
-                    .mapNever()
+                environment.feedbackLogger.log(
+                    .error, "Failed to sync subscription authorization with Core Data: \(error)"
+                ).mapNever()
             ]
         }
         
-    case ._localDataUpdateResult(transformer: let transformerFunc):
-        guard let currentPurchasesAuthState = state.subscription.purchasesAuthState else {
-            fatalError()
-        }
-
-        let (newValue, effects) = transformerFunc(currentPurchasesAuthState)
         
-        // Avoids duplicate updates if there has been no value change.
-        guard newValue != currentPurchasesAuthState else {
-            return effects + [
-                Effect(value: ._requestAuthorizationForPurchases)
-            ]
-        }
-
-        let stateUpdateEffect = state.subscription.setPurchasesAuthState(
-            newValue: newValue,
-            environment: environment
-        )
-
-        return effects + [
-            stateUpdateEffect.mapNever(),
-            Effect(value: ._requestAuthorizationForPurchases)
-        ]
+    case let ._authorizationRequestResult(result: requestResult, forTransaction: transaction):
         
-    case ._requestAuthorizationForPurchases:
-        guard let receiptData = state.receiptData else {
+        // Should never happen, however state.transactionsAuthState should have been initialized.
+        guard let transactionsAuthState = state.transactionsAuthState else {
+            environment.feedbackLogger.fatalError("transactionsAuthState is not initialized")
             return []
         }
         
-        // Filters `purchasesAuthState` for purchases that do not have an authorization,
-        // or an authorization request could be retried.
-        let purchasesWithoutAuth = state.subscription.purchasesAuthState?.values.filter {
-            $0.canRequestAuthorization(dateCompare: environment.dateCompare)
-        }
-        
-        let sortedByExpiry = purchasesWithoutAuth?.sorted(by: {
-            $0.purchase.expires < $1.purchase.expires
-        })
-        
-        // Authorization is only retrieved for purchase with the latest expiry.
-        guard let purchaseWithLatestExpiry = sortedByExpiry?.last else {
-            return []
-        }
-        
-        // If the transaction is expired according to device's clock
-        let isExpired = purchaseWithLatestExpiry.purchase
-            .isApproximatelyExpired(environment.dateCompare)
-        
-        guard !isExpired else {
-            return []
-        }
-        
-        // Adds transaction ID to set of transaction IDs pending authorization request response.
-        let (inserted, _) = state.subscription.transactionsPendingAuthRequest.insert(
-            purchaseWithLatestExpiry.purchase.webOrderLineItemID
-        )
-        
-        // Guards that the an authorization request is not already made given the transaction ID.
-        guard inserted else {
-            return []
-        }
-
-        // Creates retriable authorization request.
-
-        let req = PurchaseVerifierServer.subscription(
-            requestBody: SubscriptionValidationRequest(
-                originalTransactionID: purchaseWithLatestExpiry.purchase.originalTransactionID,
-                webOrderLineItemID: purchaseWithLatestExpiry.purchase.webOrderLineItemID,
-                productID: purchaseWithLatestExpiry.purchase.productID,
-                receipt: receiptData
-            ),
-            clientMetaData: environment.clientMetaData()
-        )
-
-        let authRequest = RetriableTunneledHttpRequest(
-            request: req.request,
-            retryCount: environment.httpRequestRetryCount,
-            retryInterval: environment.httpRequestRetryInterval
-        )
-
-        var effects = [Effect<SubscriptionAuthStateAction>]()
-
-        if let error = req.error {
-            effects += [environment.feedbackLogger.log(.error,
-                                                       tag: "SubscriptionAuthStateReducer._requestAuthorizationForPurchases",
-                                                       error).mapNever()]
-        }
-        
-        return effects + [
-            authRequest(
-                getCurrentTime: environment.dateCompare.getCurrentTime,
-                tunnelStatusSignal: environment.tunnelStatusSignal,
-                tunnelConnectionRefSignal: environment.tunnelConnectionRefSignal,
-                httpClient: environment.httpClient
-            ).map {
-                ._authorizationRequestResult(
-                    result: $0,
-                    forPurchase: purchaseWithLatestExpiry.purchase
-                )
-            },
-            environment.feedbackLogger.log(.info, """
-                initiated auth request for webOrderLineItemID \
-                \(purchaseWithLatestExpiry.purchase.webOrderLineItemID)
-                """).mapNever()
-        ]
-        
-    case let ._authorizationRequestResult(result: requestResult, forPurchase: purchase):
+        // If the transaction that this authorization request response belongs to
+        // no longer exists, we will ignore the result.
         guard
-            state.subscription.transactionsPendingAuthRequest
-                .contains(purchase.webOrderLineItemID)
-            else {
-                return [
-                    environment.feedbackLogger.log(.warn, """
-                        'state.subscription.transactionsPendingAuthRequest' does not contains \
-                        purchase with webOrderLineItemID: '\(purchase.webOrderLineItemID)'
-                        """).mapNever()
-                ]
-        }
-        
-        guard let purchasesAuthState = state.subscription.purchasesAuthState else {
-            fatalError()
-        }
-        
-        guard purchasesAuthState.contains(webOrderLineItemID: purchase.webOrderLineItemID)
-            else {
-                
-                // Removes the transaction from set of transactions pending auth request,
-                // as this transaction is no longer valid (since it is not part of the state).
-                state.subscription.transactionsPendingAuthRequest
-                    .remove(purchase.webOrderLineItemID)
-                
-                return [
-                    environment.feedbackLogger.log(.warn, """
-                        'state.subscription.purchaseAuthStates' does not contain purchase
-                        with webOrderLineItemID: '\(purchase.webOrderLineItemID)'
-                        """).mapNever()
-                ]
+            let transactionAuthState = transactionsAuthState[transaction.webOrderLineItemID]
+        else {
+            environment.feedbackLogger.fatalError("Matching purchase not found")
+            return [
+                environment.feedbackLogger.log(.warn,"""
+                    Purchase with WebOrderLineItemID(\(transaction.webOrderLineItemID) not found
+                    """).mapNever()
+            ]
         }
         
         switch requestResult {
-        case .willRetry(when: let retryCondition):
+            
+        case .willRetry(let retryCondition):
             switch retryCondition {
             case .whenResolved(tunnelError: .nilTunnelProviderManager):
+                // VPN config is not installed, request will be retired once VPN config
+                // is installed and loaded successfully.
                 return [ environment.feedbackLogger.log(.error, retryCondition).mapNever() ]
                 
             case .whenResolved(tunnelError: .tunnelNotConnected):
@@ -412,389 +389,291 @@ public let subscriptionAuthStateReducer = Reducer<SubscriptionReducerState
                 return [ environment.feedbackLogger.log(.error, retryCondition).mapNever() ]
             }
             
-        case .failed(let errorEvent):
-            // Authorization request finished in failure.
-            
-            var effects = [Effect<SubscriptionAuthStateAction>]()
-            
-            effects += environment.feedbackLogger
-                .log(.error, "authorization request failed '\(errorEvent)'").mapNever()
-            
-            // Authorization request for this purchase is no longer pending.
-            state.subscription.transactionsPendingAuthRequest.remove(purchase.webOrderLineItemID)
-            
-            let stateUpdateEffect = state.subscription.setAuthorizationState(
-                newValue: .requestError(errorEvent.eraseToRepr()),
-                forWebOrderLineItemID: purchase.webOrderLineItemID,
-                environment: environment
-            )
-            
-            effects += stateUpdateEffect.mapNever()
-            
-            return effects
-            
         case .completed(let subscriptionValidationResult):
-            // Authorization request completed with a response from purchase verifier server.
-            
-            // Authorization request for this purchase is no longer pending.
-            state.subscription.transactionsPendingAuthRequest.remove(purchase.webOrderLineItemID)
+            // Authorization request finished. Request may have been already retried
+            // automatically if it has failed.
             
             switch subscriptionValidationResult {
                 
             case .success(let okResponse):
-                // 200-OK response from the purchase verifier server.
-                guard okResponse.webOrderLineItemID == purchase.webOrderLineItemID else {
+                // 200 OK response from the purchase-verifier server.
+                // Note 200 OK response does not imply an authorization has been retrieved,
+                // error_status field of the JSON response should be checked first.
+                
+                // Sanity-check.
+                guard okResponse.webOrderLineItemID == transaction.webOrderLineItemID else {
+                    
                     let log: LogMessage =
                         """
-                        sever webOrderLineItemID '\(okResponse.webOrderLineItemID)' did not match \
-                        expected webOrderLineItemID '\(purchase.webOrderLineItemID)'
+                        Sever WebOrderLineItemID '\(okResponse.webOrderLineItemID)' did not match \
+                        expected WebOrderLineItemID '\(transaction.webOrderLineItemID)'
                         """
-                    let err = ErrorEvent(ErrorRepr(repr:String(describing:log)),
-                                         date: okResponse.requestDate)
+                    let errorEvent = ErrorEvent(ErrorRepr(repr: String(describing:log)),
+                                                date: okResponse.requestDate)
+                    
+                    state.transactionsAuthState![transaction.webOrderLineItemID] =
+                    SubscriptionTransactionAuthRequestState(
+                        purchase: transaction,
+                        authorization: .completed(.failure(.requestError(errorEvent)))
+                    )
+
                     return [
-                        state.subscription.setAuthorizationState(
-                            newValue: .requestError(err),
-                            forWebOrderLineItemID: purchase.webOrderLineItemID,
-                            environment: environment
-                        ).mapNever(),
                         environment.feedbackLogger.log(.error, log).mapNever()
                     ]
+                    
                 }
                 
                 switch okResponse.errorStatus {
+                
                 case .noError:
+                    // Gets signed_authorization from the response.
+                    // It is a programming error if this field does not exist.
                     guard let signedAuthorization = okResponse.signedAuthorization else {
-                        let log: LogMessage = "expected 'signed_authorization' in response '\(okResponse)'"
-                        let err = ErrorEvent(ErrorRepr(repr:String(describing:log)),
-                                             date: okResponse.requestDate)
+                        
+                        let log: LogMessage = "Expected 'signed_authorization' in response '\(okResponse)'"
+                        let errorEvent = ErrorEvent(ErrorRepr(repr: String(describing:log)),
+                                                    date: okResponse.requestDate)
+                        
+                        state.transactionsAuthState![transaction.webOrderLineItemID] =
+                        SubscriptionTransactionAuthRequestState(
+                            purchase: transaction,
+                            authorization: .completed(.failure(.requestError(errorEvent)))
+                        )
+                        
                         return [
-                            state.subscription.setAuthorizationState(
-                                newValue: .requestError(err),
-                                forWebOrderLineItemID: purchase.webOrderLineItemID,
-                                environment: environment
-                            ).mapNever(),
                             environment.feedbackLogger.log(.error, log).mapNever()
                         ]
+                        
                     }
                     
-                    let stateUpdateEffect = state.subscription.setAuthorizationState(
-                        newValue: .authorization(signedAuthorization),
-                        forWebOrderLineItemID: okResponse.webOrderLineItemID,
-                        environment: environment
+                    // Updates transactionsAuthState with the new authorization.
+                    state.transactionsAuthState![transaction.webOrderLineItemID] =
+                    SubscriptionTransactionAuthRequestState(
+                        purchase: transaction,
+                        authorization: .completed(.success(signedAuthorization))
                     )
                     
                     return [
-                        stateUpdateEffect.mapNever(),
+                        // Syncs updated authorizations with Core Data.
+                        environment.sharedAuthCoreData
+                            .syncAuthorizationsWithSharedCoreData(
+                                Authorization.AccessType.subscriptionTypes,
+                                state.getSharedAuthorizationModels(),
+                                environment.mainDispatcher)
+                            .map { ._coreDataSyncResult($0) },
+                        
                         environment.feedbackLogger.log(.info, """
-                            authorization request completed with auth id \
-                            '\(signedAuthorization.decoded.authorization.id)' expiring on \
-                            '\(signedAuthorization.decoded.authorization.expires)'
-                            """
-                        ).mapNever()
+                        Authorization request completed with auth id \
+                        '\(signedAuthorization.decoded.authorization.id)' expiring on \
+                        '\(signedAuthorization.decoded.authorization.expires)'
+                        """).mapNever()
                     ]
                     
                 case .transactionExpired:
-                    let stateUpdateEffect = state.subscription.setAuthorizationState(
-                        newValue: .requestRejected(.transactionExpired),
-                        forWebOrderLineItemID: okResponse.webOrderLineItemID,
-                        environment: environment
+                    // Updates transactionsAuthState with failed state.
+                    // Since authorizations have not changed (none removed or added),
+                    // there is no need to sync with Core Data.
+                    state.transactionsAuthState![transaction.webOrderLineItemID] =
+                    SubscriptionTransactionAuthRequestState(
+                        purchase: transaction,
+                        authorization: .completed(.failure(.requestRejected(.transactionExpired)))
                     )
                     
                     return [
-                        stateUpdateEffect.mapNever(),
-                        environment.feedbackLogger.log(.error, """
-                            authorization request completed with error \
-                            '\(okResponse.errorDescription)'
-                            """).mapNever()
+                        environment.feedbackLogger.log(.info, """
+                        Authorization request completed with error '\(okResponse.errorDescription)'
+                        """).mapNever()
                     ]
                     
                 case .transactionCancelled:
-                    let stateUpdateEffect = state.subscription.setAuthorizationState(
-                        newValue: .requestRejected(.transactionCancelled),
-                        forWebOrderLineItemID: okResponse.webOrderLineItemID,
-                        environment: environment
+                    // Updates transactionsAuthState with failed state.
+                    // Since authorizations have not changed (none removed or added),
+                    // there is no need to sync with Core Data.
+                    state.transactionsAuthState![transaction.webOrderLineItemID] =
+                    SubscriptionTransactionAuthRequestState(
+                        purchase: transaction,
+                        authorization: .completed(.failure(.requestRejected(.transactionCancelled)))
                     )
                     
                     return [
-                        stateUpdateEffect.mapNever(),
-                        environment.feedbackLogger.log(.error, """
-                            authorization request completed with error \
-                            '\(okResponse.errorDescription)'
-                            """).mapNever()
+                        environment.feedbackLogger.log(.info, """
+                        Authorization request completed with error '\(okResponse.errorDescription)'
+                        """).mapNever()
                     ]
+                    
                 }
                 
             case .failure(let failureEvent):
-                // Non-200 OK response from the purchase verifier server.
-                var effects = [Effect<SubscriptionAuthStateAction>]()
+                // Authorization request failed.
                 
-                effects += environment.feedbackLogger.log(.error, """
-                        authorization request failed for webOrderLineItemID \
-                        '\(purchase.webOrderLineItemID)': error: '\(failureEvent)'
-                        """).mapNever()
-                
-                if case .badRequest = failureEvent.error {
-                    let stateUpdateEffect = state.subscription.setAuthorizationState(
-                        newValue: .requestRejected(.badRequestError),
-                        forWebOrderLineItemID: purchase.webOrderLineItemID,
-                        environment: environment
+                switch failureEvent.error {
+                case .badRequest:
+                    
+                    // Request rejected by the server.
+                    // Request should not be retried until at least the local
+                    // receipt is refreshed.
+                    // User subscription status can be shown as not subscribed,
+                    // or the user should be given a chance to be able to refresh
+                    // their local app receipt.
+                    
+                    // Since authorizations have not changed (none removed or added),
+                    // there is no need to sync with Core Data.
+                    state.transactionsAuthState![transaction.webOrderLineItemID] =
+                    SubscriptionTransactionAuthRequestState(
+                        purchase: transaction,
+                        authorization: .completed(.failure(.requestRejected(.badRequestError)))
                     )
                     
-                    effects += stateUpdateEffect.mapNever()
+                case .serverError(_),
+                        .unknownStatusCode(_),
+                        .failedRequest(_),
+                        .responseBodyParseError(_):
                     
-                } else {
-                    let stateUpdateEffect = state.subscription.setAuthorizationState(
-                        newValue: .requestError(failureEvent.eraseToRepr()),
-                        forWebOrderLineItemID: purchase.webOrderLineItemID,
-                        environment: environment
+                    // Request failed due to either a network failure, a server misconfiguration
+                    // or an unknown error.
+                    // All of these errors are treated the same, and the request can be retried
+                    // later. Request may have been retried automatically.
+                    
+                    // Since authorizations have not changed (none removed or added),
+                    // there is no need to sync with Core Data.
+                    state.transactionsAuthState![transaction.webOrderLineItemID] =
+                    SubscriptionTransactionAuthRequestState(
+                        purchase: transaction,
+                        authorization: .completed(.failure(.requestError(failureEvent.eraseToRepr())))
                     )
                     
-                    effects += stateUpdateEffect.mapNever()
                 }
                 
-                return effects
-            }
-        }
-    }
-}
-
-// MARK: Type extensions
-
-extension SubscriptionStatus {
-    
-    var isSubscribed: Bool {
-        switch self {
-        case .subscribed(_): return true
-        case .notSubscribed: return false
-        case .unknown: return false
-        }
-    }
-    
-}
-
-extension Dictionary where Key == WebOrderLineItemID, Value == SubscriptionPurchaseAuthState {
-    
-    func updateAuthorizationState(
-        givenRejectedAuthIDs rejectedAuthIDs: Set<AuthorizationID>
-    ) -> Self {
-        self.mapValues { currentValue in
-            
-            guard case let .authorization(signedAuth) = currentValue.signedAuthorization else {
-                return currentValue
-            }
-            
-            guard rejectedAuthIDs.contains(signedAuth.decoded.authorization.id) else {
-                return currentValue
-            }
-            
-            return SubscriptionPurchaseAuthState(
-                purchase: currentValue.purchase,
-                signedAuthorization: .rejectedByPsiphon(signedAuth)
-            )
-        }
-    }
-    
-    /// Resets the authorization state of transactions that resulted in a 400-Bad Request error
-    /// from the purchase verifier server.
-    /// The refreshed receipt should prevent future bad request errors.
-    /// Note: Transaction IDs are regenerated after subscription is restored.
-    func resetAuthorizationBadRequest(forReceiptUpdateType updateType: ReceiptReadReason) -> Self {
-        switch updateType {
-        case .localRefresh:
-            // Do nothing
-            return self
-            
-        case .remoteRefresh:
-            return self.mapValues { currentValue in
-                
-                switch currentValue.signedAuthorization {
-                case .requestRejected(.badRequestError):
-                    return SubscriptionPurchaseAuthState(
-                        purchase: currentValue.purchase,
-                        signedAuthorization: .notRequested
-                    )
-                default:
-                    return currentValue
-                }
+                return [
+                    environment.feedbackLogger.log(.error, """
+                    Authorization request failed for \
+                    WebOrderLineItemId(\(transaction.webOrderLineItemID)): \
+                    \(failureEvent)
+                    """).mapNever()
+                ]
                 
             }
+            
+            
         }
+        
     }
     
-    /// Creates a new dictionary from from given `updatedPurchases`.
-    /// All transaction are copied from `updatedPurchases`, however `signedAuthorization`
-    /// and `rejectedByPsiphon` values copied from self if the same transaction exists.
-    /// If the same transaction is not in `self`, then authorization state is set to `.notRequested`.
-    /// - Precondition: Each element `updatedPurchases` must have unique transaction ID.
-    func merge(withUpdatedPurchases updatedPurchases: Set<SubscriptionIAPPurchase>) -> Self {
-        
-        // updatedPurchases with latest expiry, hashed by WebOrderLineItemID.
-        let altUpdatedPurchases = Set(updatedPurchases.sortedByExpiry().reversed().map {
-            HashableView($0, \.webOrderLineItemID)
-        })
+}
 
-        let updatedPurchasesDict = [WebOrderLineItemID: SubscriptionIAPPurchase](
-            uniqueKeysWithValues: altUpdatedPurchases.map {
-                ($0.value.webOrderLineItemID, $0.value)
-            }
-        )
-        return updatedPurchasesDict.mapValues {
-            SubscriptionPurchaseAuthState(
-                purchase: $0,
-                signedAuthorization: self[$0.webOrderLineItemID]?.signedAuthorization ?? .notRequested
+/// Constructs a new `TransactionsAuthState` value by combining current values,
+/// with current subscription purchases in the local app receipt, and authorizations
+/// already persisted.
+/// - Parameter currentAuthRequestState: Current transactions auth request  state.
+/// - Parameter nonExpiredPurchases: Subscription transactions in the local app receipt
+///                                  that have not expired
+/// - Parameter receiptReadReason: Whether the local app receipt was refreshed or not.
+/// - Parameter persistedAuthorizations: Subscription authorizations that have been persisted.
+func makeTransactionsAuthState(
+    currentAuthRequestStates: SubscriptionAuthState.TransactionsAuthState?,
+    nonExpiredPurchases: Set<SubscriptionIAPPurchase>,
+    receiptReadReason: ReceiptReadReason,
+    persistedAuthorizations: Set<SharedAuthorizationModel>
+) -> SubscriptionAuthState.TransactionsAuthState {
+    
+    // Combines non-expired subscription transactions in the local app receipt,
+    // with authorizations already persisted.
+    let newTransactionsAuthState: [(WebOrderLineItemID, SubscriptionTransactionAuthRequestState)] =
+    nonExpiredPurchases.map { subscriptionPurchase in
+        
+        let key = subscriptionPurchase.webOrderLineItemID
+        
+        let persistedMatch = persistedAuthorizations.filter {
+            $0.webOrderLineItemID == key
+        }.first
+        
+        let authRequestState:  SubscriptionTransactionAuthRequestState
+        
+        if let persistedMatch = persistedMatch {
+            
+            // A persisted authorization has been found.
+            authRequestState = SubscriptionTransactionAuthRequestState(
+                purchase: subscriptionPurchase,
+                authorization: .completed(.success(persistedMatch.authorization))
             )
-        }
-    }
-    
-    func contains(webOrderLineItemID: WebOrderLineItemID) -> Bool {
-        self.contains { (key, _) -> Bool in
-            key == webOrderLineItemID
-        }
-    }
-    
-}
-
-extension SubscriptionPurchaseAuthState {
-    
-    /// `canRequestAuthorization` determines whether an authorization request could be sent to the purchase verifier
-    /// server based on the current state of `signedAuthorization`, and device clock.
-    func canRequestAuthorization(dateCompare: DateCompare) -> Bool {
-        switch self.signedAuthorization {
-        case .notRequested:
-            return true
-        case .requestError(_):
-            return true
-        case .requestRejected(_):
-            return false
-        case .authorization(_):
-            return false
-        case .rejectedByPsiphon(_):
-            let isExpired = self.purchase.isApproximatelyExpired(dateCompare)
-            return !isExpired
-        }
-    }
-    
-}
-
-/// State update functions.
-extension SubscriptionAuthState {
-    
-    mutating func setAuthorizationState(
-        newValue: SubscriptionPurchaseAuthState.AuthorizationState,
-        forWebOrderLineItemID webOrderLineItemID: WebOrderLineItemID,
-        environment: SubscriptionAuthStateReducerEnvironment
-    ) -> Effect<Never> {
-        guard var purchasesAuthState = self.purchasesAuthState else {
-            fatalError()
-        }
-        
-        guard var currentValue = purchasesAuthState.removeValue(forKey: webOrderLineItemID) else{
-            fatalError("expected webOrderLineItemID '\(webOrderLineItemID)'")
-        }
-        
-        currentValue.signedAuthorization = newValue
-        purchasesAuthState[webOrderLineItemID] = currentValue
-        return setPurchasesAuthState(newValue: purchasesAuthState, environment: environment)
-    }
-    
-    mutating func setPurchasesAuthState(
-        newValue: PurchaseAuthStateDict,
-        environment: SubscriptionAuthStateReducerEnvironment
-    ) -> Effect<Never> {
-        
-        defer {
-            self.purchasesAuthState = newValue
-        }
-        
-        guard self.purchasesAuthState != nil else {
-            return .empty
-        }
-        
-        return StoredSubscriptionPurchasesAuthState.setValue(
-                sharedDB: environment.sharedDB, value: newValue
-            ).then(
-                .fireAndForget {
-					environment.notifier.post(environment.notifierUpdatedSubscriptionAuthsMessage)
-                }
-            )
-    }
-    
-}
-
-// MARK: Effects
-
-fileprivate enum StoredRejectedSubscriptionAuthIDs {
-    
-    static func getValue(
-        sharedDB: SharedDBContainer
-    ) -> Effect<(rejectedValues: Set<AuthorizationID>, writeSeqNumber: Int)> {
-        Effect { () -> (rejectedValues: Set<AuthorizationID>, writeSeqNumber: Int) in
             
-            // Sequence number is read before reading the rejected auth ID values.
-            // This is important because we do not have any atomicity guarantee.
-            //
-            // What could go wrong is described in the following steps:
-            // 1. Container reads rejected Auth IDs.
-            // 2. Extension updates sequence number and rejected subscription auth IDs.
-            // 3. Container reads updated sequence number, but now holds stale rejected Auth IDs.
+        } else {
             
-            let lastWriteSeq = sharedDB.getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber()
+            // No authorization has been persisted for this subscription purchase.
+            // If there is already an "autorization request state" value for the
+            // given WebOrderLineItemID of `subscriptionPurchase`, it is used
+            // (current state is kept and not reset unless the app receipt is refreshed.)
+            // Otherwise, the "authorization request state" is set to `nil`.
             
-            return (rejectedValues: Set(sharedDB.getRejectedSubscriptionAuthorizationIDs()),
-                    writeSeqNumber: lastWriteSeq)
+            if let value = currentAuthRequestStates?[key] {
+                
+                if case .remoteReceiptRefresh = receiptReadReason,
+                   case .completed(.failure(.requestRejected(.badRequestError))) = value.authorization {
+                    
+                       // Last request resulted in bad request error.
+                       // Since the receipt is refreshed,it's authorization
+                       // state is reset so that it can be retired again.
+                       authRequestState = SubscriptionTransactionAuthRequestState(
+                        purchase: subscriptionPurchase,
+                        authorization: .none
+                       )
+                       
+                   } else {
+                       authRequestState = value
+                   }
+                
+            } else {
+                authRequestState = SubscriptionTransactionAuthRequestState(
+                    purchase: subscriptionPurchase,
+                    authorization: .none
+                )
+            }
+            
         }
+        
+        return (subscriptionPurchase.webOrderLineItemID, authRequestState)
+        
     }
     
-    static func setContainerReadRejectedAuthIDs(
-        atLeastUpToSequenceNumber seq: Int, sharedDB: SharedDBContainer
-    ) -> Effect<()> {
-        Effect { () -> Void in
-            sharedDB.setContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber(seq)
-        }
-    }
+    // Maps list of (key, value) tuples to a dictionary.
+    return Dictionary(uniqueKeysWithValues: newTransactionsAuthState)
     
 }
 
-fileprivate enum StoredSubscriptionPurchasesAuthState {
+/// Makes a authorization request effect for the given subscription `purchase`.
+func makeAuthorizationRequest(
+    purchase: SubscriptionIAPPurchase,
+    receiptData: ReceiptData,
+    clientMetaData: () -> ClientMetaData,
+    retryCount: Int,
+    retryInterval: DispatchTimeInterval,
+    getCurrentTime: @escaping () -> Date,
+    tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
+    tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
+    httpClient: HTTPClient
+) -> Effect<RetriableTunneledHttpRequest<SubscriptionValidationResponse>.RequestResult> {
     
-    typealias StoredDataType = SubscriptionAuthState.PurchaseAuthStateDict
+    let purchaseVerifierReq = PurchaseVerifierServer.subscription(
+        requestBody: SubscriptionValidationRequest(
+            originalTransactionID: purchase.originalTransactionID,
+            webOrderLineItemID: purchase.webOrderLineItemID,
+            productID: purchase.productID,
+            receipt: receiptData
+        ),
+        clientMetaData: clientMetaData()
+    )
     
-    /// Returned effect emits stored data with type `[WebOrderLineItemID, SubscriptionPurchaseAuthState]`.
-    /// If there is no stored data, returns an empty dictionary.
-    static func getValue(
-        sharedDB: SharedDBContainer
-    ) -> Effect<Result<StoredDataType, SystemErrorEvent<Int>>> {
-        Effect { () -> Result<StoredDataType, SystemErrorEvent<Int>> in
-            guard let data = sharedDB.getSubscriptionAuths() else {
-                return .success([:])
-            }
-            do {
-                let decoded = try JSONDecoder.makeRfc3339Decoder()
-                    .decode(StoredDataType.self, from: data)
-                return .success(decoded)
-            } catch {
-                return .failure(SystemErrorEvent(SystemError<Int>.make(error as NSError), date: Date()))
-            }
-        }
-    }
+    let httpReq = RetriableTunneledHttpRequest(
+        request: purchaseVerifierReq.request,
+        retryCount: retryCount,
+        retryInterval: retryInterval
+    )
     
-    /// Encodes `value` and stores the `Data` in `sharedDB`.
-    static func setValue(
-        sharedDB: SharedDBContainer, value: StoredDataType
-    ) -> Effect<Result<(), SystemErrorEvent<Int>>> {
-        Effect { () -> Result<(), SystemErrorEvent<Int>> in
-            do {
-                guard !value.isEmpty else {
-                    sharedDB.setSubscriptionAuths(nil)
-                    return .success(())
-                }
-                let data = try JSONEncoder.makeRfc3339Encoder().encode(value)
-                sharedDB.setSubscriptionAuths(data)
-                return .success(())
-            } catch {
-                return .failure(SystemErrorEvent(SystemError<Int>.make(error as NSError), date: Date()))
-            }
-        }
-    }
+    return httpReq(
+        getCurrentTime: getCurrentTime,
+        tunnelStatusSignal: tunnelStatusSignal,
+        tunnelConnectionRefSignal: tunnelConnectionRefSignal,
+        httpClient: httpClient
+    )
     
 }

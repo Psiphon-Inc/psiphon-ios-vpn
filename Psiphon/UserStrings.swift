@@ -156,7 +156,7 @@ import Foundation
     
     static func PsiCash_subscription_already_gives_premium_access_body() -> String {
         return NSLocalizedString("PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY", tableName: nil, bundle: Bundle.main,
-                                 value: "Your Psiphon subscription already gives you always-on Speed Boost, so there is no reason to buy more. Your PsiCash balance will be retained should you ever decide to cancel your subscription.\n\nYou can still access your PsiCash account in the settings menu.",
+                                 value: "Your Psiphon subscription already gives you always-on Speed Boost, so there is no reason to buy more. Your PsiCash balance will be retained should you ever decide to cancel your subscription.\n\nYou can still access your PsiCash account from the settings menu.",
                                  comment: "A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon")
     }
 
@@ -295,7 +295,7 @@ import Foundation
     
     @objc static func Log_Out() -> String {
         return NSLocalizedString("LOG_OUT_BUTTON_TITLE_2", tableName: nil, bundle: Bundle.main,
-                                 value: "Log Out",
+                                 value: "Log out",
                                  comment: "Title of the button that lets users log out of their account")
     }
     
@@ -319,13 +319,13 @@ import Foundation
     
     static func Log_in_or_sign_up() -> String {
         return NSLocalizedString("LOG_IN_OR_SIGN_UP", tableName: nil, bundle: Bundle.main,
-                                 value: "Log In or Sign Up",
+                                 value: "Log in or sign up",
                                  comment: "Message title informing the user that they must sign up for an account or log in to their account")
     }
     
     static func Sign_up_or_login_to_psicash_account_to_continue() -> String {
         return NSLocalizedString("LOG_IN_OR_SIGNUP_TO_CONTINUE", tableName: nil, bundle: Bundle.main,
-                                 value: "Log In or Sign Up to continue using PsiCash",
+                                 value: "Log in or create account to continue using PsiCash",
                                  comment: "Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features.")
     }
     
@@ -496,9 +496,9 @@ extension UserStrings {
                                  comment: "Generic alert shown when purchase of a product fails.")
     }
     
-    static func Create_new_account_button_title() -> String {
-        return NSLocalizedString("CREATE_NEW_ACCOUNT_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
-                                 value: "Create New Account",
+    static func Create_account_button_title() -> String {
+        return NSLocalizedString("CREATE_ACCOUNT_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Create account",
                                  comment: "Button label that lets users create a new account.")
     }
     
@@ -516,7 +516,7 @@ extension UserStrings {
     
     @objc static func Log_in() -> String {
         return NSLocalizedString("LOG_IN_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
-                                 value: "Log In",
+                                 value: "Log in",
                                  comment: "Title on a button that lets users login to their account with the username and password they have entered.")
     }
     
@@ -534,7 +534,7 @@ extension UserStrings {
     
     static func Forgot_password_button_title() -> String {
         return NSLocalizedString("FORGOT_PASSWORD", tableName: nil, bundle: Bundle.main,
-                                 value: "Forgot Password?",
+                                 value: "Forgot password?",
                                  comment: "Button title that lets users reset their password if they forgot their account's password.")
     }
     

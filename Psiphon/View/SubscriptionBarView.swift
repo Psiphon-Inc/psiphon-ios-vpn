@@ -191,7 +191,7 @@ extension SubscriptionBarView {
 extension SubscriptionBarView.SubscriptionBarState {
     
     static func make(
-        authState: SubscriptionAuthState,
+        subscriptionAuthState: SubscriptionAuthState,
         subscriptionStatus: SubscriptionStatus,
         tunnelStatus: TunnelConnectedStatus
     ) -> Self {
@@ -200,30 +200,39 @@ extension SubscriptionBarView.SubscriptionBarState {
             return .init(tunnelStatus: tunnelStatus, authState: .notSubscribed)
         
         case .subscribed(let subscriptionPurchase):
-            guard let purchasesAuthState = authState.purchasesAuthState else {
-                // purchasesAuthState will eventually match subscription
-                // information presented by subscriptionStatus.
-                // For now pretend that the state is not subscribed.
+            
+            // Defaults to "not subscribed" state if `transactionsAuthState` is
+            // not initialized yet.
+            guard let transactionsAuthState = subscriptionAuthState.transactionsAuthState else {
                 return .init(tunnelStatus: tunnelStatus, authState: .notSubscribed)
             }
             
             let webOrderID = subscriptionPurchase.webOrderLineItemID
-            guard let purchaseState = purchasesAuthState[webOrderID] else {
+            guard let transactionAuthState = transactionsAuthState[webOrderID] else {
                 return .init(tunnelStatus: tunnelStatus, authState: .notSubscribed)
             }
             
-            if authState.transactionsPendingAuthRequest.contains(webOrderID) {
+            switch transactionAuthState.authorization {
+            case .none:
+                // Not requested.
+                return .init(tunnelStatus: tunnelStatus, authState: .notSubscribed)
+                
+            case .pending:
                 return .init(tunnelStatus: tunnelStatus, authState: .pending)
-            } else {
                 
-                switch purchaseState.signedAuthorization {
-                case .authorization(_):
+            case .completed(let result):
+                switch result {
+                case .success(_):
                     return .init(tunnelStatus: tunnelStatus, authState: .subscribedWithAuth)
-                
-                case .notRequested, .rejectedByPsiphon(_), .requestRejected(_):
+                    
+                case .failure(.requestRejected(_)):
+                    // Request is permanently rejected. User is not subscribed.
+                    // This allows the user to also refresh their receipt.
                     return .init(tunnelStatus: tunnelStatus, authState: .notSubscribed)
                     
-                case .requestError(_):
+                case .failure(.requestError(_)):
+                    // Request failured either due to server or network error most likely.
+                    // Failure can be recoverable by retrying.
                     return .init(tunnelStatus: tunnelStatus, authState: .failedRetry)
                 }
 
