@@ -164,18 +164,9 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
     // Adds ViewController as an observer of transactions.
     [SKPaymentQueue.defaultQueue addTransactionObserver:self];
-
-    // Removes the default iOS bottom border.
-    [self.navigationController.navigationBar setValue:@(TRUE) forKeyPath:@"hidesShadow"];
-
-    self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
-    self.navigationController.navigationBar.barTintColor = UIColor.darkBlueColor;
-    self.navigationController.navigationBar.translucent = FALSE;
-
-    self.navigationController.navigationBar.titleTextAttributes = @{
-      NSForegroundColorAttributeName:UIColor.blueGreyColor,
-      NSFontAttributeName:[UIFont avenirNextBold:15.f]
-    };
+    
+    // Applies Psiphon navigation bar styling.
+    [self.navigationController.navigationBar applyPsiphonNavigationBarStyling];
 
     // Sets navigation bar title.
     NSString *title = NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS", nil, [NSBundle mainBundle], @"Subscriptions", @"Title of the dialog for available in-app paid subscriptions");

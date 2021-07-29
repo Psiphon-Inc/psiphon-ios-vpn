@@ -53,8 +53,12 @@ extension PsiCashNewExpiringPurchaseErrorStatus: LocalizedUserDescription {
     
     public var localizedUserDescription: String {
         switch self {
+        case .existingTransaction:
+            return UserStrings.Speed_boost_you_already_have()
         case .insufficientBalance:
             return UserStrings.Insufficient_psiCash_balance()
+        case .transactionTypeNotFound:
+            return UserStrings.PsiCash_speed_boost_product_not_found_update_app_message()
         default:
             return UserStrings.Operation_failed_please_try_again_alert_message()
         }

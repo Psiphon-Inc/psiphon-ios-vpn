@@ -55,12 +55,9 @@ NSString * const CellIdentifier = @"cell";
 
     // Navigation bar
     {
-        self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
-        self.navigationController.navigationBar.barTintColor = UIColor.darkBlueColor;
-        self.navigationController.navigationBar.translucent = FALSE;
-
-        // Removes the default iOS bottom border.
-        [self.navigationController.navigationBar setValue:@(TRUE) forKeyPath:@"hidesShadow"];
+        
+        // Apply Psiphon navigation bar styling.
+        [self.navigationController.navigationBar applyPsiphonNavigationBarStyling];
 
         UIBarButtonItem *doneButton = [[UIBarButtonItem alloc]
           initWithTitle:[UserStrings Done_button_title]
@@ -70,10 +67,6 @@ NSString * const CellIdentifier = @"cell";
         doneButton.tintColor = UIColor.whiteColor;
         self.navigationItem.rightBarButtonItem = doneButton;
 
-        self.navigationController.navigationBar.titleTextAttributes = @{
-            NSFontAttributeName: [UIFont avenirNextBold:14.f],
-            NSForegroundColorAttributeName: UIColor.blueGreyColor
-        };
     }
 
     {
