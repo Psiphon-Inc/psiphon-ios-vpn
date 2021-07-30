@@ -32,6 +32,9 @@
 
 #if DEBUG || DEV_RELEASE
 
+NSString * const UserDefaultsPsiCashUsername = @"Testing-Account-Username";
+NSString * const UserDefaultsPsiCashPassword = @"Testing-Account-Password";
+
 NSString * const ActionCellIdentifier = @"ActionCell";
 NSString * const SwitchCellIdentifier = @"SwitchCell";
 NSString * const StateCellIdentifier = @"StateCell";
@@ -105,7 +108,7 @@ NSString * const StateCellIdentifier = @"StateCell";
         case 0: return 2; // PPROF
         case 1: return 3; // EXTENSION
         case 2: return 1; // PSIPHON TUNNEL
-        case 3: return 4; // CONTAINER
+        case 3: return 5; // CONTAINER
         default:
             PSIAssert(FALSE)
             return 0;
@@ -199,21 +202,26 @@ NSString * const StateCellIdentifier = @"StateCell";
         cell.selectionStyle = UITableViewCellSelectionStyleDefault;
         switch (indexPath.row) {
             case 0: {
+                cell.textLabel.text = @"Default PsiCash Accounts credentials";
+                action = @selector(onDefaultAccountsCredentials);
+                break;
+            }
+            case 1: {
                 cell.textLabel.text = @"Reset Standard UserDefaults";
                 action = @selector(onResetStandardUserDefaults);
                 break;
             }
-            case 1: {
+            case 2: {
                 cell.textLabel.text = @"Reset PsiphonDataSharedDB";
                 action = @selector(onResetPsiphonDataSharedDB);
                 break;
             }
-            case 2: {
+            case 3: {
                 cell.textLabel.text = @"Delete Core Data persistent store";
                 action = @selector(onDeleteCoreDataPersistentStores);
                 break;
             }
-            case 3: {
+            case 4: {
                 cell.textLabel.text = @"Delete PsiCash store directory";
                 action = @selector(onDeletePsiCashStore);
                 break;
@@ -254,6 +262,33 @@ NSString * const StateCellIdentifier = @"StateCell";
 - (void)onMemoryProfilerSwitch:(UISwitch *)view {
     [self.sharedDB setDebugMemoryProfiler:view.isOn];
     [[Notifier sharedInstance] post:NotifierDebugMemoryProfiler];
+}
+
+- (void)onDefaultAccountsCredentials {
+    
+    UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"PsiCash Account" message:@"Set your default credentials" preferredStyle:UIAlertControllerStyleAlert];
+    
+    [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = @"Username";
+        textField.text =[[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsPsiCashUsername];
+        textField.clearButtonMode = UITextFieldViewModeAlways;
+    }];
+    
+    [alert addTextFieldWithConfigurationHandler:^(UITextField *textField) {
+        textField.placeholder = @"Password";
+        textField.text =[[NSUserDefaults standardUserDefaults] valueForKey:UserDefaultsPsiCashPassword];
+        textField.clearButtonMode = UITextFieldViewModeAlways;
+    }];
+    
+    [alert addAction:[UIAlertAction actionWithTitle:@"Done" style:UIAlertActionStyleDefault
+                                            handler:^(UIAlertAction * _Nonnull action) {
+        [[NSUserDefaults standardUserDefaults] setValue:alert.textFields[0].text
+                                                 forKey:UserDefaultsPsiCashUsername];
+        [[NSUserDefaults standardUserDefaults] setValue:alert.textFields[1].text
+                                                 forKey:UserDefaultsPsiCashPassword];
+    }]];
+    
+    [self presentViewController:alert animated:YES completion:nil];
 }
 
 - (void)onResetStandardUserDefaults {
