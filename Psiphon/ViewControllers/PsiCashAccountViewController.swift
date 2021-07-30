@@ -246,19 +246,8 @@ final class PsiCashAccountViewController: ReactiveViewController {
         self.navigation = .completed(.mainScreen)
         
         // Customize navigation controller
-        
-        mutate(navigationController.navigationBar) {
-            $0.barStyle = .black
-            $0.barTintColor = .darkBlue()
-            $0.isTranslucent = false
-            $0.titleTextAttributes = [
-                NSAttributedString.Key.font:
-                    UIFont.avenirNextMedium(CGFloat(FontSize.normal.rawValue)),
-                NSAttributedString.Key.foregroundColor: UIColor.blueGrey()
-            ]
-            $0.hideSystemBottomBorder()
-        }
-        
+        navigationController.navigationBar.applyPsiphonNavigationBarStyling()
+                
         let navCancelBtn = UIBarButtonItem(title: "Cancel", style: .plain,
                                            target: self, action: #selector(onCancel))
         
@@ -419,6 +408,13 @@ final class PsiCashAccountViewController: ReactiveViewController {
             forgotPasswordButton,
             loginButton
         ]
+        
+        #if DEBUG || DEV_RELEASE
+        // Prepoulates username and password from defaults provided.
+        usernameTextField.textField.text = UserDefaults.standard.string(forKey: UserDefaultsPsiCashUsername)
+        passwordTextField.textField.text = UserDefaults.standard.string(forKey: UserDefaultsPsiCashPassword)
+        #endif
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
