@@ -419,6 +419,13 @@ final class PsiCashAccountViewController: ReactiveViewController {
             forgotPasswordButton,
             loginButton
         ]
+        
+        #if DEBUG || DEV_RELEASE
+        // Prepoulates username and password from defaults provided.
+        usernameTextField.textField.text = UserDefaults.standard.string(forKey: UserDefaultsPsiCashUsername)
+        passwordTextField.textField.text = UserDefaults.standard.string(forKey: UserDefaultsPsiCashPassword)
+        #endif
+        
     }
     
     override func viewWillAppear(_ animated: Bool) {
