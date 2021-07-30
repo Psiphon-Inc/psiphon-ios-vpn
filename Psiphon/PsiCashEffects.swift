@@ -92,13 +92,16 @@ extension PsiCashAmount: CustomStringFeedbackDescription {
     
 }
 
-
+/// Result of an HTTP request made by the PsiCash library.
+/// The result type Failure is `Never`, since both success and failure
+/// cases are captured by the `PSIHttpResult` object.
 fileprivate struct PsiCashHTTPResponse: HTTPResponse {
     typealias Success = PSIHttpResult
     typealias Failure = Never
     
     var result: ResultType
     
+    /// `PSIHttpResult` value to be consumed by the PsiCash library.
     var psiHTTPResult: PSIHttpResult {
         result.successToOptional()!
     }
@@ -110,7 +113,9 @@ fileprivate struct PsiCashHTTPResponse: HTTPResponse {
             let statusCode = Int32(r.metadata.statusCode.rawValue)
             
             guard let body = String(data: r.data, encoding: .utf8) else {
-                result = .success(PSIHttpResult(criticalError: ()))
+                result = .success(
+                    PSIHttpResult(recoverableError: "Failed to decode body: size: \(r.data.count)")
+                )
                 return
             }
             
@@ -124,13 +129,9 @@ fileprivate struct PsiCashHTTPResponse: HTTPResponse {
             
         case let .failure(httpRequestError):
             // In the case of a partial response, a `RECOVERABLE_ERROR` should be returned.
-            let psiHttpResult = PSIHttpResult(
-                code: PSIHttpResult.recoverable_ERROR(),
-                headers: [String: [String]](),
-                body: "",
-                error: "")
-            
-            result = .success(psiHttpResult)
+            result = .success(
+                PSIHttpResult(recoverableError: "Request failed. Error: \(httpRequestError)")
+            )
         }
     }
     
@@ -186,11 +187,11 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
                         case .some(.success(.some(let tunnelConnection))) =
                             tunnelConnectionRefSignal.first()
                     else {
-                        return PSIHttpResult(recoverableError: ())
+                        return PSIHttpResult(recoverableError: "VPN config not installed")
                     }
                     
                     guard case .connected = tunnelConnection.tunneled else {
-                        return PSIHttpResult(recoverableError: ())
+                        return PSIHttpResult(recoverableError: "Psiphon tunnel is not connected")
                     }
                     
                     // Maps [PSIPair<NSString>] to Swift type `[(String, String)]`.
@@ -199,7 +200,8 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
                     }
                     
                     guard let httpMethod = HTTPMethod(rawValue: request.method) else {
-                        return PSIHttpResult(criticalError: ())
+                        return PSIHttpResult(
+                            criticalError: "Failed to parse HTTP method '\(request.method)'")
                     }
                     
                     let maybeUrl = URL.make(scheme: request.scheme,
@@ -209,7 +211,7 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
                                             queryParams: queryParams)
                     
                     guard let url = maybeUrl else {
-                        return PSIHttpResult(criticalError: ())
+                        return PSIHttpResult(criticalError: "Failed to create URL")
                     }
                     
                     let httpRequest = HTTPRequest(url: url,
