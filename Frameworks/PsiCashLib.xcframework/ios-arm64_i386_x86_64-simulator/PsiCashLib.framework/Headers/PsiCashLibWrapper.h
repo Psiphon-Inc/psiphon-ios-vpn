@@ -77,13 +77,11 @@ NS_ASSUME_NONNULL_BEGIN
                         body:(NSString *)body
                        error:(NSString *)error;
 
-// Convenience initializer with `code` set to `CRITICAL_ERROR`, and all other fields
-// set to empty string.
-- (instancetype)initWithCriticalError;
+// Convenience initializer with `code` set to `CRITICAL_ERROR`.
+- (instancetype)initWithCriticalError:(NSString *)error;
 
-// Convenience initializer with `code` set to `RECOVERABLE_ERROR`, and all other fields
-// set to empty string.
-- (instancetype)initWithRecoverableError;
+// Convenience initializer with `code` set to `RECOVERABLE_ERROR`.
+- (instancetype)initWithRecoverableError:(NSString *)error;
 
 @end
 
@@ -344,12 +342,12 @@ be retrieved, but there may be stored (possibly stale) values that can be used.
 
 Input parameters:
 
- • local_only: If true, no network call will be made, and the refresh will utilize only
-   locally-stored data (i.e., only token expiry will be checked, and a transition into
-   a logged-out state may result).
+• local_only: If true, no network call will be made, and the refresh will utilize only
+  locally-stored data (i.e., only token expiry will be checked, and a transition into
+  a logged-out state may result).
 
- • purchase_classes: The purchase class names for which prices should be
-   retrieved, like `{"speed-boost"}`. If null or empty, no purchase prices will be retrieved.
+• purchase_classes: The purchase class names for which prices should be
+  retrieved, like `{"speed-boost"}`. If null or empty, no purchase prices will be retrieved.
 
 Result fields:
 
@@ -404,27 +402,29 @@ localOnly:(BOOL)localOnly WARN_UNUSED_RESULT;
  the `status` is anything except `Status.Success`).
  
  Possible status codes:
- 
+
  • Success: The purchase transaction was successful. The `purchase` field will be non-null.
- 
+
  • ExistingTransaction: There is already a non-expired purchase that prevents this
- purchase from proceeding.
- 
+   purchase from proceeding.
+
  • InsufficientBalance: The user does not have sufficient credit to make the requested
- purchase. Stored balance will be updated and UI should be refreshed.
- 
+   purchase. Stored balance will be updated and UI should be refreshed.
+
  • TransactionAmountMismatch: The actual purchase price does not match expectedPrice,
- so the purchase cannot proceed. The price list should be updated immediately.
- 
+   so the purchase cannot proceed. The price list should be updated immediately.
+
  • TransactionTypeNotFound: A transaction type with the given class and distinguisher
- could not be found. The price list should be updated immediately, but it might also
- indicate an out-of-date app.
- 
- • InvalidTokens: The current auth tokens are invalid.
- 
+   could not be found. The price list should be updated immediately, but it might also
+   indicate an out-of-date app.
+
+ • InvalidTokens: The current auth tokens are invalid. This shouldn't happen with
+   Trackers, but may happen for Accounts when their tokens expire. Calling RefreshState
+   should return the library to a sane state (logged out or reset).
+
  • ServerError: An error occurred on the server. Probably report to the user and try
- again later. Note that the request has already been retried internally and any
- further retry should not be immediate.
+   again later. Note that the request has already been retried internally and any
+   further retry should not be immediate.
  */
 - (PSIResult<PSINewExpiringPurchaseResponse *> *)
 newExpiringPurchaseWithTransactionClass:(NSString *)transactionClass
