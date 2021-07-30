@@ -67,3 +67,7 @@
 // InAppSettingsKit (IASK)
 #import <InAppSettingsKit/IASKSettingsReader.h>
 #import <PsiphonClientCommonLibrary/PsiphonSettingsViewController.h>
+
+#if DEBUG || DEV_RELEASE
+#import "DebugToolboxViewController.h"
+#endif
