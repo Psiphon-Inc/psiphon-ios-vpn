@@ -194,6 +194,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         // Reconnects the Psiphon tunnel if there are new authorization values.
         if (newAuthorizations != nil) {
             
+            // Sets VPN reasserting to TRUE before the tunnel goes down for reconnection.
+            self.reasserting = TRUE;
+            
             [AppProfiler logMemoryReportWithTag:@"reconnectWithConfig"];
             
             [self->localDataStore removeAllSessionAlerts];
