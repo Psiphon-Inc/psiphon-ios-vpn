@@ -364,7 +364,6 @@ public let subscriptionAuthStateReducer = Reducer<SubscriptionAuthState,
         guard
             let transactionAuthState = transactionsAuthState[transaction.webOrderLineItemID]
         else {
-            environment.feedbackLogger.fatalError("Matching purchase not found")
             return [
                 environment.feedbackLogger.log(.warn,"""
                     Purchase with WebOrderLineItemID(\(transaction.webOrderLineItemID) not found
