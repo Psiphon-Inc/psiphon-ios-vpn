@@ -42,20 +42,27 @@ enum MainViewAction: Equatable {
     case _dismissedPsiCashAccountManagement
 
     case presentPsiCashScreen(initialTab: PsiCashScreenTab, animated: Bool = true)
+    case _presentPsiCashScreenResult(success: Bool)
     case dismissedPsiCashScreen
     
     case psiCashViewAction(PsiCashViewAction)
     
     case presentPsiCashAccountScreen
+    case _presentPsiCashAccountScreenResult(success: Bool)
     case dismissedPsiCashAccountScreen
 }
 
 struct MainViewState: Equatable {
+    
     /// Set of alert messages presented, or to be presented (including failed ones).
     /// - Note: Two elements of`alertMessages` are equal if their `AlertEvent` values are equal.
     var alertMessages = Set<PresentationState<AlertEvent>>()
+    
     var psiCashViewState: PsiCashViewState? = nil
-    var isPsiCashAccountScreenShown: Bool = false
+    
+    /// Represents presentation state of PsiCash accounts screen.
+    var isPsiCashAccountScreenShown: Pending<Bool> = .completed(false)
+    
 }
 
 struct MainViewReducerState: Equatable {
@@ -420,7 +427,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                 .mapNever()
         }
 
-        effects += .fireAndForget {
+        effects += Effect.deferred {
             let topVC = environment.getTopPresentedViewController()
             let searchResult = topVC.traversePresentingStackFor(type: PsiCashViewController.self)
             
@@ -428,18 +435,29 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             case .notPresent:
                 let psiCashViewController = environment.makePsiCashViewController()
                 
-                topVC.safePresent(psiCashViewController,
-                                  animated: animated,
-                                  viewDidAppearHandler: nil)
+                let success = topVC.safePresent(psiCashViewController,
+                                                animated: animated,
+                                                viewDidAppearHandler: nil)
                 
-            case .presentInStack(_),
-                    .presentTopOfStack(_):
-                // No-op.
-                break
+                return ._presentPsiCashScreenResult(success: success)
+                
+            case .presentInStack(_), .presentTopOfStack(_):
+                return ._presentPsiCashScreenResult(success: false)
             }
         }
         
         return effects
+        
+    case ._presentPsiCashScreenResult(success: let success):
+        if !success {
+            state.mainView.psiCashViewState = .none
+            return [
+                environment.feedbackLogger.log(
+                    .warn, "Failed or will not present PsiCashViewController")
+                    .mapNever()
+            ]
+        }
+        return []
 
     case .dismissedPsiCashScreen:
         // If psiCashViewState is nil, it implies the PsiCashViewController not presented.
@@ -464,8 +482,8 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         }
         
     case .presentPsiCashAccountScreen:
-        // Presents PsiCash Account screen if not already shown.
-        guard state.mainView.isPsiCashAccountScreenShown == false else {
+        
+        guard case .completed(false) = state.mainView.isPsiCashAccountScreenShown else {
             return []
         }
         
@@ -490,35 +508,43 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             
         }
 
-        state.mainView.isPsiCashAccountScreenShown = true
-
+        state.mainView.isPsiCashAccountScreenShown = .pending
+        
         return [
-            .fireAndForget {
+            Effect.deferred {
                 let topVC = environment.getTopPresentedViewController()
                 let searchResult = topVC.traversePresentingStackFor(
                     type: PsiCashAccountViewController.self, searchChildren: true)
-
+                
                 switch searchResult {
                 case .notPresent:
                     let accountsViewController = environment.makePsiCashAccountViewController()
-                    topVC.safePresent(accountsViewController,
-                                      animated: true,
-                                      viewDidAppearHandler: nil)
-
-                case .presentInStack(_),
-                     .presentTopOfStack(_):
-                    // No-op.
-                    return
+                    let success = topVC.safePresent(accountsViewController,
+                                                    animated: true,
+                                                    viewDidAppearHandler: nil)
+                    
+                    return ._presentPsiCashAccountScreenResult(success: success)
+                    
+                case .presentInStack(_), .presentTopOfStack(_):
+                    return ._presentPsiCashAccountScreenResult(success: false)
                 }
             }
         ]
         
-    case .dismissedPsiCashAccountScreen:
-        guard state.mainView.isPsiCashAccountScreenShown == true else {
-            return []
+    case ._presentPsiCashAccountScreenResult(success: let success):
+        state.mainView.isPsiCashAccountScreenShown = .completed(success)
+        if !success {
+            return [
+                environment.feedbackLogger.log(
+                    .warn, "Failed or will not present PsiCash Accounts screen")
+                    .mapNever()
+            ]
         }
+        return []
+        
+    case .dismissedPsiCashAccountScreen:
 
-        state.mainView.isPsiCashAccountScreenShown = false
+        state.mainView.isPsiCashAccountScreenShown = .completed(false)
         
         // if psiCashViewReducerState has value,then forwards
         // the PsiCash account dismissed event to psiCashViewReducer.
