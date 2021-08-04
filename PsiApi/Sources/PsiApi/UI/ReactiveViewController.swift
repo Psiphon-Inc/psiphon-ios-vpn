@@ -104,6 +104,7 @@ open class ReactiveViewController: UIViewController {
     private let onDismissed: () -> Void
     
     /// - Parameter onDismissed: Called once after the view controller is either dismissed.
+    /// - Note: `onDimissed` is not called if `viewDidAppear(_:)` is never called.
     public init(onDismissed: @escaping () -> Void) {
         self.onDismissed = onDismissed
         
