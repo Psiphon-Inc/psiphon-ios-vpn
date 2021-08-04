@@ -93,17 +93,35 @@ extension PsiCashAmount: CustomStringFeedbackDescription {
 }
 
 /// Result of an HTTP request made by the PsiCash library.
-/// The result type Failure is `Never`, since both success and failure
-/// cases are captured by the `PSIHttpResult` object.
 fileprivate struct PsiCashHTTPResponse: HTTPResponse {
-    typealias Success = PSIHttpResult
-    typealias Failure = Never
     
+    /// Represents an HTTP respose.
+    struct Response: Equatable {
+        let code: Int32
+        let headers: [String: [String]]
+        let body: String
+    }
+    
+    typealias Success = Response
+    typealias Failure = ErrorMessage
+    
+    /// Represents result of an HTTP request.
     var result: ResultType
     
     /// `PSIHttpResult` value to be consumed by the PsiCash library.
     var psiHTTPResult: PSIHttpResult {
-        result.successToOptional()!
+        switch result {
+        case .success(let success):
+            return PSIHttpResult(
+                code: success.code,
+                headers: success.headers,
+                body: success.body,
+                error: ""
+            )
+            
+        case .failure(let errorEvent):
+            return PSIHttpResult(recoverableError: "\(errorEvent.error)")
+        }
     }
     
     init(urlSessionResult: URLSessionResult) {
@@ -113,24 +131,24 @@ fileprivate struct PsiCashHTTPResponse: HTTPResponse {
             let statusCode = Int32(r.metadata.statusCode.rawValue)
             
             guard let body = String(data: r.data, encoding: .utf8) else {
-                result = .success(
-                    PSIHttpResult(recoverableError: "Failed to decode body: size: \(r.data.count)")
+                result = .failure(
+                    ErrorEvent(ErrorMessage("Failed to decode body: size: \(r.data.count)"),
+                               date: urlSessionResult.date)
                 )
                 return
             }
             
-            let psiHttpResult = PSIHttpResult(
-                code: statusCode,
-                headers: r.metadata.headers.mapValues { [$0] },
-                body: body,
-                error: "")
-            
-            result = .success(psiHttpResult)
+            result = .success(
+                Response(code: statusCode,
+                         headers: r.metadata.headers.mapValues { [$0] },
+                         body: body)
+            )
             
         case let .failure(httpRequestError):
             // In the case of a partial response, a `RECOVERABLE_ERROR` should be returned.
-            result = .success(
-                PSIHttpResult(recoverableError: "Request failed. Error: \(httpRequestError)")
+            result = .failure(
+                ErrorEvent(ErrorMessage("Request failed. Error: \(httpRequestError)"),
+                           date: urlSessionResult.date)
             )
         }
     }
@@ -178,6 +196,9 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
                 fileStoreRoot: fileStoreRoot,
                 psiCashLegacyDataStore: psiCashLegacyDataStore,
                 httpRequestFunc: { (request: PSIHttpRequest) -> PSIHttpResult in
+                
+                    // All recoverable errors are logged immediatley.
+                    // This is useful for tracking failed requests that succeeded eventually.
                     
                     // Synchronous check for tunnel connection status.
                     
@@ -187,10 +208,12 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
                         case .some(.success(.some(let tunnelConnection))) =
                             tunnelConnectionRefSignal.first()
                     else {
+                        self.feedbackLogger.immediate(.error, "VPN config not installed")
                         return PSIHttpResult(recoverableError: "VPN config not installed")
                     }
                     
                     guard case .connected = tunnelConnection.tunneled else {
+                        self.feedbackLogger.immediate(.error, "Psiphon tunnel is not connected")
                         return PSIHttpResult(recoverableError: "Psiphon tunnel is not connected")
                     }
                     
@@ -233,6 +256,12 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
                         sem.signal()
                     }
                     sem.wait()
+                
+                    // Logs error probably caused by a network failure.
+                    if case .failure(let errorEvent) = response!.result {
+                        self.feedbackLogger.immediate(
+                            .error, "PsiCash HTTP request failed: \(errorEvent.error)")
+                    }
                     
                     return response!.psiHTTPResult
                 },
