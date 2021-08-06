@@ -24,6 +24,7 @@ import PsiCashClient
 
 // Container for data used by `SettingsViewController`.
 struct SettingsViewModel: Equatable {
+    let receiptRefreshState: ReceiptState.ReceiptRefreshState
     let subscriptionState: SubscriptionStatus
     let psiCashAccountType: PsiCashAccountType?
     let isLoggingOut: Bool
@@ -34,6 +35,15 @@ struct SettingsViewModel: Equatable {
 @objc final class ObjcSettingsViewModel: NSObject {
     
     let model: SettingsViewModel
+    
+    @objc var receiptRefreshInProgress: Bool {
+        switch model.receiptRefreshState {
+        case .pending(_):
+            return true
+        case .completed(_):
+            return false
+        }
+    }
     
     @objc var hasActiveSubscription: Bool {
         switch model.subscriptionState {

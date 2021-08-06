@@ -339,14 +339,6 @@ final class PsiCashViewController: ReactiveViewController {
                                                                     iapStore.send(.checkUnverifiedTransaction)
                                                                 })))))))
                                 
-                            case .purchaseNotRecordedByAppStore:
-                                self.containerView.bind(.left(.right(.right(.right(.left(.transactionNotRecordedByAppStore(
-                                    isRefreshingReceipt: observed.readerState.isRefreshingAppStoreReceipt,
-                                    retryAction: {
-                                        appStoreReceiptStore.send(
-                                            .remoteReceiptRefresh(optionalPromise: nil))
-                                    }
-                                )))))))
                             }
                             
                         case .notConnected:

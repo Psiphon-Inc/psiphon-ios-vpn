@@ -360,17 +360,14 @@
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon is not connected";
 
-/* 'App Store' refers to Apple's App Store, do not translate or transliterate 'App Store'. This alert message informs the user that the purchase they made has not been recorded by App Store. */
-"PURCHASE_NOT_RECORDED_BY_APPSTORE" = "Purchase not recorded by App Store.";
+/* Alert message that the users purchases have been restored successfully */
+"PURCHASES_RESTORED_SUCCESSFULLY" = "Purchases restored successfully";
 
 /* Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
 "PURCHASING_PSICASH" = "Purchasing PsiCash…";
 
 /* Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "PURCHASING_SPEED_BOOST" = "Purchasing Speed Boost…";
-
-/* Button title on an error alert that indicates it refreshes the user's purchase receipt on device. */
-"RECEIPT_REFRESH_BUTTON" = "Refresh Receipt";
 
 /* Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "Refresh your app receipt when:";
@@ -381,8 +378,8 @@
 /* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "You cannot see a subscription you purchased on this device";
 
-/* This alert message informs the user that the purchase they made has not been recorded and that they can tap the button 'Refresh Receipt' to try again. */
-"REFRESH_APP_RECEIPT_TO_TRY_AGAIN" = "Refresh the app receipt to try again.";
+/* Button that restores users previous purchases */
+"RESTORE_PURCHASES" = "Restore purchases";
 
 /* Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "Restore Subscription";
