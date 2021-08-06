@@ -122,6 +122,7 @@ public struct IAPPurchasing: Hashable, FeedbackDescription {
 public struct UnfinishedConsumableTransaction: Equatable, FeedbackDescription {
     
     public enum VerificationRequestState: Equatable {
+        
         /// No verification request for this purchase has been made.
         case notRequested
         
@@ -131,11 +132,6 @@ public struct UnfinishedConsumableTransaction: Equatable, FeedbackDescription {
         /// Request to verify purchase failed.
         case requestError(ErrorEvent<ErrorRepr>)
         
-        /// Purchase has been made, however App Store has not recorded the
-        ///
-        /// To resolve the error user can be prompted to refresh the App Store receipt,
-        /// however this may not always resolve the issue if for example device is jailbroken.
-        case purchaseNotRecordedByAppStore
     }
     
     public let transaction: PaymentTransaction

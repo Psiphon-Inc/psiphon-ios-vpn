@@ -223,10 +223,15 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
         }
         
         guard purchaseIsInReceipt else {
-            state.iap.unfinishedPsiCashTx?.verification = .purchaseNotRecordedByAppStore
+            
+            state.iap.unfinishedPsiCashTx = .none
             
             return [
-                environment.feedbackLogger.log(.error, "Transaction is not recorded by AppStore")
+                environment.paymentQueue.finishTransaction(unfinishedPsiCashTx.transaction)
+                    .mapNever(),
+                environment.feedbackLogger.log(.error, """
+                Finishing transaction since not found in the app receipt: \(unfinishedPsiCashTx)
+                """)
                 .mapNever()
             ]
         }

@@ -120,6 +120,11 @@ import PsiCashClient
     // PsiCash accounts
     @objc func logOutPsiCashAccount()
     
+    // IAP
+    
+    /// Restores Apple IAP purchases.
+    @objc func restorePurchases(_ completionHandler: @escaping (NSError?) -> Void)
+    
     // User defaults
     
     // Returns Locale for currently selected app language.
