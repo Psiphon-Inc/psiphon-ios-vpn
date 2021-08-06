@@ -391,6 +391,14 @@
 			<key>Type</key>
 			<string>PSGroupSpecifier</string>
 		</dict>
+        <dict>
+            <key>Title</key>
+            <string>!!! Not in the Root.strings, this title is set from SettingsViewController!!!</string>
+            <key>Key</key>
+            <string>settingsRestorePurchases</string>
+            <key>Type</key>
+            <string>IASKCustomViewSpecifier</string>
+        </dict>
 		<dict>
 			<key>Title</key>
 			<string>!!! Not in the Root.strings, this title is set from SettingsViewController!!!</string>

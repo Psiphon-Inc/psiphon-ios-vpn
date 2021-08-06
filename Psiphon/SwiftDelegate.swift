@@ -653,6 +653,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // Produces a SettingsViewModel type and passes
         // the value to the ObjCBridgeDelegte.
         self.lifetime += SignalProducer.combineLatest(
+            self.store.$value.signalProducer.map(\.appReceipt.remoteReceiptRefreshState)
+                .skipRepeats(),
             self.store.$value.signalProducer.map(\.subscription.status).skipRepeats(),
             self.store.$value.signalProducer.map(\.psiCashState.libData?.accountType).skipRepeats(),
             self.store.$value.signalProducer.map(\.psiCashState.isLoggingInOrOut),
@@ -660,10 +662,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         ).map {
             
             SettingsViewModel(
-                subscriptionState: $0.0,
-                psiCashAccountType: $0.1,
-                isLoggingOut: $0.2 == .logout,
-                vpnStatus: $0.3
+                receiptRefreshState: $0.0,
+                subscriptionState: $0.1,
+                psiCashAccountType: $0.2,
+                isLoggingOut: $0.3 == .logout,
+                vpnStatus: $0.4
             )
             
         }
@@ -1205,6 +1208,27 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     
     @objc func logOutPsiCashAccount() {
         self.store.send(.psiCash(.accountLogout))
+    }
+    
+    @objc func restorePurchases(_ completionHandler: @escaping (NSError?) -> Void) {
+        let promise = Promise<Result<Utilities.Unit, SystemErrorEvent<Int>>>.pending()
+        
+        self.store.send(.appReceipt(.remoteReceiptRefresh(optionalPromise: promise)))
+        
+        promise.then { result in
+            if let error = result.failureToOptional()?.error.errorInfo {
+                let nsError = NSError(
+                    domain: error.domain,
+                    code: error.errorCode,
+                    userInfo: [NSLocalizedDescriptionKey: error.errorDescription ?? ""])
+                
+                completionHandler(nsError)
+                
+            } else {
+                completionHandler(nil)
+            }
+        }
+        
     }
     
     @objc func getLocaleForCurrentAppLanguage() -> NSLocale {

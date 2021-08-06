@@ -245,13 +245,16 @@ import Foundation
                                  comment: "Button title shown when something fails to load. Asks the user to tap the button to retry the operation")
     }
     
+    @objc static func Restore_purchases() -> String {
+        return NSLocalizedString("RESTORE_PURCHASES", tableName: nil, bundle: Bundle.main,
+                                 value: "Restore purchases",
+                                 comment: "Button that restores users previous purchases")
     }
     
-    
-    static func Refresh_receipt_button_title() -> String {
-        return NSLocalizedString("RECEIPT_REFRESH_BUTTON", tableName: nil, bundle: Bundle.main,
-                                 value: "Refresh Receipt",
-                                 comment: "Button title on an error alert that indicates it refreshes the user's purchase receipt on device.")
+    @objc static func Purchases_restored_successfully() -> String {
+        return NSLocalizedString("PURCHASES_RESTORED_SUCCESSFULLY", tableName: nil, bundle: Bundle.main,
+                                 value: "Purchases restored successfully",
+                                 comment: "Alert message that the users purchases have been restored successfully")
     }
     
     static func Onboarding_user_notification_permission_title() -> String {

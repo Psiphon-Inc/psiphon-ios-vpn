@@ -34,6 +34,7 @@
 // Specifier keys for cells in settings menu
 // These keys are defined in Psiphon/InAppSettings.bundle/Root.inApp.plist
 NSString * const SettingsSubscriptionCellSpecifierKey = @"settingsSubscription";
+NSString * const SettingsRestorePurchases = @"settingsRestorePurchases";
 NSString * const SettingsReinstallVPNConfigurationKey = @"settingsReinstallVPNConfiguration";
 
 // PsiCash group
@@ -65,6 +66,7 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
         
         _customKeys = @[
           SettingsSubscriptionCellSpecifierKey,
+          SettingsRestorePurchases,
           SettingsReinstallVPNConfigurationKey,
           SettingsPsiCashGroupHeaderTitleKey,
           SettingsPsiCashCellSpecifierKey,
@@ -214,6 +216,19 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
         
         [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
         [cell.textLabel setText:[UserStrings Subscription]];
+        
+    } else if ([specifier.key isEqualToString:SettingsRestorePurchases]) {
+        
+        [cell.textLabel setText:[UserStrings Restore_purchases]];
+        
+        // Restore purchases button is enabled when VPN state in not in a transitory state,
+        // and a purchase restore is not already in progress.
+        BOOL enabled = ![VPNStateCompat isInTransition:self.viewModel.vpnStatus] &&
+        !self.viewModel.receiptRefreshInProgress;
+        
+        cell.userInteractionEnabled = enabled;
+        cell.textLabel.enabled = enabled;
+        cell.detailTextLabel.enabled = enabled;
 
     } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
 
@@ -300,6 +315,11 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
         
         // Subscription button
         [self openIAPViewController];
+        
+    } else if ([specifier.key isEqualToString:SettingsRestorePurchases]) {
+        
+        // Restore purchases button
+        [self onRestorePurchases];
 
     } else if ([specifier.key isEqualToString:SettingsReinstallVPNConfigurationKey]) {
         
@@ -406,6 +426,34 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
     [alert addCancelAction:nil];
     
     [alert presentFromTopController];
+}
+
+- (void)onRestorePurchases {
+    
+    SettingsViewController *__weak weakSelf = self;
+    
+    [SwiftDelegate.bridge restorePurchases:^(NSError *_Nullable error) {
+        
+        SettingsViewController *__strong strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+        
+        NSString *message = nil;
+        if (error != nil) {
+            message = [UserStrings Operation_failed_please_try_again_alert_message];
+        } else {
+            message = [UserStrings Purchases_restored_successfully];
+        }
+        
+        [UIAlertController presentSimpleAlertWithTitle:[UserStrings Psiphon]
+                                               message:message
+                                        preferredStyle:UIAlertControllerStyleAlert
+                                             okHandler:^(UIAlertAction * _Nonnull action) {
+            // No-op.
+        }];
+    }];
+    
 }
 
 @end
