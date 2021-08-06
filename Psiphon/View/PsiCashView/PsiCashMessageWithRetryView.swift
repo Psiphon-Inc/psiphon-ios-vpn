@@ -24,15 +24,12 @@ struct PsiCashMessageWithRetryView: ViewBuilder {
     enum Message: Equatable {
         case failedToLoadProductList(retryAction: () -> Void)
         case failedToVerifyPsiCashIAPPurchase(retryAction: () -> Void)
-        case transactionNotRecordedByAppStore(isRefreshingReceipt: Bool, retryAction: () -> Void)
         
         static func == (lhs: Self, rhs: Self) -> Bool {
             switch (lhs, rhs) {
             case (.failedToLoadProductList, .failedToLoadProductList):
                 return true
             case (.failedToVerifyPsiCashIAPPurchase, .failedToVerifyPsiCashIAPPurchase):
-                return true
-            case (.transactionNotRecordedByAppStore, .transactionNotRecordedByAppStore):
                 return true
             default: return false
             }
@@ -105,28 +102,6 @@ struct PsiCashMessageWithRetryView: ViewBuilder {
                     subtitle.text = UserStrings.Please_try_again_later()
                     retryButton.setEventHandler(retryAction)
                     retryButton.setTitle(UserStrings.Tap_to_retry(), for: .normal)
-                    
-                case let .transactionNotRecordedByAppStore(isRefreshingReceipt: isRefreshingReceipt,
-                                                           retryAction: retryAction):
-                    imageView.image = UIImage(named: "PsiCashPendingTransaction")!
-                    title.text = UserStrings.Purchase_not_recorded_by_AppStore()
-                    subtitle.text = UserStrings.Refresh_app_receipt_to_try_again()
-                    retryButton.setEventHandler(retryAction)
-                    retryButton.setTitle(UserStrings.Refresh_receipt_button_title(),
-                                         for: .normal)
-                    
-                    // Shows spinner while the receipt is being refreshed.
-                    if isRefreshingReceipt {
-                        spinner.isHidden = false
-                        spinner.startAnimating()
-                        retryButton.isHidden = true
-                        retryButton.isUserInteractionEnabled = false
-                    } else {
-                        spinner.isHidden = true
-                        spinner.stopAnimating()
-                        retryButton.isHidden = false
-                        retryButton.isUserInteractionEnabled = true
-                    }
                     
                 }
             }
