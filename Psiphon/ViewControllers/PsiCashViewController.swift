@@ -283,7 +283,7 @@ final class PsiCashViewController: ReactiveViewController {
                 return
                 
             case .subscribed(_):
-                self.updateUIState(.subscribed)
+                self.updateUIState(.subscribed(psiCashLibData.accountType))
                 return
                 
             case .notSubscribed:
@@ -457,7 +457,7 @@ final class PsiCashViewController: ReactiveViewController {
     
     enum UIState: Equatable {
         case unknownSubscription
-        case subscribed
+        case subscribed(PsiCashAccountType)
         case notSubscribed(TunnelConnectedStatus, PsiCashAccountType, PsiCashState.LoginLogoutPendingValue?)
     }
     
@@ -475,9 +475,14 @@ final class PsiCashViewController: ReactiveViewController {
                 .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
             )
             
-        case .subscribed:
-            // User is subscribed. Only shows the PsiCash balance.
-            self.accountNameViewWrapper.view.isHidden = true
+        case .subscribed(let psiCashAccountType):
+            // User is subscribed. Only shows the PsiCash balance, and the username (if logged in).
+            switch psiCashAccountType {
+            case .noTokens, .tracker, .account(loggedIn: false):
+                self.accountNameViewWrapper.view.isHidden = true
+            case .account(loggedIn: true):
+                self.accountNameViewWrapper.view.isHidden = false
+            }
             self.balanceViewWrapper.view.isHidden = false
             self.tabControl.view.isHidden = true
             self.signupOrLogInView.isHidden = true
