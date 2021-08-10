@@ -67,7 +67,7 @@
 "CREATE_ACCOUNT_BUTTON_TITLE" = "Create account";
 
 /* Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
-"CREATE_PSICASH_ACCOUNT_BODY" = "We strongly encourage you to make a PsiCash account before buying PsiCash. Having an account allows you to share your balance between devices and protect your purchases.";
+"CREATE_PSICASH_ACCOUNT_BODY_2" = "We strongly encourage you to make a PsiCash account before buying PsiCash. Having an account allows you to share your balance between devices and protect your purchases.\n\nIMPORTANT: Without an account your PsiCash will not be preserved if you uninstall Psiphon.";
 
 /* Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will continue on to the PsiCash store. */
 "CREATE_PSICASH_ACCOUNT_CONTINUE_BUTTON" = "Continue without account";
@@ -280,7 +280,7 @@
 "PSICASH_ACCOUNT_LOGOUT_TITLE" = "PsiCash Account Logout";
 
 /* Button title that opens 'PsiCash' account management. */
-"PSICASH_ACCOUNT_MANAGEMENT" = "Manage Account";
+"PSICASH_ACCOUNT_MANAGEMENT_2" = "Manage account";
 
 /* An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "Your PsiCash login has expired. Please log back in.";
