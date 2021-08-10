@@ -271,6 +271,13 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
     }
 
     func bind(_ newValue: PsiCashPurchasableViewModel) {
+        
+        // Forces title and subtitle text alignment, since they may not have translations.
+        if case .rightToLeft = UIApplication.shared.userInterfaceLayoutDirection {
+            titleLabel.textAlignment = .right
+            subtitleLabel.textAlignment = .right
+        }
+        
         titleLabel.text = newValue.title
         subtitleLabel.text = newValue.subtitle
 
