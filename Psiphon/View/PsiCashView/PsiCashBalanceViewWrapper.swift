@@ -31,7 +31,7 @@ struct PsiCashBalanceViewModel: Equatable {
 
 @objc final class PsiCashBalanceViewWrapper: NSObject, ViewWrapper, Bindable {
     typealias BindingType = PsiCashBalanceViewModel
-    private typealias IconType = EitherView<ImageViewBuilder, EitherView<Spinner, ButtonBuilder>>
+    private typealias IconType = EitherView<ImageViewBuilder, Spinner>
 
     private let psiCashPriceFormatter = PsiCashAmountFormatter(locale: Locale.current)
     private let vStack: UIStackView
@@ -77,25 +77,10 @@ struct PsiCashBalanceViewModel: Equatable {
         guard let coinImage = UIImage(named: "PsiCashCoin") else {
             fatalError("Could not find 'PsiCashCoin' image")
         }
-        guard let waitingForExpectedIncreaseImage = UIImage(named: "PsiCash_Alert") else {
-            fatalError("Could not find 'PsiCash_Alert' image")
-        }
-
+        
         icon = EitherView(
             ImageViewBuilder(image: coinImage),
-            EitherView(
-                Spinner(style: .white),
-                ButtonBuilder(style: .custom, tint: .none, image: waitingForExpectedIncreaseImage) {
-                    let alert = UIAlertController(
-                        title: UserStrings.PsiCash_balance_out_of_date(),
-                        message: UserStrings.Connect_to_psiphon_to_update_psiCash(),
-                        preferredStyle: .alert)
-                    alert.addAction(.init(title: UserStrings.Done_button_title(),
-                                          style: .default, handler: nil))
-                    AppDelegate.getTopPresentedViewController().present(alert,
-                                                                        animated: true,
-                                                                        completion: nil)
-                })
+            Spinner(style: .white)
         )
         
         iconBindable = icon.build(iconContainer)
@@ -162,21 +147,12 @@ struct PsiCashBalanceViewModel: Equatable {
             return
         }
         let iconValue: IconType.BuildType.BindingType
-        switch (newValue.balanceState.pendingPsiCashRefresh,
-                newValue.balanceState.psiCashBalance.balanceOutOfDateReason) {
-        case (.pending, _):
-            iconValue = .right(.left(true))  // Spinner
         
-        case (.completed(_), .purchasedPsiCash):
-            iconValue = .right(.right(.unit))  // Red "i" info button
-        
-        case (.completed(_), .none),
-             (.completed(_), .watchedRewardedVideo):
-            iconValue = .left(.unit)  // Coin icon
-        
-        case (_, .otherBalanceUpdateError),
-             (_, .psiCashDataStoreMigration):
-            iconValue = .right(.right(.unit))  // Red "i" info button
+        switch newValue.balanceState.pendingPsiCashRefresh {
+        case .pending:
+            iconValue = .right(true) // Spinner icon
+        case .completed(_):
+            iconValue = .left(.unit) // PsiCash coin icon
         }
         
         let balance = newValue.balanceState.psiCashBalance.optimisticBalance

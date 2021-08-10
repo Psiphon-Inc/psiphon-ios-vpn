@@ -291,12 +291,6 @@
 /* PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
 "PSICASH_BALANCE" = "PsiCash Balance:";
 
-/* User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
-"PSICASH_BALANCE_OUT_OF_DATE_ALERT_BODY" = "Connect to Psiphon to update your PsiCash balance.";
-
-/* User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
-"PSICASH_BALANCE_OUT_OF_DATE_ALERT_TITLE" = "PsiCash Balance Out of Date";
-
 /* Body text of a modal dialog shown when a PsiCash account login fails due to a 'bad request' error. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_LOGIN_BAD_REQUEST_ERROR_BODY" = "The PsiCash server indicated that the login request was invalid. Please try again later.";
 
