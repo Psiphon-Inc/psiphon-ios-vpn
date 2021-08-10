@@ -49,6 +49,7 @@ struct PsiCashEnvironment {
     let psiCashLegacyDataStore: UserDefaults
     let userConfigs: UserDefaultsConfig
     let mainDispatcher: MainDispatcher
+    let clearWebViewDataStore: () -> Effect<Never>
 }
 
 let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironment> {
@@ -358,8 +359,16 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                                                         date: environment.getCurrentTime())
         
         return [
+            
+            // Clears webview cache and storage.
+            // This clears everything and does not target PsiCash account management website
+            // data. This is not an issue for now at least, since webviews are not
+            // used anywhere else in the app.
+            environment.clearWebViewDataStore().mapNever(),
+            
             environment.psiCashEffects.accountLogout()
-                .map(PsiCashAction._accountLogoutResult)
+                .map(PsiCashAction._accountLogoutResult),
+            
         ]
         
     case ._accountLogoutResult(let result):

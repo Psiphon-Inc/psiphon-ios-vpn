@@ -27,6 +27,7 @@ import PsiApi
 import AppStoreIAP
 import PsiCashClient
 import PsiphonClientCommonLibrary
+import WebKit
 
 enum AppLifecycle: Equatable {
     case inited
@@ -458,6 +459,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     globalDispatcher: globalDispatcher,
                     getTopPresentedViewController: {
                         AppDelegate.getTopPresentedViewController()
+                    },
+                    clearWebViewDataStore: {
+                        WKWebView.clearWebviewDataStore()
                     }
                 )
                 self.environmentCleanup = cleanup

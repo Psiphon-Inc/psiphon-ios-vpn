@@ -183,6 +183,10 @@ struct AppEnvironment {
 
     /// Makes a `PsiCashAccountViewController` as root of UINavigationController.
     let makePsiCashAccountViewController: () -> UIViewController
+    
+    /// Clears cache and all website data from the webview.
+    let clearWebViewDataStore: () -> Effect<Never>
+    
 }
 
 
@@ -205,7 +209,8 @@ func makeEnvironment(
     addToDate: @escaping (Calendar.Component, Int, Date) -> Date?,
     mainDispatcher: MainDispatcher,
     globalDispatcher: GlobalDispatcher,
-    getTopPresentedViewController: @escaping () -> UIViewController
+    getTopPresentedViewController: @escaping () -> UIViewController,
+    clearWebViewDataStore: @escaping () -> Void
 ) -> (environment: AppEnvironment, cleanup: () -> Void) {
     
     let urlSessionConfig = URLSessionConfiguration.default
@@ -433,6 +438,11 @@ func makeEnvironment(
 
             let nav = UINavigationController(rootViewController: v)
             return nav
+        },
+        clearWebViewDataStore: {
+            .fireAndForget {
+                clearWebViewDataStore()
+            }
         }
     )
     
@@ -460,7 +470,8 @@ fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment
         getCurrentTime: env.dateCompare.getCurrentTime,
         psiCashLegacyDataStore: env.standardUserDefaults,
         userConfigs: env.userConfigs,
-        mainDispatcher: env.mainDispatcher
+        mainDispatcher: env.mainDispatcher,
+        clearWebViewDataStore: env.clearWebViewDataStore
     )
 }
 
