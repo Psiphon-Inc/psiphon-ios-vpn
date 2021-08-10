@@ -326,8 +326,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
             $0.clearButtonMode = .whileEditing
             $0.enablesReturnKeyAutomatically = true  // Disables "enter" key if textfield is empty
             
-            // UITextField seems to not set correct textAlignment when a RTL language is selected
-            // (although if isSecureTextEntry is set to true, it does work as expected.)
+            // Forces UITextField text alignment for RTL languages, reglardless of input language.
             if case .rightToLeft = UIApplication.shared.userInterfaceLayoutDirection {
                 $0.textAlignment = .right
             }

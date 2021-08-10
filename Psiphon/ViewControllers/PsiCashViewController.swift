@@ -283,7 +283,7 @@ final class PsiCashViewController: ReactiveViewController {
                 return
                 
             case .subscribed(_):
-                self.updateUIState(.subscribed)
+                self.updateUIState(.subscribed(psiCashLibData.accountType))
                 return
                 
             case .notSubscribed:
@@ -455,12 +455,16 @@ final class PsiCashViewController: ReactiveViewController {
         Style.default.statusBarStyle
     }
     
+    /// An incomplete representation of the UI state, used only by the `updateUIState(_:)` method.
     enum UIState: Equatable {
         case unknownSubscription
-        case subscribed
+        case subscribed(PsiCashAccountType)
         case notSubscribed(TunnelConnectedStatus, PsiCashAccountType, PsiCashState.LoginLogoutPendingValue?)
     }
     
+    /// `updateUIState(_:)` updates some parts of the UI.
+    /// This is used alongside the main subscription to the `ObservedState`
+    /// signal in the `init` method to update the UI.
     func updateUIState(_ state: UIState) {
         
         switch state {
@@ -475,9 +479,14 @@ final class PsiCashViewController: ReactiveViewController {
                 .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
             )
             
-        case .subscribed:
-            // User is subscribed. Only shows the PsiCash balance.
-            self.accountNameViewWrapper.view.isHidden = true
+        case .subscribed(let psiCashAccountType):
+            // User is subscribed. Only shows the PsiCash balance, and the username (if logged in).
+            switch psiCashAccountType {
+            case .noTokens, .tracker, .account(loggedIn: false):
+                self.accountNameViewWrapper.view.isHidden = true
+            case .account(loggedIn: true):
+                self.accountNameViewWrapper.view.isHidden = false
+            }
             self.balanceViewWrapper.view.isHidden = false
             self.tabControl.view.isHidden = true
             self.signupOrLogInView.isHidden = true
