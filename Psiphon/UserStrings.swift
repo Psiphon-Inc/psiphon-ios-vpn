@@ -264,8 +264,8 @@ import Foundation
     }
     
     @objc static func PsiCash_account_management() -> String {
-        return NSLocalizedString("PSICASH_ACCOUNT_MANAGEMENT", tableName: nil, bundle: Bundle.main,
-                                 value: "Manage Account",
+        return NSLocalizedString("PSICASH_ACCOUNT_MANAGEMENT_2", tableName: nil, bundle: Bundle.main,
+                                 value: "Manage account",
                                  comment: "Button title that opens 'PsiCash' account management.")
     }
     
@@ -390,8 +390,8 @@ import Foundation
     }
     
     static func Encourage_psicash_account_creation_body() -> String {
-        return NSLocalizedString("CREATE_PSICASH_ACCOUNT_BODY", tableName: nil, bundle: .main,
-                                 value: "We strongly encourage you to make a PsiCash account before buying PsiCash. Having an account allows you to share your balance between devices and protect your purchases.",
+        return NSLocalizedString("CREATE_PSICASH_ACCOUNT_BODY_2", tableName: nil, bundle: .main,
+                                 value: "We strongly encourage you to make a PsiCash account before buying PsiCash. Having an account allows you to share your balance between devices and protect your purchases.\n\nIMPORTANT: Without an account your PsiCash will not be preserved if you uninstall Psiphon.",
                                  comment: "Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated.")
     }
 
