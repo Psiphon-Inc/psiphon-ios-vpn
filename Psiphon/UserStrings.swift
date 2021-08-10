@@ -62,18 +62,6 @@ import Foundation
                                  comment: "Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification")
     }
 
-    static func PsiCash_balance_out_of_date() -> String {
-        return NSLocalizedString("PSICASH_BALANCE_OUT_OF_DATE_ALERT_TITLE", tableName: nil, bundle: Bundle.main,
-                                 value: "PsiCash Balance Out of Date",
-                                 comment: "User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title")
-    }
-
-    static func Connect_to_psiphon_to_update_psiCash() -> String {
-        return NSLocalizedString("PSICASH_BALANCE_OUT_OF_DATE_ALERT_BODY", tableName: nil, bundle: Bundle.main,
-                                 value: "Connect to Psiphon to update your PsiCash balance.",
-                                 comment: "User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title")
-    }
-
     static func PsiCash_unavailable() -> String {
         return NSLocalizedString("PSICASH_UNAVAILABLE", tableName: nil, bundle: Bundle.main,
                                  value: "PsiCash Unavailable",
