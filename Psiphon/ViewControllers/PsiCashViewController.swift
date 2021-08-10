@@ -455,12 +455,16 @@ final class PsiCashViewController: ReactiveViewController {
         Style.default.statusBarStyle
     }
     
+    /// An incomplete representation of the UI state, used only by the `updateUIState(_:)` method.
     enum UIState: Equatable {
         case unknownSubscription
         case subscribed(PsiCashAccountType)
         case notSubscribed(TunnelConnectedStatus, PsiCashAccountType, PsiCashState.LoginLogoutPendingValue?)
     }
     
+    /// `updateUIState(_:)` updates some parts of the UI.
+    /// This is used alongside the main subscription to the `ObservedState`
+    /// signal in the `init` method to update the UI.
     func updateUIState(_ state: UIState) {
         
         switch state {
