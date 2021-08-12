@@ -97,6 +97,19 @@
           // Set color
           [attributedString addAttribute:NSForegroundColorAttributeName value:UIColor.whiteColor range:range];
       }];
+    
+    // Forces attributedString text alignment for RTL languages.
+    if (UIApplication.sharedApplication.userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft) {
+        
+        NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
+        paragraphStyle.alignment = NSTextAlignmentRight;
+        
+        [attributedString addAttribute:NSParagraphStyleAttributeName
+                                 value:paragraphStyle
+                                 range:NSMakeRange(0, attributedString.length)];
+    }
+
 
     bodyLabel.attributedText = attributedString;
 }
