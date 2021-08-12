@@ -19,6 +19,7 @@
 		291C0BA5269CC21F0075FAB7 /* PersistentContainerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 291C0BA4269CC21F0075FAB7 /* PersistentContainerWrapper.m */; };
 		291C0BA6269CC21F0075FAB7 /* PersistentContainerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 291C0BA4269CC21F0075FAB7 /* PersistentContainerWrapper.m */; };
 		292B531E2620DFCB00C0C44A /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */; };
+		29587A8026C5ACD80015A79A /* FadingScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29587A7F26C5ACD80015A79A /* FadingScrollView.swift */; };
 		296054AA265307770001E72D /* PsiCashAccountNameViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296054A9265307770001E72D /* PsiCashAccountNameViewWrapper.swift */; };
 		296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296622B425E8A554004635A1 /* LaunchScreenViewController.swift */; };
 		296A1A89267A01E70068B115 /* CopyableLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296A1A88267A01E70068B115 /* CopyableLabel.swift */; };
@@ -400,6 +401,7 @@
 		291C0BA3269CC21F0075FAB7 /* PersistentContainerWrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PersistentContainerWrapper.h; sourceTree = "<group>"; };
 		291C0BA4269CC21F0075FAB7 /* PersistentContainerWrapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PersistentContainerWrapper.m; sourceTree = "<group>"; };
 		292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
+		29587A7F26C5ACD80015A79A /* FadingScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FadingScrollView.swift; sourceTree = "<group>"; };
 		296054A9265307770001E72D /* PsiCashAccountNameViewWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashAccountNameViewWrapper.swift; sourceTree = "<group>"; };
 		296622B425E8A554004635A1 /* LaunchScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenViewController.swift; sourceTree = "<group>"; };
 		296A1A88267A01E70068B115 /* CopyableLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyableLabel.swift; sourceTree = "<group>"; };
@@ -1351,6 +1353,7 @@
 				524B4E6C2316F27F004E9891 /* AnimatedControl.h */,
 				524B4E6D2316F27F004E9891 /* AnimatedControl.m */,
 				2911A796263F1941001A0A4D /* BlockerView.swift */,
+				29587A7F26C5ACD80015A79A /* FadingScrollView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -2105,6 +2108,7 @@
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
 				291C0BA5269CC21F0075FAB7 /* PersistentContainerWrapper.m in Sources */,
 				445F24EB20E1A5BA00D004E9 /* xer_support.c in Sources */,
+				29587A8026C5ACD80015A79A /* FadingScrollView.swift in Sources */,
 				4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */,
 				EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */,
 				EF90D7A7204F22C900228A63 /* NSDate+PSIDateExtension.m in Sources */,
