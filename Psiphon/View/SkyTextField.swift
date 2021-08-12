@@ -23,6 +23,10 @@ final class SkyTextField<TextField: UITextField>: UIView {
     
     let textField: TextField
     
+    var hasText: Bool {
+        textField.hasText
+    }
+    
     init(placeHolder: String, textColor: UIColor = .white, margin: Float = 5.0) {
         
         self.textField = TextField.init(frame: .zero)
