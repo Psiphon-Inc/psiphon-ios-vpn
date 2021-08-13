@@ -81,7 +81,7 @@ struct PsiCashViewEnvironment {
     let iapStore: (IAPAction) -> Effect<Never>
     let mainViewStore: (MainViewAction) -> Effect<Never>
 
-    let getTopPresentedViewController: () -> UIViewController
+    let getTopActiveViewController: () -> UIViewController
     
     let dateCompare: DateCompare
 }
@@ -141,7 +141,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
                 
                 Effect { observer, _ in
 
-                    let topVC = environment.getTopPresentedViewController()
+                    let topVC = environment.getTopActiveViewController()
 
                     let vc = ViewBuilderViewController(
                         viewBuilder: PsiCashPurchasingConfirmViewBuilder(
@@ -166,9 +166,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
 
                     vc.modalTransitionStyle = .crossDissolve
 
-                    topVC.safePresent(vc,
-                                      animated: true,
-                                      viewDidAppearHandler: nil)
+                    topVC.present(vc, animated: true, completion: nil)
 
                 }
             ]
@@ -183,7 +181,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
         // Dismisses presented PsiCashPurchasingConfirmViewBuilder.
         return [
             .fireAndForget {
-                let topVC = environment.getTopPresentedViewController()
+                let topVC = environment.getTopActiveViewController()
                 let searchResult = topVC.traversePresentingStackFor(
                     type: ViewBuilderViewController<PsiCashPurchasingConfirmViewBuilder>.self)
 
@@ -228,7 +226,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
                 // This signal emits true if PsiCash accounts screen needs to be presented,
                 // otherwise it emits false.
                 
-                let topVC = environment.getTopPresentedViewController()
+                let topVC = environment.getTopActiveViewController()
                 let searchResult = topVC.traversePresentingStackFor(
                     type: ViewBuilderViewController<PsiCashPurchasingConfirmViewBuilder>.self)
                 
@@ -300,7 +298,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
 
             // Dismisses purchase confirm screen.
             .fireAndForget {
-                let topVC = environment.getTopPresentedViewController()
+                let topVC = environment.getTopActiveViewController()
                 let searchResult = topVC.traversePresentingStackFor(
                     type: ViewBuilderViewController<PsiCashPurchasingConfirmViewBuilder>.self)
 

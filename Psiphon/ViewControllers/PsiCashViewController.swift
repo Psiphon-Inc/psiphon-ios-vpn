@@ -663,8 +663,7 @@ final class PsiCashViewController: ReactiveViewController {
         }
         
         self.closeButton.activateConstraints {
-            $0.constraint(to: paddedLayoutGuide, .trailing()) +
-                $0.constraint(to: self.balanceViewWrapper.view, .centerY())
+            $0.constraint(to: paddedLayoutGuide, .trailing(), .top(Float(Style.default.largePadding)))
         }
                 
         self.balanceViewWrapper.view.activateConstraints {

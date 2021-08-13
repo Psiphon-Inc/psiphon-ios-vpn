@@ -20,6 +20,7 @@
 #import "OnboardingScrollableView.h"
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
+#import "Psiphon-Swift.h"
 
 @implementation OnboardingScrollableView {
     // Set in init.
@@ -29,7 +30,7 @@
     UIView *_Nullable accessoryView;
 
     // Internal views.
-    UIScrollView *scrollView;
+    FoldingScrollView *scrollView;
     UIImageView *imageView;
     UILabel *titleLabel;
     UILabel *bodyLabel;
@@ -52,7 +53,8 @@
 }
 
 - (void)setupViews {
-    scrollView = [[UIScrollView alloc] initWithFrame:CGRectZero];
+    scrollView = [[FoldingScrollView alloc] initWithFrame:CGRectZero];
+    scrollView.delegate = self;
 
     imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
     imageView.image = image;
@@ -95,6 +97,19 @@
           // Set color
           [attributedString addAttribute:NSForegroundColorAttributeName value:UIColor.whiteColor range:range];
       }];
+    
+    // Forces attributedString text alignment for RTL languages.
+    if (UIApplication.sharedApplication.userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft) {
+        
+        NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
+        paragraphStyle.alignment = NSTextAlignmentRight;
+        
+        [attributedString addAttribute:NSParagraphStyleAttributeName
+                                 value:paragraphStyle
+                                 range:NSMakeRange(0, attributedString.length)];
+    }
+
 
     bodyLabel.attributedText = attributedString;
 }

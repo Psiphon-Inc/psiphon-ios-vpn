@@ -805,8 +805,8 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     if (buyProgressAlert != nil) {
         return;
     }
-    buyProgressAlert = [MBProgressHUD showHUDAddedTo:
-                        [AppDelegate getTopPresentedViewController].view animated:YES];
+    UIView *topView = [SwiftDelegate.bridge getTopActiveViewController].view;
+    buyProgressAlert = [MBProgressHUD showHUDAddedTo:topView animated:YES];
 
     __weak IAPViewController *weakSelf = self;
     buyProgressAlertTimer = [NSTimer scheduledTimerWithTimeInterval:60 repeats:NO block:^(NSTimer * _Nonnull timer) {

@@ -22,28 +22,6 @@ import UIKit
 
 public extension UIViewController {
 
-    /// Presents a view controller modally, and returns `true` if operation succeeded, returns `false` otherwise.
-    /// - Parameter viewDidAppearHandler: Called after the `viewDidAppear(_:)` method is called
-    /// on the presented view controller.
-    func safePresent(
-        _ viewControllerToPresent: UIViewController,
-        animated flag: Bool,
-        viewDidAppearHandler: (() -> Void)? = nil
-    ) -> Bool {
-        
-        // Guards against presenting a view controller, from a view controller
-        // that is being dismissed.
-        guard !self.isBeingDismissed else {
-            return false
-        }
-        
-        self.present(viewControllerToPresent, animated: flag, completion: viewDidAppearHandler)
-
-        // Assumes that presentation succeeded.
-        // TODO: Is there a better way of detecting if presentation succeeded?
-        return true
-    }
-
     /// This method is an attempt to organize dismissal of view controller's in order
     /// to build a typed navigation hierarchy.
     /// This method is functionally equivalent to calling dismiss on the presented view controller.

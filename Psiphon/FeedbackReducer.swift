@@ -23,7 +23,7 @@ import Promises
 import AppStoreIAP
 import PsiApi
 
-public enum FeedbackAction {
+enum FeedbackAction {
 
     /// Informational message for logging.
     case _log(String)
@@ -45,19 +45,19 @@ public enum FeedbackAction {
                                uploadDiagnostics: Bool)
 }
 
-public struct FeedbackReducerState: Equatable {
+struct FeedbackReducerState: Equatable {
     
-    public var queuedFeedbacks: [UserFeedback]
+    var queuedFeedbacks: [UserFeedback]
     
     // TODO: FeedbackUpload is not a value type, and should not be part of the state.
     var feedbackUpload: FeedbackUpload? // initialized lazily
 
-    public init(queuedFeedbacks: [UserFeedback]) {
+    init(queuedFeedbacks: [UserFeedback]) {
         self.queuedFeedbacks = queuedFeedbacks
     }
 }
 
-public struct FeedbackReducerEnvironment {
+struct FeedbackReducerEnvironment {
     let feedbackLogger: FeedbackLogger
     let getFeedbackUpload: () -> FeedbackUploadProvider
     let internetReachabilityStatusSignal: SignalProducer<ReachabilityStatus, Never>
@@ -69,8 +69,9 @@ public struct FeedbackReducerEnvironment {
     let appInfo: () -> AppInfoProvider
     let getPsiphonConfig: () -> [AnyHashable: Any]?
     let getCurrentTime: () -> Date
+    let mainViewStore: (MainViewAction) -> Effect<Never>
 
-    public init(
+    init(
         feedbackLogger: FeedbackLogger,
         getFeedbackUpload: @escaping () -> FeedbackUploadProvider,
         internetReachabilityStatusSignal: SignalProducer<ReachabilityStatus, Never>,
@@ -81,7 +82,8 @@ public struct FeedbackReducerEnvironment {
         sharedDB: PsiphonDataSharedDB,
         appInfo: @escaping () -> AppInfoProvider,
         getPsiphonConfig: @escaping () -> [AnyHashable: Any]?,
-        getCurrentTime: @escaping () -> Date
+        getCurrentTime: @escaping () -> Date,
+        mainViewStore: @escaping (MainViewAction) -> Effect<Never>
     ) {
         self.feedbackLogger = feedbackLogger
         self.getFeedbackUpload = getFeedbackUpload
@@ -94,10 +96,11 @@ public struct FeedbackReducerEnvironment {
         self.appInfo = appInfo
         self.getPsiphonConfig = getPsiphonConfig
         self.getCurrentTime = getCurrentTime
+        self.mainViewStore = mainViewStore
     }
 }
 
-public let feedbackReducer = Reducer<FeedbackReducerState,
+let feedbackReducer = Reducer<FeedbackReducerState,
            FeedbackAction,
            FeedbackReducerEnvironment> { state, action, environment in
     
@@ -149,45 +152,38 @@ public let feedbackReducer = Reducer<FeedbackReducerState,
             ]
         }
         return []
-    case .userSubmittedFeedback(let selectedThumbIndex, let comments, let email, let uploadDiagnostics):
+        
+    case let .userSubmittedFeedback(selectedThumbIndex, comments, email, uploadDiagnostics):
         // Generate feedback ID once per user feedback.
         // Using the same feedback ID for each upload attempt makes it easier to identify when a
         // feedback has been uploaded more than once, e.g. the upload succeeds but the connection
         // with the server is disrupted before the response is received by the client.
         guard let randomFeedbackId = Feedback.generateId() else {
             return [
-                environment.feedbackLogger.log(.error, "failed to generate random feedback ID").mapNever()
+                environment.feedbackLogger.log(.error, "failed to generate random feedback ID")
+                    .mapNever()
             ]
         }
+        
+        let currentTime = environment.getCurrentTime()
+        
         state.queuedFeedbacks.append(
             UserFeedback(selectedThumbIndex: selectedThumbIndex, comments: comments, email: email,
                          uploadDiagnostics: uploadDiagnostics, feedbackId: randomFeedbackId,
-                         submitTime: environment.getCurrentTime())
+                         submitTime: currentTime)
         )
+        
+        var effects = [Effect<FeedbackAction>]()
+        
+        let alertEvent = AlertEvent(.submittedFeedbackAlert, date: currentTime)
+        
+        effects += environment.mainViewStore(.presentAlert(alertEvent)) .mapNever()
 
-        let effects: [SignalProducer<FeedbackAction, Never>] =
-            [.fireAndForget {
-                let alertViewController = UIAlertController.init(title: .none,
-                                                                 message: UserStrings.Submitted_feedback(),
-                                                                 preferredStyle: .alert)
-                alertViewController.addAction(
-                    UIAlertAction(
-                        title: UserStrings.OK_button_title(),
-                        style: .default,
-                        handler: .none)
-                )
-                // TODO: uses global singleton, parameterize the environment with a UI presentation
-                // provider protocol.
-                AppDelegate.getTopPresentedViewController().present(alertViewController,
-                                                                    animated: true,
-                                                                    completion: .none)
-            }]
-
-        if (state.queuedFeedbacks.count > 1) {
+        if state.queuedFeedbacks.count > 1 {
             return effects
         }
         // Kick off uploads.
-        return effects + [SignalProducer(value:FeedbackAction._sendNextFeedback)]
+        return effects + [ Effect(value: ._sendNextFeedback) ]
     }
 }
 

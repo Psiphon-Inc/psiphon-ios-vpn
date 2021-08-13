@@ -262,8 +262,9 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
         cell.textLabel.textAlignment = NSTextAlignmentCenter;
         cell.textLabel.text = [UserStrings Log_Out];
         
-        // Logout button is enabled when VPN state in not in a transitory state.
-        BOOL enabled = ![VPNStateCompat isInTransition:self.viewModel.vpnStatus];
+        // Logout button is enabled when VPN state in not in a transitory state,
+        // and no pending logout operation.
+        BOOL enabled = ![VPNStateCompat isInTransition:self.viewModel.vpnStatus] && !self.viewModel.isLoggingOut;
         cell.userInteractionEnabled = enabled;
         cell.textLabel.enabled = enabled;
         cell.detailTextLabel.enabled = enabled;
