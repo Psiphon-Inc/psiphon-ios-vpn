@@ -77,6 +77,7 @@ import PsiCashClient
                            open url: URL,
                            options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool
 
+    @objc func getTopActiveViewController() -> UIViewController
     
     @objc func presentPsiCashAccountViewController(withPsiCashScreen: Bool)
     

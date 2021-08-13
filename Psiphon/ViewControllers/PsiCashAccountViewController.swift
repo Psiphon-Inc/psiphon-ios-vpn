@@ -556,18 +556,15 @@ final class PsiCashAccountViewController: ReactiveViewController {
             let presentedScreen = PresentedScreen(screen: screenToPresent,
                                                   viewControllerRef: viewControllerToPresent)
             
-            let success = self.safePresent(viewControllerToPresent, animated: true) {
+            self.present(viewControllerToPresent, animated: true) {
                 // Finished presenting view controller.
                 self.navigation = .completed(.presented(presentedScreen))
             }
             
-            if success {
-                self.navigation = .pending(.presented(presentedScreen))
-                return true
-            } else {
-                return false
-            }
-        
+            self.navigation = .pending(.presented(presentedScreen))
+            
+            return true
+            
         default:
             self.feedbackLogger.immediate(.error, """
                 cannot navigate from '\(currentlyPresented)' to '\(screenToPresent)'

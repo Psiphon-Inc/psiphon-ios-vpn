@@ -872,7 +872,6 @@ struct PresentationState<ViewModel: Hashable>: Hashable {
 
         /// List of all possible reasons presentation of a view controller might fail.
         enum FailureReason: Hashable {
-            case safePresentFailed
             case applicationNotActive
         }
 
