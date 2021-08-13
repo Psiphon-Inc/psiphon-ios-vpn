@@ -38,6 +38,16 @@ import UIKit
             gradientLayer.colors = gradientColors
         }
     }
+    
+    override var isEnabled: Bool {
+        didSet {
+            if isEnabled {
+                self.alpha = 1.0
+            } else {
+                self.alpha = Style.default.disabledButtonAlpha
+            }
+        }
+    }
 
     init(
         shadow: ShadowType? = .none,
@@ -115,7 +125,6 @@ import UIKit
         
     }
 
-    
     func setClearBackground() {
         shadowLayer?.removeFromSuperlayer()
         gradientLayer.removeFromSuperlayer()

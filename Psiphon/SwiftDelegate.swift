@@ -457,9 +457,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     },
                     mainDispatcher: mainDispatcher,
                     globalDispatcher: globalDispatcher,
-                    getTopPresentedViewController: {
-                        AppDelegate.getTopPresentedViewController()
-                    },
+                    getTopActiveViewController: self.getTopActiveViewController,
                     clearWebViewDataStore: {
                         WKWebView.clearWebviewDataStore()
                     }
@@ -950,6 +948,19 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                            options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         
         return deepLinkingNavigator.handle(url: url)
+    }
+    
+    /// Retruns top-most view controller that can present another view controller (i.e. is not being dismissed)
+    @objc func getTopActiveViewController() -> UIViewController {
+        
+        var vc = UIApplication.shared.keyWindow!.rootViewController!
+        
+        while let presentedVC = vc.presentedViewController, !presentedVC.isBeingDismissed {
+            vc = presentedVC
+        }
+        
+        return vc
+        
     }
 
     @objc func presentPsiCashAccountViewController(withPsiCashScreen: Bool) {

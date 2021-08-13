@@ -218,7 +218,15 @@ final class PsiCashAccountViewController: ReactiveViewController {
     
     /// Updates the UI to a state where there is no pending login event.
     private func updateNoPendingLoginEvent() {
-        self.controls.forEach { $0.isEnabled = true }
+        self.controls.forEach {
+            if $0 == loginButton {
+                // Login button has extra constraint of text fields having values
+                // before being enabled.
+                $0.isEnabled = usernameTextField.hasText && passwordTextField.hasText
+            } else {
+                $0.isEnabled = true
+            }
+        }
         self.loginButtonSpinner.isHidden = true
         self.loginButtonSpinner.stopAnimating()
         self.loginButton.setTitle(UserStrings.Log_in(), for: .normal)
@@ -326,6 +334,8 @@ final class PsiCashAccountViewController: ReactiveViewController {
             $0.clearButtonMode = .whileEditing
             $0.enablesReturnKeyAutomatically = true  // Disables "enter" key if textfield is empty
             
+            $0.addTarget(self, action: #selector(onTextFieldEditingChanged), for: .editingChanged)
+            
             // Forces UITextField text alignment for RTL languages, reglardless of input language.
             if case .rightToLeft = UIApplication.shared.userInterfaceLayoutDirection {
                 $0.textAlignment = .right
@@ -345,6 +355,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
         
         mutate(loginButton) {
             $0.setTitleColor(.darkBlue(), for: .normal)
+            $0.setTitleColor(.gray, for: .disabled)
             
             $0.titleLabel!.apply(fontSize: .h3,
                                  typeface: .demiBold,
@@ -353,6 +364,8 @@ final class PsiCashAccountViewController: ReactiveViewController {
             $0.setTitle(UserStrings.Log_in(), for: .normal)
             
             $0.contentEdgeInsets = Style.default.buttonMinimumContentEdgeInsets
+            
+            $0.isEnabled = false
         }
         
         self.loginButtonSpinner.isHidden = true
@@ -399,7 +412,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
         createAccountButton.setEventHandler(self.onCreateNewAccount)
         loginButton.setEventHandler(self.onLogIn)
 
-        // Sets UIControls variables
+        // Sets collection of all control views to `self.controls`.
         self.controls = [
             createAccountButton,
             usernameTextField.textField,
@@ -412,6 +425,8 @@ final class PsiCashAccountViewController: ReactiveViewController {
         // Prepoulates username and password from defaults provided.
         usernameTextField.textField.text = UserDefaults.standard.string(forKey: UserDefaultsPsiCashUsername)
         passwordTextField.textField.text = UserDefaults.standard.string(forKey: UserDefaultsPsiCashPassword)
+        // Enables login button if the fields have default test values.
+        loginButton.isEnabled = usernameTextField.hasText && passwordTextField.hasText
         #endif
         
     }
@@ -541,18 +556,15 @@ final class PsiCashAccountViewController: ReactiveViewController {
             let presentedScreen = PresentedScreen(screen: screenToPresent,
                                                   viewControllerRef: viewControllerToPresent)
             
-            let success = self.safePresent(viewControllerToPresent, animated: true) {
+            self.present(viewControllerToPresent, animated: true) {
                 // Finished presenting view controller.
                 self.navigation = .completed(.presented(presentedScreen))
             }
             
-            if success {
-                self.navigation = .pending(.presented(presentedScreen))
-                return true
-            } else {
-                return false
-            }
-        
+            self.navigation = .pending(.presented(presentedScreen))
+            
+            return true
+            
         default:
             self.feedbackLogger.immediate(.error, """
                 cannot navigate from '\(currentlyPresented)' to '\(screenToPresent)'
@@ -591,6 +603,11 @@ final class PsiCashAccountViewController: ReactiveViewController {
         
         return UINavigationController(rootViewController: webViewViewController)
         
+    }
+    
+    // Either username or password textfield content changed
+    @objc private func onTextFieldEditingChanged() {
+        self.loginButton.isEnabled = usernameTextField.hasText && passwordTextField.hasText
     }
     
 }

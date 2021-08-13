@@ -49,6 +49,9 @@ struct Styling {
     var statusBarStyle = UIStatusBarStyle.lightContent
     var buttonContentEdgeInsets = UIEdgeInsets(top: 10.0, left: 15.0, bottom: 10.0, right: 15.0)
     var buttonMinimumContentEdgeInsets = UIEdgeInsets(top: 5.0, left: 5.0, bottom: 5.0, right: 5.0)
+    
+    var disabledButtonAlpha = 0.7
+    
 }
 
 enum Gradients: Int {
@@ -869,7 +872,6 @@ struct PresentationState<ViewModel: Hashable>: Hashable {
 
         /// List of all possible reasons presentation of a view controller might fail.
         enum FailureReason: Hashable {
-            case safePresentFailed
             case applicationNotActive
         }
 

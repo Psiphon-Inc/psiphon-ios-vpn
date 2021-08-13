@@ -42,13 +42,13 @@ enum MainViewAction: Equatable {
     case _dismissedPsiCashAccountManagement
 
     case presentPsiCashScreen(initialTab: PsiCashScreenTab, animated: Bool = true)
-    case _presentPsiCashScreenResult(success: Bool)
+    case _presentPsiCashScreenResult(willPresent: Bool)
     case dismissedPsiCashScreen
     
     case psiCashViewAction(PsiCashViewAction)
     
     case presentPsiCashAccountScreen
-    case _presentPsiCashAccountScreenResult(success: Bool)
+    case _presentPsiCashAccountScreenResult(willPresent: Bool)
     case dismissedPsiCashAccountScreen
 }
 
@@ -94,7 +94,7 @@ extension MainViewReducerState {
 struct MainViewEnvironment {
     let psiCashStore: (PsiCashAction) -> Effect<Never>
     let psiCashViewEnvironment: PsiCashViewEnvironment
-    let getTopPresentedViewController: () -> UIViewController
+    let getTopActiveViewController: () -> UIViewController
     let feedbackLogger: FeedbackLogger
     let rxDateScheduler: DateScheduler
     let makePsiCashViewController: () -> PsiCashViewController
@@ -173,15 +173,15 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             // Alert was presented, or will be presented.
             return []
 
-        case .none, .failedToPresent(_):
+        case .none, .failedToPresent(.applicationNotActive):
 
             // This guard ensures that alert dialog is presented successfully,
             // given app's current lifecycle.
             // If the app is in the background, view controllers can be presented, but
             // not seen by the user.
             // Also if an alert is presented while the app just launched, but before
-            // the applicationDidBecomeActive(_:) callback, safePresent(_:::) will return
-            // true, however UIKit will fail to present the view controller.
+            // the applicationDidBecomeActive(_:) callback, UIKit will fail
+            // to present the view controller.
             guard case .didBecomeActive = state.appLifecycle else {
                 state.mainView.alertMessages.update(
                     with: PresentationState(alertEvent, state: .failedToPresent(.applicationNotActive))
@@ -195,7 +195,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             )
 
             return [
-                environment.feedbackLogger.log(.info, "Presenting alert: \(alertEvent)")
+                environment.feedbackLogger.log(.info, "Will present alert: \(alertEvent)")
                     .mapNever(),
 
                 // Creates a UIAlertController based on the given alertEvent, and presents it
@@ -210,12 +210,10 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                             observer.sendCompleted()
                         }
 
-                    let topVC = environment.getTopPresentedViewController()
-
-                    let success = topVC.safePresent(
+                    environment.getTopActiveViewController().present(
                         alertController,
                         animated: true,
-                        viewDidAppearHandler: {
+                        completion: {
                             observer.send(value: ._presentAlertResult(
                                             newState: PresentationState(alertEvent,
                                                                         state: .didPresent)))
@@ -225,22 +223,8 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                         }
                     )
 
-                    if success {
-                        observer.send(value: ._presentAlertResult(
-                                        newState: PresentationState(alertEvent,
-                                                                    state: .willPresent)))
-                        // safePresent `completion` callback is expected to be called,
-                        // after UIKit has finished presenting the alertController.
-                    } else {
-                        observer.send(
-                            value: ._presentAlertResult(
-                                newState: PresentationState(
-                                    alertEvent, state: .failedToPresent(.safePresentFailed))))
-
-                        // Completes the signal if failed to present alertController,
-                        // as there will be no more events to send on the stream.
-                        observer.sendCompleted()
-                    }
+                    observer.fulfill(value: ._presentAlertResult(
+                        newState: PresentationState(alertEvent, state: .willPresent)))
                 }
             ]
         }
@@ -253,6 +237,8 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             environment.feedbackLogger.fatalError("unexpected state")
             return []
         }
+        
+        var effects = [Effect<MainViewAction>]()
 
         // Verifies if oldMember has the expected value given newState.
         let expectedOldMemberState: PresentationState<AlertEvent>.State?
@@ -260,7 +246,14 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         case .notPresented:
             expectedOldMemberState = nil
 
-        case .failedToPresent, .willPresent:
+        case .failedToPresent(.applicationNotActive):
+            expectedOldMemberState = .notPresented
+            
+            effects += environment.feedbackLogger.log(
+                .error, "Failed to present alert since application not active: \(newState.viewModel)")
+                .mapNever()
+            
+        case .willPresent:
             expectedOldMemberState = .notPresented
 
         case .didPresent:
@@ -269,10 +262,10 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
 
         guard oldMember.state == expectedOldMemberState else {
             environment.feedbackLogger.fatalError("unexpected state")
-            return []
+            return effects
         }
 
-        return []
+        return effects
 
     case let ._alertButtonTapped(alertEvent, alertAction):
 
@@ -292,7 +285,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                 // Dismisses PsiCashAccountViewController if it is top of the stack.
                 return [
                     .fireAndForget {
-                        let topVC = environment.getTopPresentedViewController()
+                        let topVC = environment.getTopActiveViewController()
                         let searchResult = topVC.traversePresentingStackFor(
                             type: PsiCashAccountViewController.self,
                             searchChildren: true
@@ -326,7 +319,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
 
                 return [
                     .fireAndForget {
-                        let topVC = environment.getTopPresentedViewController()
+                        let topVC = environment.getTopActiveViewController()
 
                         let found = topVC
                             .traversePresentingStackFor(type: IAPViewController.self, searchChildren: true)
@@ -337,7 +330,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                             break
                         case .notPresent:
                             let vc = environment.makeSubscriptionViewController()
-                            topVC.safePresent(vc, animated: true, viewDidAppearHandler: nil)
+                            topVC.present(vc, animated: true, completion: nil)
                         }
                     }
                 ]
@@ -350,7 +343,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             
             Effect { observer, _ in
                 
-                let topVC = environment.getTopPresentedViewController()
+                let topVC = environment.getTopActiveViewController()
                 
                 let found = topVC
                     .traversePresentingStackFor(type: WebViewController.self, searchChildren: true)
@@ -380,14 +373,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                     webViewViewController.title = UserStrings.Psicash_account()
     
                     let vc = UINavigationController(rootViewController: webViewViewController)
-                    let success = topVC.safePresent(vc, animated: true, viewDidAppearHandler: nil)
-                    
-                    // Immediately completes the signal if the presentation failed,
-                    // since onDimissed callback above won't be called in this case,
-                    // and this would be a memory-leak.
-                    if !success {
-                        observer.sendCompleted()
-                    }
+                    topVC.present(vc, animated: true, completion: nil)
                     
                 }
                 
@@ -428,32 +414,30 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         }
 
         effects += Effect.deferred {
-            let topVC = environment.getTopPresentedViewController()
+            let topVC = environment.getTopActiveViewController()
             let searchResult = topVC.traversePresentingStackFor(type: PsiCashViewController.self)
             
             switch searchResult {
             case .notPresent:
                 let psiCashViewController = environment.makePsiCashViewController()
                 
-                let success = topVC.safePresent(psiCashViewController,
-                                                animated: animated,
-                                                viewDidAppearHandler: nil)
+                topVC.present(psiCashViewController, animated: animated, completion: nil)
                 
-                return ._presentPsiCashScreenResult(success: success)
+                return ._presentPsiCashScreenResult(willPresent: true)
                 
             case .presentInStack(_), .presentTopOfStack(_):
-                return ._presentPsiCashScreenResult(success: false)
+                return ._presentPsiCashScreenResult(willPresent: false)
             }
         }
         
         return effects
         
-    case ._presentPsiCashScreenResult(success: let success):
-        if !success {
+    case ._presentPsiCashScreenResult(willPresent: let willPresent):
+        if !willPresent {
             state.mainView.psiCashViewState = .none
             return [
                 environment.feedbackLogger.log(
-                    .warn, "Failed or will not present PsiCashViewController")
+                    .warn, "Will not present PsiCashViewController")
                     .mapNever()
             ]
         }
@@ -512,31 +496,29 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         
         return [
             Effect.deferred {
-                let topVC = environment.getTopPresentedViewController()
+                let topVC = environment.getTopActiveViewController()
                 let searchResult = topVC.traversePresentingStackFor(
                     type: PsiCashAccountViewController.self, searchChildren: true)
                 
                 switch searchResult {
                 case .notPresent:
                     let accountsViewController = environment.makePsiCashAccountViewController()
-                    let success = topVC.safePresent(accountsViewController,
-                                                    animated: true,
-                                                    viewDidAppearHandler: nil)
+                    topVC.present(accountsViewController, animated: true, completion: nil)
                     
-                    return ._presentPsiCashAccountScreenResult(success: success)
+                    return ._presentPsiCashAccountScreenResult(willPresent: true)
                     
                 case .presentInStack(_), .presentTopOfStack(_):
-                    return ._presentPsiCashAccountScreenResult(success: false)
+                    return ._presentPsiCashAccountScreenResult(willPresent: false)
                 }
             }
         ]
         
-    case ._presentPsiCashAccountScreenResult(success: let success):
-        state.mainView.isPsiCashAccountScreenShown = .completed(success)
-        if !success {
+    case ._presentPsiCashAccountScreenResult(willPresent: let willPresent):
+        state.mainView.isPsiCashAccountScreenShown = .completed(willPresent)
+        if !willPresent {
             return [
                 environment.feedbackLogger.log(
-                    .warn, "Failed or will not present PsiCash Accounts screen")
+                    .warn, "Will not present PsiCash Accounts screen")
                     .mapNever()
             ]
         }

@@ -258,16 +258,6 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [SwiftDelegate.bridge networkExtensionNotification:message];
 }
 
-#pragma mark -
-
-+ (UIViewController *)getTopPresentedViewController {
-    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    while(topController.presentedViewController != nil) {
-        topController = topController.presentedViewController;
-    }
-    return topController;
-}
-
 @end
 
 #pragma mark - ObjCBridgeDelegate
@@ -374,9 +364,9 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     UINavigationController* navCtrl = [[UINavigationController alloc]
                                        initWithRootViewController:iapViewController];
     
-    [[AppDelegate getTopPresentedViewController] presentViewController:navCtrl
-                                                         animated:TRUE
-                                                       completion:nil];
+    [[SwiftDelegate.bridge getTopActiveViewController] presentViewController:navCtrl
+                                                                    animated:TRUE
+                                                                  completion:nil];
 }
 
 /*!
