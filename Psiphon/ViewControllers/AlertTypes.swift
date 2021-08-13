@@ -31,9 +31,11 @@ enum AlertType: Hashable {
     case psiCashAccountAlert(PsiCashAccountAlert)
 
     case disallowedTrafficAlert
+    
+    case submittedFeedbackAlert
 
     case genericOperationFailedTryAgain
-
+    
     case error(localizedTitle: String, localizedMessage: String)
 }
 
@@ -219,6 +221,15 @@ extension UIAlertController {
                     }
                 ]
             )
+            
+        case .submittedFeedbackAlert:
+            return .makeAlert(title: "",
+                              message: UserStrings.Submitted_feedback(),
+                              actions: [
+                                .okButton {
+                                    onActionButtonTapped(alertEvent, .dismissTapped)
+                                }
+                              ])
 
         case .genericOperationFailedTryAgain:
             return .makeAlert(

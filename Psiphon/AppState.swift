@@ -174,7 +174,7 @@ struct AppEnvironment {
     let getAppStateFeedbackEntry: SignalProducer<DiagnosticEntry, Never>
     let getFeedbackUpload: () -> FeedbackUploadProvider
 
-    let getTopPresentedViewController: () -> UIViewController
+    let getTopActiveViewController: () -> UIViewController
 
     let makePsiCashViewController: () -> PsiCashViewController
 
@@ -209,7 +209,7 @@ func makeEnvironment(
     addToDate: @escaping (Calendar.Component, Int, Date) -> Date?,
     mainDispatcher: MainDispatcher,
     globalDispatcher: GlobalDispatcher,
-    getTopPresentedViewController: @escaping () -> UIViewController,
+    getTopActiveViewController: @escaping () -> UIViewController,
     clearWebViewDataStore: @escaping () -> Void
 ) -> (environment: AppEnvironment, cleanup: () -> Void) {
     
@@ -372,7 +372,7 @@ func makeEnvironment(
                                               psiCashLib: psiCashLib)
             },
         getFeedbackUpload: { PsiphonTunnelFeedback() },
-        getTopPresentedViewController: getTopPresentedViewController,
+        getTopActiveViewController: getTopActiveViewController,
         makePsiCashViewController: { [unowned store] in
             PsiCashViewController(
                 platform: platform,
@@ -595,7 +595,8 @@ fileprivate func toFeedbackReducerEnvironment(env: AppEnvironment) -> FeedbackRe
         sharedDB: env.sharedDB,
         appInfo: env.appInfo,
         getPsiphonConfig: env.getPsiphonConfig,
-        getCurrentTime: env.dateCompare.getCurrentTime
+        getCurrentTime: env.dateCompare.getCurrentTime,
+        mainViewStore: env.mainViewStore
     )
 }
 
@@ -616,10 +617,10 @@ fileprivate func toMainViewReducerEnvironment(env: AppEnvironment) -> MainViewEn
             feedbackLogger: env.feedbackLogger,
             iapStore: env.iapStore,
             mainViewStore: env.mainViewStore,
-            getTopPresentedViewController: env.getTopPresentedViewController,
+            getTopActiveViewController: env.getTopActiveViewController,
             dateCompare: env.dateCompare
         ),
-        getTopPresentedViewController: env.getTopPresentedViewController,
+        getTopActiveViewController: env.getTopActiveViewController,
         feedbackLogger: env.feedbackLogger,
         rxDateScheduler: env.rxDateScheduler,
         makePsiCashViewController: env.makePsiCashViewController,
