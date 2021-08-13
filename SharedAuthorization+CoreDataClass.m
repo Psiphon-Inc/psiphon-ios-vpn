@@ -28,8 +28,8 @@ NSString * const SpeedBoostTestAccessTypeValue = @"speed-boost-test";
 NSString * const SubscriptionAccessType = AppleSubscriptionTestAccessTypeValue;
 NSString * const SpeedBoostAccessType = SpeedBoostTestAccessTypeValue;
 #else
-NSString * const SubscriptionAccessType = AppleSubscriptionAccessType;
-NSString * const SpeedBoostAccessType = SpeedBoostAccessType;
+NSString * const SubscriptionAccessType = AppleSubscriptionAccessTypeValue;
+NSString * const SpeedBoostAccessType = SpeedBoostAccessTypeValue;
 #endif
 
 @implementation SharedAuthorization

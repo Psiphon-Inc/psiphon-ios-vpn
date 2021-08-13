@@ -44,7 +44,7 @@ import UIKit
             if isEnabled {
                 self.alpha = 1.0
             } else {
-                self.alpha = Style.default.disabledButtonAlpha
+                self.alpha = CGFloat(Style.default.disabledButtonAlpha)
             }
         }
     }
