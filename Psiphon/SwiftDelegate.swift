@@ -437,7 +437,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             initialValue: AppState(),
             reducer: makeAppReducer(feedbackLogger: self.feedbackLogger),
             dispatcher: mainDispatcher,
-            feedbackLogger: self.feedbackLogger,
             environment: { [unowned self] store in
                 let (environment, cleanup) = makeEnvironment(
                     platform: platform,

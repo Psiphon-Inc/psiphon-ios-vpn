@@ -89,7 +89,6 @@ public final class Store<Value: Equatable, Action> {
     private var reducer: Reducer<Value, Action, ()>!
     private var disposable: Disposable? = .none
     private var effectDisposables = CompositeDisposable()
-    private let feedbackLogger: FeedbackLogger
     
     /// Count of effects that have not completed.
     public private(set) var outstandingEffectCount = 0
@@ -98,12 +97,10 @@ public final class Store<Value: Equatable, Action> {
         initialValue: Value,
         reducer: Reducer<Value, Action, Environment>,
         dispatcher: Dispatcher,
-        feedbackLogger: FeedbackLogger,
         environment makeEnvironment: (Store<Value, Action>) -> Environment
     ) {
         self.value = initialValue
         self.dispatcher = dispatcher
-        self.feedbackLogger = feedbackLogger
         
         let environment = makeEnvironment(self)
         self.reducer = .init { value, action, _ in
@@ -111,12 +108,10 @@ public final class Store<Value: Equatable, Action> {
         }
     }
     
-    private init(dispatcher: Dispatcher, feedbackLogger: FeedbackLogger,
-                 initialValue: Value, reducer: Reducer<Value, Action, ()>) {
+    private init(dispatcher: Dispatcher, initialValue: Value, reducer: Reducer<Value, Action, ()>) {
         self.reducer = reducer
         self.value = initialValue
         self.dispatcher = dispatcher
-        self.feedbackLogger = feedbackLogger
     }
     
     deinit {
@@ -141,8 +136,7 @@ public final class Store<Value: Equatable, Action> {
                         },
                         receiveValues: { [unowned self] internalAction in
                             self.send(internalAction)
-                        },
-                        feedbackLogger: self.feedbackLogger
+                        }
                     )
                 
                 self.effectDisposables.add(disposable)
@@ -159,7 +153,6 @@ public final class Store<Value: Equatable, Action> {
         
         let localStore = Store<LocalValue, LocalAction>(
             dispatcher: self.dispatcher,
-            feedbackLogger: self.feedbackLogger,
             initialValue: toLocalValue(self.value),
             reducer: .init { localValue, localAction, _ in
                 // Local projection sends actions to the global MainStore.
