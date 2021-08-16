@@ -189,11 +189,22 @@ public final class Store<Value: Equatable, Action> {
         localStore.disposable = self.$value.signalProducer
             .skip(first: 1)  // Initial value is already set when localStore is constructed.
             .startWithValues { [weak localStore] newValue in
+                
                 // localStore value is already updated if isSending to the global store.
                 guard !isSending else { return }
-                localStore?.value = toLocalValue(newValue)
+                
+                let newLocalValue = toLocalValue(newValue)
+                
+                // Avoid updating local value if the new value has not changed.
+                // Note that this is only valid since we require Value to be Eqautable.
+                guard localStore?.value != newLocalValue else {
+                   return
+                }
+                
+                localStore?.value = newLocalValue
         }
-
+        
+        
         return localStore
     }
     
