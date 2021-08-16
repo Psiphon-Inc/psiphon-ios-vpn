@@ -20,6 +20,7 @@
 import Foundation
 import Promises
 import ReactiveSwift
+import enum Utilities.Unit
 
 public struct Reducer<Value: Equatable, Action, Environment> {
     
@@ -194,6 +195,20 @@ public final class Store<Value: Equatable, Action> {
         }
 
         return localStore
+    }
+    
+    /// - Note: `projection(value:)` is not thread-safe.
+    public func projection<LocalValue>(
+        value toLocalValue: @escaping (Value) -> LocalValue
+    ) -> Store<LocalValue, Action> {
+        self.projection(value: toLocalValue, action: id)
+    }
+    
+    /// - Note: `projection(action:)` is not thread-safe.
+    public func projection<LocalAction>(
+        action toLocalAction: @escaping (LocalAction) -> Action
+    ) -> Store<Utilities.Unit, LocalAction> {
+        projection(value: erase, action: toLocalAction)
     }
 
 }

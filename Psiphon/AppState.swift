@@ -224,9 +224,7 @@ func makeEnvironment(
     let urlSession = URLSession(configuration: urlSessionConfig)
     
     let paymentTransactionDelegate = PaymentTransactionDelegate(store:
-        store.projection(
-            value: erase,
-            action: { .iap(.transactionUpdate($0)) })
+        store.projection(action: { .iap(.transactionUpdate($0)) })
     )
     SKPaymentQueue.default().add(paymentTransactionDelegate)
     
@@ -264,26 +262,19 @@ func makeEnvironment(
         supportedAppStoreProducts: supportedAppStoreProducts,
         objcBridgeDelegate: objcBridgeDelegate,
         receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate(store:
-            store.projection(
-                value: erase,
-                action: { .appReceipt($0) })
+            store.projection(action: { .appReceipt($0) })
         ),
         paymentTransactionDelegate: paymentTransactionDelegate,
         productRequestDelegate: ProductRequestDelegate(store:
-            store.projection(
-                value: erase,
-                action: { .productRequest($0) })
+            store.projection(action: { .productRequest($0) })
         ),
         internetReachability: reachabilityForInternetConnection,
         internetReachabilityDelegate: InternetReachabilityDelegate(
             reachability: reachabilityForInternetConnection,
-            store: store.projection(
-                value: erase,
-                action: { .reachabilityAction($0) })
+            store: store.projection(action: { .reachabilityAction($0) })
         ),
         vpnConnectionObserver: PsiphonTPMConnectionObserver(store:
-            store.projection(value: erase,
-                             action: { .vpnStateAction(.action(._vpnStatusDidChange($0))) })
+            store.projection(action: { .vpnStateAction(.action(._vpnStatusDidChange($0))) })
         ),
         vpnActionStore: { [unowned store] (action: VPNPublicAction) -> Effect<Never> in
             .fireAndForget {
@@ -387,15 +378,9 @@ func makeEnvironment(
                             return .psiCash(action)
                         }
                     }),
-                iapStore: store.projection(
-                    value: erase,
-                    action: { .iap($0) }),
-                productRequestStore: store.projection(
-                    value: erase,
-                    action: { .productRequest($0) } ),
-                appStoreReceiptStore: store.projection(
-                    value: erase,
-                    action: { .appReceipt($0) } ),
+                iapStore: store.projection(action: { .iap($0) }),
+                productRequestStore: store.projection(action: { .productRequest($0) } ),
+                appStoreReceiptStore: store.projection(action: { .appReceipt($0) } ),
                 tunnelConnectedSignal: store.$value.signalProducer
                     .map(\.vpnState.value.providerVPNStatus.tunneled),
                 dateCompare: dateCompare,
