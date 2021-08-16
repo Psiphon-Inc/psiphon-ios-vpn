@@ -1896,10 +1896,9 @@
 			};
 			buildConfigurationList = CE26FC851BBDC7B700B83375 /* Build configuration list for PBXProject "Psiphon" */;
 			compatibilityVersion = "Xcode 3.2";
-			developmentRegion = English;
+			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				English,
 				en,
 				fr,
 				ar,
@@ -1938,6 +1937,7 @@
 				it,
 				sw,
 				ti,
+				Base,
 			);
 			mainGroup = CE26FC811BBDC7B700B83375;
 			productRefGroup = CE26FC8B1BBDC7B800B83375 /* Products */;
