@@ -989,8 +989,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         self.postedNetworkConnectivityFailed = FALSE;
         [[Notifier sharedInstance] post:NotifierNetworkConnectivityResolved];
     }
-    NSString *strReachabilityFlags = [reachability currentReachabilityFlagsToString];
-    LOG_DEBUG(@"onInternetReachabilityChanged: %@", strReachabilityFlags);
+    LOG_DEBUG(@"onInternetReachabilityChanged: %@", [reachability currentReachabilityFlagsToString]);
 }
 
 - (void)onDiagnosticMessage:(NSString *_Nonnull)message withTimestamp:(NSString *_Nonnull)timestamp {

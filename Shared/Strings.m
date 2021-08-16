@@ -57,7 +57,7 @@
             }
             break;
         default:
-            [NSException raise:NSGenericException format:@"Unknown period unit %lu", unit];
+            [NSException raise:NSGenericException format:@"Unknown period unit %lu", (unsigned long)unit];
     }
 
     if (numUnits > 1) {
@@ -92,7 +92,7 @@
     }
 
     if (!dropNumOfUnitsIfOne || subscription.numberOfUnits != 1) {
-        [string appendFormat:@"%lu ", subscription.numberOfUnits];
+        [string appendFormat:@"%lu", (unsigned long)subscription.numberOfUnits];
     }
 
     [string appendString:[StringUtils stringForPeriodUnit:subscription.unit
