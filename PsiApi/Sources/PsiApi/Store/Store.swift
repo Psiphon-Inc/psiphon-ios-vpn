@@ -155,28 +155,42 @@ public final class Store<Value: Equatable, Action> {
 
     /// Creates a  projection of the store value and action types.
     /// - Parameter value: A function that takes current store Value type and maps it to LocalValue.
+    /// - Note: `projection(value:action:)` is not thread-safe.
     public func projection<LocalValue, LocalAction>(
         value toLocalValue: @escaping (Value) -> LocalValue,
         action toGlobalAction: @escaping (LocalAction) -> Action
     ) -> Store<LocalValue, LocalAction> {
         
+        // isSending tracks if the local store is sending a value
+        // to the global store.
+        // This is useful for avoiding multiple redundant updates
+        // to the localStore's state value.
+        var isSending = false
+        
         let localStore = Store<LocalValue, LocalAction>(
             dispatcher: self.dispatcher,
             initialValue: toLocalValue(self.value),
             reducer: .init { localValue, localAction, _ in
+                
+                // Sets isSending to true
+                isSending = true
+                defer { isSending = false }
+                
                 // Local projection sends actions to the global MainStore,
                 // and maps the global value to local value with `toLocalValue`.
                 localValue = toLocalValue(self.syncSend(toGlobalAction(localAction)))
+                
                 return []
         })
 
         // Subscribes localStore to the value changes of the "global store",
         // due to actions outside the localStore.
         localStore.disposable = self.$value.signalProducer
-            .map(toLocalValue)
-            .skipRepeats()
+            .skip(first: 1)  // Initial value is already set when localStore is constructed.
             .startWithValues { [weak localStore] newValue in
-                localStore?.value = newValue
+                // localStore value is already updated if isSending to the global store.
+                guard !isSending else { return }
+                localStore?.value = toLocalValue(newValue)
         }
 
         return localStore
