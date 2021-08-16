@@ -83,6 +83,7 @@ public final class Store<Value: Equatable, Action> {
     public typealias OutputType = Value
     public typealias OutputErrorType = Never
 
+    /// - Note: Accessing current value is not thread-safe.
     @State public private(set) var value: Value
 
     private let dispatcher: Dispatcher
@@ -117,31 +118,39 @@ public final class Store<Value: Equatable, Action> {
     deinit {
         effectDisposables.dispose()
     }
-     
-    /// Sends action to the store.
+    
+    /// Sends action to the store asynchronously.
+    /// - Note: This function is thread-safe.
     public func send(_ action: Action) {
         self.dispatcher.dispatch { [unowned self] in
-            // Executes the reducer and collects the effects
-            let effects = self.reducer(&self.value, action, ())
-            
-            self.outstandingEffectCount += effects.count
-
-            effects.forEach { effect in
-                var disposable: Disposable?
-                disposable = effect.observe(on: self.dispatcher.rxScheduler!)
-                    .sink(
-                        receiveCompletion: {
-                            disposable?.dispose()
-                            self.outstandingEffectCount -= 1
-                        },
-                        receiveValues: { [unowned self] internalAction in
-                            self.send(internalAction)
-                        }
-                    )
-                
-                self.effectDisposables.add(disposable)
-            }
+            _ = syncSend(action)
         }
+    }
+     
+    /// Sends action to the store.
+    internal func syncSend(_ action: Action) -> Value {
+        // Executes the reducer and collects the effects
+        let effects = self.reducer(&self.value, action, ())
+        
+        self.outstandingEffectCount += effects.count
+        
+        effects.forEach { effect in
+            var disposable: Disposable?
+            disposable = effect.observe(on: self.dispatcher.rxScheduler!)
+                .sink(
+                    receiveCompletion: {
+                        disposable?.dispose()
+                        self.outstandingEffectCount -= 1
+                    },
+                    receiveValues: { [unowned self] internalAction in
+                        _ = self.syncSend(internalAction)
+                    }
+                )
+            
+            self.effectDisposables.add(disposable)
+        }
+        
+        return self.value
     }
 
     /// Creates a  projection of the store value and action types.
@@ -155,10 +164,9 @@ public final class Store<Value: Equatable, Action> {
             dispatcher: self.dispatcher,
             initialValue: toLocalValue(self.value),
             reducer: .init { localValue, localAction, _ in
-                // Local projection sends actions to the global MainStore.
-                self.send(toGlobalAction(localAction))
-                // Updates local stores value immediately.
-                localValue = toLocalValue(self.value)
+                // Local projection sends actions to the global MainStore,
+                // and maps the global value to local value with `toLocalValue`.
+                localValue = toLocalValue(self.syncSend(toGlobalAction(localAction)))
                 return []
         })
 
