@@ -78,11 +78,11 @@ public extension Reducer {
 }
 
 
-/// An event-driven state machine that runs it's effects on the main thread.
-/// Can be observed from any other thread, however, events can only be sent to it on the main-thread.
+/// An event-driven state machine that runs it's effects on the provided `Dispatcher`.
+/// Observers can subscribe to `$value.signal` and `$value.signalProducer` signals to
+/// listen for state changes.
+/// Actions can be sent to the store froma any thread by calling `send(_:)`.
 public final class Store<Value: Equatable, Action> {
-    public typealias OutputType = Value
-    public typealias OutputErrorType = Never
 
     /// - Note: Accessing current value is not thread-safe.
     @State public private(set) var value: Value
@@ -93,6 +93,7 @@ public final class Store<Value: Equatable, Action> {
     private var effectDisposables = CompositeDisposable()
     
     /// Count of effects that have not completed.
+    /// This is used for collecting statistic at the time of a feedback getting submitted.
     public private(set) var outstandingEffectCount = 0
     
     public init<Environment>(
@@ -171,7 +172,7 @@ public final class Store<Value: Equatable, Action> {
         let localStore = Store<LocalValue, LocalAction>(
             dispatcher: self.dispatcher,
             initialValue: toLocalValue(self.value),
-            reducer: .init { localValue, localAction, _ in
+            reducer: Reducer { [self] localValue, localAction, _ in
                 
                 // Sets isSending to true
                 isSending = true
