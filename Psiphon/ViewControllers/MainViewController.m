@@ -83,7 +83,7 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
     NSLayoutConstraint *startButtonHeight;
     
     // Settings
-    PsiphonSettingsViewController *appSettingsViewController;
+    PsiphonSettingsViewController *__weak appSettingsViewController;
     AnimatedUIButton *settingsButton;
 
     // Psiphon Logo
@@ -688,9 +688,11 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 }
 
 - (void)reloadAndOpenSettings {
+    
+    [[RegionAdapter sharedInstance] reloadTitlesForNewLocalization];
+    
     if (appSettingsViewController != nil) {
         [appSettingsViewController dismissViewControllerAnimated:NO completion:^{
-            [[RegionAdapter sharedInstance] reloadTitlesForNewLocalization];
             [[AppDelegate sharedAppDelegate] reloadMainViewControllerAndImmediatelyOpenSettings];
         }];
     }
@@ -738,16 +740,16 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 }
 
 - (void)openSettingsMenu {
-    appSettingsViewController = [[SettingsViewController alloc] init];
-    appSettingsViewController.delegate = appSettingsViewController;
-    appSettingsViewController.showCreditsFooter = NO;
-    appSettingsViewController.showDoneButton = YES;
-    appSettingsViewController.neverShowPrivacySettings = YES;
-    appSettingsViewController.settingsDelegate = self;
-    appSettingsViewController.preferencesSnapshot = [[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] copy];
+    PsiphonSettingsViewController *vc = [[SettingsViewController alloc] init];
+    vc.delegate = vc;
+    vc.showCreditsFooter = NO;
+    vc.showDoneButton = YES;
+    vc.neverShowPrivacySettings = YES;
+    vc.settingsDelegate = self;
+    vc.preferencesSnapshot = [[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] copy];
 
     UINavigationController *navController = [[UINavigationController alloc]
-      initWithRootViewController:appSettingsViewController];
+      initWithRootViewController:vc];
 
     if (@available(iOS 13, *)) {
         // The default navigation controller in the iOS 13 SDK is not fullscreen and can be
@@ -762,6 +764,8 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
     }
 
     [self presentViewController:navController animated:YES completion:nil];
+    
+    self->appSettingsViewController = vc;
 }
 
 #pragma mark - PsiCash
