@@ -239,7 +239,7 @@ fileprivate final class SpeedBoostExplainerCell: UICollectionViewCell {
                       numberOfLines: 1,
                       alignment: .center)
         
-        subtitle = .make(text: UserStrings.Speed_and_port_limibts_body(),
+        subtitle = .make(text: UserStrings.Speed_and_port_limits_body(),
                          fontSize: .normal,
                          typeface: .medium,
                          color: .white,
