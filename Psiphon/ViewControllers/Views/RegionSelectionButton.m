@@ -50,6 +50,9 @@
         regionNameLabel.adjustsFontSizeToFitWidth = YES;
         regionNameLabel.font = [UIFont avenirNextMedium:16.f];
         regionNameLabel.textColor = UIColor.whiteColor;
+        if (isRTL) {
+            regionNameLabel.textAlignment = NSTextAlignmentRight;
+        }
 
         rightArrow = [[UIImageView alloc] init];
 
