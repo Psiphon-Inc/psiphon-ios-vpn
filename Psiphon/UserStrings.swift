@@ -282,8 +282,8 @@ import Foundation
     }
     
     @objc static func Logout_anyway() -> String {
-        return NSLocalizedString("LOG_OUT_ANY_WAY_BUTTON_TITLE", tableName: nil, bundle: .main,
-                                 value: "Logout anyway",
+        return NSLocalizedString("LOG_OUT_ANY_WAY_BUTTON_TITLE_2", tableName: nil, bundle: .main,
+                                 value: "Log out anyway",
                                  comment: "Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed.")
     }
     
