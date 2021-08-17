@@ -189,9 +189,10 @@ public enum PsiCashTransactionClass: String, Codable, CaseIterable {
     }
 }
 
-public protocol PsiCashProduct: Hashable, Codable {
+public protocol PsiCashProduct: Hashable  {
+    associatedtype DistinguihserType: Hashable
     var transactionClass: PsiCashTransactionClass { get }
-    var distinguisher: String { get }
+    var distinguisher: DistinguihserType { get }
 }
 
 /// Information about a PsiCash product that can be purchased, and its price.
@@ -287,7 +288,7 @@ extension PsiCashPurchasableType {
     public var distinguisher: String {
         switch self {
         case .speedBoost(let purchasable):
-            return purchasable.product.distinguisher
+            return purchasable.product.distinguisher.rawValue
         }
     }
 
@@ -313,29 +314,51 @@ extension PsiCashPurchasableType: Hashable {
 
 public struct SpeedBoostProduct: PsiCashProduct {
     
-    public static let supportedProducts: [String: Int] = [
-        "1hr": 1,
-        "2hr": 2,
-        "3hr": 3,
-        "4hr": 4,
-        "5hr": 5,
-        "6hr": 6,
-        "7hr": 7,
-        "8hr": 8,
-        "9hr": 9
-    ]
+    /// Supported Speed Boost products. Raw value is the distinguisher defined by the PsiCash server.
+    public enum SpeedBoostDistinguisher: String {
+        
+        // Raw values must match distinguisher values set by the PsiCash server.
+        
+        case hr1 = "1hr"
+        case hr2 = "2hr"
+        case hr3 = "3hr"
+        case hr4 = "4hr"
+        case hr5 = "5hr"
+        case hr6 = "6hr"
+        case hr7 = "7hr"
+        case hr8 = "8hr"
+        case hr9 = "9hr"
+        
+        /// Amount of Speed Boost hours as defined by the Speed Boost distinguisher.
+        var hours: Int {
+            switch self {
+            case .hr1: return 1
+            case .hr2: return 2
+            case .hr3: return 3
+            case .hr4: return 4
+            case .hr5: return 5
+            case .hr6: return 6
+            case .hr7: return 7
+            case .hr8: return 8
+            case .hr9: return 9
+            }
+        }
+        
+    }
+    
+    /// Amount of Speed Boost hours as defined by the Speed Boost distinguisher.
+    public var hours: Int { distinguisher.hours }
     
     public let transactionClass: PsiCashTransactionClass
-    public let distinguisher: String
-    public let hours: Int
+    public let distinguisher: SpeedBoostDistinguisher
 
     /// Initializer fails if provided `distinguisher` is not supported.
     public init?(distinguisher: String) {
-        self.transactionClass = .speedBoost
-        self.distinguisher = distinguisher
-        guard let hours = Self.supportedProducts[distinguisher] else {
+        guard let parsedDistinguisher = SpeedBoostDistinguisher(rawValue: distinguisher) else {
             return nil
         }
-        self.hours = hours
+        self.distinguisher = parsedDistinguisher
+        self.transactionClass = .speedBoost
     }
+    
 }

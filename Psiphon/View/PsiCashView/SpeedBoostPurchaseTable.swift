@@ -414,18 +414,17 @@ enum SpeedBoostPurchaseBackground: String, CaseIterable {
     case yellow = "SpeedBoostBackground_Yellow"
     case limeGreen = "SpeedBoostBackground_LimeGreen"
 
-    static func background(speedBoostDistinguisher: String) -> Self {
+    static func background(speedBoostDistinguisher: SpeedBoostProduct.SpeedBoostDistinguisher) -> Self {
         switch speedBoostDistinguisher {
-        case "1hr": return .orange
-        case "2hr": return .pink
-        case "3hr": return .purple
-        case "4hr": return .darkBlue
-        case "5hr": return .blue
-        case "6hr": return .green
-        case "7hr": return .lightOrange
-        case "8hr": return .yellow
-        case "9hr": return .limeGreen
-        default: return allCases.randomElement()!
+        case .hr1: return .orange
+        case .hr2: return .pink
+        case .hr3: return .purple
+        case .hr4: return .darkBlue
+        case .hr5: return .blue
+        case .hr6: return .green
+        case .hr7: return .lightOrange
+        case .hr8: return .yellow
+        case .hr9: return .limeGreen
         }
     }
 }
