@@ -145,7 +145,7 @@
 "LOG_IN_OR_SIGNUP_TO_CONTINUE" = "Log in or create account to continue using PsiCash";
 
 /* Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed. */
-"LOG_OUT_ANY_WAY_BUTTON_TITLE" = "Logout anyway";
+"LOG_OUT_ANY_WAY_BUTTON_TITLE_2" = "Log out anyway";
 
 /* Title of the button that lets users log out of their account */
 "LOG_OUT_BUTTON_TITLE_2" = "Log out";
