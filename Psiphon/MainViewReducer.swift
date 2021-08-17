@@ -203,12 +203,14 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                 Effect { observer, _ in
 
                     let alertController = UIAlertController
-                        .makeUIAlertController(alertEvent: alertEvent) { alertEvent, alertAction in
-                            observer.send(value: ._alertButtonTapped(alertEvent, alertAction))
-
-                            // Completes the signal as the UIAlertController has been dismissed.
-                            observer.sendCompleted()
-                        }
+                        .makeUIAlertController(
+                            alertEvent: alertEvent,
+                            onActionButtonTapped: { alertEvent, alertAction in
+                                observer.send(value: ._alertButtonTapped(alertEvent, alertAction))
+                                // Completes the signal as the UIAlertController has been dismissed.
+                                observer.sendCompleted()
+                            }
+                        )
 
                     environment.getTopActiveViewController().present(
                         alertController,
@@ -223,7 +225,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                         }
                     )
 
-                    observer.fulfill(value: ._presentAlertResult(
+                    observer.send(value: ._presentAlertResult(
                         newState: PresentationState(alertEvent, state: .willPresent)))
                 }
             ]
