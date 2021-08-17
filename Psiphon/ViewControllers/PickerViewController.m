@@ -155,6 +155,10 @@ NSString * const CellIdentifier = @"cell";
 
         cell.textLabel.font = [UIFont avenirNextMedium:16.f];
         cell.textLabel.textColor = UIColor.greyishBrown;
+        
+        if (cell.semanticContentAttribute == UISemanticContentAttributeForceRightToLeft) {
+            cell.textLabel.textAlignment = NSTextAlignmentRight;
+        }
 
         cell.separatorInset = UIEdgeInsetsZero;
 

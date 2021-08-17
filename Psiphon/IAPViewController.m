@@ -567,6 +567,9 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     label.font = [UIFont avenirNextMedium:15.f];
     label.textColor = UIColor.blueGreyColor;
     label.text = [NSString stringWithFormat:@"%@\n\n%@", Strings.subscriptionScreenNoticeText, Strings.subscriptionScreenCancelNoticeText];
+    if (label.semanticContentAttribute == UISemanticContentAttributeForceRightToLeft) {
+        label.textAlignment = NSTextAlignmentRight;
+    }
     [cell.contentView addSubview:label];
 
     // label constraints
