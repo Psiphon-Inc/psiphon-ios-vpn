@@ -40,7 +40,7 @@ NSErrorDomain _Nonnull const ContainerReaderRotatedFileErrorDomain = @"Container
     DelimitedFile *file;
     DelimitedFile *olderFile;
     NSUInteger initialFileOffset;
-    NSUInteger initialOlderFileOffset;
+    unsigned long long initialOlderFileOffset;
 }
 
 - (instancetype)initWithFilepath:(NSString*)filepath
@@ -127,7 +127,7 @@ NSErrorDomain _Nonnull const ContainerReaderRotatedFileErrorDomain = @"Container
             }
 
             if (self->olderFileEntry == nil || self->olderFileEntry.fileSystemFileNumber != older_file_stat.st_ino) {
-                NSUInteger offset = 0;
+                unsigned long long offset = 0;
                 if (self->fileEntry && self->fileEntry.fileSystemFileNumber == older_file_stat.st_ino) {
                     // File was replaced as a result of a rotation
                     offset = self->fileEntry.offset;
@@ -164,7 +164,7 @@ NSErrorDomain _Nonnull const ContainerReaderRotatedFileErrorDomain = @"Container
             } else if (self->fileEntry.offset >= file_stat.st_size) {
                self->file = nil;
             } else {
-                self->initialFileOffset = self->fileEntry.offset;
+                self->initialFileOffset = (unsigned int)self->fileEntry.offset;
                 [self->file.fileHandle seekToFileOffset:self->initialFileOffset];
             }
         }

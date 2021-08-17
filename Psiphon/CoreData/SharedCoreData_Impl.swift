@@ -107,7 +107,7 @@ import AppStoreIAP
             let psiphondRejectedPred = makePredicate(psiphondRejected: psiphondRejected ?? false)
             
             // Fetches set of subscription authorizations.
-            let request = SharedAuthorization.fetchRequest() as! NSFetchRequest<SharedAuthorization>
+            let request = SharedAuthorization.fetchRequest() 
             request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates:
                                                         [accessTypePred, psiphondRejectedPred])
             
@@ -163,7 +163,7 @@ import AppStoreIAP
             }
             
             // Fetches set of all authorizations for the given access types.
-            let request = SharedAuthorization.fetchRequest() as! NSFetchRequest<SharedAuthorization>
+            let request = SharedAuthorization.fetchRequest() 
             request.predicate = makePredicate(accessTypes: accessTypes)
             
             do {

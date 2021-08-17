@@ -21,9 +21,9 @@
 
 @interface FileUtils : NSObject
 
-+ (BOOL)downgradeFileProtectionToNone:(NSArray<NSString *> *)paths withExceptions:(NSArray<NSString *> *)exceptions;
++ (BOOL)downgradeFileProtectionToNone:(NSArray<NSString *> *_Nonnull)paths withExceptions:(NSArray<NSString *> *_Nullable)exceptions;
 
-+ (NSError *)createDir:(NSURL *)dirURL;
++ (NSError *_Nullable)createDir:(NSURL *_Nonnull)dirURL;
 
 + (NSString *_Nullable)tryReadingFile:(NSString *_Nonnull)filePath;
 
