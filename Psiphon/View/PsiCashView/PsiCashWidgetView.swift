@@ -31,7 +31,7 @@ import PsiCashClient
         let accountType: PsiCashAccountType?
     }
 
-    @objc let balanceViewWrapper = PsiCashBalanceViewWrapper()
+    @objc let balanceViewWrapper: PsiCashBalanceViewWrapper
     @objc let speedBoostButton = SpeedBoostButton()
     @objc let addPsiCashButton = DuskButton()
     @objc let psiCashAccountButton = DuskButton()
@@ -40,6 +40,12 @@ import PsiCashClient
     private let topRowHStack: UIStackView
     
     override init(frame: CGRect) {
+        fatalError()
+    }
+    
+    @objc init(locale: Locale) {
+        
+        balanceViewWrapper = PsiCashBalanceViewWrapper(locale: locale)
         
         topRowHStack = UIStackView.make(
             axis: .horizontal,
@@ -48,7 +54,7 @@ import PsiCashClient
             spacing: 10.0
         )
         
-        super.init(frame: frame)
+        super.init(frame: .zero)
         
         addPsiCashButton.setTitle("+", for: .normal)
         addPsiCashButton.titleLabel!.font = AvenirFont.demiBold.customFont(20.0)

@@ -548,7 +548,8 @@ fileprivate func toRequestDelegateReducerEnvironment(
     ProductRequestEnvironment(
         feedbackLogger: env.feedbackLogger,
         productRequestDelegate: env.productRequestDelegate,
-        supportedAppStoreProducts: env.supportedAppStoreProducts
+        supportedAppStoreProducts: env.supportedAppStoreProducts,
+        getCurrentLocale: { env.userConfigs.localeForAppLanguage }
     )
 }
 

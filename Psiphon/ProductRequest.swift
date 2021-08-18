@@ -126,11 +126,12 @@ enum ProductRequestAction {
     case productRequestResult(SKProductsRequest, Result<SKProductsResponse, SystemErrorEvent<Int>>)
 }
 
-typealias ProductRequestEnvironment = (
-    feedbackLogger: FeedbackLogger,
-    productRequestDelegate: ProductRequestDelegate,
-    supportedAppStoreProducts: SupportedAppStoreProducts
-)
+struct ProductRequestEnvironment {
+    let feedbackLogger: FeedbackLogger
+    let productRequestDelegate: ProductRequestDelegate
+    let supportedAppStoreProducts: SupportedAppStoreProducts
+    let getCurrentLocale: () -> Locale
+}
 
 let productRequestReducer = Reducer<PsiCashAppStoreProductsState
                                     , ProductRequestAction
@@ -191,7 +192,7 @@ let productRequestReducer = Reducer<PsiCashAppStoreProductsState
         state.psiCashProducts = .completed(
             result.map { response in
                 
-                let formatter = PsiCashAmountFormatter(locale: Locale.current)
+                let formatter = PsiCashAmountFormatter(locale: environment.getCurrentLocale())
 
                 return response.products.map { skProduct -> ParsedPsiCashAppStorePurchasable in
                     do {
