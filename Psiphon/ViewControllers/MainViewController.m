@@ -473,13 +473,15 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 // adding and activating autolayout constraints.
 - (void)addViews {
     
+    NSLocale *currentLocale = [SwiftDelegate.bridge getLocaleForCurrentAppLanguage];
+    
     cloudBackgroundView = [[CloudsView alloc] initForAutoLayout];
     versionLabel = [[UIButton alloc] init];
     settingsButton = [[AnimatedUIButton alloc] init];
     psiphonLargeLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogoWhite"]];
     psiphonTitle = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonTitle"]];
     noConnectionBannerView = [[NoConnectionBannerView alloc] init];
-    psiCashWidget = [[PsiCashWidgetView alloc] initWithFrame:CGRectZero];
+    psiCashWidget = [[PsiCashWidgetView alloc] initWithLocale:currentLocale];
     startAndStopButton = [VPNStartAndStopButton buttonWithType:UIButtonTypeCustom];
     statusLabel = [[UILabel alloc] init];
     regionSelectionButton = [[RegionSelectionButton alloc] init];
@@ -558,7 +560,7 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 }
 
 - (void)setStatusLabelText:(NSString*)s {
-    NSString *upperCased = [s localizedUppercaseString];
+    NSString *upperCased = [s uppercaseStringWithLocale:[SwiftDelegate.bridge getLocaleForCurrentAppLanguage]];
     NSMutableAttributedString *mutableStr = [[NSMutableAttributedString alloc]
       initWithString:upperCased];
 

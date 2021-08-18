@@ -181,7 +181,7 @@ import Foundation
     static func Psiphon_connection_required() -> String {
         return NSLocalizedString("PSIPHON_CONNECTION_REQUIRED", tableName: nil, bundle: Bundle.main,
                                  value: "Psiphon Connection Required",
-                                 comment: "Alert message informing user that a Psip")
+                                 comment: "Alert message informing user that a Psiphon connection is required")
     }
 
     static func In_order_to_use_PsiCash_you_must_be_connected() -> String {
@@ -282,8 +282,8 @@ import Foundation
     }
     
     @objc static func Logout_anyway() -> String {
-        return NSLocalizedString("LOG_OUT_ANY_WAY_BUTTON_TITLE", tableName: nil, bundle: .main,
-                                 value: "Logout anyway",
+        return NSLocalizedString("LOG_OUT_ANY_WAY_BUTTON_TITLE_2", tableName: nil, bundle: .main,
+                                 value: "Log out anyway",
                                  comment: "Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed.")
     }
     
@@ -419,7 +419,7 @@ import Foundation
                                  comment: "Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active.")
     }
     
-    static func Speed_and_port_limibts_body() -> String {
+    static func Speed_and_port_limits_body() -> String {
         return NSLocalizedString("PSICASH_SPEED_PORT_LIMITS_BODY", tableName: nil, bundle: .main,
                                  value: "Without active Speed Boost, your speed is limited and some internet traffic is not supported. Activate Speed Boost with PsiCash to unlock the full potential of your Psiphon experience.",
                                  comment: "Body of an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. The word 'PsiCash' must not be translated or transliterated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.")
@@ -798,55 +798,55 @@ extension UserStrings {
     static func Speed_boost_1_hour() -> String {
         return NSLocalizedString("SPEED_BOOST_1HR", tableName: nil, bundle: Bundle.main,
                                  value: "1 hour",
-                                 comment: "Label on a button. Clicking this button will buy 1 hour of Speed Boost.")
+                                 comment: "Label on a button. Clicking this button will buy 1 hour of Speed Boost. Translate number as well.")
     }
     
     static func Speed_boost_2_hours() -> String {
         return NSLocalizedString("SPEED_BOOST_2HR", tableName: nil, bundle: Bundle.main,
                                  value: "2 hours",
-                                 comment: "Label on a button. Clicking this button will buy 2 hours of Speed Boost.")
+                                 comment: "Label on a button. Clicking this button will buy 2 hours of Speed Boost. Translate number as well.")
     }
     
     static func Speed_boost_3_hours() -> String {
         return NSLocalizedString("SPEED_BOOST_3HR", tableName: nil, bundle: Bundle.main,
                                  value: "3 hours",
-                                 comment: "Label on a button. Clicking this button will buy 3 hours of Speed Boost.")
+                                 comment: "Label on a button. Clicking this button will buy 3 hours of Speed Boost. Translate number as well.")
     }
     
     static func Speed_boost_4_hours() -> String {
         return NSLocalizedString("SPEED_BOOST_4HR", tableName: nil, bundle: Bundle.main,
                                  value: "4 hours",
-                                 comment: "Label on a button. Clicking this button will buy 4 hours of Speed Boost.")
+                                 comment: "Label on a button. Clicking this button will buy 4 hours of Speed Boost. Translate number as well.")
     }
     
     static func Speed_boost_5_hours() -> String {
         return NSLocalizedString("SPEED_BOOST_5HR", tableName: nil, bundle: Bundle.main,
                                  value: "5 hours",
-                                 comment: "Label on a button. Clicking this button will buy 5 hours of Speed Boost.")
+                                 comment: "Label on a button. Clicking this button will buy 5 hours of Speed Boost. Translate number as well.")
     }
     
     static func Speed_boost_6_hours() -> String {
         return NSLocalizedString("SPEED_BOOST_6HR", tableName: nil, bundle: Bundle.main,
                                  value: "6 hours",
-                                 comment: "Label on a button. Clicking this button will buy 6 hours of Speed Boost.")
+                                 comment: "Label on a button. Clicking this button will buy 6 hours of Speed Boost. Translate number as well.")
     }
     
     static func Speed_boost_7_hours() -> String {
         return NSLocalizedString("SPEED_BOOST_7HR", tableName: nil, bundle: Bundle.main,
                                  value: "7 hours",
-                                 comment: "Label on a button. Clicking this button will buy 7 hours of Speed Boost.")
+                                 comment: "Label on a button. Clicking this button will buy 7 hours of Speed Boost. Translate number as well.")
     }
     
     static func Speed_boost_8_hours() -> String {
         return NSLocalizedString("SPEED_BOOST_8HR", tableName: nil, bundle: Bundle.main,
                                  value: "8 hours",
-                                 comment: "Label on a button. Clicking this button will buy 8 hours of Speed Boost.")
+                                 comment: "Label on a button. Clicking this button will buy 8 hours of Speed Boost. Translate number as well.")
     }
     
     static func Speed_boost_9_hours() -> String {
         return NSLocalizedString("SPEED_BOOST_9HR", tableName: nil, bundle: Bundle.main,
                                  value: "9 hours",
-                                 comment: "Label on a button. Clicking this button will buy 9 hours of Speed Boost.")
+                                 comment: "Label on a button. Clicking this button will buy 9 hours of Speed Boost. Translate number as well.")
     }
     
 }

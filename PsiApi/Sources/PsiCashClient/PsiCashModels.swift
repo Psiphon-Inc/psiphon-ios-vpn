@@ -33,10 +33,24 @@ public enum PsiCashParseError: HashableError {
 
 /// PsiCash request header metadata keys.
 public enum PsiCashRequestMetadataKey: String {
-    case clientVersion = "client_version"
-    case propagationChannelId = "propagation_channel_id"
-    case clientRegion = "client_region"
-    case sponsorId = "sponsor_id"
+    case clientVersion
+    case propagationChannelId
+    case clientRegion
+    case sponsorId
+    
+    public var rawValue: String {
+        switch self {
+        case .clientVersion:
+            return PsiphonConstants.ClientVersionKey
+        case .propagationChannelId:
+            return PsiphonConstants.PropagationChannelIdKey
+        case .clientRegion:
+            return PsiphonConstants.ClientRegionKey
+        case .sponsorId:
+            return PsiphonConstants.SponsorIdKey
+        }
+    }
+    
 }
 
 public typealias PsiCashParsed<Value: Equatable> = Result<Value, PsiCashParseError>
@@ -189,9 +203,10 @@ public enum PsiCashTransactionClass: String, Codable, CaseIterable {
     }
 }
 
-public protocol PsiCashProduct: Hashable, Codable {
+public protocol PsiCashProduct: Hashable  {
+    associatedtype DistinguihserType: Hashable
     var transactionClass: PsiCashTransactionClass { get }
-    var distinguisher: String { get }
+    var distinguisher: DistinguihserType { get }
 }
 
 /// Information about a PsiCash product that can be purchased, and its price.
@@ -287,7 +302,7 @@ extension PsiCashPurchasableType {
     public var distinguisher: String {
         switch self {
         case .speedBoost(let purchasable):
-            return purchasable.product.distinguisher
+            return purchasable.product.distinguisher.rawValue
         }
     }
 
@@ -313,29 +328,19 @@ extension PsiCashPurchasableType: Hashable {
 
 public struct SpeedBoostProduct: PsiCashProduct {
     
-    public static let supportedProducts: [String: Int] = [
-        "1hr": 1,
-        "2hr": 2,
-        "3hr": 3,
-        "4hr": 4,
-        "5hr": 5,
-        "6hr": 6,
-        "7hr": 7,
-        "8hr": 8,
-        "9hr": 9
-    ]
+    /// Amount of Speed Boost hours as defined by the Speed Boost distinguisher.
+    public var hours: Int { distinguisher.hours }
     
     public let transactionClass: PsiCashTransactionClass
-    public let distinguisher: String
-    public let hours: Int
+    public let distinguisher: SpeedBoostDistinguisher
 
     /// Initializer fails if provided `distinguisher` is not supported.
     public init?(distinguisher: String) {
-        self.transactionClass = .speedBoost
-        self.distinguisher = distinguisher
-        guard let hours = Self.supportedProducts[distinguisher] else {
+        guard let parsedDistinguisher = SpeedBoostDistinguisher(rawValue: distinguisher) else {
             return nil
         }
-        self.hours = hours
+        self.distinguisher = parsedDistinguisher
+        self.transactionClass = .speedBoost
     }
+    
 }
