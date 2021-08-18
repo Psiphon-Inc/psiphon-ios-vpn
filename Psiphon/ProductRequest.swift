@@ -23,17 +23,6 @@ import AppStoreIAP
 
 /// Parsed representation of AppStore PsiCash consumable product.
 enum ParsedPsiCashAppStorePurchasable: Equatable {
-    
-    // Map from App Store defined Product Id to PsiCash value.
-    static let supportedProducts: [String: Double] = [
-        "ca.psiphon.Psiphon.Consumable.PsiCash.1000": 1000,
-        "ca.psiphon.Psiphon.Consumable.PsiCash.4000": 4000,
-        "ca.psiphon.Psiphon.Consumable.PsiCash.10000": 10000,
-        "ca.psiphon.Psiphon.Consumable.PsiCash.30000": 30000,
-        "ca.psiphon.Psiphon.Consumable.PsiCash.100000": 100000,
-    ]
-    
-    
     case purchasable(PsiCashPurchasableViewModel)
     case parseError(reason: String)
 }
@@ -48,13 +37,17 @@ extension ParsedPsiCashAppStorePurchasable {
     }
     
     static func make(product: AppStoreProduct, formatter: PsiCashAmountFormatter) -> Self {
-        guard let psiCashValue = Self.supportedProducts[product.productID] else {
+        guard
+            let psiCashProductID = PsiCashIAPProductIDs(rawValue: product.productID.rawValue)
+        else {
             return .parseError(reason: """
-                AppStore IAP product with identifier '\(product.productID)' is not a supported product
+                AppStore IAP product with identifier \
+                '\(product.productID)' is not a supported product
                 """)
         }
-        guard let title = formatter.string(from: psiCashValue) else {
-            return .parseError(reason: "Failed to format '\(psiCashValue)' into string")
+        guard let title = formatter.string(from: psiCashProductID.psiCashAmount) else {
+            return .parseError(reason:
+                                "Failed to format '\(psiCashProductID.psiCashAmount)' into string")
         }
         return .purchasable(
             PsiCashPurchasableViewModel(

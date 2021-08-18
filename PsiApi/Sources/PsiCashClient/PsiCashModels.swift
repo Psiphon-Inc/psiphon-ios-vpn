@@ -33,10 +33,24 @@ public enum PsiCashParseError: HashableError {
 
 /// PsiCash request header metadata keys.
 public enum PsiCashRequestMetadataKey: String {
-    case clientVersion = "client_version"
-    case propagationChannelId = "propagation_channel_id"
-    case clientRegion = "client_region"
-    case sponsorId = "sponsor_id"
+    case clientVersion
+    case propagationChannelId
+    case clientRegion
+    case sponsorId
+    
+    public var rawValue: String {
+        switch self {
+        case .clientVersion:
+            return PsiphonConstants.ClientVersionKey
+        case .propagationChannelId:
+            return PsiphonConstants.PropagationChannelIdKey
+        case .clientRegion:
+            return PsiphonConstants.ClientRegionKey
+        case .sponsorId:
+            return PsiphonConstants.SponsorIdKey
+        }
+    }
+    
 }
 
 public typealias PsiCashParsed<Value: Equatable> = Result<Value, PsiCashParseError>
@@ -313,38 +327,6 @@ extension PsiCashPurchasableType: Hashable {
 }
 
 public struct SpeedBoostProduct: PsiCashProduct {
-    
-    /// Supported Speed Boost products. Raw value is the distinguisher defined by the PsiCash server.
-    public enum SpeedBoostDistinguisher: String {
-        
-        // Raw values must match distinguisher values set by the PsiCash server.
-        
-        case hr1 = "1hr"
-        case hr2 = "2hr"
-        case hr3 = "3hr"
-        case hr4 = "4hr"
-        case hr5 = "5hr"
-        case hr6 = "6hr"
-        case hr7 = "7hr"
-        case hr8 = "8hr"
-        case hr9 = "9hr"
-        
-        /// Amount of Speed Boost hours as defined by the Speed Boost distinguisher.
-        var hours: Int {
-            switch self {
-            case .hr1: return 1
-            case .hr2: return 2
-            case .hr3: return 3
-            case .hr4: return 4
-            case .hr5: return 5
-            case .hr6: return 6
-            case .hr7: return 7
-            case .hr8: return 8
-            case .hr9: return 9
-            }
-        }
-        
-    }
     
     /// Amount of Speed Boost hours as defined by the Speed Boost distinguisher.
     public var hours: Int { distinguisher.hours }
