@@ -26,7 +26,7 @@
 "BUY_SUBSCRIPTIONS_FOOTER_CANCEL_INSTRUCTIONS_TEXT" = "شما می‌توانید اشتراک فعال خودر را در تنظیمات حساب iTunes لغو کنید.";
 
 /* Buy subscription dialog footer text */
-"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "اشتراک به صورت خودکار تمدید می‌شود مگر اینکه تا ۲۴ ساعت قبل از پایان دوره فعلی، اشتراک را لغو کنید. \n\nمبلغ اشتراک،۲۴ ساعت پیش از پایان دوره فعلی، از حساب آی‌تونز شما کم می‌شود. ";
+"BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "اشتراک به صورت خودکار تمدید می‌شود مگر اینکه تا ۲۴ ساعت قبل از پایان دوره فعلی، اشتراک را لغو کنید. \n\nمبلغ اشتراک،۲۴ ساعت پیش از پایان دوره فعلی، از حساب iTunes شما کم می‌شود. ";
 
 /* Title for a button that cancels an action. This should be generic enough to make sense whenever a cancel button is used. */
 "CANCEL_BUTTON_TITLE" = "لغو";
