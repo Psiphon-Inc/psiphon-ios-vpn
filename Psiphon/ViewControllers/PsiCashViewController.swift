@@ -89,7 +89,7 @@ final class PsiCashViewController: ReactiveViewController {
     
     // Views
     private let accountNameViewWrapper = PsiCashAccountNameViewWrapper()
-    private let balanceViewWrapper = PsiCashBalanceViewWrapper()
+    private let balanceViewWrapper: PsiCashBalanceViewWrapper
     private let closeButton = CloseButton(frame: .zero)
     
     private var vStack: UIStackView
@@ -116,6 +116,8 @@ final class PsiCashViewController: ReactiveViewController {
         self.locale = locale
         self.feedbackLogger = feedbackLogger
         self.tunnelConnectedSignal = tunnelConnectedSignal
+        
+        self.balanceViewWrapper = PsiCashBalanceViewWrapper(locale: locale)
         
         self.tunnelConnectionRefSignal = tunnelConnectionRefSignal
         
@@ -147,7 +149,7 @@ final class PsiCashViewController: ReactiveViewController {
                 SpeedBoostViewType(
                     SpeedBoostPurchaseTable(purchaseHandler: {
                         store.send(.psiCashAction(.buyPsiCashProduct(.speedBoost($0))))
-                    }),
+                    }, getLocale: { locale }),
                     EitherView(Spinner(style: .whiteLarge),
                                EitherView(PsiCashMessageViewUntunneled(action: {
                             store.send(.psiCashAction(.connectToPsiphonTapped))

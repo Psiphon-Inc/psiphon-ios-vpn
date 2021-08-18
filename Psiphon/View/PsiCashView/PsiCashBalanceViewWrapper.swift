@@ -33,7 +33,7 @@ struct PsiCashBalanceViewModel: Equatable {
     typealias BindingType = PsiCashBalanceViewModel
     private typealias IconType = EitherView<ImageViewBuilder, Spinner>
 
-    private let psiCashPriceFormatter = PsiCashAmountFormatter(locale: Locale.current)
+    private let psiCashAmountFormatter: PsiCashAmountFormatter
     private let vStack: UIStackView
     private let hStack: UIStackView
     private let title: UILabel
@@ -48,11 +48,17 @@ struct PsiCashBalanceViewModel: Equatable {
     @objc var view: UIView {
         vStack
     }
-
+    
     override init() {
+        fatalError()
+    }
+
+    init(locale: Locale) {
         
         let titleString = UserStrings.PsiCash_balance().localizedUppercase
         let fontSize: FontSize = .normal
+        
+        psiCashAmountFormatter = PsiCashAmountFormatter(locale: locale)
         
         vStack = UIStackView.make(
             axis: .vertical,
@@ -72,7 +78,8 @@ struct PsiCashBalanceViewModel: Equatable {
                              typeface: typeface,
                              color: UIColor.blueGrey())
         
-        balanceView = UILabel.make(fontSize: fontSize, typeface: typeface)
+        balanceView = EFCountingLabel(frame: .zero)
+        balanceView.apply(fontSize: fontSize, typeface: typeface)
 
         guard let coinImage = UIImage(named: "PsiCashCoin") else {
             fatalError("Could not find 'PsiCashCoin' image")
@@ -112,7 +119,7 @@ struct PsiCashBalanceViewModel: Equatable {
         }
         
         balanceView.setUpdateBlock { [unowned self] (value, label) in
-            label.text = self.psiCashPriceFormatter.string(from: Double(value).rounded(.down))
+            label.text = self.psiCashAmountFormatter.string(from: Double(value).rounded(.down))
         }
         
         balanceView.counter.timingFunction = EFTimingFunction.easeInOut(easingRate: 5)
