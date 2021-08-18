@@ -32,7 +32,7 @@ import PsiCashClient
     }
 
     @objc let balanceViewWrapper: PsiCashBalanceViewWrapper
-    @objc let speedBoostButton = SpeedBoostButton()
+    @objc let speedBoostButton: SpeedBoostButton
     @objc let addPsiCashButton = DuskButton()
     @objc let psiCashAccountButton = DuskButton()
 
@@ -46,6 +46,8 @@ import PsiCashClient
     @objc init(locale: Locale) {
         
         balanceViewWrapper = PsiCashBalanceViewWrapper(locale: locale)
+        
+        speedBoostButton = SpeedBoostButton(locale: locale)
         
         topRowHStack = UIStackView.make(
             axis: .horizontal,
