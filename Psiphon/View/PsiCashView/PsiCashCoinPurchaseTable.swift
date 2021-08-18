@@ -133,7 +133,12 @@ UITableViewDelegate {
                 addUILabelTo(toCell: cell)
             }
             
-            (cell.contentView.subviews[0] as! UILabel).text = data.footerText!
+            let footerView = cell.contentView.subviews[0] as! UILabel
+            footerView.text = data.footerText!
+            
+            if case .rightToLeft = UIApplication.shared.userInterfaceLayoutDirection {
+                footerView.textAlignment = .right
+            }
             
             return cell
 

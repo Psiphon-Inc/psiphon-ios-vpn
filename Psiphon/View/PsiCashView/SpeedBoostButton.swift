@@ -64,8 +64,9 @@ import UIKit
         }
     }
 
-    init() {
+    init(locale: Locale) {
         formatter = DateComponentsFormatter()
+        formatter.calendar?.locale = locale
         formatter.unitsStyle = .positional
         formatter.zeroFormattingBehavior = .pad
 

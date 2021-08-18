@@ -37,6 +37,12 @@
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "আপনি একটি আপস্ট্রিম প্রক্সি ব্যবহার করার জন্য সাইফন কনফিগার করেছেন। \nযাইহোক, আমরা সে প্রক্সির মাধ্যমে একটি সাইফন সার্ভারে সংযোগ করতে অক্ষম বলে মনে হচ্ছে। \nঅনুগ্রহ করে সেটিংস ঠিক করুন এবং আবার চেষ্টা করুন।";
 
+/* Title for a button that closes current screen. */
+"CLOSE_BUTTON_TITLE" = "বন্ধ";
+
+/* Button text telling the user that if they click it, Psiphon will start trying to connect to the network. This is shown to the user while Psiphon is disconnected. */
+"CONNECT_BUTTON" = "সংযোগ করুন";
+
 /* Action button title, that when pressed connects the user to Psiphon network. */
 "CONNECT_BUTTON_TITLE" = "সংযোগ করা";
 
@@ -49,8 +55,23 @@
 /*[UNTRANSLATED] User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "CONNECT_TO_USE_SPEED_BOOST" = "Connect to Psiphon to use Speed Boost";
 
+/*[UNTRANSLATED] Label text shown to user when the VPN is connecting to a Psiphon server. Do not translate or transliterate 'Psiphon' */
+"CONNECTING_TO_PSIPHON" = "Connecting to Psiphon";
+
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "আপনার অ্যাপ সেটিংস ফাইলটি নষ্ট বলে মনে হচ্ছে। ফাইলটি মেরামত করার জন্য অ্যাপ্লিকেশনটি পুনরায় ইনস্টল করার চেষ্টা করুন।";
+
+/*[UNTRANSLATED] Button label that lets users create a new account. */
+"CREATE_ACCOUNT_BUTTON_TITLE" = "Create account";
+
+/*[UNTRANSLATED] Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
+"CREATE_PSICASH_ACCOUNT_BODY_2" = "We strongly encourage you to make a PsiCash account before buying PsiCash. Having an account allows you to share your balance between devices and protect your purchases.\n\nIMPORTANT: Without an account your PsiCash will not be preserved if you uninstall Psiphon.";
+
+/*[UNTRANSLATED] Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will continue on to the PsiCash store. */
+"CREATE_PSICASH_ACCOUNT_CONTINUE_BUTTON" = "Continue without account";
+
+/*[UNTRANSLATED] Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will be taken to a screen where they can create an account or log into an existing one. */
+"CREATE_PSICASH_ACCOUNT_CREATE_BUTTON" = "Create or log into account";
 
 /* Decline button title */
 "DECLINE_BUTTON_TITLE" = "পতন";
@@ -60,6 +81,12 @@
 
 /*[UNTRANSLATED] Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
 "DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
+
+/*[UNTRANSLATED] Appears in the notification area when Psiphon disallows some non-web internet traffic. The user needs to purchase Speed Boost or subscription in order to full app compatibilty and more speed. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"DISALLOWED_TRAFFIC_NOTIFICATION_BODY_V2" = "Apps not working? Activate Speed Boost or purchase subscription to unlock the full potential of your Psiphon experience.";
+
+/*[UNTRANSLATED] Appears in the notification area when Psiphon disallows some non-web internet traffic. The user will be told to 'upgrade' their connection with Speed Boost (giving more speed and app compatibility). The word 'Psiphon' must not be translated or transliterated. */
+"DISALLOWED_TRAFFIC_NOTIFICATION_TITLE_V2" = "Upgrade your Psiphon connection";
 
 /*[UNTRANSLATED] Text next to the button indicating to the user that the rewarded video advertisement is only available when they are not connected to Psiphon. Do not translate or transliterate 'PsiCash'. Do not translate or transliterate 'Psiphon'. */
 "DISCONNECT_TO_WATCH_AND_EARN_PSICASH" = "You must disconnect from Psiphon to watch a video to earn PsiCash";
@@ -76,20 +103,23 @@
 /*[UNTRANSLATED] No comment provided by engineer. */
 "EXTENSION_EXPIRED_SUBSCRIPTION_ALERT" = "Your Psiphon subscription has expired.\n\n Please open Psiphon app to renew your subscription.";
 
-/*[UNTRANSLATED] Message shown when something fails to load */
-"FAILED_TO_LOAD" = "Failed to load";
-
 /*[UNTRANSLATED] Message shown when verification of a product already purchased fails. */
 "FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Failed to verify purchase";
 
 /* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "সাইফোন উন্নতিতে সাহায্য করার জন্য আপনাকে ধন্যবাদ!";
 
+/* Button title that lets users reset their password if they forgot their account's password. */
+"FORGOT_PASSWORD" = "পাসওয়ার্ড ভুলে গেছেন?";
+
 /*[UNTRANSLATED] Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "Free";
 
 /*[UNTRANSLATED] Generic alert shown when purchase of a product fails. */
 "GENERIC_PURCHASE_FAILED" = "Purchase Failed";
+
+/*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash login fails due to bad username or password. */
+"INCORRECT_USERNAME_OR_PASSWORD" = "The username or password entered was incorrect.";
 
 /*[UNTRANSLATED] User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
 "INSUFFICIENT_PSICASH_BALANCE" = "Insufficient PsiCash balance";
@@ -99,6 +129,30 @@
 
 /* Text displayed while app loads */
 "LOADING" = "লোড হচ্ছে ...";
+
+/*[UNTRANSLATED] Message shown when a resource (online or offline) fails to load. */
+"LOADING_FAILED" = "Loading failed";
+
+/* Title on a button that lets users login to their account with the username and password they have entered. */
+"LOG_IN_BUTTON_TITLE" = "লগইন";
+
+/*[UNTRANSLATED] Message title informing the user that they must sign up for an account or log in to their account */
+"LOG_IN_OR_SIGN_UP" = "Log in or sign up";
+
+/*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
+"LOG_IN_OR_SIGNUP_TO_CONTINUE" = "Log in or create account to continue using PsiCash";
+
+/* Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed. */
+"LOG_OUT_ANY_WAY_BUTTON_TITLE" = "Logout anyway";
+
+/*[UNTRANSLATED] Title of the button that lets users log out of their account */
+"LOG_OUT_BUTTON_TITLE_2" = "Log out";
+
+/*[UNTRANSLATED] Label indicating to the user that they are logging into their PsiCash account. Use ellipses if it makes sense. */
+"LOGGING_IN_ELLIPSES" = "Logging in ...";
+
+/*[UNTRANSLATED] Label indicating to the user that they are logging out of their PsiCash account. Use ellipses if it makes sense. */
+"LOGGING_OUT_ELLIPSES" = "Logging out ...";
 
 /* Button title that takes user to the next page */
 "NEXT_PAGE_BUTTON_TITLE" = "পরবর্তী";
@@ -111,12 +165,6 @@
 
 /*[UNTRANSLATED] Subscriptions view text that is visible when the list of subscriptions is not available */
 "NO_PRODUCTS_TEXT_2" = "Could not retrieve subscriptions from the App Store. Please try again later.";
-
-/*[UNTRANSLATED] Content of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
-"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" = "Apps not working? Tap here to improve your Psiphon experience!";
-
-/*[UNTRANSLATED] Title of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
-"NOTIFICATION_TITLE_UPGRADE_PSIPHON" = "Upgrade Psiphon";
 
 /* Alert OK Button */
 "OK_BUTTON" = "ঠিক আছে";
@@ -138,6 +186,12 @@
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "সংযোগ শেষ করতে দয়া করে সাইফন অ্যাপ্লিকেশন খুলুন।";
+
+/*[UNTRANSLATED] Capitalize where it makes sense. Label visually separating Sign up section and sign in section of the app. */
+"OR_SIGNUP_SIGNIN" = "OR";
+
+/* Text field label where users can enter their account's password */
+"PASSWORD_TEXT_FIELD" = "পাসওয়ার্ড";
 
 /* Alert dialog title indicating to the user that Psiphon needs their permission */
 "PERMISSION_REQUIRED_ALERT__TITLE" = "অনুমতি প্রয়োজন";
@@ -205,17 +259,74 @@
 /*[UNTRANSLATED] Message shown when products available for purchase could not be retrieved. */
 "PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "Product list could not be retrieved";
 
+/*[UNTRANSLATED] Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
+"PROTECT_YOUR_PURCHASES" = "Protect Your Purchases";
+
+/*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts. */
+"PSICASH_ACCOUNT" = "PsiCash Account";
+
+/*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
+"PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "Are you sure you want to log out of your PsiCash account?";
+
+/*[UNTRANSLATED] An alert shown when the user logs out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNT_LOGOUT_COMPLETE_TITLE" = "PsiCash account logout complete.";
+
+/*[UNTRANSLATED] Body of modal dialog shown when the user attempts to log out of their PsiCash account and an unexpected error occurs. Please don't modify the link URL. */
+"PSICASH_ACCOUNT_LOGOUT_FAILED_BODY" = "You logout attempt failed unexpectedly. Please try restarting the application.";
+
+/*[UNTRANSLATED] Header of a modal dialog that appears when the user tries to log out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNT_LOGOUT_TITLE" = "PsiCash Account Logout";
+
+/*[UNTRANSLATED] Button title that opens 'PsiCash' account management. */
+"PSICASH_ACCOUNT_MANAGEMENT_2" = "Manage account";
+
+/*[UNTRANSLATED] An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "Your PsiCash login has expired. Please log back in.";
+
+/*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash login succeeds. There is a fixed number of times that a user can merge a pre-account balance into a PsiCash account. This message indicates that the user has hit that limit and the merge that occurred is the last one allowed. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNTS_LAST_MERGE_WARNING_BODY" = "You are logged into your PsiCash account. The preexisting balance from this device has been transferred into your account, but this is the last time a balance merge will occur.";
+
 /*[UNTRANSLATED] PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
 "PSICASH_BALANCE" = "PsiCash Balance:";
 
-/*[UNTRANSLATED] User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
-"PSICASH_BALANCE_OUT_OF_DATE_ALERT_BODY" = "Connect to Psiphon to update your PsiCash balance.";
+/*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash account login fails due to a 'bad request' error. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_BAD_REQUEST_ERROR_BODY" = "The PsiCash server indicated that the login request was invalid. Please try again later.";
 
-/*[UNTRANSLATED] User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
-"PSICASH_BALANCE_OUT_OF_DATE_ALERT_TITLE" = "PsiCash Balance Out of Date";
+/*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash login fails without a specific reason. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_CATASTROPHIC_ERROR_BODY" = "Your PsiCash login attempt failed unexpectedly.";
+
+/*[UNTRANSLATED] Title of modal dialog shown when the PsiCash account login attempt fails for some reason. Text within the modal will explain why. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_FAILED_TITLE" = "PsiCash Login Failed";
+
+/*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash account login fails due to a server error. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_SERVER_ERROR_BODY" = "The PsiCash server responded with an error while trying to log you in. Please try again later.";
+
+/*[UNTRANSLATED] Title of modal dialog shown when the PsiCash account login attempt succeeds, if additional information needs to be conveyed. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_SUCCESS_TITLE" = "PsiCash Login Success";
+
+/*[UNTRANSLATED] Body of a modal dialog that appears when the user tries to log out of thier PsiCash account while not currently connected to the Psiphon network. We don't allow PsiCash network requests when not connected, so only an inferior localy-only logout is available. 'Psiphon' must not be translated/transliterated. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGOUT_OFFLINE_BODY" = "Being connected to the Psiphon network enables a more secure PsiCash logout. Would you like to connect before logging out?";
+
+/*[UNTRANSLATED] Body text of a modal dialog shown when the user tries to use (spend, buy, etc.) PsiCash, if they not currently connected. 'Use' here means buy, spend, or otherwise interact with. 'Psiphon' must not be translated/transliterated. 'PsiCash' must not be translated/transliterated. */
+"PSICASH_MUST_BE_CONNECTED" = "In order to use PsiCash, you must be connected to the Psiphon network.";
 
 /*[UNTRANSLATED] PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
-"PSICASH_PURCHASE_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon.";
+"PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon, unless you have created a PsiCash account and are logged into your PsiCash account.";
+
+/*[UNTRANSLATED] Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_PRODUCT_NOT_FOUND_MESSAGE" = "Speed Boost product not found. Your app may be out of date. Please check for updates.";
+
+/*[UNTRANSLATED] Body of an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. The word 'PsiCash' must not be translated or transliterated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_PORT_LIMITS_BODY" = "Without active Speed Boost, your speed is limited and some internet traffic is not supported. Activate Speed Boost with PsiCash to unlock the full potential of your Psiphon experience.";
+
+/*[UNTRANSLATED] Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. */
+"PSICASH_SPEED_PORT_LIMITS_HEAD" = "Speed and Port Limits";
+
+/*[UNTRANSLATED] A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon */
+"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY" = "Your Psiphon subscription already gives you always-on Speed Boost, so there is no reason to buy more. Your PsiCash balance will be retained should you ever decide to cancel your subscription.\n\nYou can still access your PsiCash account from the settings menu.";
+
+/*[UNTRANSLATED] A title message to the premium user (a user with a subscription when they are trying to navigate to PsiCash and Speed Boost screen. Do not translate or transliterate words PsiCash or Psiphon */
+"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_TITLE" = "Your Psiphon subscription gives you premium access!";
 
 /*[UNTRANSLATED] An error that signifies a state where the user has made a 'PsiCash' purchase, but extra action is needed from the user to finish the transaction. Do not translate or transliterate 'PsiCash'. */
 "PSICASH_TRANSACTION_PENDING" = "Transaction Pending";
@@ -235,20 +346,20 @@
 /*[UNTRANSLATED] Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
 "PSICASH_WAIT_TRANSACTION_VERIFIED" = "Please wait while your transaction is being verified";
 
+/*[UNTRANSLATED] Alert message informing user that a Psip */
+"PSIPHON_CONNECTION_REQUIRED" = "Psiphon Connection Required";
+
 /*[UNTRANSLATED] Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon is not connected";
 
-/*[UNTRANSLATED] 'App Store' refers to Apple's App Store, do not translate or transliterate 'App Store'. This alert message informs the user that the purchase they made has not been recorded by App Store. */
-"PURCHASE_NOT_RECORDED_BY_APPSTORE" = "Purchase not recorded by App Store.";
+/*[UNTRANSLATED] Alert message that the users purchases have been restored successfully */
+"PURCHASES_RESTORED_SUCCESSFULLY" = "Purchases restored successfully";
 
 /*[UNTRANSLATED] Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
 "PURCHASING_PSICASH" = "Purchasing PsiCash…";
 
 /*[UNTRANSLATED] Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "PURCHASING_SPEED_BOOST" = "Purchasing Speed Boost…";
-
-/*[UNTRANSLATED] Button title on an error alert that indicates it refreshes the user's purchase receipt on device. */
-"RECEIPT_REFRESH_BUTTON" = "Refresh Receipt";
 
 /*[UNTRANSLATED] Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "Refresh your app receipt when:";
@@ -259,11 +370,8 @@
 /*[UNTRANSLATED] Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "You cannot see a subscription you purchased on this device";
 
-/*[UNTRANSLATED] This alert message informs the user that the purchase they made has not been recorded and that they can tap the button 'Refresh Receipt' to try again. */
-"REFRESH_APP_RECEIPT_TO_TRY_AGAIN" = "Refresh the app receipt to try again.";
-
-/*[UNTRANSLATED] Title for a confirmation button that resets a user's previous consent. */
-"RESET_IDENTIFIER_BUTTON_TITLE" = "Reset Consent";
+/*[UNTRANSLATED] Button that restores users previous purchases */
+"RESTORE_PURCHASES" = "Restore purchases";
 
 /*[UNTRANSLATED] Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "Restore Subscription";
@@ -289,14 +397,38 @@
 /*[UNTRANSLATED] Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Reinstall VPN profile";
 
-/*[UNTRANSLATED] (Do not translate 'AdMob') Title of cell in settings menu which indicates the user can change or revoke the consent they've given to admob */
-"SETTINGS_RESET_ADMOB_CONSENT" = "Reset AdMob Consent";
-
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "সাবস্ক্রিপশনস";
 
 /*[UNTRANSLATED] Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST" = "Speed Boost";
+
+/* Label on a button. Clicking this button will buy 1 hour of Speed Boost. */
+"SPEED_BOOST_1HR" = "1 ঘন্টা";
+
+/*[UNTRANSLATED] Label on a button. Clicking this button will buy 2 hours of Speed Boost. */
+"SPEED_BOOST_2HR" = "2 hours";
+
+/*[UNTRANSLATED] Label on a button. Clicking this button will buy 3 hours of Speed Boost. */
+"SPEED_BOOST_3HR" = "3 hours";
+
+/*[UNTRANSLATED] Label on a button. Clicking this button will buy 4 hours of Speed Boost. */
+"SPEED_BOOST_4HR" = "4 hours";
+
+/*[UNTRANSLATED] Label on a button. Clicking this button will buy 5 hours of Speed Boost. */
+"SPEED_BOOST_5HR" = "5 hours";
+
+/*[UNTRANSLATED] Label on a button. Clicking this button will buy 6 hours of Speed Boost. */
+"SPEED_BOOST_6HR" = "6 hours";
+
+/*[UNTRANSLATED] Label on a button. Clicking this button will buy 7 hours of Speed Boost. */
+"SPEED_BOOST_7HR" = "7 hours";
+
+/*[UNTRANSLATED] Label on a button. Clicking this button will buy 8 hours of Speed Boost. */
+"SPEED_BOOST_8HR" = "8 hours";
+
+/*[UNTRANSLATED] Label on a button. Clicking this button will buy 9 hours of Speed Boost. */
+"SPEED_BOOST_9HR" = "9 hours";
 
 /*[UNTRANSLATED] Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST_ACTIVE" = "Speed Boost Active";
@@ -369,6 +501,9 @@
 
 /*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
 "UPGRADE_PSIPHON" = "Upgrade Psiphon";
+
+/* Text field label where users can enter their account's username */
+"USERNAME_TEXT_FIELD" = "ব্যবহারকারীর নাম";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "সাইফন শুরু করার সময় একটি ত্রুটি ঘটেছে।অনুগ্রহপূর্বক আবার চেষ্টা করুন। এই সমস্যাটি চলতে থাকলে, সাইফন অ্যাপ্লিকেশন পুনরায় ইনস্টল করার চেষ্টা করুন।";

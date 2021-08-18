@@ -170,7 +170,7 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
     // Sets navigation bar title.
     NSString *title = NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS", nil, [NSBundle mainBundle], @"Subscriptions", @"Title of the dialog for available in-app paid subscriptions");
-    self.title = title.localizedUppercaseString;
+    self.title = [title uppercaseStringWithLocale:[SwiftDelegate.bridge getLocaleForCurrentAppLanguage]];
 
     // Set back button title of any child view controllers pushed onto the current navigation controller
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringWithDefaultValue(@"BACK_BUTTON", nil, [NSBundle mainBundle], @"Back", @"Title of the button which takes the user to the previous screen. Text should be short and one word when possible.") style:UIBarButtonItemStylePlain target:nil action:nil];
@@ -255,7 +255,8 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     noProductsLabel.text = Strings.productRequestFailedNoticeText;
 
     UIButton *refreshButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    NSString *refreshButtonTitle = @"Tap to retry".localizedUppercaseString;
+    NSString *refreshButtonTitle = [@"Tap to retry"
+                uppercaseStringWithLocale:[SwiftDelegate.bridge getLocaleForCurrentAppLanguage]];
     [refreshButton setTitle:refreshButtonTitle forState:UIControlStateNormal];
     [refreshButton setTitle:refreshButtonTitle forState:UIControlStateHighlighted];
     [refreshButton setTintColor:UIColor.whiteColor];
@@ -567,6 +568,9 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     label.font = [UIFont avenirNextMedium:15.f];
     label.textColor = UIColor.blueGreyColor;
     label.text = [NSString stringWithFormat:@"%@\n\n%@", Strings.subscriptionScreenNoticeText, Strings.subscriptionScreenCancelNoticeText];
+    if (label.semanticContentAttribute == UISemanticContentAttributeForceRightToLeft) {
+        label.textAlignment = NSTextAlignmentRight;
+    }
     [cell.contentView addSubview:label];
 
     // label constraints

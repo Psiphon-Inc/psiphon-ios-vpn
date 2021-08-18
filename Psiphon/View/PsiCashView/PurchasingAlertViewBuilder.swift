@@ -28,6 +28,7 @@ struct PurchasingAlertViewBuilder: ViewBuilder {
     }
 
     let alert: Alert
+    let locale: Locale
 
     func build(_ container: UIView?) -> ImmutableBindableViewable<Utilities.Unit, UIView> {
         let background = UIView(frame: .zero)
@@ -50,11 +51,11 @@ struct PurchasingAlertViewBuilder: ViewBuilder {
         switch alert {
         case .psiCash:
             image = UIImageView.make(image: "PsiCashCoin_Large")
-            title.text = UserStrings.Purchasing_psiCash().localizedUppercase
+            title.text = UserStrings.Purchasing_psiCash().uppercased(with: locale)
 
         case .speedBoost:
             image = UIImageView.make(image: "RedRocket")
-            title.text = UserStrings.Purchasing_speed_boost().localizedUppercase
+            title.text = UserStrings.Purchasing_speed_boost().uppercased(with: locale)
         }
 
         // Add subviews

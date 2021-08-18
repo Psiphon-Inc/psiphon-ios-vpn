@@ -19,7 +19,7 @@
 import Foundation
 import PsiCashClient
 
-struct PsiCashHardCodedValues {
+enum PsiCashHardCodedValues {
     static let videoAdRewardAmount = PsiCashAmount(nanoPsi: Int64(35e9))
     static let videoAdRewardTitle = "35"
     /// Amount of time to wait for PsiCash to have an earner token for modifying .

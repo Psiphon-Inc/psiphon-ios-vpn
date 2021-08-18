@@ -45,10 +45,11 @@ extension SpeedBoostPurchasableViewModel: Comparable {
 struct SpeedBoostPurchaseTable: ViewBuilder {
 
     let purchaseHandler: (SpeedBoostPurchasable) -> Void
+    let getLocale: () -> Locale
 
     func build(_ container: UIView?)
         -> ImmutableBindableViewable<NonEmpty<SpeedBoostPurchasableViewModel>, SpeedBoostCollection> {
-            .init(viewable: SpeedBoostCollection(purchaseHandler: purchaseHandler))
+            .init(viewable: SpeedBoostCollection(locale: getLocale(), purchaseHandler: purchaseHandler))
             { table -> ((NonEmpty<SpeedBoostPurchasableViewModel>) -> Void) in
                 return {
                     table.bind($0)
@@ -69,7 +70,7 @@ final class SpeedBoostCollection: NSObject, ViewWrapper, Bindable {
     
     private let itemsPerRow: CGFloat = 3
     
-    private let psiCashPriceFormatter = PsiCashAmountFormatter(locale: Locale.current)
+    private let psiCashAmountFormatter: PsiCashAmountFormatter
     
     private var data: BindingType?
     private let collectionView: UICollectionView
@@ -81,7 +82,8 @@ final class SpeedBoostCollection: NSObject, ViewWrapper, Bindable {
         collectionView.collectionViewLayout as! UICollectionViewFlowLayout
     }
 
-    init(purchaseHandler: @escaping (SpeedBoostPurchasable) -> Void) {
+    init(locale: Locale, purchaseHandler: @escaping (SpeedBoostPurchasable) -> Void) {
+        self.psiCashAmountFormatter = PsiCashAmountFormatter(locale: locale)
         self.purchaseHandler = purchaseHandler
         collectionView = UICollectionView(frame: .zero,
                                           collectionViewLayout: UICollectionViewFlowLayout())
@@ -160,7 +162,7 @@ extension SpeedBoostCollection: UICollectionViewDataSource {
                         
             cell.bind(
                 data: data![indexPath.row],
-                psiCashPriceFormatter: self.psiCashPriceFormatter,
+                psiCashAmountFormatter: self.psiCashAmountFormatter,
                 purchaseHandler: self.purchaseHandler
             )
             
@@ -239,7 +241,7 @@ fileprivate final class SpeedBoostExplainerCell: UICollectionViewCell {
                       numberOfLines: 1,
                       alignment: .center)
         
-        subtitle = .make(text: UserStrings.Speed_and_port_limibts_body(),
+        subtitle = .make(text: UserStrings.Speed_and_port_limits_body(),
                          fontSize: .normal,
                          typeface: .medium,
                          color: .white,
@@ -362,7 +364,7 @@ fileprivate final class SpeedBoostPurchaseCell: UICollectionViewCell {
 
     func bind(
         data newValue: SpeedBoostPurchasableViewModel,
-        psiCashPriceFormatter: PsiCashAmountFormatter,
+        psiCashAmountFormatter: PsiCashAmountFormatter,
         purchaseHandler: @escaping (SpeedBoostPurchasable) -> Void
     ) {
         self.purchaseHandler = purchaseHandler
@@ -372,7 +374,7 @@ fileprivate final class SpeedBoostPurchaseCell: UICollectionViewCell {
         title.text = newValue.localizedProductTitle
 
         button.setTitle(
-            psiCashPriceFormatter.string(from: newValue.purchasable.price.inPsi),
+            psiCashAmountFormatter.string(from: newValue.purchasable.price.inPsi),
             for: .normal)
     }
     
@@ -414,18 +416,17 @@ enum SpeedBoostPurchaseBackground: String, CaseIterable {
     case yellow = "SpeedBoostBackground_Yellow"
     case limeGreen = "SpeedBoostBackground_LimeGreen"
 
-    static func background(speedBoostDistinguisher: String) -> Self {
+    static func background(speedBoostDistinguisher: SpeedBoostDistinguisher) -> Self {
         switch speedBoostDistinguisher {
-        case "1hr": return .orange
-        case "2hr": return .pink
-        case "3hr": return .purple
-        case "4hr": return .darkBlue
-        case "5hr": return .blue
-        case "6hr": return .green
-        case "7hr": return .lightOrange
-        case "8hr": return .yellow
-        case "9hr": return .limeGreen
-        default: return allCases.randomElement()!
+        case .hr1: return .orange
+        case .hr2: return .pink
+        case .hr3: return .purple
+        case .hr4: return .darkBlue
+        case .hr5: return .blue
+        case .hr6: return .green
+        case .hr7: return .lightOrange
+        case .hr8: return .yellow
+        case .hr9: return .limeGreen
         }
     }
 }
