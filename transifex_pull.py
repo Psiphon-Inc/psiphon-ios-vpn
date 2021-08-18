@@ -21,7 +21,7 @@
 Pulls and massages our translations from Transifex.
 '''
 
-from __future__ import print_function
+
 import os
 import sys
 import errno
@@ -123,7 +123,7 @@ def process_resource(resource, output_path_fn, output_mutator_fn,
                        stats[lang]['translated_entities'] +
                        stats[lang]['untranslated_entities']))
 
-    for in_lang, out_lang in langs.items():
+    for in_lang, out_lang in list(langs.items()):
         r = request('resource/%s/translation/%s' % (resource, in_lang))
 
         output_path = output_path_fn(out_lang)
@@ -147,7 +147,7 @@ def process_resource(resource, output_path_fn, output_mutator_fn,
 
         with codecs.open(output_path, 'w', encoding) as f:
             if bom:
-                f.write(u'\uFEFF')
+                f.write('\uFEFF')
 
             f.write(content)
 
@@ -160,7 +160,7 @@ def gather_resource(resource, langs=None, skip_untranslated=False):
         langs = DEFAULT_LANGS
 
     result = {}
-    for in_lang, out_lang in langs.items():
+    for in_lang, out_lang in list(langs.items()):
         if skip_untranslated:
             stats = request('resource/%s/stats/%s' % (resource, in_lang))
             if stats['completed'] == '0%':
