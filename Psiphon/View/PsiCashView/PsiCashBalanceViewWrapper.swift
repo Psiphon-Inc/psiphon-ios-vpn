@@ -82,7 +82,7 @@ struct PsiCashBalanceViewModel: Equatable {
                              color: UIColor.blueGrey())
         
         balanceView = EFCountingLabel(frame: .zero)
-        balanceView.apply(fontSize: fontSize, typeface: typeface)
+        balanceView.apply(fontSize: .h3, typeface: typeface)
 
         guard let coinImage = UIImage(named: "PsiCashCoin") else {
             fatalError("Could not find 'PsiCashCoin' image")
