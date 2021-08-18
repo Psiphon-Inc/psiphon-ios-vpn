@@ -560,7 +560,7 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 }
 
 - (void)setStatusLabelText:(NSString*)s {
-    NSString *upperCased = [s localizedUppercaseString];
+    NSString *upperCased = [s uppercaseStringWithLocale:[SwiftDelegate.bridge getLocaleForCurrentAppLanguage]];
     NSMutableAttributedString *mutableStr = [[NSMutableAttributedString alloc]
       initWithString:upperCased];
 

@@ -33,6 +33,7 @@ struct PsiCashBalanceViewModel: Equatable {
     typealias BindingType = PsiCashBalanceViewModel
     private typealias IconType = EitherView<ImageViewBuilder, Spinner>
 
+    private let locale: Locale
     private let psiCashAmountFormatter: PsiCashAmountFormatter
     private let vStack: UIStackView
     private let hStack: UIStackView
@@ -55,8 +56,10 @@ struct PsiCashBalanceViewModel: Equatable {
 
     init(locale: Locale) {
         
-        let titleString = UserStrings.PsiCash_balance().localizedUppercase
+        let titleString = UserStrings.PsiCash_balance().uppercased(with: locale)
         let fontSize: FontSize = .normal
+        
+        self.locale = locale
         
         psiCashAmountFormatter = PsiCashAmountFormatter(locale: locale)
         
@@ -183,7 +186,7 @@ struct PsiCashBalanceViewModel: Equatable {
             
             if balance < PsiCashAmount(nanoPsi: 10_000_000_000_000) /* 10,000 PsiCash */ {
                 // "PsiCash Balance" title
-                self.title.text = UserStrings.PsiCash_balance().localizedUppercase
+                self.title.text = UserStrings.PsiCash_balance().uppercased(with: locale)
             } else {
                 // Empty title
                 self.title.text = ""
@@ -191,7 +194,7 @@ struct PsiCashBalanceViewModel: Equatable {
             
         } else {
             // "PsiCash Balance" title
-            self.title.text = UserStrings.PsiCash_balance().localizedUppercase
+            self.title.text = UserStrings.PsiCash_balance().uppercased(with: locale)
         }
         
         self.iconBindable.bind(iconValue)

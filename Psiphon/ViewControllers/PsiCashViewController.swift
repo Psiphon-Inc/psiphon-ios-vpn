@@ -741,9 +741,9 @@ extension PsiCashViewController {
             case .mainScreen:
                 fatalError()
             case .psiCashPurchaseDialog:
-                alertViewBuilder = PurchasingAlertViewBuilder(alert: .psiCash)
+                alertViewBuilder = PurchasingAlertViewBuilder(alert: .psiCash, locale: locale)
             case .speedBoostPurchaseDialog:
-                alertViewBuilder = PurchasingAlertViewBuilder(alert: .speedBoost)
+                alertViewBuilder = PurchasingAlertViewBuilder(alert: .speedBoost, locale: locale)
             }
             
             let vc = ViewBuilderViewController(
