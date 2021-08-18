@@ -19,8 +19,8 @@
 /* Settings item text. Leads to screen where user can send feedback about the app to Psiphon Inc. Should be kept short. */
 "SETTINGS_FEEDBACK_SUBSETTINGS_LABEL" = "การตอบสนอง";
 
-/*[UNTRANSLATED] Settings item text. Leads to a frequently asked questions page. */
-"SETTINGS_FAQ" = "FAQ";
+/* Settings item text. Leads to a frequently asked questions page. */
+"SETTINGS_FAQ" = "คำถามพบบ่อย";
 
 /*[UNTRANSLATED] Settings item text. Leads to a web page with the Psiphon privacy policy. */
 "SETTINGS_PRIVACY_POLICY" = "Privacy Policy";

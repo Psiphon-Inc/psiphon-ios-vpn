@@ -62,6 +62,12 @@
 "PRIVACY_POLICY_URL" = "https://psiphon.ca/zh/privacy.html";
 
 /* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_AE" = "阿拉伯联合酋长国";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_AR" = "阿根廷";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
 "SERVER_REGION_AT" = "奧地利";
 
 /* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
@@ -77,10 +83,16 @@
 "SERVER_REGION_BG" = "保加利亚";
 
 /* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_BR" = "巴西";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
 "SERVER_REGION_CA" = "加拿大";
 
 /* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
 "SERVER_REGION_CH" = "瑞士";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_CL" = "智利";
 
 /* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
 "SERVER_REGION_CZ" = "捷克";
@@ -92,7 +104,13 @@
 "SERVER_REGION_DK" = "丹麦";
 
 /* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_EE" = "爱沙尼亚";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
 "SERVER_REGION_ES" = "西班牙";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_FI" = "芬兰";
 
 /* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
 "SERVER_REGION_FR" = "法国";
@@ -101,19 +119,34 @@
 "SERVER_REGION_GB" = "英国";
 
 /* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
-"SERVER_REGION_HK" = "香港";
-
-/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
 "SERVER_REGION_HU" = "匈牙利";
 
 /* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_IE" = "爱尔兰";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
 "SERVER_REGION_IN" = "印度";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_IS" = "冰岛";
 
 /* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
 "SERVER_REGION_IT" = "意大利";
 
 /* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
 "SERVER_REGION_JP" = "日本";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_KE" = "肯尼亚";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_KR" = "韩国";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_LV" = "拉脱维亚";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_MX" = "墨西哥";
 
 /* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
 "SERVER_REGION_NL" = "荷兰";
@@ -140,7 +173,13 @@
 "SERVER_REGION_SK" = "斯洛伐克";
 
 /* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_TW" = "中国台湾";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
 "SERVER_REGION_US" = "美国";
+
+/* Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
+"SERVER_REGION_ZA" = "南非";
 
 /* Title of the settings (aka preferences) view (InAppSettingsKit) */
 "SETTINGS_TITLE" = "设置";

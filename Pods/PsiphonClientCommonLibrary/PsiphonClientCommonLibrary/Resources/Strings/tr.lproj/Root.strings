@@ -41,7 +41,7 @@
 "CONNECTION_HELP_DISABLE_TIMEOUTS_FOOTER" = "Yavaş ağlarda zaman aşımını devre dışı bırakmak bağlı kalmanıza yardımcı olabilir.";
 
 /* Settings item text, under 'Psiphon settings'. Disabling timeouts in the Psiphon tunnel can help in really bad network conditions. Text should be kept short. */
-"DISABLE_TIMEOUTS" = "Zaman aşımını devre dışı bırakın";
+"DISABLE_TIMEOUTS" = "Zaman aşımı kullanılmasın";
 
 /* Explanatory text for the "Reconnect to the Psiphon server" command on the "My connection is bad, help!" settings page. DO NOT translate the word 'Psiphon'. */
 "CONNECTION_HELP_FORCE_RECONNECT_FOOTER" = "Geçerli bağlantınız yavaş ya da hareketsiz ise Psiphon sunucusuna yeniden bağlanmak işe yarayabilir.";
