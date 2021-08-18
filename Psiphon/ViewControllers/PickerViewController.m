@@ -27,6 +27,12 @@
 
 NSString * const CellIdentifier = @"cell";
 
+@interface PickerViewController ()
+
+@property (nonatomic, readwrite) NSLocale *locale;
+
+@end
+
 @implementation PickerViewController {
     UITableView *pickerTableView;
     NSArray<NSString *> *_Nonnull labels;
@@ -34,12 +40,14 @@ NSString * const CellIdentifier = @"cell";
 }
 
 - (instancetype)initWithLabels:(NSArray<NSString *> *)pickerLabels
-                     andImages:(NSArray<UIImage *> *_Nullable)pickerImages {
+                     andImages:(NSArray<UIImage *> *_Nullable)pickerImages
+                        locale:(NSLocale *)locale {
 
     self = [super init];
     if (self) {
         labels = pickerLabels;
         images = pickerImages;
+        self.locale = locale;
 
         if (images) {
             assert([labels count] == [images count]);
