@@ -408,4 +408,6 @@ def go():
 
 
 if __name__ == '__main__':
+    if sys.version_info[0] < 3:
+        raise Exception("Must use Python 3")
     go()
