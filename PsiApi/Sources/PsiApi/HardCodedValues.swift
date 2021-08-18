@@ -19,7 +19,15 @@
 
 import Foundation
 
-public struct VPNHardCodedValues {
+public enum PsiphonConstants {
+    public static let ClientVersionKey = "client_version"
+    public static let PropagationChannelIdKey = "propagation_channel_id"
+    public static let ClientRegionKey = "client_region"
+    public static let SponsorIdKey = "sponsor_id"
+    public static let ClientPlatformKey = "client_platform"
+}
+
+public enum VPNHardCodedValues {
     
     /// Time interval during which a response to the message sent to the tunnel provider is expected.
     /// After which the send message Effect should timeout.
@@ -31,7 +39,7 @@ public struct VPNHardCodedValues {
     
 }
 
-public struct SubscriptionHardCodedValues {
+public enum SubscriptionHardCodedValues {
     /// Timer leeway.
     public static let leeway: DispatchTimeInterval = .seconds(10)
     
@@ -44,7 +52,7 @@ public struct SubscriptionHardCodedValues {
     
 }
 
-public struct PurchaseVerifierURLs {
+public enum PurchaseVerifierURLs {
     
     public static let verifierServer = "https://subscription.psiphon3.com"
     
@@ -60,7 +68,7 @@ public struct PurchaseVerifierURLs {
     public static let devPsiCashVerify = URL(string: "\(Self.debugVerifierServer)/v2/appstore/psicash")!
 }
 
-public struct UrlRequestParameters {
+public enum UrlRequestParameters {
     
     public static let cachePolicy: URLRequest.CachePolicy = .reloadIgnoringLocalAndRemoteCacheData
     
@@ -68,7 +76,7 @@ public struct UrlRequestParameters {
     
 }
 
-public struct PsiphonDeepLinking {
+public enum PsiphonDeepLinking {
     
     public static let scheme = "psiphon"
     
@@ -85,7 +93,7 @@ public struct PsiphonDeepLinking {
 
 }
 
-public struct PsiCashClientHardCodedValues {
+public enum PsiCashClientHardCodedValues {
     
     public static let userAgent = "Psiphon-PsiCash-iOS"
     
