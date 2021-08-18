@@ -638,7 +638,7 @@ final class PsiCashViewController: ReactiveViewController {
         paddedLayoutGuide.activateConstraints {
             $0.constraint(
                 to: rootViewLayoutGuide,
-                .top(),
+                .top(Float(Style.default.padding)),
                 .bottom(),
                 .centerX()
             )
