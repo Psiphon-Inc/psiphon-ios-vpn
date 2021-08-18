@@ -41,7 +41,7 @@ class PsiphonWebsiteInfo:
         def sync(self):
             """Syncs Localization object's state with languages supported programmatically by the Psiphon website"""
             data = urllib.request.urlopen(
-                'https://bitbucket.org/psiphon/psiphon-circumvention-system/raw/default/Website/docpad.coffee').read()
+                'https://raw.githubusercontent.com/Psiphon-Inc/psiphon-website/master/docpad.coffee').read()
 
             # Rough regex for declaration of the form:
             #   languages: ['en', 'fa', 'ar', 'zh', 'bo', '...']
