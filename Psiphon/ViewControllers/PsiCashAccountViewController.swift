@@ -593,7 +593,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
                 // PsiCash RefreshState after dismissal of Account Management screen.
                 // This is necessary since the user might have updated their username, or
                 // other account information.
-                self.store.send(.psiCashAction(.refreshPsiCashState(ignoreSubscriptionState: true)))
+                self.store.send(.psiCashAction(.refreshPsiCashState(forced: true)))
                 
                 let _ = self.display(screenToPresent: .mainScreen)
             }
