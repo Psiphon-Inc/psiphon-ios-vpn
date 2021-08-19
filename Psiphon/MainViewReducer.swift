@@ -389,7 +389,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         // This is necessary since the user might have updated their username, or
         // other account information.
         return [
-            environment.psiCashStore(.refreshPsiCashState(ignoreSubscriptionState: true))
+            environment.psiCashStore(.refreshPsiCashState(forced: true))
                 .mapNever()
         ]
 
@@ -405,34 +405,31 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         )
 
         var effects = [Effect<MainViewAction>]()
-
-        // If the user is subscribed and the PsiCash screen is opened,
-        // forces a PsiCash refresh state.
-        // This is useful not show latest PsiCash state, since
-        // for a subscribed user the PsiCash balance will not get updatd otherwise.
-        if case .subscribed(_) = state.subscriptionState.status {
-            effects += environment.psiCashStore(.refreshPsiCashState(ignoreSubscriptionState: true))
-                .mapNever()
-        }
-
-        effects += Effect.deferred {
-            let topVC = environment.getTopActiveViewController()
-            let searchResult = topVC.traversePresentingStackFor(type: PsiCashViewController.self)
-            
-            switch searchResult {
-            case .notPresent:
-                let psiCashViewController = environment.makePsiCashViewController()
-                
-                topVC.present(psiCashViewController, animated: animated, completion: nil)
-                
-                return ._presentPsiCashScreenResult(willPresent: true)
-                
-            case .presentInStack(_), .presentTopOfStack(_):
-                return ._presentPsiCashScreenResult(willPresent: false)
-            }
-        }
         
-        return effects
+        return [
+            // Forced PsiCash RefreshState. This ensures updated balance is shown
+            // even if the user is for example subscribed.
+            environment.psiCashStore(.refreshPsiCashState(forced: true))
+                .mapNever(),
+            
+            // Presents PsiCashViewController
+            Effect.deferred {
+                let topVC = environment.getTopActiveViewController()
+                let searchResult = topVC.traversePresentingStackFor(type: PsiCashViewController.self)
+                
+                switch searchResult {
+                case .notPresent:
+                    let psiCashViewController = environment.makePsiCashViewController()
+                    
+                    topVC.present(psiCashViewController, animated: animated, completion: nil)
+                    
+                    return ._presentPsiCashScreenResult(willPresent: true)
+                    
+                case .presentInStack(_), .presentTopOfStack(_):
+                    return ._presentPsiCashScreenResult(willPresent: false)
+                }
+            }
+        ]
         
     case ._presentPsiCashScreenResult(willPresent: let willPresent):
         if !willPresent {

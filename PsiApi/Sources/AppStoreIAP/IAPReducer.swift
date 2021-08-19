@@ -371,8 +371,7 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
                     case .clientError = responseMetadata.statusCode.responseType
                 {
                     
-                    effects += environment.psiCashStore(
-                        .refreshPsiCashState(ignoreSubscriptionState: false))
+                    effects += environment.psiCashStore(.refreshPsiCashState())
                         .mapNever()
                     
                 }
