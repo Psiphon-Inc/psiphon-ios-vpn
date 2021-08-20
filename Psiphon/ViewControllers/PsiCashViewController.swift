@@ -32,13 +32,13 @@ final class PsiCashViewController: ReactiveViewController {
     typealias AddPsiCashViewType =
         EitherView<PsiCashCoinPurchaseTable,
                    EitherView<Spinner,
-                              EitherView<PsiCashMessageViewUntunneled,
+                              EitherView<PsiCashMessageViewWithButton,
                                          EitherView<PsiCashMessageWithRetryView,
                                                     PsiCashMessageView>>>>
     
     typealias SpeedBoostViewType = EitherView<SpeedBoostPurchaseTable,
                                               EitherView<Spinner,
-                                                         EitherView<PsiCashMessageViewUntunneled,
+                                                         EitherView<PsiCashMessageViewWithButton,
                                                                     PsiCashMessageView>>>
     
     typealias ContainerViewType = EitherView<AddPsiCashViewType, SpeedBoostViewType>
@@ -110,6 +110,7 @@ final class PsiCashViewController: ReactiveViewController {
         dateCompare: DateCompare,
         feedbackLogger: FeedbackLogger,
         tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
+        objCBridgeDelegate: ObjCBridgeDelegate,
         onDismissed: @escaping () -> Void
     ) {
         self.platform = platform
@@ -131,6 +132,18 @@ final class PsiCashViewController: ReactiveViewController {
         self.store = store
         self.productRequestStore = productRequestStore
         
+        let messageViewWithAction = PsiCashMessageViewWithButton { [unowned objCBridgeDelegate] message in
+            switch message {
+            case .untunneled(_):
+                // Dismisses this view controller, and starts the VPN.
+                objCBridgeDelegate.dismiss(screen: .psiCash) {
+                    // This action toggles the VPN, but it is expcected to only
+                    // be called when the VPN is disc
+                    objCBridgeDelegate.startStopVPN()
+                }
+            }
+        }
+        
         self.containerView = ViewBuilderContainerView(
             EitherView(
                 AddPsiCashViewType(
@@ -138,24 +151,21 @@ final class PsiCashViewController: ReactiveViewController {
                         switch $0 {
                         case .product(let product):
                             store.send(.mainViewAction(.psiCashViewAction(
-                                                        .purchaseTapped(product: product))))
+                                .purchaseTapped(product: product))))
                         }
                     }),
                     EitherView(Spinner(style: .whiteLarge),
-                               EitherView(PsiCashMessageViewUntunneled(action: {
-                            store.send(.psiCashAction(.connectToPsiphonTapped))
-                          }), EitherView(PsiCashMessageWithRetryView(),
-                                    PsiCashMessageView())))),
+                               EitherView(messageViewWithAction,
+                                          EitherView(PsiCashMessageWithRetryView(),
+                                                     PsiCashMessageView())))),
                 SpeedBoostViewType(
                     SpeedBoostPurchaseTable(purchaseHandler: {
                         store.send(.psiCashAction(.buyPsiCashProduct(.speedBoost($0))))
                     }, getLocale: { locale }),
                     EitherView(Spinner(style: .whiteLarge),
-                               EitherView(PsiCashMessageViewUntunneled(action: {
-                            store.send(.psiCashAction(.connectToPsiphonTapped))
-                          }), PsiCashMessageView()))))
+                               EitherView(messageViewWithAction, PsiCashMessageView()))))
         )
-                
+        
         super.init(onDismissed: onDismissed)
         
         // Handler for "Sign Up or Log In" button.
@@ -281,16 +291,20 @@ final class PsiCashViewController: ReactiveViewController {
             
             switch observed.readerState.subscription.status {
             case .unknown:
-                self.updateUIState(.unknownSubscription)
+                guard self.updateUIState(.unknownSubscription) else {
+                    fatalError()
+                }
                 return
                 
             case .subscribed(_):
-                self.updateUIState(.subscribed(psiCashLibData.accountType))
+                guard self.updateUIState(.subscribed(psiCashLibData.accountType)) else {
+                    fatalError()
+                }
                 return
                 
             case .notSubscribed:
             
-                self.updateUIState(
+                let handled = self.updateUIState(
                     .notSubscribed(
                         observed.tunneled,
                         psiCashLibData.accountType,
@@ -298,10 +312,14 @@ final class PsiCashViewController: ReactiveViewController {
                     )
                 )
                 
+                if handled {
+                    return
+                }
+                
                 // Invariants:
                 // - User not subscribed
                 // - Not in a tunnel transition state (connecting, disconnecting).
-                // - Has tokens, and has tokens (is tracker or logged in):
+                // - PsiCash token state: is tracker or logged in
                 // - Not pending login/logout
                 guard
                     (observed.tunneled == .connected || observed.tunneled == .notConnected),
@@ -309,11 +327,13 @@ final class PsiCashViewController: ReactiveViewController {
                     observed.readerState.psiCash.isLoggingInOrOut == .none
                 else
                 {
-                    return
+                    // updateUIState(_:) is expected to handle all other cases.
+                    fatalError()
                 }
                 
                 switch (observed.tunneled, psiCashViewState.activeTab) {
                 case (.connecting, _), (.disconnecting, _):
+                    // Already handled by above call to self.updateUIState
                     return
                     
                 case (.notConnected, .addPsiCash),
@@ -347,8 +367,8 @@ final class PsiCashViewController: ReactiveViewController {
                             // If tunnel is not connected and there is a pending PsiCash IAP,
                             // then shows the "pending psicash purchase" screen.
                             self.containerView.bind(
-                                .left(.right(.right(.left(.pendingPsiCashPurchase))))
-                            )
+                                .left(.right(.right(.left(.untunneled(.pendingPsiCashPurchase))))))
+                            
                         case .connecting, .disconnecting:
                             fatalError()
                         }
@@ -392,17 +412,14 @@ final class PsiCashViewController: ReactiveViewController {
                     switch activeSpeedBoost {
                     case .none:
                         // There is no active speed boost.
-                        let connectToPsiphonMessage =
-                            PsiCashMessageViewUntunneled.Message
-                            .speedBoostUnavailable(subtitle: .connectToPsiphon)
-                        
                         self.containerView.bind(
-                            .right(.right(.right(.left(connectToPsiphonMessage)))))
+                            .right(.right(.right(.left(
+                                .untunneled(.speedBoostUnavailable(subtitle: .connectToPsiphon)))))))
                         
                     case .some(_):
                         // There is an active speed boost.
                         self.containerView.bind(
-                            .right(.right(.right(.left(.speedBoostAlreadyActive)))))
+                            .right(.right(.right(.left(.untunneled(.speedBoostAlreadyActive))))))
                     }
                     
                 case (.connected, .speedBoost):
@@ -431,12 +448,12 @@ final class PsiCashViewController: ReactiveViewController {
                         let viewModel = NonEmpty(array: speedBoostPurchasables)
                         
                         if let viewModel = viewModel {
+                            // Has Speed Boost products
                             self.containerView.bind(.right(.left(viewModel)))
                         } else {
-                            let tryAgainLater = PsiCashMessageViewUntunneled.Message
-                                .speedBoostUnavailable(subtitle: .tryAgainLater)
+                            // There are no Speed Boost products, asks user to send feedback.
                             self.containerView.bind(
-                                .right(.right(.right(.left(tryAgainLater)))))
+                                .right(.right(.right(.right(.noSpeedBoostProducts)))))
                         }
                         
                     case .some(_):
@@ -467,7 +484,8 @@ final class PsiCashViewController: ReactiveViewController {
     /// `updateUIState(_:)` updates some parts of the UI.
     /// This is used alongside the main subscription to the `ObservedState`
     /// signal in the `init` method to update the UI.
-    func updateUIState(_ state: UIState) {
+    /// - Returns: True if containerView state is handled.
+    func updateUIState(_ state: UIState) -> Bool {
         
         switch state {
         
@@ -480,6 +498,8 @@ final class PsiCashViewController: ReactiveViewController {
             self.containerView.bind(
                 .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
             )
+            
+            return true
             
         case .subscribed(let psiCashAccountType):
             // User is subscribed. Only shows the PsiCash balance, and the username (if logged in).
@@ -497,6 +517,8 @@ final class PsiCashViewController: ReactiveViewController {
                 .left(.right(.right(.right(.right(.userSubscribed)))))
             )
             
+            return true
+            
         case let .notSubscribed(tunnelStatus, psiCashAccountType, maybePendingPsiCashLoginLogout):
             
             // Blocks UI and displays appropriate message if tunnel is connecting or disconnecting.
@@ -510,7 +532,7 @@ final class PsiCashViewController: ReactiveViewController {
                 self.containerView.bind(
                     .left(.right(.right(.right(.right(.unavailableWhileConnecting))))))
                 
-                return
+                return true
                 
             case .disconnecting:
                 
@@ -522,7 +544,7 @@ final class PsiCashViewController: ReactiveViewController {
                 self.containerView.bind(
                     .left(.right(.right(.right(.right(.unavailableWhileDisconnecting))))))
              
-                return
+                return true
                 
             default:
                 break
@@ -543,7 +565,8 @@ final class PsiCashViewController: ReactiveViewController {
                 
                 self.containerView.bind(
                     .left(.right(.right(.right(.right(.psiCashAccountsLoggingIn))))))
-                return
+                
+                return true
                 
             case .logout:
                 self.accountNameViewWrapper.view.isHidden = true
@@ -553,10 +576,10 @@ final class PsiCashViewController: ReactiveViewController {
                 
                 self.containerView.bind(
                     .left(.right(.right(.right(.right(.psiCashAccountsLoggingOut))))))
-                return
+                
+                return true
                 
             }
-            
             
             switch psiCashAccountType {
             case .noTokens:
@@ -569,6 +592,8 @@ final class PsiCashViewController: ReactiveViewController {
                     .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
                 )
                 
+                return true
+                
             case .account(loggedIn: false):
                 
                 self.accountNameViewWrapper.view.isHidden = true
@@ -580,6 +605,8 @@ final class PsiCashViewController: ReactiveViewController {
                     .left(.right(.right(.right(.right(.signupOrLoginToPsiCash)))))
                 )
                 
+                return true
+                
             case .account(loggedIn: true):
                 
                 self.accountNameViewWrapper.view.isHidden = false
@@ -587,6 +614,7 @@ final class PsiCashViewController: ReactiveViewController {
                 self.tabControl.view.isHidden = false
                 self.signupOrLogInView.isHidden = true
                 
+                return false
                 
             case .tracker:
                 
@@ -594,6 +622,8 @@ final class PsiCashViewController: ReactiveViewController {
                 self.balanceViewWrapper.view.isHidden = false
                 self.tabControl.view.isHidden = false
                 self.signupOrLogInView.isHidden = false
+                
+                return false
                 
             }
             

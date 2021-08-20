@@ -31,6 +31,7 @@ struct PsiCashMessageView: ViewBuilder {
         case signupOrLoginToPsiCash
         case psiCashAccountsLoggingIn
         case psiCashAccountsLoggingOut
+        case noSpeedBoostProducts
     }
 
     func build(_ container: UIView?) -> ImmutableBindableViewable<Message, UIView> {
@@ -134,6 +135,12 @@ struct PsiCashMessageView: ViewBuilder {
                     imageView.image = UIImage(named: "PsiCashCoinCloud")!
                     title.text = UserStrings.Logging_out_ellipses()
                     subtitle.text = ""
+                
+                case .noSpeedBoostProducts:
+                    imageView.image = UIImage(named: "PsiCashCoinCloud")!
+                    title.text = UserStrings.PsiCash_unavailable()
+                    subtitle.text = UserStrings.Something_went_wrong_try_agaig_and_send_feedback()
+                    subtitle.textAlignment = .center
                     
                 }
             }
