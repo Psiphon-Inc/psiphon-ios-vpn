@@ -142,8 +142,8 @@
 /*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
 "LOG_IN_OR_SIGNUP_TO_CONTINUE" = "Log in or create account to continue using PsiCash";
 
-/* Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed. */
-"LOG_OUT_ANY_WAY_BUTTON_TITLE" = "Logout anyway";
+/*[UNTRANSLATED] Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed. */
+"LOG_OUT_ANY_WAY_BUTTON_TITLE_2" = "Log out anyway";
 
 /* Title of the button that lets users log out of their account */
 "LOG_OUT_BUTTON_TITLE_2" = "Sair";
@@ -346,7 +346,7 @@
 /*[UNTRANSLATED] Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
 "PSICASH_WAIT_TRANSACTION_VERIFIED" = "Please wait while your transaction is being verified";
 
-/*[UNTRANSLATED] Alert message informing user that a Psip */
+/*[UNTRANSLATED] Alert message informing user that a Psiphon connection is required */
 "PSIPHON_CONNECTION_REQUIRED" = "Psiphon Connection Required";
 
 /*[UNTRANSLATED] Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
@@ -403,31 +403,31 @@
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST" = "Velocidade turbinada";
 
-/* Label on a button. Clicking this button will buy 1 hour of Speed Boost. */
+/* Label on a button. Clicking this button will buy 1 hour of Speed Boost. Translate number as well. */
 "SPEED_BOOST_1HR" = "1 hora";
 
-/* Label on a button. Clicking this button will buy 2 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 2 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_2HR" = "2 horas";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 3 hours of Speed Boost. */
+/*[UNTRANSLATED] Label on a button. Clicking this button will buy 3 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_3HR" = "3 hours";
 
-/* Label on a button. Clicking this button will buy 4 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 4 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_4HR" = "4 horas";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 5 hours of Speed Boost. */
+/*[UNTRANSLATED] Label on a button. Clicking this button will buy 5 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_5HR" = "5 hours";
 
-/* Label on a button. Clicking this button will buy 6 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 6 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_6HR" = "6 horas";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 7 hours of Speed Boost. */
+/*[UNTRANSLATED] Label on a button. Clicking this button will buy 7 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_7HR" = "7 hours";
 
-/* Label on a button. Clicking this button will buy 8 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 8 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_8HR" = "8 horas";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 9 hours of Speed Boost. */
+/*[UNTRANSLATED] Label on a button. Clicking this button will buy 9 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_9HR" = "9 hours";
 
 /*[UNTRANSLATED] Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
