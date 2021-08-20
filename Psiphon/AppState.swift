@@ -386,6 +386,7 @@ func makeEnvironment(
                 dateCompare: dateCompare,
                 feedbackLogger: feedbackLogger,
                 tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
+                objCBridgeDelegate: objcBridgeDelegate,
                 onDismissed: { [unowned store] in
                     store.send(.mainViewAction(.dismissedPsiCashScreen))
                 }

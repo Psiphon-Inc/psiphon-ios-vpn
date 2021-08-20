@@ -104,7 +104,7 @@
 		52A2465E239081C100A01FF1 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2465D239081C100A01FF1 /* AppState.swift */; };
 		52A24662239B07E000A01FF1 /* psiCashProductIds.plist in Resources */ = {isa = PBXBuildFile; fileRef = 52A24661239B07E000A01FF1 /* psiCashProductIds.plist */; };
 		52A2466D23A172A800A01FF1 /* ViewBuilderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2466C23A172A800A01FF1 /* ViewBuilderViewController.swift */; };
-		52A2466F23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2466E23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift */; };
+		52A2466F23A1769300A01FF1 /* PsiCashMessageViewWithButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2466E23A1769300A01FF1 /* PsiCashMessageViewWithButton.swift */; };
 		52A2467123A176BA00A01FF1 /* PurchasingAlertViewBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52A2467023A176BA00A01FF1 /* PurchasingAlertViewBuilder.swift */; };
 		52B3C54A23DF99E8003F6B12 /* AppObservables.m in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54923DF99E8003F6B12 /* AppObservables.m */; };
 		52B3C54C23E0E895003F6B12 /* ButtonBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52B3C54B23E0E895003F6B12 /* ButtonBuilder.swift */; };
@@ -552,7 +552,7 @@
 		52A2465D239081C100A01FF1 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
 		52A24661239B07E000A01FF1 /* psiCashProductIds.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = psiCashProductIds.plist; sourceTree = "<group>"; };
 		52A2466C23A172A800A01FF1 /* ViewBuilderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewBuilderViewController.swift; sourceTree = "<group>"; };
-		52A2466E23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageViewUntunneled.swift; sourceTree = "<group>"; };
+		52A2466E23A1769300A01FF1 /* PsiCashMessageViewWithButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashMessageViewWithButton.swift; sourceTree = "<group>"; };
 		52A2467023A176BA00A01FF1 /* PurchasingAlertViewBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchasingAlertViewBuilder.swift; sourceTree = "<group>"; };
 		52B3C54823DF99E8003F6B12 /* AppObservables.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppObservables.h; sourceTree = "<group>"; };
 		52B3C54923DF99E8003F6B12 /* AppObservables.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppObservables.m; sourceTree = "<group>"; };
@@ -1259,7 +1259,7 @@
 				52C8F0AC237E145C00E5F9C0 /* PsiCashCoinPurchaseTable.swift */,
 				528D81322384823F00AA2D77 /* PsiCashMessageView.swift */,
 				52A24658238C9AB700A01FF1 /* SpeedBoostPurchaseTable.swift */,
-				52A2466E23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift */,
+				52A2466E23A1769300A01FF1 /* PsiCashMessageViewWithButton.swift */,
 				52A2467023A176BA00A01FF1 /* PurchasingAlertViewBuilder.swift */,
 				8DB6C6352429080C005E2F4C /* PsiCashMessageWithRetryView.swift */,
 				8D335A51251A929E005F62CA /* PsiCashAccountSignupOrLoginView.swift */,
@@ -2101,7 +2101,7 @@
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
 				445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */,
 				296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */,
-				52A2466F23A1769300A01FF1 /* PsiCashMessageViewUntunneled.swift in Sources */,
+				52A2466F23A1769300A01FF1 /* PsiCashMessageViewWithButton.swift in Sources */,
 				8D0017D924DB4B1200EC3409 /* OnboardingViewController.swift in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
 				EF90D7A5204F22C900228A63 /* timestamp_parse.c in Sources */,
