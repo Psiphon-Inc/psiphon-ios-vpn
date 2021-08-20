@@ -55,8 +55,8 @@
 /* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "CONNECT_TO_USE_SPEED_BOOST" = "Conéctate a Psiphon para usar Aumento de Velocidad";
 
-/*[UNTRANSLATED] Label text shown to user when the VPN is connecting to a Psiphon server. Do not translate or transliterate 'Psiphon' */
-"CONNECTING_TO_PSIPHON" = "Connecting to Psiphon";
+/* Label text shown to user when the VPN is connecting to a Psiphon server. Do not translate or transliterate 'Psiphon' */
+"CONNECTING_TO_PSIPHON" = "Conectando a Psiphon";
 
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "El fichero de configuración de su aplicación parece estar corrupto. Pruebe a reinstalar la aplicación para reparar el fichero.";
@@ -130,29 +130,29 @@
 /* Text displayed while app loads */
 "LOADING" = "Cargando...";
 
-/*[UNTRANSLATED] Message shown when a resource (online or offline) fails to load. */
-"LOADING_FAILED" = "Loading failed";
+/* Message shown when a resource (online or offline) fails to load. */
+"LOADING_FAILED" = "Carga fallida";
 
 /* Title on a button that lets users login to their account with the username and password they have entered. */
 "LOG_IN_BUTTON_TITLE" = "Iniciar sesión";
 
-/*[UNTRANSLATED] Message title informing the user that they must sign up for an account or log in to their account */
-"LOG_IN_OR_SIGN_UP" = "Log in or sign up";
+/* Message title informing the user that they must sign up for an account or log in to their account */
+"LOG_IN_OR_SIGN_UP" = "Iniciar sesión o registrarse";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
-"LOG_IN_OR_SIGNUP_TO_CONTINUE" = "Log in or create account to continue using PsiCash";
+/* Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
+"LOG_IN_OR_SIGNUP_TO_CONTINUE" = "Inicia sesión o crea una cuenta para continuar usando PsiCash";
 
 /* Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed. */
-"LOG_OUT_ANY_WAY_BUTTON_TITLE" = "Cerrar sesión de cualquier manera";
+"LOG_OUT_ANY_WAY_BUTTON_TITLE_2" = "Cerrar sesión de todos modos";
 
 /* Title of the button that lets users log out of their account */
 "LOG_OUT_BUTTON_TITLE_2" = "Cerrar sesión";
 
-/*[UNTRANSLATED] Label indicating to the user that they are logging into their PsiCash account. Use ellipses if it makes sense. */
-"LOGGING_IN_ELLIPSES" = "Logging in ...";
+/* Label indicating to the user that they are logging into their PsiCash account. Use ellipses if it makes sense. */
+"LOGGING_IN_ELLIPSES" = "Iniciando sesión...";
 
-/*[UNTRANSLATED] Label indicating to the user that they are logging out of their PsiCash account. Use ellipses if it makes sense. */
-"LOGGING_OUT_ELLIPSES" = "Logging out ...";
+/* Label indicating to the user that they are logging out of their PsiCash account. Use ellipses if it makes sense. */
+"LOGGING_OUT_ELLIPSES" = "Cerrando sesión...";
 
 /* Button title that takes user to the next page */
 "NEXT_PAGE_BUTTON_TITLE" = "Siguiente";
@@ -259,20 +259,20 @@
 /* Message shown when products available for purchase could not be retrieved. */
 "PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "La lista de productos no pudo ser obtenida";
 
-/*[UNTRANSLATED] Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
-"PROTECT_YOUR_PURCHASES" = "Protect Your Purchases";
+/* Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
+"PROTECT_YOUR_PURCHASES" = "Protege Tus Compras";
 
 /* Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts. */
 "PSICASH_ACCOUNT" = "Cuenta PsiCash";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
-"PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "Are you sure you want to log out of your PsiCash account?";
+/* Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
+"PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "¿Seguro que quieres cerrar sesión de tu cuenta PsiCash?";
 
 /* An alert shown when the user logs out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNT_LOGOUT_COMPLETE_TITLE" = "Cierre de sesión de cuenta PsiCash completo.";
 
-/*[UNTRANSLATED] Body of modal dialog shown when the user attempts to log out of their PsiCash account and an unexpected error occurs. Please don't modify the link URL. */
-"PSICASH_ACCOUNT_LOGOUT_FAILED_BODY" = "You logout attempt failed unexpectedly. Please try restarting the application.";
+/* Body of modal dialog shown when the user attempts to log out of their PsiCash account and an unexpected error occurs. Please don't modify the link URL. */
+"PSICASH_ACCOUNT_LOGOUT_FAILED_BODY" = "Tu intento de cerrar sesión falló inesperadamente. Por favor intenta reiniciar la aplicación.";
 
 /* Header of a modal dialog that appears when the user tries to log out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNT_LOGOUT_TITLE" = "Cierre de sesión de cuenta PsiCash";
@@ -280,8 +280,8 @@
 /* Button title that opens 'PsiCash' account management. */
 "PSICASH_ACCOUNT_MANAGEMENT_2" = "Administrar cuenta";
 
-/*[UNTRANSLATED] An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "Your PsiCash login has expired. Please log back in.";
+/* An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "Tu inicio de sesión en PsiCash ha caducado. Por favor inicia sesión nuevamente.";
 
 /* Body text of a modal dialog shown when a PsiCash login succeeds. There is a fixed number of times that a user can merge a pre-account balance into a PsiCash account. This message indicates that the user has hit that limit and the merge that occurred is the last one allowed. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNTS_LAST_MERGE_WARNING_BODY" = "Tienes sesión iniciada dentro de tu cuenta PsiCash. El saldo preexistente de este dispositivo ha sido transferido dentro de tu cuenta, pero esta es la última vez que ocurrirá una unificacfión de saldos.";
@@ -346,14 +346,14 @@
 /* Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
 "PSICASH_WAIT_TRANSACTION_VERIFIED" = "Por favor espera mientras tu transacción está siendo verificada";
 
-/* Alert message informing user that a Psip */
+/* Alert message informing user that a Psiphon connection is required */
 "PSIPHON_CONNECTION_REQUIRED" = "Una conexion a Psiphon es requerida.";
 
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon no está conectado";
 
-/*[UNTRANSLATED] Alert message that the users purchases have been restored successfully */
-"PURCHASES_RESTORED_SUCCESSFULLY" = "Purchases restored successfully";
+/* Alert message that the users purchases have been restored successfully */
+"PURCHASES_RESTORED_SUCCESSFULLY" = "Compras restauradas con éxito";
 
 /* Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
 "PURCHASING_PSICASH" = "Comprando PsiCash…";
@@ -370,8 +370,8 @@
 /* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "No puede ver una suscripción que compró en éste dispositivo.";
 
-/*[UNTRANSLATED] Button that restores users previous purchases */
-"RESTORE_PURCHASES" = "Restore purchases";
+/* Button that restores users previous purchases */
+"RESTORE_PURCHASES" = "Restaurar compras";
 
 /* Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "Restaurar Suscripción";
@@ -403,31 +403,31 @@
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST" = "Turbo Velocidad";
 
-/* Label on a button. Clicking this button will buy 1 hour of Speed Boost. */
+/* Label on a button. Clicking this button will buy 1 hour of Speed Boost. Translate number as well. */
 "SPEED_BOOST_1HR" = "1 hora";
 
-/* Label on a button. Clicking this button will buy 2 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 2 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_2HR" = "2 horas";
 
-/* Label on a button. Clicking this button will buy 3 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 3 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_3HR" = "3 horas";
 
-/* Label on a button. Clicking this button will buy 4 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 4 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_4HR" = "4 horas";
 
-/* Label on a button. Clicking this button will buy 5 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 5 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_5HR" = "5 horas";
 
-/* Label on a button. Clicking this button will buy 6 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 6 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_6HR" = "6 horas";
 
-/* Label on a button. Clicking this button will buy 7 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 7 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_7HR" = "7 horas";
 
-/* Label on a button. Clicking this button will buy 8 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 8 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_8HR" = "8 horas";
 
-/* Label on a button. Clicking this button will buy 9 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 9 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_9HR" = "9 horas";
 
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
