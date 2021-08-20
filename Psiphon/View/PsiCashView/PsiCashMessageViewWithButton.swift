@@ -19,20 +19,27 @@
 
 import UIKit
 
-struct PsiCashMessageViewUntunneled: ViewBuilder {
+struct PsiCashMessageViewWithButton: ViewBuilder {
 
     enum Message: Equatable {
-        case speedBoostAlreadyActive
-        case speedBoostUnavailable(subtitle: SpeedBoostUnavailableMessage)
-        case pendingPsiCashPurchase
+        
+        enum UntunneledMessage: Equatable {
+            
+            enum SpeedBoostUnavailableMessage: Equatable {
+                case tryAgainLater
+                case connectToPsiphon
+            }
+            
+            case speedBoostAlreadyActive
+            case speedBoostUnavailable(subtitle: SpeedBoostUnavailableMessage)
+            case pendingPsiCashPurchase
+        }
+        
+        case untunneled(UntunneledMessage)
+        
     }
 
-    enum SpeedBoostUnavailableMessage: Equatable {
-        case tryAgainLater
-        case connectToPsiphon
-    }
-
-    let action: () -> Void
+    let action: (Message) -> Void
 
     func build(_ container: UIView?) -> ImmutableBindableViewable<Message, UIView> {
         
@@ -61,8 +68,6 @@ struct PsiCashMessageViewUntunneled: ViewBuilder {
         let button = GradientButton(gradient: .grey)
         button.setTitleColor(.darkBlue(), for: .normal)
         button.titleLabel!.font = AvenirFont.demiBold.font(.h3)
-        button.setTitle(UserStrings.Connect_to_psiphon_button(), for: .normal)
-        button.setEventHandler(self.action)
 
         // Add subviews
         stackView.addArrangedSubviews(
@@ -79,26 +84,42 @@ struct PsiCashMessageViewUntunneled: ViewBuilder {
 
         return .init(viewable: stackView) { _ -> ((Message) -> Void) in
             return { message in
+                
                 switch message {
-                case .speedBoostAlreadyActive:
-                    imageView.image = UIImage(named: "SpeedBoostActive")!
-                    title.text = UserStrings.Speed_boost_active()
-                    subtitle.text = UserStrings.Speed_boost_you_already_have()
-
-                case let .speedBoostUnavailable(subtitle: subtitleMessage):
-                    imageView.image = UIImage(named: "SpeedBoostUnavailable")
-                    title.text = UserStrings.Speed_boost_unavailable()
-                    switch subtitleMessage {
-                    case .connectToPsiphon:
-                        subtitle.text = UserStrings.Connect_to_psiphon_to_use_speed_boost()
-                    case .tryAgainLater:
-                        subtitle.text = UserStrings.Please_try_again_later()
+                    
+                case .untunneled(let untunneledMessage):
+                    
+                    switch untunneledMessage {
+                        
+                    case .speedBoostAlreadyActive:
+                        imageView.image = UIImage(named: "SpeedBoostActive")!
+                        title.text = UserStrings.Speed_boost_active()
+                        subtitle.text = UserStrings.Speed_boost_you_already_have()
+                        
+                    case let .speedBoostUnavailable(subtitle: subtitleMessage):
+                        imageView.image = UIImage(named: "SpeedBoostUnavailable")
+                        title.text = UserStrings.Speed_boost_unavailable()
+                        switch subtitleMessage {
+                        case .connectToPsiphon:
+                            subtitle.text = UserStrings.Connect_to_psiphon_to_use_speed_boost()
+                        case .tryAgainLater:
+                            subtitle.text = UserStrings.Please_try_again_later()
+                        }
+                        
+                    case .pendingPsiCashPurchase:
+                        imageView.image = UIImage(named: "PsiCashPendingTransaction")
+                        title.text = UserStrings.PsiCash_transaction_pending()
+                        subtitle.text = UserStrings.Connect_to_finish_psicash_transaction()
+                        
                     }
-
-                case .pendingPsiCashPurchase:
-                    imageView.image = UIImage(named: "PsiCashPendingTransaction")
-                    title.text = UserStrings.PsiCash_transaction_pending()
-                    subtitle.text = UserStrings.Connect_to_finish_psicash_transaction()
+                    
+                    button.setTitle(UserStrings.Connect_to_psiphon_button(), for: .normal)
+                    
+                }
+                
+                // Updates button event handler.
+                button.setEventHandler {
+                    self.action(message)
                 }
 
             }

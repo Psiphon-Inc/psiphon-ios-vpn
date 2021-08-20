@@ -44,7 +44,7 @@
 "CONNECT_BUTTON" = "Bağlantı kur";
 
 /* Action button title, that when pressed connects the user to Psiphon network. */
-"CONNECT_BUTTON_TITLE" = "Bağlan";
+"CONNECT_BUTTON_TITLE" = "Bağlantı kur";
 
 /* Text shown to the user telling them to connect to 'Psiphon', to finish their unfinished transaction. Do not translate or transliterate 'Psiphon'. */
 "CONNECT_TO_FINISH_PSICASH_TRANSACTION" = "İşleminizi tamamlamak için Psiphon ile bağlantı kurun";
@@ -55,8 +55,8 @@
 /* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "CONNECT_TO_USE_SPEED_BOOST" = "Speed Boost kullanmak için Psiphon bağlantısı kurun";
 
-/*[UNTRANSLATED] Label text shown to user when the VPN is connecting to a Psiphon server. Do not translate or transliterate 'Psiphon' */
-"CONNECTING_TO_PSIPHON" = "Connecting to Psiphon";
+/* Label text shown to user when the VPN is connecting to a Psiphon server. Do not translate or transliterate 'Psiphon' */
+"CONNECTING_TO_PSIPHON" = "Psiphon bağlantısı kuruluyor";
 
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "Uygulama ayarları dosyanız bozulmuş gibi görünüyor. Dosyayı onarmak için uygulamayı yeniden kurmayı deneyin.";
@@ -64,8 +64,8 @@
 /* Button label that lets users create a new account. */
 "CREATE_ACCOUNT_BUTTON_TITLE" = "Hesap açın";
 
-/*[UNTRANSLATED] Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
-"CREATE_PSICASH_ACCOUNT_BODY_2" = "We strongly encourage you to make a PsiCash account before buying PsiCash. Having an account allows you to share your balance between devices and protect your purchases.\n\nIMPORTANT: Without an account your PsiCash will not be preserved if you uninstall Psiphon.";
+/* Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
+"CREATE_PSICASH_ACCOUNT_BODY_2" = "PsiCash satın almadan önce bir PsiCash hesabı oluşturmanızı önemle öneririz. Bir hesap açarak, bakiyenizi aygıtlarınız arasında paylalabilir ve satın aldığınız PsiCash bakiyenizi koruyabilirsiniz.\n\nÖNEMLİ: Bir hesabınız olmadan, Psiphon uygulamasını kaldırırsanız PsiCash bakiyenizi kaybedersiniz.";
 
 /* Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will continue on to the PsiCash store. */
 "CREATE_PSICASH_ACCOUNT_CONTINUE_BUTTON" = "Hesap açmadan ilerle";
@@ -110,7 +110,7 @@
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Psiphon gelişimine katkıda bulunduğunuz için teşekkür ederiz!";
 
 /* Button title that lets users reset their password if they forgot their account's password. */
-"FORGOT_PASSWORD" = "Parolayı mı unuttunuz?";
+"FORGOT_PASSWORD" = "Parolanızı mı unuttunuz?";
 
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "Ücretsiz";
@@ -122,7 +122,7 @@
 "INCORRECT_USERNAME_OR_PASSWORD" = "Yazdığınız kullanıcı adı ya da parola hatalı.";
 
 /* User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
-"INSUFFICIENT_PSICASH_BALANCE" = "PsiCash birikimi yetersiz";
+"INSUFFICIENT_PSICASH_BALANCE" = "PsiCash bakiyesi yetersiz";
 
 /* External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
 "LICENSE_PAGE_URL" = "https://psiphon.ca/tr/license.html";
@@ -130,29 +130,29 @@
 /* Text displayed while app loads */
 "LOADING" = "Yükleniyor...";
 
-/*[UNTRANSLATED] Message shown when a resource (online or offline) fails to load. */
-"LOADING_FAILED" = "Loading failed";
+/* Message shown when a resource (online or offline) fails to load. */
+"LOADING_FAILED" = "Yüklenemedi";
 
 /* Title on a button that lets users login to their account with the username and password they have entered. */
 "LOG_IN_BUTTON_TITLE" = "Oturum aç";
 
-/*[UNTRANSLATED] Message title informing the user that they must sign up for an account or log in to their account */
-"LOG_IN_OR_SIGN_UP" = "Log in or sign up";
+/* Message title informing the user that they must sign up for an account or log in to their account */
+"LOG_IN_OR_SIGN_UP" = "Oturum ya da hesap açın";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
-"LOG_IN_OR_SIGNUP_TO_CONTINUE" = "Log in or create account to continue using PsiCash";
+/* Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
+"LOG_IN_OR_SIGNUP_TO_CONTINUE" = "PsiCash kullanmayı sürdürmek için oturum ya da hesap açın";
 
 /* Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed. */
-"LOG_OUT_ANY_WAY_BUTTON_TITLE" = "Hayır oturumu kapat";
+"LOG_OUT_ANY_WAY_BUTTON_TITLE_2" = "Oturumu yine de kapat";
 
 /* Title of the button that lets users log out of their account */
 "LOG_OUT_BUTTON_TITLE_2" = "Oturumu kapat";
 
-/*[UNTRANSLATED] Label indicating to the user that they are logging into their PsiCash account. Use ellipses if it makes sense. */
-"LOGGING_IN_ELLIPSES" = "Logging in ...";
+/* Label indicating to the user that they are logging into their PsiCash account. Use ellipses if it makes sense. */
+"LOGGING_IN_ELLIPSES" = "Oturum açılıyor ...";
 
-/*[UNTRANSLATED] Label indicating to the user that they are logging out of their PsiCash account. Use ellipses if it makes sense. */
-"LOGGING_OUT_ELLIPSES" = "Logging out ...";
+/* Label indicating to the user that they are logging out of their PsiCash account. Use ellipses if it makes sense. */
+"LOGGING_OUT_ELLIPSES" = "Oturum kapatılıyor ...";
 
 /* Button title that takes user to the next page */
 "NEXT_PAGE_BUTTON_TITLE" = "Sonraki";
@@ -187,8 +187,8 @@
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Lütfen bağlantıyı tamamlamak için Psiphon uygulamasını açın.";
 
-/*[UNTRANSLATED] Capitalize where it makes sense. Label visually separating Sign up section and sign in section of the app. */
-"OR_SIGNUP_SIGNIN" = "OR";
+/* Capitalize where it makes sense. Label visually separating Sign up section and sign in section of the app. */
+"OR_SIGNUP_SIGNIN" = "YA DA";
 
 /* Text field label where users can enter their account's password */
 "PASSWORD_TEXT_FIELD" = "Parola";
@@ -259,20 +259,20 @@
 /* Message shown when products available for purchase could not be retrieved. */
 "PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "Ürün listesi alınamadı";
 
-/*[UNTRANSLATED] Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
-"PROTECT_YOUR_PURCHASES" = "Protect Your Purchases";
+/* Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
+"PROTECT_YOUR_PURCHASES" = "Satın almalarınızı koruyun";
 
 /* Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts. */
 "PSICASH_ACCOUNT" = "PsiCash hesabı";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
-"PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "Are you sure you want to log out of your PsiCash account?";
+/* Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
+"PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "PsiCash hesabınızın oturumunu kapatmak istediğinize emin misiniz?";
 
 /* An alert shown when the user logs out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNT_LOGOUT_COMPLETE_TITLE" = "PsiCash hesabının oturumu kapatıldı.";
 
-/*[UNTRANSLATED] Body of modal dialog shown when the user attempts to log out of their PsiCash account and an unexpected error occurs. Please don't modify the link URL. */
-"PSICASH_ACCOUNT_LOGOUT_FAILED_BODY" = "You logout attempt failed unexpectedly. Please try restarting the application.";
+/* Body of modal dialog shown when the user attempts to log out of their PsiCash account and an unexpected error occurs. Please don't modify the link URL. */
+"PSICASH_ACCOUNT_LOGOUT_FAILED_BODY" = "Oturumunuz kapatılamadı. Lütfen uygulamayı yeniden başlatmayı deneyin.";
 
 /* Header of a modal dialog that appears when the user tries to log out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNT_LOGOUT_TITLE" = "PsiCash hesabı oturumunu kapat";
@@ -280,20 +280,20 @@
 /* Button title that opens 'PsiCash' account management. */
 "PSICASH_ACCOUNT_MANAGEMENT_2" = "Hesap yönetimi";
 
-/*[UNTRANSLATED] An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "Your PsiCash login has expired. Please log back in.";
+/* An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "PsiCash oturumunuz zaman aşımına uğramış. Lütfen yeniden oturum açın.";
 
 /* Body text of a modal dialog shown when a PsiCash login succeeds. There is a fixed number of times that a user can merge a pre-account balance into a PsiCash account. This message indicates that the user has hit that limit and the merge that occurred is the last one allowed. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNTS_LAST_MERGE_WARNING_BODY" = "PsiCash hesabınıza oturum açtınız. Bu aygıttaki bakiyeniz hesabınıza aktarıldı. Ancak bu bakiye aktarımı işlemi son kez yapıldı.";
 
 /* PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
-"PSICASH_BALANCE" = "PsiCash birikimi:";
+"PSICASH_BALANCE" = "PsiCash bakiyesi:";
 
 /* Body text of a modal dialog shown when a PsiCash account login fails due to a 'bad request' error. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_LOGIN_BAD_REQUEST_ERROR_BODY" = "PsiCash sunucusu oturum alma isteğinin geçersiz olduğunu bildirdi. Lütfen bir süre sonra yeniden deneyin.";
 
 /* Body text of a modal dialog shown when a PsiCash login fails without a specific reason. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_LOGIN_CATASTROPHIC_ERROR_BODY" = "PsiCash oturum açma girişiminiz beklenmedik şekilde sonlandı.";
+"PSICASH_LOGIN_CATASTROPHIC_ERROR_BODY" = "PsiCash oturumu açma girişiminiz beklenmedik şekilde sonlandı.";
 
 /* Title of modal dialog shown when the PsiCash account login attempt fails for some reason. Text within the modal will explain why. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_LOGIN_FAILED_TITLE" = "PsiCash oturumu açılamadı";
@@ -305,13 +305,13 @@
 "PSICASH_LOGIN_SUCCESS_TITLE" = "PsiCash oturumu açıldı";
 
 /* Body of a modal dialog that appears when the user tries to log out of thier PsiCash account while not currently connected to the Psiphon network. We don't allow PsiCash network requests when not connected, so only an inferior localy-only logout is available. 'Psiphon' must not be translated/transliterated. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_LOGOUT_OFFLINE_BODY" = "Psiphon ağına bağlanmak, PsiCash oturumunun daha güvenli şekilde kapatılmasını sağlar. Oturumu kapatmadan önce bağlantı kurmak ister misiniz?";
+"PSICASH_LOGOUT_OFFLINE_BODY" = "Psiphon ağıyla bağlantı kurmak, PsiCash oturumunun daha güvenli şekilde kapatılmasını sağlar. Oturumu kapatmadan önce bağlantı kurmak ister misiniz?";
 
 /* Body text of a modal dialog shown when the user tries to use (spend, buy, etc.) PsiCash, if they not currently connected. 'Use' here means buy, spend, or otherwise interact with. 'Psiphon' must not be translated/transliterated. 'PsiCash' must not be translated/transliterated. */
 "PSICASH_MUST_BE_CONNECTED" = "PsiCash kullanabilmeniz için, Psiphon ağına bağlı olmalısınız.";
 
-/*[UNTRANSLATED] PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
-"PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon, unless you have created a PsiCash account and are logged into your PsiCash account.";
+/* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
+"PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "ÖNEMLİ: Bir PsiCash hesabı oluşturup PsiCash hesabınızla oturum açmadıkça, Psiphon uygulamasını kaldırdığınızda PsiCash bakiyenizi kaybedersiniz.";
 
 /* Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "PSICASH_SPEED_BOOST_PRODUCT_NOT_FOUND_MESSAGE" = "Speed Boost ürünü bulunamadı. Uygulamanız eski olabilir. Lütfen güncellemeleri denetleyin.";
@@ -322,8 +322,8 @@
 /* Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. */
 "PSICASH_SPEED_PORT_LIMITS_HEAD" = "Hız ve kapı kısıtlamaları";
 
-/*[UNTRANSLATED] A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon */
-"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY" = "Your Psiphon subscription already gives you always-on Speed Boost, so there is no reason to buy more. Your PsiCash balance will be retained should you ever decide to cancel your subscription.\n\nYou can still access your PsiCash account from the settings menu.";
+/* A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon */
+"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY" = "Psiphon aboneliğiniz size sürekli Speed Boost kullanımı sağlıyor. Bu yüzden daha fazlasını satın almanıza gerek yok. Aboneliğinizi sonlandırmak isteyebilirsiniz diye PsiCash bakiyeniz tutulacak.\n\nPsiCash hesabınıza ayarlar menüsünden ulaşabilirsiniz.";
 
 /* A title message to the premium user (a user with a subscription when they are trying to navigate to PsiCash and Speed Boost screen. Do not translate or transliterate words PsiCash or Psiphon */
 "PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_TITLE" = "Psiphon aboneliğiniz size ayrıcalıklı erişim sunuyor!";
@@ -346,14 +346,14 @@
 /* Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
 "PSICASH_WAIT_TRANSACTION_VERIFIED" = "Lütfen işleminiz doğrulanırken bekleyin";
 
-/* Alert message informing user that a Psip */
+/* Alert message informing user that a Psiphon connection is required */
 "PSIPHON_CONNECTION_REQUIRED" = "Psiphon bağlantısı gerekli";
 
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon bağlantısı yok";
 
-/*[UNTRANSLATED] Alert message that the users purchases have been restored successfully */
-"PURCHASES_RESTORED_SUCCESSFULLY" = "Purchases restored successfully";
+/* Alert message that the users purchases have been restored successfully */
+"PURCHASES_RESTORED_SUCCESSFULLY" = "Satın almalarınız geri yüklendi";
 
 /* Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
 "PURCHASING_PSICASH" = "PsiCash satın alınıyor…";
@@ -370,8 +370,8 @@
 /* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "Bu aygıt üzerinden satın aldığınız bir aboneliği göremezsiniz";
 
-/*[UNTRANSLATED] Button that restores users previous purchases */
-"RESTORE_PURCHASES" = "Restore purchases";
+/* Button that restores users previous purchases */
+"RESTORE_PURCHASES" = "Satın almaları geri yükle";
 
 /* Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "Aboneliği geri yükle";
@@ -403,31 +403,31 @@
 /*[UNTRANSLATED] Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST" = "Speed Boost";
 
-/* Label on a button. Clicking this button will buy 1 hour of Speed Boost. */
+/* Label on a button. Clicking this button will buy 1 hour of Speed Boost. Translate number as well. */
 "SPEED_BOOST_1HR" = "1 saat";
 
-/* Label on a button. Clicking this button will buy 2 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 2 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_2HR" = "2 saat";
 
-/* Label on a button. Clicking this button will buy 3 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 3 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_3HR" = "3 saat";
 
-/* Label on a button. Clicking this button will buy 4 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 4 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_4HR" = "4 saat";
 
-/* Label on a button. Clicking this button will buy 5 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 5 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_5HR" = "5 saat";
 
-/* Label on a button. Clicking this button will buy 6 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 6 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_6HR" = "6 saat";
 
-/* Label on a button. Clicking this button will buy 7 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 7 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_7HR" = "7 saat";
 
-/* Label on a button. Clicking this button will buy 8 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 8 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_8HR" = "8 saat";
 
-/* Label on a button. Clicking this button will buy 9 hours of Speed Boost. */
+/* Label on a button. Clicking this button will buy 9 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_9HR" = "9 saat";
 
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */

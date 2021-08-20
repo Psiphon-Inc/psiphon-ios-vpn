@@ -36,9 +36,9 @@ public enum PsiCashAction: Equatable {
             result: NewExpiringPurchaseResult
          )
     
-    /// PsiCash RefreshState. If `ignoreSubscriptionState` is true, RefreshState action
-    /// is not taken if the user is subscribed.
-    case refreshPsiCashState(ignoreSubscriptionState: Bool = false)
+    /// Performs a PsiCash RefreshState.
+    ///  If `forced` is true, RefreshState action is taken whether or not the user is subscribed.
+    case refreshPsiCashState(forced: Bool = false)
     case _refreshPsiCashStateResult(PsiCashEffectsProtocol.PsiCashRefreshResult)
     
     case accountLogout
@@ -49,7 +49,6 @@ public enum PsiCashAction: Equatable {
     
     case userDidEarnReward(PsiCashAmount, PsiCashBalance.BalanceOutOfDateReason)
     
-    case connectToPsiphonTapped
     case dismissedAlert(PsiCashAlertDismissAction)
     
     /// Represents result of syncing authorizations with Core Data.

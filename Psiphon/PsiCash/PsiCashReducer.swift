@@ -134,7 +134,9 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         
         return [
             environment.psiCashEffects.setLocale(locale)
-                .mapNever()
+                .mapNever(),
+            
+            Effect(value: .refreshPsiCashState())
         ]
         
     case .buyPsiCashProduct(let purchasableType):
@@ -254,7 +256,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                     .requestError(.errorStatus(.transactionTypeNotFound)),
                     .requestError(.errorStatus(.invalidTokens)):
                 
-                effects += Effect(value: .refreshPsiCashState(ignoreSubscriptionState: false))
+                effects += Effect(value: .refreshPsiCashState())
                 
             case .tunnelNotConnected,
                     .requestError(.errorStatus(.existingTransaction)),
@@ -452,22 +454,22 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         
         state.psiCash.libData = environment.psiCashEffects.libData()
         
+        var effects = [Effect<PsiCashAction>]()
+        
+        // Refresh PsiCash state (regardless of whether login was successful or not.)
+        effects += Effect(value: .refreshPsiCashState())
+        
         switch result {
         case .success(let accountLoginResponse):
-            return [
-                // Refreshes PsiCash state immediately after successful login.
-                Effect(value: .refreshPsiCashState()),
-                
-                environment.feedbackLogger.log(
-                    .info, "account login completed: '\(accountLoginResponse)'"
-                ).mapNever()
-            ]
+            effects += environment.feedbackLogger.log(
+                .info, "account login completed: '\(accountLoginResponse)'"
+            ).mapNever()
             
         case .failure(let errorEvent):
-            return [
-                environment.feedbackLogger.log(.error, errorEvent).mapNever()
-            ]
+            effects += environment.feedbackLogger.log(.error, errorEvent).mapNever()
         }
+        
+        return effects
         
     case .dismissedAlert(let dismissed):
         switch dismissed {
@@ -487,15 +489,6 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             persisted: environment.psiCashPersistedValues)
         
         return [ Effect(value: .refreshPsiCashState()) ]
-        
-    case .connectToPsiphonTapped:
-        return [
-            .fireAndForget { [unowned objcBridgeDelegate = environment.objcBridgeDelegate] in
-                objcBridgeDelegate?.dismiss(screen: .psiCash, completion: {
-                    objcBridgeDelegate?.startStopVPN()
-                })
-            }
-        ]
         
     case ._coreDataSyncResult(let syncResult):
         

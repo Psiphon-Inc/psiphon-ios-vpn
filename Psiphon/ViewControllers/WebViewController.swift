@@ -22,6 +22,7 @@ import WebKit
 import PsiApi
 import Utilities
 import ReactiveSwift
+import SafariServices
 
 fileprivate enum WebViewFailure: HashableError {
     case didFail(SystemError<Int>)
@@ -252,6 +253,27 @@ extension WebViewController: WKUIDelegate {
     
     func webViewDidClose(_ webView: WKWebView) {
         self.dismiss(animated: true, completion: nil)
+    }
+    
+    func webView(
+        _ webView: WKWebView,
+        createWebViewWith configuration: WKWebViewConfiguration,
+        for navigationAction: WKNavigationAction,
+        windowFeatures: WKWindowFeatures
+    ) -> WKWebView? {
+        
+        // Opens target="_blank" links in an SFSafariViewController,
+        // presented on top of the current view controller.
+        
+        guard let url = navigationAction.request.url else {
+            return nil
+        }
+        
+        let safari = SFSafariViewController(url: url)
+        self.present(safari, animated: true, completion: nil)
+        
+        return nil
+        
     }
     
 }
