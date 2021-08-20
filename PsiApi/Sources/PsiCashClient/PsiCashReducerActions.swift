@@ -49,7 +49,6 @@ public enum PsiCashAction: Equatable {
     
     case userDidEarnReward(PsiCashAmount, PsiCashBalance.BalanceOutOfDateReason)
     
-    case connectToPsiphonTapped
     case dismissedAlert(PsiCashAlertDismissAction)
     
     /// Represents result of syncing authorizations with Core Data.

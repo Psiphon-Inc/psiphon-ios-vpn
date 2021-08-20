@@ -490,15 +490,6 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         
         return [ Effect(value: .refreshPsiCashState()) ]
         
-    case .connectToPsiphonTapped:
-        return [
-            .fireAndForget { [unowned objcBridgeDelegate = environment.objcBridgeDelegate] in
-                objcBridgeDelegate?.dismiss(screen: .psiCash, completion: {
-                    objcBridgeDelegate?.startStopVPN()
-                })
-            }
-        ]
-        
     case ._coreDataSyncResult(let syncResult):
         
         // Notifies the Network Extension of any changes to persisted authorization in Core Data.
