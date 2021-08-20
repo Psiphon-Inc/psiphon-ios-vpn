@@ -262,15 +262,20 @@ public struct HTTPClient {
 
 extension HTTPClient {
     
-    public static func `default`(urlSession: URLSession) -> HTTPClient {
+    public static func `default`(urlSession: URLSession, feedbackLogger: FeedbackLogger) -> HTTPClient {
         HTTPClient(urlSession: urlSession) { (getCurrentTime, session, urlRequest, completionHandler)
             -> CancellableURLRequest in
+            
+            let requestBody = String(data: urlRequest.httpBody ?? Data(), encoding: .utf8) ?? ""
+            
+            feedbackLogger.immediate(.info, "URLSessionDataTask Started: URL:\(String(describing: urlRequest.url?.path)), requestBody:\(requestBody)")
             
             let sessionTask = session.dataTask(with: urlRequest)
             { data, response, error in
                 let result: URLSessionResult
                 if let error = error {
                     // If URLSession task resulted in an error, there might be a partial response.
+                    feedbackLogger.immediate(.error, "URLSessionDataTask Error: \(SystemError<Int>.make(error as NSError))")
                     
                     result = URLSessionResult(
                         date: getCurrentTime(),
@@ -286,6 +291,10 @@ extension HTTPClient {
                 } else {
                     // If `error` is nil, then URLSession task callback guarantees that
                     // `data` and `response` are non-nil.
+                    
+                    let urlResponse = (response! as! HTTPURLResponse)
+                    let responseBody = String(data: data ?? Data(), encoding: .utf8) ?? ""
+                    feedbackLogger.immediate(.info, "URLSessionDataTask Finished: Status:\(urlResponse.statusCode), Headers:\(urlResponse.allHeaderFields), Body:\(responseBody)")
                     
                     result = URLSessionResult(
                         date: getCurrentTime(),

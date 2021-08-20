@@ -189,7 +189,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
     private var platform: Platform!
     private var deepLinkingNavigator = DeepLinkingNavigator()
     private let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: PsiphonAppGroupIdentifier)
-    private let feedbackLogger = FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler())
+    let feedbackLogger = FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler())
     private let supportedProducts =
         SupportedAppStoreProducts.fromPlists(types: [.subscription, .psiCash])
     private let userDefaultsConfig = UserDefaultsConfig()
