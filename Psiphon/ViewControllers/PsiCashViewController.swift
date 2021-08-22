@@ -323,7 +323,8 @@ final class PsiCashViewController: ReactiveViewController {
                 // - Not pending login/logout
                 guard
                     (observed.tunneled == .connected || observed.tunneled == .notConnected),
-                    psiCashLibData.accountType.hasTokens,
+                    (psiCashLibData.accountType == .tracker ||
+                     psiCashLibData.accountType == .account(loggedIn: true)),
                     observed.readerState.psiCash.isLoggingInOrOut == .none
                 else
                 {
