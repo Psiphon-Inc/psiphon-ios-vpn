@@ -65,20 +65,6 @@ public enum PsiCashAccountType: Equatable {
     case tracker
 }
 
-public extension PsiCashAccountType {
-    
-    /// True iff PsiCash `HasTokens()` is true.
-    var hasTokens: Bool {
-        switch self {
-        case .noTokens, .account(loggedIn: false):
-            return false
-        case .tracker, .account(loggedIn: true):
-            return true
-        }
-    }
-    
-}
-
 // MARK: PsiCash data model
 public struct PsiCashLibData: Equatable {
 
