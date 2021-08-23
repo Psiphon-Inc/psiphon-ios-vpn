@@ -34,6 +34,7 @@
 
 NSString * const UserDefaultsPsiCashUsername = @"Testing-Account-Username";
 NSString * const UserDefaultsPsiCashPassword = @"Testing-Account-Password";
+NSString * const UserDefaultsRecordHTTP = @"Testing-Record-Http";
 
 NSString * const ActionCellIdentifier = @"ActionCell";
 NSString * const SwitchCellIdentifier = @"SwitchCell";
@@ -108,7 +109,7 @@ NSString * const StateCellIdentifier = @"StateCell";
         case 0: return 2; // PPROF
         case 1: return 3; // EXTENSION
         case 2: return 1; // PSIPHON TUNNEL
-        case 3: return 5; // CONTAINER
+        case 3: return 6; // CONTAINER
         default:
             PSIAssert(FALSE)
             return 0;
@@ -202,26 +203,38 @@ NSString * const StateCellIdentifier = @"StateCell";
         cell.selectionStyle = UITableViewCellSelectionStyleDefault;
         switch (indexPath.row) {
             case 0: {
+                NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                cell.textLabel.text = @"Record HTTP traffic";
+                UISwitch *switchView = [[UISwitch alloc] initWithFrame:CGRectZero];
+                [switchView setOn:[defaults boolForKey:UserDefaultsRecordHTTP]];
+                [switchView addTarget:self
+                               action:@selector(onRecordHttpTrafficSwitch:)
+                     forControlEvents:UIControlEventValueChanged];
+                cell.accessoryView = switchView;
+                break;
+            }
+            case 1: {
                 cell.textLabel.text = @"Default PsiCash Accounts credentials";
                 action = @selector(onDefaultAccountsCredentials);
                 break;
             }
-            case 1: {
+            case 2: {
                 cell.textLabel.text = @"Reset Standard UserDefaults";
                 action = @selector(onResetStandardUserDefaults);
                 break;
             }
-            case 2: {
+            case 3: {
                 cell.textLabel.text = @"Reset PsiphonDataSharedDB";
                 action = @selector(onResetPsiphonDataSharedDB);
                 break;
             }
-            case 3: {
+            case 4: {
                 cell.textLabel.text = @"Delete Core Data persistent store";
                 action = @selector(onDeleteCoreDataPersistentStores);
                 break;
             }
-            case 4: {
+            case 5: {
                 cell.textLabel.text = @"Delete PsiCash store directory";
                 action = @selector(onDeletePsiCashStore);
                 break;
@@ -262,6 +275,10 @@ NSString * const StateCellIdentifier = @"StateCell";
 - (void)onMemoryProfilerSwitch:(UISwitch *)view {
     [self.sharedDB setDebugMemoryProfiler:view.isOn];
     [[Notifier sharedInstance] post:NotifierDebugMemoryProfiler];
+}
+
+- (void)onRecordHttpTrafficSwitch:(UISwitch *)view {
+    [[NSUserDefaults standardUserDefaults] setBool:view.isOn forKey:UserDefaultsRecordHTTP];
 }
 
 - (void)onDefaultAccountsCredentials {

@@ -190,6 +190,15 @@ public struct HTTPRequestError: HashableError {
     /// From: https://developer.apple.com/documentation/foundation/urlsession/1410330-datatask
     public let partialResponseMetadata: HTTPResponseMetadata?
     public let error: SystemError<Int>
+    
+    public init(
+        partialResponseMetadata: HTTPResponseMetadata?,
+        error: SystemError<Int>
+    ) {
+        self.partialResponseMetadata = partialResponseMetadata
+        self.error = error
+    }
+    
 }
 
 extension URL {
@@ -256,53 +265,6 @@ public struct HTTPClient {
             handler(Response(urlSessionResult: result))
         }
         
-    }
-    
-}
-
-extension HTTPClient {
-    
-    public static func `default`(urlSession: URLSession) -> HTTPClient {
-        HTTPClient(urlSession: urlSession) { (getCurrentTime, session, urlRequest, completionHandler)
-            -> CancellableURLRequest in
-            
-            let sessionTask = session.dataTask(with: urlRequest)
-            { data, response, error in
-                let result: URLSessionResult
-                if let error = error {
-                    // If URLSession task resulted in an error, there might be a partial response.
-                    
-                    result = URLSessionResult(
-                        date: getCurrentTime(),
-                        result: .failure(
-                            HTTPRequestError(
-                                partialResponseMetadata: (response as? HTTPURLResponse)
-                                    .map(HTTPResponseMetadata.init),
-                                error: SystemError<Int>.make(error as NSError)
-                            )
-                        )
-                    )
-                    
-                } else {
-                    // If `error` is nil, then URLSession task callback guarantees that
-                    // `data` and `response` are non-nil.
-                    
-                    result = URLSessionResult(
-                        date: getCurrentTime(),
-                        result: .success(
-                            HTTPResponseData(
-                                data: data!,
-                                metadata: HTTPResponseMetadata(response! as! HTTPURLResponse)
-                            )
-                        )
-                    )
-                    
-                }
-                completionHandler(result)
-            }
-            sessionTask.resume()
-            return sessionTask
-        }
     }
     
 }
