@@ -33,6 +33,19 @@ fileprivate enum WebViewFailure: HashableError {
 fileprivate typealias WebViewLoadingState = Pending<Result<Utilities.Unit,
                                                            ErrorEvent<WebViewFailure>>>
 
+
+/// A WKWebView view controller, with no navigation back/forward buttons.
+/// Links with the `target="_blank"` attribute will opened in a `SFSafariViewController`,
+/// presented on top of this view controller.
+///
+/// Note regarding PsiCash Accounts website (or any other websit:
+/// Formal contract between PsiCash Accounts website and platforms that use webviews:
+/// - All links that lead to a outside websites (even those owened by Psiphon)
+///   should have the `target="_blank"` attribute.
+/// - Webviews are not required to have navigation back/forward buttons. The intention is for the
+///   experience to feel as native as possible.
+///   Users should be able to navigate to anywhere within the PsiCash Accounts website from any page.
+///
 final class WebViewController: ReactiveViewController {
     
     private struct ObservedState: Equatable {
