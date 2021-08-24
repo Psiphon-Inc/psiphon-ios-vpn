@@ -199,6 +199,9 @@
 /* Subtitle shown when the current operation failed, asking the user to try again at a later time. */
 "PLEASE_TRY_AGAIN_LATER" = "နောက်မှပြန်စမ်းသပ်ကြည့်ပေးပါ။";
 
+/*[UNTRANSLATED] Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
+"PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Something went wrong, please try again later.\n\nIf this problem persists, please send a feedback.";
+
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
 "PRIVACY_POLICY_DECLINED_ALERT_BODY" = "Psiphon အားဆက်လက်အသုံးပြုရန် သင်သည် ကိုယ်ရေးကိုယ်တာမူဝါဒကို လက်ခံရပါမည်။";
 
