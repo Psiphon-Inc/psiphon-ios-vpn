@@ -29,6 +29,7 @@
 		29C3220A26B1C17D0075BB34 /* AppInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920720F3DA190033114B /* AppInfo.m */; };
 		29EE50B726ACDC0E00DB8A60 /* AppFiles.m in Sources */ = {isa = PBXBuildFile; fileRef = 29EE50B626ACDC0E00DB8A60 /* AppFiles.m */; };
 		29EE50B826ACDC0E00DB8A60 /* AppFiles.m in Sources */ = {isa = PBXBuildFile; fileRef = 29EE50B626ACDC0E00DB8A60 /* AppFiles.m */; };
+		29F8536E26D4549000533472 /* Requests+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F8536D26D4549000533472 /* Requests+Additions.swift */; };
 		29FE979125C0C1CA00D9C09F /* HostAppProtocol.m in Sources */ = {isa = PBXBuildFile; fileRef = 29FE979025C0C1CA00D9C09F /* HostAppProtocol.m */; };
 		440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 440D75BD1F59E041005C603B /* StoreKit.framework */; };
 		4435CC271F70566000F3A809 /* SettingsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4435CC261F70566000F3A809 /* SettingsViewController.m */; };
@@ -410,6 +411,7 @@
 		29BA6DA0268630A9001445EA /* TunnelFileDescriptor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TunnelFileDescriptor.m; sourceTree = "<group>"; };
 		29EE50B526ACDC0E00DB8A60 /* AppFiles.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppFiles.h; sourceTree = "<group>"; };
 		29EE50B626ACDC0E00DB8A60 /* AppFiles.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppFiles.m; sourceTree = "<group>"; };
+		29F8536D26D4549000533472 /* Requests+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Requests+Additions.swift"; sourceTree = "<group>"; };
 		29FE978F25C0C1CA00D9C09F /* HostAppProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HostAppProtocol.h; sourceTree = "<group>"; };
 		29FE979025C0C1CA00D9C09F /* HostAppProtocol.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = HostAppProtocol.m; sourceTree = "<group>"; };
 		2D1DAF6C9CAF197D05CDCFCF /* Pods-Testing-TestingTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Testing-TestingTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-Testing-TestingTests/Pods-Testing-TestingTests.release.xcconfig"; sourceTree = "<group>"; };
@@ -1444,6 +1446,7 @@
 				8DEEE12E252F757600B0A9EC /* SupportedLocalizations.swift */,
 				8D82F0E525420E21002D37E7 /* PsiCashViewReducer.swift */,
 				8D82F1022542216C002D37E7 /* MainViewReducer.swift */,
+				29F8536D26D4549000533472 /* Requests+Additions.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -2200,6 +2203,7 @@
 				521FD0F9219E0DDF00F748EC /* AppStats.m in Sources */,
 				8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */,
 				8D7789BD247493300038BFDA /* VPNState.swift in Sources */,
+				29F8536E26D4549000533472 /* Requests+Additions.swift in Sources */,
 				9BFECD174E254989EC97A437 /* IAPHelpViewController.m in Sources */,
 				52055D04230C823100244F9E /* GradientButton.swift in Sources */,
 				8D9D9BCC247C6A9D0093220E /* PsiphonRotatingFileFeedbackLogger.swift in Sources */,

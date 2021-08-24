@@ -34,6 +34,7 @@
 
 NSString * const UserDefaultsPsiCashUsername = @"Testing-Account-Username";
 NSString * const UserDefaultsPsiCashPassword = @"Testing-Account-Password";
+NSString * const UserDefaultsRecordHTTP = @"Testing-Record-Http";
 
 NSString * const ActionCellIdentifier = @"ActionCell";
 NSString * const SwitchCellIdentifier = @"SwitchCell";
@@ -60,14 +61,14 @@ NSString * const StateCellIdentifier = @"StateCell";
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
+    
     // Navigation bar
     self.title = @"Toolbox";
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc]
-            initWithBarButtonSystemItem:UIBarButtonSystemItemDone
-                                 target:self
-                                 action:@selector(dismiss)];
-
+                                              initWithBarButtonSystemItem:UIBarButtonSystemItemDone
+                                              target:self
+                                              action:@selector(dismiss)];
+    
     actionsTableView = [[UITableView alloc] init];
     actionsTableView.dataSource = self;
     actionsTableView.delegate = self;
@@ -81,14 +82,14 @@ NSString * const StateCellIdentifier = @"StateCell";
         actionsTableView.backgroundColor = [UIColor whiteColor];
     }
     [self.view addSubview:actionsTableView];
-
+    
     // Layout constraints
     actionsTableView.translatesAutoresizingMaskIntoConstraints = FALSE;
     [actionsTableView.topAnchor constraintEqualToAnchor:self.view.topAnchor].active = TRUE;
     [actionsTableView.bottomAnchor constraintEqualToAnchor:self.view.bottomAnchor].active = TRUE;
     [actionsTableView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor].active = TRUE;
     [actionsTableView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor].active = TRUE;
-
+    
     // Register to Notifier messages.
     [[Notifier sharedInstance] registerObserver:self callbackQueue:dispatch_get_main_queue()];
 }
@@ -105,10 +106,10 @@ NSString * const StateCellIdentifier = @"StateCell";
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
-        case 0: return 2; // PPROF
-        case 1: return 3; // EXTENSION
-        case 2: return 1; // PSIPHON TUNNEL
-        case 3: return 5; // CONTAINER
+        case 0: return 6; // CONTAINER
+        case 1: return 1; // PSIPHON TUNNEL
+        case 2: return 3; // EXTENSION
+        case 3: return 2; // PPROF
         default:
             PSIAssert(FALSE)
             return 0;
@@ -117,10 +118,10 @@ NSString * const StateCellIdentifier = @"StateCell";
 
 - (nullable NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     switch (section) {
-        case 0: return @"PPROF";
-        case 1: return @"EXTENSION";
-        case 2: return @"PSIPHON TUNNEL";
-        case 3: return @"CONTAINER";
+        case 0: return @"CONTAINER";
+        case 1: return @"PSIPHON TUNNEL";
+        case 2: return @"EXTENSION";
+        case 3: return @"PPROF";
         default:
             PSIAssert(FALSE);
             return @"";
@@ -130,30 +131,77 @@ NSString * const StateCellIdentifier = @"StateCell";
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell;
     SEL action = nil;
-
-    // PPROF section
+    
     if (indexPath.section == 0) {
-
-        cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier forIndexPath:indexPath];
+        // CONTAINER section
+        cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier
+                                               forIndexPath:indexPath];
+        cell.selectionStyle = UITableViewCellSelectionStyleDefault;
         switch (indexPath.row) {
             case 0: {
-                cell.textLabel.text = @"Write Go Profiles";
-                action = @selector(onWriteGoProfiles);
+                NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                cell.textLabel.text = @"Record HTTP traffic";
+                UISwitch *switchView = [[UISwitch alloc] initWithFrame:CGRectZero];
+                [switchView setOn:[defaults boolForKey:UserDefaultsRecordHTTP]];
+                [switchView addTarget:self
+                               action:@selector(onRecordHttpTrafficSwitch:)
+                     forControlEvents:UIControlEventValueChanged];
+                cell.accessoryView = switchView;
                 break;
             }
             case 1: {
-                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
-                cell.textLabel.text = @"Show Go Profiles";
-                action = @selector(onGoProfiles);
+                cell.textLabel.text = @"Default PsiCash Accounts credentials";
+                action = @selector(onDefaultAccountsCredentials);
+                break;
+            }
+            case 2: {
+                cell.textLabel.text = @"Reset Standard UserDefaults";
+                cell.textLabel.textColor = UIColor.radicalRed;
+                action = @selector(onResetStandardUserDefaults);
+                break;
+            }
+            case 3: {
+                cell.textLabel.text = @"Reset PsiphonDataSharedDB";
+                cell.textLabel.textColor = UIColor.radicalRed;
+                action = @selector(onResetPsiphonDataSharedDB);
+                break;
+            }
+            case 4: {
+                cell.textLabel.text = @"Delete Core Data persistent store";
+                cell.textLabel.textColor = UIColor.radicalRed;
+                action = @selector(onDeleteCoreDataPersistentStores);
+                break;
+            }
+            case 5: {
+                cell.textLabel.text = @"Delete PsiCash store directory";
+                cell.textLabel.textColor = UIColor.radicalRed;
+                action = @selector(onDeletePsiCashStore);
                 break;
             }
         }
-
-    // EXTENSION section
+        
     } else if (indexPath.section == 1) {
+        // PSIPHON TUNNEL section
         cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier
-          forIndexPath:indexPath];
-
+                                               forIndexPath:indexPath];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        switch (indexPath.row) {
+            case 0: {
+                psiphonTunnelConnectionStateLabel = [[UILabel alloc] init];
+                psiphonTunnelConnectionStateLabel.textColor = UIColor.lightishBlueTwo;
+                cell.textLabel.text = @"Connection State";
+                cell.accessoryView = psiphonTunnelConnectionStateLabel;
+                [self updateConnectionStateLabel];
+                break;
+            }
+        }
+        
+    } else if (indexPath.section == 2) {
+        // EXTENSION section
+        cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier
+                                               forIndexPath:indexPath];
+        
         switch (indexPath.row) {
             case 0: {
                 cell.textLabel.text = @"Custom Function";
@@ -177,64 +225,31 @@ NSString * const StateCellIdentifier = @"StateCell";
                 break;
             }
         }
-
-    // PSIPHON TUNNEL section
-    } else if (indexPath.section == 2) {
-
-        cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier
-                                               forIndexPath:indexPath];
-        cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        switch (indexPath.row) {
-            case 0: {
-                psiphonTunnelConnectionStateLabel = [[UILabel alloc] init];
-                psiphonTunnelConnectionStateLabel.textColor = UIColor.brownColor;
-                cell.textLabel.text = @"Connection State";
-                cell.accessoryView = psiphonTunnelConnectionStateLabel;
-                [self updateConnectionStateLabel];
-                break;
-            }
-        }
-
-    // CONTAINER section
+        
     } else if (indexPath.section == 3) {
-        cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier
-                                               forIndexPath:indexPath];
-        cell.selectionStyle = UITableViewCellSelectionStyleDefault;
+        // PPROF section
+        cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier forIndexPath:indexPath];
         switch (indexPath.row) {
             case 0: {
-                cell.textLabel.text = @"Default PsiCash Accounts credentials";
-                action = @selector(onDefaultAccountsCredentials);
+                cell.textLabel.text = @"Write Go Profiles";
+                action = @selector(onWriteGoProfiles);
                 break;
             }
             case 1: {
-                cell.textLabel.text = @"Reset Standard UserDefaults";
-                action = @selector(onResetStandardUserDefaults);
-                break;
-            }
-            case 2: {
-                cell.textLabel.text = @"Reset PsiphonDataSharedDB";
-                action = @selector(onResetPsiphonDataSharedDB);
-                break;
-            }
-            case 3: {
-                cell.textLabel.text = @"Delete Core Data persistent store";
-                action = @selector(onDeleteCoreDataPersistentStores);
-                break;
-            }
-            case 4: {
-                cell.textLabel.text = @"Delete PsiCash store directory";
-                action = @selector(onDeletePsiCashStore);
+                cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+                cell.textLabel.text = @"Show Go Profiles";
+                action = @selector(onGoProfiles);
                 break;
             }
         }
     }
-
+    
     if (action != nil) {
         UITapGestureRecognizer *gr = [[UITapGestureRecognizer alloc]
-                initWithTarget:self action:action];
+                                      initWithTarget:self action:action];
         [cell addGestureRecognizer:gr];
     }
-
+    
     return cell;
 }
 
@@ -254,14 +269,18 @@ NSString * const StateCellIdentifier = @"StateCell";
 
 - (void)onGoProfiles {
     DebugDirectoryViewerViewController *wvc = [DebugDirectoryViewerViewController
-            createAndLoadDirectory:self.sharedDB.goProfileDirectory
-            withTitle:@"Go Profiles"];
+                                               createAndLoadDirectory:self.sharedDB.goProfileDirectory
+                                               withTitle:@"Go Profiles"];
     [self.navigationController pushViewController:wvc animated:TRUE];
 }
 
 - (void)onMemoryProfilerSwitch:(UISwitch *)view {
     [self.sharedDB setDebugMemoryProfiler:view.isOn];
     [[Notifier sharedInstance] post:NotifierDebugMemoryProfiler];
+}
+
+- (void)onRecordHttpTrafficSwitch:(UISwitch *)view {
+    [[NSUserDefaults standardUserDefaults] setBool:view.isOn forKey:UserDefaultsRecordHTTP];
 }
 
 - (void)onDefaultAccountsCredentials {
@@ -355,11 +374,11 @@ NSString * const StateCellIdentifier = @"StateCell";
 }
 
 - (void)onMessageReceived:(NotifierMessage)message {
-
+    
     if ([NotifierDebugPsiphonTunnelState isEqualToString:message]) {
         [self updateConnectionStateLabel];
     }
-
+    
 }
 
 #pragma mark - Helper methods

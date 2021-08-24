@@ -24,6 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSString * const UserDefaultsPsiCashUsername;
 extern NSString * const UserDefaultsPsiCashPassword;
+extern NSString * const UserDefaultsRecordHTTP;
 
 @interface DebugToolboxViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
 @end

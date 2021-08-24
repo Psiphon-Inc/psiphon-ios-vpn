@@ -101,19 +101,44 @@ let landingPageReducer = Reducer<LandingPageReducerState
 /// If no PsiCash tokens are available, waits up to `PsiCashHardCodedValues.getEarnerTokenTimeout`
 /// for PsiCash tokens to be obtained.
 fileprivate func modifyLandingPagePendingObtainingToken(
-    url: URL, psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType?, Never>,
+    url: URL,
+    psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType?, Never>,
     psiCashEffects: PsiCashEffects
 ) -> Effect<URL> {
+    
     psiCashAccountTypeSignal
-        .map {
-            $0?.hasTokens ?? false
-        }
-        .falseIfNotTrue(within: PsiCashHardCodedValues.getEarnerTokenTimeout)
-        .flatMap(.latest) { hasTokens -> SignalProducer<URL, Never> in
-            if hasTokens {
-                return psiCashEffects.modifyLandingPage(url)
-            } else {
-                return SignalProducer(value: url)
+        .shouldWait(upto: PsiCashHardCodedValues.getEarnerTokenTimeout,
+                    otherwiseEmit: .none,
+                    shouldWait: { accountType in
+            
+            guard let accountType = accountType else {
+                // PsiCash account information is not avaible. Should wait.
+                return true
             }
-    }
+            
+            switch accountType {
+            case .noTokens:
+                // No PsiCash tokens are available, should wait for first time retrieval
+                // of PsiCash tokens.
+                return true
+                
+            case .tracker, .account(loggedIn: false), .account(loggedIn: true):
+                // PsiCash tokens have already been retrieved.
+                return false
+            }
+            
+        })
+        .flatMap(.latest) { accountType -> Effect<URL> in
+            
+            // Modifies the landing pages URL if user has tracker tokens or is logged in.
+            
+            switch accountType {
+            case .none, .noTokens, .account(loggedIn: false):
+                return Effect(value: url)
+            case .tracker, .account(loggedIn: true):
+                return psiCashEffects.modifyLandingPage(url)
+            }
+            
+        }
+    
 }
