@@ -21,6 +21,8 @@
 
 @interface UIColor (Additions)
 
++ (UIColor * _Nonnull)radicalRed;
+
 + (UIColor * _Nonnull)paleBlueColor;
 
 + (UIColor * _Nonnull)clearBlueColor;

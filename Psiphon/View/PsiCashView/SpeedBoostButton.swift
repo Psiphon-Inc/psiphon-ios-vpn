@@ -66,10 +66,14 @@ import UIKit
 
     init(locale: Locale) {
         formatter = DateComponentsFormatter()
-        formatter.calendar?.locale = locale
-        formatter.unitsStyle = .positional
-        formatter.zeroFormattingBehavior = .pad
-
+        mutate(formatter) {
+            $0.calendar!.locale = locale
+            $0.unitsStyle = .abbreviated
+            $0.maximumUnitCount = 2
+            $0.zeroFormattingBehavior = .dropLeading
+            // $0.allowedUnits should be set before display.
+        }
+        
         super.init(shadow: .light, contentShadow: true, gradient: .blue)
     }
 
@@ -147,7 +151,7 @@ import UIKit
         if expiry.timeIntervalSinceNow <= Self.ShowSecondsAt {
             self.formatter.allowedUnits = [.minute, .second]
         } else {
-            self.formatter.allowedUnits = [.hour, .minute]
+            self.formatter.allowedUnits = [.day, .hour, .minute]
         }
 
         let time = formatter.string(from: max(0.0, expiry.timeIntervalSinceNow))!

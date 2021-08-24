@@ -230,7 +230,7 @@ func makeEnvironment(
     
     let reachabilityForInternetConnection = Reachability.forInternetConnection()!
     
-    let httpClient = HTTPClient.default(urlSession: urlSession)
+    let httpClient = HTTPClient.default(urlSession: urlSession, feedbackLogger: feedbackLogger)
     
     let tunnelStatusSignal = store.$value.signalProducer
         .map(\.vpnState.value.providerVPNStatus)

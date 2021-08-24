@@ -64,9 +64,6 @@ final class PsiCashAccountNameViewWrapper: NSObject, ViewWrapper, Bindable {
     }
 
     func bind(_ newValue: String) {
-        guard !newValue.isEmpty else {
-            fatalError("account name cannot be empty")
-        }
         label.text = newValue
     }
 

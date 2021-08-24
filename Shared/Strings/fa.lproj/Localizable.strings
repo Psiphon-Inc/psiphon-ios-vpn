@@ -199,6 +199,9 @@
 /* Subtitle shown when the current operation failed, asking the user to try again at a later time. */
 "PLEASE_TRY_AGAIN_LATER" = "لطفا بعدا دوباره امتحان کنید.";
 
+/*[UNTRANSLATED] Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
+"PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Something went wrong, please try again later.\n\nIf this problem persists, please send a feedback.";
+
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
 "PRIVACY_POLICY_DECLINED_ALERT_BODY" = "قبل از استفاده کردن از Psiphon، شما باید سیاست حفظ حریم شخصی ما را قبول کنید.";
 
@@ -317,7 +320,7 @@
 "PSICASH_SPEED_BOOST_PRODUCT_NOT_FOUND_MESSAGE" = "محصول اسپید بوست یافت نشد. برنامه شما ممکن است قدیمی باشد. لطفا به‌روزرسانی‌ها را بررسی کنید. ";
 
 /* Body of an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. The word 'PsiCash' must not be translated or transliterated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_SPEED_PORT_LIMITS_BODY" = "بدون فعالسازی اسپید بوست، سرعت شما محدود بوده و بخشی از ترافیک اینترنت پشتیبانی نمی‌شود. برای نهایت استفاده از تجربه سایفون خود، اسپید بوست را با PsiCash فعال کنید.";
+"PSICASH_SPEED_PORT_LIMITS_BODY" = "بدون فعالسازی اسپید بوست، سرعت شما محدود بوده و بخشی از ترافیک اینترنت پشتیبانی نمی‌شود. برای نهایت استفاده از تجربه Psiphon خود، اسپید بوست را با PsiCash فعال کنید.";
 
 /* Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. */
 "PSICASH_SPEED_PORT_LIMITS_HEAD" = "محدودیت‌های سرعت و درگاه";

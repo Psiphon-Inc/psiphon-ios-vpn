@@ -64,8 +64,8 @@
 /* Button label that lets users create a new account. */
 "CREATE_ACCOUNT_BUTTON_TITLE" = "Crear cuenta";
 
-/*[UNTRANSLATED] Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
-"CREATE_PSICASH_ACCOUNT_BODY_2" = "We strongly encourage you to make a PsiCash account before buying PsiCash. Having an account allows you to share your balance between devices and protect your purchases.\n\nIMPORTANT: Without an account your PsiCash will not be preserved if you uninstall Psiphon.";
+/* Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
+"CREATE_PSICASH_ACCOUNT_BODY_2" = "Te animamos enfáticamente a crear una cuenta PsiCash antes de comprar PsiCash. Tener una cuenta te permite compartir tu saldo entre dispositivos y proteger tus compras.\n\nIMPORTANTE: Sin una cuenta, tu PsiCash no será preservado si desinstalas Psiphon.";
 
 /* Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will continue on to the PsiCash store. */
 "CREATE_PSICASH_ACCOUNT_CONTINUE_BUTTON" = "Continuar sin cuenta";
@@ -199,6 +199,9 @@
 /* Subtitle shown when the current operation failed, asking the user to try again at a later time. */
 "PLEASE_TRY_AGAIN_LATER" = "Por favor, inténtalo de nuevo más tarde.";
 
+/* Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
+"PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Algo salió mal, por favor intenta de nuevo más tarde.\n\nSi este problema persiste, por favor envía un comentario.";
+
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
 "PRIVACY_POLICY_DECLINED_ALERT_BODY" = "Debe aceptar nuestra Política de Privacidad antes de continuar con el uso de Psiphon.";
 
@@ -310,11 +313,11 @@
 /* Body text of a modal dialog shown when the user tries to use (spend, buy, etc.) PsiCash, if they not currently connected. 'Use' here means buy, spend, or otherwise interact with. 'Psiphon' must not be translated/transliterated. 'PsiCash' must not be translated/transliterated. */
 "PSICASH_MUST_BE_CONNECTED" = "Para poder utilizar PsiCash, debe estar conectado a la red Psiphon.";
 
-/*[UNTRANSLATED] PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
-"PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon, unless you have created a PsiCash account and are logged into your PsiCash account.";
+/* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
+"PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "IMPORTANTE: Tu PsiCash no será preservado si desinstalas Psiphon, a menos que hayas creado una cuenta PsiCash y hayas iniciado sesión en la misma.";
 
-/*[UNTRANSLATED] Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_SPEED_BOOST_PRODUCT_NOT_FOUND_MESSAGE" = "Speed Boost product not found. Your app may be out of date. Please check for updates.";
+/* Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_PRODUCT_NOT_FOUND_MESSAGE" = "Producto de Aumento de Velocidad no encontrado. Tu aplicación puede estar desactualizada. Por favor comprueba si hay actualizaciones.";
 
 /* Body of an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. The word 'PsiCash' must not be translated or transliterated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "PSICASH_SPEED_PORT_LIMITS_BODY" = "Sin Aumento de Velocidad activo, tu velocidad está limitada, y algún tráfico de Internet no está soportado. Activa Aumento de Velocidad con PsiCash para desbloquear el potencial completo de tu experiencia con Psiphon.";
@@ -322,8 +325,8 @@
 /* Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. */
 "PSICASH_SPEED_PORT_LIMITS_HEAD" = "Límites de velocidad y puertos";
 
-/*[UNTRANSLATED] A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon */
-"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY" = "Your Psiphon subscription already gives you always-on Speed Boost, so there is no reason to buy more. Your PsiCash balance will be retained should you ever decide to cancel your subscription.\n\nYou can still access your PsiCash account from the settings menu.";
+/* A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon */
+"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY" = "Tu suscripción a Psiphon ya te da Aumento de Velocidad siempre activo, de manera que no hay razón para comprar más. Tu balance de PsiCash será conservado, si alguna vez decidieras cancelar tu suscripción.\n\nAún puedes acceder a tu cuenta PsiCash desde el menú de configuraciones.";
 
 /* A title message to the premium user (a user with a subscription when they are trying to navigate to PsiCash and Speed Boost screen. Do not translate or transliterate words PsiCash or Psiphon */
 "PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_TITLE" = "¡Tu suscripción a Psiphon te da acceso premium!";
