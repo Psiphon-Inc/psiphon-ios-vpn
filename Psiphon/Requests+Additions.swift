@@ -84,7 +84,7 @@ extension HTTPClient {
                         } else {
                             responseBody = "(nil data)"
                         }
-                        feedbackLogger.immediate(.error, """
+                        feedbackLogger.immediate(.info, """
                             URLSessionDataTask Finished: UUID: \(uuid), \
                             Status: \(urlResponse.statusCode), \
                             Headers: \(urlResponse.allHeaderFields), \
