@@ -36,7 +36,7 @@ extension AppState {
             """
             ContainerInfo: {
             \"AppState\":\"\(makeFeedbackEntry(self))\",
-            \"PsiCashLib\":\"\(psiCashLib.getDiagnosticInfo())\",
+            \"PsiCashLib\":\"\(psiCashLib.getDiagnosticInfo(lite: false))\",
             \"UserDefaultsConfig\":\"\(makeFeedbackEntry(UserDefaultsConfig()))\",
             \"PsiphonDataSharedDB\": \"\(makeFeedbackEntry(sharedDB))\",
             \"OutstandingEffectCount\": \(store.outstandingEffectCount)
