@@ -41,7 +41,8 @@ fileprivate typealias WebViewLoadingState = Pending<Result<Utilities.Unit,
 /// Note regarding PsiCash Accounts website (or any other websit:
 /// Formal contract between PsiCash Accounts website and platforms that use webviews:
 /// - All links that lead to a outside websites (even those owened by Psiphon)
-///   should have the `target="_blank"` attribute.
+///   should have the `target="_blank"` attribute or use `window.open` call.
+/// - Return value of `window.open` will be nil.
 /// - Webviews are not required to have navigation back/forward buttons. The intention is for the
 ///   experience to feel as native as possible.
 ///   Users should be able to navigate to anywhere within the PsiCash Accounts website from any page.
@@ -260,6 +261,11 @@ final class WebViewController: ReactiveViewController {
         self.dismiss(animated: true, completion: nil)
     }
     
+    private func presentInNewWindow(url: URL) {
+        let safari = SFSafariViewController(url: url)
+        self.present(safari, animated: true, completion: nil)
+    }
+    
 }
 
 extension WebViewController: WKUIDelegate {
@@ -275,15 +281,14 @@ extension WebViewController: WKUIDelegate {
         windowFeatures: WKWindowFeatures
     ) -> WKWebView? {
         
-        // Opens target="_blank" links in an SFSafariViewController,
-        // presented on top of the current view controller.
+        // Handles JS window.open call by opening the link in a new SFSafariViewController
+        // presented on top of this view controller.
         
         guard let url = navigationAction.request.url else {
             return nil
         }
         
-        let safari = SFSafariViewController(url: url)
-        self.present(safari, animated: true, completion: nil)
+        presentInNewWindow(url: url)
         
         return nil
         
@@ -424,8 +429,18 @@ extension WebViewController: WKNavigationDelegate {
         // webView(_:decidePolicyFor:preferences:decisionHandler:) method,
         // the web view doesn’t call this method.
         
-        // Copy of isMainFrame value.
-        let isTargetFrameMainFrame = navigationAction.targetFrame!.isMainFrame
+        // If the target of the navigation is a new window,
+        // navigationAction.targetFrame property is nil.
+        guard let targetFrame = navigationAction.targetFrame else {
+            // Handles links with `target="_blank"` attribute by opening
+            // the URL in a new SFSafariViewController presented
+            // on top of this view controller.
+            presentInNewWindow(url: navigationAction.request.url!)
+            decisionHandler(.cancel)
+            return
+        }
+        
+        let isTargetFrameMainFrame = targetFrame.isMainFrame
         
         self.isLoadingMainFrame = .none
         
