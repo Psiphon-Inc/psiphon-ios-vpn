@@ -61,10 +61,10 @@ public struct NewExpiringPurchaseResult: Equatable {
 /// PsiCash state in the app.
 /// TODO: Once actors are introduced in the language, they're better suited for defining of side-effects.
 public protocol PsiCashEffectsProtocol {
+    
+    typealias PsiCashInitResult = Result<PsiCashLibInitSuccess, ErrorRepr>
         
-    typealias PsiCashRefreshResult =
-        Result<RefreshStateResponse,
-               ErrorEvent<PsiCashRefreshError>>
+    typealias PsiCashRefreshResult = Result<RefreshStateResponse, ErrorEvent<PsiCashRefreshError>>
     
     typealias PsiCashAccountLoginResult =
         Result<AccountLoginResponse,
@@ -79,7 +79,7 @@ public protocol PsiCashEffectsProtocol {
         fileStoreRoot: String?,
         psiCashLegacyDataStore: UserDefaults,
         tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
-    ) -> Effect<Result<PsiCashLibInitSuccess, ErrorRepr>>
+    ) -> Effect<PsiCashInitResult>
     
     func libData() -> PsiCashLibData
     

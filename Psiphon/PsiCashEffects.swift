@@ -183,9 +183,9 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
         fileStoreRoot: String?,
         psiCashLegacyDataStore: UserDefaults,
         tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
-    ) -> Effect<Result<PsiCashLibInitSuccess, ErrorRepr>> {
+    ) -> Effect<PsiCashInitResult> {
         
-        Effect { () -> Result<PsiCashLibInitSuccess, ErrorRepr> in
+        Effect { () -> PsiCashInitResult in
 
             guard let fileStoreRoot = fileStoreRoot else {
                 return .failure(ErrorRepr(repr: "nil psicash file store root"))
@@ -267,6 +267,10 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
                 },
                 test: Debugging.devServers)
             
+            // Logs lite diagnostic info
+            self.feedbackLogger.immediate(
+                .info, "PsiCash diagnostics: Init: \(self.psiCashLib.getDiagnosticInfo(lite: true))")
+            
             switch initResult {
             case .success(let requiredStateRefresh):
                 return .success(
@@ -310,6 +314,10 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
             let result = self.psiCashLib.refreshState(purchaseClasses: purchaseClasses,
                                               localOnly: localOnly)
             
+            // Logs lite diagnostic info
+            self.feedbackLogger.immediate(
+                .info, "PsiCash diagnostics: RefreshState: \(self.psiCashLib.getDiagnosticInfo(lite: true))")
+            
             fulfilled(
                 result.mapError {
                     ErrorEvent($0, date: self.getCurrentTime())
@@ -349,6 +357,10 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
             
             // Blocking call.
             let result = self.psiCashLib.newExpiringPurchase(purchasable: purchasable)
+            
+            // Logs lite diagnostic info
+            self.feedbackLogger.immediate(
+                .info, "PsiCash diagnostics: NewExpiringPurchase \(self.psiCashLib.getDiagnosticInfo(lite: true))")
             
             fulfilled(
                 NewExpiringPurchaseResult(
@@ -411,11 +423,16 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
         Effect.deferred(dispatcher: globalDispatcher) { fulfilled in
             
             // This may involve a network operation and so can be blocking.
+            let result = self.psiCashLib.accountLogout()
+            
+            // Logs lite diagnostic info
+            self.feedbackLogger.immediate(
+                .info, "PsiCash diagnostics: AccountLogout: \(self.psiCashLib.getDiagnosticInfo(lite: true))")
             
             fulfilled(
-                self.psiCashLib.accountLogout()
-                    .mapError { ErrorEvent($0, date: self.getCurrentTime()) }
+                result.mapError { ErrorEvent($0, date: self.getCurrentTime()) }
             )
+            
         }
         
     }
@@ -437,6 +454,9 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
             
             // This is a blocking call.
             let result = self.psiCashLib.accountLogin(username: username, password: password)
+            
+            self.feedbackLogger.immediate(
+                .info, "PsiCash diagnostics: AccountLogin: \(self.psiCashLib.getDiagnosticInfo(lite: true))")
             
             fulfilled(
                 result.mapError {

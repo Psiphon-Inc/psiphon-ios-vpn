@@ -311,8 +311,12 @@ typedef NS_ENUM(NSInteger, PSIUserSiteURLType) {
 /// before it's complete.
 - (PSIResult<NSString *> *)getRewardedActivityData;
 
-/// Returns a string that can be included in a feedback diagnostic data package.
-- (NSString *)getDiagnosticInfo;
+/// If `lite` is true, the diagnostic info will be smaller -- on the order of 200 bytes.
+/// If `lite` false, the diagnostic info will be larger -- on the order of 1k bytes.
+/// The smaller package is suitable for more frequent logging.
+/// Returns a JSON object suitable for serializing that can be included in a
+/// feedback diagnostic data package.
+- (NSString *)getDiagnosticInfo:(BOOL)lite;
 
 // MARK: API Server Requests
 
