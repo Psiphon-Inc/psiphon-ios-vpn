@@ -27,10 +27,10 @@ import UIKit
     }
 
     // Timer tick frequency.
-    static let TickFrequency = TimeInterval(1.0)
+    static let TickFrequency = TimeInterval(1.0)  // 1 second
 
     // UI starts showing the 'seconds' counter when expiry is less than or equal to `ShowSecondsAt`.
-    static let ShowSecondsAt = TimeInterval(5 * 60)
+    static let ShowSecondsAt = TimeInterval(60)  // 60 seconds
 
     let formatter: DateComponentsFormatter
     let activeTint = UIColor.weirdGreen()
