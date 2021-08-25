@@ -624,8 +624,8 @@ final class PsiCashLib {
     }
     
     /// Exposes PsiCash library `getDiagnosticInfo` function.
-    func getDiagnosticInfo() -> String {
-        self.client.getDiagnosticInfo()
+    func getDiagnosticInfo(lite: Bool) -> String {
+        self.client.getDiagnosticInfo(lite)
     }
     
 }
