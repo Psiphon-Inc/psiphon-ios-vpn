@@ -21,6 +21,7 @@ import Foundation
 import SwiftParsec
 import ArgumentParser
 import AppStateParser
+import CustomDump
 
 func runParser(input: String) -> Either<ParseError, AppStateValue> {
     let result = AppStateValue.parser.runSafe(userState: (), sourceName: "", input: input)
@@ -178,10 +179,10 @@ struct CLI: ParsableCommand {
             if printParseTree {
 
                 var dumpedValue: String = ""
-                dump(value, to: &dumpedValue)
+                customDump(value, to: &dumpedValue)
 
                 dumpedValue = dumpedValue
-                    .replacingOccurrences(of: "AppStateParser.AppStateValue", with: "")
+                    .replacingOccurrences(of: "AppStateValue", with: "")
 
                 print("\n🛂", dumpedValue, "\n")
 
