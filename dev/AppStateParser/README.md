@@ -25,9 +25,10 @@ OPTIONS:
 ## Example usage
 
 ```
-swift run parser -nohl "A(values: [\"a\", \"b\", \"c\"])"
+$ swift run parser -nohl "A(values: [\"a\", \"b\", \"c\"])"
 
-swift run parser "A(pendingPsiCashRefresh: Pending<Result<Unit, Error>>.completed)"
+$ swift run parser "{\"AppState\": \"AppState(num: 2, string: \\\"stringValue\\\")\"}"
+
 ```
 
 # Some notes

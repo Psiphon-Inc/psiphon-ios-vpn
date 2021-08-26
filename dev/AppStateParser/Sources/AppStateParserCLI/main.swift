@@ -18,8 +18,99 @@
  */
 
 import Foundation
+import SwiftParsec
 import ArgumentParser
 import AppStateParser
+
+func runParser(input: String) -> Either<ParseError, AppStateValue> {
+    let result = AppStateValue.parser.runSafe(userState: (), sourceName: "", input: input)
+    
+    guard case .right(let parseTree) = result else {
+        return result
+    }
+    
+    return .right(recursiveApply(parseTree: parseTree))
+    
+}
+
+func recursiveApply(parseTree: AppStateValue) -> AppStateValue {
+    
+    switch parseTree {
+        
+    case .tuple(let array):
+        return .tuple(array.map { recursiveApply(parseTree: $0) })
+        
+    case .array(let array):
+        return .array(array.map { recursiveApply(parseTree: $0) })
+        
+    case .dictionary(let uniqueKeysWithValues):
+        return .dictionary(
+            uniqueKeysWithValues.map { key, value in
+                (recursiveApply(parseTree: key), recursiveApply(parseTree: value))
+            }
+        )
+        
+    case .object(let uniqueKeysWithValues):
+        return .object(
+            uniqueKeysWithValues.map { key, value in (key, recursiveApply(parseTree: value)) }
+        )
+        
+    case .jsonObject(let uniqueKeysWithValues):
+        return .jsonObject(
+            uniqueKeysWithValues.map { key, value in (key, recursiveApply(parseTree: value)) }
+        )
+        
+    case .type(let typeName, let fields):
+        return .type(typeName, recursiveApply(parseTree: fields))
+        
+    case .date(let date):
+        return .date(date)
+        
+    case .number(let number):
+        return .number(number)
+        
+    case .string(let string):
+        
+        // Tries to unquote and parse the string if possible.
+        
+        guard string.contains("\"") else {
+            return .string(string)
+        }
+                
+        let unquoted = string.replacingOccurrences(of: "\\\"", with: "\"")
+        
+        switch AppStateValue.parser.runSafe(userState: (), sourceName: "", input: unquoted) {
+            
+        case .left(_):
+            // Failed to further parse unquoted string
+            return .string(string)
+            
+        case .right(let parsed):
+            
+            switch parsed {
+                
+            case .string(let string), .enumValue(let string):
+                // Did not make progress. String was returned as string.
+                // If a string turned into an enum, then it was probably a string,
+                // and didn't need further parsing.
+                return .string(string)
+                
+            default:
+                // Was able to parse further. Let's keep going.
+                return recursiveApply(parseTree: parsed)
+                
+            }
+            
+        }
+        
+    case .enumValue(let enumValue):
+        return .enumValue(enumValue)
+        
+    case .custom(let customValue):
+        return .custom(customValue)
+    }
+    
+}
 
 struct CLI: ParsableCommand {
 
@@ -65,12 +156,13 @@ struct CLI: ParsableCommand {
         }
 
         input = input.trimmingCharacters(in: .whitespacesAndNewlines)
-
+        input = input.replacingOccurrences(of: "\\n", with: "")
+        
         if unquote {
             input = input.replacingOccurrences(of: "\\\"", with: "\"")
         }
-
-        let result = AppStateValue.parser.runSafe(userState: (), sourceName: "", input: input)
+        
+        let result = runParser(input: input)
 
         switch  result {
 
