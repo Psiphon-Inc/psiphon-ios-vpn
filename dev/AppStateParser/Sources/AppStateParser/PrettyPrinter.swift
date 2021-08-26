@@ -32,8 +32,23 @@ public struct PrettyPrinter {
     let numberColor = Color.extended(123)  // cyan
     let stringColor = Color.extended(191)  // yellow
     let valueColor = Color.extended(196)   // red
+    
+    let formatDate: (Date) -> String
 
-    public init() {}
+    public init(timeZone: String?) {
+        if let timeZone = timeZone {
+            if #available(macOS 10.12, *) {
+                let dateFormatter = ISO8601DateFormatter()
+                dateFormatter.formatOptions = [.withInternetDateTime]
+                dateFormatter.timeZone = TimeZone(identifier: timeZone)
+                formatDate = { dateFormatter.string(from: $0) }
+            } else {
+                formatDate = { $0.description }
+            }
+        } else {
+            formatDate = { $0.description }
+        }
+    }
 
     private func spaces(indent: Int) -> String {
 
@@ -61,8 +76,7 @@ public struct PrettyPrinter {
             return [[ "\(text, color: numberColor, apply: highlight)" ]]
 
         case .date(let date):
-
-            return [[ "\(date.description, color: valueColor, apply: highlight)" ]]
+            return [[ "\(self.formatDate(date), color: valueColor, apply: highlight)" ]]
 
         case let .type(typeName, typeValue):
 
