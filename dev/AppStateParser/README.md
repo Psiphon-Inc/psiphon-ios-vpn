@@ -2,20 +2,17 @@
 
 AppStateParser package performs basic parsing of the output of AppState value dump in the feedbacks for the purpose of pretty-printing.
 
-If the input is copied from a feedback, it might have to be unquoted by passing `-u` or `--unquote` flag.
-
 You can disable syntax highlighting by passing `-nohl` flag.
 
 ```
 $ swift run parser --help
-USAGE: cli [-nohl] [--unquote] [--print-parse-tree] [-timezone <timezone>] [-file <file>] [<string>]
+USAGE: cli [-nohl] [--print-parse-tree] [-timezone <timezone>] [-file <file>] [<string>]
 
 ARGUMENTS:
   <string>                AppState string to parse. 
 
 OPTIONS:
   -nohl                   Disable syntax highlighting. 
-  -u, --unquote           Unquotes the input. 
   --print-parse-tree      Prints parse tree. 
   -t, -timezone <timezone>
                           Formats dates in the given time zone (e.g. "America/Toronto") 

@@ -23,7 +23,7 @@ import SwiftParsec
 let lexer = GenericTokenParser(languageDefinition: LanguageDefinition<()>.swift)
 
 // Java style is used since it is more permissive, without having to write our own string literal parser.
-let stringLiteralLexemeParser = GenericTokenParser(languageDefinition: LanguageDefinition<()>.javaStyle).stringLiteral
+let stringLiteralLexemeParser = GenericTokenParser(languageDefinition: LanguageDefinition<()>.json).stringLiteral
 
 let stringParser = GenericParser<String, (), String>.string
 
@@ -115,12 +115,12 @@ public let dateParser: GenericParser<String, (), Date> = lexer.integer >>- { yea
 
 public enum AppStateValue {
 
+    indirect case type(String, AppStateValue)
     case tuple([AppStateValue])
     case array([AppStateValue])
     case dictionary([(AppStateValue, AppStateValue)])
     case object([(String?, AppStateValue)])
     case jsonObject([(String, AppStateValue)])
-    indirect case type(String, AppStateValue)
     case date(Date)
     case number(String)
     case string(String)
@@ -134,19 +134,8 @@ public enum AppStateValue {
             
             // Parses values like `123 bytes`.
             let bytesParser: GenericParser<String, (), AppStateValue> =
-            lexer.number >>- { number in
-                
-                let numBytes: Int
-                
-                switch number {
-                case .left(let int):
-                    numBytes = int
-                case .right(_): /* Double value */
-                    return GenericParser.fail("Expected integer number of bytes")
-                }
-                
-                return lexer.whiteSpace *> lexer.symbol("bytes").map { _ in .custom("\(numBytes) bytes") }
-                
+            lexer.natural >>- { numBytes in
+                lexer.whiteSpace *> lexer.symbol("bytes").map { _ in .custom("\(numBytes) bytes") }
             }
             
             let appStateDateParser: GenericParser<String, (), AppStateValue> =
@@ -171,16 +160,6 @@ public enum AppStateValue {
             stringLiteralLexemeParser.map {
                 AppStateValue.string("\($0)")
             }
-            
-            let stringWrappedValue: GenericParser<String, (), AppStateValue> =
-            lexer.symbol("\"") *> rec.map { parsed in
-                // If the parsed value in quotations is an enum, then it was probably a string.
-                if case .enumValue(let enumValue) = parsed {
-                    return .string(enumValue)
-                } else {
-                    return parsed
-                }
-            } <* lexer.symbol("\"")
             
             // An enum value parses the same as a type with addition of true/false/nil
             // reserved keywords that are enums.
@@ -264,24 +243,21 @@ public enum AppStateValue {
 
                 }
 
-            return
-                appStateDateParser.attempt
-                <|>
-                bytesParser.attempt
-                <|>
-                numberLiteral.attempt
+            return jsonObjLiteral.attempt
                 <|>
                 dictionaryLiteral.attempt
                 <|>
                 arrayLiteral.attempt
                 <|>
-                jsonObjLiteral.attempt
-                <|>
                 tupleLiteral.attempt
                 <|>
                 nominalType.attempt
                 <|>
-                stringWrappedValue.attempt
+                appStateDateParser.attempt
+                <|>
+                bytesParser.attempt
+                <|>
+                numberLiteral.attempt
                 <|>
                 stringLiteral.attempt
                 <|>
