@@ -19,9 +19,11 @@
 
 import Foundation
 import SwiftParsec
-import Chalk
 
 let lexer = GenericTokenParser(languageDefinition: LanguageDefinition<()>.swift)
+
+// Java style is used since it is more permissive, without having to write our own string literal parser.
+let stringLiteralLexemeParser = GenericTokenParser(languageDefinition: LanguageDefinition<()>.javaStyle).stringLiteral
 
 let stringParser = GenericParser<String, (), String>.string
 
@@ -117,23 +119,36 @@ public enum AppStateValue {
     case array([AppStateValue])
     case dictionary([(AppStateValue, AppStateValue)])
     case object([(String?, AppStateValue)])
+    case jsonObject([(String, AppStateValue)])
     indirect case type(String, AppStateValue)
     case date(Date)
     case number(String)
     case string(String)
     case enumValue(String)
-    case unparsed(String)
+    case custom(String)
 
     public static let parser: GenericParser<String, (), AppStateValue> = {
 
-        var appStateParser: GenericParser<String, (), AppStateValue>!
-
-        _ = GenericParser.recursive { (rec: GenericParser<String, (), AppStateValue>) in
+        let appStateParser: GenericParser<String, (), AppStateValue> =
+        GenericParser.recursive { (rec: GenericParser<String, (), AppStateValue>) in
             
-//            let unparsed: GenericParser<String, (), AppStateValue> = noneOf(",()[]").many1.stringValue.map {
-//                AppStateValue.unparsed($0)
-//            }
-
+            // Parses values like `123 bytes`.
+            let bytesParser: GenericParser<String, (), AppStateValue> =
+            lexer.number >>- { number in
+                
+                let numBytes: Int
+                
+                switch number {
+                case .left(let int):
+                    numBytes = int
+                case .right(_): /* Double value */
+                    return GenericParser.fail("Expected integer number of bytes")
+                }
+                
+                return lexer.whiteSpace *> lexer.symbol("bytes").map { _ in .custom("\(numBytes) bytes") }
+                
+            }
+            
             let appStateDateParser: GenericParser<String, (), AppStateValue> =
                 dateParser.map { AppStateValue.date($0) }
 
@@ -152,10 +167,21 @@ public enum AppStateValue {
 
             }
 
-            let stringLiteral: GenericParser<String, (), AppStateValue> = lexer.stringLiteral.map {
-                AppStateValue.string("\"\($0)\"")
+            let stringLiteral: GenericParser<String, (), AppStateValue> =
+            stringLiteralLexemeParser.map {
+                AppStateValue.string("\($0)")
             }
-
+            
+            let stringWrappedValue: GenericParser<String, (), AppStateValue> =
+            lexer.symbol("\"") *> rec.map { parsed in
+                // If the parsed value in quotations is an enum, then it was probably a string.
+                if case .enumValue(let enumValue) = parsed {
+                    return .string(enumValue)
+                } else {
+                    return parsed
+                }
+            } <* lexer.symbol("\"")
+            
             // An enum value parses the same as a type with addition of true/false/nil
             // reserved keywords that are enums.
             let enumValue: GenericParser<String, (), AppStateValue> =
@@ -191,12 +217,23 @@ public enum AppStateValue {
             let emtpyDictionary: GenericParser<String, (), [(AppStateValue, AppStateValue)]> =
                 symbol("[") *> symbol(":") *> symbol("]") *> GenericParser(result: [])
 
-
             let dictionary: GenericParser<String, (), [(AppStateValue, AppStateValue)]> =
                 (dictionary1.attempt <|> emtpyDictionary)
 
             let dictionaryLiteral = dictionary.map {
                 AppStateValue.dictionary($0)
+            }
+            
+            let jsonField: GenericParser<String, (), (String, AppStateValue)> =
+            lexer.stringLiteral >>- { name in
+                    symbol(":") *> rec.map { value in (name, value) }
+                }
+            
+            let jsonObj1: GenericParser<String, (), [(String, AppStateValue)]> =
+                lexer.braces(lexer.commaSeparated1(jsonField))
+
+            let jsonObjLiteral = jsonObj1.map {
+                AppStateValue.jsonObject($0)
             }
 
             let fieldWithValue: GenericParser<String, (), (String, AppStateValue)> =
@@ -227,27 +264,28 @@ public enum AppStateValue {
 
                 }
 
-            appStateParser = nominalType
-
             return
                 appStateDateParser.attempt
                 <|>
-                numberLiteral.attempt
+                bytesParser.attempt
                 <|>
-                stringLiteral.attempt
+                numberLiteral.attempt
                 <|>
                 dictionaryLiteral.attempt
                 <|>
                 arrayLiteral.attempt
                 <|>
+                jsonObjLiteral.attempt
+                <|>
                 tupleLiteral.attempt
                 <|>
                 nominalType.attempt
                 <|>
+                stringWrappedValue.attempt
+                <|>
+                stringLiteral.attempt
+                <|>
                 enumValue
-            //        enumValue.attempt
-            //        <|>
-            //        unparsed
 
         }
 
@@ -298,145 +336,6 @@ extension Array where Element == Array<String> {
         } else {
 
             return self
-
-        }
-
-    }
-
-}
-
-public struct PrettyPrinter {
-
-    let indetation: String = " "
-    let tabWidth: Int = 2
-    let oneLineCharLimit: Int = 80
-
-    let color = Color.white
-    let typeColor = Color.extended(36)
-    let valueColor = Color.extended(191)
-
-    public init() {}
-
-    private func spaces(indent: Int) -> String {
-
-        String(repeating: " ", count: indent * tabWidth)
-
-    }
-
-    // Not perfect, but it works.
-    public func prettyPrint(_ value: AppStateValue, _ level: Int = 0, highlight: Bool) -> [[String]] {
-
-        switch value {
-
-        case .unparsed(let text), .enumValue(let text), .string(let text), .number(let text):
-
-            return [[ "\(text, color: valueColor, apply: highlight)" ]]
-
-        case .date(let date):
-
-            return [[ "\(date.description, color: valueColor, apply: highlight)" ]]
-
-        case let .type(typeName, typeValue):
-
-            let fields = prettyPrint(typeValue, level + 1, highlight: highlight)
-
-            if fields.count == 0 {
-
-                return [[typeName]]
-
-            } else {
-
-                let oneLineCharCount = fields.map { $0.map { $0.count }.reduce(0, +) }.reduce(0, +)
-
-                if oneLineCharCount < oneLineCharLimit {
-
-                    let oneLiner = fields.flatten().joined()
-                    return [[ "\(typeName, color: typeColor, apply: highlight)(\(oneLiner))" ]]
-
-                } else {
-
-                    return [[ "\(typeName, color: typeColor, apply: highlight)(" ] + fields.indent(spaces(indent: 1)).flatten() + [ ")" ]]
-
-                }
-            }
-
-        case let .tuple(tuple):
-
-            if tuple.isEmpty {
-
-                return [[ "()" ]]
-
-            } else {
-
-                let fields = tuple.flatMap {
-                    prettyPrint($0, level + 1, highlight: highlight)
-                        .indent(spaces(indent: level + 1))
-                }
-
-                return [[ "(" ] + fields.flatten() + [ ")" ]]
-
-            }
-
-        case .array(let array):
-
-            if array.isEmpty {
-
-                return [[ "\("[]", color: valueColor, apply: highlight)" ]]
-
-            } else {
-
-                return [[ "[" ] +
-                            array.map {
-                                prettyPrint($0, level + 1, highlight: highlight).flatten()
-                            }.indent(spaces(indent: 1)).commaSeparated().flatten() +
-                            [ "]" ]]
-
-            }
-
-        case .object(let fields):
-            let objectFields = fields.flatMap { (maybeName, value) -> [[String]] in
-
-                var prettyPrintedValue = prettyPrint(value, level, highlight: highlight)
-
-                if let name = maybeName {
-                    if let first = prettyPrintedValue.first {
-                        prettyPrintedValue.removeFirst()
-                        let rest = prettyPrintedValue.flatten()
-                        return [ ["\(name): \(first.first!)"] + Array(first.dropFirst()) + rest ]
-                    } else {
-                        return [["()"]]
-                    }
-                } else {
-                    return prettyPrintedValue
-                }
-
-            }
-
-            return objectFields.commaSeparated()
-
-        case .dictionary(let dict):
-
-            if dict.isEmpty {
-
-                return [[ "\("[:]", color: valueColor, apply: highlight)" ]]
-
-            } else {
-
-                let fields =  dict.flatMap { (name, value) -> [[String]]  in
-
-                    let prettyPrintedName = prettyPrint(name, level + 1, highlight: highlight).flatten().joined()
-                    let prettyPrintedValue = prettyPrint(value, level + 1, highlight: highlight)
-
-                    let first = prettyPrintedValue.flatten().map {$0.trimmingCharacters(in: .whitespaces)}.joined()
-                    let rest = Array(prettyPrintedValue.dropFirst())
-
-                    return [[ "\(prettyPrintedName): \(first)" ] + rest.flatten() ]
-
-                }.commaSeparated()
-
-                return [ [ "[" ] + fields.indent(spaces(indent: 1)).flatten() + [ "]" ] ]
-
-            }
 
         }
 

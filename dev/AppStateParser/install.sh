@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -xe
+set -xev
 
 # Build the project under .build/release/
 swift build -c release

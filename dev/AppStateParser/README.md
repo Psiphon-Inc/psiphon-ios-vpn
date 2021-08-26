@@ -1,6 +1,6 @@
 # AppStateParser
 
-AppStateParser package performs basic parsing of the output of `String(describing:)` for the purpose of pretty-printing.
+AppStateParser package performs basic parsing of the output of AppState value dump in the feedbacks for the purpose of pretty-printing.
 
 If the input is copied from a feedback, it might have to be unquoted by passing `-u` or `--unquote` flag.
 
@@ -8,7 +8,7 @@ You can disable syntax highlighting by passing `-nohl` flag.
 
 ```
 $ swift run parser --help
-USAGE: cli [-nohl] [--unquote] [--print-parse-tree] [-file <file>] [<string>]
+USAGE: cli [-nohl] [--unquote] [--print-parse-tree] [-timezone <timezone>] [-file <file>] [<string>]
 
 ARGUMENTS:
   <string>                AppState string to parse. 
@@ -17,6 +17,8 @@ OPTIONS:
   -nohl                   Disable syntax highlighting. 
   -u, --unquote           Unquotes the input. 
   --print-parse-tree      Prints parse tree. 
+  -t, -timezone <timezone>
+                          Formats dates in the given time zone (e.g. "America/Toronto") 
   -f, -file <file>        Input file path. 
   -h, --help              Show help information.
 ```
@@ -25,14 +27,15 @@ OPTIONS:
 ## Example usage
 
 ```
-swift run parser -nohl "A(values: [\"a\", \"b\", \"c\"])"
+$ swift run parser -nohl "A(values: [\"a\", \"b\", \"c\"])"
 
-swift run parser "A(pendingPsiCashRefresh: Pending<Result<Unit, Error>>.completed)"
+$ swift run parser "{\"AppState\": \"AppState(num: 2, string: \\\"stringValue\\\")\"}"
+
 ```
 
 # Some notes
 
-- Check value of `String(describing:)` when changes are made to the values that are included in the feedbacks, like [AppState](https://github.com/Psiphon-Inc/psiphon-ios-vpn/blob/master/Psiphon/AppState.swift).
+- Check value of AppState that is logged into feedback when changes are made to the struct.
 
 - Prefer to wrap description of Objective-C types in double quotes. Trying to parse description of many Objective-C types adds complexity to the parser.
 
