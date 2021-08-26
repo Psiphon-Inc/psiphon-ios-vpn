@@ -30,18 +30,18 @@ extension AppState {
         store: Store<Value, Action>,
         psiCashLib: PsiCashLib
     ) -> DiagnosticEntry {
-        
 
         let msg =
             """
-            ContainerInfo: {
-            \"AppState\":\"\(makeFeedbackEntry(self))\",
-            \"PsiCashLib\":\"\(psiCashLib.getDiagnosticInfo(lite: false))\",
-            \"UserDefaultsConfig\":\"\(makeFeedbackEntry(UserDefaultsConfig()))\",
-            \"PsiphonDataSharedDB\": \"\(makeFeedbackEntry(sharedDB))\",
-            \"OutstandingEffectCount\": \(store.outstandingEffectCount)
+            ContainerInfo: {\
+            \"AppState\":\"\(makeFeedbackEntry(self))\",\
+            \"PsiCashLib\":\"\(psiCashLib.getDiagnosticInfo(lite: false))\",\
+            \"UserDefaultsConfig\":\"\(makeFeedbackEntry(UserDefaultsConfig()))\",\
+            \"PsiphonDataSharedDB\": \"\(makeFeedbackEntry(sharedDB))\",\
+            \"OutstandingEffectCount\": \(store.outstandingEffectCount)\
             }
             """
+        
         return DiagnosticEntry(msg, andTimestamp: .some(Date()))
         
     }
