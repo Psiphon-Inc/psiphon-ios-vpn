@@ -123,6 +123,10 @@ struct CLI: ParsableCommand {
 
     @Flag(help: "Prints parse tree.")
     var printParseTree: Bool = false
+    
+    @Option(name: [.short, .customLong("timezone", withSingleDash: true)],
+            help: "Formats dates in the given time zone (e.g. \"America/Toronto\")")
+    var timeZone: String?
 
     @Option(name: [.short, .customLong("file", withSingleDash: true)],
             help: "Input file path.")
@@ -133,7 +137,7 @@ struct CLI: ParsableCommand {
 
     mutating func run() throws {
 
-        let prettyPrinter = PrettyPrinter()
+        let prettyPrinter = PrettyPrinter(timeZone: timeZone)
 
         var input: String
 
