@@ -21,6 +21,16 @@ import Foundation
 import PsiApi
 import ReactiveSwift
 
+struct AppStateFeedbackEntryJSON: Encodable {
+    
+    let AppState: String
+    let PsiCashLib: String
+    let UserDefaultsConfig: String
+    let PsiphonDataSharedDB: String
+    let OutstandingEffectCount: Int
+    
+}
+
 extension AppState {
 
     /// `feedbackEntry` returns a diagnostic entry which captures the current app state for logging.
@@ -30,19 +40,25 @@ extension AppState {
         store: Store<Value, Action>,
         psiCashLib: PsiCashLib
     ) -> DiagnosticEntry {
-
-        let msg =
-            """
-            ContainerInfo: {\
-            \"AppState\":\"\(makeFeedbackEntry(self))\",\
-            \"PsiCashLib\":\"\(psiCashLib.getDiagnosticInfo(lite: false))\",\
-            \"UserDefaultsConfig\":\"\(makeFeedbackEntry(UserDefaultsConfig()))\",\
-            \"PsiphonDataSharedDB\": \"\(makeFeedbackEntry(sharedDB))\",\
-            \"OutstandingEffectCount\": \(store.outstandingEffectCount)\
-            }
-            """
         
-        return DiagnosticEntry(msg, andTimestamp: .some(Date()))
+        let jsonObj = AppStateFeedbackEntryJSON(
+            AppState: makeFeedbackEntry(self),
+            PsiCashLib: psiCashLib.getDiagnosticInfo(lite: false),
+            UserDefaultsConfig: makeFeedbackEntry(UserDefaultsConfig()),
+            PsiphonDataSharedDB: makeFeedbackEntry(sharedDB),
+            OutstandingEffectCount: store.outstandingEffectCount
+        )
+        
+        do {
+            let jsonData = try JSONEncoder().encode(jsonObj)
+            if let jsonString = String(data: jsonData, encoding: .utf8) {
+                return DiagnosticEntry("ContainerInfo: \(jsonString)", andTimestamp: Date())
+            } else {
+                return DiagnosticEntry("Failed to decode data with UTF-8")
+            }
+        } catch {
+            return DiagnosticEntry("Failed to encode: \(error)", andTimestamp: Date())
+        }
         
     }
 
