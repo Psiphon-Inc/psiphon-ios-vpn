@@ -37,14 +37,10 @@ public struct PrettyPrinter {
 
     public init(timeZone: String?) {
         if let timeZone = timeZone {
-            if #available(macOS 10.12, *) {
-                let dateFormatter = ISO8601DateFormatter()
-                dateFormatter.formatOptions = [.withInternetDateTime]
-                dateFormatter.timeZone = TimeZone(identifier: timeZone)
-                formatDate = { dateFormatter.string(from: $0) }
-            } else {
-                formatDate = { $0.description }
-            }
+            let dateFormatter = ISO8601DateFormatter()
+            dateFormatter.formatOptions = [.withInternetDateTime]
+            dateFormatter.timeZone = TimeZone(identifier: timeZone)
+            formatDate = { dateFormatter.string(from: $0) }
         } else {
             formatDate = { $0.description }
         }
