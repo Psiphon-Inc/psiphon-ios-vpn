@@ -52,6 +52,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) RACReplaySubject<ObjcSettingsViewModel *> *settingsViewModel;
 
+@property (nonatomic, readonly) RACReplaySubject<Region *> *selectedServerRegion;
+
 + (AppObservables *)shared;
 
 // Should be called when app is launched for the first time.

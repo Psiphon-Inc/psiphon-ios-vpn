@@ -19,7 +19,6 @@
 
 #import "RegionSelectionButton.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
-#import "RegionAdapter.h"
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
 #import "UIImage+CountryFlag.h"
@@ -56,10 +55,9 @@
 
         rightArrow = [[UIImageView alloc] init];
 
-
-        [self update];
         [self addViews];
         [self setupAutoLayoutConstraints];
+        
     }
 
     return self;
@@ -98,8 +96,7 @@
     }
 }
 
-- (void)update {
-    Region *selectedRegion = [[RegionAdapter sharedInstance] getSelectedRegion];
+- (void)bind:(Region *)selectedRegion {
     flagImageView.image = [ImageUtils regionFlagForResourceId:selectedRegion.flagResourceId];
 
     NSString *regionText = [[RegionAdapter sharedInstance] getLocalizedRegionTitle:selectedRegion.code];

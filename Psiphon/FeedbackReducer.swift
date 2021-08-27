@@ -23,8 +23,16 @@ import Promises
 import AppStoreIAP
 import PsiApi
 
-enum FeedbackAction {
+/// Represents data associated with user action to submit a feedback.
+struct SubmitFeedbackData: Equatable {
+    let selectedThumbIndex: Int
+    let comments: String
+    let email: String
+    let uploadDiagnostics: Bool
+}
 
+enum FeedbackAction {
+    
     /// Informational message for logging.
     case _log(String)
 
@@ -39,10 +47,7 @@ enum FeedbackAction {
     case _feedbackUploadProviderCompleted(Error?)
 
     /// The user submitted an in-app feedback.
-    case userSubmittedFeedback(selectedThumbIndex: Int,
-                               comments: String,
-                               email: String,
-                               uploadDiagnostics: Bool)
+    case userSubmittedFeedback(SubmitFeedbackData)
 }
 
 struct FeedbackReducerState: Equatable {
@@ -153,7 +158,7 @@ let feedbackReducer = Reducer<FeedbackReducerState,
         }
         return []
         
-    case let .userSubmittedFeedback(selectedThumbIndex, comments, email, uploadDiagnostics):
+    case .userSubmittedFeedback(let submitFeedbackData):
         // Generate feedback ID once per user feedback.
         // Using the same feedback ID for each upload attempt makes it easier to identify when a
         // feedback has been uploaded more than once, e.g. the upload succeeds but the connection
@@ -168,9 +173,14 @@ let feedbackReducer = Reducer<FeedbackReducerState,
         let currentTime = environment.getCurrentTime()
         
         state.queuedFeedbacks.append(
-            UserFeedback(selectedThumbIndex: selectedThumbIndex, comments: comments, email: email,
-                         uploadDiagnostics: uploadDiagnostics, feedbackId: randomFeedbackId,
-                         submitTime: currentTime)
+            UserFeedback(
+                selectedThumbIndex: submitFeedbackData.selectedThumbIndex,
+                comments: submitFeedbackData.comments,
+                email: submitFeedbackData.email,
+                uploadDiagnostics: submitFeedbackData.uploadDiagnostics,
+                feedbackId: randomFeedbackId,
+                submitTime: currentTime
+            )
         )
         
         var effects = [Effect<FeedbackAction>]()

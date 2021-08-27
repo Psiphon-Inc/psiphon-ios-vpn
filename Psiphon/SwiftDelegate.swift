@@ -85,6 +85,7 @@ struct AppDelegateEnvironment {
     let paymentQueue: PaymentQueue
     let mainViewStore: (MainViewAction) -> Effect<Never>
     let appReceiptStore: (ReceiptStateAction) -> Effect<Never>
+    let serverRegionStore: (ServerRegionAction) -> Effect<Never>
     let paymentTransactionDelegate: PaymentTransactionDelegate
     let mainDispatcher: MainDispatcher
     let getCurrentTime: () -> Date
@@ -118,7 +119,10 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
         
         case .didBecomeActive:
             return [
-                Effect(value: .checkForDisallowedTrafficAlertNotification)
+                Effect(value: .checkForDisallowedTrafficAlertNotification),
+                
+                // Available regions may have changed in the background.
+                environment.serverRegionStore(.updateAvailableRegions).mapNever()
             ]
             
         default:
@@ -386,10 +390,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                                         appInfo: AppInfoObjC(),
                                         feedbackLogger: self.feedbackLogger)
         
-        if appUpgrade.firstRunOfVersion == true {
-            self.objcBridge.updateAvailableEgressRegionsOnFirstRunOfAppVersion()
-        }
-        
         UNUserNotificationCenter.current().delegate = self
         
         return true
@@ -399,6 +399,10 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         _ application: UIApplication
     ) {
         self.feedbackLogger.immediate(.info, "applicationDidFinishLaunching")
+        
+        // Ensures settings values are copied, even if the PsiphonSettingsViewController
+        // did not call for changed settings to be copied (e.g. app was closed with settings opens).
+        CopySettingsToPsiphonDataSharedDB.sharedInstance.copyAllSettings()
         
         // Logs any filesystem errors stored.
         if let error = appSupportFileStore.filesystemError {
@@ -445,6 +449,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     sharedDB: self.sharedDB,
                     sharedAuthCoreData: SharedCoreData_Impl(),
                     psiCashLib: self.psiCashLib,
+                    regionAdapter: RegionAdapter.sharedInstance(),
+                    embeddedServerEntriesFile: PsiphonConfigReader.embeddedServerEntriesPath,
                     psiCashFileStoreRoot: self.appSupportFileStore.psiCashFileStoreRootPath,
                     supportedAppStoreProducts: self.supportedProducts,
                     userDefaultsConfig: self.userDefaultsConfig,
@@ -457,6 +463,13 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     mainDispatcher: mainDispatcher,
                     globalDispatcher: globalDispatcher,
                     getTopActiveViewController: self.getTopActiveViewController,
+                    reloadMainScreen: {
+                        Effect.deferred { fulfill in
+                            AppDelegate.shared().reloadMainViewController(
+                                animated: false,
+                                completion: { fulfill(.unit) })
+                        }
+                    },
                     clearWebViewDataStore: {
                         WKWebView.clearWebviewDataStore()
                     }
@@ -468,7 +481,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.store.send(.appDelegateAction(.appLifecycleEvent(.didFinishLaunching)))
         self.store.send(vpnAction: .appLaunched)
         self.store.send(.psiCash(.initialize))
-
+        
+        if appUpgrade.firstRunOfVersion == true {
+            self.store.send(.serverRegionAction(.updateAvailableRegions))
+        }
+        
         // Registers accepted deep linking URLs.
         deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.legacyBuyPsiCashDeepLink,
                                              PsiphonDeepLinking.buyPsiCashDeepLink ]) { [unowned self] in
@@ -478,6 +495,14 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.legacySpeedBoostDeepLink,
                                               PsiphonDeepLinking.speedBoostDeepLink ]) { [unowned self] in
             self.store.send(.mainViewAction(.presentPsiCashScreen(initialTab: .speedBoost)))
+            return true
+        }
+        deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.settingsDeepLink ]) { [unowned self] in
+            self.store.send(.mainViewAction(.presentSettingsScreen))
+            return true
+        }
+        deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.feedbackDeepLink ]) { [unowned self] in
+            self.store.send(.mainViewAction(.presentSettingsScreen))
             return true
         }
         
@@ -541,6 +566,16 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 ObjcSubscriptionBarViewState(swiftState: newValue)
             )
         }
+        
+        // Forwards server region change.
+        self.lifetime += self.store.$value.signalProducer.map(\.serverRegionState.selectedRegion)
+            .skipRepeats()
+            .startWithValues { [unowned objcBridge] region in
+                guard let region = region else {
+                    return
+                }
+                objcBridge!.onSelectedServerRegionUpdate(region)
+            }
         
         // Forwards VPN status changes to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
@@ -981,6 +1016,10 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.store.send(.mainViewAction(.presentPsiCashAccountManagement))
     }
     
+    @objc func presentSettingsViewController() {
+        self.store.send(.mainViewAction(.presentSettingsScreen))
+    }
+    
     @objc func loadingScreenDismissSignal(_ completionHandler: @escaping () -> Void) {
                 
         self.store.$value.signalProducer
@@ -1159,6 +1198,10 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         return self.supportedProducts.supported[.subscription]!.rawValues
     }
     
+    @objc func userSelectedRegion(_ region: Region) {
+        store.send(.serverRegionAction(.userSelectedRegion(region: region)))
+    }
+    
     @objc func switchVPNStartStopIntent()
     -> Promise<SwitchedVPNStartStopIntent>.ObjCPromise<SwitchedVPNStartStopIntent>
     {
@@ -1249,18 +1292,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         return self.userDefaultsConfig.localeForAppLanguage as NSLocale
     }
 
-    @objc func userSubmittedFeedback(selectedThumbIndex: Int,
-                                     comments: String,
-                                     email: String,
-                                     uploadDiagnostics: Bool) {
-        self.store.send(
-            .feedbackAction(
-                .userSubmittedFeedback(selectedThumbIndex: selectedThumbIndex,
-                                       comments: comments,
-                                       email: email,
-                                       uploadDiagnostics: uploadDiagnostics)))
-    }
-
     @objc func versionLabelText() -> String {
 
         let shortVersionString: String = Bundle.main.object(
@@ -1314,8 +1345,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 reason: .providerNotificationPsiphonTunnelConnected))
             
         case .availableEgressRegions:
-            let regions = self.sharedDB.emittedEgressRegions()
-            RegionAdapter.sharedInstance().onAvailableEgressRegions(regions)
+            store.send(.serverRegionAction(.updateAvailableRegions))
             
         case .networkConnectivityFailed, .networkConnectivityResolved:
             break
@@ -1343,5 +1373,51 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.appSupportFileStore.psiCashFileStoreRootPath
     }
 #endif
+    
+}
+
+/// Specialized singleton to copy data persisted by `PsiphonSettingsViewController`
+/// to `PsiphonDataSharedDB`.
+final class CopySettingsToPsiphonDataSharedDB {
+    
+    // The PsiphonVPN process (i.e. the network extension), reads user defaults
+    // values from PsiphonDataSharedDB. For any setting that is updated
+    // through the PsiphonSettingsViewController, the values need to be copied
+    // to PsiphonDataSharedDB or PsiphonConfigUserDefaults.
+    
+    @objc static let sharedInstance = CopySettingsToPsiphonDataSharedDB()
+    
+    private let userDefaults: UserDefaults
+    private let sharedDefaults: UserDefaults
+    
+    private override init(){
+        userDefaults = UserDefaults.standard
+        sharedDefaults = UserDefaults(suiteName: PsiphonAppGroupIdentifier)!
+    }
+    
+    func copyAllSettings() {
+        copyDisableTimeouts()
+        copySelectedRegion()
+        copyUpstreamProxySettings()
+    }
+    
+    func copyDisableTimeouts() {
+        sharedDefaults.set(userDefaults.bool(forKey:kDisableTimeouts), forKey: kDisableTimeouts)
+    }
+    
+    func copySelectedRegion() {
+        let persistedRegionCode = RegionAdapter.sharedInstance().getSelectedRegion().code
+        PsiphonConfigUserDefaults.sharedInstance().setEgressRegion(persistedRegionCode)
+    }
+    
+    func copyUpstreamProxySettings() {
+        // Copies upstream proxy URL
+        let upstreamProxyURL = UpstreamProxySettings.sharedInstance().getUpstreamProxyUrl()
+        sharedDefaults.set(upstreamProxyURL, forKey: PsiphonConfigUpstreamProxyURL)
+        
+        // Copies upstream proxy custom headers
+        let headers = UpstreamProxySettings.sharedInstance().getUpstreamProxyCustomHeaders()
+        sharedDefaults.set(headers, forKey: PsiphonConfigCustomHeaders)
+    }
     
 }

@@ -957,7 +957,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 - (void)onAvailableEgressRegions:(NSArray *)regions {
     [self.sharedDB setEmittedEgressRegions:regions];
-
     [[Notifier sharedInstance] post:NotifierAvailableEgressRegions];
 
     PsiphonConfigUserDefaults *userDefaults = [PsiphonConfigUserDefaults sharedInstance];

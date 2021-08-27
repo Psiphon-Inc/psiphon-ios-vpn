@@ -30,6 +30,8 @@
 
 @property (nonatomic, readwrite) RACReplaySubject<ObjcSettingsViewModel *> *settingsViewModel;
 
+@property (nonatomic, readwrite) RACReplaySubject<Region *> *selectedServerRegion;
+
 // Private properties
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
 
@@ -60,6 +62,7 @@
         _vpnStartStopStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _reachabilityStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _settingsViewModel = [RACReplaySubject replaySubjectWithCapacity:1];
+        _selectedServerRegion = [RACReplaySubject replaySubjectWithCapacity:1];
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
     }
     return self;
