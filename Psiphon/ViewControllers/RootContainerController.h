@@ -22,11 +22,11 @@
 @interface RootContainerController : UIViewController
 
 /**
- * Destroys current MainViewController and creates a new open, opening the Settings immediately
- * after it has loaded.
+ * Dismisses `MainViewController` and all modally presented view controllers,
+ * then adds a new instance of `MainViewController` as a child view controller to self.
  */
-- (void)reloadMainViewControllerAndImmediatelyOpenSettings;
-
+- (void)reloadMainViewControllerAnimated:(BOOL)animated
+                              completion:(void (^ __nullable)(void))completion;
 /**
  * Destroys current Onboarding view controller and create a new one.
  */

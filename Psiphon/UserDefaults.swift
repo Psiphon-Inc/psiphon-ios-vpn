@@ -70,6 +70,15 @@ final class UserDefaultsConfig: PsiCashPersistedValues {
     /// 2: PsiCash client based on psicash-lib-core that uses a file as data store.
     @UserDefault(.standard, "Psiphon-PsiCash-DataStore-Migrated-Version", defaultValue: 0)
     var psiCashDataStoreMigratedToVersion: Int
+    
+    // MARK: Legacy keys
+    // Legacy keys are prefixed with an underscore.
+    // All keys that will no longer be used should appear under this marker
+    // to document them and avoid future naming clashes.
+    
+    @UserDefault(.standard, "embedded_server_entries_egress_regions", defaultValue: [])
+    var _embeddedServerRegions: [String]
+    
 }
 
 extension UserDefaultsConfig {

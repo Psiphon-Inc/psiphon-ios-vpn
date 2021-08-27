@@ -22,6 +22,8 @@ import ReactiveSwift
 import PsiApi
 import AppStoreIAP
 import PsiCashClient
+import enum Utilities.Unit
+import PsiphonClientCommonLibrary
 
 var Style = AppStyle()
 
@@ -45,6 +47,7 @@ struct AppState: Equatable {
     var appDelegateState = AppDelegateState()
     var queuedFeedbacks: [UserFeedback] = []
     var mainView = MainViewState()
+    var serverRegionState = ServerRegionState(selectedRegion: nil)
 }
 
 // Fields that are added to the
@@ -118,6 +121,7 @@ enum AppAction {
     case reachabilityAction(ReachabilityAction)
     case feedbackAction(FeedbackAction)
     case mainViewAction(MainViewAction)
+    case serverRegionAction(ServerRegionAction)
 }
 
 // MARK: Environment
@@ -157,6 +161,8 @@ struct AppEnvironment {
     let subscriptionStore: (SubscriptionAction) -> Effect<Never>
     let subscriptionAuthStateStore: (SubscriptionAuthStateAction) -> Effect<Never>
     let mainViewStore: (MainViewAction) -> Effect<Never>
+    let tunnelIntentStore: (TunnelStartStopIntent) -> Effect<Never>
+    let serverRegionStore: (ServerRegionAction) -> Effect<Never>
 
     /// `vpnStartCondition` returns true whenever the app is in such a state as to to allow
     /// the VPN to be started. If false is returned the VPN should not be started
@@ -175,6 +181,8 @@ struct AppEnvironment {
     let getFeedbackUpload: () -> FeedbackUploadProvider
 
     let getTopActiveViewController: () -> UIViewController
+    
+    let reloadMainScreen: () -> Effect<Utilities.Unit>
 
     let makePsiCashViewController: () -> PsiCashViewController
 
@@ -184,8 +192,15 @@ struct AppEnvironment {
     /// Makes a `PsiCashAccountViewController` as root of UINavigationController.
     let makePsiCashAccountViewController: () -> UIViewController
     
+    let makeSettingsViewController: () -> UIViewController
+    
     /// Clears cache and all website data from the webview.
     let clearWebViewDataStore: () -> Effect<Never>
+    
+    let regionAdapter: RegionAdapter
+    
+    /// Reads embedded serveries entries (region codes) from file.
+    let readEmbeddedServerEntries: () -> Effect<Result<Set<String>, ErrorMessage>>
     
 }
 
@@ -200,6 +215,8 @@ func makeEnvironment(
     sharedDB: PsiphonDataSharedDB,
     sharedAuthCoreData: SharedAuthCoreData,
     psiCashLib: PsiCashLib,
+    regionAdapter: RegionAdapter,
+    embeddedServerEntriesFile: String,
     psiCashFileStoreRoot: String?,
     supportedAppStoreProducts: SupportedAppStoreProducts,
     userDefaultsConfig: UserDefaultsConfig,
@@ -210,6 +227,7 @@ func makeEnvironment(
     mainDispatcher: MainDispatcher,
     globalDispatcher: GlobalDispatcher,
     getTopActiveViewController: @escaping () -> UIViewController,
+    reloadMainScreen: @escaping () -> Effect<Utilities.Unit>,
     clearWebViewDataStore: @escaping () -> Void
 ) -> (environment: AppEnvironment, cleanup: () -> Void) {
     
@@ -223,10 +241,23 @@ func makeEnvironment(
     }
     let urlSession = URLSession(configuration: urlSessionConfig)
     
-    let paymentTransactionDelegate = PaymentTransactionDelegate(store:
-        store.projection(action: { .iap(.transactionUpdate($0)) })
+    let paymentTransactionDelegate = PaymentTransactionDelegate(
+        store: store.projection(action: { .iap(.transactionUpdate($0)) })
     )
     SKPaymentQueue.default().add(paymentTransactionDelegate)
+    
+    // RegionAdapter delegate is not needed.
+    guard regionAdapter.delegate == nil else {
+        // RegionAdapter can only have one delegate.
+        fatalError("Expected RegionAdapter to have a nil delegate")
+    }
+    
+    let feedbackViewControllerDelegate = PsiphonFeedbackDelegate(store: store.stateless())
+    
+    let settingsViewControllerDelegate = PsiphonSettingsDelegate(
+        store: store.stateless(),
+        feedbackDelegate: feedbackViewControllerDelegate,
+        shouldEnableSettingsLinks: true)
     
     let reachabilityForInternetConnection = Reachability.forInternetConnection()!
     
@@ -312,6 +343,16 @@ func makeEnvironment(
                 store.send(.mainViewAction(action))
             }
         },
+        tunnelIntentStore: { [unowned store] (action: TunnelStartStopIntent) -> Effect<Never> in
+            .fireAndForget {
+                store.send(vpnAction: .tunnelStateIntent(intent: action, reason: .userInitiated))
+            }
+        },
+        serverRegionStore: { [unowned store] (action: ServerRegionAction) -> Effect<Never> in
+            .fireAndForget {
+                store.send(.serverRegionAction(action))
+            }
+        },
         vpnStartCondition: { () -> Bool in
             // Retruns true if the VPN can be started given the current state of the app.
             // Legacy: It was used to disallow starting VPN if an interstitial ad is presented.
@@ -364,6 +405,7 @@ func makeEnvironment(
             },
         getFeedbackUpload: { PsiphonTunnelFeedback() },
         getTopActiveViewController: getTopActiveViewController,
+        reloadMainScreen: reloadMainScreen,
         makePsiCashViewController: { [unowned store] in
             PsiCashViewController(
                 platform: platform,
@@ -425,10 +467,57 @@ func makeEnvironment(
             let nav = UINavigationController(rootViewController: v)
             return nav
         },
+        makeSettingsViewController: {
+            let vc = SettingsViewController()
+            vc.delegate = vc;
+            vc.showCreditsFooter = false;
+            vc.showDoneButton = true;
+            vc.neverShowPrivacySettings = true;
+            vc.settingsDelegate = settingsViewControllerDelegate
+            vc.preferencesSnapshot = UserDefaults.standard.dictionaryRepresentation()
+
+            let nav = UINavigationController(rootViewController: vc)
+                // The default navigation controller in the iOS 13 SDK is not fullscreen and can be
+                // dismissed by swiping it away.
+                //
+                // PsiphonSettingsViewController depends on being dismissed with the "done" button, which
+                // is hooked into the InAppSettingsKit lifecycle. Swiping away the settings menu bypasses
+                // this and results in the VPN not being restarted if: a new region was selected, the
+                // disable timeouts settings was changed, etc. The solution is to force fullscreen
+                // presentation until the settings menu can be refactored.
+                nav.modalPresentationStyle = .fullScreen
+
+            return nav
+        },
         clearWebViewDataStore: {
             .fireAndForget {
                 clearWebViewDataStore()
             }
+        },
+        regionAdapter: regionAdapter,
+        regionAdapterDelegate: regionAdapterDelegate,
+        readEmbeddedServerEntries: { () -> Effect<Result<Set<String>, ErrorMessage>> in
+            
+            // Reads embedded server entries.
+            Effect.deferred {
+                
+                var error: NSError? = nil
+                let embeddedRegions = EmbeddedServerEntries.egressRegions(
+                    fromFile: embeddedServerEntriesFile, error: &error)
+                
+                if let error = error {
+                    let systemError = SystemError<Int>.make(error)
+                    return .failure(ErrorMessage("\(systemError)"))
+                }
+                
+                guard !embeddedRegions.isEmpty else {
+                    return .failure(ErrorMessage("No embedded egress regions found"))
+                }
+                
+                return .success(embeddedRegions as! Set<String>)
+                
+            }
+            
         }
     )
     
@@ -563,6 +652,7 @@ fileprivate func toAppDelegateReducerEnvironment(env: AppEnvironment) -> AppDele
         paymentQueue: env.paymentQueue,
         mainViewStore: env.mainViewStore,
         appReceiptStore: env.appReceiptStore,
+        serverRegionStore: env.serverRegionStore,
         paymentTransactionDelegate: env.paymentTransactionDelegate,
         mainDispatcher: env.mainDispatcher,
         getCurrentTime: env.dateCompare.getCurrentTime,
@@ -617,8 +707,26 @@ fileprivate func toMainViewReducerEnvironment(env: AppEnvironment) -> MainViewEn
         tunnelStatusSignal: env.tunnelStatusSignal,
         tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
         psiCashEffects: env.psiCashEffects,
-        makePsiCashAccountViewController: env.makePsiCashAccountViewController
+        tunnelIntentStore: env.tunnelIntentStore,
+        serverRegionStore: env.serverRegionStore,
+        reloadMainScreen: env.reloadMainScreen,
+        makePsiCashAccountViewController: env.makePsiCashAccountViewController,
+        makeSettingsViewController: env.makeSettingsViewController
     )
+}
+
+fileprivate func toSelectedRegionReducerEnvironment(
+    env: AppEnvironment
+) -> ServerRegionEnvironment {
+    
+    ServerRegionEnvironment(
+        regionAdapter: env.regionAdapter,
+        sharedDB: env.sharedDB,
+        readEmbeddedServerEntries: env.readEmbeddedServerEntries,
+        tunnelIntentStore: env.tunnelIntentStore,
+        feedbackLogger: env.feedbackLogger
+    )
+    
 }
 
 func makeAppReducer(
@@ -672,7 +780,11 @@ func makeAppReducer(
         mainViewReducer.pullback(
             value: \.mainViewReducerState,
             action: \.mainViewAction,
-            environment: toMainViewReducerEnvironment(env:))
+            environment: toMainViewReducerEnvironment(env:)),
+        serverRegionReducer.pullback(
+            value: \.serverRegionState,
+            action: \.serverRegionAction,
+            environment: toSelectedRegionReducerEnvironment(env:))
     )
 }
 

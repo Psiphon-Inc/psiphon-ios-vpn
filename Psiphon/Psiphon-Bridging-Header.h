@@ -26,7 +26,6 @@
 // AppStore receipt
 #import "AppStoreParsedReceiptData.h"
 
-// Utilities
 #import "AppInfo.h"
 #import "AppFiles.h"
 #import "SharedConstants.h"
@@ -34,6 +33,7 @@
 #import "AppDelegate.h"
 #import "PsiFeedbackLogger.h"
 #import <PsiphonTunnel/PsiphonTunnel.h>
+#import "EmbeddedServerEntries.h"
 
 // UI
 #import "UIColor+Additions.h"
@@ -50,6 +50,7 @@
 #import "SubscriptionStatusView.h"
 #import "RootContainerController.h"
 #import "IAPViewController.h"
+#import "SettingsViewController.h"
 
 // Data stores
 #import "PsiphonConfigReader.h"

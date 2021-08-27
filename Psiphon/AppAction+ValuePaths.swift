@@ -157,6 +157,17 @@ extension AppAction {
         }
     }
     
+    var serverRegionAction: ServerRegionAction? {
+        get {
+            guard case let .serverRegionAction(value) = self else { return nil }
+            return value
+        }
+        set {
+            guard case .serverRegionAction = self, let newValue = newValue else { return }
+            self = .serverRegionAction(newValue)
+        }
+    }
+    
 }
 
 
