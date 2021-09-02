@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (BOOL)stringsBothEqualOrNil:(NSString*)a b:(NSString*)b;
 
+- (NSString *)stringByReplacingNewLineAndWhiteSpaces;
+
 @end
 
 NS_ASSUME_NONNULL_END

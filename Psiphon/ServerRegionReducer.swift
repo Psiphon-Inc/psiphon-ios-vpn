@@ -150,8 +150,10 @@ let serverRegionReducer = Reducer<ServerRegionState,
         
         switch availableRegionsResult {
         case .success(let availableRegions):
+            
             state.selectedRegion = selectedRegion
             state.availableRegions = availableRegions
+            
             return [
                 .fireAndForget {
                     CopySettingsToPsiphonDataSharedDB.sharedInstance.copySelectedRegion()

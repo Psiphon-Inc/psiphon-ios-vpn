@@ -55,7 +55,6 @@
 // Data stores
 #import "PsiphonConfigReader.h"
 #import "PsiphonDataSharedDB.h"
-#import "PsiphonConfigUserDefaults.h"
 #import "PersistentContainerWrapper.h"
 
 #import "SharedAuthorization+CoreDataProperties.h"

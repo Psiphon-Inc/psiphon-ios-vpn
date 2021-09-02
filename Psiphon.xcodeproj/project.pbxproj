@@ -23,6 +23,7 @@
 		296054AA265307770001E72D /* PsiCashAccountNameViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296054A9265307770001E72D /* PsiCashAccountNameViewWrapper.swift */; };
 		296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296622B425E8A554004635A1 /* LaunchScreenViewController.swift */; };
 		296950AA26DD363F0052330F /* ServerRegionReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296950A926DD363F0052330F /* ServerRegionReducer.swift */; };
+		296950AB26E143870052330F /* NSString+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A366B21666B99008A3D7B /* NSString+Additions.m */; };
 		296A1A89267A01E70068B115 /* CopyableLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296A1A88267A01E70068B115 /* CopyableLabel.swift */; };
 		29923FDA264EFC720078E8BB /* PsiCashLib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; };
 		29923FDB264EFC720078E8BB /* PsiCashLib.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -182,9 +183,7 @@
 		9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */; };
 		9BFECEA225F023F895CC8DA1 /* Authorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */; };
-		9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
-		9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84087FA4B1BC2C725D900D9 /* PsiphonProgressView.m */; };
 		A840803A0733D9FCA5410796 /* ActivityIndicatorRoyalSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A840842CECC0146241243488 /* ActivityIndicatorRoyalSkyButton.m */; };
 		A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408F6123BCC98725932A59 /* VPNStartAndStopButton.m */; };
@@ -679,13 +678,11 @@
 		9433F6FADEFD218CED8B343A /* Pods-PsiApi-PsiApiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-PsiApiTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-PsiApiTests/Pods-PsiApi-PsiApiTests.release.xcconfig"; sourceTree = "<group>"; };
 		9876294EDE951EF39C9F97BE /* Pods-PsiApi-Testing-Utilities.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-Utilities.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-Utilities/Pods-PsiApi-Testing-Utilities.release.xcconfig"; sourceTree = "<group>"; };
 		9A06EEF4B515E4AE40E5CA93 /* Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Utilities-UtilitiesTests/Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig"; sourceTree = "<group>"; };
-		9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigUserDefaults.h; sourceTree = "<group>"; };
 		9BFEC1C9F506CE1DF07306D2 /* NEBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NEBridge.h; sourceTree = "<group>"; };
 		9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPHelpViewController.m; sourceTree = "<group>"; };
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Authorization.m; sourceTree = "<group>"; };
 		9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Asserts.h; sourceTree = "<group>"; };
-		9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigUserDefaults.m; sourceTree = "<group>"; };
 		9BFEC673CE5EA236279F07BD /* Authorization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Authorization.h; sourceTree = "<group>"; };
 		9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Additions.m"; sourceTree = "<group>"; };
 		9BFEC8783D4222F2272E50E7 /* BasePacketTunnelProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasePacketTunnelProvider.h; sourceTree = "<group>"; };
@@ -1109,8 +1106,6 @@
 				EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */,
 				EFC2F5C9202267B0007B52F9 /* PsiphonConfigReader.h */,
 				EFC2F5CA202267B0007B52F9 /* PsiphonConfigReader.m */,
-				9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */,
-				9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */,
 				4E0DCB181F28481E00495781 /* PsiphonDataSharedDB.h */,
 				4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */,
 				EF652CDB1F365B8C002AFB48 /* SharedConstants.h */,
@@ -1185,8 +1180,6 @@
 				4E0A3668215AB7EE008A3D7B /* UIFont+Additions.m */,
 				4E5DAE6320A942A300E06342 /* UILabel+GetLabelHeight.h */,
 				4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */,
-				4E0A366A21666B99008A3D7B /* NSString+Additions.h */,
-				4E0A366B21666B99008A3D7B /* NSString+Additions.m */,
 				A8408A0C4220563DA1FE3048 /* ImageUtils.m */,
 				A840830557814D4234CFD86D /* ImageUtils.h */,
 				52DF5E9123C675EC00A1B067 /* ViewController+Additions.swift */,
@@ -1663,6 +1656,8 @@
 				EF90D799204F22C900228A63 /* FileUtils.m */,
 				CED6791924A4F88D00C4CA81 /* JSONCodable.h */,
 				CED6791A24A4F88D00C4CA81 /* JSONCodable.m */,
+				4E0A366A21666B99008A3D7B /* NSString+Additions.h */,
+				4E0A366B21666B99008A3D7B /* NSString+Additions.m */,
 				EF90D795204F22C900228A63 /* NSError+Convenience.h */,
 				EF90D79A204F22C900228A63 /* NSError+Convenience.m */,
 				EF90D79D204F22C900228A63 /* NSDate+Comparator.h */,
@@ -2132,7 +2127,6 @@
 				4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */,
 				52A2466D23A172A800A01FF1 /* ViewBuilderViewController.swift in Sources */,
 				5246800D22D65926009AEC6E /* UIUtils.swift in Sources */,
-				9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */,
 				4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */,
 				8D7789B9247491CA0038BFDA /* PsiphonBundle.swift in Sources */,
 				291C0BA1269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m in Sources */,
@@ -2286,6 +2280,7 @@
 				CE93EE5624F55B92001F4EC9 /* SharedConstants.m in Sources */,
 				EFC2F5CC20226835007B52F9 /* PsiphonConfigReader.m in Sources */,
 				29BA6DA1268630A9001445EA /* TunnelFileDescriptor.m in Sources */,
+				296950AB26E143870052330F /* NSString+Additions.m in Sources */,
 				29EE50B826ACDC0E00DB8A60 /* AppFiles.m in Sources */,
 				CED6794524A4F95D00C4CA81 /* RunningStat.m in Sources */,
 				CED6795224A4F9D400C4CA81 /* DiskBackedFile.m in Sources */,
@@ -2315,7 +2310,6 @@
 				CED6794724A4F95D00C4CA81 /* RunningMinMax.m in Sources */,
 				CED6794924A4F95D00C4CA81 /* RunningBins.m in Sources */,
 				CED6795A24A4FA1200C4CA81 /* FileRegistry.m in Sources */,
-				9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */,
 				CED6795624A4F9F100C4CA81 /* Archiver.m in Sources */,
 				CED6791C24A4F88D00C4CA81 /* JSONCodable.m in Sources */,
 				EF90D7B7204F235800228A63 /* FileUtils.m in Sources */,

@@ -26,4 +26,9 @@
     return (([a length] == 0) && ([b length] == 0)) || ([a isEqualToString:b]);
 }
 
+- (NSString *)stringByReplacingNewLineAndWhiteSpaces {
+    return [[self stringByReplacingOccurrencesOfString:@"\n" withString:@""]
+            stringByReplacingOccurrencesOfString:@" " withString:@""];
+}
+
 @end

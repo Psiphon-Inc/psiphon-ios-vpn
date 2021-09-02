@@ -25,7 +25,6 @@
 #import "DispatchUtils.h"
 #import "Logging.h"
 #import "DebugViewController.h"
-#import "PsiphonConfigUserDefaults.h"
 #import "SharedConstants.h"
 #import "NSString+Additions.h"
 #import "UIAlertController+Additions.h"
