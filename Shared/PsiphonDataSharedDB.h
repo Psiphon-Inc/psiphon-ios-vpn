@@ -24,6 +24,11 @@
 #import "PsiphonData.h"
 #endif
 
+#pragma mark - Keys from PsiphonClientCommonLibrary
+
+// Value re-defined from PsiphonClientCommonLibrary
+#define kPsiphonRegionBestPerformance  @""
+
 #pragma mark - NSUserDefaults Keys
 
 extern UserDefaultsKey const _Nonnull EgressRegionsStringArrayKey;
@@ -100,6 +105,22 @@ NS_ASSUME_NONNULL_BEGIN
 
 #endif
 
+#pragma mark - Tunnel core configs
+
+- (NSString *)getEgressRegion;
+
+- (void)setEgressRegion:(NSString *)regionCode;
+
+- (void)setDisableTimeouts:(BOOL)disableTimeouts;
+
+- (void)setUpstreamProxyURL:(NSString *_Nullable)url;
+
+- (void)setCustomHttpHeaders:(NSDictionary *_Nullable)customHeaders;
+
+/**
+ Returns dictionary of tunnel core configs.
+ */
+- (NSDictionary *)getTunnelCoreUserConfigs;
 
 #pragma mark - Container Data (Data originating in the container)
 

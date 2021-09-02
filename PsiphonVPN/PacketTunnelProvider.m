@@ -32,7 +32,6 @@
 #import "AppProfiler.h"
 #import "PacketTunnelProvider.h"
 #import "PsiphonConfigReader.h"
-#import "PsiphonConfigUserDefaults.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
 #import "Notifier.h"
@@ -51,6 +50,7 @@
 #import "NSUserDefaults+KeyedDataStore.h"
 #import "ExtensionDataStore.h"
 #import "HostAppProtocol.h"
+#import "NSString+Additions.h"
 
 NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
 
@@ -746,10 +746,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         [self exitGracefully];
     }
 
-    // Get a mutable copy of the Psiphon configs.
-    NSMutableDictionary *mutableConfigCopy = [psiphonConfigReader.config mutableCopy];
-
-    // Applying mutations to config
     // iOS 15
     NSOperatingSystemVersion ios15 = {.majorVersion = 15, .minorVersion = 0, .patchVersion = 0};
     
@@ -768,19 +764,23 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         [self exitGracefully];
     }
 
-    // In case of duplicate keys, value from psiphonConfigUserDefaults
-    // will replace mutableConfigCopy value.
-    PsiphonConfigUserDefaults *psiphonConfigUserDefaults =
-        [[PsiphonConfigUserDefaults alloc] initWithSuiteName:PsiphonAppGroupIdentifier];
-    [mutableConfigCopy addEntriesFromDictionary:[psiphonConfigUserDefaults dictionaryRepresentation]];
+    NSDictionary *tunnelUserConfigs = [self.sharedDB getTunnelCoreUserConfigs];
+    
+    NSString *tunnelUserConfigsDescription = [[tunnelUserConfigs description]
+                                              stringByReplacingNewLineAndWhiteSpaces];
+    [PsiFeedbackLogger infoWithType:PsiphonTunnelDelegateLogType
+                             format:@"TunnelCore user configs: %@", tunnelUserConfigsDescription];
 
+    // Get a mutable copy of the Psiphon configs.
+    NSMutableDictionary *mutableConfigCopy = [psiphonConfigReader.config mutableCopy];
+    
+    // In case of duplicate keys, values from tunnelUserConfigs
+    // will replace mutableConfigCopy.
+    [mutableConfigCopy addEntriesFromDictionary:tunnelUserConfigs];
+    
     mutableConfigCopy[@"PacketTunnelTunFileDescriptor"] = fd;
 
     mutableConfigCopy[@"ClientVersion"] = [AppInfo appVersion];
-    
-    [PsiFeedbackLogger infoWithType:PsiphonTunnelDelegateLogType
-                             format:@"EgressRegion: region code: %@",
-     psiphonConfigUserDefaults.egressRegion];
 
     // Configure data root directory.
     // PsiphonTunnel will store all of its files under this directory.
@@ -958,15 +958,13 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 - (void)onAvailableEgressRegions:(NSArray *)regions {
     [self.sharedDB setEmittedEgressRegions:regions];
     [[Notifier sharedInstance] post:NotifierAvailableEgressRegions];
-
-    PsiphonConfigUserDefaults *userDefaults = [PsiphonConfigUserDefaults sharedInstance];
-
-    NSString *selectedRegion = [userDefaults egressRegion];
+    
+    NSString *selectedRegion = [self.sharedDB getEgressRegion];
     if (selectedRegion &&
         ![selectedRegion isEqualToString:kPsiphonRegionBestPerformance] &&
         ![regions containsObject:selectedRegion]) {
 
-        [[PsiphonConfigUserDefaults sharedInstance] setEgressRegion:kPsiphonRegionBestPerformance];
+        [self.sharedDB setEgressRegion:kPsiphonRegionBestPerformance];
 
         dispatch_async(self->workQueue, ^{
             [self displayMessageOnce:Strings.selectedRegionUnavailableAlertBody

@@ -246,7 +246,8 @@ func makeEnvironment(
     )
     SKPaymentQueue.default().add(paymentTransactionDelegate)
     
-    // RegionAdapter delegate is not needed.
+    // RegionAdapter delegate is not expected be used.
+    // Check serverRegionReducer function.
     guard regionAdapter.delegate == nil else {
         // RegionAdapter can only have one delegate.
         fatalError("Expected RegionAdapter to have a nil delegate")
@@ -495,7 +496,6 @@ func makeEnvironment(
             }
         },
         regionAdapter: regionAdapter,
-        regionAdapterDelegate: regionAdapterDelegate,
         readEmbeddedServerEntries: { () -> Effect<Result<Set<String>, ErrorMessage>> in
             
             // Reads embedded server entries.

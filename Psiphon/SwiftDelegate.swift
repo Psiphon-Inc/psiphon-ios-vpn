@@ -1383,41 +1383,47 @@ final class CopySettingsToPsiphonDataSharedDB {
     // The PsiphonVPN process (i.e. the network extension), reads user defaults
     // values from PsiphonDataSharedDB. For any setting that is updated
     // through the PsiphonSettingsViewController, the values need to be copied
-    // to PsiphonDataSharedDB or PsiphonConfigUserDefaults.
+    // to the shared NSUserDefaults with the network extension.
     
-    @objc static let sharedInstance = CopySettingsToPsiphonDataSharedDB()
+    static let sharedInstance = CopySettingsToPsiphonDataSharedDB()
     
     private let userDefaults: UserDefaults
-    private let sharedDefaults: UserDefaults
+    private let sharedDB: PsiphonDataSharedDB
     
-    private override init(){
+    private init(){
         userDefaults = UserDefaults.standard
-        sharedDefaults = UserDefaults(suiteName: PsiphonAppGroupIdentifier)!
+        sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: PsiphonAppGroupIdentifier)
     }
     
     func copyAllSettings() {
         copyDisableTimeouts()
         copySelectedRegion()
         copyUpstreamProxySettings()
+        copyCustomHttpHeaders()
     }
     
     func copyDisableTimeouts() {
-        sharedDefaults.set(userDefaults.bool(forKey:kDisableTimeouts), forKey: kDisableTimeouts)
+        // Disable timeouts is stored in standard NSUserDefaults under "disableTimeouts"
+        // key by PsiphonSettingsViewController.
+        let disableTimeouts = userDefaults.bool(forKey:kDisableTimeouts)
+        sharedDB.setDisableTimeouts(disableTimeouts)
     }
     
     func copySelectedRegion() {
-        let persistedRegionCode = RegionAdapter.sharedInstance().getSelectedRegion().code
-        PsiphonConfigUserDefaults.sharedInstance().setEgressRegion(persistedRegionCode)
+        guard let selectedRegion = RegionAdapter.sharedInstance().getSelectedRegion().code else {
+            fatalError()
+        }
+        sharedDB.setEgressRegion(selectedRegion)
     }
     
     func copyUpstreamProxySettings() {
-        // Copies upstream proxy URL
         let upstreamProxyURL = UpstreamProxySettings.sharedInstance().getUpstreamProxyUrl()
-        sharedDefaults.set(upstreamProxyURL, forKey: PsiphonConfigUpstreamProxyURL)
-        
-        // Copies upstream proxy custom headers
-        let headers = UpstreamProxySettings.sharedInstance().getUpstreamProxyCustomHeaders()
-        sharedDefaults.set(headers, forKey: PsiphonConfigCustomHeaders)
+        sharedDB.setUpstreamProxyURL(upstreamProxyURL)
+    }
+    
+    func copyCustomHttpHeaders() {
+        let customHeaders = UpstreamProxySettings.sharedInstance().getUpstreamProxyCustomHeaders()
+        sharedDB.setCustomHttpHeaders(customHeaders)
     }
     
 }

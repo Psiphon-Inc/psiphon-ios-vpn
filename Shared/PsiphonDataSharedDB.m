@@ -48,6 +48,15 @@ UserDefaultsKey const ExtensionDisallowedTrafficAlertWriteSeqIntKey =
 UserDefaultsKey const ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey =
 @"container_disallowed_traffic_alert_read_at_least_up_to_seq_int";
 
+UserDefaultsKey const TunnelEgressRegionKey = @"Tunnel-EgressRegion";
+
+UserDefaultsKey const TunnelDisableTimeoutsKey = @"Tunnel-Disable-Timeouts";
+
+UserDefaultsKey const TunnelUpstreamProxyURLKey = @"Tunnel-UpstreamProxyURL";
+
+UserDefaultsKey const TunnelCustomHeadersKey = @"Tunnel-CustomHeaders";
+
+
 /**
  * Key for boolean value that when TRUE indicates that the extension crashed before stop was called.
  * This value is only valid if the extension is not currently running.
@@ -257,6 +266,62 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
     return allEntries;
 }
 #endif
+
+#pragma mark - Tunnel core configs
+
+- (NSString *_Nonnull)getEgressRegion {
+    NSString *_Nullable egressRegion = [sharedDefaults stringForKey:TunnelEgressRegionKey];
+    if (egressRegion == nil) {
+        return kPsiphonRegionBestPerformance;
+    }
+    return egressRegion;
+}
+
+- (void)setEgressRegion:(NSString *)regionCode {
+    [sharedDefaults setObject:regionCode forKey:TunnelEgressRegionKey];
+}
+
+- (void)setDisableTimeouts:(BOOL)disableTimeouts {
+    [sharedDefaults setBool:disableTimeouts forKey:TunnelDisableTimeoutsKey];
+}
+
+- (void)setUpstreamProxyURL:(NSString *_Nullable)url {
+    [sharedDefaults setObject:url forKey:TunnelUpstreamProxyURLKey];
+}
+
+- (void)setCustomHttpHeaders:(NSDictionary *_Nullable)customHeaders {
+    [sharedDefaults setObject:customHeaders forKey:TunnelCustomHeadersKey];
+}
+
+- (NSDictionary *)getTunnelCoreUserConfigs {
+    
+    NSMutableDictionary *userConfigs = [[NSMutableDictionary alloc] init];
+
+    NSString *egressRegion = [sharedDefaults stringForKey:TunnelEgressRegionKey];
+    if (egressRegion) {
+        userConfigs[@"EgressRegion"] = egressRegion;
+    }
+
+    if ([sharedDefaults boolForKey:TunnelDisableTimeoutsKey]) {
+        userConfigs[@"NetworkLatencyMultiplierLambda"] = @(0.1);
+    }
+
+    NSString *upstreamProxyUrl = [sharedDefaults stringForKey:TunnelUpstreamProxyURLKey];
+    if (upstreamProxyUrl && [upstreamProxyUrl length] > 0) {
+        userConfigs[@"UpstreamProxyUrl"] = upstreamProxyUrl;
+    }
+
+    id upstreamProxyCustomHeaders = [sharedDefaults objectForKey:TunnelCustomHeadersKey];
+    if ([upstreamProxyCustomHeaders isKindOfClass:[NSDictionary class]]) {
+        NSDictionary *customHeaders = (NSDictionary*)upstreamProxyCustomHeaders;
+        if ([customHeaders count] > 0) {
+            userConfigs[@"CustomHeaders"] = customHeaders;
+        }
+    }
+
+    return userConfigs;
+    
+}
 
 #pragma mark - Container Data (Data originating in the container)
 

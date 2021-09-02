@@ -237,14 +237,15 @@ func feedbackUploadPsiphonConfig(basePsiphonConfig: [AnyHashable: Any],
     }
 
     if !useUpstreamProxy {
-        config.removeValue(forKey: PsiphonConfigUpstreamProxyURL)
+        config.removeValue(forKey: "UpstreamProxyUrl")
     }
 
     // TODO: effect not parameterized
-    let psiphonConfigUserDefaults = PsiphonConfigUserDefaults(suiteName: PsiphonAppGroupIdentifier)
-    if let userConfiguredSettings = psiphonConfigUserDefaults?.dictionaryRepresentation() {
-        config.merge(userConfiguredSettings) { (_, new) in new }
-    }
+    let psiphonTunnelUserConfigs = PsiphonDataSharedDB(
+        forAppGroupIdentifier: PsiphonAppGroupIdentifier
+    ).getTunnelCoreUserConfigs()
+    
+    config.merge(psiphonTunnelUserConfigs) { (_, new) in new }
 
     return .success(config)
 }
