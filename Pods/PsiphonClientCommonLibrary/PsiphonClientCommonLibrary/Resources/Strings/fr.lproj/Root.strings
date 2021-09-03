@@ -59,7 +59,7 @@
 "FEEDBACK_EMAIL_LABEL" = "Votre adresse courriel";
 
 /* On the feedback screen, this is the placeholder text for the email address text field. This text should be kept short. */
-"FEEDBACK_EMAIL_PLACEHOLDER" = "Où pouvons-nous vous répondre ?";
+"FEEDBACK_EMAIL_PLACEHOLDER" = "Où pouvons-nous vous répondre?";
 
 /* On the feedback screen, this is the label above the "Upload diagnostic data" option. This text should be kept short. */
 "FEEDBACK_DIAGNOSTIC_DATA_SECTION" = "Données de diagnostic";

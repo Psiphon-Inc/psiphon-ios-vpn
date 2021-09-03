@@ -14,7 +14,7 @@
 "FAQ_URL" = "https://psiphon.ca/fr/faq.html";
 
 /* Comments section placeholder text */
-"FEEDBACK_COMMENTS_PLACEHOLDER" = "À quoi pensez-vous ? Veuillez nous laisser une rétroaction";
+"FEEDBACK_COMMENTS_PLACEHOLDER" = "À quoi pensez-vous? Veuillez nous laisser une rétroaction";
 
 /* Text referring user to frequently asked questions. %@ is where the separate translation for the phrase 'Frequently Asked Questions' will be placed. */
 "FEEDBACK_FAQ_DIRECTION" = "Vous trouverez des solutions à de nombreux problèmes habituels dans notre %@.";

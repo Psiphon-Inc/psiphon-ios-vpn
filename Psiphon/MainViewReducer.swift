@@ -23,33 +23,53 @@ import AppStoreIAP
 import PsiCashClient
 import Utilities
 import ReactiveSwift
+import UIKit
+import PsiphonClientCommonLibrary
+import SafariServices
 
 enum MainViewAction: Equatable {
 
+    case psiCashViewAction(PsiCashViewAction)
+    
+    case reloadAppUI(openSettingsScreen: Bool)
+    
     case applicationDidBecomeActive
-
-    // Alert message actions
+    
+    case openExternalURL(URL)
+    
+    // MARK: Alerts
     case presentAlert(AlertEvent)
-
     case _presentAlertResult(newState: PresentationState<AlertEvent>)
-
     case _alertButtonTapped(AlertEvent, AlertAction)
     
+    // MARK: PsiCash account management
     // PsiCash Account Management is presented in a webview.
     case presentPsiCashAccountManagement
-    
     // PsiCash Account Management screen is dismissed.
     case _dismissedPsiCashAccountManagement
 
+    // MARK: PsiCash screen
     case presentPsiCashScreen(initialTab: PsiCashScreenTab, animated: Bool = true)
     case _presentPsiCashScreenResult(willPresent: Bool)
     case dismissedPsiCashScreen
     
-    case psiCashViewAction(PsiCashViewAction)
-    
+    // MARK: PsiCash account screen
     case presentPsiCashAccountScreen
     case _presentPsiCashAccountScreenResult(willPresent: Bool)
     case dismissedPsiCashAccountScreen
+    
+    // MARK: Settings screen
+    case presentSettingsScreen
+    case _presentSettingsScreenResult(willPresent: Bool)
+    case dismissedSettingsScreen(forceReconnect: Bool)
+    
+    // MARK: Feedback screen
+    /// Presents feedback screen modally. This is separate from feedback screen
+    /// presented by `InAppSettingsKit` thourght `PsiphonSettingsViewController`.
+    case presentModalFeedbackScreen
+    case _presentModalFeedbackScreenResult(willPresent: Bool)
+    case dismissedModalFeedbackScreen
+    
 }
 
 struct MainViewState: Equatable {
@@ -62,6 +82,14 @@ struct MainViewState: Equatable {
     
     /// Represents presentation state of PsiCash accounts screen.
     var isPsiCashAccountScreenShown: Pending<Bool> = .completed(false)
+    
+    /// Represents presentation state of the settings screen.
+    var isSettingsScreenShown: Pending<Bool> = .completed(false)
+    
+    /// Represents presentation state of the feedback screen.
+    /// This is state of a modally presented feedback screen, and is separate
+    /// from `FeedbackViewController` presented by the `PsiphonSettingsViewController`.
+    var isModalFeedbackScreenShown: Pending<Bool> = .completed(false)
     
 }
 
@@ -105,8 +133,20 @@ struct MainViewEnvironment {
     let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
     let psiCashEffects: PsiCashEffects
     
-    /// Makes `PsiCashAccountViewController` as root of UINavigationController.
+    let tunnelIntentStore: (TunnelStartStopIntent) -> Effect<Never>
+    
+    let serverRegionStore: (ServerRegionAction) -> Effect<Never>
+    
+    let reloadMainScreen: () -> Effect<Utilities.Unit>
+    
+    /// Makes `PsiCashAccountViewController` as root of a `UINavigationController`.
     let makePsiCashAccountViewController: () -> UIViewController
+    
+    /// Makes `SettingsViewController` as root of a `UINavigationController`.
+    let makeSettingsViewController: () -> UIViewController
+    
+    /// Makes `FeedbackViewController` as root of a `UINavigationController`.
+    let makeFeedbackViewController: () -> UIViewController
     
 }
 
@@ -114,7 +154,38 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
     state, action, environment in
     
     switch action {
-
+        
+    case .psiCashViewAction(let psiCashAction):
+        switch state.psiCashViewReducerState {
+        case .none:
+            return []
+        case .some(_):
+            let effects = psiCashViewReducer(
+                &state.psiCashViewReducerState!, psiCashAction, environment.psiCashViewEnvironment
+            )
+            
+            return effects.map { $0.map { MainViewAction.psiCashViewAction($0) } }
+        }
+        
+    case .reloadAppUI(openSettingsScreen: let openSettingsScreen):
+        
+        return [
+            // Updates RegionAdapter's localized region titles.
+            // It is assumed that app language has changed at this point.
+           .fireAndForget {
+                RegionAdapter.sharedInstance().reloadTitlesForNewLocalization()
+            },
+           
+           environment.reloadMainScreen().flatMap(.latest, { _ in
+               if openSettingsScreen {
+                   return Effect(value: .presentSettingsScreen)
+               } else {
+                   return .empty
+               }
+           })
+           
+        ]
+        
     case .applicationDidBecomeActive:
         let failedMessages = state.mainView.alertMessages.filter {
             if case .failedToPresent(_) = $0.state {
@@ -140,6 +211,14 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             Effect(value: .presentAlert($0.viewModel))
         }
 
+    case .openExternalURL(let url):
+        return [
+            .fireAndForget {
+                let topVC = environment.getTopActiveViewController()
+                let safariVC = SFSafariViewController(url: url)
+                topVC.present(safariVC, animated: true, completion: nil)
+            }
+        ]
 
     case let .presentAlert(alertEvent):
 
@@ -451,18 +530,6 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         state.mainView.psiCashViewState = .none
 
         return []
-
-    case .psiCashViewAction(let psiCashAction):
-        switch state.psiCashViewReducerState {
-        case .none:
-            return []
-        case .some(_):
-            let effects = psiCashViewReducer(
-                &state.psiCashViewReducerState!, psiCashAction, environment.psiCashViewEnvironment
-            )
-            
-            return effects.map { $0.map { MainViewAction.psiCashViewAction($0) } }
-        }
         
     case .presentPsiCashAccountScreen:
         
@@ -539,7 +606,201 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             
             return effects.map { $0.map { MainViewAction.psiCashViewAction($0) } }
         }
+        
+    case .presentSettingsScreen:
+        
+        guard case .completed(false) = state.mainView.isSettingsScreenShown else {
+            return []
+        }
+        
+        state.mainView.isSettingsScreenShown = .pending
+        
+        return [
+            Effect.deferred {
+                let topVC = environment.getTopActiveViewController()
+                let searchResult = topVC.traversePresentingStackFor(
+                    type: SettingsViewController.self, searchChildren: true)
+                
+                switch searchResult {
+                case .notPresent:
+                    let settingsViewController = environment.makeSettingsViewController()
+                    topVC.present(settingsViewController, animated: true, completion: nil)
+                    return ._presentSettingsScreenResult(willPresent: true)
+                case .presentInStack(_), .presentTopOfStack(_):
+                    return ._presentSettingsScreenResult(willPresent: false)
+                }
+            }
+        ]
+        
+    case ._presentSettingsScreenResult(willPresent: let willPresent):
+        state.mainView.isSettingsScreenShown = .completed(willPresent)
+        if !willPresent {
+            return [
+                environment.feedbackLogger.log(
+                    .warn, "Will not present settings screen")
+                    .mapNever()
+            ]
+        }
+        return []
+        
+    case .dismissedSettingsScreen(forceReconnect: let forceReconnect):
+        state.mainView.isSettingsScreenShown = .completed(false)
+        
+        var effects = [Effect<MainViewAction>]()
+        
+        // Copies all settings, in case any setting has changed.
+        effects += .fireAndForget {
+            CopySettingsToPsiphonDataSharedDB.sharedInstance.copyAllSettings()
+        }
+        
+        // Updates selected region, in case it has changed.
+        effects += environment.serverRegionStore(.updateAvailableRegions)
+            .mapNever()
+        
+        if forceReconnect {
+            // Restarts VPN if settings have changed.
+            effects += environment.tunnelIntentStore(.start(transition: .restart)).mapNever()
+        }
+        
+        return effects
+        
+    case .presentModalFeedbackScreen:
+        
+        guard case .completed(false) = state.mainView.isModalFeedbackScreenShown else {
+            return []
+        }
+        
+        state.mainView.isModalFeedbackScreenShown = .pending
+        
+        return [
+            Effect.deferred {
+                let topVC = environment.getTopActiveViewController()
+                let searchResult = topVC.traversePresentingStackFor(
+                    type: SettingsViewController.self, searchChildren: true)
+                
+                switch searchResult {
+                case .notPresent:
+                    let settingsViewController = environment.makeFeedbackViewController()
+                    topVC.present(settingsViewController, animated: true, completion: nil)
+                    return ._presentModalFeedbackScreenResult(willPresent: true)
+                case .presentInStack(_), .presentTopOfStack(_):
+                    return ._presentModalFeedbackScreenResult(willPresent: false)
+                }
+            }
+        ]
+        
+    case ._presentModalFeedbackScreenResult(willPresent: let willPresent):
+        
+        state.mainView.isModalFeedbackScreenShown = .completed(willPresent)
+        if !willPresent {
+            return [
+                environment.feedbackLogger.log(
+                    .warn, "Will not present feedback screen")
+                    .mapNever()
+            ]
+        }
+        return []
+        
+    case .dismissedModalFeedbackScreen:
+        
+        guard state.mainView.isModalFeedbackScreenShown != .completed(false) else {
+            // Feedback screen was not presented modally, instead
+            // it was presented through PsiphonSettingsViewController.
+            return []
+        }
+        
+        state.mainView.isModalFeedbackScreenShown = .completed(false)
+        return []
+        
+    }
+    
+}
 
+// MARK: Settings Delegate
+
+/// `PsiphonFeedbackDelegate` bridges callbacks from `FeedbackViewController`
+/// to Store actions.
+final class PsiphonFeedbackDelegate: StoreDelegate<AppAction>, FeedbackViewControllerDelegate {
+    
+    func userSubmittedFeedback(
+        _ selectedThumbIndex: Int,
+        comments: String!,
+        email: String!,
+        uploadDiagnostics: Bool
+    ) {
+        
+        let submitFeedbackData = SubmitFeedbackData(
+            selectedThumbIndex: selectedThumbIndex,
+            comments: comments,
+            email: email,
+            uploadDiagnostics: uploadDiagnostics
+        )
+        
+        storeSend(.feedbackAction(.userSubmittedFeedback(submitFeedbackData)))
+        
+    }
+    
+    func userPressedURL(_ URL: URL!) {
+        storeSend(.mainViewAction(.openExternalURL(URL)))
+    }
+    
+    func feedbackViewControllerWillDismiss() {
+        storeSend(.mainViewAction(.dismissedModalFeedbackScreen))
+    }
+    
+}
+
+/// `PsiphonSettingsDelegate` bridges callbacks from `PsiphonSettingsViewController`
+/// to Store actions.
+final class PsiphonSettingsDelegate: StoreDelegate<AppAction>, PsiphonSettingsViewControllerDelegate {
+    
+    private let enableSettingsLinks: Bool
+    private let feedbackDelegate: PsiphonFeedbackDelegate
+    
+    init(
+        store: Store<Utilities.Unit, AppAction>,
+        feedbackDelegate: PsiphonFeedbackDelegate,
+        shouldEnableSettingsLinks: Bool
+    ) {
+        self.enableSettingsLinks = shouldEnableSettingsLinks
+        self.feedbackDelegate = feedbackDelegate
+        super.init(store: store)
+    }
+    
+    func notifyPsiphonConnectionState() {
+        // Ignored
+    }
+    
+    func reloadAndOpenSettings() {
+        storeSend(.mainViewAction(.reloadAppUI(openSettingsScreen: true)))
+    }
+    
+    func settingsWillDismiss(withForceReconnect forceReconnect: Bool) {
+        storeSend(.mainViewAction(.dismissedSettingsScreen(forceReconnect: forceReconnect)))
+    }
+    
+    func shouldEnableSettingsLinks() -> Bool {
+        enableSettingsLinks
+    }
+    
+    func hiddenSpecifierKeys() -> [String]! {
+        return []
+    }
+    
+    // MARK: FeedbackViewControllerDelegate
+    
+    func userSubmittedFeedback(
+        _ selectedThumbIndex: Int,
+        comments: String!,
+        email: String!,
+        uploadDiagnostics: Bool
+    ) {
+        feedbackDelegate.userSubmittedFeedback(
+            selectedThumbIndex, comments: comments, email: email, uploadDiagnostics: uploadDiagnostics)
+    }
+    
+    func userPressedURL(_ URL: URL!) {
+        feedbackDelegate.userPressedURL(URL)
     }
     
 }

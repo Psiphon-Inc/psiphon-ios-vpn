@@ -22,14 +22,13 @@ import Promises
 import PsiApi
 import AppStoreIAP
 import PsiCashClient
+import PsiphonClientCommonLibrary
 
 // MARK: Bridge Protocols
 
 /// ObjC-Swift interface. Functionality implemented in ObjC and called from Swift.
 /// All Delegate functions are called on the main thread.
 @objc protocol ObjCBridgeDelegate {
-    
-    @objc func updateAvailableEgressRegionsOnFirstRunOfAppVersion()
     
     @objc func startStopVPN()
     
@@ -38,6 +37,8 @@ import PsiCashClient
     @objc func onSubscriptionStatus(_ status: BridgedUserSubscription)
     
     @objc func onSubscriptionBarViewStatusUpdate(_ status: ObjcSubscriptionBarViewState)
+    
+    @objc func onSelectedServerRegionUpdate(_ region: Region)
     
     @objc func onVPNStatusDidChange(_ status: VPNStatus)
     
@@ -85,6 +86,8 @@ import PsiCashClient
     
     @objc func presentPsiCashAccountManagement()
     
+    @objc func presentSettingsViewController()
+    
     @objc func loadingScreenDismissSignal(_ completionHandler: @escaping () -> Void)
     
     @objc func makeSubscriptionBarView() -> SubscriptionBarView
@@ -106,6 +109,8 @@ import PsiCashClient
         _ skProduct: SKProduct
     ) -> Promise<ObjCIAPResult>.ObjCPromise<ObjCIAPResult>
     @objc func getAppStoreSubscriptionProductIDs() -> Set<String>
+    
+    @objc func userSelectedRegion(_ region: Region)
     
     // VPN
     
@@ -131,11 +136,6 @@ import PsiCashClient
     // Returns Locale for currently selected app language.
     // Note that this can be different from device Locale value `Locale.current`.
     @objc func getLocaleForCurrentAppLanguage() -> NSLocale
-
-    @objc func userSubmittedFeedback(selectedThumbIndex: Int,
-                                     comments: String,
-                                     email: String,
-                                     uploadDiagnostics: Bool)
 
     // Version string to be displayed by the user-interface.
     @objc func versionLabelText() -> String

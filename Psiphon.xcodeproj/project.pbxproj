@@ -22,6 +22,8 @@
 		29587A8026C5ACD80015A79A /* FadingScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29587A7F26C5ACD80015A79A /* FadingScrollView.swift */; };
 		296054AA265307770001E72D /* PsiCashAccountNameViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296054A9265307770001E72D /* PsiCashAccountNameViewWrapper.swift */; };
 		296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296622B425E8A554004635A1 /* LaunchScreenViewController.swift */; };
+		296950AA26DD363F0052330F /* ServerRegionReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296950A926DD363F0052330F /* ServerRegionReducer.swift */; };
+		296950AB26E143870052330F /* NSString+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E0A366B21666B99008A3D7B /* NSString+Additions.m */; };
 		296A1A89267A01E70068B115 /* CopyableLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296A1A88267A01E70068B115 /* CopyableLabel.swift */; };
 		29923FDA264EFC720078E8BB /* PsiCashLib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; };
 		29923FDB264EFC720078E8BB /* PsiCashLib.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -78,7 +80,6 @@
 		4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */; };
 		4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263CA2072984D0021FEF5 /* IAPViewController.m */; };
 		4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */; };
-		4EB846422151830600687344 /* AvailableServerRegions.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EB846412151830600687344 /* AvailableServerRegions.m */; };
 		4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526220AB8DBE000B4BEA /* Pastel.m */; };
 		4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526520AB8DCD000B4BEA /* PastelView.m */; };
 		5202011D2360D34000D00C8E /* EitherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5202011C2360D34000D00C8E /* EitherView.swift */; };
@@ -182,9 +183,7 @@
 		9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */; };
 		9BFECEA225F023F895CC8DA1 /* Authorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */; };
-		9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		9BFECF9F760F1A93A8933089 /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
-		9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */; };
 		A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */ = {isa = PBXBuildFile; fileRef = A84087FA4B1BC2C725D900D9 /* PsiphonProgressView.m */; };
 		A840803A0733D9FCA5410796 /* ActivityIndicatorRoyalSkyButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A840842CECC0146241243488 /* ActivityIndicatorRoyalSkyButton.m */; };
 		A84080E163F24876A1476544 /* VPNStartAndStopButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408F6123BCC98725932A59 /* VPNStartAndStopButton.m */; };
@@ -212,7 +211,6 @@
 		A8408EB1E9DABE35016580A7 /* ImageUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408A0C4220563DA1FE3048 /* ImageUtils.m */; };
 		A8408F5F45CDBDF42701063E /* Strings.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083974C8CF9DDFE7A341D /* Strings.m */; };
 		A8408FA13890CD67154033C6 /* RegionSelectionButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408C84138113DE79F0DCD0 /* RegionSelectionButton.m */; };
-		A8408FF45D08D31E102FA41F /* ContainerDB.m in Sources */ = {isa = PBXBuildFile; fileRef = A84086716D701D0F5B48E4C0 /* ContainerDB.m */; };
 		CE234A7424F439CB0007709A /* FeedbackReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE234A7324F439CB0007709A /* FeedbackReducer.swift */; };
 		CE234A7624F46AEC0007709A /* Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE234A7524F46AEC0007709A /* Feedback.swift */; };
 		CE26FC951BBDC7B800B83375 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CE26FC941BBDC7B800B83375 /* Assets.xcassets */; };
@@ -405,6 +403,7 @@
 		29587A7F26C5ACD80015A79A /* FadingScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FadingScrollView.swift; sourceTree = "<group>"; };
 		296054A9265307770001E72D /* PsiCashAccountNameViewWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashAccountNameViewWrapper.swift; sourceTree = "<group>"; };
 		296622B425E8A554004635A1 /* LaunchScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenViewController.swift; sourceTree = "<group>"; };
+		296950A926DD363F0052330F /* ServerRegionReducer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServerRegionReducer.swift; sourceTree = "<group>"; };
 		296A1A88267A01E70068B115 /* CopyableLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyableLabel.swift; sourceTree = "<group>"; };
 		29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = PsiCashLib.xcframework; path = Frameworks/PsiCashLib.xcframework; sourceTree = "<group>"; };
 		29BA6D9F268630A9001445EA /* TunnelFileDescriptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TunnelFileDescriptor.h; sourceTree = "<group>"; };
@@ -515,8 +514,6 @@
 		4E5263CB2072984D0021FEF5 /* IAPViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPViewController.h; sourceTree = "<group>"; };
 		4E5DAE6320A942A300E06342 /* UILabel+GetLabelHeight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UILabel+GetLabelHeight.h"; sourceTree = "<group>"; };
 		4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UILabel+GetLabelHeight.m"; sourceTree = "<group>"; };
-		4EB846402151830600687344 /* AvailableServerRegions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AvailableServerRegions.h; sourceTree = "<group>"; };
-		4EB846412151830600687344 /* AvailableServerRegions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AvailableServerRegions.m; sourceTree = "<group>"; };
 		4EC5526120AB8DB9000B4BEA /* Pastel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pastel.h; sourceTree = "<group>"; };
 		4EC5526220AB8DBE000B4BEA /* Pastel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Pastel.m; sourceTree = "<group>"; };
 		4EC5526420AB8DC7000B4BEA /* PastelView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PastelView.h; sourceTree = "<group>"; };
@@ -681,13 +678,11 @@
 		9433F6FADEFD218CED8B343A /* Pods-PsiApi-PsiApiTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-PsiApiTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-PsiApiTests/Pods-PsiApi-PsiApiTests.release.xcconfig"; sourceTree = "<group>"; };
 		9876294EDE951EF39C9F97BE /* Pods-PsiApi-Testing-Utilities.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-Utilities.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-Utilities/Pods-PsiApi-Testing-Utilities.release.xcconfig"; sourceTree = "<group>"; };
 		9A06EEF4B515E4AE40E5CA93 /* Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Utilities-UtilitiesTests/Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig"; sourceTree = "<group>"; };
-		9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonConfigUserDefaults.h; sourceTree = "<group>"; };
 		9BFEC1C9F506CE1DF07306D2 /* NEBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NEBridge.h; sourceTree = "<group>"; };
 		9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPHelpViewController.m; sourceTree = "<group>"; };
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Authorization.m; sourceTree = "<group>"; };
 		9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Asserts.h; sourceTree = "<group>"; };
-		9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PsiphonConfigUserDefaults.m; sourceTree = "<group>"; };
 		9BFEC673CE5EA236279F07BD /* Authorization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Authorization.h; sourceTree = "<group>"; };
 		9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Additions.m"; sourceTree = "<group>"; };
 		9BFEC8783D4222F2272E50E7 /* BasePacketTunnelProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasePacketTunnelProvider.h; sourceTree = "<group>"; };
@@ -706,7 +701,6 @@
 		A84081E39C751846A6009BEC /* CloudsView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CloudsView.m; sourceTree = "<group>"; };
 		A840830557814D4234CFD86D /* ImageUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageUtils.h; sourceTree = "<group>"; };
 		A84083119A599C815D2D80F5 /* SkyButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SkyButton.h; sourceTree = "<group>"; };
-		A8408319CD72511CABBE4CD4 /* ContainerDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ContainerDB.h; sourceTree = "<group>"; };
 		A8408390A766C7C2C246797C /* PickerViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PickerViewController.m; sourceTree = "<group>"; };
 		A84083974C8CF9DDFE7A341D /* Strings.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Strings.m; sourceTree = "<group>"; };
 		A840841151FC43C5E1658677 /* AlertDialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AlertDialogs.m; sourceTree = "<group>"; };
@@ -716,7 +710,6 @@
 		A84084C5C538AC8171021D2C /* UIView+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Additions.m"; sourceTree = "<group>"; };
 		A840856AD6865619ACF78509 /* PsiphonProgressView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PsiphonProgressView.h; sourceTree = "<group>"; };
 		A840864BAA38AA3E4620EC35 /* PickerViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PickerViewController.h; sourceTree = "<group>"; };
-		A84086716D701D0F5B48E4C0 /* ContainerDB.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ContainerDB.m; sourceTree = "<group>"; };
 		A8408672FB2E1CD144A2BE7C /* SkyButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SkyButton.m; sourceTree = "<group>"; };
 		A840867F8062E477F0B355DD /* UIView+AutoLayoutViewGroup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+AutoLayoutViewGroup.m"; sourceTree = "<group>"; };
 		A84086A6BF880CC20E5C57B4 /* LayerAutoResizeUIView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LayerAutoResizeUIView.h; sourceTree = "<group>"; };
@@ -1113,8 +1106,6 @@
 				EF639C2E1F8FCE2A009D6B42 /* PsiFeedbackLogger.m */,
 				EFC2F5C9202267B0007B52F9 /* PsiphonConfigReader.h */,
 				EFC2F5CA202267B0007B52F9 /* PsiphonConfigReader.m */,
-				9BFEC0419AD3808370915E01 /* PsiphonConfigUserDefaults.h */,
-				9BFEC584519C408D9D6D3FF1 /* PsiphonConfigUserDefaults.m */,
 				4E0DCB181F28481E00495781 /* PsiphonDataSharedDB.h */,
 				4E0DCB191F28481E00495781 /* PsiphonDataSharedDB.m */,
 				EF652CDB1F365B8C002AFB48 /* SharedConstants.h */,
@@ -1189,8 +1180,6 @@
 				4E0A3668215AB7EE008A3D7B /* UIFont+Additions.m */,
 				4E5DAE6320A942A300E06342 /* UILabel+GetLabelHeight.h */,
 				4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */,
-				4E0A366A21666B99008A3D7B /* NSString+Additions.h */,
-				4E0A366B21666B99008A3D7B /* NSString+Additions.m */,
 				A8408A0C4220563DA1FE3048 /* ImageUtils.m */,
 				A840830557814D4234CFD86D /* ImageUtils.h */,
 				52DF5E9123C675EC00A1B067 /* ViewController+Additions.swift */,
@@ -1408,16 +1397,12 @@
 				EF652CCF1F3521F8002AFB48 /* Supporting Files */,
 				4ED48C06215058C900B1A9A5 /* Util */,
 				4ED48C05215056E800B1A9A5 /* ViewControllers */,
-				4EB846402151830600687344 /* AvailableServerRegions.h */,
-				4EB846412151830600687344 /* AvailableServerRegions.m */,
 				EF652CD21F35224C002AFB48 /* AppDelegate.h */,
 				EF652CD31F35224C002AFB48 /* AppDelegate.m */,
 				4E5263C6207294550021FEF5 /* EmbeddedServerEntries.h */,
 				4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */,
 				4E5263B5207290360021FEF5 /* EmbeddedServerEntriesHelpers.h */,
 				4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */,
-				A84086716D701D0F5B48E4C0 /* ContainerDB.m */,
-				A8408319CD72511CABBE4CD4 /* ContainerDB.h */,
 				52D2581022BADE1900CA956A /* SwiftDelegate.swift */,
 				52D2580F22BADE1900CA956A /* Psiphon-Bridging-Header.h */,
 				5245C5C82342A6840033EE13 /* UserDefaults.swift */,
@@ -1447,6 +1432,7 @@
 				8D82F0E525420E21002D37E7 /* PsiCashViewReducer.swift */,
 				8D82F1022542216C002D37E7 /* MainViewReducer.swift */,
 				29F8536D26D4549000533472 /* Requests+Additions.swift */,
+				296950A926DD363F0052330F /* ServerRegionReducer.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -1670,6 +1656,8 @@
 				EF90D799204F22C900228A63 /* FileUtils.m */,
 				CED6791924A4F88D00C4CA81 /* JSONCodable.h */,
 				CED6791A24A4F88D00C4CA81 /* JSONCodable.m */,
+				4E0A366A21666B99008A3D7B /* NSString+Additions.h */,
+				4E0A366B21666B99008A3D7B /* NSString+Additions.m */,
 				EF90D795204F22C900228A63 /* NSError+Convenience.h */,
 				EF90D79A204F22C900228A63 /* NSError+Convenience.m */,
 				EF90D79D204F22C900228A63 /* NSDate+Comparator.h */,
@@ -2076,7 +2064,6 @@
 				8D255E2D24620E2900FD5D1C /* NoConnectionBannerView.swift in Sources */,
 				EF90D7A6204F22C900228A63 /* NSDate+Comparator.m in Sources */,
 				CED6791424A4F82400C4CA81 /* JetsamPerAppVersionStat.m in Sources */,
-				4EB846422151830600687344 /* AvailableServerRegions.m in Sources */,
 				291C0B8E269CBF720075FAB7 /* SharedModel.xcdatamodeld in Sources */,
 				8D7789CA247499110038BFDA /* Reachability+Additions.swift in Sources */,
 				5246800922D51CE4009AEC6E /* PsiCashBalanceViewWrapper.swift in Sources */,
@@ -2106,6 +2093,7 @@
 				296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */,
 				52A2466F23A1769300A01FF1 /* PsiCashMessageViewWithButton.swift in Sources */,
 				8D0017D924DB4B1200EC3409 /* OnboardingViewController.swift in Sources */,
+				296950AA26DD363F0052330F /* ServerRegionReducer.swift in Sources */,
 				EFC2F5C420226782007B52F9 /* RootContainerController.m in Sources */,
 				EF90D7A5204F22C900228A63 /* timestamp_parse.c in Sources */,
 				EF652CD11F352212002AFB48 /* main.m in Sources */,
@@ -2139,7 +2127,6 @@
 				4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */,
 				52A2466D23A172A800A01FF1 /* ViewBuilderViewController.swift in Sources */,
 				5246800D22D65926009AEC6E /* UIUtils.swift in Sources */,
-				9BFECFEB3BC9F10542C1A416 /* PsiphonConfigUserDefaults.m in Sources */,
 				4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */,
 				8D7789B9247491CA0038BFDA /* PsiphonBundle.swift in Sources */,
 				291C0BA1269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m in Sources */,
@@ -2263,7 +2250,6 @@
 				52B3C54A23DF99E8003F6B12 /* AppObservables.m in Sources */,
 				A84084C8B5C16F0EB80364FA /* Strings.m in Sources */,
 				296A1A89267A01E70068B115 /* CopyableLabel.swift in Sources */,
-				A8408FF45D08D31E102FA41F /* ContainerDB.m in Sources */,
 				5245C5C92342A6840033EE13 /* UserDefaults.swift in Sources */,
 				2911A793263D5DED001A0A4D /* ViewBuilderContainerView.swift in Sources */,
 				52B3C54C23E0E895003F6B12 /* ButtonBuilder.swift in Sources */,
@@ -2294,6 +2280,7 @@
 				CE93EE5624F55B92001F4EC9 /* SharedConstants.m in Sources */,
 				EFC2F5CC20226835007B52F9 /* PsiphonConfigReader.m in Sources */,
 				29BA6DA1268630A9001445EA /* TunnelFileDescriptor.m in Sources */,
+				296950AB26E143870052330F /* NSString+Additions.m in Sources */,
 				29EE50B826ACDC0E00DB8A60 /* AppFiles.m in Sources */,
 				CED6794524A4F95D00C4CA81 /* RunningStat.m in Sources */,
 				CED6795224A4F9D400C4CA81 /* DiskBackedFile.m in Sources */,
@@ -2323,7 +2310,6 @@
 				CED6794724A4F95D00C4CA81 /* RunningMinMax.m in Sources */,
 				CED6794924A4F95D00C4CA81 /* RunningBins.m in Sources */,
 				CED6795A24A4FA1200C4CA81 /* FileRegistry.m in Sources */,
-				9BFECF8895D5FE1940A6F700 /* PsiphonConfigUserDefaults.m in Sources */,
 				CED6795624A4F9F100C4CA81 /* Archiver.m in Sources */,
 				CED6791C24A4F88D00C4CA81 /* JSONCodable.m in Sources */,
 				EF90D7B7204F235800228A63 /* FileUtils.m in Sources */,
