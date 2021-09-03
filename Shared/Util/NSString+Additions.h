@@ -17,15 +17,16 @@
  *
  */
 
+
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface AvailableServerRegions : NSObject
+@interface NSString (Additions)
 
-// Add any available regions from shared db to region adapter
-// TODO: return new regions?
-- (void)sync;
++ (BOOL)stringsBothEqualOrNil:(NSString*)a b:(NSString*)b;
+
+- (NSString *)stringByReplacingNewLineAndWhiteSpaces;
 
 @end
 

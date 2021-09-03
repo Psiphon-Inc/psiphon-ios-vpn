@@ -21,9 +21,8 @@
 import Foundation
 
 public func removedCommonPackageNames(_ value: String) -> String {
-    value.replacingOccurrences(of: "\"", with: "\\\"")
-        // Removes module prefixes.
-        .replacingOccurrences(of: "Psiphon.", with: "")
+    // Removes module prefixes.
+    value.replacingOccurrences(of: "Psiphon.", with: "")
         .replacingOccurrences(of: "Swift.", with: "")
         .replacingOccurrences(of: "PsiApi.", with: "")
         .replacingOccurrences(of: "AppStoreIAP.", with: "")

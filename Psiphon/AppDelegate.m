@@ -47,7 +47,6 @@
 #import "RACSignal+Operations.h"
 #import "RACReplaySubject.h"
 #import "Asserts.h"
-#import "ContainerDB.h"
 #import "AppObservables.h"
 #import <PsiphonTunnel/PsiphonTunnel.h>
 #import "RegionAdapter.h"
@@ -241,9 +240,10 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
 #pragma mark -
 
-- (void)reloadMainViewControllerAndImmediatelyOpenSettings {
+- (void)reloadMainViewControllerAnimated:(BOOL)animated
+                              completion:(void (^ __nullable)(void))completion {
     LOG_DEBUG();
-    [rootContainerController reloadMainViewControllerAndImmediatelyOpenSettings];
+    [rootContainerController reloadMainViewControllerAnimated:animated completion:completion];
 }
 
 - (void)reloadOnboardingViewController {
@@ -303,6 +303,10 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
 - (void)onSubscriptionBarViewStatusUpdate:(ObjcSubscriptionBarViewState *)status {
     [AppObservables.shared.subscriptionBarStatus sendNext: status];
+}
+
+- (void)onSelectedServerRegionUpdate:(Region *)region {
+    [AppObservables.shared.selectedServerRegion sendNext:region];
 }
 
 - (void)onVPNStatusDidChange:(NEVPNStatus)status {
@@ -367,32 +371,6 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [[SwiftDelegate.bridge getTopActiveViewController] presentViewController:navCtrl
                                                                     animated:TRUE
                                                                   completion:nil];
-}
-
-/*!
- * @brief Updates available egress regions from embedded server entries.
- *
- * This function should only be called once per app version on first launch.
- */
-- (void)updateAvailableEgressRegionsOnFirstRunOfAppVersion {
-    NSString *embeddedServerEntriesPath = PsiphonConfigReader.embeddedServerEntriesPath;
-    NSError *e;
-    NSSet<NSString*> *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:embeddedServerEntriesPath
-                                                                                     error:&e];
-
-    // Note: server entries may have been decoded before the error occurred and
-    // they will be present in the result.
-    if (e != nil) {
-        [PsiFeedbackLogger error:e message:@"Error decoding embedded server entries"];
-    }
-
-    if (embeddedEgressRegions != nil && [embeddedEgressRegions count] > 0) {
-        LOG_DEBUG("Available embedded egress regions: %@.", embeddedEgressRegions);
-        ContainerDB *containerDB = [[ContainerDB alloc] init];
-        [containerDB setEmbeddedEgressRegions:[NSArray arrayWithArray:[embeddedEgressRegions allObjects]]];
-    } else {
-        [PsiFeedbackLogger error:@"Error no egress regions found in %@.", embeddedServerEntriesPath];
-    }
 }
 
 @end

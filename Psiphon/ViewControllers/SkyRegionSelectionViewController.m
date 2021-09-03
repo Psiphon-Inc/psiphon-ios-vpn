@@ -38,6 +38,8 @@
     [self populateRegionsArray];
 
     // Listen to notification from client common library for when regions are updated.
+    // TODO: RegionAdapter should be decoupled from views, and ServerRegionState
+    // should be used instead.
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(onUpdateAvailableRegions)
                                                  name:kPsiphonAvailableRegionsNotification

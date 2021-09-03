@@ -108,6 +108,9 @@
 /* Message shown when verification of a product already purchased fails. */
 "FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Failed to verify purchase";
 
+/* Title of screen that lets user to send feedback about the app to Psiphon Inc. Should be kept short. */
+"FEEDBACK_TITLE" = "Feedback";
+
 /* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Thank you for helping improve Psiphon!";
 

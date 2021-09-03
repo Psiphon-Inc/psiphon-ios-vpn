@@ -23,6 +23,8 @@ import ArgumentParser
 import AppStateParser
 import CustomDump
 
+let stringLiteralLexemeParser = GenericTokenParser(languageDefinition: LanguageDefinition<()>.json).stringLiteral
+
 func runParser(input: String) -> Either<ParseError, AppStateValue> {
     let result = AppStateValue.parser.runSafe(userState: (), sourceName: "", input: input)
     
@@ -74,11 +76,7 @@ func recursiveApply(parseTree: AppStateValue) -> AppStateValue {
         
         // Tries to unquote and parse the string if possible.
         
-        guard string.contains("\"") else {
-            return .string(string)
-        }
-                
-        let unquoted = string.replacingOccurrences(of: "\\\"", with: "\"")
+        let unquoted = string.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
         
         switch AppStateValue.parser.runSafe(userState: (), sourceName: "", input: unquoted) {
             
@@ -90,8 +88,15 @@ func recursiveApply(parseTree: AppStateValue) -> AppStateValue {
             
             switch parsed {
                 
-            case .string(let string), .enumValue(let string):
-                // Did not make progress. String was returned as string.
+            case .string(let newString):
+                if string == newString {
+                    // Did not make progress. String was returned as string.
+                    return .string(string)
+                } else {
+                    return recursiveApply(parseTree: .string(newString))
+                }
+                
+            case .enumValue(let string):
                 // If a string turned into an enum, then it was probably a string,
                 // and didn't need further parsing.
                 return .string(string)
@@ -118,9 +123,6 @@ struct CLI: ParsableCommand {
     @Flag(name: [.customLong("nohl", withSingleDash: true)],
           help: "Disable syntax highlighting.")
     var noHighlight: Bool = false
-
-    @Flag(name: [.short, .long], help: "Unquotes the input.")
-    var unquote: Bool = false
 
     @Flag(help: "Prints parse tree.")
     var printParseTree: Bool = false
@@ -158,13 +160,6 @@ struct CLI: ParsableCommand {
 
             throw ValidationError("Must provide either <string> argument or -file option.")
 
-        }
-
-        input = input.trimmingCharacters(in: .whitespacesAndNewlines)
-        input = input.replacingOccurrences(of: "\\n", with: "")
-        
-        if unquote {
-            input = input.replacingOccurrences(of: "\\\"", with: "\"")
         }
         
         let result = runParser(input: input)

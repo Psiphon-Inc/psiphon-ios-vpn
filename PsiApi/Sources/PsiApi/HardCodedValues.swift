@@ -80,16 +80,22 @@ public enum PsiphonDeepLinking {
     
     public static let scheme = "psiphon"
     
-    public static let psiCashHost = "psicash"
-    
-    public static let speedBoostHost = "speedboost"
+    enum Hosts: String {
+        case psiCash = "psicash"
+        case speedBoost = "speedboost"
+        case feedback = "feedback"
+        case settings = "settings"
+    }
 
-    public static let legacyBuyPsiCashDeepLink = URL(string: "\(scheme)://\(psiCashHost)")!
-    public static let legacySpeedBoostDeepLink = URL(string: "\(scheme)://\(speedBoostHost)")!
+    public static let legacyBuyPsiCashDeepLink = URL(string: "\(scheme)://\(Hosts.psiCash.rawValue)")!
+    public static let legacySpeedBoostDeepLink = URL(string: "\(scheme)://\(Hosts.speedBoost.rawValue)")!
 
-    fileprivate static let psiCashDeepLinkBaseURL = URL(string: "\(scheme)://\(psiCashHost)")!
+    fileprivate static let psiCashDeepLinkBaseURL = URL(string: "\(scheme)://\(Hosts.psiCash.rawValue)")!
     public static let buyPsiCashDeepLink = psiCashDeepLinkBaseURL.appendingPathComponent("buy")
     public static let speedBoostDeepLink = psiCashDeepLinkBaseURL.appendingPathComponent("speedboost")
+    
+    public static let feedbackDeepLink = URL(string: "\(scheme)://\(Hosts.feedback.rawValue)")!
+    public static let settingsDeepLink = URL(string: "\(scheme)://\(Hosts.settings.rawValue)")!
 
 }
 

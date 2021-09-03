@@ -27,7 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (AppDelegate *)sharedAppDelegate;
 
-- (void)reloadMainViewControllerAndImmediatelyOpenSettings;
+- (void)reloadMainViewControllerAnimated:(BOOL)animated
+                              completion:(void (^ __nullable)(void))completion;
 
 - (void)reloadOnboardingViewController;
 
