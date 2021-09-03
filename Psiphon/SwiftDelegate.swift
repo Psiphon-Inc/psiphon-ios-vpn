@@ -502,7 +502,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             return true
         }
         deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.feedbackDeepLink ]) { [unowned self] in
-            self.store.send(.mainViewAction(.presentSettingsScreen))
+            self.store.send(.mainViewAction(.presentModalFeedbackScreen))
             return true
         }
         

@@ -194,6 +194,8 @@ struct AppEnvironment {
     
     let makeSettingsViewController: () -> UIViewController
     
+    let makeFeedbackViewController: () -> UIViewController
+    
     /// Clears cache and all website data from the webview.
     let clearWebViewDataStore: () -> Effect<Never>
     
@@ -490,6 +492,29 @@ func makeEnvironment(
 
             return nav
         },
+        makeFeedbackViewController: {
+
+            // TODO: This is a hack. Ideally IASK should be retired.
+            // FeedbackViewController is implemeneted as part of InAppSettingsKit.
+            // Since it does not store any user configs, we can present it
+            // safely from here without providing the  IASKSettingsStore object.
+            let commonLibBundle = PsiphonClientCommonLibraryHelpers.commonLibraryBundle()
+            let vc = FeedbackViewController()
+            vc.delegate = vc
+            vc.feedbackDelegate = feedbackViewControllerDelegate
+            vc.bundle = commonLibBundle
+            vc.file = "Feedback"
+            vc.settingsStore = nil
+            vc.showDoneButton = false
+            vc.showCreditsFooter = false
+            // Default title value is "Settings"
+            vc.title = UserStrings.Feedback_title()
+            
+            let nav = UINavigationController(rootViewController: vc)
+            
+            return nav
+            
+        },
         clearWebViewDataStore: {
             .fireAndForget {
                 clearWebViewDataStore()
@@ -711,7 +736,8 @@ fileprivate func toMainViewReducerEnvironment(env: AppEnvironment) -> MainViewEn
         serverRegionStore: env.serverRegionStore,
         reloadMainScreen: env.reloadMainScreen,
         makePsiCashAccountViewController: env.makePsiCashAccountViewController,
-        makeSettingsViewController: env.makeSettingsViewController
+        makeSettingsViewController: env.makeSettingsViewController,
+        makeFeedbackViewController: env.makeFeedbackViewController
     )
 }
 

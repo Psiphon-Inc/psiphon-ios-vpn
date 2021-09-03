@@ -63,6 +63,13 @@ enum MainViewAction: Equatable {
     case _presentSettingsScreenResult(willPresent: Bool)
     case dismissedSettingsScreen(forceReconnect: Bool)
     
+    // MARK: Feedback screen
+    /// Presents feedback screen modally. This is separate from feedback screen
+    /// presented by `InAppSettingsKit` thourght `PsiphonSettingsViewController`.
+    case presentModalFeedbackScreen
+    case _presentModalFeedbackScreenResult(willPresent: Bool)
+    case dismissedModalFeedbackScreen
+    
 }
 
 struct MainViewState: Equatable {
@@ -78,6 +85,11 @@ struct MainViewState: Equatable {
     
     /// Represents presentation state of the settings screen.
     var isSettingsScreenShown: Pending<Bool> = .completed(false)
+    
+    /// Represents presentation state of the feedback screen.
+    /// This is state of a modally presented feedback screen, and is separate
+    /// from `FeedbackViewController` presented by the `PsiphonSettingsViewController`.
+    var isModalFeedbackScreenShown: Pending<Bool> = .completed(false)
     
 }
 
@@ -130,8 +142,11 @@ struct MainViewEnvironment {
     /// Makes `PsiCashAccountViewController` as root of a `UINavigationController`.
     let makePsiCashAccountViewController: () -> UIViewController
     
-    /// Makes `SettingsViweController` as root of a `UINavigationController`.
+    /// Makes `SettingsViewController` as root of a `UINavigationController`.
     let makeSettingsViewController: () -> UIViewController
+    
+    /// Makes `FeedbackViewController` as root of a `UINavigationController`.
+    let makeFeedbackViewController: () -> UIViewController
     
 }
 
@@ -622,7 +637,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         if !willPresent {
             return [
                 environment.feedbackLogger.log(
-                    .warn, "Will not present PsiCash Accounts screen")
+                    .warn, "Will not present settings screen")
                     .mapNever()
             ]
         }
@@ -648,6 +663,54 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         }
         
         return effects
+        
+    case .presentModalFeedbackScreen:
+        
+        guard case .completed(false) = state.mainView.isModalFeedbackScreenShown else {
+            return []
+        }
+        
+        state.mainView.isModalFeedbackScreenShown = .pending
+        
+        return [
+            Effect.deferred {
+                let topVC = environment.getTopActiveViewController()
+                let searchResult = topVC.traversePresentingStackFor(
+                    type: SettingsViewController.self, searchChildren: true)
+                
+                switch searchResult {
+                case .notPresent:
+                    let settingsViewController = environment.makeFeedbackViewController()
+                    topVC.present(settingsViewController, animated: true, completion: nil)
+                    return ._presentModalFeedbackScreenResult(willPresent: true)
+                case .presentInStack(_), .presentTopOfStack(_):
+                    return ._presentModalFeedbackScreenResult(willPresent: false)
+                }
+            }
+        ]
+        
+    case ._presentModalFeedbackScreenResult(willPresent: let willPresent):
+        
+        state.mainView.isModalFeedbackScreenShown = .completed(willPresent)
+        if !willPresent {
+            return [
+                environment.feedbackLogger.log(
+                    .warn, "Will not present feedback screen")
+                    .mapNever()
+            ]
+        }
+        return []
+        
+    case .dismissedModalFeedbackScreen:
+        
+        guard state.mainView.isModalFeedbackScreenShown != .completed(false) else {
+            // Feedback screen was not presented modally, instead
+            // it was presented through PsiphonSettingsViewController.
+            return []
+        }
+        
+        state.mainView.isModalFeedbackScreenShown = .completed(false)
+        return []
         
     }
     
@@ -679,6 +742,10 @@ final class PsiphonFeedbackDelegate: StoreDelegate<AppAction>, FeedbackViewContr
     
     func userPressedURL(_ URL: URL!) {
         storeSend(.mainViewAction(.openExternalURL(URL)))
+    }
+    
+    func feedbackViewControllerWillDismiss() {
+        storeSend(.mainViewAction(.dismissedModalFeedbackScreen))
     }
     
 }
