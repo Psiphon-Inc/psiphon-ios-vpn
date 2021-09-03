@@ -209,7 +209,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
     private var environmentCleanup: (() -> Void)?
 
     // NSNotification observers
-    private var appLangChagneObserver: NSObjectProtocol?
+    private var appLangChangeObserver: NSObjectProtocol?
     
     private override init() {
 
@@ -508,7 +508,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         
         // Note that settings can also change outside of IASK menu,
         // such as language selection in onboarding.
-        appLangChagneObserver = NotificationCenter.default.addObserver(
+        appLangChangeObserver = NotificationCenter.default.addObserver(
             forName: NSNotification.Name(kIASKAppSettingChanged),
             object: nil,
             queue: .main
@@ -969,7 +969,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     
     @objc func applicationWillTerminate(_ application: UIApplication) {
         
-        if let observer = self.appLangChagneObserver {
+        if let observer = self.appLangChangeObserver {
             NotificationCenter.default.removeObserver(observer)
         }
         
