@@ -53,7 +53,12 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
 @property (nonatomic) BOOL hasActiveSubscription;
 @property (nonatomic) BOOL hasBeenInIntroPeriod;
+
+// TRUE if pending result of IAP product request.
+@property (nonatomic) BOOL pendingProductRequestResponse;
+
 @property (nonatomic) NSArray<SKProduct *> *_Nonnull storeProducts;
+
 @property (nonatomic) NSString *_Nullable pendingProductIdentifier;
 @property (nonatomic) RACDisposable *subscriptionStatusDisposable;
 
@@ -70,6 +75,7 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     if (self) {
         _hasActiveSubscription = FALSE;
         _hasBeenInIntroPeriod = FALSE;
+        _pendingProductIdentifier = FALSE;
         _storeProducts = [NSArray array];
         _pendingProductIdentifier = nil;
 
@@ -93,23 +99,37 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     SKProductsRequest* productRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:productIdentifiers];
     productRequest.delegate = self;
     [productRequest start];
+    
+    self.pendingProductRequestResponse = TRUE;
+    
 }
 
 #pragma mark - SKProductsRequestDelegate
 
 - (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response {
+    IAPViewController *__weak weakSelf = self;
     dispatch_async_main(^{
-        NSSortDescriptor *mySortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"price" ascending:YES];
-        NSMutableArray *sortArray = [[NSMutableArray alloc] initWithArray:response.products];
-        [sortArray sortUsingDescriptors:[NSArray arrayWithObject:mySortDescriptor]];
-        self.storeProducts = sortArray;
-        [self reloadTableData];
+        IAPViewController *__strong strongSelf = weakSelf;
+        if (strongSelf != nil) {
+            NSSortDescriptor *mySortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"price" ascending:YES];
+            NSMutableArray *sortArray = [[NSMutableArray alloc] initWithArray:response.products];
+            [sortArray sortUsingDescriptors:[NSArray arrayWithObject:mySortDescriptor]];
+            strongSelf.storeProducts = sortArray;
+            strongSelf.pendingProductRequestResponse = FALSE;
+            [strongSelf reloadTableData];
+        }
     });
+    
 }
 
 - (void)request:(SKRequest *)request didFailWithError:(NSError *)error {
+    IAPViewController *__weak weakSelf = self;
     dispatch_async_main(^{
-        [self reloadTableData];
+        IAPViewController *__strong strongSelf = weakSelf;
+        if (strongSelf != nil) {
+            strongSelf.pendingProductRequestResponse = FALSE;
+            [strongSelf reloadTableData];
+        }
     });
 }
 
@@ -255,8 +275,8 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     noProductsLabel.text = Strings.productRequestFailedNoticeText;
 
     UIButton *refreshButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    NSString *refreshButtonTitle = [@"Tap to retry"
-                uppercaseStringWithLocale:[SwiftDelegate.bridge getLocaleForCurrentAppLanguage]];
+    NSString *refreshButtonTitle = [[UserStrings Retry_button_title]
+                   uppercaseStringWithLocale:[SwiftDelegate.bridge getLocaleForCurrentAppLanguage]];
     [refreshButton setTitle:refreshButtonTitle forState:UIControlStateNormal];
     [refreshButton setTitle:refreshButtonTitle forState:UIControlStateHighlighted];
     [refreshButton setTintColor:UIColor.whiteColor];
@@ -308,10 +328,18 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
 
-    // If no products have been loaded show the alternative header.
-    if ([self.storeProducts count] == 0 && !self.hasActiveSubscription) {
+    if ([self.storeProducts count] == 0 && !self.hasActiveSubscription && !self.pendingProductRequestResponse) {
+        // If no products have been loaded, and there is no pending product request,
+        // displays the retry button.
         UIView *header = [self createNoProductsView];
         return header;
+        
+    } else if ([self.storeProducts count] == 0 && !self.hasActiveSubscription && self.pendingProductRequestResponse) {
+        // If no products have been loaded yet, but there is a pending product requdst,
+        // only show a spinner.
+        UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] init];
+        [spinner startAnimating];
+        return spinner;
 
     } else {
         UIView *cellView = [[UIView alloc] initWithFrame:CGRectZero];
