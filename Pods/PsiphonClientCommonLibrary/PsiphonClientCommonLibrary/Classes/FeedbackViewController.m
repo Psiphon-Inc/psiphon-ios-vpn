@@ -80,6 +80,22 @@
     [super viewWillDisappear:animated];
 }
 
+- (void)viewDidDisappear:(BOOL)animated {
+    [super viewDidDisappear:animated];
+    
+    if ([self isBeingDismissed] ||
+        [self.parentViewController isBeingDismissed] ||
+        [self isMovingFromParentViewController]) {
+        
+        id<FeedbackViewControllerDelegate> strongDelegate = self.feedbackDelegate;
+        if ([strongDelegate respondsToSelector:@selector(feedbackViewControllerWillDismiss)]) {
+            [strongDelegate feedbackViewControllerWillDismiss];
+        }
+        
+    }
+    
+}
+
 - (void)sendFeedback:(id)sender {
 
     NSUserDefaults *userDefaults = [NSUserDefaults standardUserDefaults];
@@ -88,13 +104,13 @@
     NSString *comments = _comments.showingPlaceholder ? @"" : _comments.textView.text; // textview contains placeholder text, user has inputted nothing
     NSString *emailAddress = [userDefaults stringForKey:kEmailSpecifierKey];
     BOOL uploadDiagnostics = [userDefaults boolForKey:kSendDiagnosticsSpecifierKey];
-
-    [self.navigationController popViewControllerAnimated:YES];
-
+    
     id<FeedbackViewControllerDelegate> strongDelegate = self.feedbackDelegate;
     if ([strongDelegate respondsToSelector:@selector(userSubmittedFeedback:comments:email:uploadDiagnostics:)]) {
         [strongDelegate userSubmittedFeedback:selectedThumbIndex comments:comments email:emailAddress uploadDiagnostics:uploadDiagnostics];
     }
+    
+    [self dismissOrPopFeedbackViewController];
 }
 
 #pragma mark - IASK UITableView delegate methods
@@ -283,7 +299,6 @@
     if ([strongDelegate respondsToSelector:@selector(userPressedURL:)]) {
         [strongDelegate userPressedURL:URL];
     }
-    [self.navigationController dismissViewControllerAnimated:YES completion:nil];
     return NO;
 }
 
@@ -313,7 +328,21 @@
 #pragma mark - Helper functions
 
 - (void)dismiss:(id)sender {
-    [self.navigationController popViewControllerAnimated:YES];
+    [self dismissOrPopFeedbackViewController];
+}
+
+- (void)dismissOrPopFeedbackViewController {
+    
+    if ([self.navigationController.childViewControllers count] == 1) {
+        // This view controller is the only child of the self.navigationController.
+        // Dismisses both.
+        [self dismissViewControllerAnimated:TRUE completion:nil];
+    } else {
+        // This view controller is pushed on top of another child view controller
+        // of the self.navigationController.
+        [self.navigationController popViewControllerAnimated:YES];
+    }
+    
 }
 
 @end
