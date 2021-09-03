@@ -425,6 +425,12 @@ import Foundation
                                  comment: "Body of an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. The words 'PsiCash' and 'Psiphon' must not be translated or transliterated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.")
     }
     
+    static func Feedback_title() -> String {
+        return NSLocalizedString("FEEDBACK_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Feedback",
+                                 comment: "Title of screen that lets user to send feedback about the app to Psiphon Inc. Should be kept short.")
+    }
+    
 }
 
 // MARK: Internet reachability
