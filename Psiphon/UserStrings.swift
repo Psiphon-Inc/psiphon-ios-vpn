@@ -769,7 +769,7 @@ extension UserStrings {
             comment: "Action button title, that when pressed connects the user to Psiphon network.")
     }
 
-    static func Retry_button_title() -> String {
+    @objc static func Retry_button_title() -> String {
         return NSLocalizedString(
             "RETRY_BUTTON_TITLE", tableName: nil, bundle: .main,
             value: "Retry",
