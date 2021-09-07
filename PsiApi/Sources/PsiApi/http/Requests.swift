@@ -418,8 +418,7 @@ public struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equ
                     // hence error is converted to a value and passed downstream.
                     // These errors will not terminate the signal.
                     return SignalProducer.neverComplete(value:
-                        .value(.willRetry(.whenResolved(tunnelError: tunnelError)))
-                    ).concat(.never)
+                        .value(.willRetry(.whenResolved(tunnelError: tunnelError))))
                     
                 case .responseRetryError(let responseError):
                     // Error is due to retrieved response for the request,
