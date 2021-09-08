@@ -106,6 +106,9 @@
 /*[UNTRANSLATED] Message shown when verification of a product already purchased fails. */
 "FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Failed to verify purchase";
 
+/* Title of screen that lets user to send feedback about the app to Psiphon Inc. Should be kept short. */
+"FEEDBACK_TITLE" = "Rückmeldung";
+
 /* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Rückmeldung erfolgreich hochgeladen";
 
@@ -319,10 +322,10 @@
 /*[UNTRANSLATED] Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "PSICASH_SPEED_BOOST_PRODUCT_NOT_FOUND_MESSAGE" = "Speed Boost product not found. Your app may be out of date. Please check for updates.";
 
-/*[UNTRANSLATED] Body of an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. The word 'PsiCash' must not be translated or transliterated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+/*[UNTRANSLATED] Body of an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. The words 'PsiCash' and 'Psiphon' must not be translated or transliterated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "PSICASH_SPEED_PORT_LIMITS_BODY" = "Without active Speed Boost, your speed is limited and some internet traffic is not supported. Activate Speed Boost with PsiCash to unlock the full potential of your Psiphon experience.";
 
-/*[UNTRANSLATED] Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. */
+/*[UNTRANSLATED] Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. Port here refers to port in computer networking. */
 "PSICASH_SPEED_PORT_LIMITS_HEAD" = "Speed and Port Limits";
 
 /*[UNTRANSLATED] A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon */
