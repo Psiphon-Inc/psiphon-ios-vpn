@@ -676,7 +676,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             Effect.deferred {
                 let topVC = environment.getTopActiveViewController()
                 let searchResult = topVC.traversePresentingStackFor(
-                    type: SettingsViewController.self, searchChildren: true)
+                    type: FeedbackViewController.self, searchChildren: true)
                 
                 switch searchResult {
                 case .notPresent:
