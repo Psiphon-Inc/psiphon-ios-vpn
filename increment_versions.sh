@@ -123,9 +123,12 @@ increment_version_number_into() {
             ;;
         minor)
             _MINOR=$((_MINOR + 1))
+            _PATCH=0
             ;;
         major)
             _MAJOR=$((_MAJOR + 1))
+            _MINOR=0
+            _PATCH=0
             ;;
         *)
             echo "Incorrect case '${2}'"
