@@ -20,6 +20,7 @@
 import Foundation
 import PsiApi
 import AppStoreIAP
+import class PsiphonClientCommonLibrary.Region
 
 extension TunnelProviderVPNStatus: CustomStringFeedbackDescription {
     
@@ -116,4 +117,10 @@ extension UserFeedback: CustomFieldFeedbackDescription {
          "submitTime": submitTime]
     }
 
+}
+
+extension Region {
+    open override var description: String {
+        "Region(code: \(String(describing: code)), serverExists: \(serverExists))"
+    }
 }

@@ -50,7 +50,8 @@ struct AppState: Equatable {
     var serverRegionState = ServerRegionState(selectedRegion: nil)
 }
 
-// Fields that are added to the
+// Fields of AppState that are to be included in the feedback,
+// must be manually added.
 extension AppState: CustomFieldFeedbackDescription {
     var feedbackFields: [String : CustomStringConvertible] {
         [
@@ -67,6 +68,7 @@ extension AppState: CustomFieldFeedbackDescription {
             "appDelegateState": String(describing: appDelegateState),
             "queuedFeedbacks": String(describing: queuedFeedbacks),
             "mainView": String(describing: mainView),
+            "serverRegionState": String(describing: serverRegionState)
         ]
     }
 }
