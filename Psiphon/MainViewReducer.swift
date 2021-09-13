@@ -731,8 +731,8 @@ final class PsiphonFeedbackDelegate: StoreDelegate<AppAction>, FeedbackViewContr
         
         let submitFeedbackData = SubmitFeedbackData(
             selectedThumbIndex: selectedThumbIndex,
-            comments: comments,
-            email: email,
+            comments: comments ?? "",
+            email: email ?? "",
             uploadDiagnostics: uploadDiagnostics
         )
         
