@@ -29,7 +29,7 @@ public protocol CustomFieldFeedbackDescription: FeedbackDescription, CustomStrin
     var feedbackFields: [String: CustomStringConvertible] { get }
 }
 
-extension CustomFieldFeedbackDescription {
+public extension CustomFieldFeedbackDescription {
     /// Default description for `CustomFeedbackDescription`.
     ///
     /// For example, given the following struct
@@ -48,14 +48,14 @@ extension CustomFieldFeedbackDescription {
     /// let value = SomeValue(string: "string", float: 3.14)
     /// value.description == "SomeValue([\"float\": 3.14])"
     /// ```
-    public var description: String {
+    var description: String {
         feedbackFieldsDescription
     }
     
     /// For `NSObject` classes, default `description` field of `CustomFieldFeedbackDescription` will not be called.
     /// Classes that want to conform to this protocol should also override `NSObject` `description` property,
     /// and only call this function.
-    public func objcClassDescription() -> String {
+    func objcClassDescription() -> String {
         feedbackFieldsDescription
     }
     

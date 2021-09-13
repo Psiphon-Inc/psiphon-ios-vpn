@@ -233,27 +233,24 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
                 switch searchResult {
                 case .notPresent:
                     // No-op.
-                    observer.send(value: false)
-                    observer.sendCompleted()
+                    observer.fulfill(value: false)
                     return
                     
                 case .presentInStack(let viewController):
                     viewController.dismiss(animated: false, completion: {
-                        observer.send(value: true)
-                        observer.sendCompleted()
+                        observer.fulfill(value: true)
                     })
                     
                 case .presentTopOfStack(let viewController):
                     viewController.dismiss(animated: false, completion: {
-                        observer.send(value: true)
-                        observer.sendCompleted()
+                        observer.fulfill(value: true)
                     })
                 }
             }.flatMap(.latest) { (displayPsiCashAccountsScreen: Bool) -> Effect<Never> in
                 if displayPsiCashAccountsScreen {
                     return environment.mainViewStore(.presentPsiCashAccountScreen)
                 } else {
-                    return Effect.never
+                    return Effect.empty
                 }
             }.mapNever()
             ]
