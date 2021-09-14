@@ -112,8 +112,8 @@
 /*[UNTRANSLATED] Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Thank you for helping improve Psiphon!";
 
-/*[UNTRANSLATED] Button title that lets users reset their password if they forgot their account's password. */
-"FORGOT_PASSWORD" = "Forgot password?";
+/* Button title that lets users reset their password if they forgot their account's password. */
+"FORGOT_PASSWORD" = "Сырсөздү унуттуңузбу?";
 
 /*[UNTRANSLATED] Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "Free";

@@ -112,8 +112,8 @@
 /*[UNTRANSLATED] Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Thank you for helping improve Psiphon!";
 
-/*[UNTRANSLATED] Button title that lets users reset their password if they forgot their account's password. */
-"FORGOT_PASSWORD" = "Forgot password?";
+/* Button title that lets users reset their password if they forgot their account's password. */
+"FORGOT_PASSWORD" = "Құпиясөзді ұмыттыңыз ба?";
 
 /*[UNTRANSLATED] Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "Free";
@@ -136,8 +136,8 @@
 /*[UNTRANSLATED] Message shown when a resource (online or offline) fails to load. */
 "LOADING_FAILED" = "Loading failed";
 
-/*[UNTRANSLATED] Title on a button that lets users login to their account with the username and password they have entered. */
-"LOG_IN_BUTTON_TITLE" = "Log in";
+/* Title on a button that lets users login to their account with the username and password they have entered. */
+"LOG_IN_BUTTON_TITLE" = "Кіру";
 
 /*[UNTRANSLATED] Message title informing the user that they must sign up for an account or log in to their account */
 "LOG_IN_OR_SIGN_UP" = "Log in or sign up";
