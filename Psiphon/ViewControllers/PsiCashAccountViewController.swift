@@ -319,6 +319,9 @@ final class PsiCashAccountViewController: ReactiveViewController {
         }
         
         mutate(usernameTextField.textField) {
+            if #available(iOS 11.0, *) {
+                $0.textContentType = .username
+            }
             $0.becomeFirstResponder()
             $0.autocorrectionType = .no
             $0.autocapitalizationType = .none
@@ -326,6 +329,9 @@ final class PsiCashAccountViewController: ReactiveViewController {
         }
         
         mutate(passwordTextField.textField) {
+            if #available(iOS 11.0, *) {
+                $0.textContentType = .password
+            }
             $0.returnKeyType = .go
         }
         
