@@ -766,10 +766,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
     NSDictionary *tunnelUserConfigs = [self.sharedDB getTunnelCoreUserConfigs];
     
+#if DEBUG || DEV_RELEASE
     NSString *tunnelUserConfigsDescription = [[tunnelUserConfigs description]
                                               stringByReplacingNewLineAndWhiteSpaces];
     [PsiFeedbackLogger infoWithType:PsiphonTunnelDelegateLogType
                              format:@"TunnelCore user configs: %@", tunnelUserConfigsDescription];
+#endif
 
     // Get a mutable copy of the Psiphon configs.
     NSMutableDictionary *mutableConfigCopy = [psiphonConfigReader.config mutableCopy];
