@@ -452,9 +452,17 @@ final class PsiCashViewController: ReactiveViewController {
                             // Has Speed Boost products
                             self.containerView.bind(.right(.left(viewModel)))
                         } else {
-                            // There are no Speed Boost products, asks user to send feedback.
-                            self.containerView.bind(
-                                .right(.right(.right(.right(.noSpeedBoostProducts)))))
+                            
+                            // If there is no pending PsiCash refresh state, and
+                            // there are no Speed Boost products, shows error message.
+                            if case .pending = observed.readerState.psiCash.pendingPsiCashRefresh {
+                                // Shows spinner while PsiCash refresh state is pending.
+                                self.containerView.bind(.right(.right(.left(true))))
+                            } else {
+                                self.containerView.bind(
+                                    .right(.right(.right(.right(.noSpeedBoostProducts)))))
+                            }
+                            
                         }
                         
                     case .some(_):
