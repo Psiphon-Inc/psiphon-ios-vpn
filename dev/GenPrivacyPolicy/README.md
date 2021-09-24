@@ -20,6 +20,6 @@ OPTIONS:
 ## Example usage
 
 ```
-$ swift run GenPrivacyPolicy --app-language-key appLangKey --privacy-policy-template-url https://raw.githubusercontent.com/.../privacy.html.eco --translations-url https://raw.githubusercontent.com/.../messages.json > output.swift
+$ swift run GenPrivacyPolicy --app-language-key languageCode --privacy-policy-template-url https://raw.githubusercontent.com/.../privacy.html.eco --translations-url https://raw.githubusercontent.com/.../messages.json > output.swift
 
 ```

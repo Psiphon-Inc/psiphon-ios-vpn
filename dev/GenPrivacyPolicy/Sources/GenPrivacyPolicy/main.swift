@@ -65,7 +65,7 @@ struct CLI: ParsableCommand {
         try removeElementsWithNoText(ppSection)
         
         let acc = StringBuilder()
-        acc.appendLine("static func privacy_policy_...() -> String {")
+        acc.appendLine("static func privacy_policy_...(\(appLanguageKey): String) -> String {")
         acc.appendLine("")
         
         for (translationKey, swiftTranslationKey) in translationKeysMap {
