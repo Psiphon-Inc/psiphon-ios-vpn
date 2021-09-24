@@ -25,15 +25,16 @@ import Promises
 /// Represents different stages of onboarding.
 /// Note that each stage may not be limited to only one screen.
 enum OnboardingStage: String, Codable {
+    
     case languageSelection
-    case privacyPolicy_v2018_05_15
+    case privacyPolicy_v2021_09_09
     case vpnConfigPermission
     case userNotificationPermission
     
     /// Ordered set of the stages that would have to be completed by the user.
     static let stagesToComplete: [OnboardingStage] =
         [ .languageSelection,
-          .privacyPolicy_v2018_05_15,
+          .privacyPolicy_v2021_09_09,
           .vpnConfigPermission,
           .userNotificationPermission ]
     
@@ -55,7 +56,7 @@ fileprivate extension OnboardingStage {
     var screens: OrderedSet<OnboardingScreen> {
         switch self {
         case .languageSelection,
-             .privacyPolicy_v2018_05_15:
+             .privacyPolicy_v2021_09_09:
             return [ OnboardingScreen(stage: self, screenIndex: 0) ]
             
         case .vpnConfigPermission,
@@ -79,7 +80,7 @@ fileprivate extension OnboardingScreen {
         switch (self.stage, self.screenIndex) {
         case (.languageSelection, 0):
             return true
-        case (.privacyPolicy_v2018_05_15, 0):
+        case (.privacyPolicy_v2021_09_09, 0):
             return false
         case (.vpnConfigPermission, 0):
             return true
@@ -282,7 +283,7 @@ fileprivate extension OnboardingScreen {
                 self.present(nav, animated: true, completion: nil)
             }
 
-        case (.privacyPolicy_v2018_05_15, 0):
+        case (.privacyPolicy_v2021_09_09, 0):
             onboardingView = makePrivacyPolicyOnboardingView(
                 onAccepted: { [unowned self] in
                     self.gotoScreenFollowing(screenIndex: currentIndex)
@@ -479,7 +480,7 @@ fileprivate func makePrivacyPolicyOnboardingView(
     return OnboardingScrollableView(
         image: UIImage(named: "OnboardingPrivacyPolicy")!,
         withTitle: Strings.privacyPolicyTitle(),
-        withBody: Strings.privacyPolicyHTMLText_v2018(),
+        withBody: UserStrings.privacyPolicyHTMLText_v2021_09_09(appLangKey: UserDefaultsConfig().appLanguage),
         withAccessoryView: stackView
     )
 }
