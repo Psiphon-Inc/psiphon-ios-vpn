@@ -74,7 +74,7 @@
     bodyTextView.backgroundColor = UIColor.clearColor;
 
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc]
-            initWithData:[htmlBody dataUsingEncoding:NSUTF8StringEncoding]
+            initWithData:[htmlBody dataUsingEncoding:NSUnicodeStringEncoding]
                  options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType}
       documentAttributes:nil
                    error:nil];
