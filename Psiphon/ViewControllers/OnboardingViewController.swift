@@ -480,7 +480,7 @@ fileprivate func makePrivacyPolicyOnboardingView(
     return OnboardingScrollableView(
         image: UIImage(named: "OnboardingPrivacyPolicy")!,
         withTitle: Strings.privacyPolicyTitle(),
-        withBody: UserStrings.privacyPolicyHTMLText_v2021_09_09(appLangKey: UserDefaultsConfig().appLanguage),
+        withHTMLBody: UserStrings.privacyPolicyHTMLText_v2021_09_09(appLangKey: UserDefaultsConfig().appLanguage),
         withAccessoryView: stackView
     )
 }
