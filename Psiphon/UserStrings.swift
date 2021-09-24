@@ -867,7 +867,7 @@ extension UserStrings {
 
 extension UserStrings {
     
-    static func privacyPolicyHTMLText_v2021_09_09(appLangKey: String) -> String {
+    static func privacyPolicyHTMLText_v2021_09_09(languageCode: String) -> String {
         
         let privacy_information_collected_vpndata_shareable_subhead = NSLocalizedString("privacy-information-collected-vpndata-shareable-subhead", tableName: nil, bundle: Bundle.main,
                                                                                         value: "Shareable Aggregated Data",
@@ -1302,7 +1302,7 @@ extension UserStrings {
         </ul>
         <!-- App Stores -->
         <h3>\(faq_information_collected_answer_head_4)</h3>
-        <p> \(faq_information_collected_answer_para_10) <a href="https://support.google.com/googleplay/android-developer/answer/139628?hl=\(appLangKey)" target="_blank">https://support.google.com/googleplay/android-developer/answer/139628?hl=\(appLangKey)</a> </p>
+        <p> \(faq_information_collected_answer_para_10) <a href="https://support.google.com/googleplay/android-developer/answer/139628?hl=\(languageCode)" target="_blank">https://support.google.com/googleplay/android-developer/answer/139628?hl=\(languageCode)</a> </p>
         """
     }
     
