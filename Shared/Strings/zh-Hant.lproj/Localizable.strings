@@ -106,6 +106,72 @@
 /*[UNTRANSLATED] Message shown when verification of a product already purchased fails. */
 "FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Failed to verify purchase";
 
+/* No comment provided by engineer. */
+"faq-information-collected-answer-head-2" = "反饋";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-head-3" = "電子郵件回復者";
+
+/* this is referring to the general idea of app stores, like the Google Play Store, Amazon AppStore, Apple App Store */
+"faq-information-collected-answer-head-4" = "應用程式商店";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-10" = "請注意如果在應用程式商店下載賽風，譬如谷歌商店或是亞馬遜商店，這些商店有可能會收集額外的資料。以下的例子是谷歌商店會收集的資料：";
+
+/*[UNTRANSLATED] No comment provided by engineer. */
+"faq-information-collected-answer-para-11" = "When you send an email request to our email auto-responder server, we are able to see your email address. While your email is being processed it is saved to the email server's disk, and it is deleted as soon as it is processed (usually in a few seconds). Your email address may be written to the server system logs. These logs are deleted after one week.";
+
+/*[UNTRANSLATED] No comment provided by engineer. */
+"faq-information-collected-answer-para-12" = "Our email auto-responder server is hosted in the Amazon EC2 cloud. This means that Amazon is able to see the email you send and our response to you.";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-13" = "我們每收到一封電子郵件，都會把訊息存儲到：";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-13-item-1" = "收到該郵件請求的日期和時間。";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-13-item-2" = "回復該郵件請求的日期和時間為：";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-13-item-3" = "郵件的大小。";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-13-item-4" = "電郵請求來源的郵件伺服器。（域名的最后三部分。例如<code>ne1.example.com</code>，而不是<code>web120113.mail.ne1.example.com</code>。）";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-6" = "當您選擇通過 Psiphon 提交回饋意見時，您將有提交診斷資料的選項。我們使用這些資訊來幫助我們解決您可能遇到的任何問題，並幫助我們維持 Psiphon 平穩運行。發送診斷資料是完全可行的。在您發送此資料之前，它已經被加密了，且只有我們可以解密。數據中的信息來自於不同平台，但它可能包括：";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-7-item-1" = "作業系統版本";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-7-item-2" = "防毒軟體版本";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-7-item-3" = "您如何連接到網路（例如，您是否使用撥號連線或者通過代理連接）";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-7-item-4" = "您的電腦有多少可用記憶體";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-7-list-start" = "Windows：";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-8-item-1" = "安卓版本";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-8-item-2" = "設備型號";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-8-item-3" = "您的設備是否 root 過";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-8-list-start" = "Android：";
+
+/* Heading for a section in our privacy policy. */
+"faq-information-collected-question" = "賽風收集用戶的哪些資訊？";
+
 /* Title of screen that lets user to send feedback about the app to Psiphon Inc. Should be kept short. */
 "FEEDBACK_TITLE" = "反饋";
 
@@ -205,59 +271,236 @@
 /*[UNTRANSLATED] Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
 "PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Something went wrong, please try again later.\n\nIf this problem persists, please send a feedback.";
 
+/* Sub-heading on the Privacy Policy page above the info about what user information is collected by the ads shown in the Psiphon client software */
+"privacy-information-collected-client-ads-head" = "Psiphon 客戶廣告網絡";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-client-advertising-networks-para-1" = "我們有時使用廣告系統支持我們的服務，這可能使用諸如 Cookie 和 Web 信標技術。我們的廣告合作商使用 Cookie 使他們及其合作伙伴基於您的使用資料為您提供廣告。這一過程收集的任何資料將依於合作廣告商的隱私政策處理。";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-client-advertising-networks-para-2" = "您可以選擇不使用 Cookie 相關的基於訪問興趣的廣告網路：";
+
+/*[UNTRANSLATED] Header text in the 'my.psi.cash' section of the Privacy page. Refers to the cookies stored by web browsers. */
+"privacy-information-collected-mypsicash-cookies-head" = "Cookies";
+
+/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-cookies-para-1" = "my.psi.cash only uses cookies and similar tracking technologies to carry out activities that are essential for the operation of the website. Essential cookies are necessary to ensure basic functions of the website. Cookies are small text files that are stored on your computer and saved by your browser, and do not represent any risk to your device. You can configure your browser settings to personalize how you would like your browser to handle cookies. Disabling essential cookies will degrade the functionality of this website.";
+
+/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-para-1" = "Users create and manage their PsiCash accounts on the <a href=\"https://my.psi.cash\" target=\"_blank\" rel=\"noopener noreferrer\">my.psi.cash</a> website.";
+
+/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-recaptcha-para-1" = "my.psi.cash uses Google’s reCAPTCHA v3 (hereinafter “reCAPTCHA”), which protects websites from spam and abuse by non-human users (i.e., bots). reCAPTCHA collects personal information that is required for the functioning of the technology and is subject to its own privacy policy. Use of my.psi.cash indicates acceptance of Google’s <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">Privacy Policy</a> and <a href=\"https://policies.google.com/terms\" target=\"_blank\" rel=\"noopener noreferrer\">Terms</a>.";
+
+/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-recaptcha-para-2" = "Our use of reCAPTCHA is strictly limited to ensuring the continued functioning of my.psi.cash. reCAPTCHA technology performs an automatic analysis for each site request without requiring the user to take any additional actions. This analysis is based on interactions made by the user, and is used to mitigate bot and other malicious behaviour on our website. The data collected during analysis is forwarded to Google, where Google will use this data to determine if you are a human user. This analysis takes place in the background, and users are not advised it is taking place.";
+
+/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. */
+"privacy-information-collected-mypsicash-recaptcha-para-3" = "For more information about Google’s reCAPTCHA technology, please visit <a href=\"https://www.google.com/recaptcha/about/\" target=\"_blank\" rel=\"noopener noreferrer\">https://www.google.com/recaptcha/about/</a>.";
+
+/* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-1" = "PsiCash 系統只收集維持系統運作、監測健康與確保安全所需的必要資訊，";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to randomly generated values that allow a user to access and utilize the system. */
+"privacy-information-collected-psicash-para-2-item-1" = "產生用戶訪問的授權令牌";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to the user PsiCash balance -- i.e., how much they have available to spend. */
+"privacy-information-collected-psicash-para-2-item-2" = "餘額";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to the date and time that the user last earned or spent PsiCash. */
+"privacy-information-collected-psicash-para-2-item-3" = "最近活動時間戳圖";
+
+/*[UNTRANSLATED] Bullet list item in the 'operation of the system' list. This item refers to transaction history of the user earning PsiCash. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-2-item-4" = "PsiCash earning history, including what actions the rewards were granted for";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to transaction history of the user spending PsiCash, such as by buying Speed Boost. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-2-item-5" = "PsiCash 交易記錄，包括購買方案。";
+
+/* Paragraph text in the 'PsiCash' section of the Privacy page. This is preamble to a detailed bullet list. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-2-list-start" = "PsiCash 伺服器儲存個別用戶資料以便於系統進行下列營運操作：";
+
+/*[UNTRANSLATED] Paragraph text on the Privacy Policy page. Describes the user data requirements for PsiCash accounts. 'PsiCash' must not be translated or transliterated. 'Psiphon' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-2b" = "Creating a PsiCash account is optional. If an account is created, account-specific information such as username, password, and email address (if provided) are stored on the server. When logged in to a Psiphon client, the username is also stored locally.";
+
+/* Bullet list item in the 'data stored in web browser' list. This item refers to randomly generated values that allow a user to access and utilize the system. */
+"privacy-information-collected-psicash-para-3-item-1" = "產生用戶訪問的授權令牌";
+
+/* Bullet list item in the 'data stored in web browser' list. PsiCash earning rewards can only be claimed every so often in the web browser, so this refers to the date-time when the user is next allowed to claim a reward. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-3-item-2" = "可再次索取 PsiCash 獎賞 ";
+
+/* Paragraph text in the 'PsiCash' section of the Privacy page. This is preamble to a detailed bullet list. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-3-list-start" = "在用戶瀏覽器儲存了某些資料以便於賺取和購買，其包含：";
+
+/* Bullet list item in the 'system health and security' list. This item refers to the country from which a user was connecting when he/she performed an action. */
+"privacy-information-collected-psicash-para-4-item-1" = "用戶國家";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to the user PsiCash balance -- i.e., how much they have available to spend. */
+"privacy-information-collected-psicash-para-4-item-2" = "餘額";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to 'user agent string' of the client software used to perform an action. This can be either a web browser or the Psiphon client itself. */
+"privacy-information-collected-psicash-para-4-item-3" = "用戶瀏覽器字串　";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to the version of the Psiphon app. */
+"privacy-information-collected-psicash-para-4-item-4" = "客戶端版本 ";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to transaction history of the user earning and spending PsiCash. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-4-item-5" = "PsiCash 收支詳情";
+
+/* Paragraph text in the 'PsiCash' section of the Privacy page. This is preamble to a detailed bullet list. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-4-list-start" = "為了監控系統健康安全，我們會收隻下列活動數據：";
+
+/* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-5" = "絕不會與第三方分享個別用戶的資料，我們或許會分享粗略加總的統計數據，但絕不包含可辨別身份的內容。";
+
+/*[UNTRANSLATED] Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-6" = "PsiCash server resources are stored in AWS, which means Amazon has access to the data.";
+
+/* Sub-heading for section describing use of logging access to data storage (aka S3 bucket logging). The way to read this is 'creation of logs for user accesses to data storage'. Psiphon 'stores' websites, downloads, and upgrades (the 'data') in Amazon S3 (the 'storage'). Users 'access' the data storage. And, somtimes, we 'log' those accesses. (For example, if we suspect attackers are accessing the storage, or if it seems the storage is blocked by a country.) */
+"privacy-information-collected-s3-logging-head" = "儲存訪問日誌";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-s3-logging-para-1" = "我們使用 Amazon S3 儲存資料，例如網站文件和 Psiphon 服務器搜尋列表等。我們有時允許記錄這些文件的下載。分析這些數據能夠幫助我們回答一些問題，例如“多少用戶中斷了服務器搜尋列表的下載？”，“下載的資料如何在網站資料及服務器搜尋間分配？”和“我們的網站是否面臨拒絕服務攻擊？”";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-s3-logging-para-2" = "S3 <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/LogFormat.html\" target=\"_blank\">bucket 訪問日誌</a>包含IP地址、用戶代理字符串以及時間戳記。這些日誌存儲在 S3 本身，因此亞馬遜將有權限訪問這些日誌。（不過，亞馬遜已經在提供這些文件，因此他們已經可以訪問此信息。）Psiphon 開發者將下載這些日誌，匯總並分析數據，然後刪除日誌。原始數據將保持較長時間以完成匯總，不會與第三方共享。";
+
+/*[UNTRANSLATED] Paragraph text in the 'Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-aggdata-para-1" = "Data is “aggregated” by taking a lot of sensitive user activity data and combining it together to form coarse statistical data that is no longer specific to a user. After aggregation, the user activity data is deleted.";
+
+/*[UNTRANSLATED] Paragraph text in the 'Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-aggdata-para-2" = "An example of aggregated data might be: On a particular day, 250 people connected from New York City using Comcast, and transferred 200GB from <code>youtube.com</code> and 500GB in total.";
+
+/*[UNTRANSLATED] Paragraph text in the 'Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-aggdata-para-3" = "Aggregated data is much less sensitive than activity data, but we still treat it as potentially sensitive and do not share it in this form.";
+
+/* Sub-heading for the definition of 'Aggregated Data' under the 'User Activity and VPN Data' section of the Privacy Policy page. */
+"privacy-information-collected-vpndata-aggdata-subhead" = "匯總數據";
+
+/* Sub-heading on the Privacy Policy page for the section describing handling of user traffic data and activity statistics through the Psiphon VPN */
+"privacy-information-collected-vpndata-head-v2" = "用戶活動和 VPN 數據";
+
+/*[UNTRANSLATED] Paragraph text in the 'What kinds of user data does Psiphon collect?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-kindsofdata-para-1" = "We will define some categories of data to help us talk about them in the context of Psiphon.";
+
+/* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. */
+"privacy-information-collected-vpndata-kindsofdata-subhead" = "賽風會收集哪些用戶數據?";
+
+/*[UNTRANSLATED] Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-shareable-para-1" = "When sharing aggregated data with third parties, we make sure that the data could not be combined with other sources to reveal user identities. For example, we do not share data for countries that only have a few Psiphon users in a day. We make sure that the data is anonymized.";
+
+/* Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-shareable-para-2" = "我們不會向第三方分享網域相關資料";
+
+/*[UNTRANSLATED] Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-shareable-para-3" = "An example of shareable aggregated data might be: On a particular day, 500 people connected from New York City and transferred 800GB in total.";
+
+/*[UNTRANSLATED] Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. '<em>' is an HTML tag that adds emphasis (like italics), which can be used if it makes sense in your language. */
+"privacy-information-collected-vpndata-shareable-para-4" = "An example of data that is <em>not shareable</em>: On a particular day, 2 people connected from Los Angeles. Those people will be included in the stats for the entire US, but that is too few people to anonymously share city data for.";
+
+/* Sub-heading for the definition of 'Shareable Aggregated Data' under the 'User Activity and VPN Data' section of the Privacy Policy page. */
+"privacy-information-collected-vpndata-shareable-subhead" = "可分享的匯總數據";
+
+/*[UNTRANSLATED] Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-useractivity-para-1" = "While a user's device is tunneled through Psiphon, we collect some information about how they're using it. We record what protocol Psiphon used to connect, how long the device was connected, how many bytes were transferred during the session, and what city, country, and ISP the connection came from. For some domains (but very few, and only popular ones) or server IP addresses (e.g., known malware servers) that are visited, we also record how many bytes were transferred to it. (But never full URLs or anything more sensitive. And only domains of general interest, not all domains.)";
+
+/*[UNTRANSLATED] Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-useractivity-para-2" = "Geographical location and ISP info are derived from user IP addresses, which are then immediately discarded.";
+
+/*[UNTRANSLATED] Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-useractivity-para-3" = "An example of user activity data might be: At a certain time a user connected from New York City, using Comcast, and transferred 100MB from <code>youtube.com</code> and 300MB in total.";
+
+/*[UNTRANSLATED] Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-useractivity-para-4.1" = "We consider user activity data the most sensitive category of data. We never, ever share this data with third parties. We keep user activity data for at most 90 days, and then we aggregate it and delete it. Backups of that data are kept for a reasonable amount of time.";
+
+/* Sub-heading for the definition of 'User Activity Data' under the 'User Activity and VPN Data' section of the Privacy Policy page. */
+"privacy-information-collected-vpndata-useractivity-subhead" = "用戶活動數據";
+
+/*[UNTRANSLATED] Paragraph text in the 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-para-1-v2" = "Activity and aggregated statistical data are vital for us to make Psiphon work best. It allows us to do things like:";
+
+/*[UNTRANSLATED] Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-para-2-item-1" = "Monitor the health and success of the Psiphon network: We need to know how many people are connecting, from where, how much data they're transferring, and if they're having any problems.";
+
+/*[UNTRANSLATED] Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-para-2-item-2" = "Monitor threats to our users' devices: We watch for malware infections that attempt to contact command-and-control servers.";
+
+/*[UNTRANSLATED] Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-para-2-item-3" = "Ensure users stay connected while foiling censors: We try to detect that a user is behaving like a real person and then reveal new Psiphon servers to them. (This is our obfuscated server list technology.)";
+
+/* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-subhead-v2" = "Psiphon 會如何處理用戶活動和匯總數據?";
+
+/*[UNTRANSLATED] Paragraph text in the 'What does Psiphon NOT do with your data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphonnotdowith-para-1" = "We DO NOT collect or store any VPN data that is not mentioned here.";
+
+/* Paragraph text in the 'What does Psiphon NOT do with your data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphonnotdowith-para-2" = "我們不會更改您的VPN數據";
+
+/* Paragraph text in the 'What does Psiphon NOT do with your data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphonnotdowith-para-3" = "我們不會向第三方分享任何敏感或用戶特定數據";
+
+/*[UNTRANSLATED] Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes what undesirable things Psiphon DOES NOT do with user data. '<strong>' is an HTML tag that makes text bold, which can be used if it makes sense in your language. */
+"privacy-information-collected-vpndata-whatdoespsiphonnotdowith-subhead" = "What does Psiphon <strong>NOT</strong> do with your data?";
+
+/*[UNTRANSLATED] Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-1-v2" = "Shareable aggregated data is shared with sponsors, organizations we collaborate with, and civil society researchers. The data can be used to show such things as:";
+
+/*[UNTRANSLATED] Bullet list text under 'Who does Psiphon share Aggregated Data with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-2-item-1" = "How well Psiphon is working in a particular region.";
+
+/*[UNTRANSLATED] Bullet list text under 'Who does Psiphon share Aggregated Data with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-2-item-2" = "The blocking patterns in a given country, for example during political events.";
+
+/*[UNTRANSLATED] Bullet list text under 'Who does Psiphon share Aggregated Data with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-2-item-3" = "That the populace of a country is determined to access the open internet.";
+
+/*[UNTRANSLATED] Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-3-v2" = "Again, only anonymized shareable aggregated data is ever shared with third parties.";
+
+/*[UNTRANSLATED] Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-subhead-v2" = "Who does Psiphon share Aggregated Data with?";
+
+/*[UNTRANSLATED] Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whycare-para-1" = "When using a VPN or proxy you should be concerned about what the VPN provider can see in your data, collect from it, and do to it.";
+
+/*[UNTRANSLATED] Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. '<em>' is an 'emphasis' (like italics) HTML tag, which can be used if it makes sense in your language. */
+"privacy-information-collected-vpndata-whycare-para-2" = "When you use a VPN, all data to and from your device goes through it. If you visit a website that uses unencrypted HTTP, all of that site's data is visible to the VPN. If you visit a website that uses encrypted HTTPS, the site content is encrypted, but some information about the site might be visible to the VPN. Other apps and services on your device will also transfer data that is encrypted or unencrypted. (Note that this is distinct from the encryption that all VPNs provide. Here we're only concerned with data that is or is not encrypted <em>inside</em> the VPN tunnel.)";
+
+/*[UNTRANSLATED] Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whycare-para-3" = "For unencrypted services, it is possible for a VPN provider to see, collect, and modify (e.g., injecting ads into) the contents of your data. For encrypted data, it is still possible for a VPN to collect metadata about sites visited or actions taken. You should also be concerned with your VPN provider sharing your data with third parties.";
+
+/* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
+"privacy-information-collected-vpndata-whycare-subhead" = "為何要關心？";
+
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-1" = "推估未來成本：每個月所傳輸的大量用戶數據佔了成本的大宗，因此很有必要關注與理解這個數據的波動變化。";
+
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-3" = "判定大型網路審查事件的本質：某些網站或服務常常突然、無預警地遭到屏蔽封鎖，這導致 Psiphon 在一些地區用量大增的情況。例如當<a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">巴西政府封鎖 WhatsApp</a> 或是<a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">土耳其政府關閉社交網站服務</a>，Psiphon 就遇上流量激增 20倍的情況。";
+
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-4" = "了解哪些人需要協助：有些網站絕不會被屏蔽，而有些網站則在某些國家遭到封鎖，或是偶而無法訪問。為了確保用戶能夠自由訪問使用網路，我們必須了解這些規律，知道哪些人受到波及，和合作伙伴共同努力改善 Psiphon 以提供最佳服務。";
+
+/*[UNTRANSLATED] Sub-heading for section describing use of Google Analytics and what info they collect */
+"privacy-information-collected-websites-google-analytics-head" = "Google Analytics";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-websites-google-analytics-para-1" = "我們在一些網站上使用 Google Analytics 來收集使用量的資料。Google Analytics 所收集的資料只會用於用戶在此特定站點上瀏覽習慣的統計分析。我們從 Google Analytics 獲取的信息無關個人資料，也不會跟任何第三方資料作關連來製作個人資料。";
+
+/*[UNTRANSLATED] No comment provided by engineer. */
+"privacy-information-collected-websites-google-analytics-para-2" = "Google Analytics sets a permanent cookie in your web browser to identify you as a unique user the next time you visit the site, but this cookie cannot be used by anyone except Google, and the data collected cannot be altered or retrieved by services from other domains.";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-websites-google-analytics-para-3" = "谷歌使用或分享 Google Analytics 所收集用戶瀏覽資料的行為受限於<a href=\"http://www.google.ca/analytics/terms/us.html\" target=\"_blank\"> Google Analytics 使用條款</a>和<a href=\"http://www.google.com/policies/privacy/\" target=\"_blank\">谷歌隱私政策</a>。閣下也可以選擇在瀏覽器的個人設置中關閉 cookie 以停用。";
+
+/* Sub-heading on the Privacy Policy page above the info about what user information is collected by the Psiphon websites */
+"privacy-information-collected-websites-head" = "Psiphon 網站";
+
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
 "PRIVACY_POLICY_DECLINED_ALERT_BODY" = "繼續使用 Psiphon 之前必須先同意我們的隱私權條件。";
 
 /*[UNTRANSLATED] External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
 "PRIVACY_POLICY_URL" = "https://psiphon.ca/en/privacy.html";
-
-/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara1" = "Psiphon 只會在必要時查看用戶數據和收集系統使用的統計，我們會記錄用戶連線時的傳輸總流量以及傳輸到某些特定域名的流量，這些統計資料會在 60 天後銷毀。";
-
-/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara2" = "Psiphon 不會檢查或記錄完整的 URLs (只保留域名)，也不會檢查用戶數據，當使用者透過 VP N 使用 Psiphon 時，其資料不會被修改。";
-
-/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara3" = "這些粗略的數據難以回溯追踪原當事人，因為我們立即將用戶的 IP 位置轉換成地理資訊後予以毀棄，無人可以辨識所儲存的資訊。";
-
-/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithSubhead" = "Psiphon 對資料的處置方式？";
-
-/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara1" = "與第三方分享時， Psiphon 只會提供粗略、加總的域名統計數字，我們不會分享個別訪問期間或是任何可辨識的資訊。";
-
-/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara2" = "我們數據分享的對象一般是合作的組織或服務-- 例如幾年前與<a href=\"http://www.dw.com/en/psiphon-helps-dodge-the-online-trackers/a-16765092\" target=\"_blank\">DW</a>合作。這些統計數據協助我們雙方回答像\"伊朗用戶透過  Psiphon 訪問 DW.com 的當月流量是多少？\"之類的問題。";
-
-/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara3" = "再次聲明，我們不會把詳細或可能用來辨別個人身份的資料交給任何第三方。";
-
-/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithSubhead" = "Psiphon  與誰分享這些統計數據？";
-
-/* Paragraph text in the 'Why should you care?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhycarePara1" = "使用 VPN 或代理器可能要擔心服務提供者可以查看、收集進而使用您的數據。尤其是一些網頁或電子郵件連線，理論上 VPN 服務商可以看見、收集和修改內容。";
-
-/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
-"PrivacyInformationCollectedVpndataWhycareSubhead" = "為何要關心？";
-
-/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item1" = "推估未來成本：每個月所傳輸的大量用戶數據佔了成本的大宗，因此很有必要關注與理解這個數據的波動變化。";
-
-/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item2" = "最適化流量種類：影片串流和網頁瀏覽會有不同的網路需求，當然也不同於線上聊天或視訊。主要媒體供應適商不同類型的流量位元統計，可以幫助我們理解如何為用戶提供最佳使用體驗。";
-
-/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. If available in your language, the blog post URLs should be updated to the localized post. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item3" = "判定大型網路審查事件的本質：某些網站或服務常常突然、無預警地遭到屏蔽封鎖，這導致 Psiphon 在一些地區用量大增的情況。例如當<a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">巴西政府封鎖 WhatsApp</a> 或是<a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">土耳其政府關閉社交網站服務</a>，Psiphon 就遇上流量激增 20倍的情況。";
-
-/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. (English is using 'who' instead of 'whom' to reflect common idiom.) */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item4" = "了解哪些人需要協助：有些網站絕不會被屏蔽，而有些網站則在某些國家遭到封鎖，或是偶而無法訪問。為了確保用戶能夠自由訪問使用網路，我們必須了解這些規律，知道哪些人受到波及，和合作伙伴共同努力改善 Psiphon 以提供最佳服務。";
-
-/* Paragraph text in the 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. This paragraph serves as preamble for a detailed list, which is why it ends with a colon. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1ListStart" = "我們所用的數據將決定 Psiphon 網路如何被使用，它也讓我們可以： ";
-
-/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why Psiphon needs VPN data stats. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead" = "為何 Psiphon 需要統計這些數據？";
 
 /* page title for the Privacy Policy page */
 "PrivacyTitle" = "隱私政策";
