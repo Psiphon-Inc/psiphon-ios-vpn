@@ -106,6 +106,72 @@
 /* Message shown when verification of a product already purchased fails. */
 "FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Imeshindwa kuhakiki ununuzi";
 
+/* No comment provided by engineer. */
+"faq-information-collected-answer-head-2" = "maoni";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-head-3" = "Majibu ya barua Pepe";
+
+/* this is referring to the general idea of app stores, like the Google Play Store, Amazon AppStore, Apple App Store */
+"faq-information-collected-answer-head-4" = "Duka la programu";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-10" = "Nakili kwamba kama utapata Psiphon kutoka kwa \"ghili ya programu\", kama kama vile Google Play Store au Amazon AppStore,  takwimu za ziada zitakusanywa kwa store hiyo. Kwa mfano, haya ni maelezo kitu gani kimekusanywa na Google Play Store:";
+
+/*[UNTRANSLATED] No comment provided by engineer. */
+"faq-information-collected-answer-para-11" = "When you send an email request to our email auto-responder server, we are able to see your email address. While your email is being processed it is saved to the email server's disk, and it is deleted as soon as it is processed (usually in a few seconds). Your email address may be written to the server system logs. These logs are deleted after one week.";
+
+/*[UNTRANSLATED] No comment provided by engineer. */
+"faq-information-collected-answer-para-12" = "Our email auto-responder server is hosted in the Amazon EC2 cloud. This means that Amazon is able to see the email you send and our response to you.";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-13" = "Kwa kila barua pepe iliyotumwa, tunahifadhi kwenye taarifa zifuatazo:";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-13-item-1" = "Tarehe na muda ombi la barua pepe lilipokelewa.";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-13-item-2" = "Tarehe na muda ombi la barua pepe lilijibiwa kwa.";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-13-item-3" = "Saizi ya barua pepe";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-13-item-4" = "Seva ya barua ombi la barua limekuja kutoka. (Sehemu tatu angalau maalum za jina la kikao, <code>ne1.mfano.com</code>, lakini hapana <code> wavu120113.barua.net.mfano.com</code>.)";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-6" = "wakati unachagua kukusanya maoni kupitia Psiphon utakua na chaguo ikiwemo uchunguzi wa data. tunatumia data hii kutusaidia shida na matatizo tutapata kitu na kusaidia Psiphon kukimbia vizuri. tuma kabisa data kwa hiari. Data iliyosimbwa kabla ya kutumwa, Taarifa za data inatofautiana, ila inaweza kujumuisha: ";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-7-item-1" = "Toleo la mfumo wa uendeshaji";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-7-item-2" = "Uendeshaji wa anti-virusi";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-7-item-3" = "Vipi utajiunganisha na wavuti (kwa mfano, kama unatumia dayo au kunganishwa kupitia kwa wakala) ";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-7-item-4" = "Kompyuta yako ina kumbukumbu ngapi za bure";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-7-list-start" = "Madirisha";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-8-item-1" = "Toleo la admin";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-8-item-2" = "mfano wa kifaa";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-8-item-3" = "Ikiwa kifaa chako kina mzizi";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-8-list-start" = "Android";
+
+/* Heading for a section in our privacy policy. */
+"faq-information-collected-question" = "Ni habari zipi za mtumiaji Psiphon zinakusanya";
+
 /* Title of screen that lets user to send feedback about the app to Psiphon Inc. Should be kept short. */
 "FEEDBACK_TITLE" = "maoni";
 
@@ -205,59 +271,236 @@
 /*[UNTRANSLATED] Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
 "PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Something went wrong, please try again later.\n\nIf this problem persists, please send a feedback.";
 
+/* Sub-heading on the Privacy Policy page above the info about what user information is collected by the ads shown in the Psiphon client software */
+"privacy-information-collected-client-ads-head" = "Tangazo la mitandao la Mteja wa Psiphon ";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-client-advertising-networks-para-1" = "Kuna muda mwingine tunatumia matangazo kwa kusaidia huduma zetu, ambayo hutumia teknologia kama vile kuki na wavu za beakon. Matangazo yetu washiriki watumiaji wa kuki inawawezesha na na wenzi wao kutumia matangao msingi kwenye data unayotumia. Taarifa yeyote iliyokusanywa moja kwa moja kwenye mchakato inashughulikiwa ma timu kwenye matangazo yetu ya ushiriki wa  sera faragha:";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-client-advertising-networks-para-2" = "Unaweza kuchagua nje ya matumizi ya kuki kwa msingi-riba ya matangazo kwa kutembelea:";
+
+/*[UNTRANSLATED] Header text in the 'my.psi.cash' section of the Privacy page. Refers to the cookies stored by web browsers. */
+"privacy-information-collected-mypsicash-cookies-head" = "Cookies";
+
+/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-cookies-para-1" = "my.psi.cash only uses cookies and similar tracking technologies to carry out activities that are essential for the operation of the website. Essential cookies are necessary to ensure basic functions of the website. Cookies are small text files that are stored on your computer and saved by your browser, and do not represent any risk to your device. You can configure your browser settings to personalize how you would like your browser to handle cookies. Disabling essential cookies will degrade the functionality of this website.";
+
+/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-para-1" = "Users create and manage their PsiCash accounts on the <a href=\"https://my.psi.cash\" target=\"_blank\" rel=\"noopener noreferrer\">my.psi.cash</a> website.";
+
+/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-recaptcha-para-1" = "my.psi.cash uses Google’s reCAPTCHA v3 (hereinafter “reCAPTCHA”), which protects websites from spam and abuse by non-human users (i.e., bots). reCAPTCHA collects personal information that is required for the functioning of the technology and is subject to its own privacy policy. Use of my.psi.cash indicates acceptance of Google’s <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">Privacy Policy</a> and <a href=\"https://policies.google.com/terms\" target=\"_blank\" rel=\"noopener noreferrer\">Terms</a>.";
+
+/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-recaptcha-para-2" = "Our use of reCAPTCHA is strictly limited to ensuring the continued functioning of my.psi.cash. reCAPTCHA technology performs an automatic analysis for each site request without requiring the user to take any additional actions. This analysis is based on interactions made by the user, and is used to mitigate bot and other malicious behaviour on our website. The data collected during analysis is forwarded to Google, where Google will use this data to determine if you are a human user. This analysis takes place in the background, and users are not advised it is taking place.";
+
+/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. */
+"privacy-information-collected-mypsicash-recaptcha-para-3" = "For more information about Google’s reCAPTCHA technology, please visit <a href=\"https://www.google.com/recaptcha/about/\" target=\"_blank\" rel=\"noopener noreferrer\">https://www.google.com/recaptcha/about/</a>.";
+
+/* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-1" = "Mfumo wa PsiCash tu hukusanya taarifa sahihi kwa  kufanya kazi ya mfumo, kusimamia ya afya ya mfumo,na kuhakikisha usalama wa mfumo.";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to randomly generated values that allow a user to access and utilize the system. */
+"privacy-information-collected-psicash-para-2-item-1" = "Mafikio ya mtumiaji wa tokeni kwa ujumla";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to the user PsiCash balance -- i.e., how much they have available to spend. */
+"privacy-information-collected-psicash-para-2-item-2" = "Usawa";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to the date and time that the user last earned or spent PsiCash. */
+"privacy-information-collected-psicash-para-2-item-3" = "Kazi ya mwisho kwa mda";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to transaction history of the user earning PsiCash. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-2-item-4" = "Kupata historia ya PsiCash, pamoja na hatua gani ya malipo ambayo mlipewa kwa ";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to transaction history of the user spending PsiCash, such as by buying Speed Boost. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-2-item-5" = "PsiCash imeweka historia, ikiwema kilichonunuliwa  ";
+
+/* Paragraph text in the 'PsiCash' section of the Privacy page. This is preamble to a detailed bullet list. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-2-list-start" = "PsiCash seva uhifadhi taarifa za mtumiaji kuruhusu operesheni ya mfumo, ikiwemo:";
+
+/*[UNTRANSLATED] Paragraph text on the Privacy Policy page. Describes the user data requirements for PsiCash accounts. 'PsiCash' must not be translated or transliterated. 'Psiphon' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-2b" = "Creating a PsiCash account is optional. If an account is created, account-specific information such as username, password, and email address (if provided) are stored on the server. When logged in to a Psiphon client, the username is also stored locally.";
+
+/* Bullet list item in the 'data stored in web browser' list. This item refers to randomly generated values that allow a user to access and utilize the system. */
+"privacy-information-collected-psicash-para-3-item-1" = "Mafikio ya mtumiaji wa tokeni kwa ujumla";
+
+/* Bullet list item in the 'data stored in web browser' list. PsiCash earning rewards can only be claimed every so often in the web browser, so this refers to the date-time when the user is next allowed to claim a reward. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-3-item-2" = "Wakati malipo ya PsiCash yataruhusiwa kudaiwa tena";
+
+/* Paragraph text in the 'PsiCash' section of the Privacy page. This is preamble to a detailed bullet list. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-3-list-start" = "Kwenye tovu ya kivinjari ya mtumiaji, data nyingine zimehifadhiwa kuruhusu kwa kupata malipo na kuweka manunuzi. Data hii ni pamoja na:";
+
+/* Bullet list item in the 'system health and security' list. This item refers to the country from which a user was connecting when he/she performed an action. */
+"privacy-information-collected-psicash-para-4-item-1" = "Akaunti ya mtumiaji";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to the user PsiCash balance -- i.e., how much they have available to spend. */
+"privacy-information-collected-psicash-para-4-item-2" = "Usawa";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to 'user agent string' of the client software used to perform an action. This can be either a web browser or the Psiphon client itself. */
+"privacy-information-collected-psicash-para-4-item-3" = "Utungo wa wakala wa mtumiaji";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to the version of the Psiphon app. */
+"privacy-information-collected-psicash-para-4-item-4" = "Toleo la koteja";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to transaction history of the user earning and spending PsiCash. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-4-item-5" = "Kulipwa kwa PsiCash na matumizi ya  undani";
+
+/* Paragraph text in the 'PsiCash' section of the Privacy page. This is preamble to a detailed bullet list. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-4-list-start" = "Kwa mfumo wa ufatiliaji afya na usalama, kazi ya mfumo wa data zilizokusanywa nakukusanywa. Data hii ni kama:";
+
+/* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-5" = "Mtumiaji bianafsi hawezi kushiriki na sehemu ya tatu. takwimu za coarse zilizokusanywa zinaweza kua kushiriki, ila haiwezi kua kwenye mfumo ambao inawezekana unaweza kuwatambulisha watumiaji. ";
+
+/*[UNTRANSLATED] Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-6" = "PsiCash server resources are stored in AWS, which means Amazon has access to the data.";
+
+/* Sub-heading for section describing use of logging access to data storage (aka S3 bucket logging). The way to read this is 'creation of logs for user accesses to data storage'. Psiphon 'stores' websites, downloads, and upgrades (the 'data') in Amazon S3 (the 'storage'). Users 'access' the data storage. And, somtimes, we 'log' those accesses. (For example, if we suspect attackers are accessing the storage, or if it seems the storage is blocked by a country.) */
+"privacy-information-collected-s3-logging-head" = "Uhifadhi na upatikanaji wa Logging";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-s3-logging-para-1" = "Tunatumia Amazon S3 kwa kuhifadhi mali kama faili ya wavuti na Psiphon seva kwa kugundua listi. Mda mwingine tunawezesha logging ya upakuaji wa hizi faili. Chambua kumbukumbu hizi kutusaidia kujibu maswali kama \"watumiaji wangapi wameanza lakini hawajamaliza kupakua listi ya ugunduzi seva?\", \"vipi upakuaji wa data utagawanyika kati ya mali ya wavuti na ugunduzi wa seva?\", na \"";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-s3-logging-para-2" = "S3 <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/LogFormat.html\" target=\"_blank\">kufikia kumbukubu ya kutunza ndoo</a> yenye anuani ya IP, wakala wa watumiaji, na nyakati za wakati. Hizi kumbukumbu zinahifadhiwa S3 yenyewe. kwahiyo Amazon imefikia kuhifadhi kumbukumbu hizo. (Walakini, Amazon imefikia habari.) Psiphon imekuza upakuaji wa kumbukumbu, data zilizokusanywa na kuchambuliwa, na kwahiyo futa kumbukumbu hizo. sheria ya data itawekwa kwa kipindi kilefu tu kwa kukusanywa na haitashirikishwa pamoja na nafasi ya tatu.";
+
+/* Paragraph text in the 'Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-aggdata-para-1" = "Data ni \"zilizokusanywa\" kwa kua makini na kazi ya mtumiaji data na kuchanganywa kwa pamoja kwenye fomu ya takwimu ya data ya coarse ambayo sio maalumu sana kwa mtumiaji. Baada ya kukusanyika, Kazi ya mtumiaji imefutwa.";
+
+/* Paragraph text in the 'Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-aggdata-para-2" = "Mfano wa data zilisokusanywa zinaweza kua: Kwenye siku maalum, watu 250 wameunganishwa kutoka Mji wa New York kutumia Comcast, na kusafili 200GB kutoka <code>youtube.com </code> na 500GB kwa ujumla.";
+
+/* Paragraph text in the 'Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-aggdata-para-3" = "Data zilizokusanywa ni nyeti kidogo kuliko kazi za data, lakini tunachukulia kama uwezekano nyeti na isishiriki katika fomu hii. ";
+
+/* Sub-heading for the definition of 'Aggregated Data' under the 'User Activity and VPN Data' section of the Privacy Policy page. */
+"privacy-information-collected-vpndata-aggdata-subhead" = "Data zilizokusanywa";
+
+/* Sub-heading on the Privacy Policy page for the section describing handling of user traffic data and activity statistics through the Psiphon VPN */
+"privacy-information-collected-vpndata-head-v2" = "Kazi ya mtumiaji na VPN Data";
+
+/* Paragraph text in the 'What kinds of user data does Psiphon collect?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-kindsofdata-para-1" = "Tutaelezew baadhi ya maana za aina za data kwa kutusaidia kuzungumza kuhusu hizo kwenye muktadha wa Psiphon.";
+
+/* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. */
+"privacy-information-collected-vpndata-kindsofdata-subhead" = "Ni aina gani ya mtumiaji wa data anaweza kukusanya Psiphon?";
+
+/* Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-shareable-para-1" = "Lini data zilizokusanywa zitashiriki na sehemu ya tatu, tunahakikisha kua data haziwezi kua pamoja na chanzo chochote kuonyesha utambulisho wa mtumiaji. ";
+
+/* Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-shareable-para-2" = "Pia hatuwezi kushiriki habari inayohusiana na kikao cha sehemu ya tatu.";
+
+/* Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-shareable-para-3" = "Mfano wa data zilizokusanywa kushiriki zinaweza kua: Kwenye siku maalum, watu 500 wameunganishwa kwenye mji wa New York na  jumla ya 800GB kuhamishwa.";
+
+/* Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. '<em>' is an HTML tag that adds emphasis (like italics), which can be used if it makes sense in your language. */
+"privacy-information-collected-vpndata-shareable-para-4" = "Mfano wa data ni kama <em>haiwezi kugawanyika</em>: Kwenye siku maalum, watu wawili wameunganishwa kwenye Los Aneles. Watu hao watakua pamoja kwenye takwimu nzima ya US, lakini hii ni kwa watu wachache wanaoshiriki kutumia data za mji kwa. ";
+
+/* Sub-heading for the definition of 'Shareable Aggregated Data' under the 'User Activity and VPN Data' section of the Privacy Policy page. */
+"privacy-information-collected-vpndata-shareable-subhead" = " Data zilizokusanywa zinaweza kugawanyika";
+
+/* Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-useractivity-para-1" = "Wakati vifaa vya watumiaji vime tunn kupitia kwenye Psiphon, tuna kusanya baadhi ya taarifa kuhusu vipi itakavyo tumika. Tuna rekodi ipi itifaki ya Psiphon imetumika kuunganisha, ni kwa muda gani kifaa kili unganishwa, ni baiti ngapi zilisafiri wakati wa kikao, na mji upi, nchi, na ISP inaunganisha kutoka. kwa baadhi ya vikao (ila ni chache sana, na umarufu mmoja tu) au anuani ya seva IP (mfano., seva zisizo julikana) ambazo zilitembelewa, pia tuna rekodi ni baiti ngapi ambazo zilihamishwa kwa hilo. (Lakini URLs kamwe haitakua kamili au kitu chochote kinachofaa zaidi. Na vikao tu kwa maslahi ya jumla, sio kwa vikao vyote.)";
+
+/* Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-useractivity-para-2" = "Eneo la kijografia na habari za ISP zimefika kutoka kwenye anuani ya mtumiaji, ambazo zimetengwa mara moja.";
+
+/* Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-useractivity-para-3" = "Mfano wa kazi ya mtumiaji wa data inaweza kua: Katika wakati maalum mtumiaji ameunganishwa kutoka Mji wa New York, tumia Comcast, na imesafiri 100MB kutoka <code>youtube.com</code> na jumla ya 300MB.";
+
+/* Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-useractivity-para-4.1" = "Tunazingatia kazi ya data za mtumiaji umakini mwingi wa aina nyingi za data. Hatuwezi, kushiriki data hii na sehemu ya tatu. Tunaweka kazi za mtumiaji data  kwa takribani siku 90, na tena tutazikusanya na kuzifuta. Backup ya hiyo data zinatunzwa kwa sababu ya kiasi cha mda.  ";
+
+/* Sub-heading for the definition of 'User Activity Data' under the 'User Activity and VPN Data' section of the Privacy Policy page. */
+"privacy-information-collected-vpndata-useractivity-subhead" = "Kazi ya mtumiaji Data";
+
+/* Paragraph text in the 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-para-1-v2" = "Kazi na takwimu data zilizokusanywa ni muhimu kwetu ili kuweka Psiphon iliyonzuri. inaturuhusu sisi kufanya vitu kama:";
+
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-para-2-item-1" = "Usimamizi wa afya na mafanikio ya mtandao wa Psiphon: Tunatakiwa kujua watu wangapi wataunganishwa, kutokea wapi, kwa kiasi gani data zitasafiri, na kama zitakua na tatizo lolote.";
+
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-para-2-item-2" = "Simamia vitisho vya vifaa vya watumiaji: Tunaangalia mambukizo mabaya yanajaribu kuwasiliana amri na uthibiti seva.";
+
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-para-2-item-3" = "Hakikisha watumiaji wanakua wameunganishwa wakati unachunguza censors: Tunajaribu kugundua kua mtumiaji ana tabia kama mtu wa kweli na tena kuonyesha Psiphon mpya kwao. (Hii ni listi yetu ya tekinologia seva isiyojulikana.)    ";
+
+/* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-subhead-v2" = "Psiphon imefanya nini kwenye kazi ya mtumiaji na Data zilizokusanywa?";
+
+/* Paragraph text in the 'What does Psiphon NOT do with your data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphonnotdowith-para-1" = "HATUKUSANYI au kuhifadhi VPN yeyote ya data ambazohazijtajwa hapa.";
+
+/* Paragraph text in the 'What does Psiphon NOT do with your data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphonnotdowith-para-2" = "HATUTA badilisha yaliyomo kwenye VPN data.";
+
+/* Paragraph text in the 'What does Psiphon NOT do with your data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphonnotdowith-para-3" = "HATUWEZI kukusanya nyeti yeyote au mtumiaji wa data maalumu kwenye upande wa tatu.";
+
+/* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes what undesirable things Psiphon DOES NOT do with user data. '<strong>' is an HTML tag that makes text bold, which can be used if it makes sense in your language. */
+"privacy-information-collected-vpndata-whatdoespsiphonnotdowith-subhead" = "Psiphon hufanya nini <strong>HAPANA</strong> fanya na data yako?";
+
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-1-v2" = "Data zilizokusanywa zilizoweza kugawanyika imeshirikiwa na wadhaini, mashirika tunayoshirikiana nayo, na watafiti wa mashirika ya kijamii. Data inaweza kutumika kuona vitu kama: ";
+
+/* Bullet list text under 'Who does Psiphon share Aggregated Data with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-2-item-1" = "Psiphon inafanyaje kazi vizuri ";
+
+/* Bullet list text under 'Who does Psiphon share Aggregated Data with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-2-item-2" = "kufunga kwa pateni katika nchi, kwa mfano kipindi cha matukio.";
+
+/* Bullet list text under 'Who does Psiphon share Aggregated Data with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-2-item-3" = "katika maeneo ya nchi inajigawa kufikia kwa kufungua wovuti.";
+
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-3-v2" = "Tena, anonymized tu imechangia kukubaliana kwa data haita changia  katika nafasi ya tatu.";
+
+/* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-subhead-v2" = "Psiphon inachangia vipi kukubaliana na data?";
+
+/* Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whycare-para-1" = "Wakati unatumia VPN au proxy unatakiwa kua na wasi wasi kuhusu VPN inatoa kitu gani naweza kuona kwenye data yako, kusanya, na fanya kwenye hilo.";
+
+/* Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. '<em>' is an 'emphasis' (like italics) HTML tag, which can be used if it makes sense in your language. */
+"privacy-information-collected-vpndata-whycare-para-2" = "Wakati unatumia VPN, data zote na kutoka kwenye kifaa chako itapelekea moja kwa moja. Kama umetembelea wavuti ambayo inatumika bilamsimbo HTTP, tovuti zote za data zinaonekana kwenye VPN. Kama ukitembalea wavuti ambayo inatumia msimbo HTTPS, yaliyomo kwenye tovuti ni msimbo, lakini taarifa zingine kuhusu tovutizitzkuz zinaonekana kwenye VPN. programu zingine na huduma kwenye kifaa chako pia zita hamisha data kama zina msimbo au hazina msimbo. (Kumbuka kua  hii ni tofauti kutoka kwenye usimbuaji fiche ambayo hutoa VPN yote. Hapa walijali tu kwenye data ambayo ni au sio ya msimbo <em>ndani</em> VPN tunn.)";
+
+/* Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whycare-para-3" = "Kwa huduma isyodhibitiwa, inawezekana kwa VPN kutoa kuangalia, kukusanya, na kurekebisha (mfano., kuingiza matangazo ndani) yaliyomo kwenye data yako. Kwa msimbo fiche data, bado inawezekana kwa VPN kwa kukusanya metadata kuhusu utembeleaji wa tovuti au hatua iliyochukuliwa. Unatakiwa pia kua na wasi wasi kwa VPN yako inatoa kugawana data yako kwa mtu wa tatu.";
+
+/* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
+"privacy-information-collected-vpndata-whycare-subhead" = "Kwanini unapaswa kujali?";
+
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-1" = "Makadirio ya gharama za siku zijazo: Kiasi kikubwa cha data ya mtumiaji tunahamisha kila mwezini sababu kuu ya gharama zetu. Ni muhimu kwetu kuona na kuelewa kushuka kwa matumizi.";
+
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-3" = "Kuamua asili ya matukio ya udhamini mkubwa: Tovuti na huduma maranyingi hufungiwa ghafla na kutokua na tahadhari, Ambayo inaweza kusababisha tofauti kubwa katika maeneo yanayotumiwa na Psiphon. Kwa mfano, tutakua juu ya 20x surges kwa utumiaji ndani ya siku wakati <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">Brazil imefunga WhatsApp</a> au <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\"> Turkey imefunga mtandao wa kijamii</a>.";
+
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-4" = "Elewa nani tunatakiwa kumsaidia: baadhi ya tovuti na huduma haziwezi kufungiwa popote pale, baadhi mara kwa mara zitakua zimefungiwa katika nchi chache, na baadhi zitakua mara kwa mara zimefungiwa baadhi ya nchi. kuhakikisha kua watumiaji wetu wanauwezo wa kuzungumza na kusoma kwa uhuru, Tunatakiwa kujua mifumo hii, angalia nani aliyeathirika, na kufanya kazi na wahusika kwa kuhakikisha huduma zao zinafanya kazi na Psiphon.";
+
+/* Sub-heading for section describing use of Google Analytics and what info they collect */
+"privacy-information-collected-websites-google-analytics-head" = "Uchambuzi wa Google";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-websites-google-analytics-para-1" = "Tunatumia uchambuzi wa Google kati ya tovuti zetu kwa kukusanya habari kuhusu utumiaji. Habari zimekusanywa na uchambuzi wa Google itatumiwa tu kwa uchambuzi wa takwimu zinazohusiana  kwenye tabia yako ya kivinjari  kwenye hii tovuti maalumu.";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-websites-google-analytics-para-2" = "Uchambuzi wa tovuti ya Google kuki ya kudumu kwenye wavu yako kivinjari kwa kutambua ni mtumiaji wa kipeke muda mwingine tembelea tovuti, lakini koku hii haitatumika na mtu yeyote iipokua Google, na data imekusnywa haitabainishwa au kupatikana na huduma kutoka vikao vingine.";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-websites-google-analytics-para-3" = "Uwezo wa Google wa kutumia na kushiriki habari zilizokusanywa kwa Uchambuzi wa Google kuhusu utembeleaji wako kwenye hii tovuti imezuiliwa na<a href=\"http://www.google.ca/analytics/terms/us.html\" target=\"_blank\">masharti ya huduma ya kutumia uchambuzi wa Google</a> na ya <a href=\"http://www.google.com/policies/privacy/\" target=\"_blank\">Sera ya Faragha ya Google</a>.Unaweza kuchagua machaguo kwa kuzima kuki kwenye mpangilio wa upendeleo kwenye tovuti kivinjari yako. ";
+
+/* Sub-heading on the Privacy Policy page above the info about what user information is collected by the Psiphon websites */
+"privacy-information-collected-websites-head" = "tovuti ya Psiphon";
+
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
 "PRIVACY_POLICY_DECLINED_ALERT_BODY" = "Ni lazima ukubali sera ya faragha kabla ya kuendelea kutumia Psiphon.";
 
 /*[UNTRANSLATED] External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
 "PRIVACY_POLICY_URL" = "https://psiphon.ca/en/privacy.html";
-
-/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara1" = "Psiphon ina angalia data yako tu kwa kiwango muhimu cha ukusanyaji wa takwimu kuhusu matumizi ya mfumo wetu. Tuna rekodi jumla ya baiti zilizo hamishwa kwa uunganishwaji wa mtumiaji, pamoja na baiti zilizo hamishwa kwa kikoa fulani. Takwimu hizi zitatengwa baada ya siku 60.";
-
-/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara2" = "Psiphon haina kukagua au kurekodi URLs kamili (majina ya kikoa tu), na haifanyi mbali ukaguzi wa data yako. Psiphon haibadilishi data yako kadri inavyo pita kupitia VPN.";
-
-/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara3" = "Hata hii course data ingekuwa ngumu kurudi kuunganisha kwako, Tangu tumebadili mara moja anuani yako ya IP kwa taarifa ya jiografia na kutupa IP. Wala taarifa yoyote iliyo tambulika kuhifadhiwa.";
-
-/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithSubhead" = "Nini Psiphon inafanya kwa data ya VPN yako?";
-
-/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara1" = "Wakati wa ushiriki wa watu wengine, Psiphon pekee milele hutoa coarse, kukusanya takwimu za baiti za kikoa. Hatushiriki taarifa za kikao cha kabla au uwezekano mwingine wowote wa kubaini taarifa.";
-
-/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara2" = "Huu ushiriki kawaida hufanywa pamoja na huduma au taasisi tunazo shirikiana nazo —kama 1tulivyo fanya pamoja na DW1 miaka michache iliyo pita. Hizi takwimu zinaweza kutusaidia sisi na wao kujibu maswali kama,  “ni baiti ngapi zimehamishwa kupitia  Psiphon kwa DW.com kwa watumiaji wote wa Iran katika kipindi cha mwezi wa 4?”";
-
-/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara3" = "Kwa mara nyingine, kwa kawaida hatutoi taarifa bainifu za kina au uwezekano za mtumiaji kwa washirika au vyama vingine vyote.";
-
-/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithSubhead" = "Ni nani Psiphon anamshirikisha hizi takwimu?";
-
-/* Paragraph text in the 'Why should you care?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhycarePara1" = "Pindi unapo tumia VPN au proxy unatakiwa kujali kuhusu nini mtoaji anaweza kuona katika data yako, kusanya kutoka kwake, na ufanye hivyo. Kwa unganisho fulani la tovuti na barua pepe, kinadharia inawezekana kwa VPN kuweza kuona, kukusanya, na kubadili maudhui.";
-
-/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
-"PrivacyInformationCollectedVpndataWhycareSubhead" = "Kwanini unapaswa kujali?";
-
-/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item1" = "Makadirio ya gharama za siku zijazo: Kiasi kikubwa cha data ya mtumiaji tunahamisha kila mwezini sababu kuu ya gharama zetu. Ni muhimu kwetu kuona na kuelewa kushuka kwa matumizi.";
-
-/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item2" = "Kungeza kwa aina ya trafiki: Utiririshaji wa video una mtandao tofauti mahitaji kuliko inavyofanya kuvinjari kwa wavuti, ambayo ni tofauti kuliko sauti, na  kadhaliko. Tarakimu kuhusu namba za baiti kuhamishwa kwa baadhi ya vyombo vya habari watoa hudum wanatusaidia kuelewa jinsi ya  kutoa uzoefu mzuri kwa watumiaji wetu.";
-
-/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. If available in your language, the blog post URLs should be updated to the localized post. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item3" = "Kuamua asili ya matukio ya udhamini mkubwa: Tovuti na huduma maranyingi hufungiwa ghafla na kutokua na tahadhari, Ambayo inaweza kusababisha tofauti kubwa katika maeneo yanayotumiwa na Psiphon. Kwa mfano, tutakua juu ya 20x surges kwa utumiaji ndani ya siku wakati <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">Brazil imefunga WhatsApp</a> au <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\"> Turkey imefunga mtandao wa kijamii</a>.";
-
-/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. (English is using 'who' instead of 'whom' to reflect common idiom.) */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item4" = "Elewa nani tunatakiwa kumsaidia: baadhi ya tovuti na huduma haziwezi kufungiwa popote pale, baadhi mara kwa mara zitakua zimefungiwa katika nchi chache, na baadhi zitakua mara kwa mara zimefungiwa baadhi ya nchi. kuhakikisha kua watumiaji wetu wanauwezo wa kuzungumza na kusoma kwa uhuru, Tunatakiwa kujua mifumo hii, angalia nani aliyeathirika, na kufanya kazi na wahusika kwa kuhakikisha huduma zao zinafanya kazi na Psiphon.";
-
-/* Paragraph text in the 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. This paragraph serves as preamble for a detailed list, which is why it ends with a colon. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1ListStart" = "Hii data tunaitumia kwa kuamua vipi mtandao wetu utakua ukitumika. Hii huturuhusu kufanya kitu kama:";
-
-/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why Psiphon needs VPN data stats. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead" = "Kwanini hufanya Psiphon kuhitaji takwimu hizi?";
 
 /* page title for the Privacy Policy page */
 "PrivacyTitle" = "Sera ya faragha";
