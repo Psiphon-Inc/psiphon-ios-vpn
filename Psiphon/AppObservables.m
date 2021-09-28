@@ -20,15 +20,17 @@
 
 @property (nonatomic, readwrite) RACReplaySubject<ObjcSubscriptionBarViewState *> *subscriptionBarStatus;
 
-@property (nonatomic, readwrite) RACReplaySubject<BridgedBalanceViewBindingType *> *psiCashBalance;
-
-@property (nonatomic, readwrite) RACReplaySubject<NSDate *> *speedBoostExpiry;
+@property (nonatomic, readwrite) RACReplaySubject<BridgedPsiCashWidgetBindingType *> *psiCashWidgetViewModel;
 
 @property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *vpnStatus;
 
 @property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *vpnStartStopStatus;
 
 @property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *reachabilityStatus;
+
+@property (nonatomic, readwrite) RACReplaySubject<ObjcSettingsViewModel *> *settingsViewModel;
+
+@property (nonatomic, readwrite) RACReplaySubject<Region *> *selectedServerRegion;
 
 // Private properties
 @property (nonatomic) RACCompoundDisposable *compoundDisposable;
@@ -55,11 +57,12 @@
 
         _subscriptionStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _subscriptionBarStatus = [RACReplaySubject replaySubjectWithCapacity:1];
-        _psiCashBalance = [RACReplaySubject replaySubjectWithCapacity:1];
-        _speedBoostExpiry = [RACReplaySubject replaySubjectWithCapacity:1];
+        _psiCashWidgetViewModel = [RACReplaySubject replaySubjectWithCapacity:1];
         _vpnStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _vpnStartStopStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _reachabilityStatus = [RACReplaySubject replaySubjectWithCapacity:1];
+        _settingsViewModel = [RACReplaySubject replaySubjectWithCapacity:1];
+        _selectedServerRegion = [RACReplaySubject replaySubjectWithCapacity:1];
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
     }
     return self;

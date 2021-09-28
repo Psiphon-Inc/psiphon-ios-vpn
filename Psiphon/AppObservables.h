@@ -39,10 +39,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) RACReplaySubject<ObjcSubscriptionBarViewState *> *subscriptionBarStatus;
 
-@property (nonatomic, readonly) RACReplaySubject<BridgedBalanceViewBindingType *> *psiCashBalance;
-
-// Contained value is nil if there is not Speed Boost purchase.
-@property (nonatomic, readonly) RACReplaySubject<NSDate *> *speedBoostExpiry;
+@property (nonatomic, readonly) RACReplaySubject<BridgedPsiCashWidgetBindingType *> *psiCashWidgetViewModel;
 
 // Wraps VPN status of type `NEVPNStatus`.
 @property (nonatomic, readonly) RACReplaySubject<NSNumber *> *vpnStatus;
@@ -52,6 +49,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 // reachabilityStatus subject forwards AppState `internetReachability` ReachabilityStatus values.
 @property (nonatomic, readonly) RACReplaySubject<NSNumber *> *reachabilityStatus;
+
+@property (nonatomic, readonly) RACReplaySubject<ObjcSettingsViewModel *> *settingsViewModel;
+
+@property (nonatomic, readonly) RACReplaySubject<Region *> *selectedServerRegion;
 
 + (AppObservables *)shared;
 

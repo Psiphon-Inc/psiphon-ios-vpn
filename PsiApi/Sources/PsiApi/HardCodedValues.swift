@@ -19,7 +19,15 @@
 
 import Foundation
 
-public struct VPNHardCodedValues {
+public enum PsiphonConstants {
+    public static let ClientVersionKey = "client_version"
+    public static let PropagationChannelIdKey = "propagation_channel_id"
+    public static let ClientRegionKey = "client_region"
+    public static let SponsorIdKey = "sponsor_id"
+    public static let ClientPlatformKey = "client_platform"
+}
+
+public enum VPNHardCodedValues {
     
     /// Time interval during which a response to the message sent to the tunnel provider is expected.
     /// After which the send message Effect should timeout.
@@ -31,7 +39,7 @@ public struct VPNHardCodedValues {
     
 }
 
-public struct SubscriptionHardCodedValues {
+public enum SubscriptionHardCodedValues {
     /// Timer leeway.
     public static let leeway: DispatchTimeInterval = .seconds(10)
     
@@ -44,7 +52,7 @@ public struct SubscriptionHardCodedValues {
     
 }
 
-public struct PurchaseVerifierURLs {
+public enum PurchaseVerifierURLs {
     
     public static let verifierServer = "https://subscription.psiphon3.com"
     
@@ -60,7 +68,7 @@ public struct PurchaseVerifierURLs {
     public static let devPsiCashVerify = URL(string: "\(Self.debugVerifierServer)/v2/appstore/psicash")!
 }
 
-public struct UrlRequestParameters {
+public enum UrlRequestParameters {
     
     public static let cachePolicy: URLRequest.CachePolicy = .reloadIgnoringLocalAndRemoteCacheData
     
@@ -68,19 +76,31 @@ public struct UrlRequestParameters {
     
 }
 
-public struct PsiphonDeepLinking {
+public enum PsiphonDeepLinking {
     
     public static let scheme = "psiphon"
     
-    public static let psiCashHost = "psicash"
-    
-    public static let speedBoostHost = "speedboost"
+    enum Hosts: String {
+        case psiCash = "psicash"
+        case speedBoost = "speedboost"
+        case feedback = "feedback"
+        case settings = "settings"
+    }
 
-    public static let legacyBuyPsiCashDeepLink = URL(string: "\(scheme)://\(psiCashHost)")!
-    public static let legacySpeedBoostDeepLink = URL(string: "\(scheme)://\(speedBoostHost)")!
+    public static let legacyBuyPsiCashDeepLink = URL(string: "\(scheme)://\(Hosts.psiCash.rawValue)")!
+    public static let legacySpeedBoostDeepLink = URL(string: "\(scheme)://\(Hosts.speedBoost.rawValue)")!
 
-    fileprivate static let psiCashDeepLinkBaseURL = URL(string: "\(scheme)://\(psiCashHost)")!
+    fileprivate static let psiCashDeepLinkBaseURL = URL(string: "\(scheme)://\(Hosts.psiCash.rawValue)")!
     public static let buyPsiCashDeepLink = psiCashDeepLinkBaseURL.appendingPathComponent("buy")
     public static let speedBoostDeepLink = psiCashDeepLinkBaseURL.appendingPathComponent("speedboost")
+    
+    public static let feedbackDeepLink = URL(string: "\(scheme)://\(Hosts.feedback.rawValue)")!
+    public static let settingsDeepLink = URL(string: "\(scheme)://\(Hosts.settings.rawValue)")!
 
+}
+
+public enum PsiCashClientHardCodedValues {
+    
+    public static let userAgent = "Psiphon-PsiCash-iOS"
+    
 }

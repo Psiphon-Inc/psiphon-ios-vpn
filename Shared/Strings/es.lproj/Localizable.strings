@@ -37,6 +37,12 @@
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "Ha configurado Psiphon para que use un proxy hacia Internet.\nSin embargo, parece que no podemos conectar al servidor Psiphon a través de ese proxy.\nPor favor, corrija la configuración e inténtelo de nuevo.";
 
+/* Title for a button that closes current screen. */
+"CLOSE_BUTTON_TITLE" = "Cerrar";
+
+/* Button text telling the user that if they click it, Psiphon will start trying to connect to the network. This is shown to the user while Psiphon is disconnected. */
+"CONNECT_BUTTON" = "Conectar";
+
 /* Action button title, that when pressed connects the user to Psiphon network. */
 "CONNECT_BUTTON_TITLE" = "Conectar";
 
@@ -49,8 +55,23 @@
 /* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "CONNECT_TO_USE_SPEED_BOOST" = "Conéctate a Psiphon para usar Aumento de Velocidad";
 
+/* Label text shown to user when the VPN is connecting to a Psiphon server. Do not translate or transliterate 'Psiphon' */
+"CONNECTING_TO_PSIPHON" = "Conectando a Psiphon";
+
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "El fichero de configuración de su aplicación parece estar corrupto. Pruebe a reinstalar la aplicación para reparar el fichero.";
+
+/* Button label that lets users create a new account. */
+"CREATE_ACCOUNT_BUTTON_TITLE" = "Crear cuenta";
+
+/* Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
+"CREATE_PSICASH_ACCOUNT_BODY_2" = "Te animamos enfáticamente a crear una cuenta PsiCash antes de comprar PsiCash. Tener una cuenta te permite compartir tu saldo entre dispositivos y proteger tus compras.\n\nIMPORTANTE: Sin una cuenta, tu PsiCash no será preservado si desinstalas Psiphon.";
+
+/* Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will continue on to the PsiCash store. */
+"CREATE_PSICASH_ACCOUNT_CONTINUE_BUTTON" = "Continuar sin cuenta";
+
+/* Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will be taken to a screen where they can create an account or log into an existing one. */
+"CREATE_PSICASH_ACCOUNT_CREATE_BUTTON" = "Crear o iniciar sesión dentro de la cuenta";
 
 /* Decline button title */
 "DECLINE_BUTTON_TITLE" = "Declinar";
@@ -60,6 +81,12 @@
 
 /* Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
 "DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "Algún tráfico en Internet no es soportado por la versión gratis de Psiphon. Compra una suscripción o Aumento de Velocidad para desplegar el potencial completo de tu experiencia con Psiphon.";
+
+/* Appears in the notification area when Psiphon disallows some non-web internet traffic. The user needs to purchase Speed Boost or subscription in order to full app compatibilty and more speed. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"DISALLOWED_TRAFFIC_NOTIFICATION_BODY_V2" = "¿Las aplicacioness no funcionan? Activa Aumento de Velocidad o compra una suscripción para desbloquear el potencial completo de tu experiencia Psiphon.";
+
+/* Appears in the notification area when Psiphon disallows some non-web internet traffic. The user will be told to 'upgrade' their connection with Speed Boost (giving more speed and app compatibility). The word 'Psiphon' must not be translated or transliterated. */
+"DISALLOWED_TRAFFIC_NOTIFICATION_TITLE_V2" = "Actualiza tu conexión de Psiphon";
 
 /* Text next to the button indicating to the user that the rewarded video advertisement is only available when they are not connected to Psiphon. Do not translate or transliterate 'PsiCash'. Do not translate or transliterate 'Psiphon'. */
 "DISCONNECT_TO_WATCH_AND_EARN_PSICASH" = "Debes desconectarte de Psiphon para mirar un vídeo y ganar PsiCash";
@@ -76,20 +103,92 @@
 /* No comment provided by engineer. */
 "EXTENSION_EXPIRED_SUBSCRIPTION_ALERT" = "Tu suscripción a Psiphon ha expirado.\n\nPor favor abre la aplicación Psiphon para renovarla.";
 
-/* Message shown when something fails to load */
-"FAILED_TO_LOAD" = "Fallo al cargar";
-
 /* Message shown when verification of a product already purchased fails. */
 "FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Fallo al verificar la compra";
 
+/* No comment provided by engineer. */
+"faq-information-collected-answer-head-2" = "Opiniones";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-head-3" = "Contestador de correo electrónico";
+
+/*[UNTRANSLATED] this is referring to the general idea of app stores, like the Google Play Store, Amazon AppStore, Apple App Store */
+"faq-information-collected-answer-head-4" = "App Stores";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-10" = "Observe que si obtiene Psiphon de una \"app store\" (tienda de aplicaciones) como la Google Play Store o la Amazon AppStore, puede que se recojan estadísticas adicionales por parte de esa tienda. Por ejemplo, aquí tiene una descripción de lo que la Google Play Store recopila:";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-11" = "Cuando envías una solicitud por correo electrónico a nuestro servidor auto-contestador, podemos ver tu dirección. Mientras tu correo electrónico está siendo procesado, se guarda en el disco del servidor de correo electrónico, y se borra tan pronto como sea procesado (usualmente en unos pocos segundos). Tu dirección de correo electrónico podría ser escrita en los archivos de registro del sistema. Los mismos son borrados después de una semana.";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-12" = "Nuestro servidor auto-contestador de correo electrónico está alojado en la nube Amazon EC2. Esto significa que Amazon es capaz de ver el correo electrónico que envías, y nuestra respuesta hacia tí.";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-13" = "Para cada correo electrónico que recibimos, almacenamos la siguiente información:";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-13-item-1" = "La fecha y hora en la que la petición de correo electrónico fue recibida.";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-13-item-2" = "La fecha y hora en la que la petición de correo electrónico fue respondida.";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-13-item-3" = "El tamaño del correo electrónico.";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-13-item-4" = "El servidor de correo electrónico del que proviene el email de la petición (las tres partes menos específicas del nombre de dominio, por ejemplo, <code>ne1.example.com</code>, pero no <code>web120113.mail.ne1.example.com</code>). ";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-6" = "Cuando elija enviar sus comentarios a través de Psiphon tendrá la opción de incluir los datos de diagnóstico. Usamos esos datos para ayudarnos a resolver cualquier problema que pudiera estar teniendo y para ayudarnos a mantener Psiphon ejecutándose sin sobresaltos. Enviar estos datos es completamente opcional. Los datos son cifrados antes de que los envíe, y solo pueden ser descifrados por nosotros. La información contenida en los datos varía según la plataforma, pero debe incluir:";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-7-item-1" = "Versión del sistema operativo";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-7-item-2" = "Versión del anti-virus";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-7-item-3" = "Cómo está conectado a Internet (por ejemplo, si está usando conexión de llamada telefónica o se conecta vía proxy)";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-7-item-4" = "Cuánta memoria libre tiene su equipo";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-7-list-start" = "Windows: ";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-8-item-1" = "Versión de Android";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-8-item-2" = "Modelo de dispositivo";
+
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-8-item-3" = "Si su dispositivo está o no rooteado";
+
+/*[UNTRANSLATED] No comment provided by engineer. */
+"faq-information-collected-answer-para-8-list-start" = "Android:";
+
+/* Heading for a section in our privacy policy. */
+"faq-information-collected-question" = "¿Qué información de usuario recoge Psiphon?";
+
+/* Title of screen that lets user to send feedback about the app to Psiphon Inc. Should be kept short. */
+"FEEDBACK_TITLE" = "Opiniones";
+
 /* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "¡Gracias por ayudarnos a mejorar Psiphon!";
+
+/* Button title that lets users reset their password if they forgot their account's password. */
+"FORGOT_PASSWORD" = "¿Has olvidado la contraseña?";
 
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "Gratis";
 
 /* Generic alert shown when purchase of a product fails. */
 "GENERIC_PURCHASE_FAILED" = "Falló la Compra";
+
+/* Body text of a modal dialog shown when a PsiCash login fails due to bad username or password. */
+"INCORRECT_USERNAME_OR_PASSWORD" = "El nombre de usuario o contraseña ingresada es incorrecta.";
 
 /* User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
 "INSUFFICIENT_PSICASH_BALANCE" = "Saldo insuficiente de PsiCash";
@@ -99,6 +198,30 @@
 
 /* Text displayed while app loads */
 "LOADING" = "Cargando...";
+
+/* Message shown when a resource (online or offline) fails to load. */
+"LOADING_FAILED" = "Carga fallida";
+
+/* Title on a button that lets users login to their account with the username and password they have entered. */
+"LOG_IN_BUTTON_TITLE" = "Iniciar sesión";
+
+/* Message title informing the user that they must sign up for an account or log in to their account */
+"LOG_IN_OR_SIGN_UP" = "Iniciar sesión o registrarse";
+
+/* Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
+"LOG_IN_OR_SIGNUP_TO_CONTINUE" = "Inicia sesión o crea una cuenta para continuar usando PsiCash";
+
+/* Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed. */
+"LOG_OUT_ANY_WAY_BUTTON_TITLE_2" = "Cerrar sesión de todos modos";
+
+/* Title of the button that lets users log out of their account */
+"LOG_OUT_BUTTON_TITLE_2" = "Cerrar sesión";
+
+/* Label indicating to the user that they are logging into their PsiCash account. Use ellipses if it makes sense. */
+"LOGGING_IN_ELLIPSES" = "Iniciando sesión...";
+
+/* Label indicating to the user that they are logging out of their PsiCash account. Use ellipses if it makes sense. */
+"LOGGING_OUT_ELLIPSES" = "Cerrando sesión...";
 
 /* Button title that takes user to the next page */
 "NEXT_PAGE_BUTTON_TITLE" = "Siguiente";
@@ -111,12 +234,6 @@
 
 /* Subscriptions view text that is visible when the list of subscriptions is not available */
 "NO_PRODUCTS_TEXT_2" = "No se pudieron obtener las suscripciones desde la App Store. Por favor inténtelo de nuevo más tarde.";
-
-/* Content of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
-"NOTIFICATION_BODY_DISALLOWED_TRAFFIC_ALERT" = "¿La aplicaciones no están funcionando? ¡Pulsa aquí para mejorar tu experiencia con Psiphon!";
-
-/* Title of the user notification which is shown to the user when Psiphon server detects an unsupported Internet traffic request */
-"NOTIFICATION_TITLE_UPGRADE_PSIPHON" = "Actualizar Psiphon";
 
 /*[UNTRANSLATED] Alert OK Button */
 "OK_BUTTON" = "OK";
@@ -139,11 +256,245 @@
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Por favor, abra la aplicación Psiphon para finalizar la conexión.";
 
+/* Capitalize where it makes sense. Label visually separating Sign up section and sign in section of the app. */
+"OR_SIGNUP_SIGNIN" = "O";
+
+/* Text field label where users can enter their account's password */
+"PASSWORD_TEXT_FIELD" = "Contraseña";
+
 /* Alert dialog title indicating to the user that Psiphon needs their permission */
 "PERMISSION_REQUIRED_ALERT__TITLE" = "Se requiere permiso";
 
 /* Subtitle shown when the current operation failed, asking the user to try again at a later time. */
 "PLEASE_TRY_AGAIN_LATER" = "Por favor, inténtalo de nuevo más tarde.";
+
+/* Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
+"PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Algo salió mal, por favor intenta de nuevo más tarde.\n\nSi este problema persiste, por favor envía un comentario.";
+
+/* Sub-heading on the Privacy Policy page above the info about what user information is collected by the ads shown in the Psiphon client software */
+"privacy-information-collected-client-ads-head" = "Redes de publicidad del cliente Psiphon";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-client-advertising-networks-para-1" = "A veces usamos publicidad para sostener nuestro servicio, lo que puede hacer uso de tecnologías como cookies y balizas web. El uso de cookies por parte de nuestros socios publicitarios les habilita a ellos y a sus socios a servir anuncios en base a sus datos de uso. Cualquier información recopilada a través de este proceso es tratada bajo los términos de las políticas de privacidad de nuestros socios publicitarios.";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-client-advertising-networks-para-2" = "Puede desistir del uso de cookies para publicidad basada-en-intereses visitando:";
+
+/*[UNTRANSLATED] Header text in the 'my.psi.cash' section of the Privacy page. Refers to the cookies stored by web browsers. */
+"privacy-information-collected-mypsicash-cookies-head" = "Cookies";
+
+/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-cookies-para-1" = "my.psi.cash only uses cookies and similar tracking technologies to carry out activities that are essential for the operation of the website. Essential cookies are necessary to ensure basic functions of the website. Cookies are small text files that are stored on your computer and saved by your browser, and do not represent any risk to your device. You can configure your browser settings to personalize how you would like your browser to handle cookies. Disabling essential cookies will degrade the functionality of this website.";
+
+/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-para-1" = "Users create and manage their PsiCash accounts on the <a href=\"https://my.psi.cash\" target=\"_blank\" rel=\"noopener noreferrer\">my.psi.cash</a> website.";
+
+/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-recaptcha-para-1" = "my.psi.cash uses Google’s reCAPTCHA v3 (hereinafter “reCAPTCHA”), which protects websites from spam and abuse by non-human users (i.e., bots). reCAPTCHA collects personal information that is required for the functioning of the technology and is subject to its own privacy policy. Use of my.psi.cash indicates acceptance of Google’s <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">Privacy Policy</a> and <a href=\"https://policies.google.com/terms\" target=\"_blank\" rel=\"noopener noreferrer\">Terms</a>.";
+
+/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-recaptcha-para-2" = "Our use of reCAPTCHA is strictly limited to ensuring the continued functioning of my.psi.cash. reCAPTCHA technology performs an automatic analysis for each site request without requiring the user to take any additional actions. This analysis is based on interactions made by the user, and is used to mitigate bot and other malicious behaviour on our website. The data collected during analysis is forwarded to Google, where Google will use this data to determine if you are a human user. This analysis takes place in the background, and users are not advised it is taking place.";
+
+/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. */
+"privacy-information-collected-mypsicash-recaptcha-para-3" = "For more information about Google’s reCAPTCHA technology, please visit <a href=\"https://www.google.com/recaptcha/about/\" target=\"_blank\" rel=\"noopener noreferrer\">https://www.google.com/recaptcha/about/</a>.";
+
+/* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-1" = "El sistema PsiCash solamente recopila información necesaria para el funcionamiento del mismo, el monitoreo de su salud, y la garantización de su seguridad.";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to randomly generated values that allow a user to access and utilize the system. */
+"privacy-information-collected-psicash-para-2-item-1" = "credenciales generadas de acceso de usuario";
+
+/*[UNTRANSLATED] Bullet list item in the 'operation of the system' list. This item refers to the user PsiCash balance -- i.e., how much they have available to spend. */
+"privacy-information-collected-psicash-para-2-item-2" = "balance";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to the date and time that the user last earned or spent PsiCash. */
+"privacy-information-collected-psicash-para-2-item-3" = "marca de tiempo de última actividad";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to transaction history of the user earning PsiCash. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-2-item-4" = "Historial de ganancia de PsiCash, incluyendo por qué acciones fueron otorgadas las recompensas";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to transaction history of the user spending PsiCash, such as by buying Speed Boost. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-2-item-5" = "Historial de gastos de PsiCash, incluyendo qué compras fueron hechas";
+
+/* Paragraph text in the 'PsiCash' section of the Privacy page. This is preamble to a detailed bullet list. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-2-list-start" = "El servidor PsiCash almacena información por cada usuario para permitir la operación del sistema, incluyendo:";
+
+/* Paragraph text on the Privacy Policy page. Describes the user data requirements for PsiCash accounts. 'PsiCash' must not be translated or transliterated. 'Psiphon' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-2b" = "Crear una cuenta PsiCash es opcional. Si una cuenta es creada, información específica de la misma tal como nombre de usuario, contraseña y dirección de correo electrónico (si es provista) es almacenada en el servidor. Cuando se tiene sesión iniciada en un cliente Psiphon, el nombre de usuario también es almacenado localmente.";
+
+/* Bullet list item in the 'data stored in web browser' list. This item refers to randomly generated values that allow a user to access and utilize the system. */
+"privacy-information-collected-psicash-para-3-item-1" = "credenciales generadas de acceso de usuario";
+
+/* Bullet list item in the 'data stored in web browser' list. PsiCash earning rewards can only be claimed every so often in the web browser, so this refers to the date-time when the user is next allowed to claim a reward. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-3-item-2" = "cuándo es permitido reclamar una recompensa PsiCash de nuevo";
+
+/* Paragraph text in the 'PsiCash' section of the Privacy page. This is preamble to a detailed bullet list. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-3-list-start" = "En el navegador web del usuario, algunos datos son almacenados para permitir ganar recompensas y hacer compras. Estos datos incluyen:";
+
+/* Bullet list item in the 'system health and security' list. This item refers to the country from which a user was connecting when he/she performed an action. */
+"privacy-information-collected-psicash-para-4-item-1" = "país del usuario";
+
+/*[UNTRANSLATED] Bullet list item in the 'operation of the system' list. This item refers to the user PsiCash balance -- i.e., how much they have available to spend. */
+"privacy-information-collected-psicash-para-4-item-2" = "balance";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to 'user agent string' of the client software used to perform an action. This can be either a web browser or the Psiphon client itself. */
+"privacy-information-collected-psicash-para-4-item-3" = "Cadena 'agente de usuario'";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to the version of the Psiphon app. */
+"privacy-information-collected-psicash-para-4-item-4" = "versión del cliente";
+
+/* Bullet list item in the 'operation of the system' list. This item refers to transaction history of the user earning and spending PsiCash. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-4-item-5" = "Detalles de ganancias y gastos PsiCash";
+
+/* Paragraph text in the 'PsiCash' section of the Privacy page. This is preamble to a detailed bullet list. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-4-list-start" = "Para monitorear la salud y seguridad del sistema, los datos de actividad del mismo son recopilados y agregados. Estos datos incluyen: ";
+
+/* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-5" = "Datos de usuario individuales nunca son compartidos con terceros. Estadísticas en bruto agregadas pueden ser compartidas, pero nunca en una forma que pueda posiblemente identificar usuarios.";
+
+/* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-6" = "Los recursos del servidor PsiCash son almacenados en AWS, lo cual significa que Amazon tiene acceso a los datos.";
+
+/* Sub-heading for section describing use of logging access to data storage (aka S3 bucket logging). The way to read this is 'creation of logs for user accesses to data storage'. Psiphon 'stores' websites, downloads, and upgrades (the 'data') in Amazon S3 (the 'storage'). Users 'access' the data storage. And, somtimes, we 'log' those accesses. (For example, if we suspect attackers are accessing the storage, or if it seems the storage is blocked by a country.) */
+"privacy-information-collected-s3-logging-head" = "Registro de acceso al almacenamiento";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-s3-logging-para-1" = "Utilizamos Amazon S3 para almacenar elementos esenciales tales como ficheros del sitio web y listas de servidores Psiphon descubiertos. A veces habilitamos el registro (log) de descargas de estos ficheros. Analizar estos registros nos ayuda a responder preguntas como \"¿cuántos usuarios están iniciando pero no completando la descarga de la lista de servidores descubiertos?\", \"¿cómo se dividen los datos descargados entre elementos del sitio web y servidores descubiertos?\", y \"¿hay un atacante realizando una ofensiva de denegación-de-servicio contra nuestros sitios web?\"";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-s3-logging-para-2" = "Los <a href=\"https://docs.aws.amazon.com/es_es/AmazonS3/latest/dev/LogFormat.html\" target=\"_blank\">registros de acceso al 'bucket'</a> (cubículo) de S3 contienen direcciones IP, agentes del usuario, y marcas de tiempo. Estos registros se almacenan en el propio S3, así que Amazon tiene acceso a ellos (no obstante, Amazon ya sirve los ficheros, así que podía acceder a esta información). Los desarrolladores de Psiphon, descargarán los registros, agregarán y analizarán los datos, y luego borrarán estos registros. Los datos en crudo se conservarán sólo lo suficiente para agregarlos, y no se compartirán con terceros.";
+
+/* Paragraph text in the 'Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-aggdata-para-1" = "Los datos son “generalizados” tomando un montón de datos delicados de actividad de usuarios y combinándolos juntos para formar datos estadísticos bastos que ya no son específicos a un usuario. Luego de la generalización, los datos de actividad de usuario son borrados.";
+
+/* Paragraph text in the 'Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-aggdata-para-2" = "Un ejemplo de datos agregados puede ser: en un día específico. 250 personas conectadas desde Nueva York usan Comcast, y 200GB son transferidos desde <code>youtube.com</code>, para un total de  500 GB. ";
+
+/* Paragraph text in the 'Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-aggdata-para-3" = "Los datos agregados son mucho más sensibles que los datos de actividad, pero los consideramos como potencialmente sensibles y no son compartidos en este formato. ";
+
+/* Sub-heading for the definition of 'Aggregated Data' under the 'User Activity and VPN Data' section of the Privacy Policy page. */
+"privacy-information-collected-vpndata-aggdata-subhead" = "Datos agregados";
+
+/* Sub-heading on the Privacy Policy page for the section describing handling of user traffic data and activity statistics through the Psiphon VPN */
+"privacy-information-collected-vpndata-head-v2" = "Actividad del usuario y datos de VPN.";
+
+/* Paragraph text in the 'What kinds of user data does Psiphon collect?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-kindsofdata-para-1" = "Se va definir algunas categorías de datos para entenderlos en el contexto de Psiphon. ";
+
+/* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. */
+"privacy-information-collected-vpndata-kindsofdata-subhead" = "¿Qué tipo de datos de usuario almacena Psiphon?";
+
+/* Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-shareable-para-1" = "Cuando compartimos datos generalizados con terceros, nos aseguramos que los datos no puedan ser combinados con otras fuentes para revelar identidades de usuarios. Por ejemplo, no compartimos datos para países que solamente tienen unos pocos usuarios de Psiphon en un día. Nos aseguramos que los datos sean anonimizados.";
+
+/* Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-shareable-para-2" = "Tampoco compartimos con terceros, nunca, información relacionada con dominio.";
+
+/* Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-shareable-para-3" = "Un ejemplo de datos agregados compartibles podría ser:  500 personas conectadas desde la ciudad de Nueva York y un total de 800GB son transferidos en un día específico. ";
+
+/* Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. '<em>' is an HTML tag that adds emphasis (like italics), which can be used if it makes sense in your language. */
+"privacy-information-collected-vpndata-shareable-para-4" = "Un ejemplo de datos que <em>no son compartibles</em>: Un día en particular 2 personas se conectan desde Los Ángeles. Estas personas serán incluidas en las estadísticas generales para los Estados Unidos, pero este es un número muy pequeño de personas para poder compartir los datos de la ciudad de manera anónima. ";
+
+/* Sub-heading for the definition of 'Shareable Aggregated Data' under the 'User Activity and VPN Data' section of the Privacy Policy page. */
+"privacy-information-collected-vpndata-shareable-subhead" = "Datos agregados compartibles";
+
+/* Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-useractivity-para-1" = "Mientras que el dispositivo de un usuario sea conducido por un túnel a través de Psiphon, recolectamos alguna información acerca de cómo lo está usando. Registramos qué protocolo Psiphon usó para conectarse, cuánto tiempo estuvo conectado el dispositivo, cuántos bytes fueron transferidos durante la sesión, y desde qué ciudad, país, e ISP vino la conexión. Para algunos dominios (pero muy pocos, y solamente los populares) o direcciones IP de servidores (ej., servidores conocidos de malware) que son visitados, también registramos cuántos bytes fueron transferidos hacia ellos. (Pero nunca URLs completos o algo más delicado. Y solo dominios de interés general, no todos ellos.)";
+
+/* Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-useractivity-para-2" = "La ubicación geográfica y la información del ISP son derivadas de la dirección IP del usuario, las cuales son inmediatamente descartadas luego.";
+
+/* Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-useractivity-para-3" = "Un ejemplo de actividad de datos de usuario puede ser: en un momento determinado un usuario conectado desde la ciudad de New York, usando Comcast, transfirió 100MB desde <code>youtube.com</code> y 300MB en total.";
+
+/* Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-useractivity-para-4.1" = "Consideramos que los datos de actividad de usuario son la categoría más delicada. Nunca jamás compartimos estos datos con terceros. Mantenemos los datos de actividad de usuario a lo sumo por 90 días, y luego los generalizamos y borramos. Copias de respaldo de esos datos son mantenidas por una cantidad de tiempo razonable.";
+
+/* Sub-heading for the definition of 'User Activity Data' under the 'User Activity and VPN Data' section of the Privacy Policy page. */
+"privacy-information-collected-vpndata-useractivity-subhead" = "Datos de la actividad del usuario";
+
+/* Paragraph text in the 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-para-1-v2" = "La actividad y los datos estadísticos agregados son de gran importancia para ayudarnos a que Psiphon funcione de la mejor manera. Nos permite hacer cosas como:";
+
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-para-2-item-1" = "Monitorear la salud y el éxito de la red Psiphon: Necesitamos saber cuántas personas se están conectando, desde dónde, cuántos datos están transfiriendo, y si están teniendo algún problema.";
+
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-para-2-item-2" = "Monitorear amenazas a los dispositivos de nuestros usuarios: Nos mantenemos vigilantes por infecciones de malware que intentan contactar servidores de comando y control.";
+
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-para-2-item-3" = "Asegurar que los usuarios están conectados mientras que los censores son frustrados: Intentamos detectar que un usuario se esté comportando como una persona real, y luego le revelamos nuevos servidores Psiphon. (Esta es nuestra tecnología de lista de servidor ofuscado.)";
+
+/* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-subhead-v2" = "¿Qué hace Psiphon con la actividad de usuario y los datos agregados?";
+
+/* Paragraph text in the 'What does Psiphon NOT do with your data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphonnotdowith-para-1" = "Nosotros no recopilamos ni almacenamos ningunos datos de la VPN que no hayan sido mencionadas acá.";
+
+/* Paragraph text in the 'What does Psiphon NOT do with your data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphonnotdowith-para-2" = "Nosotros NO modificamos el contenido de sus datos que están en la VPN.";
+
+/* Paragraph text in the 'What does Psiphon NOT do with your data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphonnotdowith-para-3" = "Nosotros NO compartimos ningunos datos delicados o específicos de un usuario con ninguna otra persona. ";
+
+/* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes what undesirable things Psiphon DOES NOT do with user data. '<strong>' is an HTML tag that makes text bold, which can be used if it makes sense in your language. */
+"privacy-information-collected-vpndata-whatdoespsiphonnotdowith-subhead" = "¿Qué <strong>NO</strong> hace Psiphon con sus datos?";
+
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-1-v2" = "Los datos agregados compartibles son distribuidos con patrocinadores, las organizaciones con las que colaboramos y investigadores de la sociedad civil. Los datos pueden ser utilizados para mostrar cosas como: ";
+
+/* Bullet list text under 'Who does Psiphon share Aggregated Data with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-2-item-1" = "Qué tan bien está trabajando Psiphon en una región particular. ";
+
+/* Bullet list text under 'Who does Psiphon share Aggregated Data with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-2-item-2" = "Los patrones de bloqueo en un país específico, por ejemplo durante eventos políticos.";
+
+/* Bullet list text under 'Who does Psiphon share Aggregated Data with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-2-item-3" = "Que la población de un país esté decidida a acceder a la internet abierta.";
+
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-3-v2" = "Una vez más, solo datos compartibles agregados y anónimos son compartidos con terceros.";
+
+/* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-subhead-v2" = "¿Con quién comparte Psiphon los datos agregados?";
+
+/* Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whycare-para-1" = "Cuando use una VPN o proxy debe cuidarse de lo que su proveedor de VPN puede ver, almacenar y hacer con sus datos.";
+
+/* Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. '<em>' is an 'emphasis' (like italics) HTML tag, which can be used if it makes sense in your language. */
+"privacy-information-collected-vpndata-whycare-para-2" = "Al usar una VPN todos los datos entran y salen a través de ésta. Si usted visita un sitio web que usa HTTP sin encriptar, todos los datos de ese sitio son visibles para la VPN. Si usted visita un sitio web que usa datos encriptados, el contenido del sitio es encriptado pero alguna información del sitio podría ser visible para la VPN. Otras aplicaciones y servicios en su dispositivo van también a tansmitir datos encrptados o sin ecriptar. (Note que esto es distinto de la encriptación que todas las VPNs ofrecen. Lo que importa aquí son los datos que están encriptados <em>dentro</em> del túnel de la VPN.";
+
+/* Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whycare-para-3" = "Para servicios que no estén cifrados, es posible para un proveedor de VPN veer, recolectar y modificar (p.ej. introducir publicidad en) el contenido de sus datos. Para datos cifrados, un proveedor de VPN todavía puede recolectar metadatos sobre los sitios que ha visitado o las acciones que realiza. También debería preocuparse de que su proveedor de VPN comparta sus datos con terceros.";
+
+/* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
+"privacy-information-collected-vpndata-whycare-subhead" = "¿Por qué debiera importarle?";
+
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-1" = "Estimar costos futuros: La enorme cantidad de datos de usuario que transferimos cada mes es un factor preponderante en nuestros costos. Nos es vital el ver y entender fluctuaciones en el uso.";
+
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-3" = "Determinar la naturaleza de eventos mayoritarios de censura: Sitios y servicios a menudo se ven bloqueados súbitamente y sin advertencia, lo cual puede conducir a enormes variaciones en el uso regional de Psiphon. Por ejemplo, tuvimos incrementos en uso del orden de 20 veces dentro de un día cuando <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">Brasil bloqueó WhatsApp</a> o <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">Turquía bloqueó las redes sociales</a>.";
+
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-4" = "Entender a quién necesitamos ayudar: Algunos sitios y servicios nunca serán bloqueados en ningún lado, algunos serán bloqueados siempre en ciertos países, y algunos serán bloqueados ocasionalmente en algunos otros. Para asegurar que nuestros usuarios son capaces de comunicarse y aprender libremente, necesitamos entender estos patrones, ver quiénes son afectados y trabajar con nuestros socios para asegurar que sus servicios funcionan de la mejor manera con Psiphon.";
+
+/*[UNTRANSLATED] Sub-heading for section describing use of Google Analytics and what info they collect */
+"privacy-information-collected-websites-google-analytics-head" = "Google Analytics";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-websites-google-analytics-para-1" = "Utilizamos Google Analytics en algunos de nuestros sitios web para recoger información sobre uso. La información recopilada por Google Analytics sólo se usará para análisis estadístico relativo a sus hábitos de navegación en este sitio específico. La información que obtenemos desde Google Analytics no es personalmente identificativa, ni se combina con información obtenida de otras fuentes para crear información que le identifique personalmente.";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-websites-google-analytics-para-2" = "Google Analytics coloca una cookie permanente en su navegador web para identificarlo como usuario único la siguiente vez que visite el sitio web, pero esta cookie solo puede ser utilizada por Google, y los datos recopilados no pueden ser alterados o recuperados por servicios de otros dominios. ";
+
+/* No comment provided by engineer. */
+"privacy-information-collected-websites-google-analytics-para-3" = "La capacidad de Google de usar y compartir información recopilada por Google Analytics acerca de las visitas que usted realice a este sitio está restringida por los <a href=\"http://www.google.ca/analytics/terms/es.html\" target=\"_blank\">Términos y Condiciones de Servicio de Google Analytics</a> y la <a href=\"http://www.google.com/intl/es/policies/privacy/\" target=\"_blank\">Política de Privacidad de Google</a>. Puede optar por rehusar deshabilitando las cookies en las preferencias de la configuración de su navegador.";
+
+/* Sub-heading on the Privacy Policy page above the info about what user information is collected by the Psiphon websites */
+"privacy-information-collected-websites-head" = "Sitios web de Psiphon";
 
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
 "PRIVACY_POLICY_DECLINED_ALERT_BODY" = "Debe aceptar nuestra Política de Privacidad antes de continuar con el uso de Psiphon.";
@@ -151,71 +502,80 @@
 /* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
 "PRIVACY_POLICY_URL" = "https://psiphon.ca/es/privacy.html";
 
-/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara1" = "Psiphon mira sus datos solamente en el grado necesario para recopilar estadísticas acerca del uso de nuestro sistema. Registramos el total de bytes transferidos por una conexión de usuario, como así también los bytes transferidos por algunos dominios específicos. Estas estadísticas se descartan luego de 60 días.";
-
-/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara2" = "Psiphon no inspecciona o registra URLs completos (solamente nombres de dominio), y tampoco inspecciona sus datos en profundidad. Psiphon no modifica sus datos al pasar a través de la VPN.";
-
-/* Paragraph text in the 'What does Psiphon do with your VPN data?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithPara3" = "Aún estos datos en bruto serían dificultosos de ser relacionados a usted, ya que convertimos inmediatamente su dirección IP a información geográfica, y luego descartamos el IP. Ninguna otra información identificatoria es almacenada.";
-
-/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
-"PrivacyInformationCollectedVpndataWhatdoespsiphondowithSubhead" = "¿Qué hace Psiphon con sus datos de VPN?";
-
-/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara1" = "Al compartir con terceros, Psiphon solamente provee estadísticas en bruto o consolidadas en bytes de dominio. Nunca compartimos información por sesión, o cualquier otra información posiblemente identificatoria.";
-
-/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara2" = "Lo que compartimos, lo hacemos típicamente con servicios u organizaciones con los que colaboramos — como lo <a href=\"http://www.dw.com/en/psiphon-helps-dodge-the-online-trackers/a-16765092\" target=\"_blank\">hicimos con DW</a> unos años atrás. Estas estadísticas ayudan a que tanto nosotros como ellos respondan preguntas tales como “¿cuántos bytes fueron transferidos a través de Psiphon desde DW.com hacia todos los usuarios en Irán en Abril?”";
-
-/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithPara3" = "De nuevo, específicamente no damos información detallada o potencialmente identificatoria a nivel de usuario a nuestros socios o terceros.";
-
-/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
-"PrivacyInformationCollectedVpndataWhopsiphonshareswithSubhead" = "¿Con quién comparte estas estadísticas Psiphon?";
-
-/* Paragraph text in the 'Why should you care?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhycarePara1" = "Al emplear una VPN o proxy, debiera estar preocupado acerca de qué puede ver el proveedor en sus datos, recopilar a partir de los mismos, y hacer con ellos. Para algunas conexiones web y de correo electrónico, es teóricamente posible para una VPN el ver, recopilar y modificar los contenidos.";
-
-/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
-"PrivacyInformationCollectedVpndataWhycareSubhead" = "¿Por qué debiera importarle?";
-
-/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item1" = "Estimar costos futuros: La enorme cantidad de datos de usuario que transferimos cada mes es un factor preponderante en nuestros costos. Nos es vital el ver y entender fluctuaciones en el uso.";
-
-/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item2" = "Optimizar por tipos de tráfico: La transmisión de vídeo tiene diferentes requerimientos de red que la navegación web, la cual es diferente del chat, la cual es diferente de voz, y así sucesivamente. Las estadísticas acerca del número de bytes transferidos por algunos de los proveedores de medios masivos nos ayudan a entender cómo proveer la mejor experiencia a nuestros usuarios.";
-
-/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. If available in your language, the blog post URLs should be updated to the localized post. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item3" = "Determinar la naturaleza de eventos mayoritarios de censura: Sitios y servicios a menudo se ven bloqueados súbitamente y sin advertencia, lo cual puede conducir a enormes variaciones en el uso regional de Psiphon. Por ejemplo, tuvimos incrementos en uso del orden de 20 veces dentro de un día cuando <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">Brasil bloqueó WhatsApp</a> o <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">Turquía bloqueó las redes sociales</a>.";
-
-/* Bullet list text under 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. (English is using 'who' instead of 'whom' to reflect common idiom.) */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1Item4" = "Entender a quién necesitamos ayudar: Algunos sitios y servicios nunca serán bloqueados en ningún lado, algunos serán bloqueados siempre en ciertos países, y algunos serán bloqueados ocasionalmente en algunos otros. Para asegurar que nuestros usuarios son capaces de comunicarse y aprender libremente, necesitamos entender estos patrones, ver quiénes son afectados y trabajar con nuestros socios para asegurar que sus servicios funcionan de la mejor manera con Psiphon.";
-
-/* Paragraph text in the 'Why does Psiphon need these statistics?' subsection of the 'User VPN Data' section of the Privacy page. This paragraph serves as preamble for a detailed list, which is why it ends with a colon. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedPara1ListStart" = "Estos datos son usados para determinar cómo está siendo usada nuestra red. Nos permite hacer cosas como:";
-
-/* Sub-heading in the 'User VPN Data' section of the Privacy Policy page. The section describes why Psiphon needs VPN data stats. */
-"PrivacyInformationCollectedVpndataWhydoespsiphonneedSubhead" = "¿Por qué precisa Psiphon estas estadísticas?";
-
 /* page title for the Privacy Policy page */
 "PrivacyTitle" = "Política de privacidad";
 
 /* Message shown when products available for purchase could not be retrieved. */
 "PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "La lista de productos no pudo ser obtenida";
 
+/* Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
+"PROTECT_YOUR_PURCHASES" = "Protege Tus Compras";
+
+/* Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts. */
+"PSICASH_ACCOUNT" = "Cuenta PsiCash";
+
+/* Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
+"PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "¿Seguro que quieres cerrar sesión de tu cuenta PsiCash?";
+
+/* An alert shown when the user logs out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNT_LOGOUT_COMPLETE_TITLE" = "Cierre de sesión de cuenta PsiCash completo.";
+
+/* Body of modal dialog shown when the user attempts to log out of their PsiCash account and an unexpected error occurs. Please don't modify the link URL. */
+"PSICASH_ACCOUNT_LOGOUT_FAILED_BODY" = "Tu intento de cerrar sesión falló inesperadamente. Por favor intenta reiniciar la aplicación.";
+
+/* Header of a modal dialog that appears when the user tries to log out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNT_LOGOUT_TITLE" = "Cierre de sesión de cuenta PsiCash";
+
+/* Button title that opens 'PsiCash' account management. */
+"PSICASH_ACCOUNT_MANAGEMENT_2" = "Administrar cuenta";
+
+/* An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "Tu inicio de sesión en PsiCash ha caducado. Por favor inicia sesión nuevamente.";
+
+/* Body text of a modal dialog shown when a PsiCash login succeeds. There is a fixed number of times that a user can merge a pre-account balance into a PsiCash account. This message indicates that the user has hit that limit and the merge that occurred is the last one allowed. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNTS_LAST_MERGE_WARNING_BODY" = "Tienes sesión iniciada dentro de tu cuenta PsiCash. El saldo preexistente de este dispositivo ha sido transferido dentro de tu cuenta, pero esta es la última vez que ocurrirá una unificacfión de saldos.";
+
 /* PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
 "PSICASH_BALANCE" = "Balance de PsiCash:";
 
-/* User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
-"PSICASH_BALANCE_OUT_OF_DATE_ALERT_BODY" = "Conéctate a Psiphon para actualizar tu balance de PsiCash.";
+/* Body text of a modal dialog shown when a PsiCash account login fails due to a 'bad request' error. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_BAD_REQUEST_ERROR_BODY" = "El servidor PsiCash indicó que la solicitud de inicio de sesión fue inválida. Por favor intenta de nuevo más tarde.";
 
-/* User's PsiCash balance is not up to date. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text is shown on an alert pop up title */
-"PSICASH_BALANCE_OUT_OF_DATE_ALERT_TITLE" = "Balance de PsiCash Desactualizado";
+/* Body text of a modal dialog shown when a PsiCash login fails without a specific reason. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_CATASTROPHIC_ERROR_BODY" = "Su intento de inicio de sesión PsiCash falló inesperadamente.";
+
+/* Title of modal dialog shown when the PsiCash account login attempt fails for some reason. Text within the modal will explain why. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_FAILED_TITLE" = "Falló inicio de sesión PsiCash";
+
+/* Body text of a modal dialog shown when a PsiCash account login fails due to a server error. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_SERVER_ERROR_BODY" = "El servidor PsiCash respondió con un error mientras intentaba iniciar tu sesión. Por favor intenta más tarde.";
+
+/* Title of modal dialog shown when the PsiCash account login attempt succeeds, if additional information needs to be conveyed. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_SUCCESS_TITLE" = "Inicio de sesión PsiCash exitoso";
+
+/* Body of a modal dialog that appears when the user tries to log out of thier PsiCash account while not currently connected to the Psiphon network. We don't allow PsiCash network requests when not connected, so only an inferior localy-only logout is available. 'Psiphon' must not be translated/transliterated. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGOUT_OFFLINE_BODY" = "Estando conectado a la red Psiphon habilita un cierre de sesión PsiCash más seguro. ¿Te gustaría conectar antes de cerrar sesión?";
+
+/* Body text of a modal dialog shown when the user tries to use (spend, buy, etc.) PsiCash, if they not currently connected. 'Use' here means buy, spend, or otherwise interact with. 'Psiphon' must not be translated/transliterated. 'PsiCash' must not be translated/transliterated. */
+"PSICASH_MUST_BE_CONNECTED" = "Para poder utilizar PsiCash, debe estar conectado a la red Psiphon.";
 
 /* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
-"PSICASH_PURCHASE_SCREEN_NOTICE" = "IMPORTANTE: Tu PsiCash no será preservado si desinstalas Psiphon.";
+"PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "IMPORTANTE: Tu PsiCash no será preservado si desinstalas Psiphon, a menos que hayas creado una cuenta PsiCash y hayas iniciado sesión en la misma.";
+
+/* Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_PRODUCT_NOT_FOUND_MESSAGE" = "Producto de Aumento de Velocidad no encontrado. Tu aplicación puede estar desactualizada. Por favor comprueba si hay actualizaciones.";
+
+/* Body of an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. The words 'PsiCash' and 'Psiphon' must not be translated or transliterated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_PORT_LIMITS_BODY" = "Sin Aumento de Velocidad activo, tu velocidad está limitada, y algún tráfico de Internet no está soportado. Activa Aumento de Velocidad con PsiCash para desbloquear el potencial completo de tu experiencia con Psiphon.";
+
+/* Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. Port here refers to port in computer networking. */
+"PSICASH_SPEED_PORT_LIMITS_HEAD" = "Límites de velocidad y puertos";
+
+/* A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon */
+"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY" = "Tu suscripción a Psiphon ya te da Aumento de Velocidad siempre activo, de manera que no hay razón para comprar más. Tu balance de PsiCash será conservado, si alguna vez decidieras cancelar tu suscripción.\n\nAún puedes acceder a tu cuenta PsiCash desde el menú de configuraciones.";
+
+/* A title message to the premium user (a user with a subscription when they are trying to navigate to PsiCash and Speed Boost screen. Do not translate or transliterate words PsiCash or Psiphon */
+"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_TITLE" = "¡Tu suscripción a Psiphon te da acceso premium!";
 
 /* An error that signifies a state where the user has made a 'PsiCash' purchase, but extra action is needed from the user to finish the transaction. Do not translate or transliterate 'PsiCash'. */
 "PSICASH_TRANSACTION_PENDING" = "Transacción Pendiente";
@@ -235,20 +595,20 @@
 /* Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
 "PSICASH_WAIT_TRANSACTION_VERIFIED" = "Por favor espera mientras tu transacción está siendo verificada";
 
+/* Alert message informing user that a Psiphon connection is required */
+"PSIPHON_CONNECTION_REQUIRED" = "Una conexion a Psiphon es requerida.";
+
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon no está conectado";
 
-/* 'App Store' refers to Apple's App Store, do not translate or transliterate 'App Store'. This alert message informs the user that the purchase they made has not been recorded by App Store. */
-"PURCHASE_NOT_RECORDED_BY_APPSTORE" = "Compra no registrada por  App Store.";
+/* Alert message that the users purchases have been restored successfully */
+"PURCHASES_RESTORED_SUCCESSFULLY" = "Compras restauradas con éxito";
 
 /* Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
 "PURCHASING_PSICASH" = "Comprando PsiCash…";
 
 /* Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "PURCHASING_SPEED_BOOST" = "Comprando Aumento de Velocidad...";
-
-/* Button title on an error alert that indicates it refreshes the user's purchase receipt on device. */
-"RECEIPT_REFRESH_BUTTON" = "Refrescar Recibo";
 
 /* Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "Refresque el recibo de su aplicación cuando:";
@@ -259,11 +619,8 @@
 /* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "No puede ver una suscripción que compró en éste dispositivo.";
 
-/* This alert message informs the user that the purchase they made has not been recorded and that they can tap the button 'Refresh Receipt' to try again. */
-"REFRESH_APP_RECEIPT_TO_TRY_AGAIN" = "Refrescar recibo de la app para intentar de nuevo.";
-
-/* Title for a confirmation button that resets a user's previous consent. */
-"RESET_IDENTIFIER_BUTTON_TITLE" = "Restablecer Consentimiento";
+/* Button that restores users previous purchases */
+"RESTORE_PURCHASES" = "Restaurar compras";
 
 /* Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "Restaurar Suscripción";
@@ -289,14 +646,38 @@
 /* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Reinstalar perfil de VPN";
 
-/* (Do not translate 'AdMob') Title of cell in settings menu which indicates the user can change or revoke the consent they've given to admob */
-"SETTINGS_RESET_ADMOB_CONSENT" = "Restablecer consentimiento de AdMob";
-
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "Suscripciones";
 
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST" = "Turbo Velocidad";
+
+/* Label on a button. Clicking this button will buy 1 hour of Speed Boost. Translate number as well. */
+"SPEED_BOOST_1HR" = "1 hora";
+
+/* Label on a button. Clicking this button will buy 2 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_2HR" = "2 horas";
+
+/* Label on a button. Clicking this button will buy 3 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_3HR" = "3 horas";
+
+/* Label on a button. Clicking this button will buy 4 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_4HR" = "4 horas";
+
+/* Label on a button. Clicking this button will buy 5 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_5HR" = "5 horas";
+
+/* Label on a button. Clicking this button will buy 6 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_6HR" = "6 horas";
+
+/* Label on a button. Clicking this button will buy 7 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_7HR" = "7 horas";
+
+/* Label on a button. Clicking this button will buy 8 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_8HR" = "8 horas";
+
+/* Label on a button. Clicking this button will buy 9 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_9HR" = "9 horas";
 
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST_ACTIVE" = "Turbo Velocidad activa";
@@ -369,6 +750,9 @@
 
 /* Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
 "UPGRADE_PSIPHON" = "Actualizar Psiphon";
+
+/* Text field label where users can enter their account's username */
+"USERNAME_TEXT_FIELD" = "Nombre de usuario";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "Ocurrió un error mientras se iniciaba Psiphon. Por favor, inténtelo de nuevo.";

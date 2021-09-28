@@ -21,6 +21,8 @@
 
 @interface UIColor (Additions)
 
++ (UIColor * _Nonnull)radicalRed;
+
 + (UIColor * _Nonnull)paleBlueColor;
 
 + (UIColor * _Nonnull)clearBlueColor;
@@ -34,6 +36,8 @@
 + (UIColor * _Nonnull)lightishBlue;
 
 + (UIColor * _Nonnull)lightishBlueTwo;
+
++ (UIColor * _Nonnull)vividBlue;
 
 + (UIColor * _Nonnull)greyishBrown;
 
@@ -106,5 +110,9 @@
 + (UIColor * _Nonnull)algaeGreenColor;
 
 + (UIColor * _Nonnull)greyishColor;
+
++ (UIColor * _Nonnull)darkGray2Color;
+
++ (UIColor * _Nonnull)whiteHighlightedColor;
 
 @end

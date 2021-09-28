@@ -28,79 +28,121 @@ struct PsiCashMessageView: ViewBuilder {
         case unavailableWhileConnecting
         case unavailableWhileDisconnecting
         case otherErrorTryAgain
+        case signupOrLoginToPsiCash
+        case psiCashAccountsLoggingIn
+        case psiCashAccountsLoggingOut
+        case noSpeedBoostProducts
     }
 
-    func build(_ container: UIView?) -> MutableBindableViewable<Message, UIView> {
-        let root = UIView(frame: .zero)
+    func build(_ container: UIView?) -> ImmutableBindableViewable<Message, UIView> {
+        
+        // vStack is contained in wrapper, letting the wrapper
+        // grow beyond the vStack natural size..
+        let wrapper = UIView(frame: .zero)
+        
+        let vStack = UIStackView.make(
+            axis: .vertical,
+            distribution: .fill,
+            alignment: .fill,
+            spacing: Style.default.padding,
+            margins: (top: 5.0, bottom: Style.default.padding)
+        )
 
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFit
-
+        let imageView = UIImageView.make(
+            contentMode: .scaleAspectFit,
+            easyToShrink: true
+        )
+        
         let title = UILabel.make(fontSize: .h1,
+                                 numberOfLines: 0,
                                  alignment: .center)
 
         let subtitle = UILabel.make(fontSize: .h3,
                                     typeface: .medium,
-                                    numberOfLines: 0,
-                                    alignment: .center)
+                                    numberOfLines: 0)
 
         // Add subviews
-        root.addSubviews(imageView, title, subtitle)
-        container!.addSubview(root)
-
-        // Autolayout
-        root.activateConstraints {
-            $0.constraintToParent(.leading(), .trailing(),.centerX(), .centerY())
+        vStack.addArrangedSubviews(
+            imageView,
+            title,
+            subtitle
+        )
+        
+        wrapper.addSubviews(vStack)
+        
+        vStack.activateConstraints {
+            $0.constraintToParent(.centerX(), .top(Float(Style.default.largePadding)),
+                                  .leading(), .trailing())
+        }
+        
+        wrapper.activateConstraints {
+            [
+                $0.bottomAnchor.constraint(greaterThanOrEqualTo: vStack.bottomAnchor)
+            ]
         }
 
-        imageView.activateConstraints {
-            $0.constraintToParent(.top(), .centerX())
-        }
-
-        title.activateConstraints {
-            $0.constraintToParent(.leading(), .trailing()) +
-                [ $0.topAnchor.constraint(equalTo: imageView.bottomAnchor, constant: 20) ]
-        }
-
-        subtitle.activateConstraints {
-            $0.constraintToParent(.leading(), .trailing(), .bottom()) +
-                [ $0.topAnchor.constraint(equalTo: title.bottomAnchor, constant: 13) ]
-        }
-
-        return .init(viewable: root) { [imageView, title, subtitle] _ -> ((PsiCashMessageView.Message) -> UIView?) in
+        return .init(viewable: wrapper) { [imageView, title, subtitle] _ -> ((PsiCashMessageView.Message) -> Void) in
             return { [imageView, title, subtitle] msg in
                 switch msg {
                 case .pendingPsiCashVerification:
                     imageView.image = UIImage(named: "PsiCashPendingTransaction")
                     title.text = UserStrings.PsiCash_transaction_pending()
                     subtitle.text = UserStrings.PsiCash_wait_for_transaction_to_be_verified()
+                    subtitle.textAlignment = .center
 
                 case .speedBoostAlreadyActive:
                     imageView.image = UIImage(named: "SpeedBoostActive")!
                     title.text = UserStrings.Speed_boost_active()
                     subtitle.text = UserStrings.Speed_boost_you_already_have()
+                    subtitle.textAlignment = .center
 
                 case .userSubscribed:
                     imageView.image =  UIImage(named: "PsiCashCoinCloud")!
-                    title.text = UserStrings.PsiCash_unavailable()
-                    subtitle.text = UserStrings.PsiCash_is_unavailable_while_subscribed()
+                    title.text = UserStrings.PsiCash_subscription_already_gives_premium_access_title()
+                    subtitle.text = UserStrings.PsiCash_subscription_already_gives_premium_access_body()
+                    subtitle.textAlignment = .natural
 
                 case .unavailableWhileConnecting:
                     imageView.image =  UIImage(named: "PsiCashCoinCloud")!
                     title.text = UserStrings.PsiCash_unavailable()
                     subtitle.text = UserStrings.PsiCash_is_unavailable_while_connecting_to_psiphon()
+                    subtitle.textAlignment = .center
                     
                 case .unavailableWhileDisconnecting:
                     imageView.image =  UIImage(named: "PsiCashCoinCloud")!
                     title.text = UserStrings.PsiCash_unavailable()
                     subtitle.text = UserStrings.PsiCash_is_unavailable_while_disconnecting_from_psiphon()
+                    subtitle.textAlignment = .center
                     
                 case .otherErrorTryAgain:
                     imageView.image =  UIImage(named: "PsiCashCoinCloud")!
                     title.text = UserStrings.PsiCash_unavailable()
                     subtitle.text = UserStrings.Please_try_again_later()
+                    subtitle.textAlignment = .center
+                
+                case .signupOrLoginToPsiCash:
+                    imageView.image = UIImage(named: "PsiCashCoinCloud")!
+                    title.text = ""
+                    subtitle.text = UserStrings.Sign_up_or_login_to_psicash_account_to_continue()
+                    subtitle.textAlignment = .center
+                    
+                case .psiCashAccountsLoggingIn:
+                    imageView.image = UIImage(named: "RedRocket")!
+                    title.text = UserStrings.Logging_in_ellipses()
+                    subtitle.text = ""
+                
+                case .psiCashAccountsLoggingOut:
+                    imageView.image = UIImage(named: "PsiCashCoinCloud")!
+                    title.text = UserStrings.Logging_out_ellipses()
+                    subtitle.text = ""
+                
+                case .noSpeedBoostProducts:
+                    imageView.image = UIImage(named: "PsiCashCoinCloud")!
+                    title.text = UserStrings.PsiCash_unavailable()
+                    subtitle.text = UserStrings.Something_went_wrong_try_agaig_and_send_feedback()
+                    subtitle.textAlignment = .center
+                    
                 }
-                return nil
             }
         }
     }

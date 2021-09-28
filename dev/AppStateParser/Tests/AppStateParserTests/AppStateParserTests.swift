@@ -69,7 +69,7 @@ final class AppStateParserTests: XCTestCase {
 
     // TODO: For development testing, should be replaced with an actual test.
     func testTypeParser() {
-        var inputs = [
+        let inputs = [
             "Pending<()>",
 
             "Pending<Result>",
@@ -93,7 +93,7 @@ final class AppStateParserTests: XCTestCase {
 
     // TODO: For development testing, should be replaced with an actual test.
     func testAppStateParser() {
-        var inputs = [
+        _ = [
             "tuple(1, 2)",
             "tuple2(a: 1, b: 2, 3)",
             "string(\"mystring\")",

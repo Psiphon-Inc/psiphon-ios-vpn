@@ -59,4 +59,23 @@ public extension Either {
             return false
         }
     }
+    
+    func leftToOptional() -> A? {
+        switch self {
+        case .left(let value):
+            return value
+        case .right(_):
+            return .none
+        }
+    }
+    
+    func rightToOptional() -> B? {
+        switch self {
+        case .left(_):
+            return .none
+        case .right(let value):
+            return value
+        }
+    }
+
 }

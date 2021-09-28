@@ -22,13 +22,13 @@ import argparse
 import json
 import re
 import transifex_pull
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 from datetime import datetime
 
 
 class PsiphonWebsiteInfo:
     default_language_code = 'en'
-    language_code_mappings = {v: k for k, v in transifex_pull.DEFAULT_LANGS.iteritems()}  # invert language code mappings
+    language_code_mappings = {v: k for k, v in transifex_pull.DEFAULT_LANGS.items()}  # invert language code mappings
 
     def __init__(self):
         self._localization = self.Localization()
@@ -40,8 +40,10 @@ class PsiphonWebsiteInfo:
 
         def sync(self):
             """Syncs Localization object's state with languages supported programmatically by the Psiphon website"""
-            data = urllib2.urlopen(
-                'https://bitbucket.org/psiphon/psiphon-circumvention-system/raw/default/Website/docpad.coffee').read()
+
+            resource = urllib.request.urlopen('https://raw.githubusercontent.com/Psiphon-Inc/psiphon-website/master/docpad.coffee')
+
+            data = resource.read().decode(resource.headers.get_content_charset())
 
             # Rough regex for declaration of the form:
             #   languages: ['en', 'fa', 'ar', 'zh', 'bo', '...']
@@ -184,7 +186,7 @@ if __name__ == "__main__":
         query_response_json = query_language_support_json(psiphon_website, args.language_code, args.faq,
                                                           args.privacy_policy)
 
-    print query_response_json
+    print(query_response_json)
 
 
 else:

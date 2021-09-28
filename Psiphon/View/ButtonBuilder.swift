@@ -26,7 +26,7 @@ struct ButtonBuilder: ViewBuilder {
     let image: UIImage?
     let eventHandler: (() -> Void)?
 
-    func build(_ container: UIView?) -> StrictBindableViewable<Utilities.Unit, SwiftUIButton> {
+    func build(_ container: UIView?) -> ImmutableBindableViewable<Utilities.Unit, SwiftUIButton> {
         let button = SwiftUIButton(type: style)
         if let tint = tint {
             button.tintColor = tint

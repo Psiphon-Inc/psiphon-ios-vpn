@@ -186,19 +186,26 @@
 
 #pragma mark - Public methods
 
-// reloadMainViewControllerAndImmediatelyOpenSettings destroys the current MainViewController,
-// and creates a new one and loads it.
-- (void)reloadMainViewControllerAndImmediatelyOpenSettings {
+- (void)reloadMainViewControllerAnimated:(BOOL)animated
+                              completion:(void (^ __nullable)(void))completion {
+    
     assert([self.childViewControllers count] == 1);
-    MainViewController *mainViewController = self.childViewControllers[0];
+    
+    [self dismissViewControllerAnimated:animated completion:^{
+        
+        MainViewController *mainViewController = self.childViewControllers[0];
+        
+        // Removes current child.
+        [self removeChildVC:mainViewController];
 
-    // Removes current child.
-    [self removeChildVC:mainViewController];
+        // Creates new child MainViewController, and adds its view to current root view hierarchy.
+        mainViewController = [[MainViewController alloc] initWithStartingVPN:FALSE];
+        [self addAndDisplayChildVC:mainViewController];
+        
+        completion();
+        
+    }];
 
-    // Creates new child MainViewController, and adds its view to current root view hierarchy.
-    mainViewController = [[MainViewController alloc] initWithStartingVPN:FALSE];
-    mainViewController.openSettingImmediatelyOnViewDidAppear = TRUE;
-    [self addAndDisplayChildVC:mainViewController];
 }
 
 - (void)reloadOnboardingViewController {

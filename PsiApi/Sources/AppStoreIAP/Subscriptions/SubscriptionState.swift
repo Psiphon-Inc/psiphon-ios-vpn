@@ -36,7 +36,7 @@ public struct SubscriptionState: Equatable {
 }
 
 public enum SubscriptionAction {
-    case updatedReceiptData(ReceiptData?)
+    case appReceiptDataUpdated(ReceiptData?)
     case _timerFinished(withExpiry:Date)
 }
 
@@ -45,18 +45,21 @@ extension SubscriptionAction: Equatable {}
 public typealias SubscriptionReducerEnvironment = (
     feedbackLogger: FeedbackLogger,
     appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
-    getCurrentTime: () -> Date,
-    compareDates: (Date, Date, Calendar.Component) -> ComparisonResult,
+    dateCompare: DateCompare,
     singleFireTimer:
     (_ interval: TimeInterval, _ leeway: DispatchTimeInterval) -> Effect<()>
 )
 
-public func subscriptionReducer(
-    state: inout SubscriptionState, action: SubscriptionAction,
-    environment: SubscriptionReducerEnvironment
-) -> [Effect<SubscriptionAction>] {
+/// Note that `subscriptionTimerReducer` bases it's timer on the latest subscription
+/// transaction available in the receipt, and it's state is currently
+/// independent of `subscriptionAuthStateReducer`.
+public let subscriptionTimerReducer = Reducer<SubscriptionState
+                                         , SubscriptionAction
+                                         , SubscriptionReducerEnvironment> {
+    state, action, environment in
+    
     switch action {
-    case .updatedReceiptData(let receipt):
+    case .appReceiptDataUpdated(let receipt):
         guard let subscriptionPurchases = receipt?.subscriptionInAppPurchases else {
             state.status = .notSubscribed
             return []
@@ -67,10 +70,7 @@ public func subscriptionReducer(
             return []
         }
         
-        let isExpired = purchaseWithLatestExpiry.isApproximatelyExpired(
-            getCurrentTime: environment.getCurrentTime,
-            compareDates: environment.compareDates
-        )
+        let isExpired = purchaseWithLatestExpiry.isApproximatelyExpired(environment.dateCompare)
         guard !isExpired else {
             state.status = .notSubscribed
             return []

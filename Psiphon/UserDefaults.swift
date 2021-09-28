@@ -21,6 +21,14 @@ import Foundation
 import PsiApi
 import PsiCashClient
 
+// Constants defined in PsiphonClientCommonLibrary
+struct PsiphonCommonLibConstants {
+    
+    // App language set by PsiphonClientCommonLibrary.
+    static let kAppLanguage = appLanguage
+    
+}
+
 // Feedback description note:
 // For new fields that are added, the feedback description in FeedbackDescriptions.swift
 // should also be updated.
@@ -38,7 +46,11 @@ final class UserDefaultsConfig: PsiCashPersistedValues {
     }
     
     /// App language code.
-    @UserDefault(.standard, "appLanguage", defaultValue: Language.defaultLanguageCode)
+    /// The value is set by `PsiphonClientCommonLibrary`.
+    /// - Note: Value stored at `PsiphonCommonLibConstants.kAppLanguage` is a valid BCP 47 tag.
+    @UserDefault(.standard,
+                 PsiphonCommonLibConstants.kAppLanguage,
+                 defaultValue: Language.defaultLanguageCode)
     var appLanguage: String
     
     /// Set of onboardings that have been completed by the user.
@@ -47,6 +59,26 @@ final class UserDefaultsConfig: PsiCashPersistedValues {
     
     @UserDefault(.standard, "LastCFBundleVersion", defaultValue: "")
     var lastBundleVersion: String
+
+    // TODO: The value here is not accessed directly though PsiCashEffects,
+    // but rather indirectly through PsiCash class migrateTokens method.
+    /// Represents the latest PsiCash data store version that the app has migrated to.
+    ///
+    /// Versions:
+    /// 0 (default): First PsiCash client version that uses NSUserDefaults as data store.
+    /// 1: Skipped.
+    /// 2: PsiCash client based on psicash-lib-core that uses a file as data store.
+    @UserDefault(.standard, "Psiphon-PsiCash-DataStore-Migrated-Version", defaultValue: 0)
+    var psiCashDataStoreMigratedToVersion: Int
+    
+    // MARK: Legacy keys
+    // Legacy keys are prefixed with an underscore.
+    // All keys that will no longer be used should appear under this marker
+    // to document them and avoid future naming clashes.
+    
+    @UserDefault(.standard, "embedded_server_entries_egress_regions", defaultValue: [])
+    var _embeddedServerRegions: [String]
+    
 }
 
 extension UserDefaultsConfig {

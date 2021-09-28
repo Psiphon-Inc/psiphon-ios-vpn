@@ -20,12 +20,30 @@
         }
       },
       {
+        "package": "swift-custom-dump",
+        "repositoryURL": "https://github.com/pointfreeco/swift-custom-dump",
+        "state": {
+          "branch": null,
+          "revision": "8655495733d8c712db8d9078f47d17f3555db79f",
+          "version": "0.1.2"
+        }
+      },
+      {
         "package": "SwiftParsec",
         "repositoryURL": "https://github.com/davedufresne/SwiftParsec.git",
         "state": {
           "branch": null,
-          "revision": "7169bfda454a086ea362b0af6d209d5de99743bd",
-          "version": "4.0.0"
+          "revision": "00ae75a5e9e0fc790056a8b8ebdf2a1833e7117a",
+          "version": "4.0.1"
+        }
+      },
+      {
+        "package": "xctest-dynamic-overlay",
+        "repositoryURL": "https://github.com/pointfreeco/xctest-dynamic-overlay",
+        "state": {
+          "branch": null,
+          "revision": "50a70a9d3583fe228ce672e8923010c8df2deddd",
+          "version": "0.2.1"
         }
       }
     ]

@@ -21,6 +21,53 @@ import Foundation
 import ReactiveSwift
 import Utilities
 
+public protocol Dispatcher {
+    
+    // Compatibility with ReactiveSwift.Scheduler
+    var rxScheduler: ReactiveSwift.Scheduler? { get }
+    
+    func dispatch(_ action: @escaping () -> Void)
+    
+}
+
+/// Represents a scheduler that performs its work on the main dispatch queue.
+public struct MainDispatcher: Dispatcher {
+    
+    public var rxScheduler: Scheduler? {
+        backingScheduler
+    }
+    
+    private let backingScheduler: QueueScheduler
+    
+    public init() {
+        backingScheduler = .main
+    }
+    
+    public func dispatch(_ action: @escaping () -> Void) {
+        backingScheduler.schedule(action)
+    }
+    
+}
+
+/// Represents a scheduler that performs its work outside the main dispatch queue.
+public struct GlobalDispatcher: Dispatcher {
+    
+    public var rxScheduler: Scheduler? {
+        backingScheduler
+    }
+    
+    private let backingScheduler: QueueScheduler
+    
+    public init(qos: DispatchQoS, name: String) {
+        backingScheduler = QueueScheduler(qos: qos, name: name, targeting: nil)
+    }
+    
+    public func dispatch(_ action: @escaping () -> Void) {
+        backingScheduler.schedule(action)
+    }
+    
+}
+
 public protocol EffectObserver {
     associatedtype Value
     func fulfill(value: Value)
@@ -36,6 +83,18 @@ extension Signal.Observer: EffectObserver {
 }
 
 public typealias Effect<A> = SignalProducer<A, Never>
+
+public func += <A> (_ lhs: inout [Effect<A>], _ rhs: Effect<A>) {
+    lhs = lhs + [rhs]
+}
+
+public func += <A> (_ lhs: inout [Effect<A>], _ rhs: [Effect<A>]) {
+    lhs = lhs + rhs
+}
+
+public func + <A> (_ lhs: [Effect<A>], _ rhs: Effect<A>) -> [Effect<A>] {
+    lhs + [ rhs ]
+}
 
 extension Effect where Value == Never {
     
@@ -56,8 +115,7 @@ extension Effect {
     
     public func sink(
         receiveCompletion: @escaping () -> Void,
-        receiveValues: @escaping (Value) -> Void,
-        feedbackLogger: FeedbackLogger
+        receiveValues: @escaping (Value) -> Void
     ) -> Disposable? {
         return self.start { event in
             switch event {
@@ -66,23 +124,28 @@ extension Effect {
             case .completed:
                 receiveCompletion()
             case .interrupted:
-                feedbackLogger.fatalError("Unexpected effect interruption")
-                return
+                fatalError("Unexpected effect interruption")
             case .failed(_):
-                feedbackLogger.fatalError("Effect failed")
-                return
+                fatalError("Effect failed")
             }
         }
     }
     
     /// A safer work-around for `Effect.init(_ startHandler:)`.
-    /// The async work is only given access to the `fulfill(value:)` function of the `Signal.Observer`,
-    /// and hence the returned Effect is completed as long as the `fulfill(value:)` function is called.
+    /// If a `dispatcher` is given, `work` will be dispatched on it,
+    /// otherwise `work` is called on whatever dispatch queue the returned Effect is running on.
     public static func deferred(
+        dispatcher: Dispatcher? = nil,
         work: @escaping (@escaping (Value) -> Void) -> Void
     ) -> Effect<Value> {
         Effect { observer, _ in
-            work(observer.fulfill(value:))
+            if let dispatcher = dispatcher {
+                dispatcher.dispatch {
+                    work(observer.fulfill(value:))
+                }
+            } else {
+                work(observer.fulfill(value:))
+            }
         }
     }
     

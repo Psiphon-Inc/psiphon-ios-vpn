@@ -30,7 +30,7 @@ extension ReceiptData {
         appBundle: PsiphonBundle,
         isSupportedProduct: (ProductID) -> AppStoreProductType?,
         getCurrentTime: () -> Date,
-        compareDates: (Date, Date, Calendar.Component) -> ComparisonResult,
+        compareDates: @escaping (Date, Date, Calendar.Component) -> ComparisonResult,
         feedbackLogger: FeedbackLogger
     ) -> ReceiptData? {
         // TODO: This function should return a result type and not log errors directly here.
@@ -88,12 +88,15 @@ extension ReceiptData {
                         parsedIAP.webOrderLineItemID!)!,
                     purchaseDate: parsedIAP.purchaseDate,
                     expires: parsedIAP.expiresDate!,
+                    cancellationDate: parsedIAP.cancellationDate,
                     isInIntroOfferPeriod: parsedIAP.isInIntroPeriod,
                     hasBeenInIntroOfferPeriod: hasSubscriptionBeenInIntroOfferPeriod
                 )
                 
-                let approxExpired = purchase.isApproximatelyExpired(getCurrentTime: { readDate },
-                                                                    compareDates: compareDates)
+                let approxExpired = purchase.isApproximatelyExpired(
+                    DateCompare(getCurrentTime: { readDate },
+                                compareDates: compareDates))
+                
                 guard !approxExpired else {
                     return nil
                 }

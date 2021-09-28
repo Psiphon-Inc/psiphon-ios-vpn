@@ -24,7 +24,10 @@
 #import "PsiphonData.h"
 #endif
 
-@class Authorization;
+#pragma mark - Keys from PsiphonClientCommonLibrary
+
+// Value re-defined from PsiphonClientCommonLibrary
+#define kPsiphonRegionBestPerformance  @""
 
 #pragma mark - NSUserDefaults Keys
 
@@ -33,12 +36,7 @@ extern UserDefaultsKey const _Nonnull ClientRegionStringKey;
 extern UserDefaultsKey const _Nonnull TunnelStartTimeStringKey;
 extern UserDefaultsKey const _Nonnull TunnelSponsorIDStringKey;
 extern UserDefaultsKey const _Nonnull ServerTimestampStringKey;
-extern UserDefaultsKey const _Nonnull ContainerAuthorizationSetKey;
 extern UserDefaultsKey const _Nonnull ExtensionIsZombieBoolKey;
-extern UserDefaultsKey const _Nonnull ContainerSubscriptionAuthorizationsDictKey;
-extern UserDefaultsKey const _Nonnull ExtensionRejectedSubscriptionAuthorizationIDsArrayKey;
-extern UserDefaultsKey const _Nonnull ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey;
-extern UserDefaultsKey const _Nonnull ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey;
 extern UserDefaultsKey const _Nonnull ContainerForegroundStateBoolKey;
 extern UserDefaultsKey const _Nonnull ContainerTunnelIntentStatusIntKey;
 extern UserDefaultsKey const _Nonnull ExtensionDisallowedTrafficAlertWriteSeqIntKey;
@@ -101,32 +99,28 @@ NS_ASSUME_NONNULL_BEGIN
 
 #if !(TARGET_IS_EXTENSION)
 
-+ (NSString *_Nullable)tryReadingFile:(NSString *)filePath;
-
-/*!
- * If fileHandlePtr points to nil, then a new NSFileHandle for
- * reading filePath is created and fileHandlePtr is set to point to the new object.
- * If fileHandlePtr points to a NSFileHandle, it will be used for reading.
- * Reading operation is retried MAX_RETRIES more times if it fails for any reason,
- * while putting the thread to sleep for an amount of time defined by RETRY_SLEEP_TIME.
- * No errors are thrown if opening the file/reading operations fail.
- * @param filePath Path used to create a NSFileHandle if fileHandlePtr points to nil.
- * @param fileHandlePtr Pointer to existing NSFileHandle or nil.
- * @param bytesOffset The byte offset to seek to before reading.
- * @param readToOffset Populated with the file offset that was read to.
- * @return UTF8 string of read file content.
- */
-+ (NSString *_Nullable)tryReadingFile:(NSString *)filePath
-                      usingFileHandle:(NSFileHandle *_Nullable __strong *_Nonnull)fileHandlePtr
-                       readFromOffset:(unsigned long long)bytesOffset
-                         readToOffset:(unsigned long long *_Nullable)readToOffset;
-
 - (void)readLogsData:(NSString *)logLines intoArray:(NSMutableArray<DiagnosticEntry *> *)entries;
 
 - (NSArray<DiagnosticEntry*>*)getAllLogs;
 
 #endif
 
+#pragma mark - Tunnel core configs
+
+- (NSString *)getEgressRegion;
+
+- (void)setEgressRegion:(NSString *)regionCode;
+
+- (void)setDisableTimeouts:(BOOL)disableTimeouts;
+
+- (void)setUpstreamProxyURL:(NSString *_Nullable)url;
+
+- (void)setCustomHttpHeaders:(NSDictionary *_Nullable)customHeaders;
+
+/**
+ Returns dictionary of tunnel core configs.
+ */
+- (NSDictionary *)getTunnelCoreUserConfigs;
 
 #pragma mark - Container Data (Data originating in the container)
 
@@ -236,48 +230,6 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 
 - (NSInteger)getDisallowedTrafficAlertWriteSequenceNum;
 
-#pragma mark - Authorizations
-
-#if TARGET_IS_EXTENSION
-
-- (void)removeNonSubscriptionAuthorizationsNotAccepted:(NSSet<NSString*>*_Nullable)authIdsToRemove;
-
-#else
-
-- (void)setNonSubscriptionEncodedAuthorizations:(NSSet<NSString*>*_Nullable)encodedAuthorizations;
-
-- (void)appendNonSubscriptionEncodedAuthorization:(NSString *_Nonnull)base64Encoded;
-
-#endif
-
-- (NSSet<NSString *> *)getNonSubscriptionEncodedAuthorizations;
-
-#pragma mark - Subscription Authorizations
-
-#if !(TARGET_IS_EXTENSION)
-/// Encoded object must JSON representation of type `[TransactionID: SubscriptionPurchaseAuth]`.
-/// This method does no validation on the given `purchaseAuths`.
-- (void)setSubscriptionAuths:(NSData *_Nullable)purchaseAuths;
-#endif
-
-/// Encoded object has JSON representation of type `[TransactionID: SubscriptionPurchaseAuth]`.
-/// This method does no validation on the stored data.
-- (NSData *_Nullable)getSubscriptionAuths;
-
--(NSArray<NSString *> *_Nonnull)getRejectedSubscriptionAuthorizationIDs;
-
-#if TARGET_IS_EXTENSION
-- (void)insertRejectedSubscriptionAuthorizationID:(NSString *)authorizationID;
-#endif
-
-- (NSInteger)getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber;
-
-- (NSInteger)getContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber;
-
-#if !(TARGET_IS_EXTENSION)
-- (void)setContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber:(NSInteger)seq;
-#endif
-
 #pragma mark - Jetsam counter
 
 - (NSString*)extensionJetsamMetricsFilePath;
@@ -300,7 +252,7 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 
 #pragma mark - Debug Preferences
 
-#if DEBUG
+#if DEBUG || DEV_RELEASE
 
 - (void)setDebugMemoryProfiler:(BOOL)enabled;
 

@@ -48,12 +48,7 @@ extension SubscriptionAuthStateReducerEnvironment: Arbitrary {
                 tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>(value: c.generate()),
                 tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>(value: c.generate()),
                 clientMetaData: { ClientMetaData(MockAppInfoProvider()) },
-                getCurrentTime: {
-                    return Date()
-                },
-                compareDates: { date1, date2, _ -> ComparisonResult in
-                    return PsiApiTestingCommon.compareDates(date1, to: date2)
-                }
+                dateCompare: DateCompare.mock
             )
         }
     }
@@ -77,12 +72,7 @@ extension SubscriptionAuthStateReducerEnvironment: Arbitrary {
                 tunnelStatusSignal: tunnelStatusSignal,
                 tunnelConnectionRefSignal: tunnelConnectionRefSignal,
                 clientMetaData: { ClientMetaData(MockAppInfoProvider()) },
-                getCurrentTime: {
-                    return Date()
-                },
-                compareDates: { date1, date2, _ -> ComparisonResult in
-                    return PsiApiTestingCommon.compareDates(date1, to: date2)
-                }
+                dateCompare: DateCompare.mock
             )
         }
     }

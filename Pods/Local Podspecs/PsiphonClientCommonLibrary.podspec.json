@@ -1,6 +1,6 @@
 {
   "name": "PsiphonClientCommonLibrary",
-  "version": "4.0.6",
+  "version": "4.0.8",
   "summary": "Psiphon iOS Shared Client Library.",
   "description": "A shared library that encapsulates common client code used across different Psiphon iOS apps.",
   "homepage": "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library",
@@ -13,7 +13,7 @@
   },
   "source": {
     "git": "https://github.com/Psiphon-Inc/psiphon-ios-client-common-library.git",
-    "tag": "4.0.6"
+    "tag": "4.0.8"
   },
   "platforms": {
     "ios": "8.0"

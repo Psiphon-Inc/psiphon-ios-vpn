@@ -23,7 +23,7 @@ import Foundation
 /// `CustomDebugStringConvertible` or `CustomStringConvertible`.
 /// https://forums.swift.org/t/why-is-an-enum-returning-enumname-rather-than-caselabel-for-string-describing/27327/3
 
-extension PsiCashStatus: CustomDebugStringConvertible {
+extension PSIStatus: CustomDebugStringConvertible {
     
     public var debugDescription: String {
         switch self {
@@ -34,6 +34,8 @@ extension PsiCashStatus: CustomDebugStringConvertible {
         case .transactionAmountMismatch: return "transactionAmountMismatch"
         case .transactionTypeNotFound: return "transactionTypeNotFound"
         case .invalidTokens: return "invalidTokens"
+        case .invalidCredentials: return "invalidCredentials"
+        case .badRequest: return "badRequest"
         case .serverError: return "serverError"
         @unknown default: return "unknown(\(self.rawValue))"
         }

@@ -20,31 +20,32 @@
 #import "OnboardingScrollableView.h"
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
+#import "Psiphon-Swift.h"
 
 @implementation OnboardingScrollableView {
     // Set in init.
     UIImage *image;
     NSString *title;
-    NSString *body;
+    NSString *htmlBody;
     UIView *_Nullable accessoryView;
 
     // Internal views.
-    UIScrollView *scrollView;
+    FoldingScrollView *scrollView;
     UIImageView *imageView;
     UILabel *titleLabel;
-    UILabel *bodyLabel;
+    UITextView *bodyTextView;
 }
 
 - (instancetype)initWithImage:(UIImage *)image
                     withTitle:(NSString *)title
-                     withBody:(NSString *)body
+                     withHTMLBody:(NSString *)htmlBody
             withAccessoryView:(UIView *_Nullable)accessoryView {
 
     self = [super init];
     if (self) {
         self->image = image;
         self->title = title;
-        self->body = body;
+        self->htmlBody = htmlBody;
         self->accessoryView = accessoryView;
         [self customSetup];
     }
@@ -52,7 +53,8 @@
 }
 
 - (void)setupViews {
-    scrollView = [[UIScrollView alloc] initWithFrame:CGRectZero];
+    scrollView = [[FoldingScrollView alloc] initWithFrame:CGRectZero];
+    scrollView.delegate = self;
 
     imageView = [[UIImageView alloc] initWithFrame:CGRectZero];
     imageView.image = image;
@@ -66,11 +68,13 @@
     titleLabel.font = [UIFont avenirNextDemiBold:22.f];
     titleLabel.textColor = UIColor.whiteColor;
 
-    bodyLabel = [[UILabel alloc] initWithFrame:CGRectZero];
-    bodyLabel.numberOfLines = 0;
+    bodyTextView = [[UITextView alloc] initWithFrame:CGRectZero];
+    bodyTextView.scrollEnabled = FALSE; // UITextView is already nested in a UIScrollView.
+    bodyTextView.editable = FALSE;
+    bodyTextView.backgroundColor = UIColor.clearColor;
 
     NSMutableAttributedString *attributedString = [[NSMutableAttributedString alloc]
-            initWithData:[body dataUsingEncoding:NSUnicodeStringEncoding]
+            initWithData:[htmlBody dataUsingEncoding:NSUnicodeStringEncoding]
                  options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType}
       documentAttributes:nil
                    error:nil];
@@ -95,15 +99,28 @@
           // Set color
           [attributedString addAttribute:NSForegroundColorAttributeName value:UIColor.whiteColor range:range];
       }];
+    
+    // Forces attributedString text alignment for RTL languages.
+    if (UIApplication.sharedApplication.userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft) {
+        
+        NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle alloc] init];
+        paragraphStyle.lineBreakMode = NSLineBreakByWordWrapping;
+        paragraphStyle.alignment = NSTextAlignmentRight;
+        
+        [attributedString addAttribute:NSParagraphStyleAttributeName
+                                 value:paragraphStyle
+                                 range:NSMakeRange(0, attributedString.length)];
+    }
 
-    bodyLabel.attributedText = attributedString;
+    bodyTextView.attributedText = attributedString;
+    
 }
 
 - (void)addSubviews {
     [self addSubview:scrollView];
     [scrollView addSubview:imageView];
     [scrollView addSubview:titleLabel];
-    [scrollView addSubview:bodyLabel];
+    [scrollView addSubview:bodyTextView];
 
     if (accessoryView) {
         [self addSubview:accessoryView];
@@ -153,15 +170,15 @@
       [titleLabel.centerXAnchor constraintEqualToAnchor:scrollView.centerXAnchor]
     ]];
 
-    // bodyLabel
-    bodyLabel.translatesAutoresizingMaskIntoConstraints = FALSE;
+    // bodyTextView
+    bodyTextView.translatesAutoresizingMaskIntoConstraints = FALSE;
     [NSLayoutConstraint activateConstraints:@[
-      [bodyLabel.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:15.f],
-      [bodyLabel.bottomAnchor constraintEqualToAnchor:scrollView.bottomAnchor constant:15.f],
-      [bodyLabel.centerXAnchor constraintEqualToAnchor:scrollView.centerXAnchor],
-      [bodyLabel.leadingAnchor constraintGreaterThanOrEqualToAnchor:scrollView.leadingAnchor
+      [bodyTextView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:15.f],
+      [bodyTextView.bottomAnchor constraintEqualToAnchor:scrollView.bottomAnchor constant:15.f],
+      [bodyTextView.centerXAnchor constraintEqualToAnchor:scrollView.centerXAnchor],
+      [bodyTextView.leadingAnchor constraintGreaterThanOrEqualToAnchor:scrollView.leadingAnchor
                                                            constant:20.f],
-      [bodyLabel.trailingAnchor constraintLessThanOrEqualToAnchor:scrollView.trailingAnchor
+      [bodyTextView.trailingAnchor constraintLessThanOrEqualToAnchor:scrollView.trailingAnchor
                                                          constant:-20.f]
     ]];
 

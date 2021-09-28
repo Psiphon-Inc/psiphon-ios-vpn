@@ -18,13 +18,14 @@
  */
 
 #import <UIKit/UIKit.h>
+#import "RegionAdapter.h"
 #import "AnimatedControl.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 @interface RegionSelectionButton : AnimatedControl
 
-- (void)update;
+- (void)bind:(Region *)selectedRegion;
 
 @end
 

@@ -118,13 +118,22 @@ extension HTTPResponseMetadata {
 
 extension HTTPClient {
     public static func arbitraryPurchaseVerificationClient() -> Gen<HTTPClient> {
+        
         HTTPClient.arbitrary(resultGen: { urlRequest in
-            Gen.frequency([
+            
+            let gen: Gen<URLSessionResult> = Gen.frequency([
                 (3,
-                 HTTPResponseData.arbitraryPurchaseVerificationResponse(req: urlRequest).map(Result.success)),
+                 HTTPResponseData.arbitraryPurchaseVerificationResponse(req: urlRequest)
+                    .map { successValue in
+                        URLSessionResult(date: Date(), result: .success(successValue))
+                    }),
                 (1,
-                 HTTPRequestError.arbitrary.map(Result.failure))
+                 HTTPRequestError.arbitrary.map { failureValue in
+                    URLSessionResult(date: Date(), result: .failure(failureValue))
+                 })
             ])
+            
+            return gen
         })
     }
 }

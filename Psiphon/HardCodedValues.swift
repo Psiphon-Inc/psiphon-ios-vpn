@@ -19,7 +19,7 @@
 import Foundation
 import PsiCashClient
 
-struct PsiCashHardCodedValues {
+enum PsiCashHardCodedValues {
     static let videoAdRewardAmount = PsiCashAmount(nanoPsi: Int64(35e9))
     static let videoAdRewardTitle = "35"
     /// Amount of time to wait for PsiCash to have an earner token for modifying .
@@ -29,21 +29,3 @@ struct PsiCashHardCodedValues {
 // There is no point to load an interstitial after the user
 // presses the disconnected button.
 let InterstitialDelayAfterDisconnection: TimeInterval = 5.0  // 5 seconds.
-
-/// AdMob ad units IDs.
-struct AdMobAdUnitIDs {
-    
-    #if DEBUG
-    // Demo ad unit Ids: https://developers.google.com/admob/ios/test-ads
-    static let UntunneledAdMobInterstitialAdUnitID =
-        "ca-app-pub-3940256099942544/4411468910"
-    static let UntunneledAdMobRewardedVideoAdUnitID =
-        "ca-app-pub-3940256099942544/1712485313"
-    #else
-    static let UntunneledAdMobInterstitialAdUnitID =
-        "ca-app-pub-1072041961750291/8751062454"
-    static let UntunneledAdMobRewardedVideoAdUnitID =
-        "ca-app-pub-1072041961750291/8356247142"
-    #endif
-    
-}

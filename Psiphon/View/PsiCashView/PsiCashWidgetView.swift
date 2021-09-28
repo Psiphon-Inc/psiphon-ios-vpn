@@ -19,50 +19,91 @@
 
 import Foundation
 import UIKit
+import PsiCashClient
 
-@objc final class PsiCashWidgetView: UIView {
+@objc final class PsiCashWidgetView: UIView, Bindable {
+    
+    typealias BindingType = ViewModel
+    
+    struct ViewModel: Equatable {
+        let balanceViewModel: PsiCashBalanceViewWrapper.BindingType
+        let speedBoostButtonModel: SpeedBoostButton.BindingType
+        let accountType: PsiCashAccountType?
+    }
 
-    @objc let balanceView = PsiCashBalanceView(frame: CGRect.zero)
-    @objc let speedBoostButton = SpeedBoostButton()
+    @objc let balanceViewWrapper: PsiCashBalanceViewWrapper
+    @objc let speedBoostButton: SpeedBoostButton
     @objc let addPsiCashButton = DuskButton()
-    private let topRowLayoutGuide = UILayoutGuide()
+    @objc let psiCashAccountButton = DuskButton()
 
+    // Horizonal stack containing the top row items.
+    private let topRowHStack: UIStackView
+    
     override init(frame: CGRect) {
-        super.init(frame: frame)
+        fatalError()
+    }
+    
+    @objc init(locale: Locale) {
+        
+        balanceViewWrapper = PsiCashBalanceViewWrapper(locale: locale)
+        
+        speedBoostButton = SpeedBoostButton(locale: locale)
+        
+        topRowHStack = UIStackView.make(
+            axis: .horizontal,
+            distribution: .fill,
+            alignment: .center,
+            spacing: 10.0
+        )
+        
+        super.init(frame: .zero)
         
         addPsiCashButton.setTitle("+", for: .normal)
         addPsiCashButton.titleLabel!.font = AvenirFont.demiBold.customFont(20.0)
         addPsiCashButton.setTitleColor(.white, for: .normal)
-        addPsiCashButton.contentEdgeInsets = UIEdgeInsets(top: 0, left: 7, bottom: 0, right: 7)
+        
+        let accountIcon = UIImage(named: "AccountIcon")!
+        psiCashAccountButton.setImage(accountIcon, for: .normal)
         
         speedBoostButton.contentEdgeInset(.normal)
 
-        addLayoutGuide(topRowLayoutGuide)
-        addSubview(speedBoostButton)
-        addSubview(balanceView)
-        addSubview(addPsiCashButton)
+        // Adds permanent views to the stack view.
+        topRowHStack.addArrangedSubviews(
+            balanceViewWrapper.view,
+            addPsiCashButton,
+            psiCashAccountButton
+        )
         
-        topRowLayoutGuide.activateConstraints {
-            [ $0.topAnchor.constraint(equalTo: self.topAnchor),
-              $0.bottomAnchor.constraint(equalTo: balanceView.bottomAnchor),
-              $0.leadingAnchor.constraint(equalTo: balanceView.leadingAnchor),
-              $0.trailingAnchor.constraint(equalTo: addPsiCashButton.trailingAnchor),
-              $0.centerXAnchor.constraint(equalTo: self.centerXAnchor) ]
+        self.addSubviews(
+            topRowHStack,
+            speedBoostButton
+        )
+        
+        topRowHStack.activateConstraints {
+            $0.constraintToParent(.top(), .centerX()) +
+            [
+                $0.leadingAnchor.constraint(greaterThanOrEqualTo: self.leadingAnchor),
+                $0.trailingAnchor.constraint(lessThanOrEqualTo: self.trailingAnchor)
+            ]
         }
-        
-        balanceView.activateConstraints {
-            $0.constraint(to: topRowLayoutGuide, [.leading(0), .top(0)]) +
-                [ $0.centerYAnchor.constraint(equalTo: addPsiCashButton.centerYAnchor) ]
-        }
-        
+
         addPsiCashButton.activateConstraints {
-            [ $0.topAnchor.constraint(equalTo: balanceView.topAnchor),
-              $0.leadingAnchor.constraint(equalTo: balanceView.trailingAnchor, constant: 10.0) ]
+            [
+                $0.widthAnchor.constraint(equalToConstant: Style.default.buttonHeight),
+                $0.heightAnchor.constraint(equalToConstant: Style.default.buttonHeight)
+            ]
+        }
+        
+        psiCashAccountButton.activateConstraints {
+            [
+                $0.widthAnchor.constraint(equalToConstant: Style.default.buttonHeight),
+                $0.heightAnchor.constraint(equalToConstant: Style.default.buttonHeight)
+            ]
         }
         
         speedBoostButton.activateConstraints {
             $0.constraintToParent(.bottom(), .leading(), .trailing()) +
-                [ $0.topAnchor.constraint(equalTo: balanceView.bottomAnchor,
+                [ $0.topAnchor.constraint(equalTo: topRowHStack.bottomAnchor,
                                           constant: Style.default.padding) ]
         }
 
@@ -72,4 +113,32 @@ import UIKit
         fatalError("init(coder:) has not been implemented")
     }
 
+    func bind(_ newValue: BindingType) {
+        
+        balanceViewWrapper.bind(newValue.balanceViewModel)
+        speedBoostButton.bind(newValue.speedBoostButtonModel)
+        
+        switch newValue.accountType {
+        case .none, .noTokens, .tracker, .account(loggedIn: false):
+            // Shows psiCashAccountButton, if not displayed already.
+            if psiCashAccountButton.isHidden {
+                topRowHStack.addArrangedSubview(psiCashAccountButton)
+                psiCashAccountButton.isHidden = false
+            }
+            
+        case .account(loggedIn: true):
+            // Hides psiCashAccountButton, if not removed already.
+            if !psiCashAccountButton.isHidden {
+                topRowHStack.removeArrangedSubview(psiCashAccountButton)
+                psiCashAccountButton.isHidden = true
+            }
+
+        }
+        
+    }
+    
+    @objc func objcBind(_ newValue: BridgedPsiCashWidgetBindingType) {
+        self.bind(newValue.swiftValue)
+    }
+    
 }

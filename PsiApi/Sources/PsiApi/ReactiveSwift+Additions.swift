@@ -82,19 +82,33 @@ extension Signal where Error == Never {
 
 }
 
-extension Signal where Value == Bool, Error == Never {
-
-    public func falseIfNotTrue(within timeout: DispatchTimeInterval) -> Signal<Bool, Never> {
+extension Signal where Error == Never {
+    
+    /// Emits `defaultValue` and completes the signal, if `shouldWait` has not returned `false`
+    /// for any of the values emitted upstream.
+    /// - Parameter defaultValue: Default value that is emitted if `shouldWait` never
+    ///  returns `false` within `timeout`.
+    /// - Parameter timeout: Timeout interval within which if `shouldWait` doesn't returne
+    /// `false`, `defaultValue` is emitted.
+    /// - Parameter shouldWait: Called for every upstream value emitted, if it returns `false`
+    /// the upstream value is emitted and the returned signal is completed. If `shouldWait` never
+    /// returns `false` within `timeout`, then `defaultValue` is emitted and the signal completed.
+    public func shouldWait(
+        upto timeout: DispatchTimeInterval,
+        otherwiseEmit defaultValue: Value,
+        shouldWait: @escaping (Value) -> Bool
+    ) -> Signal<Value, Never> {
         precondition(timeout != .never, "Unexpected '.never' timeout")
-
-        return self.filter { $0 == true }
-            .take(first: 1)
-            .timeout(after: timeout.toDouble()!, raising: TimeoutError(), on: QueueScheduler())
-            .flatMapError { anyError -> SignalProducer<Bool, Error> in
-                return .init(value: false)
-            }
+        
+        return self.filter { !shouldWait($0) }
+        .take(first: 1)
+        .timeout(after: timeout.toDouble()!, raising: TimeoutError(), on: QueueScheduler.main)
+        .flatMapError { anyError -> SignalProducer<Value, Error> in
+            return SignalProducer(value: defaultValue)
+        }
+        
     }
-
+    
 }
 
 extension SignalProducer {
@@ -156,19 +170,33 @@ extension SignalProducer {
     
 }
 
-extension SignalProducer where Value == Bool, Error == Never {
-
-    public func falseIfNotTrue(within timeout: DispatchTimeInterval) -> SignalProducer<Bool, Never> {
+extension SignalProducer where Error == Never {
+    
+    /// Emits `defaultValue` and completes the signal, if `shouldWait` has not returned `false`
+    /// for any of the values emitted upstream.
+    /// - Parameter defaultValue: Default value that is emitted if `shouldWait` never
+    ///  returns `false` within `timeout`.
+    /// - Parameter timeout: Timeout interval within which if `shouldWait` doesn't returne
+    /// `false`, `defaultValue` is emitted.
+    /// - Parameter shouldWait: Called for every upstream value emitted, if it returns `false`
+    /// the upstream value is emitted and the returned signal is completed. If `shouldWait` never
+    /// returns `false` within `timeout`, then `defaultValue` is emitted and the signal completed.
+    public func shouldWait(
+        upto timeout: DispatchTimeInterval,
+        otherwiseEmit defaultValue: Value,
+        shouldWait: @escaping (Value) -> Bool
+    ) -> SignalProducer<Value, Never> {
         precondition(timeout != .never, "Unexpected '.never' timeout")
-
-        return self.producer.filter { $0 == true }
-            .take(first: 1)
-            .timeout(after: timeout.toDouble()!, raising: TimeoutError(), on: QueueScheduler())
-            .flatMapError { anyError -> SignalProducer<Bool, Error> in
-                return .init(value: false)
+        
+        return self.filter { !shouldWait($0) }
+        .take(first: 1)
+        .timeout(after: timeout.toDouble()!, raising: TimeoutError(), on: QueueScheduler.main)
+        .flatMapError { anyError -> SignalProducer<Value, Error> in
+            return SignalProducer(value: defaultValue)
         }
+        
     }
-
+    
 }
 
 extension SignalProducer where Error == Never {

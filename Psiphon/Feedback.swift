@@ -138,8 +138,12 @@ fileprivate final class FeedbackHandler : NSObject,
 /// See the comments on the PsiphonTunnelFeedback class in PsiphonTunnel/PsiphonTunnel.h for more details. Therefore one
 /// FeedbackUpload instance should be used to schedule all feedback upload work and using multiple instances to schedule, or stop,
 /// work is unsupported and can result in undefined behavior.
-final class FeedbackUpload {
+final class FeedbackUpload: Equatable {
 
+    static func == (lhs: FeedbackUpload, rhs: FeedbackUpload) -> Bool {
+        return lhs === rhs
+    }
+    
     let feedbackUploadProvider: FeedbackUploadProvider
     let workQueue: DispatchQueue
 
@@ -233,14 +237,15 @@ func feedbackUploadPsiphonConfig(basePsiphonConfig: [AnyHashable: Any],
     }
 
     if !useUpstreamProxy {
-        config.removeValue(forKey: PsiphonConfigUpstreamProxyURL)
+        config.removeValue(forKey: "UpstreamProxyUrl")
     }
 
     // TODO: effect not parameterized
-    let psiphonConfigUserDefaults = PsiphonConfigUserDefaults(suiteName: PsiphonAppGroupIdentifier)
-    if let userConfiguredSettings = psiphonConfigUserDefaults?.dictionaryRepresentation() {
-        config.merge(userConfiguredSettings) { (_, new) in new }
-    }
+    let psiphonTunnelUserConfigs = PsiphonDataSharedDB(
+        forAppGroupIdentifier: PsiphonAppGroupIdentifier
+    ).getTunnelCoreUserConfigs()
+    
+    config.merge(psiphonTunnelUserConfigs) { (_, new) in new }
 
     return .success(config)
 }

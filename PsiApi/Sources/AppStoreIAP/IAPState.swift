@@ -34,7 +34,7 @@ public enum IAPError: HashableError {
     case storeKitError(PaymentTransaction.TransactionState.TransactionErrorState)
 }
 
-public struct IAPPurchasing: Hashable {
+public struct IAPPurchasing: Hashable, FeedbackDescription {
     public typealias PurchasingState = PendingValue<Payment?, ErrorEvent<IAPError>>
     
     public enum TransactionUniqueness: Equatable {
@@ -119,9 +119,10 @@ public struct IAPPurchasing: Hashable {
 }
 
 /// Represents  a consumable transaction has not been finished, pending verification by the purchase-verifier server.
-public struct UnfinishedConsumableTransaction: Equatable {
+public struct UnfinishedConsumableTransaction: Equatable, FeedbackDescription {
     
     public enum VerificationRequestState: Equatable {
+        
         /// No verification request for this purchase has been made.
         case notRequested
         
@@ -131,11 +132,6 @@ public struct UnfinishedConsumableTransaction: Equatable {
         /// Request to verify purchase failed.
         case requestError(ErrorEvent<ErrorRepr>)
         
-        /// Purchase has been made, however App Store has not recorded the
-        ///
-        /// To resolve the error user can be prompted to refresh the App Store receipt,
-        /// however this may not always resolve the issue if for example device is jailbroken.
-        case purchaseNotRecordedByAppStore
     }
     
     public let transaction: PaymentTransaction

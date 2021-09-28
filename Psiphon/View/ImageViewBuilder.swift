@@ -25,7 +25,7 @@ struct ImageViewBuilder: ViewBuilder {
 
     let image: UIImage
 
-    func build(_ container: UIView?) -> StrictBindableViewable<Utilities.Unit, UIImageView> {
+    func build(_ container: UIView?) -> ImmutableBindableViewable<Utilities.Unit, UIImageView> {
         let imageView = UIImageView(image: image)
         imageView.contentMode = .scaleAspectFit
 

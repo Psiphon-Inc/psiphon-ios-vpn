@@ -18,7 +18,6 @@
  */
 
 #import <UIKit/UIKit.h>
-#import "RegionAdapter.h"
 #import "SettingsViewController.h"
 
 @class RACSignal<__covariant ValueType>;
@@ -26,10 +25,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MainViewController : UIViewController <PsiphonSettingsViewControllerDelegate,
-                                                  RegionAdapterDelegate>
-
-@property (nonatomic) BOOL openSettingImmediatelyOnViewDidAppear;
+@interface MainViewController : UIViewController
 
 - (instancetype)initWithStartingVPN:(BOOL)startVPN;
 

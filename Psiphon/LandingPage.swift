@@ -25,7 +25,7 @@ import PsiCashClient
 
 fileprivate let landingPageTag = LogTag("LandingPage")
 
-struct LandingPageReducerState {
+struct LandingPageReducerState: Equatable {
     var pendingLandingPageOpening: Bool
     let tunnelConnection: TunnelConnection?
 }
@@ -40,13 +40,15 @@ typealias LandingPageEnvironment = (
     sharedDB: PsiphonDataSharedDB,
     urlHandler: URLHandler,
     psiCashEffects: PsiCashEffects,
-    psiCashAuthPackageSignal: SignalProducer<PsiCashAuthPackage, Never>
+    psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType?, Never>,
+    mainDispatcher: MainDispatcher
 )
 
-func landingPageReducer(
-    state: inout LandingPageReducerState, action: LandingPageAction,
-    environment: LandingPageEnvironment
-) -> [Effect<LandingPageAction>] {
+let landingPageReducer = Reducer<LandingPageReducerState
+                                 , LandingPageAction
+                                 , LandingPageEnvironment> {
+    state, action, environment in
+    
     switch action {
     case .tunnelConnectedAfterIntentSwitchedToStart:
         guard !state.pendingLandingPageOpening else {
@@ -70,15 +72,21 @@ func landingPageReducer(
         
         state.pendingLandingPageOpening = true
         
-        let randomlySelectedURL = landingPages.randomElement()!.url
+        #if DEV_RELEASE
+        // Hard-coded landing page for PsiCash accounts testing
+        let randomlySelectedURL = URL(string: "https://landing.dev.psi.cash/dev-index.html")!
+        #else
+        // let randomlySelectedURL = landingPages.randomElement()!.url
+        let randomlySelectedURL = URL(string: "https://landing.psi.cash")!
+        #endif
         
         return [
-            modifyLandingPagePendingEarnerToken(
+            modifyLandingPagePendingObtainingToken(
                 url: randomlySelectedURL,
-                authPackageSignal: environment.psiCashAuthPackageSignal,
+                psiCashAccountTypeSignal: environment.psiCashAccountTypeSignal,
                 psiCashEffects: environment.psiCashEffects
             ).flatMap(.latest) {
-                environment.urlHandler.open($0, tunnelConnection)
+                environment.urlHandler.open($0, tunnelConnection, environment.mainDispatcher)
             }
             .map(LandingPageAction._urlOpened(success:))
         ]
@@ -90,18 +98,48 @@ func landingPageReducer(
     }
 }
 
-fileprivate func modifyLandingPagePendingEarnerToken(
-    url: URL, authPackageSignal: SignalProducer<PsiCashAuthPackage, Never>,
+/// Modifies landing page with PsiCash custom data.
+/// If no PsiCash tokens are available, waits up to `PsiCashHardCodedValues.getEarnerTokenTimeout`
+/// for PsiCash tokens to be obtained.
+fileprivate func modifyLandingPagePendingObtainingToken(
+    url: URL,
+    psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType?, Never>,
     psiCashEffects: PsiCashEffects
 ) -> Effect<URL> {
-    authPackageSignal
-        .map(\.hasEarnerToken)
-        .falseIfNotTrue(within: PsiCashHardCodedValues.getEarnerTokenTimeout)
-        .flatMap(.latest) { hasEarnerToken -> SignalProducer<URL, Never> in
-            if hasEarnerToken {
-                return psiCashEffects.modifyLandingPage(url)
-            } else {
-                return SignalProducer(value: url)
+    
+    psiCashAccountTypeSignal
+        .shouldWait(upto: PsiCashHardCodedValues.getEarnerTokenTimeout,
+                    otherwiseEmit: .none,
+                    shouldWait: { accountType in
+            
+            guard let accountType = accountType else {
+                // PsiCash account information is not avaible. Should wait.
+                return true
             }
-    }
+            
+            switch accountType {
+            case .noTokens:
+                // No PsiCash tokens are available, should wait for first time retrieval
+                // of PsiCash tokens.
+                return true
+                
+            case .tracker, .account(loggedIn: false), .account(loggedIn: true):
+                // PsiCash tokens have already been retrieved.
+                return false
+            }
+            
+        })
+        .flatMap(.latest) { accountType -> Effect<URL> in
+            
+            // Modifies the landing pages URL if user has tracker tokens or is logged in.
+            
+            switch accountType {
+            case .none, .noTokens, .account(loggedIn: false):
+                return Effect(value: url)
+            case .tracker, .account(loggedIn: true):
+                return psiCashEffects.modifyLandingPage(url)
+            }
+            
+        }
+    
 }

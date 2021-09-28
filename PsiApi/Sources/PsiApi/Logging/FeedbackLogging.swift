@@ -81,6 +81,11 @@ final class ArrayFeedbackLogHandler: FeedbackLogHandler {
         logs.append(Log(level: .nonFatal(.info), type: type, message: message, timestamp: .some(timestamp)))
     }
     
+    /// True if all recorded logs are level 'Info' and not above.
+    func allLogsLevelInfo() -> Bool {
+        logs.allSatisfy { $0.level == .nonFatal(.info) }
+    }
+    
 }
 
 public struct LogMessage: ExpressibleByStringLiteral, ExpressibleByStringInterpolation,
@@ -198,14 +203,7 @@ public func makeFeedbackEntry<T: CustomFieldFeedbackDescription>(_ value: T) -> 
 }
 
 fileprivate func normalizeFeedbackDescriptionTypes(_ value: String) -> String {
-    value.replacingOccurrences(of: "\"", with: "\\\"")
-        // Removes module prefixes.
-        .replacingOccurrences(of: "Psiphon.", with: "")
-        .replacingOccurrences(of: "Swift.", with: "")
-        .replacingOccurrences(of: "PsiApi.", with: "")
-        .replacingOccurrences(of: "AppStoreIAP.", with: "")
-        .replacingOccurrences(of: "Utilities.", with: "")
-        .replacingOccurrences(of: "PsiCashClient.", with: "")
+    removedCommonPackageNames(value)
 }
 
 extension String {
@@ -222,4 +220,4 @@ extension String {
 
 // MARK: Default FeedbackDescription conformances
 
-extension Optional: FeedbackDescription {}
+extension Optional: FeedbackDescription where Wrapped: FeedbackDescription {}

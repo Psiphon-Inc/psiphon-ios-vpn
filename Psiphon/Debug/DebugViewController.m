@@ -24,8 +24,7 @@
 #import "PsiFeedbackLogger.h"
 #import "DebugToolboxViewController.h"
 
-#if DEBUG
-
+#if DEBUG || DEV_RELEASE
 @implementation DebugViewController {
     PsiphonDataSharedDB *sharedDB;
 }
@@ -62,11 +61,21 @@
     containerNav.modalPresentationStyle = UIModalPresentationFullScreen;
     containerNav.modalTransitionStyle = UIModalTransitionStyleCoverVertical;
 
-
-    toolboxNav.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Toolbox" image:nil tag:0];
-    tunnelCoreNav.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Core" image:nil tag:0];
-    networkExtensionNav.tabBarItem =  [[UITabBarItem alloc] initWithTitle:@"Extension" image:nil tag:1];
-    containerNav.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Container" image:nil tag:2];
+    UIImage *wrench = nil;
+    UIImage *atom = nil;
+    UIImage *puzzle = nil;
+    UIImage *app = nil;
+    if (@available(iOS 13.0, *)) {
+        wrench = [UIImage systemImageNamed:@"wrench.fill"];
+        atom = [UIImage systemImageNamed:@"atom"];
+        puzzle = [UIImage systemImageNamed:@"puzzlepiece.extension.fill"];
+        app = [UIImage systemImageNamed:@"app.fill"];
+    }
+    
+    toolboxNav.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Toolbox" image:wrench tag:0];
+    tunnelCoreNav.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Core" image:atom tag:0];
+    networkExtensionNav.tabBarItem =  [[UITabBarItem alloc] initWithTitle:@"Extension" image:puzzle tag:1];
+    containerNav.tabBarItem = [[UITabBarItem alloc] initWithTitle:@"Container" image:app tag:2];
 
     NSArray *viewControllers = @[toolboxNav, tunnelCoreNav, networkExtensionNav, containerNav];
     [self setViewControllers:viewControllers animated:FALSE];

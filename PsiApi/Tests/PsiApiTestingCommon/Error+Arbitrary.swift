@@ -19,14 +19,32 @@
 
 import Foundation
 import SwiftCheck
+import struct StoreKit.SKError
 @testable import PsiApi
 
-extension SystemError: Arbitrary {
-    public static var arbitrary: Gen<SystemError> {
+extension SystemError: Arbitrary where Code: Arbitrary {
+    public static var arbitrary: Gen<SystemError<Code>> {
         Gen.compose { c in
-            SystemError(NSError(domain: c.generate(),
-                                code: c.generate(),
-                                userInfo: nil))
+            
+            let errorInfo = ErrorInfo(
+                domain: c.generate(),
+                code: c.generate(),
+                errorCode: c.generate(),
+                localizedDescription: c.generate(),
+                localizedFailureReason: c.generate()
+            )
+            
+            return SystemError<Code>.rootError(errorInfo)
+            
         }
+    }
+}
+
+extension SKError.Code: Arbitrary {
+    public static var arbitrary: Gen<SKError.Code> {
+        Gen<Int>.fromElements(in: 0...19)
+            .map { code -> SKError.Code in
+                SKError.Code(rawValue: code)!
+            }
     }
 }

@@ -20,148 +20,213 @@
 import Foundation
 import Promises
 import ReactiveSwift
+import enum Utilities.Unit
 
-public typealias Reducer<Value, Action, Environment> =
-    (inout Value, Action, Environment) -> [Effect<Action>]
-
-public func combine<Value, Action, Environment>(
-    _ reducers: Reducer<Value, Action, Environment>...
-) -> Reducer<Value, Action, Environment> {
-    return { value, action, environment in
-        let effects = reducers.flatMap { $0(&value, action, environment) }
-        return effects
+public struct Reducer<Value: Equatable, Action, Environment> {
+    
+    private let reducer: (inout Value, Action, Environment) -> [Effect<Action>]
+    
+    public init(_ reducer: @escaping (inout Value, Action, Environment) -> [Effect<Action>]) {
+        self.reducer = reducer
     }
+    
+    public func callAsFunction(
+        _ value: inout Value, _ action: Action, _ environment: Environment
+    ) -> [Effect<Action>] {
+        self.reducer(&value, action, environment)
+    }
+    
 }
 
-public func pullback<LocalValue, GlobalValue, LocalAction, GlobalAction, LocalEnv, GlobalEnv>(
-    _ localReducer: @escaping Reducer<LocalValue, LocalAction, LocalEnv>,
-    value valuePath: WritableKeyPath<GlobalValue, LocalValue>,
-    action actionPath: WritableKeyPath<GlobalAction, LocalAction?>,
-    environment toLocalEnvironment: @escaping (GlobalEnv) -> (LocalEnv)
-) -> Reducer<GlobalValue, GlobalAction, GlobalEnv> {
-    return { globalValue, globalAction, globalEnv in
-
-        // Converts GlobalAction into LocalAction accepted by `localReducer`.
-        guard let localAction = globalAction[keyPath: actionPath] else { return [] }
-
-        let effects = localReducer(&globalValue[keyPath: valuePath], localAction,
-                                   toLocalEnvironment(globalEnv))
-
-        // Pulls local action into global action.
-        let pulledLocalEffects = effects.map { localEffect in
-            localEffect.map { localAction -> GlobalAction in
-                var globalAction = globalAction
-                globalAction[keyPath: actionPath] = localAction
-                return globalAction
-            }
+public extension Reducer {
+    
+    static func combine(_ reducers: Reducer<Value, Action, Environment>...) -> Self {
+        .init { value, action, environment in
+            let effects = reducers.flatMap { $0(&value, action, environment) }
+            return effects
         }
-
-        return pulledLocalEffects
     }
+
+    
+    func pullback<GlobalValue, GlobalAction, GlobalEnvironment>(
+        value valuePath: WritableKeyPath<GlobalValue, Value>,
+        action actionPath: WritableKeyPath<GlobalAction, Action?>,
+        environment toLocalEnvironment: @escaping (GlobalEnvironment) -> (Environment)
+    ) -> Reducer<GlobalValue, GlobalAction, GlobalEnvironment> {
+        .init { globalValue, globalAction, globalEnv in
+
+            // Converts GlobalAction into LocalAction accepted by `self.reducer`.
+            guard let localAction = globalAction[keyPath: actionPath] else { return [] }
+
+            let effects: [Effect<Action>] = self(&globalValue[keyPath: valuePath],
+                                                 localAction,
+                                                 toLocalEnvironment(globalEnv))
+
+            // Pulls local action into global action.
+            let pulledLocalEffects: [Effect<GlobalAction>] = effects.map { localEffect in
+                localEffect.map { localAction -> GlobalAction in
+                    var globalAction = globalAction
+                    globalAction[keyPath: actionPath] = localAction
+                    return globalAction
+                }
+            }
+
+            return pulledLocalEffects
+        }
+    }
+    
 }
 
-/// An event-driven state machine that runs it's effects on the main thread.
-/// Can be observed from any other thread, however, events can only be sent to it on the main-thread.
-public final class Store<Value: Equatable, Action> {
-    public typealias OutputType = Value
-    public typealias OutputErrorType = Never
-    public typealias StoreReducer = Reducer<Value, Action, ()>
 
+/// An event-driven state machine that runs it's effects on the provided `Dispatcher`.
+/// Observers can subscribe to `$value.signal` and `$value.signalProducer` signals to
+/// listen for state changes.
+/// Actions can be sent to the store froma any thread by calling `send(_:)`.
+public final class Store<Value: Equatable, Action> {
+
+    /// - Note: Accessing current value is not thread-safe.
     @State public private(set) var value: Value
 
-    private let scheduler: UIScheduler
-    private var reducer: StoreReducer!
+    private let dispatcher: Dispatcher
+    private var reducer: Reducer<Value, Action, ()>!
     private var disposable: Disposable? = .none
     private var effectDisposables = CompositeDisposable()
-    private let feedbackLogger: FeedbackLogger
     
     /// Count of effects that have not completed.
+    /// This is used for collecting statistic at the time of a feedback getting submitted.
     public private(set) var outstandingEffectCount = 0
     
     public init<Environment>(
         initialValue: Value,
-        reducer: @escaping Reducer<Value, Action, Environment>,
-        feedbackLogger: FeedbackLogger,
+        reducer: Reducer<Value, Action, Environment>,
+        dispatcher: Dispatcher,
         environment makeEnvironment: (Store<Value, Action>) -> Environment
     ) {
         self.value = initialValue
-        self.scheduler = .init()
-        self.feedbackLogger = feedbackLogger
+        self.dispatcher = dispatcher
         
         let environment = makeEnvironment(self)
-        self.reducer = { value, action, _ in
+        self.reducer = .init { value, action, _ in
             reducer(&value, action, environment)
         }
     }
     
-    private init(scheduler: UIScheduler, feedbackLogger: FeedbackLogger,
-                 initialValue: Value, reducer: @escaping StoreReducer) {
+    private init(dispatcher: Dispatcher, initialValue: Value, reducer: Reducer<Value, Action, ()>) {
         self.reducer = reducer
         self.value = initialValue
-        self.scheduler = scheduler
-        self.feedbackLogger = feedbackLogger
+        self.dispatcher = dispatcher
     }
     
     deinit {
         effectDisposables.dispose()
     }
+    
+    /// Sends action to the store asynchronously.
+    /// - Note: This function is thread-safe.
+    public func send(_ action: Action) {
+        self.dispatcher.dispatch { [unowned self] in
+            _ = syncSend(action)
+        }
+    }
      
     /// Sends action to the store.
-    public func send(_ action: Action) {
-        self.scheduler.schedule { [unowned self] in
-            // Executes the reducer and collects the effects
-            let effects = self.reducer!(&self.value, action, ())
+    internal func syncSend(_ action: Action) -> Value {
+        // Executes the reducer and collects the effects
+        let effects = self.reducer(&self.value, action, ())
+        
+        self.outstandingEffectCount += effects.count
+        
+        effects.forEach { effect in
+            var disposable: Disposable?
+            disposable = effect.observe(on: self.dispatcher.rxScheduler!)
+                .sink(
+                    receiveCompletion: {
+                        disposable?.dispose()
+                        self.outstandingEffectCount -= 1
+                    },
+                    receiveValues: { [unowned self] internalAction in
+                        _ = self.syncSend(internalAction)
+                    }
+                )
             
-            self.outstandingEffectCount += effects.count
-
-            effects.forEach { effect in
-                var disposable: Disposable?
-                disposable = effect.observe(on: self.scheduler)
-                    .sink(
-                        receiveCompletion: {
-                            disposable?.dispose()
-                            self.outstandingEffectCount -= 1
-                        },
-                        receiveValues: { [unowned self] internalAction in
-                            self.send(internalAction)
-                        },
-                        feedbackLogger: self.feedbackLogger
-                    )
-                
-                self.effectDisposables.add(disposable)
-            }
+            self.effectDisposables.add(disposable)
         }
+        
+        return self.value
     }
 
     /// Creates a  projection of the store value and action types.
     /// - Parameter value: A function that takes current store Value type and maps it to LocalValue.
+    /// - Note: `projection(value:action:)` is not thread-safe.
     public func projection<LocalValue, LocalAction>(
         value toLocalValue: @escaping (Value) -> LocalValue,
         action toGlobalAction: @escaping (LocalAction) -> Action
     ) -> Store<LocalValue, LocalAction> {
         
+        // isSending tracks if the local store is sending a value
+        // to the global store.
+        // This is useful for avoiding multiple redundant updates
+        // to the localStore's state value.
+        var isSending = false
+        
         let localStore = Store<LocalValue, LocalAction>(
-            scheduler: self.scheduler,
-            feedbackLogger: self.feedbackLogger,
+            dispatcher: self.dispatcher,
             initialValue: toLocalValue(self.value),
-            reducer: { localValue, localAction, _ in
-                // Local projection sends actions to the global MainStore.
-                self.send(toGlobalAction(localAction))
-                // Updates local stores value immediately.
-                localValue = toLocalValue(self.value)
+            reducer: Reducer { [self] localValue, localAction, _ in
+                
+                // Sets isSending to true
+                isSending = true
+                defer { isSending = false }
+                
+                // Local projection sends actions to the global MainStore,
+                // and maps the global value to local value with `toLocalValue`.
+                localValue = toLocalValue(self.syncSend(toGlobalAction(localAction)))
+                
                 return []
         })
 
         // Subscribes localStore to the value changes of the "global store",
         // due to actions outside the localStore.
         localStore.disposable = self.$value.signalProducer
-            .map(toLocalValue)
-            .skipRepeats()
+            .skip(first: 1)  // Initial value is already set when localStore is constructed.
             .startWithValues { [weak localStore] newValue in
-                localStore?.value = newValue
+                
+                // localStore value is already updated if isSending to the global store.
+                guard !isSending else { return }
+                
+                let newLocalValue = toLocalValue(newValue)
+                
+                // Avoid updating local value if the new value has not changed.
+                // Note that this is only valid since we require Value to be Eqautable.
+                guard localStore?.value != newLocalValue else {
+                   return
+                }
+                
+                localStore?.value = newLocalValue
         }
-
+        
+        
         return localStore
+    }
+    
+    /// - Note: `projection(value:)` is not thread-safe.
+    public func projection<LocalValue>(
+        value toLocalValue: @escaping (Value) -> LocalValue
+    ) -> Store<LocalValue, Action> {
+        projection(value: toLocalValue, action: id)
+    }
+    
+    /// - Note: `projection(action:)` is not thread-safe.
+    public func projection<LocalAction>(
+        action toLocalAction: @escaping (LocalAction) -> Action
+    ) -> Store<Utilities.Unit, LocalAction> {
+        projection(value: erase, action: toLocalAction)
+    }
+    
+    /// A stateless projection of self.
+    /// - Note: `stateless()` is not thread-safe.
+    public func stateless() -> Store<Utilities.Unit, Action> {
+        projection(value: erase, action: id)
     }
 
 }

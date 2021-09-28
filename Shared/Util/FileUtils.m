@@ -104,6 +104,83 @@
     return e;
 }
 
++ (NSString *_Nullable)tryReadingFile:(NSString *_Nonnull)filePath {
+    NSFileHandle *fileHandle;
+    // NSFileHandle will close automatically when deallocated.
+    return [FileUtils tryReadingFile:filePath
+                               usingFileHandle:&fileHandle
+                                readFromOffset:0
+                                  readToOffset:nil];
+}
+
++ (NSString *_Nullable)tryReadingFile:(NSString *_Nonnull)filePath
+                      usingFileHandle:(NSFileHandle *_Nullable __strong *_Nonnull)fileHandlePtr
+                       readFromOffset:(unsigned long long)bytesOffset
+                         readToOffset:(unsigned long long *_Nullable)readToOffset {
+
+    NSData *fileData;
+    NSError *err;
+    
+    // File operations parameters
+    #define MAX_RETRIES 3
+    #define RETRY_SLEEP_TIME 0.1f  // Sleep for 100 milliseconds.
+
+    for (int i = 0; i < MAX_RETRIES; ++i) {
+
+        if (!(*fileHandlePtr)) {
+            // NOTE: NSFileHandle created with fileHandleForReadingFromURL
+            //       the handle owns its associated file descriptor, and will
+            //       close it automatically when deallocated.
+            (*fileHandlePtr) = [NSFileHandle fileHandleForReadingFromURL:[NSURL fileURLWithPath:filePath]
+                                                                error:&err];
+            if (err) {
+                LOG_WARN(@"Error opening file handle for %@: Error: %@", filePath, err);
+                // On failure explicitly setting fileHandlePtr to point to nil.
+                (*fileHandlePtr) = nil;
+            }
+        }
+
+        if ((*fileHandlePtr)) {
+            @try {
+                // From https://developer.apple.com/documentation/foundation/nsfilehandle/1413916-readdataoflength?language=objc
+                // readDataToEndOfFile raises NSFileHandleOperationException if attempts
+                // to determine file-handle type fail or if attempts to read from the file
+                // or channel fail.
+                [(*fileHandlePtr) seekToFileOffset:bytesOffset];
+                fileData = [(*fileHandlePtr) readDataToEndOfFile];
+
+                if (fileData) {
+                    if (readToOffset) {
+                        (*readToOffset) = [(*fileHandlePtr) offsetInFile];
+                    }
+                    return [[NSString alloc] initWithData:fileData encoding:NSUTF8StringEncoding];
+                } else {
+                    (*readToOffset) = (unsigned long long) 0;
+                }
+            }
+            @catch (NSException *e) {
+                [PsiFeedbackLogger error:@"Error reading file: %@", [e debugDescription]];
+
+            }
+        }
+
+        // Put thread to sleep for 100 ms and try again.
+        [NSThread sleepForTimeInterval:RETRY_SLEEP_TIME];
+    }
+
+    return nil;
+}
+
++ (NSString *)getFileSize:(NSString *)filePath {
+    NSError *err;
+    unsigned long long byteCount = [[[NSFileManager defaultManager]
+                                     attributesOfItemAtPath:filePath error:&err] fileSize];
+    if (err) {
+        return nil;
+    }
+    return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleBinary];
+}
+
 #if DEBUG
 // See comment in header
 + (void)listDirectory:(NSString *)dir resource:(NSString *)resource recursively:(BOOL)recurse {
@@ -199,6 +276,7 @@
         }
     }
 }
-#endif
+
+#endif // DEBUG
 
 @end

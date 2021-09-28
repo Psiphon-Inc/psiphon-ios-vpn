@@ -59,7 +59,7 @@
 + (UIAlertController *)genericOperationFailedTryAgain {
     UIAlertController *alert = [UIAlertController
       alertControllerWithTitle:[Strings operationFailedAlertTitle]
-                       message:[UserStrings Operation_failed_alert_message]
+                       message:[UserStrings Operation_failed_please_try_again_alert_message]
                 preferredStyle:UIAlertControllerStyleAlert];
     UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:[UserStrings Dismiss_button_title]
                                                             style:UIAlertActionStyleCancel

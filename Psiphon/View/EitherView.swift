@@ -87,3 +87,31 @@ struct EitherView<A: ViewBuilder, B: ViewBuilder>: ViewBuilder {
     }
 
 }
+
+/// `PlaceHolderView` is useful in an `EitherView` to be a placeholder for a view
+/// that contains state that should not be lost (e.g. `WKWebView`).
+/// Note that `EitherView`'s `bind(_:)` function rebuilds the view if it's value has changed.
+struct PlaceholderView<PlaceholderType: UIView>: ViewBuilder {
+    
+    func build(_ container: UIView?) -> ImmutableBindableViewable<PlaceholderType, UIView> {
+
+        let background = UIView(frame: .zero)
+        background.backgroundColor = .darkGray2()
+        
+        return .init(viewable: background) { background in
+            
+            return { materializedView in
+                
+                background.subviews.forEach { $0.removeFromSuperview() }
+                background.addSubview(materializedView)
+                materializedView.activateConstraints {
+                    $0.matchParentConstraints()
+                }
+                
+            }
+            
+        }
+        
+    }
+    
+}
