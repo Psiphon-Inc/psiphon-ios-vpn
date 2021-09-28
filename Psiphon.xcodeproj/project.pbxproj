@@ -393,10 +393,10 @@
 		2911A794263D6C6D001A0A4D /* WebViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewController.swift; sourceTree = "<group>"; };
 		2911A796263F1941001A0A4D /* BlockerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlockerView.swift; sourceTree = "<group>"; };
 		291C0B8D269CBF720075FAB7 /* SharedModel.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SharedModel.xcdatamodel; sourceTree = "<group>"; };
-		291C0B9B269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SharedAuthorization+CoreDataProperties.h"; sourceTree = SOURCE_ROOT; };
-		291C0B9C269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SharedAuthorization+CoreDataClass.h"; sourceTree = SOURCE_ROOT; };
-		291C0B9D269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "SharedAuthorization+CoreDataClass.m"; sourceTree = SOURCE_ROOT; };
-		291C0B9E269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "SharedAuthorization+CoreDataProperties.m"; sourceTree = SOURCE_ROOT; };
+		291C0B9B269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "SharedAuthorization+CoreDataProperties.h"; path = "Shared/CoreData/Model/SharedAuthorization+CoreDataProperties.h"; sourceTree = SOURCE_ROOT; };
+		291C0B9C269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "SharedAuthorization+CoreDataClass.h"; path = "Shared/CoreData/Model/SharedAuthorization+CoreDataClass.h"; sourceTree = SOURCE_ROOT; };
+		291C0B9D269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "SharedAuthorization+CoreDataClass.m"; path = "Shared/CoreData/Model/SharedAuthorization+CoreDataClass.m"; sourceTree = SOURCE_ROOT; };
+		291C0B9E269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "SharedAuthorization+CoreDataProperties.m"; path = "Shared/CoreData/Model/SharedAuthorization+CoreDataProperties.m"; sourceTree = SOURCE_ROOT; };
 		291C0BA3269CC21F0075FAB7 /* PersistentContainerWrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PersistentContainerWrapper.h; sourceTree = "<group>"; };
 		291C0BA4269CC21F0075FAB7 /* PersistentContainerWrapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PersistentContainerWrapper.m; sourceTree = "<group>"; };
 		292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
@@ -936,23 +936,12 @@
 		291C0B8B269CBF5D0075FAB7 /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
-				291C0B96269CC06B0075FAB7 /* Model */,
+				29D2E5502703858A007A978E /* Model */,
 				291C0B8C269CBF720075FAB7 /* SharedModel.xcdatamodeld */,
 				291C0BA3269CC21F0075FAB7 /* PersistentContainerWrapper.h */,
 				291C0BA4269CC21F0075FAB7 /* PersistentContainerWrapper.m */,
 			);
 			path = CoreData;
-			sourceTree = "<group>";
-		};
-		291C0B96269CC06B0075FAB7 /* Model */ = {
-			isa = PBXGroup;
-			children = (
-				291C0B9C269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.h */,
-				291C0B9D269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.m */,
-				291C0B9B269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.h */,
-				291C0B9E269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m */,
-			);
-			path = Model;
 			sourceTree = "<group>";
 		};
 		292B531C2620DFC000C0C44A /* Settings */ = {
@@ -977,6 +966,17 @@
 				CEBA9C122481AA9F0097D700 /* SharedCoreData_Impl.swift */,
 			);
 			path = CoreData;
+			sourceTree = "<group>";
+		};
+		29D2E5502703858A007A978E /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				291C0B9C269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.h */,
+				291C0B9D269CC19B0075FAB7 /* SharedAuthorization+CoreDataClass.m */,
+				291C0B9B269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.h */,
+				291C0B9E269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m */,
+			);
+			path = Model;
 			sourceTree = "<group>";
 		};
 		445F249720E1A5BA00D004E9 /* asn1c */ = {
