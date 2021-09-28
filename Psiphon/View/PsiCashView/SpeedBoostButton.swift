@@ -21,16 +21,16 @@ import UIKit
 
 @objc final class SpeedBoostButton: GradientButton, Bindable {
 
-    enum SpeedBoostButtonState: Equatable {
+    enum SpeedBoostButtonViewModel: Equatable {
         case inactive
         case active(Date)
     }
 
     // Timer tick frequency.
-    static let TickFrequency = TimeInterval(1.0)
+    static let TickFrequency = TimeInterval(1.0)  // 1 second
 
     // UI starts showing the 'seconds' counter when expiry is less than or equal to `ShowSecondsAt`.
-    static let ShowSecondsAt = TimeInterval(5 * 60)
+    static let ShowSecondsAt = TimeInterval(60)  // 60 seconds
 
     let formatter: DateComponentsFormatter
     let activeTint = UIColor.weirdGreen()
@@ -43,7 +43,7 @@ import UIKit
         }
     }
 
-    var timerState: SpeedBoostButtonState? = .none {
+    var timerState: SpeedBoostButtonViewModel? = .none {
         // Carries out the effect of setting a new timer state.
         willSet(newState) {
             switch newState {
@@ -64,12 +64,17 @@ import UIKit
         }
     }
 
-    init() {
+    init(locale: Locale) {
         formatter = DateComponentsFormatter()
-        formatter.unitsStyle = .positional
-        formatter.zeroFormattingBehavior = .pad
-
-        super.init(gradient: .blue)
+        mutate(formatter) {
+            $0.calendar!.locale = locale
+            $0.unitsStyle = .abbreviated
+            $0.maximumUnitCount = 2
+            $0.zeroFormattingBehavior = .dropLeading
+            // $0.allowedUnits should be set before display.
+        }
+        
+        super.init(shadow: .light, contentShadow: true, gradient: .blue)
     }
 
     required init?(coder: NSCoder) {
@@ -94,7 +99,7 @@ import UIKit
         titleLabel!.font = AvenirFont.demiBold.font(.h3)
     }
 
-    func bind(_ newValue: SpeedBoostButtonState) {
+    func bind(_ newValue: SpeedBoostButtonViewModel) {
         switch newValue {
         case .inactive:
             guard self.timerState != .inactive else {
@@ -106,15 +111,6 @@ import UIKit
                 return
             }
             self.timerState = .active(expiry)
-        }
-    }
-
-    // ObjC bridging function for `bind`.
-    @objc func setExpiryTime(_ expiry: Date?) {
-        if let expiry = expiry {
-            self.bind(.active(expiry))
-        } else {
-            self.bind(.inactive)
         }
     }
 
@@ -155,7 +151,7 @@ import UIKit
         if expiry.timeIntervalSinceNow <= Self.ShowSecondsAt {
             self.formatter.allowedUnits = [.minute, .second]
         } else {
-            self.formatter.allowedUnits = [.hour, .minute]
+            self.formatter.allowedUnits = [.day, .hour, .minute]
         }
 
         let time = formatter.string(from: max(0.0, expiry.timeIntervalSinceNow))!
@@ -165,25 +161,28 @@ import UIKit
         setTitle(title, for: .highlighted)
     }
 
-    private func updateUIState(timerState: SpeedBoostButtonState) {
+    private func updateUIState(timerState: SpeedBoostButtonViewModel) {
         switch timerState {
         case .active(_):
-            layer.borderWidth = 2.0
-
-            // Sets colors
-            gradientColors = [UIColor.clear].cgColors
+            
+            self.setClearBackground()
+            
             layer.borderColor = activeTint.cgColor
+            layer.borderWidth = 2.0
+            
             setTitleColor(activeTint, for: .normal)
             setTitleColor(activeTint, for: .highlighted)
             imageView!.tintColor = activeTint
 
         case .inactive:
+            
+            self.setGradientBackground()
+            
+            layer.borderWidth = 0.0
+            
             setTitle(UserStrings.Speed_boost(), for: .normal)
             setTitle(UserStrings.Speed_boost(), for: .highlighted)
-            layer.borderWidth = 0.0
-
-            // Resets colors
-            gradientColors = Gradients.blue.colors
+            
             setTitleColor(UIColor.white, for: .normal)
             setTitleColor(UIColor.white, for: .highlighted)
             imageView!.tintColor = UIColor.white

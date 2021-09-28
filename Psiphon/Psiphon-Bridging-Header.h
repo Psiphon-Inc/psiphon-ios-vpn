@@ -18,8 +18,7 @@
 */
 
 // PsiCash
-#import <PsiCashLib/PsiCash.h>
-#import <PsiCashLib/PsiCashAPIModels.h>
+#import <PsiCashLib/PsiCashLib.h>
 
 // Tunnel Provider
 #import "NEBridge.h"
@@ -27,13 +26,14 @@
 // AppStore receipt
 #import "AppStoreParsedReceiptData.h"
 
-// Utilities
 #import "AppInfo.h"
+#import "AppFiles.h"
 #import "SharedConstants.h"
 #import "Notifier.h"
 #import "AppDelegate.h"
 #import "PsiFeedbackLogger.h"
 #import <PsiphonTunnel/PsiphonTunnel.h>
+#import "EmbeddedServerEntries.h"
 
 // UI
 #import "UIColor+Additions.h"
@@ -50,13 +50,24 @@
 #import "SubscriptionStatusView.h"
 #import "RootContainerController.h"
 #import "IAPViewController.h"
+#import "SettingsViewController.h"
 
 // Data stores
 #import "PsiphonConfigReader.h"
 #import "PsiphonDataSharedDB.h"
-#import "PsiphonConfigUserDefaults.h"
+#import "PersistentContainerWrapper.h"
+
+#import "SharedAuthorization+CoreDataProperties.h"
 
 // Feedback
 #import "Feedback.h"
 #import "JetsamTracking.h"
 #import "JetsamMetrics+Feedback.h"
+
+// InAppSettingsKit (IASK)
+#import <InAppSettingsKit/IASKSettingsReader.h>
+#import <PsiphonClientCommonLibrary/PsiphonSettingsViewController.h>
+
+#if DEBUG || DEV_RELEASE
+#import "DebugToolboxViewController.h"
+#endif

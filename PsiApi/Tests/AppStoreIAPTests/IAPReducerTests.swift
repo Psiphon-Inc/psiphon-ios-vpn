@@ -39,7 +39,7 @@ final class IAPReducerTests: XCTestCase {
     override func setUpWithError() throws {
         feedbackHandler = ArrayFeedbackLogHandler()
         feedbackLogger = FeedbackLogger(feedbackHandler)
-        Debugging = .disabled()
+        Debugging = .disabled(buildConfig: .debug)
     }
     
     override func tearDownWithError() throws {
@@ -51,7 +51,7 @@ final class IAPReducerTests: XCTestCase {
         let env = IAPEnvironment.mock(
             self.feedbackLogger,
             appReceiptStore: { action in
-                guard case .localReceiptRefresh = action else { XCTFatal() }
+                guard case .readLocalReceiptFile = action else { XCTFatal() }
                 return .empty
         })
         
@@ -89,7 +89,7 @@ final class IAPReducerTests: XCTestCase {
             IAPReducer.purchase adds purchase given that: there are no pending transactions, \
             if the transaction is a consumable, that there are no consumables pending verification \
             by the purchase-verifier server, and if the transaction is a PsiCash transaction that \
-            it has minimal tokens to purchase PsiCash
+            it has tokens necessary to purchase PsiCash
             """, arguments: args)
             <-
             forAll(IAPReducerState.arbitraryWithNonPurchasingState, AppStoreProduct.arbitrary, Payment.arbitrary) {
@@ -115,9 +115,9 @@ final class IAPReducerTests: XCTestCase {
                     ^&&^
                     (nextState.iap.purchasing[product.type]?.purchasingState ==== .pending(nil)) <?> "State is pending"
                     ^&&^
-                    (effectsResults ==== [[.completed]]) <?> "Effect result added purchase"
+                    (effectsResults ==== [[.completed], [.completed]]) <?> "Effect result added purchase with logging"
                     ^&&^
-                    (self.feedbackHandler.logs ==== []) <?> "Feedback logs"
+                    (self.feedbackHandler.allLogsLevelInfo()) <?> "Only info Feedback logs"
         }
     
         
@@ -239,7 +239,7 @@ final class IAPReducerTests: XCTestCase {
             tunnelStatusSignal: SignalProducer(value: .connected),
             tunnelConnectionRefSignal: SignalProducer(value:
                 .some(TunnelConnection { .connection(.connected) })),
-            psiCashEffects: .mock(rewardedVideoCustomData: String.arbitrary),
+            psiCashEffects: MockPsiCashEffects(rewardedVideoCustomDataGen: String.arbitrary),
             getCurrentTime: { () -> Date in return fixedDate }
         )
         
@@ -282,6 +282,7 @@ final class IAPReducerTests: XCTestCase {
                             purchaseDate: unfinishedPsiCashTx.completedTransaction.transactionDate)
                                                 
                         receipt = ReceiptData(
+                            filename: "receipt", // unused
                             subscriptionInAppPurchases: generatedReceipt.subscriptionInAppPurchases,
                             consumableInAppPurchases: generatedReceipt.consumableInAppPurchases.union([matchingConsumableIAP]),
                             data: Data(),
@@ -289,6 +290,7 @@ final class IAPReducerTests: XCTestCase {
                         
                     } else {
                         receipt = ReceiptData(
+                            filename: "receipt", // unused
                             subscriptionInAppPurchases: generatedReceipt.subscriptionInAppPurchases,
                             consumableInAppPurchases: Set(),
                             data: Data(),
@@ -299,7 +301,7 @@ final class IAPReducerTests: XCTestCase {
                 
                 // Act
                 let (nextState, effectsResults) = testReducer(initState,
-                                                              .receiptUpdated(receipt),
+                                                              .appReceiptDataUpdated(receipt),
                                                               env, iapReducer)
                 
                 return conjoin(
@@ -380,7 +382,7 @@ final class IAPReducerTests: XCTestCase {
             tunnelStatusSignal: SignalProducer(value: .connected),
             tunnelConnectionRefSignal: SignalProducer(value:
                 .some(TunnelConnection { .connection(.connected) })),
-            psiCashEffects: .mock(rewardedVideoCustomData: String.arbitrary),
+            psiCashEffects: MockPsiCashEffects(rewardedVideoCustomDataGen: String.arbitrary),
             psiCashStore: { (action: PsiCashAction) -> Effect<Never> in
                 return .empty
             },

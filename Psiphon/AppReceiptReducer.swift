@@ -30,29 +30,55 @@ typealias ReceiptReducerEnvironment = (
     subscriptionAuthStateStore: (SubscriptionAuthStateAction) -> Effect<Never>,
     receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate,
     isSupportedProduct: (ProductID) -> AppStoreProductType?,
-    getCurrentTime: () -> Date,
-    compareDates: (Date, Date, Calendar.Component) -> ComparisonResult
+    dateCompare: DateCompare
 )
 
-func receiptReducer(
-    state: inout ReceiptState, action: ReceiptStateAction, environment: ReceiptReducerEnvironment
-) -> [Effect<ReceiptStateAction>] {
+let receiptReducer = Reducer<ReceiptState, ReceiptStateAction, ReceiptReducerEnvironment> {
+    state, action, environment in
+    
     switch action {
-    case .localReceiptRefresh:
+    case .readLocalReceiptFile:
          return [
             ReceiptData.fromLocalReceipt(environment: environment)
-                .map(ReceiptStateAction._localReceiptDidRefresh(refreshedData:))
+                .map(ReceiptStateAction._readLocalReceiptFile(refreshedData:))
         ]
 
-    case ._localReceiptDidRefresh(let refreshedData):
-
-        state.receiptData = refreshedData
-
-        return notifyRefreshedReceiptEffects(
-            receiptData: refreshedData,
-            reason: .localRefresh,
-            environment: environment
-        )
+    case ._readLocalReceiptFile(let updatedReceipt):
+        
+        switch state.receiptData {
+        case .none:
+            
+            // First time the receipt is read.
+            state.receiptData = .some(updatedReceipt)
+            
+            return notifyUpdatedReceiptData(
+                receiptData: updatedReceipt,
+                reason: .localUpdate,
+                environment: environment
+            )
+            
+        case .some(let current):
+            
+            if current != updatedReceipt {
+                // Content of the receipt have changed.
+                
+                state.receiptData = .some(updatedReceipt)
+                
+                return notifyUpdatedReceiptData(
+                    receiptData: updatedReceipt,
+                    reason: .localUpdate,
+                    environment: environment
+                )
+                
+            } else {
+                // Content of receipt file have not changed since last read.
+                return [
+                    environment.feedbackLogger.log(
+                        .info, "Receipt file not updated").mapNever()
+                ]
+            }
+            
+        }
 
     case .remoteReceiptRefresh(optionalPromise: let optionalPromise):
         if let promise = optionalPromise {
@@ -79,7 +105,7 @@ func receiptReducer(
         return [
             state.fulfillRefreshPromises(result).mapNever(),
             ReceiptData.fromLocalReceipt(environment: environment)
-                .map(ReceiptStateAction._localReceiptDidRefresh(refreshedData:))
+                .map(ReceiptStateAction._readLocalReceiptFile(refreshedData:))
         ]
 
     }
@@ -95,8 +121,8 @@ extension ReceiptData {
             ReceiptData.parseLocalReceipt(
                 appBundle: environment.appBundle,
                 isSupportedProduct: environment.isSupportedProduct,
-                getCurrentTime: environment.getCurrentTime,
-                compareDates: environment.compareDates,
+                getCurrentTime: environment.dateCompare.getCurrentTime,
+                compareDates: environment.dateCompare.compareDates,
                 feedbackLogger: environment.feedbackLogger
             )
         }
@@ -104,18 +130,24 @@ extension ReceiptData {
 
 }
 
-fileprivate func notifyRefreshedReceiptEffects<NeverAction>(
+/// Notifies all relevant services of updated receipt.
+fileprivate func notifyUpdatedReceiptData<NeverAction>(
     receiptData: ReceiptData?, reason: ReceiptReadReason, environment: ReceiptReducerEnvironment
 ) -> [Effect<NeverAction>] {
     return [
-        environment.subscriptionStore(.updatedReceiptData(receiptData)).mapNever(),
+        
+        environment.subscriptionStore(.appReceiptDataUpdated(receiptData)).mapNever(),
+        
         environment.subscriptionAuthStateStore(
-            .localDataUpdate(type: .didRefreshReceiptData(reason))
+            .appReceiptDataUpdated(receiptData, reason)
         ).mapNever(),
-        environment.iapStore(.receiptUpdated(receiptData)).mapNever(),
+        
+        environment.iapStore(.appReceiptDataUpdated(receiptData)).mapNever(),
+        
         environment.feedbackLogger.log(
             .info, LogMessage(stringLiteral: makeFeedbackEntry(receiptData))
         ).mapNever()
+        
     ]
 }
 
@@ -127,7 +159,7 @@ final class ReceiptRefreshRequestDelegate: StoreDelegate<ReceiptStateAction>, SK
     }
 
     func request(_ request: SKRequest, didFailWithError error: Error) {
-        let errorEvent = ErrorEvent(SystemError<Int>.make(error as NSError))
+        let errorEvent = ErrorEvent(SystemError<Int>.make(error as NSError), date: Date())
         return storeSend(._remoteReceiptRefreshResult(.failure(errorEvent)))
     }
 

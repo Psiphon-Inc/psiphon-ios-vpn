@@ -34,7 +34,7 @@ final class ReducerTestsTests: XCTestCase {
 
     func testBasicTestReducerWithActions() {
         
-        let reducer: Reducer<State, Action, ()> = { state, action, _ -> [Effect<Action>] in
+        let reducer = Reducer<State, Action, ()> { state, action, _ in
             switch action {
             case .inc:
                 state.count += 1

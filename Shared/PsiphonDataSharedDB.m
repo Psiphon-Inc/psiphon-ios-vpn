@@ -21,15 +21,8 @@
 #import "Logging.h"
 #import "NSDate+PSIDateExtension.h"
 #import "SharedConstants.h"
+#import "FileUtils.h"
 #import <PsiphonTunnel/PsiphonTunnel.h>
-
-#if TARGET_IS_EXTENSION
-#import "Authorization.h"
-#endif
-
-// File operations parameters
-#define MAX_RETRIES 3
-#define RETRY_SLEEP_TIME 0.1f  // Sleep for 100 milliseconds.
 
 #pragma mark - NSUserDefaults Keys
 
@@ -43,24 +36,9 @@ UserDefaultsKey const TunnelSponsorIDStringKey = @"current_sponsor_id";
 
 UserDefaultsKey const ServerTimestampStringKey = @"server_timestamp";
 
-UserDefaultsKey const ContainerAuthorizationSetKey = @"authorizations_container_key";
-
 UserDefaultsKey const ExtensionIsZombieBoolKey = @"extension_zombie";
 
-UserDefaultsKey const ContainerSubscriptionAuthorizationsDictKey =
-    @"subscription_authorizations_dict";
-
-UserDefaultsKey const ExtensionRejectedSubscriptionAuthorizationIDsArrayKey =
-    @"extension_rejected_subscription_authorization_ids";
-
-UserDefaultsKey const ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey =
-@"extension_rejected_subscription_authorization_ids_write_seq_int";
-
-UserDefaultsKey const ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey =
-    @"container_read_rejected_subscription_authorization_ids_read_at_least_up_to_seq_int";
-
-UserDefaultsKey const ContainerForegroundStateBoolKey =
-@"container_foreground_state_bool_key";
+UserDefaultsKey const ContainerForegroundStateBoolKey = @"container_foreground_state_bool_key";
 
 UserDefaultsKey const ContainerTunnelIntentStatusIntKey = @"container_tunnel_intent_status_key";
 
@@ -69,6 +47,15 @@ UserDefaultsKey const ExtensionDisallowedTrafficAlertWriteSeqIntKey =
 
 UserDefaultsKey const ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey =
 @"container_disallowed_traffic_alert_read_at_least_up_to_seq_int";
+
+UserDefaultsKey const TunnelEgressRegionKey = @"Tunnel-EgressRegion";
+
+UserDefaultsKey const TunnelDisableTimeoutsKey = @"Tunnel-Disable-Timeouts";
+
+UserDefaultsKey const TunnelUpstreamProxyURLKey = @"Tunnel-UpstreamProxyURL";
+
+UserDefaultsKey const TunnelCustomHeadersKey = @"Tunnel-CustomHeaders";
+
 
 /**
  * Key for boolean value that when TRUE indicates that the extension crashed before stop was called.
@@ -79,12 +66,31 @@ UserDefaultsKey const ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey =
  */
 UserDefaultsKey const SharedDataExtensionCrashedBeforeStopBoolKey = @"PsiphonDataSharedDB.ExtensionCrashedBeforeStopBoolKey";
 
-#if DEBUG
+#if DEBUG || DEV_RELEASE
 
 UserDefaultsKey const DebugMemoryProfileBoolKey = @"PsiphonDataSharedDB.DebugMemoryProfilerBoolKey";
 UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataSharedDB.DebugPsiphonConnectionStateStringKey";
 
 #endif
+
+#pragma mark - Unused legacy keys
+UserDefaultsKey const ContainerAuthorizationSetKey_Legacy = @"authorizations_container_key";
+
+UserDefaultsKey const ContainerSubscriptionAuthorizationsDictKey_Legacy=
+    @"subscription_authorizations_dict";
+
+UserDefaultsKey const ExtensionRejectedSubscriptionAuthorizationIDsArrayKey_Legacy =
+    @"extension_rejected_subscription_authorization_ids";
+
+UserDefaultsKey const ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey_Legacy =
+@"extension_rejected_subscription_authorization_ids_write_seq_int";
+
+UserDefaultsKey const ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey_Legacy =
+    @"container_read_rejected_subscription_authorization_ids_read_at_least_up_to_seq_int";
+
+UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
+@"Container-Latest-Subscription-Expiry-Date";
+
 
 #pragma mark -
 
@@ -150,68 +156,6 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
     return [PsiphonTunnel olderNoticesFilePath:[PsiphonDataSharedDB dataRootDirectory]].path;
 }
 
-+ (NSString *_Nullable)tryReadingFile:(NSString *_Nonnull)filePath {
-    NSFileHandle *fileHandle;
-    // NSFileHandle will close automatically when deallocated.
-    return [PsiphonDataSharedDB tryReadingFile:filePath
-                               usingFileHandle:&fileHandle
-                                readFromOffset:0
-                                  readToOffset:nil];
-}
-
-+ (NSString *_Nullable)tryReadingFile:(NSString *_Nonnull)filePath
-                      usingFileHandle:(NSFileHandle *_Nullable __strong *_Nonnull)fileHandlePtr
-                       readFromOffset:(unsigned long long)bytesOffset
-                         readToOffset:(unsigned long long *_Nullable)readToOffset {
-
-    NSData *fileData;
-    NSError *err;
-
-    for (int i = 0; i < MAX_RETRIES; ++i) {
-
-        if (!(*fileHandlePtr)) {
-            // NOTE: NSFileHandle created with fileHandleForReadingFromURL
-            //       the handle owns its associated file descriptor, and will
-            //       close it automatically when deallocated.
-            (*fileHandlePtr) = [NSFileHandle fileHandleForReadingFromURL:[NSURL fileURLWithPath:filePath]
-                                                                error:&err];
-            if (err) {
-                LOG_WARN(@"Error opening file handle for %@: Error: %@", filePath, err);
-                // On failure explicitly setting fileHandlePtr to point to nil.
-                (*fileHandlePtr) = nil;
-            }
-        }
-
-        if ((*fileHandlePtr)) {
-            @try {
-                // From https://developer.apple.com/documentation/foundation/nsfilehandle/1413916-readdataoflength?language=objc
-                // readDataToEndOfFile raises NSFileHandleOperationException if attempts
-                // to determine file-handle type fail or if attempts to read from the file
-                // or channel fail.
-                [(*fileHandlePtr) seekToFileOffset:bytesOffset];
-                fileData = [(*fileHandlePtr) readDataToEndOfFile];
-
-                if (fileData) {
-                    if (readToOffset) {
-                        (*readToOffset) = [(*fileHandlePtr) offsetInFile];
-                    }
-                    return [[NSString alloc] initWithData:fileData encoding:NSUTF8StringEncoding];
-                } else {
-                    (*readToOffset) = (unsigned long long) 0;
-                }
-            }
-            @catch (NSException *e) {
-                [PsiFeedbackLogger error:@"Error reading file: %@", [e debugDescription]];
-
-            }
-        }
-
-        // Put thread to sleep for 100 ms and try again.
-        [NSThread sleepForTimeInterval:RETRY_SLEEP_TIME];
-    }
-
-    return nil;
-}
 
 // readLogsData tries to parse logLines, and for each JSON formatted line creates
 // a DiagnosticEntry which is appended to entries.
@@ -275,9 +219,9 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 // This method is not meant to handle large files.
 #if !(TARGET_IS_EXTENSION)
 - (NSArray<DiagnosticEntry*> *_Nonnull)getAllLogs {
-
-    LOG_DEBUG(@"Log filesize:%@", [self getFileSize:[self rotatingLogNoticesPath]]);
-    LOG_DEBUG(@"Log backup filesize:%@", [self getFileSize:[self rotatingOlderLogNoticesPath]]);
+    
+    LOG_DEBUG(@"Log filesize:%@", [FileUtils getFileSize:[self rotatingLogNoticesPath]]);
+    LOG_DEBUG(@"Log backup filesize:%@", [FileUtils getFileSize:[self rotatingOlderLogNoticesPath]]);
 
     NSMutableArray<NSArray<DiagnosticEntry *> *> *entriesArray = [[NSMutableArray alloc] initWithCapacity:3];
 
@@ -287,8 +231,8 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 
    NSArray<DiagnosticEntry *> *(^readRotatedLogs)(NSString *, NSString *) = ^(NSString *olderPath, NSString *newPath){
        NSMutableArray<DiagnosticEntry *> *entries = [[NSMutableArray alloc] init];
-       NSString *tunnelCoreOlderLogs = [PsiphonDataSharedDB tryReadingFile:olderPath];
-       NSString *tunnelCoreLogs = [PsiphonDataSharedDB tryReadingFile:newPath];
+       NSString *tunnelCoreOlderLogs = [FileUtils tryReadingFile:olderPath];
+       NSString *tunnelCoreLogs = [FileUtils tryReadingFile:newPath];
        [self readLogsData:tunnelCoreOlderLogs intoArray:entries];
        [self readLogsData:tunnelCoreLogs intoArray:entries];
        return entries;
@@ -322,6 +266,62 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
     return allEntries;
 }
 #endif
+
+#pragma mark - Tunnel core configs
+
+- (NSString *_Nonnull)getEgressRegion {
+    NSString *_Nullable egressRegion = [sharedDefaults stringForKey:TunnelEgressRegionKey];
+    if (egressRegion == nil) {
+        return kPsiphonRegionBestPerformance;
+    }
+    return egressRegion;
+}
+
+- (void)setEgressRegion:(NSString *)regionCode {
+    [sharedDefaults setObject:regionCode forKey:TunnelEgressRegionKey];
+}
+
+- (void)setDisableTimeouts:(BOOL)disableTimeouts {
+    [sharedDefaults setBool:disableTimeouts forKey:TunnelDisableTimeoutsKey];
+}
+
+- (void)setUpstreamProxyURL:(NSString *_Nullable)url {
+    [sharedDefaults setObject:url forKey:TunnelUpstreamProxyURLKey];
+}
+
+- (void)setCustomHttpHeaders:(NSDictionary *_Nullable)customHeaders {
+    [sharedDefaults setObject:customHeaders forKey:TunnelCustomHeadersKey];
+}
+
+- (NSDictionary *)getTunnelCoreUserConfigs {
+    
+    NSMutableDictionary *userConfigs = [[NSMutableDictionary alloc] init];
+
+    NSString *egressRegion = [sharedDefaults stringForKey:TunnelEgressRegionKey];
+    if (egressRegion) {
+        userConfigs[@"EgressRegion"] = egressRegion;
+    }
+
+    if ([sharedDefaults boolForKey:TunnelDisableTimeoutsKey]) {
+        userConfigs[@"NetworkLatencyMultiplierLambda"] = @(0.1);
+    }
+
+    NSString *upstreamProxyUrl = [sharedDefaults stringForKey:TunnelUpstreamProxyURLKey];
+    if (upstreamProxyUrl && [upstreamProxyUrl length] > 0) {
+        userConfigs[@"UpstreamProxyUrl"] = upstreamProxyUrl;
+    }
+
+    id upstreamProxyCustomHeaders = [sharedDefaults objectForKey:TunnelCustomHeadersKey];
+    if ([upstreamProxyCustomHeaders isKindOfClass:[NSDictionary class]]) {
+        NSDictionary *customHeaders = (NSDictionary*)upstreamProxyCustomHeaders;
+        if ([customHeaders count] > 0) {
+            userConfigs[@"CustomHeaders"] = customHeaders;
+        }
+    }
+
+    return userConfigs;
+    
+}
 
 #pragma mark - Container Data (Data originating in the container)
 
@@ -413,7 +413,7 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
     NSMutableArray<Homepage *> *homepages = nil;
     NSError *err;
 
-    NSString *data = [PsiphonDataSharedDB tryReadingFile:[self homepageNoticesPath]];
+    NSString *data = [FileUtils tryReadingFile:[self homepageNoticesPath]];
 
     if (!data) {
         [PsiFeedbackLogger error:@"Failed reading homepage notices file. Error:%@", err];
@@ -463,130 +463,6 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
     return [sharedDefaults stringForKey:ServerTimestampStringKey];
 }
 
-
-#pragma mark - Authorizations
-
-#if TARGET_IS_EXTENSION
-- (void)removeNonSubscriptionAuthorizationsNotAccepted:(NSSet<NSString *> *_Nullable)authIdsToRemove {
-
-    NSMutableSet<NSString *> *newEncodedAuths = [NSMutableSet set];
-
-    [[self getNonSubscriptionEncodedAuthorizations]
-     enumerateObjectsUsingBlock:^(NSString * _Nonnull encoded, BOOL * _Nonnull stop) {
-        Authorization *_Nullable storedAuthorization = [[Authorization alloc]
-                                                        initWithEncodedAuthorization:encoded];
-        if (storedAuthorization == nil) {
-            return;
-        }
-        
-        if (![authIdsToRemove containsObject:storedAuthorization.ID]) {
-            // storedAuthorization.ID doesn't match any of `authIdsToRemove`.
-            [newEncodedAuths addObject:storedAuthorization.base64Representation];
-        }
-
-    }];
-
-    [self setNonSubscriptionEncodedAuthorizations:newEncodedAuths];
-}
-#endif
-
-- (void)setNonSubscriptionEncodedAuthorizations:(NSSet<NSString*>*_Nullable)encodedAuthorizations {
-    // Persists Base64 representation of the Authorizations.
-    [sharedDefaults setObject:encodedAuthorizations.allObjects
-                       forKey:ContainerAuthorizationSetKey];
-    [sharedDefaults synchronize];
-}
-
-- (void)appendNonSubscriptionEncodedAuthorization:(NSString *_Nonnull)base64Encoded {
-    NSMutableSet<NSString *> *newSet = [NSMutableSet
-                                        setWithSet:[self getNonSubscriptionEncodedAuthorizations]];
-    [newSet addObject:base64Encoded];
-    [self setNonSubscriptionEncodedAuthorizations:newSet];
-}
-
-- (NSSet<NSString *> *_Nonnull)getNonSubscriptionEncodedAuthorizations {
-    NSArray<NSString *> *_Nullable encodedAuths = [sharedDefaults
-                                                   stringArrayForKey:ContainerAuthorizationSetKey];
-    if (encodedAuths == nil) {
-        return [NSSet set];
-    } else {
-        return [NSSet setWithArray:encodedAuths];
-    }
-}
-
-#pragma mark - Subscription
-
-#if !(TARGET_IS_EXTENSION)
-/// Encoded object must JSON representation of type `[SubscriptionPurchaseAuth]`.
-- (void)setSubscriptionAuths:(NSData *_Nullable)purchaseAuths {
-    [sharedDefaults setObject:purchaseAuths forKey:ContainerSubscriptionAuthorizationsDictKey];
-}
-#endif
-
-- (NSData *_Nullable)getSubscriptionAuths {
-    return [sharedDefaults dataForKey:ContainerSubscriptionAuthorizationsDictKey];
-}
-
--(NSArray<NSString *> *_Nonnull)getRejectedSubscriptionAuthorizationIDs {
-    NSArray<NSString *> *_Nullable storedValue =
-        [sharedDefaults stringArrayForKey:ExtensionRejectedSubscriptionAuthorizationIDsArrayKey];
-    
-    if (storedValue == nil) {
-        return [NSArray array];
-    } else {
-        return storedValue;
-    }
-}
-
-#if TARGET_IS_EXTENSION
-- (void)insertRejectedSubscriptionAuthorizationID:(NSString *)authorizationID {
-    NSInteger extensionSeq = [self getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber];
-    NSInteger containerReadAtLeastToSeq =
-      [self getContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber];
-    
-    NSMutableArray<NSString *> *rejectedAuthIDs;
-    
-    if (containerReadAtLeastToSeq < extensionSeq) {
-        rejectedAuthIDs = [NSMutableArray arrayWithArray:[self getRejectedSubscriptionAuthorizationIDs]];
-    } else {
-        // Container is up-to-date with the extension.
-        // Currently stored values for rejected subscription authorization ids can be removed.
-        rejectedAuthIDs = [NSMutableArray array];
-    }
-    
-    [rejectedAuthIDs addObject:authorizationID];
-    
-    // Updates the rejection authorization IDs before sequence number.
-    // This guarantees that there is no data loss, and at most sequence number
-    // will be out-of-sync.
-    
-    [sharedDefaults setObject:rejectedAuthIDs
-                       forKey:ExtensionRejectedSubscriptionAuthorizationIDsArrayKey];
-    
-    [sharedDefaults setInteger:(extensionSeq + 1)
-                        forKey:ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey];
-}
-#endif
-
-- (NSInteger)getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber {
-    NSInteger seq = [sharedDefaults
-                     integerForKey:ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey];
-    return seq;
-}
-
-- (NSInteger)getContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber {
-    NSInteger seq = [sharedDefaults
-               integerForKey:ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey];
-    return seq;
-}
-
-#if !(TARGET_IS_EXTENSION)
-- (void)setContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber:(NSInteger)seq {
-    [sharedDefaults setInteger:seq
-                      forKey:ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey];
-}
-#endif
-
 #pragma mark - Jetsam counter
 
 - (NSString*)extensionJetsamMetricsFilePath {
@@ -619,15 +495,7 @@ UserDefaultsKey const DebugPsiphonConnectionStateStringKey = @"PsiphonDataShared
 
 #pragma mark - Debug Preferences
 
-#if DEBUG
-
-- (NSString *)getFileSize:(NSString *)filePath {
-    NSError *err;
-    unsigned long long byteCount = [[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&err] fileSize];
-    if (err) { return nil;
-    }
-    return [NSByteCountFormatter stringFromByteCount:byteCount countStyle:NSByteCountFormatterCountStyleBinary];
-}
+#if DEBUG || DEV_RELEASE
 
 - (void)setDebugMemoryProfiler:(BOOL)enabled {
     [sharedDefaults setBool:enabled forKey:DebugMemoryProfileBoolKey];

@@ -22,12 +22,9 @@
 #import "AppInfo.h"
 #import "AppDelegate.h"
 #import "Asserts.h"
-#import "AvailableServerRegions.h"
 #import "DispatchUtils.h"
-#import "IAPViewController.h"
 #import "Logging.h"
 #import "DebugViewController.h"
-#import "PsiphonConfigUserDefaults.h"
 #import "SharedConstants.h"
 #import "NSString+Additions.h"
 #import "UIAlertController+Additions.h"
@@ -64,9 +61,6 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 @end
 
 @implementation MainViewController {
-    // Models
-    AvailableServerRegions *availableServerRegions;
-
     // UI elements
     UILayoutGuide *viewWidthGuide;
     UILabel *statusLabel;
@@ -84,7 +78,7 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
     NSLayoutConstraint *startButtonHeight;
     
     // Settings
-    PsiphonSettingsViewController *appSettingsViewController;
+    PsiphonSettingsViewController *__weak appSettingsViewController;
     AnimatedUIButton *settingsButton;
 
     // Psiphon Logo
@@ -112,17 +106,8 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 - (id)initWithStartingVPN:(BOOL)startVPN {
     self = [super init];
     if (self) {
-        
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
-        
-        // TODO: remove persistance from init function.
-        [self persistSettingsToSharedUserDefaults];
-        
-        _openSettingImmediatelyOnViewDidAppear = FALSE;
-
         _startVPNOnFirstLoad = startVPN;
-
-        [RegionAdapter sharedInstance].delegate = self;
     }
     return self;
 }
@@ -136,9 +121,6 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 - (void)viewDidLoad {
     LOG_DEBUG();
     [super viewDidLoad];
-
-    availableServerRegions = [[AvailableServerRegions alloc] init];
-    [availableServerRegions sync];
     
     // Setting up the UI
     // calls them in the right order
@@ -263,25 +245,13 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
         [self.compoundDisposable addDisposable:disposable];
     }
 
-    // Subscribes to `AppDelegate.psiCashBalance` subject to receive PsiCash balance updates.
+    // Updates PsiCashWidgetView with updated view model.
     {
-        [self.compoundDisposable addDisposable:[AppObservables.shared.psiCashBalance
-                                subscribeNext:^(BridgedBalanceViewBindingType * _Nullable balance) {
+        [self.compoundDisposable addDisposable:[AppObservables.shared.psiCashWidgetViewModel
+                                subscribeNext:^(BridgedPsiCashWidgetBindingType * _Nullable newValue) {
             MainViewController *__strong strongSelf = weakSelf;
             if (strongSelf) {
-                [strongSelf->psiCashWidget.balanceView objcBind:balance];
-            }
-        }]];
-    }
-
-    // Subscribes to `AppObservable.shared.speedBoostExpiry` subject
-    // to update `psiCashWidget` with the latest expiry time.
-    {
-        [self.compoundDisposable addDisposable:[AppObservables.shared.speedBoostExpiry
-                                                subscribeNext:^(NSDate * _Nullable expiry) {
-            MainViewController *__strong strongSelf = weakSelf;
-            if (strongSelf) {
-                [strongSelf->psiCashWidget.speedBoostButton setExpiryTime:expiry];
+                [strongSelf->psiCashWidget objcBind:newValue];
             }
         }]];
     }
@@ -302,6 +272,18 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
         }]];
     }
     
+    // Observes selected server region.
+    {
+        [self.compoundDisposable addDisposable:
+             [AppObservables.shared.selectedServerRegion subscribeNext:^(Region * _Nullable selectedRegion) {
+            MainViewController *__strong strongSelf = weakSelf;
+            if (strongSelf) {
+                [strongSelf->regionSelectionButton bind:selectedRegion];
+            }
+        }]
+        ];
+    }
+    
     // Calls startStopVPN if startVPNOnFirstLoad is TRUE.
     {
         if (self.startVPNOnFirstLoad == TRUE) {
@@ -314,15 +296,6 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 - (void)viewDidAppear:(BOOL)animated {
     LOG_DEBUG();
     [super viewDidAppear:animated];
-    // Available regions may have changed in the background
-    // TODO: maybe have availableServerRegions listen to a global signal?
-    [availableServerRegions sync];
-    [regionSelectionButton update];
-    
-    if (self.openSettingImmediatelyOnViewDidAppear) {
-        [self openSettingsMenu];
-        self.openSettingImmediatelyOnViewDidAppear = FALSE;
-    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -365,12 +338,10 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 }
 
 - (void)onSettingsButtonTap:(UIButton *)sender {
-    [self openSettingsMenu];
+    [SwiftDelegate.bridge presentSettingsViewController];
 }
 
 - (void)onRegionSelectionButtonTap:(UIButton *)sender {
-    NSString *selectedRegionCodeSnapshot = [[RegionAdapter sharedInstance] getSelectedRegion].code;
-
     SkyRegionSelectionViewController *regionViewController =
       [[SkyRegionSelectionViewController alloc] init];
 
@@ -380,17 +351,8 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
       ^(NSUInteger selectedIndex, id selectedItem, PickerViewController *viewController) {
           MainViewController *__strong strongSelf = weakSelf;
           if (strongSelf != nil) {
-
               Region *selectedRegion = (Region *)selectedItem;
-
-              [[RegionAdapter sharedInstance] setSelectedRegion:selectedRegion.code];
-
-              if (![NSString stringsBothEqualOrNil:selectedRegion.code b:selectedRegionCodeSnapshot]) {
-                  [strongSelf persistSelectedRegion];
-                  [strongSelf->regionSelectionButton update];
-                  [SwiftDelegate.bridge restartVPNIfActive];
-              }
-
+              [SwiftDelegate.bridge userSelectedRegion:selectedRegion];
               [viewController dismissViewControllerAnimated:TRUE completion:nil];
           }
       };
@@ -400,7 +362,7 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
     [self presentViewController:navController animated:YES completion:nil];
 }
 
-#if DEBUG
+#if DEBUG || DEV_RELEASE
 - (void)onVersionLabelTap:(UIButton *)sender {
     DebugViewController *viewController = [[DebugViewController alloc] init];
     [self presentViewController:viewController animated:YES completion:nil];
@@ -486,13 +448,15 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 // adding and activating autolayout constraints.
 - (void)addViews {
     
+    NSLocale *currentLocale = [SwiftDelegate.bridge getLocaleForCurrentAppLanguage];
+    
     cloudBackgroundView = [[CloudsView alloc] initForAutoLayout];
     versionLabel = [[UIButton alloc] init];
     settingsButton = [[AnimatedUIButton alloc] init];
     psiphonLargeLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogoWhite"]];
     psiphonTitle = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonTitle"]];
     noConnectionBannerView = [[NoConnectionBannerView alloc] init];
-    psiCashWidget = [[PsiCashWidgetView alloc] initWithFrame:CGRectZero];
+    psiCashWidget = [[PsiCashWidgetView alloc] initWithLocale:currentLocale];
     startAndStopButton = [VPNStartAndStopButton buttonWithType:UIButtonTypeCustom];
     statusLabel = [[UILabel alloc] init];
     regionSelectionButton = [[RegionSelectionButton alloc] init];
@@ -571,7 +535,7 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 }
 
 - (void)setStatusLabelText:(NSString*)s {
-    NSString *upperCased = [s localizedUppercaseString];
+    NSString *upperCased = [s uppercaseStringWithLocale:[SwiftDelegate.bridge getLocaleForCurrentAppLanguage]];
     NSMutableAttributedString *mutableStr = [[NSMutableAttributedString alloc]
       initWithString:upperCased];
 
@@ -583,8 +547,6 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 
 - (void)setupRegionSelectionButton {
     [regionSelectionButton addTarget:self action:@selector(onRegionSelectionButtonTap:) forControlEvents:UIControlEventTouchUpInside];
-
-    [regionSelectionButton update];
 
     // Add constraints
     regionSelectionButton.translatesAutoresizingMaskIntoConstraints = NO;
@@ -616,7 +578,7 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
     versionLabel.userInteractionEnabled = FALSE;
     versionLabel.contentEdgeInsets = UIEdgeInsetsMake(padding, padding, padding, padding);
 
-#if DEBUG
+#if DEBUG || DEV_RELEASE
     versionLabel.userInteractionEnabled = TRUE;
     [versionLabel addTarget:self
                      action:@selector(onVersionLabelTap:)
@@ -627,6 +589,7 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
         versionLabel.hidden = YES;
     }
 #endif
+    
     // Setup autolayout
     [NSLayoutConstraint activateConstraints:@[
       [versionLabel.trailingAnchor constraintEqualToAnchor:psiCashWidget.trailingAnchor
@@ -673,125 +636,18 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 
 }
 
-#pragma mark - FeedbackViewControllerDelegate methods and helpers
-
-- (void)userSubmittedFeedback:(NSInteger)selectedThumbIndex
-                     comments:(NSString *)comments
-                        email:(NSString *)email
-            uploadDiagnostics:(BOOL)uploadDiagnostics {
-
-    // Ensure any settings changes are persisted. E.g. upstream proxy configuration. 
-    [self persistSettingsToSharedUserDefaults];
-
-    [SwiftDelegate.bridge userSubmittedFeedbackWithSelectedThumbIndex:selectedThumbIndex
-                                                             comments:comments
-                                                                email:email
-                                                    uploadDiagnostics:uploadDiagnostics];
-}
-
-- (void)userPressedURL:(NSURL *)URL {
-    [[UIApplication sharedApplication] openURL:URL options:@{} completionHandler:nil];
-}
-
-#pragma mark - PsiphonSettingsViewControllerDelegate methods and helpers
-
-- (void)notifyPsiphonConnectionState {
-    // Unused
-}
-
-- (void)reloadAndOpenSettings {
-    if (appSettingsViewController != nil) {
-        [appSettingsViewController dismissViewControllerAnimated:NO completion:^{
-            [[RegionAdapter sharedInstance] reloadTitlesForNewLocalization];
-            [[AppDelegate sharedAppDelegate] reloadMainViewControllerAndImmediatelyOpenSettings];
-        }];
-    }
-}
-
-- (void)settingsWillDismissWithForceReconnect:(BOOL)forceReconnect {
-    if (forceReconnect) {
-        [self persistSettingsToSharedUserDefaults];
-        [SwiftDelegate.bridge restartVPNIfActive];
-    }
-}
-
-- (void)persistSettingsToSharedUserDefaults {
-    [self persistDisableTimeouts];
-    [self persistSelectedRegion];
-    [self persistUpstreamProxySettings];
-}
-
-- (void)persistDisableTimeouts {
-    NSUserDefaults *containerUserDefaults = [NSUserDefaults standardUserDefaults];
-    NSUserDefaults *sharedUserDefaults = [[NSUserDefaults alloc] initWithSuiteName:PsiphonAppGroupIdentifier];
-    [sharedUserDefaults setObject:@([containerUserDefaults boolForKey:kDisableTimeouts]) forKey:kDisableTimeouts];
-}
-
-- (void)persistSelectedRegion {
-    [[PsiphonConfigUserDefaults sharedInstance] setEgressRegion:[RegionAdapter.sharedInstance getSelectedRegion].code];
-}
-
-- (void)persistUpstreamProxySettings {
-    NSUserDefaults *userDefaults = [[NSUserDefaults alloc] initWithSuiteName:PsiphonAppGroupIdentifier];
-    NSString *upstreamProxyUrl = [[UpstreamProxySettings sharedInstance] getUpstreamProxyUrl];
-    [userDefaults setObject:upstreamProxyUrl forKey:PsiphonConfigUpstreamProxyURL];
-    NSDictionary *upstreamProxyCustomHeaders = [[UpstreamProxySettings sharedInstance] getUpstreamProxyCustomHeaders];
-    [userDefaults setObject:upstreamProxyCustomHeaders forKey:PsiphonConfigCustomHeaders];
-}
-
-- (BOOL)shouldEnableSettingsLinks {
-    return YES;
-}
-
-#pragma mark - Psiphon Settings
-
-- (void)notice:(NSString *)noticeJSON {
-    NSLog(@"Got notice %@", noticeJSON);
-}
-
-- (void)openSettingsMenu {
-    appSettingsViewController = [[SettingsViewController alloc] init];
-    appSettingsViewController.delegate = appSettingsViewController;
-    appSettingsViewController.showCreditsFooter = NO;
-    appSettingsViewController.showDoneButton = YES;
-    appSettingsViewController.neverShowPrivacySettings = YES;
-    appSettingsViewController.settingsDelegate = self;
-    appSettingsViewController.preferencesSnapshot = [[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] copy];
-
-    UINavigationController *navController = [[UINavigationController alloc]
-      initWithRootViewController:appSettingsViewController];
-
-    if (@available(iOS 13, *)) {
-        // The default navigation controller in the iOS 13 SDK is not fullscreen and can be
-        // dismissed by swiping it away.
-        //
-        // PsiphonSettingsViewController depends on being dismissed with the "done" button, which
-        // is hooked into the InAppSettingsKit lifecycle. Swiping away the settings menu bypasses
-        // this and results in the VPN not being restarted if: a new region was selected, the
-        // disable timeouts settings was changed, etc. The solution is to force fullscreen
-        // presentation until the settings menu can be refactored.
-        navController.modalPresentationStyle = UIModalPresentationFullScreen;
-    }
-
-    [self presentViewController:navController animated:YES completion:nil];
-}
-
-#pragma mark - PsiCash
-
 #pragma mark - PsiCash UI
 
-- (void)presentPsiCashViewController:(PsiCashViewControllerTabs)tab {
-    UIViewController *psiCashViewController = [SwiftDelegate.bridge
-                                               makePsiCashViewController:tab];
-    [self presentViewController:psiCashViewController animated:YES completion:nil];
+- (void)addPsiCashButtonTapped {
+    [SwiftDelegate.bridge presentPsiCashViewController:PsiCashScreenTabAddPsiCash];
 }
 
-- (void)addPsiCashButtonTapped {
-    [self presentPsiCashViewController:PsiCashViewControllerTabsAddPsiCash];
+- (void)psiCashAccountButtonTapped {
+    [SwiftDelegate.bridge presentPsiCashAccountViewControllerWithPsiCashScreen:TRUE];
 }
 
 - (void)speedBoostButtonTapped {
-    [self presentPsiCashViewController:PsiCashViewControllerTabsSpeedBoost];
+    [SwiftDelegate.bridge presentPsiCashViewController:PsiCashScreenTabSpeedBoost];
 }
 
 - (void)setupPsiphonLogoView {
@@ -864,15 +720,24 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
         [psiCashWidget.trailingAnchor constraintEqualToAnchor:viewWidthGuide.trailingAnchor]
     ]];
 
-    // Sets button action
-    [psiCashWidget.addPsiCashButton addTarget:self action:@selector(addPsiCashButtonTapped) forControlEvents:UIControlEventTouchUpInside];
-    [psiCashWidget.speedBoostButton addTarget:self action:@selector(speedBoostButtonTapped) forControlEvents:UIControlEventTouchUpInside];
+    // Sets button actions
+    [psiCashWidget.addPsiCashButton addTarget:self
+                                       action:@selector(addPsiCashButtonTapped)
+                             forControlEvents:UIControlEventTouchUpInside];
+    
+    [psiCashWidget.psiCashAccountButton addTarget:self
+                                           action:@selector(psiCashAccountButtonTapped)
+                                 forControlEvents:UIControlEventTouchUpInside];
+    
+    [psiCashWidget.speedBoostButton addTarget:self
+                                       action:@selector(speedBoostButtonTapped)
+                             forControlEvents:UIControlEventTouchUpInside];
     
     // Makes balance view tappable
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
                                              initWithTarget:self
                                              action:@selector(addPsiCashButtonTapped)];
-    [psiCashWidget.balanceView addGestureRecognizer:tapRecognizer];
+    [psiCashWidget.balanceViewWrapper.view addGestureRecognizer:tapRecognizer];
 }
 
 - (void)setPsiCashContentHidden:(BOOL)hidden {
@@ -882,17 +747,6 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
     // Show Psiphon large logo and hide Psiphon small logo when PsiCash is hidden.
     psiphonLargeLogo.hidden = !hidden;
     psiphonTitle.hidden = hidden;
-}
-
-#pragma mark - RegionAdapterDelegate protocol implementation
-
-- (void)selectedRegionDisappearedThenSwitchedToBestPerformance {
-    MainViewController *__weak weakSelf = self;
-    dispatch_async_main(^{
-        MainViewController *__strong strongSelf = weakSelf;
-        [strongSelf->regionSelectionButton update];
-    });
-    [self persistSelectedRegion];
 }
 
 @end

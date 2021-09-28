@@ -93,6 +93,11 @@ Note that the App Store does not support all the languages supported by apps -- 
 
 To update translations in iTunes Connect, switch between the languages in the web interface and paste in the corresponding translation from `StoreAssets/<language>.yaml`. _Remember to de-indent the description_.
 
+## Updating Privacy Policy
+
+Check `dev/GenPrivacyPolicy` command line tool to automatically generate Swift code
+for the Privacy Policy.
+
 ## Acknowledgements
 
 Psiphon iOS VPN client uses:

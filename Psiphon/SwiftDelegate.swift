@@ -26,6 +26,8 @@ import Utilities
 import PsiApi
 import AppStoreIAP
 import PsiCashClient
+import PsiphonClientCommonLibrary
+import WebKit
 
 enum AppLifecycle: Equatable {
     case inited
@@ -52,16 +54,13 @@ extension AppLifecycle {
 
 enum AppDelegateAction {
     case appLifecycleEvent(AppLifecycle)
-    case appDidLaunch(psiCashData: PsiCashLibData)
     case checkForDisallowedTrafficAlertNotification
-    case _disallowedNotificationAlertPresentation(success: Bool)
     case onboardingCompleted
 }
 
 struct AppDelegateReducerState: Equatable {
-    var psiCashBalance: PsiCashBalance
-    var psiCash: PsiCashState
-    var appDelegate: AppDelegateState
+    var appDelegateState: AppDelegateState
+    let subscriptionState: SubscriptionState
 }
 
 struct AppDelegateState: Equatable {
@@ -78,32 +77,52 @@ struct AppDelegateState: Equatable {
     
 }
 
-typealias AppDelegateEnvironment = (
-    platform: Platform,
-    feedbackLogger: FeedbackLogger,
-    psiCashPersistedValues: PsiCashPersistedValues,
-    sharedDB: PsiphonDataSharedDB,
-    psiCashEffects: PsiCashEffects,
-    paymentQueue: PaymentQueue,
-    appReceiptStore: (ReceiptStateAction) -> Effect<Never>,
-    psiCashStore: (PsiCashAction) -> Effect<Never>,
-    paymentTransactionDelegate: PaymentTransactionDelegate,
-    userDefaultsConfig: UserDefaultsConfig
-)
+struct AppDelegateEnvironment {
+    let platform: Platform
+    let feedbackLogger: FeedbackLogger
+    let sharedDB: PsiphonDataSharedDB
+    let psiCashEffects: PsiCashEffects
+    let paymentQueue: PaymentQueue
+    let mainViewStore: (MainViewAction) -> Effect<Never>
+    let appReceiptStore: (ReceiptStateAction) -> Effect<Never>
+    let serverRegionStore: (ServerRegionAction) -> Effect<Never>
+    let paymentTransactionDelegate: PaymentTransactionDelegate
+    let mainDispatcher: MainDispatcher
+    let getCurrentTime: () -> Date
+    let userDefaultsConfig: UserDefaultsConfig
+}
 
-func appDelegateReducer(
-    state: inout AppDelegateReducerState, action: AppDelegateAction,
-    environment: AppDelegateEnvironment
-) -> [Effect<AppDelegateAction>] {
+let appDelegateReducer = Reducer<AppDelegateReducerState,
+                                 AppDelegateAction,
+                                 AppDelegateEnvironment> {
+    state, action, environment in
+    
     switch action {
+    
     case .appLifecycleEvent(let lifecycle):
-        state.appDelegate.appLifecycle = lifecycle
+        
+        state.appDelegateState.appLifecycle = lifecycle
         
         switch lifecycle {
         
+        case .didFinishLaunching:
+            // Determines whether onboarding is complete.
+            let stagesNotCompleted = OnboardingStage.findStagesNotCompleted(
+                completedStages: environment.userDefaultsConfig.onboardingStagesCompletedTyped)
+            
+            state.appDelegateState.onboardingCompleted = stagesNotCompleted.isEmpty
+            
+            return [
+                environment.paymentQueue.addObserver(environment.paymentTransactionDelegate).mapNever(),
+                environment.appReceiptStore(.readLocalReceiptFile).mapNever()
+            ]
+        
         case .didBecomeActive:
             return [
-                Effect(value: .checkForDisallowedTrafficAlertNotification)
+                Effect(value: .checkForDisallowedTrafficAlertNotification),
+                
+                // Available regions may have changed in the background.
+                environment.serverRegionStore(.updateAvailableRegions).mapNever()
             ]
             
         default:
@@ -111,40 +130,8 @@ func appDelegateReducer(
             
         }
         
-    case .appDidLaunch(psiCashData: let libData):
-        state.psiCash.appDidLaunch(libData)
-        state.psiCashBalance = .fromStoredExpectedReward(
-            libData: libData,
-            persisted: environment.psiCashPersistedValues
-        )
-        
-        // Determines whether onboarding is complete.
-        let stagesNotCompleted = OnboardingStage.findStagesNotCompleted(
-            completedStages: environment.userDefaultsConfig.onboardingStagesCompletedTyped)
-        
-        state.appDelegate.onboardingCompleted = stagesNotCompleted.isEmpty
-        
-        let nonSubscriptionAuths = environment.sharedDB.getNonSubscriptionEncodedAuthorizations()
-        
-        return [
-            environment.psiCashEffects.expirePurchases(nonSubscriptionAuths).mapNever(),
-            environment.paymentQueue.addObserver(environment.paymentTransactionDelegate).mapNever(),
-            environment.appReceiptStore(.localReceiptRefresh).mapNever()
-        ]
-        
     case .checkForDisallowedTrafficAlertNotification:
-        
-        // If the app is in the background, view controllers can be presented, but
-        // not seen by the user.
-        // This guard ensures that the user sees the alert dialog.
-        guard case .didBecomeActive = state.appDelegate.appLifecycle else {
-            return []
-        }
-        
-        guard !state.appDelegate.pendingPresentingDisallowedTrafficAlert else {
-            return []
-        }
-        
+
         let lastReadSeq = environment.sharedDB
             .getContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum()
         
@@ -155,71 +142,38 @@ func appDelegateReducer(
             return []
         }
         
-        state.appDelegate.pendingPresentingDisallowedTrafficAlert = true
-        
-        return [
-            environment.feedbackLogger.log(.info, "Presenting disallowed traffic alert")
-                .mapNever(),
-            
-            .deferred { fulfill in
-                let found = AppDelegate.getTopPresentedViewController()
-                    .traversePresentingStackFor(type: RootContainerController.self)
-                
-                switch found {
-                case .notPresent:
-                   fulfill(._disallowedNotificationAlertPresentation(success: false))
-                   return
-                    
-                case .presentTopOfStack(_), .presentInStack(_):
-                
-                    // FIXME: Accessing global singleton variable
-                    let alertController = makeDisallowedTrafficAlertController(
-                        onSpeedBoostClicked: {
-                            tryPresentPsiCashViewController(
-                                platform: environment.platform,
-                                locale: environment.userDefaultsConfig.localeForAppLanguage,
-                                tab: .speedBoost,
-                                makePsiCashViewController:
-                                    SwiftDelegate.instance.makePsiCashViewController(platform:locale:initialTab:),
-                                getTopMostPresentedViewController:
-                                    AppDelegate.getTopPresentedViewController
-                            )
-                        },
-                        onSubscriptionClicked: {
-                            tryPresentSubscriptionViewController(getTopMostPresentedViewController:
-                                    AppDelegate.getTopPresentedViewController)
-                        })
-                    
-                    let success = AppDelegate.getTopPresentedViewController()
-                        .safePresent(alertController, animated: true)
-                    
-                    fulfill(._disallowedNotificationAlertPresentation(success: success))
-                 
-                }
-                
-            }
-        ]
-        
-    case let ._disallowedNotificationAlertPresentation(success: success):
-        
-        state.appDelegate.pendingPresentingDisallowedTrafficAlert = false
-        
-        guard success else {
-            return [
-                environment.feedbackLogger.log(.error, "Failed to present disallowed traffic alert")
-                    .mapNever()
+        // TODO: The `date` of this event should really be the same as the last seq number read.
+        // In the implementation below two AlertEvents for the same seq number, are not equal.
+        let alertEvent = AlertEvent(.disallowedTrafficAlert,
+                                    date: environment.getCurrentTime())
+
+        var effects = [Effect<AppDelegateAction>]()
+
+        // Updates disallowed traffic alert read seq number.
+        effects += .fireAndForget {
+            environment.sharedDB.setContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum(
+                environment.sharedDB.getDisallowedTrafficAlertWriteSequenceNum())
+        }
+
+        // Presents disallowed traffic alert only if the user is not subscribed.
+        if case .subscribed(_) = state.subscriptionState.status {
+            effects += environment.feedbackLogger
+                .log(.info, "Disallowed traffic alert not presented.")
+                .mapNever()
+        } else {
+            effects += [
+                environment.feedbackLogger.log(.info, "Presenting disallowed traffic alert")
+                    .mapNever(),
+                environment.mainViewStore(.presentAlert(alertEvent)).mapNever(),
             ]
         }
-        
-        environment.sharedDB.setContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum(
-                environment.sharedDB.getDisallowedTrafficAlertWriteSequenceNum())
-        
-        return []
+
+        return effects
         
     case .onboardingCompleted:
         
-        state.appDelegate.onboardingCompleted = true
-
+        state.appDelegateState.onboardingCompleted = true
+        
         return [
             .fireAndForget {
                 environment.userDefaultsConfig.onboardingStagesCompleted =
@@ -237,30 +191,53 @@ func appDelegateReducer(
     static let instance = SwiftDelegate()
 
     private var platform: Platform!
-    private var navigator = Navigator()
+    private var deepLinkingNavigator = DeepLinkingNavigator()
     private let sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: PsiphonAppGroupIdentifier)
     private let feedbackLogger = FeedbackLogger(PsiphonRotatingFileFeedbackLogHandler())
     private let supportedProducts =
         SupportedAppStoreProducts.fromPlists(types: [.subscription, .psiCash])
     private let userDefaultsConfig = UserDefaultsConfig()
     private let appUpgrade = AppUpgrade()
+    private let dateCompare: DateCompare
+    private let appSupportFileStore: ApplicationSupportFileStore
+    private let sharedAuthCoreData: SharedAuthCoreData
     
     private var (lifetime, token) = Lifetime.make()
     private var objcBridge: ObjCBridgeDelegate!
     private var store: Store<AppState, AppAction>!
-    private var psiCashLib: PsiCash!
+    private var psiCashLib: PsiCashLib
     private var environmentCleanup: (() -> Void)?
 
-    override init() {
-        platform = Platform(ProcessInfo.processInfo)
-    }
+    // NSNotification observers
+    private var appLangChangeObserver: NSObjectProtocol?
+    
+    private override init() {
 
+        deepLinkingNavigator = DeepLinkingNavigator()
+
+        dateCompare = DateCompare(
+            getCurrentTime: { Date () },
+            compareDates: { Calendar.current.compare($0, to: $1, toGranularity: $2) })
+        
+        appSupportFileStore = ApplicationSupportFileStore(fileManager: FileManager.default)
+        
+        sharedAuthCoreData = SharedCoreData_Impl()
+        
+        platform = Platform(ProcessInfo.processInfo)
+        
+        psiCashLib = PsiCashLib(feedbackLogger: self.feedbackLogger, platform: platform)
+        
+    }
+    
     // Should be called early in the application lifecycle.
     @objc static func setupDebugFlags() {
         #if DEBUG
         Debugging = DebugFlags(buildConfig: .debug)
         #elseif DEV_RELEASE
-        Debugging = DebugFlags(buildConfig: .devRelease)
+        Debugging = DebugFlags(
+            buildConfig: .devRelease,
+            devServers: true
+        )
         #else
         Debugging = DebugFlags.disabled(buildConfig: .release)
         #endif
@@ -269,6 +246,7 @@ func appDelegateReducer(
     func applicationDidBecomeActive() {
         
         self.store.send(.appDelegateAction(.appLifecycleEvent(.didBecomeActive)))
+        self.store.send(.mainViewAction(.applicationDidBecomeActive))
         
     }
     
@@ -280,7 +258,7 @@ func appDelegateReducer(
         
         self.store.send(.appDelegateAction(.appLifecycleEvent(.willEnterForeground)))
         self.store.send(vpnAction: .syncWithProvider(reason: .appEnteredForeground))
-        self.store.send(.psiCash(.refreshPsiCashState))
+        self.store.send(.psiCash(.refreshPsiCashState()))
         
     }
     
@@ -412,10 +390,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                                         appInfo: AppInfoObjC(),
                                         feedbackLogger: self.feedbackLogger)
         
-        if appUpgrade.firstRunOfVersion == true {
-            self.objcBridge.updateAvailableEgressRegionsOnFirstRunOfAppVersion()
-        }
-        
         UNUserNotificationCenter.current().delegate = self
         
         return true
@@ -425,6 +399,18 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         _ application: UIApplication
     ) {
         self.feedbackLogger.immediate(.info, "applicationDidFinishLaunching")
+        
+        // Ensures settings values are copied, even if the PsiphonSettingsViewController
+        // did not call for changed settings to be copied (e.g. app was closed with settings opens).
+        CopySettingsToPsiphonDataSharedDB.sharedInstance.copyAllSettings()
+        
+        // Logs any filesystem errors stored.
+        if let error = appSupportFileStore.filesystemError {
+            self.feedbackLogger.immediate(.error, "\(error)")
+        }
+        
+        let mainDispatcher = MainDispatcher()
+        let globalDispatcher = GlobalDispatcher(qos: .default, name: "globalDispatcher")
         
         // On Mac the iOS AppDelegate callbacks are not called when the app's window
         // loses focus. Once the app is opened "applicationDidBecomeActive" is called once,
@@ -451,81 +437,108 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
             
         }
-        
-        navigator.register(urls: PsiphonDeepLinking.legacyBuyPsiCashDeepLink, PsiphonDeepLinking.buyPsiCashDeepLink) { [unowned self] in
-            tryPresentPsiCashViewController(
-                platform: platform,
-                locale: userDefaultsConfig.localeForAppLanguage,
-                tab: .addPsiCash,
-                makePsiCashViewController: self.makePsiCashViewController(platform:locale:initialTab:),
-                getTopMostPresentedViewController: AppDelegate.getTopPresentedViewController
-            )
-            return true
-        }
-        
-        navigator.register(urls: PsiphonDeepLinking.legacySpeedBoostDeepLink, PsiphonDeepLinking.speedBoostDeepLink) { [unowned self] in
-            tryPresentPsiCashViewController(
-                platform: platform,
-                locale: userDefaultsConfig.localeForAppLanguage,
-                tab: .speedBoost,
-                makePsiCashViewController: self.makePsiCashViewController(platform:locale:initialTab:),
-                getTopMostPresentedViewController: AppDelegate.getTopPresentedViewController
-            )
-            return true
-        }
-                
-        self.psiCashLib = PsiCash.make(flags: Debugging)
-        
         self.store = Store(
             initialValue: AppState(),
             reducer: makeAppReducer(feedbackLogger: self.feedbackLogger),
-            feedbackLogger: self.feedbackLogger,
+            dispatcher: mainDispatcher,
             environment: { [unowned self] store in
                 let (environment, cleanup) = makeEnvironment(
                     platform: platform,
                     store: store,
                     feedbackLogger: self.feedbackLogger,
                     sharedDB: self.sharedDB,
+                    sharedAuthCoreData: SharedCoreData_Impl(),
                     psiCashLib: self.psiCashLib,
+                    regionAdapter: RegionAdapter.sharedInstance(),
+                    embeddedServerEntriesFile: PsiphonConfigReader.embeddedServerEntriesPath,
+                    psiCashFileStoreRoot: self.appSupportFileStore.psiCashFileStoreRootPath,
                     supportedAppStoreProducts: self.supportedProducts,
                     userDefaultsConfig: self.userDefaultsConfig,
+                    standardUserDefaults: UserDefaults.standard,
                     objcBridgeDelegate: objcBridge,
-                    calendar: Calendar.current,
-                    topMostViewController: AppDelegate.getTopPresentedViewController
+                    dateCompare: self.dateCompare,
+                    addToDate: { calendarComponent, value, date -> Date? in
+                        Calendar.current.date(byAdding: calendarComponent, value: value, to: date)
+                    },
+                    mainDispatcher: mainDispatcher,
+                    globalDispatcher: globalDispatcher,
+                    getTopActiveViewController: self.getTopActiveViewController,
+                    reloadMainScreen: {
+                        Effect.deferred { fulfill in
+                            AppDelegate.shared().reloadMainViewController(
+                                animated: false,
+                                completion: { fulfill(.unit) })
+                        }
+                    },
+                    clearWebViewDataStore: {
+                        WKWebView.clearWebviewDataStore()
+                    }
                 )
                 self.environmentCleanup = cleanup
                 return environment
-        })
+            })
         
         self.store.send(.appDelegateAction(.appLifecycleEvent(.didFinishLaunching)))
         self.store.send(vpnAction: .appLaunched)
-        self.store.send(.appDelegateAction(.appDidLaunch(psiCashData: self.psiCashLib.dataModel())))
+        self.store.send(.psiCash(.initialize))
         
-        // Maps connected events to refresh state messages sent to store.
-        self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
-            .skipRepeats()
-            .filter { $0 == .connected }
-            .map(value: AppAction.psiCash(.refreshPsiCashState))
-            .send(store: self.store)
-        
-        // Maps connected events to rejected authorization ID data update.
-        // This is true as long as rejected authorization IDs are updated in tunnel provider
-        // during `onActiveAuthorizationIDs:` callback, before the `onConnected` callback.
-        self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
-            .skipRepeats()
-            .filter { $0 == .connected }
-            .map(value: AppAction.subscriptionAuthStateAction(
-                .localDataUpdate(type: .didUpdateRejectedSubscriptionAuthIDs))
-            )
-            .send(store: self.store)
-        
-        // Forwards `PsiCashState` updates to ObjCBridgeDelegate.
-        self.lifetime += self.store.$value.signalProducer
-            .map(\.psiCashBalanceViewModel)
-            .skipRepeats()
-            .startWithValues { [unowned objcBridge] viewModel in
-                objcBridge!.onPsiCashBalanceUpdate(.init(swiftState: viewModel))
+        if appUpgrade.firstRunOfVersion == true {
+            self.store.send(.serverRegionAction(.updateAvailableRegions))
         }
+        
+        // Registers accepted deep linking URLs.
+        deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.legacyBuyPsiCashDeepLink,
+                                             PsiphonDeepLinking.buyPsiCashDeepLink ]) { [unowned self] in
+            self.store.send(.mainViewAction(.presentPsiCashScreen(initialTab: .addPsiCash)))
+            return true
+        }
+        deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.legacySpeedBoostDeepLink,
+                                              PsiphonDeepLinking.speedBoostDeepLink ]) { [unowned self] in
+            self.store.send(.mainViewAction(.presentPsiCashScreen(initialTab: .speedBoost)))
+            return true
+        }
+        deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.settingsDeepLink ]) { [unowned self] in
+            self.store.send(.mainViewAction(.presentSettingsScreen))
+            return true
+        }
+        deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.feedbackDeepLink ]) { [unowned self] in
+            self.store.send(.mainViewAction(.presentModalFeedbackScreen))
+            return true
+        }
+        
+        // Note that settings can also change outside of IASK menu,
+        // such as language selection in onboarding.
+        appLangChangeObserver = NotificationCenter.default.addObserver(
+            forName: NSNotification.Name(kIASKAppSettingChanged),
+            object: nil,
+            queue: .main
+        ) { [unowned self] note in
+            
+            let fieldName = note.userInfo?.keys.first as? String?
+            
+            if fieldName == PsiphonCommonLibConstants.kAppLanguage {
+                let currentLocale = self.userDefaultsConfig.localeForAppLanguage
+                self.store.send(.psiCash(.setLocale(currentLocale)))
+            }
+            
+        }
+        
+        // Observes VPN connected state, and sends actions that need to be performed.
+        self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
+            .skipRepeats()
+            .filter { $0 == .connected }
+            .startWithValues { _ in
+                
+                // PsiCash RefreshState
+                self.store.send(.psiCash(.refreshPsiCashState()))
+                
+                // Validity of subscription authorization is determined by Psiphon servers
+                // when the VPN connects.
+                // Performs a local receipt refersh in case there is a new
+                // that can be retrieved. (e.g. server authorization rekey.)
+                self.store.send(.appReceipt(.readLocalReceiptFile))
+                
+            }
         
         // Forwards `SubscriptionStatus` updates to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer
@@ -533,7 +546,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .skipRepeats()
             .startWithValues { [unowned objcBridge] in
                 objcBridge!.onSubscriptionStatus(BridgedUserSubscription.from(state: $0))
-        }
+            }
         
         // Forwards subscription auth status to ObjCBridgeDelegate.
         self.lifetime += SignalProducer.combineLatest(
@@ -541,18 +554,28 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             self.store.$value.signalProducer.map(\.subscription.status).skipRepeats(),
             self.store.$value.signalProducer
                 .map(\.vpnState.value.providerVPNStatus.tunneled).skipRepeats()
-            ).map {
-                SubscriptionBarView.SubscriptionBarState.make(
-                    authState: $0.0, subscriptionStatus: $0.1, tunnelStatus: $0.2
-                )
-            }
-            .skipRepeats()
-            .startWithValues { [unowned objcBridge] newValue in
-                
-                objcBridge!.onSubscriptionBarViewStatusUpdate(
-                    ObjcSubscriptionBarViewState(swiftState: newValue)
-                )
+        ).map {
+            SubscriptionBarView.SubscriptionBarState.make(
+                subscriptionAuthState: $0.0, subscriptionStatus: $0.1, tunnelStatus: $0.2
+            )
         }
+        .skipRepeats()
+        .startWithValues { [unowned objcBridge] newValue in
+
+            objcBridge!.onSubscriptionBarViewStatusUpdate(
+                ObjcSubscriptionBarViewState(swiftState: newValue)
+            )
+        }
+        
+        // Forwards server region change.
+        self.lifetime += self.store.$value.signalProducer.map(\.serverRegionState.selectedRegion)
+            .skipRepeats()
+            .startWithValues { [unowned objcBridge] region in
+                guard let region = region else {
+                    return
+                }
+                objcBridge!.onSelectedServerRegionUpdate(region)
+            }
         
         // Forwards VPN status changes to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
@@ -569,20 +592,21 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 Pair(appState.vpnState.value.vpnStatusWithIntent, appState.vpnState.value.loadState)
             }
             .skipRepeats()
-            .flatMap(.latest) { vpnStateTunnelLoadStatePair ->
+            .flatMap(.latest) { [unowned self] vpnStateTunnelLoadStatePair ->
                 SignalProducer<Result<Utilities.Unit, ErrorEvent<ErrorRepr>>, Never> in
                 
                 guard case .loaded(_) = vpnStateTunnelLoadStatePair.second.value else {
                     return Effect(value: .success(.unit))
                 }
-            
+
                 let compareValue = (current: vpnStateTunnelLoadStatePair.first.status.tunneled,
                                     expected: vpnStateTunnelLoadStatePair.first.intent)
                 
                 switch compareValue {
                 case (current: .notConnected, expected: .start(transition: .none)):
                     let error = ErrorEvent(
-                        ErrorRepr(repr: "Unexpected value '\(vpnStateTunnelLoadStatePair.second)'")
+                        ErrorRepr(repr: "Unexpected value '\(vpnStateTunnelLoadStatePair.second)'"),
+                        date: self.dateCompare.getCurrentTime()
                     )
                     
                     // Waits for the specified amount of time before emitting the vpn status
@@ -597,7 +621,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 }
             }
             .skipRepeats()
-        .startWithValues { [unowned self] (result: Result<Utilities.Unit, ErrorEvent<ErrorRepr>>) in
+            .startWithValues { [unowned self] (result: Result<Utilities.Unit, ErrorEvent<ErrorRepr>>) in
                 switch result {
                 case .success(.unit):
                     break
@@ -614,16 +638,36 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // Forwards SpeedBoost purchase expiry date (if the user is not subscribed)
         // to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer
-            .map { appState -> Date? in
+            .map { [unowned self] appState -> SpeedBoostButton.SpeedBoostButtonViewModel in
                 if case .subscribed(_) = appState.subscription.status {
-                    return nil
+                    return .inactive
                 } else {
-                    return appState.psiCash.activeSpeedBoost?.transaction.localTimeExpiry
+                    let activeSpeedBoost = appState.psiCashState.activeSpeedBoost(self.dateCompare)
+                    if let expiry = activeSpeedBoost?.transaction.localTimeExpiry {
+                        return .active(expiry)
+                    } else {
+                        return .inactive
+                    }
                 }
             }
             .skipRepeats()
-            .startWithValues{ [unowned objcBridge] speedBoostExpiry in
-                objcBridge!.onSpeedBoostActivePurchase(speedBoostExpiry)
+            .combineLatest(
+                with: self.store.$value.signalProducer.map(\.psiCashBalanceViewModel).skipRepeats()
+            )
+            .combineLatest(
+                with: self.store.$value.signalProducer.map(\.psiCashState.libData?.accountType).skipRepeats()
+            )
+            .startWithValues { [unowned objcBridge] (tuple: ((SpeedBoostButton.SpeedBoostButtonViewModel, PsiCashBalanceViewModel), PsiCashAccountType?)) in
+                
+                let newValue = PsiCashWidgetView.ViewModel(
+                    balanceViewModel: tuple.0.1,
+                    speedBoostButtonModel: tuple.0.0,
+                    accountType: tuple.1
+                )
+                
+                objcBridge!.onPsiCashWidgetViewModelUpdate(
+                    BridgedPsiCashWidgetBindingType(swiftValue: newValue))
+                
             }
         
         self.lifetime += self.store.$value.signalProducer
@@ -642,6 +686,30 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 objcBridge!.onReachabilityStatusDidChange(reachabilityStatus.networkStatus)
             }
         
+        // Produces a SettingsViewModel type and passes
+        // the value to the ObjCBridgeDelegte.
+        self.lifetime += SignalProducer.combineLatest(
+            self.store.$value.signalProducer.map(\.appReceipt.remoteReceiptRefreshState)
+                .skipRepeats(),
+            self.store.$value.signalProducer.map(\.subscription.status).skipRepeats(),
+            self.store.$value.signalProducer.map(\.psiCashState.libData?.accountType).skipRepeats(),
+            self.store.$value.signalProducer.map(\.psiCashState.isLoggingInOrOut),
+            self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus).skipRepeats()
+        ).map {
+            
+            SettingsViewModel(
+                receiptRefreshState: $0.0,
+                subscriptionState: $0.1,
+                psiCashAccountType: $0.2,
+                isLoggingOut: $0.3 == .logout,
+                vpnStatus: $0.4
+            )
+            
+        }
+        .startWithValues { [unowned objcBridge] model in
+            objcBridge!.onSettingsViewModelDidChange(ObjcSettingsViewModel(model))
+        }
+
         // Opens landing page whenever Psiphon tunnel is connected, with
         // change in value of `VPNState` tunnel intent.
         // Landing page should not be opened after a reconnection due to an In-App purchase.
@@ -654,6 +722,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .filter { (combined: Combined<TunnelStartStopIntent?>) -> Bool in
                 
                 switch (previous: combined.previous, current: combined.current) {
+                case (previous: .none, current: .start(transition: .none)):
+                    // First connection of the first launch of the app should
+                    // not present the landing page.
+                    // NOTE: This method has a minor false-positive where `tunnelIntent` is nil
+                    // after launch if a VPN config is not installed.
+                    return false
                 case (previous: .stop, current: .start(transition: .none)):
                     return true
                 case (previous: .start(transition: .restart), current: .start(transition: .none)):
@@ -674,14 +748,187 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
             .send(store: self.store)
 
-        if Debugging.printAppState {
-            self.lifetime += self.store.$value.signalProducer.startWithValues { appState in
-                print("*", "-----")
-                dump(appState[keyPath: \.subscriptionAuthState])
-                print("*", "-----")
-            }
-        }
+        // Displays alerts related to PsiCash accounts login and logout events.
+        self.lifetime += self.store.$value.signalProducer
+            .map(\.psiCashState.pendingAccountLoginLogout)
+            .skipRepeats()
+            .startWithValues { [unowned store] maybeLoginLogoutEvent in
+                guard let loginLogoutEvent = maybeLoginLogoutEvent else {
+                    return
+                }
 
+                let maybeAlert: AlertType?
+                
+                switch loginLogoutEvent.wrapped {
+                case .pending(_):
+                    maybeAlert = .none
+                    
+                case let .completed(.left(completedLoginEvent)):
+                    // PsiCash Account Login
+                    
+                    switch completedLoginEvent {
+                    case let .success(loginResponse):
+                        if loginResponse.lastTrackerMerge {
+                            maybeAlert = .psiCashAccountAlert(.loginSuccessLastTrackerMergeAlert)
+                        } else {
+                            maybeAlert = .none
+                        }
+
+                    case let .failure(errorEvent):
+                        switch errorEvent.error {
+                        case .tunnelNotConnected:
+                            maybeAlert = .psiCashAccountAlert(.tunnelNotConnectedAlert)
+
+                        case .requestError(.errorStatus(let psiCashServerErrorStatus)):
+                            
+                            switch psiCashServerErrorStatus {
+                            case .invalidCredentials:
+                                maybeAlert = .psiCashAccountAlert(.incorrectUsernameOrPasswordAlert)
+                                
+                            case .badRequest:
+                                maybeAlert = .psiCashAccountAlert(.accountLoginBadRequestAlert)
+                                
+                            case .serverError:
+                                maybeAlert = .psiCashAccountAlert(.accountLoginServerErrorAlert)
+                            }
+                            
+                        case .requestError(.requestCatastrophicFailure(_)):
+                            maybeAlert = .psiCashAccountAlert(.accountLoginCatastrophicFailureAlert)
+                        }
+                    }
+
+                case let .completed(.right(completedLogoutEvent)):
+                    // PsiCash Account Logout
+                    
+                    switch completedLogoutEvent {
+                    case .success(_):
+                        maybeAlert = .psiCashAccountAlert(.logoutSuccessAlert)
+
+                    case .failure(_):
+                        maybeAlert = .psiCashAccountAlert(.accountLogoutCatastrophicFailureAlert)
+                    }
+                    
+                }
+
+                // Sends alert to store if one has been set.
+                if let alert = maybeAlert {
+                    let alertEvent = loginLogoutEvent.map { _ -> AlertType in
+                        alert
+                    }
+                    store!.send(.mainViewAction(.presentAlert(alertEvent)))
+                }
+            }
+        
+        
+        // TODO: Replace with tuple once equatable synthesis for tuples is added to Swift.
+        struct _TokensExpiredData: Equatable {
+            // PsiCash account completed login/logout event.
+            let accountLoginLogoutCompletedEvent: Event<PsiCashState.AccountLoginLogoutCompleted>?
+            let accountType: PsiCashAccountType
+        }
+        
+        // Scans PsiCash libdata for when the login expires (i.e. token expiring),
+        // alerting the user if state transitioned from having tokens
+        // into logged out state.
+        self.lifetime += self.store.$value.signalProducer
+            .map(\.psiCashState)
+            .skipRepeats()  // Reduces number of redundant items downstream.
+            .compactMap { psiCashState -> _TokensExpiredData? in
+                
+                // Removes PsiCash library non-initialized value (literal `nil`) from signal.
+                guard let accountType = psiCashState.libData?.accountType else {
+                    return nil
+                }
+                
+                // Removes PsiCash account pending login/logout events from signal,
+                // to simplify the state space by removing states we don't care about.
+                switch psiCashState.pendingAccountLoginLogout {
+                case .none:
+                    return _TokensExpiredData(accountLoginLogoutCompletedEvent: nil,
+                                              accountType: accountType)
+                case .some(let loginLogoutEvent):
+                    switch loginLogoutEvent.wrapped {
+                    case .pending(_):
+                        return nil
+                    case let .completed(loginLogoutCompleted):
+                        let loginLogoutCompletedEvent = Event(loginLogoutCompleted,
+                                                              date: loginLogoutEvent.date)
+                        return _TokensExpiredData(
+                            accountLoginLogoutCompletedEvent: loginLogoutCompletedEvent,
+                            accountType: accountType
+                        )
+                    }
+                }
+                
+            }
+            .skipRepeats()  // Scan operator below assumes that events are unique
+                            // in determining the expiry date of account token.
+            .scan(nil) { (prvCombined, cur) -> (_TokensExpiredData, Date?)? in
+                
+                // Scans upstream signal for the last two values emitted.
+                // Since RxSwift doens't have a buffer operator, the returned tuple's
+                // first element is always `cur`, and second element is to be used downstream,
+                // and ignroed by this scan operator.
+                //
+                // This operator returns date of when the PsiCah account token expired.
+                
+                // Ignores initial nil value of `prv`, since we're interested in state change.
+                guard let prv = prvCombined?.0 else {
+                    return (cur, nil)
+                }
+                
+                // Ensure that events are unique.
+                guard prv != cur else {
+                    fatalError("programming error")
+                }
+                
+                // If we are newly transitioning into a logged out state due
+                // to account token expiry, let the user know
+                guard
+                    case .account(loggedIn: false) = cur.accountType,
+                    case .account(loggedIn: true) = prv.accountType,
+                    cur.accountLoginLogoutCompletedEvent == prv.accountLoginLogoutCompletedEvent
+                else {
+                    // Either the user has logged out,
+                    // or logged in (which would be a programming error).
+                    return (cur, nil)
+                }
+                
+                // User is logged out due to token expiry, because there has been
+                // no manual logout event (since `prv`), and the user cannot login if
+                // the previous state (`prv`) is logged in.
+                
+                // Unique timestamp of token expiry.
+                let tokenExpiryDate = Date()
+                return (cur, tokenExpiryDate)
+                
+            }
+            .map {
+                $0?.1 // `Date?` field - account token expiry date
+            }
+            .startWithValues { [unowned store] maybeAccountTokenExpired in
+                guard let date = maybeAccountTokenExpired else {
+                    return
+                }
+                let alertEvent = AlertEvent(.psiCashAccountAlert(.accountTokensExpiredAlert),
+                                            date: date)
+                store!.send(.mainViewAction(.presentAlert(alertEvent)))
+            }
+
+        
+        if Debugging.printAppState {
+
+            self.lifetime += self.store.$value.signalProducer
+                .map(\AppState.vpnState.value.tunnelIntent)
+                .skipRepeats()
+                .startWithValues { value in
+                    var output = ""
+                    dump(value, to: &output)
+                    print("* -> \(removedCommonPackageNames(output))")
+                }
+            
+        }
+        
     }
     
     @objc func applicationDidBecomeActive(_ application: UIApplication) {
@@ -721,14 +968,56 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func applicationWillTerminate(_ application: UIApplication) {
+        
+        if let observer = self.appLangChangeObserver {
+            NotificationCenter.default.removeObserver(observer)
+        }
+        
         self.environmentCleanup?()
+        
     }
 
     @objc func application(_ app: UIApplication,
                            open url: URL,
                            options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         
-        return navigator.handle(url: url)
+        return deepLinkingNavigator.handle(url: url)
+    }
+    
+    /// Retruns top-most view controller that can present another view controller (i.e. is not being dismissed)
+    @objc func getTopActiveViewController() -> UIViewController {
+        
+        var vc = UIApplication.shared.keyWindow!.rootViewController!
+        
+        while let presentedVC = vc.presentedViewController, !presentedVC.isBeingDismissed {
+            vc = presentedVC
+        }
+        
+        return vc
+        
+    }
+
+    @objc func presentPsiCashAccountViewController(withPsiCashScreen: Bool) {
+        
+        if withPsiCashScreen {
+            self.store.send(.mainViewAction(
+                                .presentPsiCashScreen(initialTab: .speedBoost, animated: true)))
+        }
+        
+        self.store.send(.mainViewAction(.presentPsiCashAccountScreen))
+        
+    }
+    
+    @objc func presentPsiCashViewController(_ initialTab: PsiCashScreenTab) {
+        self.store.send(.mainViewAction(.presentPsiCashScreen(initialTab: initialTab)))
+    }
+    
+    @objc func presentPsiCashAccountManagement() {
+        self.store.send(.mainViewAction(.presentPsiCashAccountManagement))
+    }
+    
+    @objc func presentSettingsViewController() {
+        self.store.send(.mainViewAction(.presentSettingsScreen))
     }
     
     @objc func loadingScreenDismissSignal(_ completionHandler: @escaping () -> Void) {
@@ -772,13 +1061,13 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     return true
                 }
                 
-                if case .some(_) = appState.psiCash.activeSpeedBoost {
+                if case .some(_) = appState.psiCashState.activeSpeedBoost(self.dateCompare) {
                     // If user has an active Speed Boost, dismiss loading screen.
                     return true
                 }
                 
                 return true
-                
+                                
             }
             .skipRepeats()
             .flatMap(.race) { dismiss -> SignalProducer<Bool, Never> in
@@ -811,10 +1100,10 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             switch state.authState {
             case .notSubscribed, .subscribedWithAuth:
                 objcBridge?.presentSubscriptionIAPViewController()
-            
+
             case .failedRetry:
-                store?.send(.appReceipt(.localReceiptRefresh))
-        
+                store?.send(.appReceipt(.readLocalReceiptFile))
+
             case .pending:
                 if state.tunnelStatus == .notConnected {
                     objcBridge?.startStopVPN()
@@ -822,18 +1111,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
         }
     }
-    
-    @objc func makePsiCashViewController(
-        _ initialTab: PsiCashViewController.PsiCashViewControllerTabs
-    ) -> UIViewController {
-
-        return self.makePsiCashViewController(
-            platform: platform,
-            locale: userDefaultsConfig.localeForAppLanguage,
-            initialTab: initialTab)
-
-    }
-    
     @objc func makeOnboardingViewControllerWithStagesNotCompleted(
         _ completionHandler: @escaping (OnboardingViewController) -> Void
     ) -> OnboardingViewController? {
@@ -880,16 +1157,13 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func getCustomRewardData(_ callback: @escaping (CustomData?) -> Void) {
-        callback(
-            PsiCashEffects.default(psiCash: self.psiCashLib, feedbackLogger: self.feedbackLogger)
-                .rewardedVideoCustomData()
-        )
+        callback(self.psiCashLib.getRewardActivityData().successToOptional())
     }
     
     @objc func refreshAppStoreReceipt() -> Promise<Error?>.ObjCPromise<NSError> {
         let promise = Promise<Result<Utilities.Unit, SystemErrorEvent<Int>>>.pending()
         let objcPromise = promise.then { result -> Error? in
-            return result.projectError()?.error
+            return result.failureToOptional()?.error
         }
         self.store.send(.appReceipt(.remoteReceiptRefresh(optionalPromise: promise)))
         return objcPromise.asObjCPromise()
@@ -924,32 +1198,32 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         return self.supportedProducts.supported[.subscription]!.rawValues
     }
     
-    @objc func disallowedTrafficAlertNotification() {
-        self.store.send(.appDelegateAction(.checkForDisallowedTrafficAlertNotification))
+    @objc func userSelectedRegion(_ region: Region) {
+        store.send(.serverRegionAction(.userSelectedRegion(region: region)))
     }
     
     @objc func switchVPNStartStopIntent()
-        -> Promise<SwitchedVPNStartStopIntent>.ObjCPromise<SwitchedVPNStartStopIntent>
+    -> Promise<SwitchedVPNStartStopIntent>.ObjCPromise<SwitchedVPNStartStopIntent>
     {
         let promise = Promise<SwitchedVPNStartStopIntent>.pending()
         
         let syncedVPNState: SignalProducer<VPNProviderManagerState<PsiphonTPM>, Never> =
             self.store.$value.signalProducer
-                .map(\.vpnState.value)
-                .filter { vpnProviderManagerState -> Bool in
-                    if case .completed(_) = vpnProviderManagerState.providerSyncResult {
-                        return true
-                    } else {
-                        return false
-                    }
+            .map(\.vpnState.value)
+            .filter { vpnProviderManagerState -> Bool in
+                if case .completed(_) = vpnProviderManagerState.providerSyncResult {
+                    return true
+                } else {
+                    return false
                 }
-                .take(first: 1)
+            }
+            .take(first: 1)
         
         syncedVPNState.map {
-                SwitchedVPNStartStopIntent.make(fromProviderManagerState: $0)
-            }.startWithValues { newIntentValue in
-                promise.fulfill(newIntentValue)
-            }
+            SwitchedVPNStartStopIntent.make(fromProviderManagerState: $0)
+        }.startWithValues { newIntentValue in
+            promise.fulfill(newIntentValue)
+        }
         
         return promise.asObjCPromise()
     }
@@ -969,15 +1243,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             return
         }
     }
-    
+        
     @objc func restartVPNIfActive() {
         self.store.send(vpnAction: .tunnelStateIntent(
             intent: .start(transition: .restart), reason: .userInitiated
-            ))
-    }
-    
-    @objc func syncWithTunnelProvider(reason: TunnelProviderSyncReason) {
-        self.store.send(vpnAction: .syncWithProvider(reason: reason))
+        ))
     }
     
     @objc func reinstallVPNConfig() {
@@ -987,26 +1257,39 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     typealias IndexedPsiphonTPMLoadState = Indexed<ProviderManagerLoadState<PsiphonTPM>.LoadState>
     
     @objc func installVPNConfigWithPromise() ->
-        Promise<VPNConfigInstallResultWrapper>.ObjCPromise<VPNConfigInstallResultWrapper>
+    Promise<VPNConfigInstallResultWrapper>.ObjCPromise<VPNConfigInstallResultWrapper>
     {
         // Maps Swift type `Promise<VPNConfigInstallResult>` to equivalent ObjC type.
         self.installVPNConfig().then { VPNConfigInstallResultWrapper($0) }.asObjCPromise()
     }
     
+    @objc func logOutPsiCashAccount() {
+        self.store.send(.psiCash(.accountLogout))
+    }
+    
+    @objc func restorePurchases(_ completionHandler: @escaping (NSError?) -> Void) {
+        let promise = Promise<Result<Utilities.Unit, SystemErrorEvent<Int>>>.pending()
+        
+        self.store.send(.appReceipt(.remoteReceiptRefresh(optionalPromise: promise)))
+        
+        promise.then { result in
+            if let error = result.failureToOptional()?.error.errorInfo {
+                let nsError = NSError(
+                    domain: error.domain,
+                    code: error.errorCode,
+                    userInfo: [NSLocalizedDescriptionKey: error.errorDescription ?? ""])
+                
+                completionHandler(nsError)
+                
+            } else {
+                completionHandler(nil)
+            }
+        }
+        
+    }
+    
     @objc func getLocaleForCurrentAppLanguage() -> NSLocale {
         return self.userDefaultsConfig.localeForAppLanguage as NSLocale
-    }
-
-    @objc func userSubmittedFeedback(selectedThumbIndex: Int,
-                                     comments: String,
-                                     email: String,
-                                     uploadDiagnostics: Bool) {
-        self.store.send(
-            .feedbackAction(
-                .userSubmittedFeedback(selectedThumbIndex: selectedThumbIndex,
-                                       comments: comments,
-                                       email: email,
-                                       uploadDiagnostics: uploadDiagnostics)))
     }
 
     @objc func versionLabelText() -> String {
@@ -1041,121 +1324,106 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         return "V.\(shortVersionString)\(postfix)"
     }
 
-}
-
-fileprivate extension SwiftDelegate {
-    
-    func makePsiCashViewController(
-        platform: Platform,
-        locale: Locale,
-        initialTab: PsiCashViewController.PsiCashViewControllerTabs
-    ) -> PsiCashViewController {
-        PsiCashViewController(
-            platform: platform,
-            locale: locale,
-            initialTab: initialTab,
-            store: self.store.projection(
-                value: { $0.psiCashViewController },
-                action: { .psiCash($0) }),
-            iapStore: self.store.projection(
-                value: erase,
-                action: { .iap($0) }),
-            productRequestStore: self.store.projection(
-                value: erase,
-                action: { .productRequest($0) } ),
-            appStoreReceiptStore: self.store.projection(
-                value: erase,
-                action: { .appReceipt($0) } ),
-            tunnelConnectedSignal: self.store.$value.signalProducer
-                .map(\.vpnState.value.providerVPNStatus.tunneled),
-            feedbackLogger: self.feedbackLogger
-        )
+    func connectButtonTappedFromSettings() {
+        // This is a round-about way of calling into ObjC AppDelegate through Swift.
+        // This is to make transition to Swift-only codebase easier in the future.
+        self.objcBridge.dismiss(screen: .settings) { [unowned self] in
+            self.objcBridge.startStopVPN()
+        }
     }
+    
+    // Handles Darwin notifications sent to the host app from the Network Extension process.
+    @objc func networkExtensionNotification(_ message: String) {
         
-}
+        // Maps the string message type to an enumerable value.
+        let typedMessage = NotifierNetworkExtensionMessage(rawValue: message)
+        
+        switch typedMessage {
+            
+        case .tunnelConnected:
+            self.store.send(vpnAction: .syncWithProvider(
+                reason: .providerNotificationPsiphonTunnelConnected))
+            
+        case .availableEgressRegions:
+            store.send(.serverRegionAction(.updateAvailableRegions))
+            
+        case .networkConnectivityFailed, .networkConnectivityResolved:
+            break
+            
+        case .disallowedTrafficAlert:
+            self.store.send(.appDelegateAction(.checkForDisallowedTrafficAlertNotification))
+            
+        case .isHostAppProcessRunning:
+            Notifier.sharedInstance().post(NotifierHostAppProcessRunning)
 
-fileprivate func tryPresentPsiCashViewController(
-    platform: Platform,
-    locale: Locale,
-    tab: PsiCashViewController.PsiCashViewControllerTabs,
-    makePsiCashViewController:
-        @escaping (Platform, Locale, PsiCashViewController.PsiCashViewControllerTabs) -> PsiCashViewController,
-    getTopMostPresentedViewController: @escaping () -> UIViewController
-) {
-    let topMostViewController = getTopMostPresentedViewController()
-    
-    let found = topMostViewController
-        .traversePresentingStackFor(type: PsiCashViewController.self)
-    
-    switch found {
-    case .presentInStack(_):
-        // NO-OP
-        break
-        
-    case .presentTopOfStack(let psiCashViewController):
-        psiCashViewController.activeTab = tab
-        
-    case .notPresent:
-        let psiCashViewController = makePsiCashViewController(platform, locale, tab)
-        topMostViewController.present(psiCashViewController, animated: true)
-    }
-}
-
-fileprivate func tryPresentSubscriptionViewController(
-    getTopMostPresentedViewController: @escaping () -> UIViewController
-) {
-    let topMostViewController = getTopMostPresentedViewController()
-    
-    let found = topMostViewController
-        .traversePresentingStackFor(type: IAPViewController.self, searchChildren: true)
-    
-    switch found {
-    case .presentTopOfStack(_), .presentInStack(_):
-        // NO-OP
-        break
-    case .notPresent:
-        let navCtrl = UINavigationController(rootViewController: IAPViewController())
-        topMostViewController.present(navCtrl, animated: true)
+        default:
+            feedbackLogger.immediate(.error, "Unknown Notifier message: '\(message)'")
+            
+        }
         
     }
+    
+    // Core Data
+    @objc func sharedCoreData() -> SharedCoreData {
+        self.sharedAuthCoreData
+    }
+    
+#if DEBUG || DEV_RELEASE
+    @objc func getPsiCashStoreDir() -> String? {
+        self.appSupportFileStore.psiCashFileStoreRootPath
+    }
+#endif
+    
 }
+
+/// Specialized singleton to copy data persisted by `PsiphonSettingsViewController`
+/// to `PsiphonDataSharedDB`.
+final class CopySettingsToPsiphonDataSharedDB {
     
-fileprivate func makeDisallowedTrafficAlertController(
-    onSpeedBoostClicked: @escaping () -> Void,
-    onSubscriptionClicked: @escaping () -> Void
-) -> UIAlertController {
+    // The PsiphonVPN process (i.e. the network extension), reads user defaults
+    // values from PsiphonDataSharedDB. For any setting that is updated
+    // through the PsiphonSettingsViewController, the values need to be copied
+    // to the shared NSUserDefaults with the network extension.
     
-    let alertController = UIAlertController(
-        title: UserStrings.Upgrade_psiphon(),
-        message: UserStrings.Disallowed_traffic_alert_message(),
-        preferredStyle: .alert
-    )
+    static let sharedInstance = CopySettingsToPsiphonDataSharedDB()
     
-    alertController.addAction(
-        UIAlertAction(
-            title: UserStrings.Subscribe_action_button_title(),
-            style: .default,
-            handler: { _ in
-                onSubscriptionClicked()
-            })
-    )
+    private let userDefaults: UserDefaults
+    private let sharedDB: PsiphonDataSharedDB
     
-    alertController.addAction(
-        UIAlertAction(
-            title: UserStrings.Speed_boost(),
-            style: .default,
-            handler: { _ in
-                onSpeedBoostClicked()
-            })
-    )
+    private init(){
+        userDefaults = UserDefaults.standard
+        sharedDB = PsiphonDataSharedDB(forAppGroupIdentifier: PsiphonAppGroupIdentifier)
+    }
     
-    alertController.addAction(
-        UIAlertAction(
-            title: UserStrings.Dismiss_button_title(),
-            style: .cancel,
-            handler: nil
-        )
-    )
+    func copyAllSettings() {
+        copyDisableTimeouts()
+        copySelectedRegion()
+        copyUpstreamProxySettings()
+        copyCustomHttpHeaders()
+    }
     
-    return alertController
+    func copyDisableTimeouts() {
+        // Disable timeouts is stored in standard NSUserDefaults under "disableTimeouts"
+        // key by PsiphonSettingsViewController.
+        let disableTimeouts = userDefaults.bool(forKey:kDisableTimeouts)
+        sharedDB.setDisableTimeouts(disableTimeouts)
+    }
+    
+    func copySelectedRegion() {
+        guard let selectedRegion = RegionAdapter.sharedInstance().getSelectedRegion().code else {
+            fatalError()
+        }
+        sharedDB.setEgressRegion(selectedRegion)
+    }
+    
+    func copyUpstreamProxySettings() {
+        let upstreamProxyURL = UpstreamProxySettings.sharedInstance().getUpstreamProxyUrl()
+        sharedDB.setUpstreamProxyURL(upstreamProxyURL)
+    }
+    
+    func copyCustomHttpHeaders() {
+        let customHeaders = UpstreamProxySettings.sharedInstance().getUpstreamProxyCustomHeaders()
+        sharedDB.setCustomHttpHeaders(customHeaders)
+    }
+    
 }

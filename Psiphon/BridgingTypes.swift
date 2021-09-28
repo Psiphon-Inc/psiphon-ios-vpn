@@ -22,6 +22,7 @@ import Promises
 import PsiApi
 import AppStoreIAP
 import PsiCashClient
+import PsiphonClientCommonLibrary
 
 // MARK: Bridge Protocols
 
@@ -29,20 +30,15 @@ import PsiCashClient
 /// All Delegate functions are called on the main thread.
 @objc protocol ObjCBridgeDelegate {
     
-    @objc func updateAvailableEgressRegionsOnFirstRunOfAppVersion()
-    
     @objc func startStopVPN()
     
-    @objc func onPsiCashBalanceUpdate(_ balance: BridgedBalanceViewBindingType)
-
-    /// Called with latest active Speed Boost expiry time.
-    /// If no Speed Boost purchase exists, or if it has already expired, delegate is called
-    /// with nil value.
-    @objc func onSpeedBoostActivePurchase(_ expiryTime: Date?)
+    @objc func onPsiCashWidgetViewModelUpdate(_ newValue: BridgedPsiCashWidgetBindingType)
 
     @objc func onSubscriptionStatus(_ status: BridgedUserSubscription)
     
     @objc func onSubscriptionBarViewStatusUpdate(_ status: ObjcSubscriptionBarViewState)
+    
+    @objc func onSelectedServerRegionUpdate(_ region: Region)
     
     @objc func onVPNStatusDidChange(_ status: VPNStatus)
     
@@ -51,6 +47,8 @@ import PsiCashClient
     @objc func onVPNStateSyncError(_ userErrorMessage: String)
     
     @objc func onReachabilityStatusDidChange(_ previousStats: ReachabilityStatus)
+    
+    @objc func onSettingsViewModelDidChange(_ model: ObjcSettingsViewModel)
 
     @objc func dismiss(screen: DismissibleScreen, completion: (() -> Void)?)
     
@@ -79,16 +77,20 @@ import PsiCashClient
     @objc func application(_ app: UIApplication,
                            open url: URL,
                            options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool
+
+    @objc func getTopActiveViewController() -> UIViewController
     
-    // -
+    @objc func presentPsiCashAccountViewController(withPsiCashScreen: Bool)
+    
+    @objc func presentPsiCashViewController(_ initialTab: PsiCashScreenTab)
+    
+    @objc func presentPsiCashAccountManagement()
+    
+    @objc func presentSettingsViewController()
     
     @objc func loadingScreenDismissSignal(_ completionHandler: @escaping () -> Void)
     
     @objc func makeSubscriptionBarView() -> SubscriptionBarView
-    
-    @objc func makePsiCashViewController(
-        _ initialTab: PsiCashViewController.PsiCashViewControllerTabs
-    ) -> UIViewController
     
     /// Returns `nil` if there are no onboarding stages to complete.
     @objc func makeOnboardingViewControllerWithStagesNotCompleted(
@@ -107,7 +109,8 @@ import PsiCashClient
         _ skProduct: SKProduct
     ) -> Promise<ObjCIAPResult>.ObjCPromise<ObjCIAPResult>
     @objc func getAppStoreSubscriptionProductIDs() -> Set<String>
-    @objc func disallowedTrafficAlertNotification()
+    
+    @objc func userSelectedRegion(_ region: Region)
     
     // VPN
     
@@ -116,10 +119,17 @@ import PsiCashClient
     @objc func sendNewVPNIntent(_ value: SwitchedVPNStartStopIntent)
     
     @objc func restartVPNIfActive()
-    @objc func syncWithTunnelProvider(reason: TunnelProviderSyncReason)
     @objc func reinstallVPNConfig()
     @objc func installVPNConfigWithPromise()
         -> Promise<VPNConfigInstallResultWrapper>.ObjCPromise<VPNConfigInstallResultWrapper>
+    
+    // PsiCash accounts
+    @objc func logOutPsiCashAccount()
+    
+    // IAP
+    
+    /// Restores Apple IAP purchases.
+    @objc func restorePurchases(_ completionHandler: @escaping (NSError?) -> Void)
     
     // User defaults
     
@@ -127,13 +137,20 @@ import PsiCashClient
     // Note that this can be different from device Locale value `Locale.current`.
     @objc func getLocaleForCurrentAppLanguage() -> NSLocale
 
-    @objc func userSubmittedFeedback(selectedThumbIndex: Int,
-                                     comments: String,
-                                     email: String,
-                                     uploadDiagnostics: Bool)
-
     // Version string to be displayed by the user-interface.
     @objc func versionLabelText() -> String
+    
+    @objc func connectButtonTappedFromSettings()
+    
+    // Network Extension notification
+    @objc func networkExtensionNotification(_ message: String)
+    
+    // Core Data
+    @objc func sharedCoreData() -> SharedCoreData
+    
+    #if DEBUG || DEV_RELEASE
+    @objc func getPsiCashStoreDir() -> String?
+    #endif
     
 }
 
@@ -239,6 +256,7 @@ import PsiCashClient
     }
 }
 
+/// Enables access to Swift properties associated with `VPNStatus` and  `TunnelProviderVPNStatus`.
 @objc final class VPNStateCompat: NSObject {
     
     @objc static func providerNotStopped(_ value: TunnelProviderVPNStatus) -> Bool {
@@ -248,6 +266,27 @@ import PsiCashClient
     @objc static func providerNotStopped(vpnStatus value: VPNStatus) -> Bool {
         return value.providerNotStopped
     }
+    
+    /// Checks if `status` is `.connected`.
+    /// If `ignoreTunneledChecks` debug flag is set, then always returns True.
+    @objc static func isConnected(_ status: VPNStatus) -> Bool {
+        if Debugging.ignoreTunneledChecks {
+            return true
+        } else {
+            return status == .connected
+        }
+    }
+    
+    /// Returns true if VPN status is disconnected or invalid.
+    @objc static func isDisconnected(_ status: VPNStatus) -> Bool {
+        return !status.providerRunning
+    }
+    
+    /// Returns true if tunnel is neither connected or disconnected.
+    @objc static func isInTransition(_ status: VPNStatus) -> Bool {
+        return status.isInTransition
+    }
+    
 }
 
 // `SubscriptionState` case only bridged to ObjC compatible type.
@@ -282,11 +321,43 @@ import PsiCashClient
 
 }
 
-/// Wraps `BalanceState` struct.
-@objc final class BridgedBalanceViewBindingType: NSObject {
-    let state: PsiCashBalanceView.BindingType
+/// Wraps `PsiCashWidgetView.BindingType` struct.
+@objc final class BridgedPsiCashWidgetBindingType: NSObject {
+    let swiftValue: PsiCashWidgetView.BindingType
 
-    init(swiftState state: PsiCashBalanceView.BindingType) {
-        self.state = state
+    init(swiftValue: PsiCashWidgetView.BindingType) {
+        self.swiftValue = swiftValue
     }
+}
+
+/// Wraps Notifier message types that can be send from the Network Extension to the host app.
+/// Source: `Notifier.h`
+enum NotifierNetworkExtensionMessage {
+    
+    case tunnelConnected
+    case availableEgressRegions
+    case networkConnectivityFailed
+    case networkConnectivityResolved
+    case disallowedTrafficAlert
+    case isHostAppProcessRunning
+    
+    init?(rawValue: String) {
+        switch rawValue {
+        case NotifierTunnelConnected:
+            self = .tunnelConnected
+        case NotifierAvailableEgressRegions:
+            self = .availableEgressRegions
+        case NotifierNetworkConnectivityFailed:
+            self = .networkConnectivityFailed
+        case NotifierNetworkConnectivityResolved:
+            self = .networkConnectivityResolved
+        case NotifierDisallowedTrafficAlert:
+            self = .disallowedTrafficAlert
+        case NotifierIsHostAppProcessRunning:
+            self = .isHostAppProcessRunning
+        default:
+            return nil
+        }
+    }
+    
 }

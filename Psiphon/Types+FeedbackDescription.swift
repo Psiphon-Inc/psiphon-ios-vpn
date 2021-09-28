@@ -20,8 +20,7 @@
 import Foundation
 import PsiApi
 import AppStoreIAP
-
-extension AppState: FeedbackDescription {}
+import class PsiphonClientCommonLibrary.Region
 
 extension TunnelProviderVPNStatus: CustomStringFeedbackDescription {
     
@@ -69,45 +68,6 @@ extension UserDefaultsConfig: CustomFieldFeedbackDescription {
 
 extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
     
-    private func getNonSecretNonSubscriptionEncodedAuthorizations() -> String {
-        let decoder = JSONDecoder.makeRfc3339Decoder()
-        
-        do {
-            let secret = self.getNonSubscriptionEncodedAuthorizations()
-            let signedAuths = try secret.map { base64Auth -> SignedAuthorization in
-                guard let authData = Data(base64Encoded: base64Auth) else {
-                    throw ErrorRepr(repr: """
-                        Failed to create data from base64 encoded string: '\(base64Auth)'
-                        """)
-                }
-                return try decoder.decode(SignedAuthorization.self, from: authData)
-            }
-            
-            return String(describing: signedAuths.map { $0.description })
-            
-        } catch {
-            return String(describing: error)
-        }
-    }
-    
-    private func getNonSecretSubscriptionAuths() -> String {
-        guard let data = self.getSubscriptionAuths() else {
-            return "nil"
-        }
-        
-        let decoder = JSONDecoder.makeRfc3339Decoder()
-        
-        do {
-            let decoded = try decoder.decode(SubscriptionAuthState.PurchaseAuthStateDict.self,
-                                             from: data)
-            return decoded.description
-            
-        } catch {
-            return String(describing: error)
-        }
-        
-    }
-    
     public var feedbackFields: [String: CustomStringConvertible] {
         
         var fields: [String: CustomStringConvertible] = [
@@ -122,20 +82,7 @@ extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
             
             ServerTimestampStringKey: String(describing: self.getServerTimestamp()),
             
-            ContainerAuthorizationSetKey: self.getNonSecretNonSubscriptionEncodedAuthorizations(),
-            
             ExtensionIsZombieBoolKey: self.getExtensionIsZombie(),
-            
-            ContainerSubscriptionAuthorizationsDictKey: self.getNonSecretSubscriptionAuths(),
-            
-            ExtensionRejectedSubscriptionAuthorizationIDsArrayKey:
-                String(describing: self.getRejectedSubscriptionAuthorizationIDs()),
-            
-            ExtensionRejectedSubscriptionAuthorizationIDsWriteSeqIntKey:
-                self.getExtensionRejectedSubscriptionAuthIdWriteSequenceNumber(),
-            
-            ContainerRejectedSubscriptionAuthorizationIDsReadAtLeastUpToSeqIntKey:
-                self.getContainerRejectedSubscriptionAuthIdReadAtLeastUpToSequenceNumber(),
             
             ContainerForegroundStateBoolKey: self.getAppForegroundState(),
             
@@ -170,4 +117,10 @@ extension UserFeedback: CustomFieldFeedbackDescription {
          "submitTime": submitTime]
     }
 
+}
+
+extension Region {
+    open override var description: String {
+        "Region(code: \(String(describing: code)), serverExists: \(serverExists))"
+    }
 }

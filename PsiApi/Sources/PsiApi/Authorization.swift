@@ -35,6 +35,8 @@ import Foundation
 
 public typealias AuthorizationID = String
 
+public typealias SignedAuthorizationData = SignedData<SignedAuthorization>
+
 public struct SignedAuthorization: Hashable, Codable {
     public let authorization: Authorization
     public let signingKeyID: String
@@ -68,11 +70,20 @@ public struct Authorization: Hashable, Codable {
     public let accessType: AccessType
     public let expires: Date
     
+    /// Authorizations access types accepted by this app.
+    /// - Note: This list is re-defined in SharedAuthorization+CoreDataClass.{m,h} files.
     public enum AccessType: String, Codable, CaseIterable {
         case appleSubscription = "apple-subscription"
         case appleSubscriptionTest = "apple-subscription-test"
         case speedBoost = "speed-boost"
         case speedBoostTest = "speed-boost-test"
+        
+        public static let subscriptionTypes = Set([AccessType.appleSubscription,
+                                                   AccessType.appleSubscriptionTest])
+        
+        public static let speedBoostTypes = Set([AccessType.speedBoost,
+                                                 AccessType.speedBoostTest])
+        
     }
     
     enum CodingKeys: String, CodingKey {

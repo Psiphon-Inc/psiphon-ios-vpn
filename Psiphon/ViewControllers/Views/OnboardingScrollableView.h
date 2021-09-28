@@ -23,11 +23,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface OnboardingScrollableView : UIView
+@interface OnboardingScrollableView : UIView <UIScrollViewDelegate>
 
 - (instancetype)initWithImage:(UIImage *)image
                     withTitle:(NSString *)title
-                     withBody:(NSString *)body
+                     withHTMLBody:(NSString *)htmlBody
             withAccessoryView:(UIView *_Nullable)accessoryView;
 
 @end

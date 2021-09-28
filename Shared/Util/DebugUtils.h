@@ -22,7 +22,7 @@
 
 @interface DebugUtils : NSObject
 
-#if DEBUG
+#if DEBUG || DEV_RELEASE
 
 /**
  * At every allocationInterval allocates pageNum number of pages.

@@ -47,10 +47,10 @@
 #import "RACSignal+Operations.h"
 #import "RACReplaySubject.h"
 #import "Asserts.h"
-#import "ContainerDB.h"
 #import "AppObservables.h"
 #import <PsiphonTunnel/PsiphonTunnel.h>
 #import "RegionAdapter.h"
+#import "SettingsViewController.h"
 
 PsiFeedbackLogType const RewardedVideoLogType = @"RewardedVideo";
 
@@ -240,9 +240,10 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
 #pragma mark -
 
-- (void)reloadMainViewControllerAndImmediatelyOpenSettings {
+- (void)reloadMainViewControllerAnimated:(BOOL)animated
+                              completion:(void (^ __nullable)(void))completion {
     LOG_DEBUG();
-    [rootContainerController reloadMainViewControllerAndImmediatelyOpenSettings];
+    [rootContainerController reloadMainViewControllerAnimated:animated completion:completion];
 }
 
 - (void)reloadOnboardingViewController {
@@ -254,44 +255,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
 - (void)onMessageReceived:(NotifierMessage)message {
     LOG_DEBUG(@"Received notification: '%@'", message);
-    
-    if ([NotifierTunnelConnected isEqualToString:message]) {
-        
-        [SwiftDelegate.bridge syncWithTunnelProviderWithReason:
-         TunnelProviderSyncReasonProviderNotificationPsiphonTunnelConnected];
-
-    } else if ([NotifierAvailableEgressRegions isEqualToString:message]) {
-        
-        // Update available regions
-        __weak AppDelegate *weakSelf = self;
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-            NSArray<NSString *> *regions = [weakSelf.sharedDB emittedEgressRegions];
-            [[RegionAdapter sharedInstance] onAvailableEgressRegions:regions];
-        });
-
-    } else if ([NotifierNetworkConnectivityFailed isEqualToString:message]) {
-        // TODO: fix
-        
-    } else if ([NotifierDisallowedTrafficAlert isEqualToString:message]) {
-        
-        [SwiftDelegate.bridge disallowedTrafficAlertNotification];
-        
-    } else if ([NotifierIsHostAppProcessRunning isEqualToString:message]) {
-        
-        // Sends notification back to the network extension indicating the host process is running.
-        [[Notifier sharedInstance] post:NotifierHostAppProcessRunning];
-        
-    }
-}
-
-#pragma mark -
-
-+ (UIViewController *)getTopPresentedViewController {
-    UIViewController *topController = [UIApplication sharedApplication].keyWindow.rootViewController;
-    while(topController.presentedViewController != nil) {
-        topController = topController.presentedViewController;
-    }
-    return topController;
+    [SwiftDelegate.bridge networkExtensionNotification:message];
 }
 
 @end
@@ -329,12 +293,8 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
 @implementation AppDelegate (SwiftExtensions)
 
-- (void)onPsiCashBalanceUpdate:(BridgedBalanceViewBindingType *)balance {
-    [AppObservables.shared.psiCashBalance sendNext:balance];
-}
-
-- (void)onSpeedBoostActivePurchase:(NSDate *)expiryTime {
-    [AppObservables.shared.speedBoostExpiry sendNext:expiryTime];
+- (void)onPsiCashWidgetViewModelUpdate:(BridgedPsiCashWidgetBindingType *)balance {
+    [AppObservables.shared.psiCashWidgetViewModel sendNext:balance];
 }
 
 - (void)onSubscriptionStatus:(BridgedUserSubscription * _Nonnull)status {
@@ -343,6 +303,10 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
 - (void)onSubscriptionBarViewStatusUpdate:(ObjcSubscriptionBarViewState *)status {
     [AppObservables.shared.subscriptionBarStatus sendNext: status];
+}
+
+- (void)onSelectedServerRegionUpdate:(Region *)region {
+    [AppObservables.shared.selectedServerRegion sendNext:region];
 }
 
 - (void)onVPNStatusDidChange:(NEVPNStatus)status {
@@ -378,12 +342,20 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [AppObservables.shared.reachabilityStatus sendNext:@(status)];
 }
 
+- (void)onSettingsViewModelDidChange:(ObjcSettingsViewModel *)model {
+    [AppObservables.shared.settingsViewModel sendNext:model];
+}
+
 - (void)dismissWithScreen:(enum DismissibleScreen)screen
                completion:(void (^ _Nullable)(void))completion
 {
     switch (screen) {
         case DismissibleScreenPsiCash:
             [self.window.rootViewController dismissViewControllerType:PsiCashViewController.class
+                                                           completion:completion];
+            break;
+        case DismissibleScreenSettings:
+            [self.window.rootViewController dismissViewControllerType:SettingsViewController.class
                                                            completion:completion];
             break;
     }
@@ -396,35 +368,9 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     UINavigationController* navCtrl = [[UINavigationController alloc]
                                        initWithRootViewController:iapViewController];
     
-    [[AppDelegate getTopPresentedViewController] presentViewController:navCtrl
-                                                         animated:TRUE
-                                                       completion:nil];
-}
-
-/*!
- * @brief Updates available egress regions from embedded server entries.
- *
- * This function should only be called once per app version on first launch.
- */
-- (void)updateAvailableEgressRegionsOnFirstRunOfAppVersion {
-    NSString *embeddedServerEntriesPath = PsiphonConfigReader.embeddedServerEntriesPath;
-    NSError *e;
-    NSSet<NSString*> *embeddedEgressRegions = [EmbeddedServerEntries egressRegionsFromFile:embeddedServerEntriesPath
-                                                                                     error:&e];
-
-    // Note: server entries may have been decoded before the error occurred and
-    // they will be present in the result.
-    if (e != nil) {
-        [PsiFeedbackLogger error:e message:@"Error decoding embedded server entries"];
-    }
-
-    if (embeddedEgressRegions != nil && [embeddedEgressRegions count] > 0) {
-        LOG_DEBUG("Available embedded egress regions: %@.", embeddedEgressRegions);
-        ContainerDB *containerDB = [[ContainerDB alloc] init];
-        [containerDB setEmbeddedEgressRegions:[NSArray arrayWithArray:[embeddedEgressRegions allObjects]]];
-    } else {
-        [PsiFeedbackLogger error:@"Error no egress regions found in %@.", embeddedServerEntriesPath];
-    }
+    [[SwiftDelegate.bridge getTopActiveViewController] presentViewController:navCtrl
+                                                                    animated:TRUE
+                                                                  completion:nil];
 }
 
 @end

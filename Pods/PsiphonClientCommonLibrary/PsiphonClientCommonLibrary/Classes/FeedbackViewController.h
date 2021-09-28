@@ -22,11 +22,18 @@
 #import "IASKAppSettingsViewController.h"
 
 @protocol FeedbackViewControllerDelegate <NSObject>
+
 - (void)userSubmittedFeedback:(NSInteger)selectedThumbIndex
                      comments:(NSString*)comments
                         email:(NSString*)email
             uploadDiagnostics:(BOOL)uploadDiagnostics;
+
 - (void)userPressedURL:(NSURL*)URL;
+
+@optional
+
+- (void)feedbackViewControllerWillDismiss;
+
 @end
 
 @interface FeedbackViewController : IASKAppSettingsViewController <UITableViewDelegate, IASKSettingsDelegate, UITextViewDelegate>

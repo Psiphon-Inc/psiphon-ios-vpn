@@ -25,6 +25,8 @@ NS_ASSUME_NONNULL_BEGIN
 @interface PickerViewController : UIViewController
   <UITableViewDelegate, UITableViewDataSource>
 
+@property (nonatomic, readonly) NSLocale *locale;
+
 /**
  * Index of item that is currently selected. Default value is 0.
  */
@@ -39,7 +41,8 @@ NS_ASSUME_NONNULL_BEGIN
  * Subclasses should provide their own init methods, and not use this method.
  */
 - (instancetype)initWithLabels:(NSArray<NSString *> *)pickerLabels
-                     andImages:(NSArray<UIImage *> *_Nullable)pickerImages;
+                     andImages:(NSArray<UIImage *> *_Nullable)pickerImages
+                        locale:(NSLocale *)locale;
 
 /**
  * To be implemented by subclasses to tell number of rows to the internal table view.

@@ -17,7 +17,7 @@
  *
  */
 
-#if !os(macOS)
+#if os(iOS)
 
 import Foundation
 import UIKit
@@ -80,18 +80,43 @@ extension ViewControllerLifeCycle {
         viewWillDisappear || viewDidDisappear
     }
     
+    /// Returns true while the view controller life cycle is somewhere between
+    /// `viewDidLoad` and `viewDidAppear` (inclusive).
+    public var viewDidLoadOrAppeared: Bool {
+        viewDidLoad || viewWillAppear || viewDidAppear
+    }
+    
 }
 
 /// ReactiveViewController makes the values of UIViewController lifecycle calls available in a stream
 /// and also buffers the last value.
 open class ReactiveViewController: UIViewController {
     
+    /// The time at which this view controller's `viewDidLoad` got called.
+    /// Value is nil beforehand.
+    public private(set) var viewControllerDidLoadDate: Date?
+    
     /// Value of the last UIViewController lifecycle call. The property wrapper provides
     /// an interface to obtain a stream of UIViewController lifecycle call values, which starts
     /// with the current value of this variable.
     @State public private(set) var lifeCycle: ViewControllerLifeCycle = .initing
+
+    private let onDismissed: () -> Void
+    
+    /// - Parameter onDismissed: Called once after the view controller is either dismissed.
+    /// - Note: `onDimissed` is not called if `viewDidAppear(_:)` is never called.
+    public init(onDismissed: @escaping () -> Void) {
+        self.onDismissed = onDismissed
+        
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required public init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     open override func viewDidLoad() {
+        self.viewControllerDidLoadDate = Date()
         super.viewDidLoad()
         lifeCycle = .viewDidLoad
     }
@@ -114,16 +139,32 @@ open class ReactiveViewController: UIViewController {
     open override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
         lifeCycle = .viewDidDisappear(animated: animated)
+
+        // Invariant to hold: onDismissed should be called only once, and only if
+        // this view controller will be removed from the view controller hierarchy.
+        //
+        // If this view controller is being removed from view controller hierarchy
+        // and it is a child of a another view controller `self.isBeingDismissed`
+        // will evaluate to false, however `self.parent?.isBeingDismissed` will evaluate to true.
+        // If however, this view controller has no parent, `self.isBeingDismissed` will
+        // evaluate to true.
+
+        if self.isBeingDismissed || (self.parent?.isBeingDismissed ?? false) {
+            onDismissed()
+        }
     }
     
+    /// Presents `viewControllerToPresent` only after `viewDidAppear(_:)` has been called
+    /// on this view controller.
     public func presentOnViewDidAppear(
         _ viewControllerToPresent: UIViewController,
         animated flag: Bool,
         completion: (() -> Void)? = nil
     ) {
-        
         self.$lifeCycle.signalProducer
-            .filter{ $0.viewDidAppear }.take(first: 1).startWithValues { [weak self] _ in
+            .filter{ $0.viewDidAppear }
+            .take(first: 1)
+            .startWithValues { [weak self] _ in
                 guard let self = self else {
                     return
                 }

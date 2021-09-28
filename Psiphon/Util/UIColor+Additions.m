@@ -21,6 +21,10 @@
 
 @implementation UIColor (Additions)
 
++ (UIColor * _Nonnull)radicalRed {
+    return [UIColor colorWithRed:250.0f / 255.0f green:54.0f / 255.0f blue:94.0f / 255.0f alpha:1.0f];
+}
+
 + (UIColor * _Nonnull)paleBlueColor {
     return [UIColor colorWithRed:244.0f / 255.0f green:250.0f / 255.0f blue:254.0f / 255.0f alpha:1.0f];
 }
@@ -47,6 +51,10 @@
 
 + (UIColor * _Nonnull)lightishBlueTwo {
     return [UIColor colorWithRed:87.0f / 255.0f green:93.0f / 255.0f blue:1.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)vividBlue {
+    return [UIColor colorWithRed:27.0f / 255.0f green:31.0f / 255.0f blue:1.0f alpha:1.0f];
 }
 
 + (UIColor * _Nonnull)greyishBrown {
@@ -191,6 +199,14 @@
 
 + (UIColor * _Nonnull)greyishColor {
     return [UIColor colorWithWhite:180.0f / 255.0f alpha:1.0f];
+}
+
++ (UIColor * _Nonnull)darkGray2Color {
+    return [UIColor colorWithRed:0.17 green:0.17 blue:0.17 alpha:1.0];
+}
+
++ (UIColor * _Nonnull)whiteHighlightedColor {
+    return [UIColor colorWithWhite:1.0 alpha:0.3];
 }
 
 @end

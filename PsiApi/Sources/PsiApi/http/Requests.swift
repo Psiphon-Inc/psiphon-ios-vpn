@@ -20,6 +20,25 @@
 import Foundation
 import ReactiveSwift
 
+extension URL {
+    
+    public static func make(scheme: String, hostname: String, port: Int32,
+          path: String, queryParams: [(field: String, value: String)]) -> URL? {
+
+        // Syntax components of URLs: https://tools.ietf.org/html/rfc3986#section-3
+        
+        let query = queryParams.map { "\($0.field)=\($0.value)" }
+            .joined(separator: "&")
+        
+        let authority = "\(hostname):\(port)"
+        
+        let queryString = query.isEmpty ? "" : "?\(query)"
+        
+        return URL(string: "\(scheme)://\(authority)\(path)\(queryString)")
+    }
+    
+}
+
 public enum HTTPMethod: String {
     case get = "GET"
     case post = "POST"
@@ -28,7 +47,18 @@ public enum HTTPMethod: String {
 public enum HTTPContentType: String, HTTPHeader {
     case json = "application/json"
     
-    public static var headerKey: String { "Content-Type" }
+    public static let headerKey = "Content-Type"
+}
+
+public struct HTTPDateHeader: HTTPHeader {
+    
+    public let value: String
+    
+    public init(_ value: String) {
+        self.value = value
+    }
+    
+    public static let headerKey = "Date"
 }
 
 public struct HTTPResponseData: Hashable {
@@ -59,10 +89,21 @@ public struct HTTPResponseMetadata: Hashable {
     }
 }
 
-/// A success case means that the HTTP request succeeded and server returned a response,
-/// the response from the server might itself contain an error.
-public typealias URLSessionResult =
-    Result<HTTPResponseData, HTTPRequestError>
+
+public struct URLSessionResult: Equatable {
+    
+    /// Date that the result was produced.
+    public let date: Date
+    
+    /// A success case means that the HTTP request succeeded and server returned a response,
+    /// the response from the server might itself contain an error.
+    public let result: Result<HTTPResponseData, HTTPRequestError>
+    
+    public init(date: Date, result: Result<HTTPResponseData, HTTPRequestError>) {
+        self.date = date
+        self.result = result
+    }
+}
 
 public protocol HTTPHeader {
     static var headerKey: String { get }
@@ -72,6 +113,7 @@ public protocol HTTPResponse {
     associatedtype Success: Equatable
     associatedtype Failure: HashableError
     typealias FailureEvent = ErrorEvent<Failure>
+    
     typealias ResultType = Result<Success, FailureEvent>
     
     var result: ResultType { get }
@@ -101,22 +143,26 @@ extension RetriableHTTPResponse {
     
 }
 
+/// Represents a HTTP request.
+/// `Response` is a phantom type.
 public struct HTTPRequest<Response: HTTPResponse>: Equatable {
     
     let urlRequest: URLRequest
     
-    private init(url: URL, body: Data?, clientMetaData: String, method: HTTPMethod,
-                 contentType: HTTPContentType, response: Response.Type
-    ) {
+    public init(url: URL, httpMethod: HTTPMethod, headers: [String: String],
+                body: Data?, response: Response.Type) {
         var request = URLRequest(
             url: url,
             cachePolicy: UrlRequestParameters.cachePolicy,
             timeoutInterval: UrlRequestParameters.timeoutInterval
         )
+        
+        request.httpMethod = httpMethod.rawValue
         request.httpBody = body
-        request.httpMethod = method.rawValue
-        request.setValue(contentType.rawValue, forHTTPHeaderField: HTTPContentType.headerKey)
-        request.setValue(clientMetaData, forHTTPHeaderField: "X-Verifier-Metadata")
+        
+        for (field, value) in headers {
+            request.setValue(value, forHTTPHeaderField: field)
+        }
         
         if Debugging.printHttpRequests {
             request.debugPrint()
@@ -130,18 +176,29 @@ public struct HTTPRequest<Response: HTTPResponse>: Equatable {
         url: URL, jsonData: Data, clientMetaData: String, method: HTTPMethod,
         response: Response.Type
     ) -> Self {
-        return .init(url: url, body: jsonData, clientMetaData: clientMetaData,
-                     method: method, contentType: .json, response: response)
+        let headers = [HTTPContentType.headerKey: HTTPContentType.json.rawValue,
+                       "X-Verifier-Metadata": clientMetaData]
+        return .init(url: url, httpMethod: method, headers: headers,
+                     body: jsonData, response: response)
     }
     
 }
 
-public struct HTTPRequestError: Error {
+public struct HTTPRequestError: HashableError {
     /// If a response from the server is received, regardless of whether the request
     /// completes successfully or fails, the response parameter contains that information.
     /// From: https://developer.apple.com/documentation/foundation/urlsession/1410330-datatask
     public let partialResponseMetadata: HTTPResponseMetadata?
-    public let errorEvent: ErrorEvent<SystemError<Int>>
+    public let error: SystemError<Int>
+    
+    public init(
+        partialResponseMetadata: HTTPResponseMetadata?,
+        error: SystemError<Int>
+    ) {
+        self.partialResponseMetadata = partialResponseMetadata
+        self.error = error
+    }
+    
 }
 
 extension URL {
@@ -212,40 +269,6 @@ public struct HTTPClient {
     
 }
 
-extension HTTPClient {
-    
-    public static func `default`(urlSession: URLSession) -> HTTPClient {
-        HTTPClient(urlSession: urlSession) { (getCurrentTime, session, urlRequest, completionHandler)
-            -> CancellableURLRequest in
-            
-            let sessionTask = session.dataTask(with: urlRequest)
-            { data, response, error in
-                let result: URLSessionResult
-                if let error = error {
-                    // If URLSession task resulted in an error, there might be a partial response.
-                    result = .failure(
-                        HTTPRequestError(
-                            partialResponseMetadata: (response as? HTTPURLResponse)
-                                .map(HTTPResponseMetadata.init),
-                            errorEvent: ErrorEvent(SystemError<Int>.make(error as NSError), date: getCurrentTime())
-                        )
-                    )
-                } else {
-                    // If `error` is nil, then URLSession task callback guarantees that
-                    // `data` and `response` are non-nil.
-                    result = .success(
-                        HTTPResponseData(data: data!, metadata: HTTPResponseMetadata(response! as! HTTPURLResponse))
-                    )
-                }
-                completionHandler(result)
-            }
-            sessionTask.resume()
-            return sessionTask
-        }
-    }
-    
-}
-
 /// `tunneledHttpRequest` check tunnel status immediately before sending the HTTP request.
 fileprivate func tunneledHttpRequest<Response>(
     getCurrentTime: @escaping () -> Date,
@@ -298,13 +321,10 @@ public struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equ
         /// Request will be retried according to RetryCondition.
         case willRetry(RetryCondition)
         
-        /// Request failed and will not be retried.
-        /// This is a terminal value.
-        case failed(ErrorEvent<Response.Failure>)
-        
         /// Request is completed and will not be retried.
         /// This is a terminal value.
         case completed(Response.ResultType)
+        
     }
     
     /// RetryError represents errors that can be retried automatically.
@@ -398,8 +418,7 @@ public struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equ
                     // hence error is converted to a value and passed downstream.
                     // These errors will not terminate the signal.
                     return SignalProducer.neverComplete(value:
-                        .value(.willRetry(.whenResolved(tunnelError: tunnelError)))
-                    ).concat(.never)
+                        .value(.willRetry(.whenResolved(tunnelError: tunnelError))))
                     
                 case .responseRetryError(let responseError):
                     // Error is due to retrieved response for the request,
@@ -416,9 +435,8 @@ public struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equ
         }
         .flatMapError { (responseError: ErrorEvent<Response.Failure>)
             -> Effect<SignalTermination<RequestResult>> in
-            // Maps failure response error after all retries from a signal failure
-            // to a signal value event.
-            return SignalProducer(value: .value(.failed(responseError)))
+            // Forwards failure respose error after all automatic retries.
+            return SignalProducer(value: .value(.completed(.failure(responseError))))
         }
         .take(while: { (signalTermination: SignalTermination) -> Bool in
             // Forwards values while the `.terminate` value has not been emitted.

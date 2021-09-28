@@ -27,34 +27,113 @@ import Utilities
 @testable import PsiApi
 @testable import AppStoreIAP
 
-extension PsiCashEffects {
+extension ReceiptData {
     
     static func mock(
-        libData: Gen<PsiCashLibData>? = nil,
-        refreshState: Gen<PsiCashRefreshResult>? = nil,
-        purchaseProduct: Gen<PsiCashPurchaseResult>? = nil,
-        modifyLandingPage: Gen<URL>? = nil,
-        rewardedVideoCustomData: Gen<String>? = nil
-    ) -> PsiCashEffects {
-        PsiCashEffects(
-            libData: { () -> PsiCashLibData in
-                returnGeneratedOrFail(libData)
-            },
-            refreshState: { _, _ -> Effect<PsiCashRefreshResult> in
-                Effect(value: returnGeneratedOrFail(refreshState))
-            },
-            purchaseProduct: { _, _ -> Effect<PsiCashPurchaseResult> in
-                Effect(value: returnGeneratedOrFail(purchaseProduct))
-            },
-            modifyLandingPage: { _ -> Effect<URL> in
-                Effect(value: returnGeneratedOrFail(modifyLandingPage))
-            },
-            rewardedVideoCustomData: { () -> String? in
-                returnGeneratedOrFail(rewardedVideoCustomData)
-            },
-            expirePurchases: { _ -> Effect<Never> in
-                return .empty
-            })
+        subscriptionInAppPurchases: Set<SubscriptionIAPPurchase> = Set([]),
+        consumableInAppPurchases: Set<ConsumableIAPPurchase> = Set([]),
+        readDate: Date = Date()
+    ) -> ReceiptData {
+        ReceiptData(
+            filename: "receipt", // unused in tests.
+            subscriptionInAppPurchases: subscriptionInAppPurchases,
+            consumableInAppPurchases: consumableInAppPurchases,
+            data: Data(), // unused in tests.
+            readDate: readDate
+        )
+    }
+    
+}
+
+final class MockPsiCashEffects: PsiCashEffectsProtocol {
+    
+    private let initGen: Gen<Result<PsiCashLibInitSuccess, ErrorRepr>>?
+    private let libDataGen: Gen<PsiCashLibData>?
+    private let refreshStateGen: Gen<PsiCashRefreshResult>?
+    private let purchaseProductGen: Gen<NewExpiringPurchaseResult>?
+    private let modifyLandingPageGen: Gen<URL>?
+    private let rewardedVideoCustomDataGen: Gen<String>?
+    
+    init(
+        initGen: Gen<Result<PsiCashLibInitSuccess, ErrorRepr>>? = nil,
+        libDataGen: Gen<PsiCashLibData>? = nil,
+        refreshStateGen: Gen<PsiCashRefreshResult>? = nil,
+        purchaseProductGen: Gen<NewExpiringPurchaseResult>? = nil,
+        modifyLandingPageGen: Gen<URL>? = nil,
+        rewardedVideoCustomDataGen: Gen<String>? = nil
+    ) {
+        self.initGen = initGen
+        self.libDataGen = libDataGen
+        self.refreshStateGen = refreshStateGen
+        self.purchaseProductGen = purchaseProductGen
+        self.modifyLandingPageGen = modifyLandingPageGen
+        self.rewardedVideoCustomDataGen = rewardedVideoCustomDataGen
+    }
+    
+    func initialize(
+        fileStoreRoot: String?,
+        psiCashLegacyDataStore: UserDefaults,
+        tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
+    ) -> Effect<Result<PsiCashLibInitSuccess, ErrorRepr>> {
+        Effect(value: returnGeneratedOrFail(initGen))
+    }
+    
+    func libData() -> PsiCashLibData {
+        returnGeneratedOrFail(libDataGen)
+    }
+    
+    func refreshState(
+        priceClasses: [PsiCashTransactionClass],
+        tunnelConnection: TunnelConnection,
+        clientMetaData: ClientMetaData
+    ) -> Effect<PsiCashRefreshResult> {
+        
+        Effect(value: returnGeneratedOrFail(refreshStateGen))
+        
+    }
+    
+    func purchaseProduct(
+        purchasable: PsiCashPurchasableType,
+        tunnelConnection: TunnelConnection,
+        clientMetaData: ClientMetaData
+    ) -> Effect<NewExpiringPurchaseResult> {
+        
+        Effect(value: returnGeneratedOrFail(purchaseProductGen))
+        
+    }
+    
+    func modifyLandingPage(_ url: URL) -> Effect<URL> {
+
+        Effect(value: returnGeneratedOrFail(modifyLandingPageGen))
+        
+    }
+    
+    func rewardedVideoCustomData() -> String? {
+        
+        returnGeneratedOrFail(rewardedVideoCustomDataGen)
+        
+    }
+    
+    func removePurchasesNotIn(psiCashAuthorizations: Set<String>) -> Effect<Never> {
+        return .empty
+    }
+    
+    func accountLogout() -> Effect<PsiCashAccountLogoutResult> {
+        fatalError("not implemented")
+        return .empty
+    }
+    
+    func accountLogin(
+        tunnelConnection: TunnelConnection,
+        username: String,
+        password: SecretString
+    ) -> Effect<PsiCashAccountLoginResult> {
+        fatalError("not implemented")
+        return .empty
+    }
+    
+    func setLocale(_ locale: Locale) -> Effect<Never> {
+        return .empty
     }
     
 }
@@ -96,7 +175,7 @@ extension IAPEnvironment {
         _ feedbackLogger: FeedbackLogger,
         tunnelStatusSignal: @autoclosure () -> SignalProducer<TunnelProviderVPNStatus, Never>? = nil,
         tunnelConnectionRefSignal: @autoclosure () -> SignalProducer<TunnelConnection?, Never>? = nil,
-        psiCashEffects: PsiCashEffects? = nil,
+        psiCashEffects: PsiCashEffectsProtocol? = nil,
         paymentQueue: PaymentQueue? = nil,
         clientMetaData: (() -> ClientMetaData)? = nil,
         isSupportedProduct: ((ProductID) -> AppStoreProductType?)? = nil,
@@ -115,7 +194,7 @@ extension IAPEnvironment {
             feedbackLogger: feedbackLogger,
             tunnelStatusSignal: _tunnelStatusSignal,
             tunnelConnectionRefSignal: _tunnelConnectionRefSignal,
-            psiCashEffects: psiCashEffects ?? PsiCashEffects.mock(),
+            psiCashEffects: psiCashEffects ?? MockPsiCashEffects(),
             clientMetaData: clientMetaData ?? { ClientMetaData(MockAppInfoProvider()) },
             paymentQueue: paymentQueue ?? PaymentQueue.mock(),
             psiCashPersistedValues: MockPsiCashPersistedValues(),

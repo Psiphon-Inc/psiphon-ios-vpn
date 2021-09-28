@@ -59,7 +59,9 @@
  */
 @property (nonatomic, strong, readonly) NSDate *_Nullable expiresDate;
 
-/** For a transaction that was canceled by Apple customer support, the date of the cancellation.
+/**
+ For a transaction that was canceled by Apple customer support, the date of the cancellation.
+ For an auto-renewable subscription plan that was upgraded, the time and date of the upgrade transaction.
  */
 @property (nonatomic, strong, readonly) NSDate *_Nullable cancellationDate;
 

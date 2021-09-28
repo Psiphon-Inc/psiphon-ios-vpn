@@ -24,7 +24,7 @@ import AppStoreIAP
 import PsiCashClient
 
 extension AppAction {
-
+    
     var appDelegateAction: AppDelegateAction? {
         get {
             guard case let .appDelegateAction(value) = self else { return nil }
@@ -112,7 +112,7 @@ extension AppAction {
             self = .productRequest(newValue)
         }
     }
-
+    
     var reachabilityAction: ReachabilityAction? {
         get {
             guard case let .reachabilityAction(value) = self else { return nil }
@@ -134,7 +134,7 @@ extension AppAction {
             self = .vpnStateAction(newValue)
         }
     }
-
+    
     var feedbackAction: FeedbackAction? {
         get {
             guard case let .feedbackAction(value) = self else { return nil }
@@ -143,6 +143,28 @@ extension AppAction {
         set {
             guard case .feedbackAction = self, let newValue = newValue else { return }
             self = .feedbackAction(newValue)
+        }
+    }
+    
+    var mainViewAction: MainViewAction? {
+        get {
+            guard case let .mainViewAction(value) = self else { return nil }
+            return value
+        }
+        set {
+            guard case .mainViewAction = self, let newValue = newValue else { return }
+            self = .mainViewAction(newValue)
+        }
+    }
+    
+    var serverRegionAction: ServerRegionAction? {
+        get {
+            guard case let .serverRegionAction(value) = self else { return nil }
+            return value
+        }
+        set {
+            guard case .serverRegionAction = self, let newValue = newValue else { return }
+            self = .serverRegionAction(newValue)
         }
     }
     
@@ -155,15 +177,21 @@ extension AppState {
     ///  TunnelProviderManager reference if it exists.
     var tunnelConnection: TunnelConnection? {
         get {
+            // Workaround, since VPN config cannot be installed on a simulator.
+            #if targetEnvironment(simulator)
+            return TunnelConnection { () -> TunnelConnection.ConnectionResourceStatus in
+                return .connection(.connected)
+            }
+            #else
             guard case let .loaded(tpm) = self.vpnState.value.loadState.value else {
                 return nil
             }
             return tpm.connection
+            #endif
         }
     }
     
     var vpnReducerState: VPNReducerState<PsiphonTPM> {
-        // TODO: This can be simplified by a new `SerialEffectState` constructor.
         get {
             VPNReducerState(
                 pendingActionQueue: self.vpnState.pendingActionQueue,
@@ -171,8 +199,8 @@ extension AppState {
                 pendingEffectCompletion: self.vpnState.pendingEffectCompletion,
                 value: VPNProviderManagerReducerState (
                     vpnState: self.vpnState.value,
-                    subscriptionTransactionsPendingAuthorization:
-                    self.subscriptionAuthState .transactionsPendingAuthRequest
+                    anySubscriptionTxPendingAuthorization:
+                        self.subscriptionAuthState.anyPendingAuthRequests
                 )
             )
         }
@@ -189,7 +217,7 @@ extension AppState {
             IAPReducerState(
                 iap: self.iapState,
                 psiCashBalance: self.psiCashBalance,
-                psiCashAuth: self.psiCash.libData.authPackage
+                psiCashAccountType: self.psiCashState.libData?.accountType
             )
         }
         set {
@@ -202,29 +230,26 @@ extension AppState {
         get {
             PsiCashReducerState(
                 psiCashBalance: self.psiCashBalance,
-                psiCash: self.psiCash,
+                psiCash: self.psiCashState,
                 subscription: self.subscription,
                 tunnelConnection: self.tunnelConnection
             )
         }
         set {
             self.psiCashBalance = newValue.psiCashBalance
-            self.psiCash = newValue.psiCash
+            self.psiCashState = newValue.psiCash
         }
     }
     
     var appDelegateReducerState: AppDelegateReducerState {
         get {
             AppDelegateReducerState(
-                psiCashBalance: self.psiCashBalance,
-                psiCash: self.psiCash,
-                appDelegate: self.appDelegateState
+                appDelegateState: self.appDelegateState,
+                subscriptionState: self.subscription
             )
         }
         set {
-            self.psiCashBalance = newValue.psiCashBalance
-            self.psiCash = newValue.psiCash
-            self.appDelegateState = newValue.appDelegate
+            self.appDelegateState = newValue.appDelegateState
         }
     }
     
@@ -240,22 +265,11 @@ extension AppState {
         }
     }
     
-    var subscriptionAuthReducerState: SubscriptionReducerState {
-        get {
-            SubscriptionReducerState(
-                subscription: self.subscriptionAuthState,
-                receiptData: self.appReceipt.receiptData
-            )
-        }
-        set {
-            self.subscriptionAuthState = newValue.subscription
-        }
-    }
-    
-    var psiCashViewController: PsiCashViewControllerState {
-        PsiCashViewControllerState(
+    var psiCashViewControllerReaderState: PsiCashViewController.ReaderState {
+        PsiCashViewController.ReaderState(
+            mainViewState: self.mainView,
             psiCashBalanceViewModel: self.psiCashBalanceViewModel,
-            psiCash: self.psiCash,
+            psiCash: self.psiCashState,
             iap: self.iapState,
             subscription: self.subscription,
             appStorePsiCashProducts: self.products.psiCashProducts,
@@ -265,18 +279,18 @@ extension AppState {
     
     var psiCashBalanceViewModel: PsiCashBalanceViewModel {
         PsiCashBalanceViewModel(
-            psiCashLibLoaded: self.psiCash.libLoaded,
+            psiCashLibLoaded: self.psiCashState.libData != nil,
             balanceState: self.balanceState
         )
     }
     
     var balanceState: BalanceState {
         BalanceState(
-            pendingPsiCashRefresh: self.psiCash.pendingPsiCashRefresh,
+            pendingPsiCashRefresh: self.psiCashState.pendingPsiCashRefresh,
             psiCashBalance: self.psiCashBalance
         )
     }
-
+    
     var feedbackReducerState: FeedbackReducerState {
         get {
             FeedbackReducerState(
@@ -285,6 +299,21 @@ extension AppState {
         }
         set {
             self.queuedFeedbacks = newValue.queuedFeedbacks
+        }
+    }
+    
+    var mainViewReducerState: MainViewReducerState {
+        get {
+            MainViewReducerState(
+                mainView: self.mainView,
+                subscriptionState: self.subscription,
+                psiCashAccountType: self.psiCashState.libData?.accountType,
+                appLifecycle: self.appDelegateState.appLifecycle,
+                tunnelConnectedStatus: self.vpnState.value.providerVPNStatus.tunneled
+            )
+        }
+        set {
+            self.mainView = newValue.mainView
         }
     }
     

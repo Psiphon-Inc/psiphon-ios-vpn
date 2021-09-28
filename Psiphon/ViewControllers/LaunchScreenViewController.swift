@@ -46,7 +46,7 @@ import Foundation
         
         // Autolayout
         
-        let rootViewLayoutGuide = addSafeAreaLayoutGuide(to: self.view)
+        let rootViewLayoutGuide = makeSafeAreaLayoutGuide(addToView: self.view)
         
         launchScreenView.activateConstraints {
             $0.matchParentConstraints()

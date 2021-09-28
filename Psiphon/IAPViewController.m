@@ -53,7 +53,12 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
 @property (nonatomic) BOOL hasActiveSubscription;
 @property (nonatomic) BOOL hasBeenInIntroPeriod;
+
+// TRUE if pending result of IAP product request.
+@property (nonatomic) BOOL pendingProductRequestResponse;
+
 @property (nonatomic) NSArray<SKProduct *> *_Nonnull storeProducts;
+
 @property (nonatomic) NSString *_Nullable pendingProductIdentifier;
 @property (nonatomic) RACDisposable *subscriptionStatusDisposable;
 
@@ -70,6 +75,7 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     if (self) {
         _hasActiveSubscription = FALSE;
         _hasBeenInIntroPeriod = FALSE;
+        _pendingProductIdentifier = FALSE;
         _storeProducts = [NSArray array];
         _pendingProductIdentifier = nil;
 
@@ -93,23 +99,37 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     SKProductsRequest* productRequest = [[SKProductsRequest alloc] initWithProductIdentifiers:productIdentifiers];
     productRequest.delegate = self;
     [productRequest start];
+    
+    self.pendingProductRequestResponse = TRUE;
+    
 }
 
 #pragma mark - SKProductsRequestDelegate
 
 - (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response {
+    IAPViewController *__weak weakSelf = self;
     dispatch_async_main(^{
-        NSSortDescriptor *mySortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"price" ascending:YES];
-        NSMutableArray *sortArray = [[NSMutableArray alloc] initWithArray:response.products];
-        [sortArray sortUsingDescriptors:[NSArray arrayWithObject:mySortDescriptor]];
-        self.storeProducts = sortArray;
-        [self reloadTableData];
+        IAPViewController *__strong strongSelf = weakSelf;
+        if (strongSelf != nil) {
+            NSSortDescriptor *mySortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"price" ascending:YES];
+            NSMutableArray *sortArray = [[NSMutableArray alloc] initWithArray:response.products];
+            [sortArray sortUsingDescriptors:[NSArray arrayWithObject:mySortDescriptor]];
+            strongSelf.storeProducts = sortArray;
+            strongSelf.pendingProductRequestResponse = FALSE;
+            [strongSelf reloadTableData];
+        }
     });
+    
 }
 
 - (void)request:(SKRequest *)request didFailWithError:(NSError *)error {
+    IAPViewController *__weak weakSelf = self;
     dispatch_async_main(^{
-        [self reloadTableData];
+        IAPViewController *__strong strongSelf = weakSelf;
+        if (strongSelf != nil) {
+            strongSelf.pendingProductRequestResponse = FALSE;
+            [strongSelf reloadTableData];
+        }
     });
 }
 
@@ -164,22 +184,13 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
     // Adds ViewController as an observer of transactions.
     [SKPaymentQueue.defaultQueue addTransactionObserver:self];
-
-    // Removes the default iOS bottom border.
-    [self.navigationController.navigationBar setValue:@(TRUE) forKeyPath:@"hidesShadow"];
-
-    self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
-    self.navigationController.navigationBar.barTintColor = UIColor.darkBlueColor;
-    self.navigationController.navigationBar.translucent = FALSE;
-
-    self.navigationController.navigationBar.titleTextAttributes = @{
-      NSForegroundColorAttributeName:UIColor.blueGreyColor,
-      NSFontAttributeName:[UIFont avenirNextBold:15.f]
-    };
+    
+    // Applies Psiphon navigation bar styling.
+    [self.navigationController.navigationBar applyPsiphonNavigationBarStyling];
 
     // Sets navigation bar title.
     NSString *title = NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS", nil, [NSBundle mainBundle], @"Subscriptions", @"Title of the dialog for available in-app paid subscriptions");
-    self.title = title.localizedUppercaseString;
+    self.title = [title uppercaseStringWithLocale:[SwiftDelegate.bridge getLocaleForCurrentAppLanguage]];
 
     // Set back button title of any child view controllers pushed onto the current navigation controller
     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringWithDefaultValue(@"BACK_BUTTON", nil, [NSBundle mainBundle], @"Back", @"Title of the button which takes the user to the previous screen. Text should be short and one word when possible.") style:UIBarButtonItemStylePlain target:nil action:nil];
@@ -264,7 +275,8 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     noProductsLabel.text = Strings.productRequestFailedNoticeText;
 
     UIButton *refreshButton = [UIButton buttonWithType:UIButtonTypeSystem];
-    NSString *refreshButtonTitle = @"Tap to retry".localizedUppercaseString;
+    NSString *refreshButtonTitle = [[UserStrings Retry_button_title]
+                   uppercaseStringWithLocale:[SwiftDelegate.bridge getLocaleForCurrentAppLanguage]];
     [refreshButton setTitle:refreshButtonTitle forState:UIControlStateNormal];
     [refreshButton setTitle:refreshButtonTitle forState:UIControlStateHighlighted];
     [refreshButton setTintColor:UIColor.whiteColor];
@@ -316,10 +328,18 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
 - (UIView *)tableView:(UITableView *)tableView viewForHeaderInSection:(NSInteger)section {
 
-    // If no products have been loaded show the alternative header.
-    if ([self.storeProducts count] == 0 && !self.hasActiveSubscription) {
+    if ([self.storeProducts count] == 0 && !self.hasActiveSubscription && !self.pendingProductRequestResponse) {
+        // If no products have been loaded, and there is no pending product request,
+        // displays the retry button.
         UIView *header = [self createNoProductsView];
         return header;
+        
+    } else if ([self.storeProducts count] == 0 && !self.hasActiveSubscription && self.pendingProductRequestResponse) {
+        // If no products have been loaded yet, but there is a pending product requdst,
+        // only show a spinner.
+        UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] init];
+        [spinner startAnimating];
+        return spinner;
 
     } else {
         UIView *cellView = [[UIView alloc] initWithFrame:CGRectZero];
@@ -576,6 +596,9 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     label.font = [UIFont avenirNextMedium:15.f];
     label.textColor = UIColor.blueGreyColor;
     label.text = [NSString stringWithFormat:@"%@\n\n%@", Strings.subscriptionScreenNoticeText, Strings.subscriptionScreenCancelNoticeText];
+    if (label.semanticContentAttribute == UISemanticContentAttributeForceRightToLeft) {
+        label.textAlignment = NSTextAlignmentRight;
+    }
     [cell.contentView addSubview:label];
 
     // label constraints
@@ -814,8 +837,8 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     if (buyProgressAlert != nil) {
         return;
     }
-    buyProgressAlert = [MBProgressHUD showHUDAddedTo:
-                        [AppDelegate getTopPresentedViewController].view animated:YES];
+    UIView *topView = [SwiftDelegate.bridge getTopActiveViewController].view;
+    buyProgressAlert = [MBProgressHUD showHUDAddedTo:topView animated:YES];
 
     __weak IAPViewController *weakSelf = self;
     buyProgressAlertTimer = [NSTimer scheduledTimerWithTimeInterval:60 repeats:NO block:^(NSTimer * _Nonnull timer) {

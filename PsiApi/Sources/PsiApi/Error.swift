@@ -66,7 +66,7 @@ public struct ErrorRepr: HashableError, Codable {
 /// Wraps an error event with a localized user description of the error.
 /// Note that `ErrorEventDescription` values are equal up to their `event` value only,
 /// i.e. `localizedUserDescription` value does not participate in hashValue or equality check.
-public struct ErrorEventDescription<E: HashableError>: HashableError {
+public struct ErrorEventDescription<E: HashableError>: HashableError, LocalizedUserDescription {
     public let event: ErrorEvent<E>
     public let localizedUserDescription: String
 
@@ -89,7 +89,7 @@ public struct ErrorEvent<E: HashableError>: HashableError, FeedbackDescription {
     public let error: E
     public let date: Date
 
-    public init(_ error: E, date: Date = Date()) {
+    public init(_ error: E, date: Date) {
         self.error = error
         self.date = date
     }
@@ -125,7 +125,11 @@ public enum SystemError<Code: Hashable>: HashableError {
     indirect case error(ErrorInfo, underlyingError: SystemError<Int>)
 
     /// Wraps values from an `NSError` object that we care about.
-    public struct ErrorInfo: HashableError {
+    public struct ErrorInfo: HashableError, LocalizedError {
+        
+        // Check https://github.com/apple/swift-evolution/blob/master/proposals/0112-nserror-bridging.md
+        // for why it is necessary to conform to LocalizedError protocol as an error type.
+        
         /// Error domain.
         public let domain: String
         /// Typed error code for the given domain.
@@ -133,9 +137,24 @@ public enum SystemError<Code: Hashable>: HashableError {
         /// Integral error code for the given domain.
         public let errorCode: Int
         /// Localized description of an `NSError`.
-        public let localizedDescription: String?
+        public let errorDescription: String?
         /// Localized failure reason of an `NSError`.
-        public let localizedFailureReason: String?
+        public let failureReason: String?
+        
+        public init(
+            domain: String,
+            code: Code,
+            errorCode: Int,
+            errorDescription: String? = nil,
+            failureReason: String? = nil
+        ) {
+            self.domain = domain
+            self.code = code
+            self.errorCode = errorCode
+            self.errorDescription = errorDescription
+            self.failureReason = failureReason
+        }
+        
     }
 
     /// Returns `ErrorInfo` object of the top error.
@@ -171,8 +190,8 @@ public extension SystemError {
             domain: nsError.domain,
             code: nsError.code,
             errorCode: nsError.code,
-            localizedDescription: nsError.localizedDescription,
-            localizedFailureReason: nsError.localizedFailureReason
+            errorDescription: nsError.localizedDescription,
+            failureReason: nsError.localizedFailureReason
         )
 
         let maybeUnderlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError
@@ -191,8 +210,8 @@ public extension SystemError {
             domain: NEVPNError.errorDomain,
             code: nsError.code,
             errorCode: nsError.errorCode,
-            localizedDescription: nsError.localizedDescription,
-            localizedFailureReason: nil
+            errorDescription: nsError.localizedDescription,
+            failureReason: nil
         )
 
         let maybeUnderlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError
@@ -211,8 +230,8 @@ public extension SystemError {
             domain: SKError.errorDomain,
             code: nsError.code,
             errorCode: nsError.errorCode,
-            localizedDescription: nsError.localizedDescription,
-            localizedFailureReason: nil
+            errorDescription: nsError.localizedDescription,
+            failureReason: nil
         )
 
         let maybeUnderlyingError = nsError.userInfo[NSUnderlyingErrorKey] as? NSError
@@ -228,26 +247,6 @@ public extension SystemError {
 }
 
 public typealias SystemErrorEvent<Code: Hashable> = ErrorEvent<SystemError<Code>>
-
-extension Either: Error where A: Error, B: Error {
-    public var localizedDescription: String {
-        switch self {
-        case let .left(error):
-            return error.localizedDescription
-        case let .right(error):
-            return error.localizedDescription
-        }
-    }
-}
-
-//extension Array: Error where Element: Error {}
-
-public protocol ErrorUserDescription where Self: Error {
-    
-    /// User-facing description of error.
-    var userDescription: String { get }
-    
-}
 
 public typealias CodableError = Codable & Error
 

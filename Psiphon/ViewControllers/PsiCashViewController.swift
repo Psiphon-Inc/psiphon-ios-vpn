@@ -27,80 +27,40 @@ import Utilities
 import AppStoreIAP
 import PsiCashClient
 
-struct PsiCashViewControllerState: Equatable {
-    let psiCashBalanceViewModel: PsiCashBalanceViewModel
-    let psiCash: PsiCashState
-    let iap: IAPState
-    let subscription: SubscriptionState
-    let appStorePsiCashProducts:
-        PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent<Int>>
-    let isRefreshingAppStoreReceipt: Bool
-}
-
-extension PsiCashViewControllerState {
-    
-    /// Adds rewarded video product to list of `PsiCashPurchasableViewModel`  retrieved from AppStore.
-    func allProducts(
-        platform: Platform,
-        rewardedVideoClearedForSale: Bool,
-        rewardedVideoSubtitle: String
-    ) -> PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent<Int>> {
-
-        switch platform.current {
-
-        case .iOSAppOnMac:
-
-            return appStorePsiCashProducts.map(
-                pending: { $0.compactMap { $0.viewModel } },
-                completed: { $0.map { $0.compactMap { $0.viewModel } } }
-            )
-
-        case .iOS:
-
-            // Adds rewarded video ad as the first product if running device is iOS.
-
-            return appStorePsiCashProducts.map(pending: { lastParsedList -> [PsiCashPurchasableViewModel] in
-
-                let viewModels = lastParsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
-                    parsed.viewModel
-                }
-
-                switch viewModels {
-                case []: return []
-                default: return viewModels
-                }
-
-            }, completed: { result in
-                result.map { parsedList -> [PsiCashPurchasableViewModel] in
-
-                    return parsedList.compactMap { parsed -> PsiCashPurchasableViewModel? in
-                        parsed.viewModel
-                    }
-                }
-            })
-
-        }
-
-    }
-    
-}
-
 final class PsiCashViewController: ReactiveViewController {
+    
     typealias AddPsiCashViewType =
         EitherView<PsiCashCoinPurchaseTable,
                    EitherView<Spinner,
-                              EitherView<PsiCashMessageViewUntunneled,
+                              EitherView<PsiCashMessageViewWithButton,
                                          EitherView<PsiCashMessageWithRetryView,
                                                     PsiCashMessageView>>>>
     
     typealias SpeedBoostViewType = EitherView<SpeedBoostPurchaseTable,
                                               EitherView<Spinner,
-                                                         EitherView<PsiCashMessageViewUntunneled,
+                                                         EitherView<PsiCashMessageViewWithButton,
                                                                     PsiCashMessageView>>>
     
+    typealias ContainerViewType = EitherView<AddPsiCashViewType, SpeedBoostViewType>
+
+    struct ReaderState: Equatable {
+        let mainViewState: MainViewState
+        let psiCashBalanceViewModel: PsiCashBalanceViewModel
+        let psiCash: PsiCashState
+        let iap: IAPState
+        let subscription: SubscriptionState
+        let appStorePsiCashProducts:
+            PendingWithLastSuccess<[ParsedPsiCashAppStorePurchasable], SystemErrorEvent<Int>>
+        let isRefreshingAppStoreReceipt: Bool
+    }
+
+    enum ViewControllerAction: Equatable {
+        case psiCashAction(PsiCashAction)
+        case mainViewAction(MainViewAction)
+    }
+    
     struct ObservedState: Equatable {
-        let state: PsiCashViewControllerState
-        let activeTab: PsiCashViewController.PsiCashViewControllerTabs
+        let readerState: ReaderState
         let tunneled: TunnelConnectedStatus
         let lifeCycle: ViewControllerLifeCycle
     }
@@ -110,384 +70,409 @@ final class PsiCashViewController: ReactiveViewController {
         case psiCashPurchaseDialog
         case speedBoostPurchaseDialog
     }
-    
-    @objc enum PsiCashViewControllerTabs: Int, UICases {
-        case addPsiCash
-        case speedBoost
-        
-        var description: String {
-            switch self {
-            case .addPsiCash: return UserStrings.Add_psiCash()
-            case .speedBoost: return UserStrings.Speed_boost()
-            }
-        }
-    }
-    
-    private let viewControllerInitTime = Date()
 
     private let platform: Platform
     private let locale: Locale
+    private let feedbackLogger: FeedbackLogger
+    private let tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>
+    
+    private let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
     
     private let (lifetime, token) = Lifetime.make()
-    private let store: Store<PsiCashViewControllerState, PsiCashAction>
+    private let store: Store<ReaderState, ViewControllerAction>
+    
     private let productRequestStore: Store<Utilities.Unit, ProductRequestAction>
     
     // VC-specific UI state
     
-    /// Active view in the view controller.
-    /// - Warning: Must only be set from the main thread.
-    @State var activeTab: PsiCashViewControllerTabs
     private var navigation: Screen = .mainScreen
     
-    /// Set of presented error alerts.
-    /// Note: Once an error alert has been dismissed by the user, it will be removed from the set.
-    private var errorAlerts = Set<ErrorEventDescription<ErrorRepr>>()
-    
     // Views
-    private let balanceView = PsiCashBalanceView(frame: .zero)
+    private let accountNameViewWrapper = PsiCashAccountNameViewWrapper()
+    private let balanceViewWrapper: PsiCashBalanceViewWrapper
     private let closeButton = CloseButton(frame: .zero)
-    private let tabControl = TabControlView<PsiCashViewControllerTabs>()
     
-    private let container: EitherView<AddPsiCashViewType, SpeedBoostViewType>
-    private let containerView = UIView(frame: .zero)
-    private let containerBindable: EitherView<AddPsiCashViewType, SpeedBoostViewType>.BuildType
+    private var vStack: UIStackView
+    
+    private let tabControl = TabControlViewWrapper<PsiCashScreenTab>()
+    private let signupOrLogInView = PsiCashAccountSignupOrLoginView()
+    
+    private let containerView: ViewBuilderContainerView<ContainerViewType>
     
     init(
         platform: Platform,
         locale: Locale,
-        initialTab: PsiCashViewControllerTabs,
-        store: Store<PsiCashViewControllerState, PsiCashAction>,
+        store: Store<ReaderState, ViewControllerAction>,
         iapStore: Store<Utilities.Unit, IAPAction>,
         productRequestStore: Store<Utilities.Unit, ProductRequestAction>,
         appStoreReceiptStore: Store<Utilities.Unit, ReceiptStateAction>,
         tunnelConnectedSignal: SignalProducer<TunnelConnectedStatus, Never>,
-        feedbackLogger: FeedbackLogger
+        dateCompare: DateCompare,
+        feedbackLogger: FeedbackLogger,
+        tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
+        objCBridgeDelegate: ObjCBridgeDelegate,
+        onDismissed: @escaping () -> Void
     ) {
         self.platform = platform
         self.locale = locale
-        self.activeTab = initialTab
+        self.feedbackLogger = feedbackLogger
+        self.tunnelConnectedSignal = tunnelConnectedSignal
+        
+        self.balanceViewWrapper = PsiCashBalanceViewWrapper(locale: locale)
+        
+        self.tunnelConnectionRefSignal = tunnelConnectionRefSignal
+        
+        self.vStack = UIStackView.make(
+            axis: .vertical,
+            distribution: .fill,
+            alignment: .fill,
+            spacing: Style.default.padding
+        )
+
         self.store = store
         self.productRequestStore = productRequestStore
         
-        self.container = .init(
-            AddPsiCashViewType(
-                PsiCashCoinPurchaseTable(purchaseHandler: {
-                    switch $0 {
-                    case .product(let product):
-                        iapStore.send(.purchase(product: product))
-                    }
-                }),
-                .init(Spinner(style: .whiteLarge),
-                      .init(PsiCashMessageViewUntunneled(action: {
-                        store.send(.connectToPsiphonTapped)
-                      }), .init(PsiCashMessageWithRetryView(),
-                                PsiCashMessageView())))),
-            SpeedBoostViewType(
-                SpeedBoostPurchaseTable(purchaseHandler: {
-                    store.send(.buyPsiCashProduct(.speedBoost($0)))
-                }),
-                .init(Spinner(style: .whiteLarge),
-                      .init(PsiCashMessageViewUntunneled(action: {
-                        store.send(.connectToPsiphonTapped)
-                      }), PsiCashMessageView()))))
+        let messageViewWithAction = PsiCashMessageViewWithButton { [unowned objCBridgeDelegate] message in
+            switch message {
+            case .untunneled(_):
+                // Dismisses this view controller, and starts the VPN.
+                objCBridgeDelegate.dismiss(screen: .psiCash) {
+                    // This action toggles the VPN, but it is expcected to only
+                    // be called when the VPN is disc
+                    objCBridgeDelegate.startStopVPN()
+                }
+            }
+        }
         
-        containerBindable = self.container.build(self.containerView)
+        self.containerView = ViewBuilderContainerView(
+            EitherView(
+                AddPsiCashViewType(
+                    PsiCashCoinPurchaseTable(purchaseHandler: {
+                        switch $0 {
+                        case .product(let product):
+                            store.send(.mainViewAction(.psiCashViewAction(
+                                .purchaseTapped(product: product))))
+                        }
+                    }),
+                    EitherView(Spinner(style: .whiteLarge),
+                               EitherView(messageViewWithAction,
+                                          EitherView(PsiCashMessageWithRetryView(),
+                                                     PsiCashMessageView())))),
+                SpeedBoostViewType(
+                    SpeedBoostPurchaseTable(purchaseHandler: {
+                        store.send(.psiCashAction(.buyPsiCashProduct(.speedBoost($0))))
+                    }, getLocale: { locale }),
+                    EitherView(Spinner(style: .whiteLarge),
+                               EitherView(messageViewWithAction, PsiCashMessageView()))))
+        )
         
-        super.init(nibName: nil, bundle: nil)
+        super.init(onDismissed: onDismissed)
         
+        // Handler for "Sign Up or Log In" button.
+        self.signupOrLogInView.onLogInTapped { [unowned self] in
+            self.store.send(.mainViewAction(.presentPsiCashAccountScreen))
+        }
+
         // Updates UI by merging all necessary signals.
         self.lifetime += SignalProducer.combineLatest(
             store.$value.signalProducer,
-            self.$activeTab.signalProducer,
             tunnelConnectedSignal,
-            self.$lifeCycle.signalProducer)
-            .map(ObservedState.init)
-            .skipRepeats()
-            .filter { observed in
-                !observed.lifeCycle.viewWillOrDidDisappear
+            self.$lifeCycle.signalProducer
+        ).map(ObservedState.init)
+        .skipRepeats()
+        .filter { observed in
+            observed.lifeCycle.viewDidLoadOrAppeared
+        }
+        .startWithValues { [unowned self] observed in
+            
+            // Even though the reactive signal has a filter on
+            // `!observed.lifeCycle.viewWillOrDidDisappear`, due to async nature
+            // of the signal it is ambiguous if this closure is called when
+            // `self.lifeCycle.viewWillOrDidDisappear` is true.
+            // Due to this race-condition, the source-of-truth (`self.lifeCycle`),
+            // is checked for whether view will or did disappear.
+            guard !self.lifeCycle.viewWillOrDidDisappear else {
+                return
             }
-            .startWithValues { [unowned self] observed in
+
+            guard let psiCashViewState = observed.readerState.mainViewState.psiCashViewState else {
+                // View controller state has been set to nil,
+                // and it will be dismissed (if not already).
+                return
+            }
+            
+            guard let psiCashLibData = observed.readerState.psiCash.libData else {
+                fatalError("PsiCash lib not loaded")
+            }
+            
+            let psiCashIAPPurchase = observed.readerState.iap.purchasing[.psiCash] ?? nil
+            let purchasingNavState = (psiCashIAPPurchase?.purchasingState,
+                                      observed.readerState.psiCash.purchasing,
+                                      self.navigation)
+            
+            switch purchasingNavState {
+            case (.none, .none, _):
+                self.dismissPurchasingScreens()
                 
-                // Even though the reactive signal has a filter on
-                // `!observed.lifeCycle.viewWillOrDidDisappear`, due to async nature
-                // of the signal it is ambiguous if this closure is called when
-                // `self.lifeCycle.viewWillOrDidDisappear` is true.
-                // Due to this race-condition, the source-of-truth (`self.lifeCycle`),
-                // is checked for whether view will or did disappear.
-                guard !self.lifeCycle.viewWillOrDidDisappear else {
-                    return
+            case (.pending(_), _, .mainScreen):
+                let _ = self.display(screen: .psiCashPurchaseDialog)
+                
+            case (.pending(_), _, .psiCashPurchaseDialog):
+                break
+                
+            case (_, .speedBoost(_), .mainScreen):
+                let _ = self.display(screen: .speedBoostPurchaseDialog)
+                
+            case (_, .speedBoost(_), .speedBoostPurchaseDialog):
+                break
+                
+            case (_, .error(let psiCashErrorEvent), _):
+                let errorDesc = ErrorEventDescription(
+                    event: psiCashErrorEvent.eraseToRepr(),
+                    localizedUserDescription: psiCashErrorEvent.error.localizedUserDescription
+                )
+
+                self.dismissPurchasingScreens()
+
+                switch psiCashErrorEvent.error {
+                case .requestError(.errorStatus(.insufficientBalance)):
+                    let alertEvent = AlertEvent(
+                        .psiCashAlert(
+                            .insufficientBalanceErrorAlert(localizedMessage: errorDesc.localizedUserDescription)),
+                            date: psiCashErrorEvent.date)
+
+                    self.store.send(.mainViewAction(.presentAlert(alertEvent)))
+
+                default:
+                    let alertEvent = AlertEvent(
+                        .error(
+                            localizedTitle: UserStrings.Error_title(),
+                            localizedMessage: errorDesc.localizedUserDescription
+                        ),
+                        date: psiCashErrorEvent.date
+                    )
+
+                    self.store.send(.mainViewAction(.presentAlert(alertEvent)))
+                }
+
+            case (.completed(let iapErrorEvent), _, _):
+                self.dismissPurchasingScreens()
+                if let errorDesc = iapErrorEvent.localizedErrorEventDescription {
+
+                    let alertEvent = AlertEvent(
+                        .error(
+                            localizedTitle: UserStrings.Purchase_failed(),
+                            localizedMessage: errorDesc.localizedUserDescription
+                        ),
+                        date: iapErrorEvent.date
+                    )
+
+                    self.store.send(.mainViewAction(.presentAlert(alertEvent)))
                 }
                 
-                
-                let psiCashIAPPurchase = observed.state.iap.purchasing[.psiCash] ?? nil
-                let purchasingNavState = (psiCashIAPPurchase?.purchasingState,
-                                          observed.state.psiCash.purchasing,
-                                          self.navigation)
-                
-                switch purchasingNavState {
-                case (.none, .none, _):
-                    self.display(screen: .mainScreen)
-                    
-                case (.pending(_), _, .mainScreen):
-                    self.display(screen: .psiCashPurchaseDialog)
-                    
-                case (.pending(_), _, .psiCashPurchaseDialog):
-                    break
-                    
-                case (_, .speedBoost(_), .mainScreen):
-                    self.display(screen: .speedBoostPurchaseDialog)
-                    
-                case (_, .speedBoost(_), .speedBoostPurchaseDialog):
-                    break
-                    
-                case (_, .error(let psiCashErrorEvent), _):
-                    let errorDesc = ErrorEventDescription(
-                        event: psiCashErrorEvent.eraseToRepr(),
-                        localizedUserDescription: psiCashErrorEvent.error.userDescription
-                    )
-                    
-                    self.display(screen: .mainScreen)
-                    
-                    if case let .serverError(psiCashStatus, _, nil) = psiCashErrorEvent.error,
-                       PsiCashStatus(rawValue: psiCashStatus)! == .insufficientBalance {
-                        
-                        self.display(errorDesc: errorDesc,
-                                     makeAlertController:
-                                        UIAlertController.makeSimpleAlertWithDismissButton(
-                                            actionButtonTitle: UserStrings.Add_psiCash(),
-                                            message: errorDesc.localizedUserDescription,
-                                            addPsiCashHandler: { [unowned self] in
-                                                self.activeTab = .addPsiCash
-                                            }
-                                        ))
-                        
-                    } else {
-                        self.displayBasicAlert(errorDesc: errorDesc)
-                    }
-                    
-                case (.completed(let iapErrorEvent), _, _):
-                    self.display(screen: .mainScreen)
-                    if let errorDesc = iapErrorEvent.localizedErrorEventDescription {
-                        self.displayBasicAlert(errorDesc: errorDesc)
-                    }
-                    
-                default:
-                    feedbackLogger.fatalError("""
+            default:
+                feedbackLogger.fatalError("""
                         Invalid purchase navigation state combination: \
                         '\(String(describing: purchasingNavState))',
                         """)
+                return
+            }
+
+            // Updates active tab UI
+            self.tabControl.bind(psiCashViewState.activeTab)
+            
+            // Updates PsiCash balance (this does not control whether the view is hidden or not)
+            self.balanceViewWrapper.bind(observed.readerState.psiCashBalanceViewModel)
+            
+            // Sets account username if availalbe
+            if let accountName = observed.readerState.psiCash.libData?.accountUsername {
+                self.accountNameViewWrapper.bind(accountName)
+            }
+            
+            switch observed.readerState.subscription.status {
+            case .unknown:
+                guard self.updateUIState(.unknownSubscription) else {
+                    fatalError()
+                }
+                return
+                
+            case .subscribed(_):
+                guard self.updateUIState(.subscribed(psiCashLibData.accountType)) else {
+                    fatalError()
+                }
+                return
+                
+            case .notSubscribed:
+            
+                let handled = self.updateUIState(
+                    .notSubscribed(
+                        observed.tunneled,
+                        psiCashLibData.accountType,
+                        observed.readerState.psiCash.isLoggingInOrOut
+                    )
+                )
+                
+                if handled {
                     return
                 }
                 
-                guard observed.state.psiCash.libData.authPackage.hasMinimalTokens else {
-                    self.balanceView.isHidden = true
-                    self.tabControl.isHidden = true
-                    self.containerBindable.bind(
-                        .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
-                    )
-                    return
+                // Invariants:
+                // - User not subscribed
+                // - Not in a tunnel transition state (connecting, disconnecting).
+                // - PsiCash token state: is tracker or logged in
+                // - Not pending login/logout
+                guard
+                    (observed.tunneled == .connected || observed.tunneled == .notConnected),
+                    (psiCashLibData.accountType == .tracker ||
+                     psiCashLibData.accountType == .account(loggedIn: true)),
+                    observed.readerState.psiCash.isLoggingInOrOut == .none
+                else
+                {
+                    // updateUIState(_:) is expected to handle all other cases.
+                    fatalError()
                 }
                 
-                switch observed.state.subscription.status {
-                case .unknown:
-                    // There is not PsiCash state or subscription state is unknown.
-                    self.balanceView.isHidden = true
-                    self.tabControl.isHidden = true
-                    self.containerBindable.bind(
-                        .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
-                    )
+                switch (observed.tunneled, psiCashViewState.activeTab) {
+                case (.connecting, _), (.disconnecting, _):
+                    // Already handled by above call to self.updateUIState
+                    return
                     
-                case .subscribed(_):
-                    // User is subscribed. Only shows the PsiCash balance.
-                    self.balanceView.isHidden = false
-                    self.tabControl.isHidden = true
-                    self.balanceView.bind(observed.state.psiCashBalanceViewModel)
-                    self.containerBindable.bind(
-                        .left(.right(.right(.right(.right(.userSubscribed)))))
-                    )
+                case (.notConnected, .addPsiCash),
+                     (.connected, .addPsiCash):
                     
-                case .notSubscribed:
-                    self.balanceView.isHidden = false
-                    self.tabControl.isHidden = false
-                    self.balanceView.bind(observed.state.psiCashBalanceViewModel)
-                    
-                    // Updates active tab UI
-                    switch observed.activeTab {
-                    case .addPsiCash:
-                        self.tabControl.bind(.addPsiCash)
-                    case .speedBoost:
-                        self.tabControl.bind(.speedBoost)
+                    if let unverifiedPsiCashTx = observed.readerState.iap.unfinishedPsiCashTx {
+                        switch observed.tunneled {
+                        case .connected:
+                            
+                            // Set view content based on verification state of the
+                            // unverified PsiCash IAP transaction.
+                            switch unverifiedPsiCashTx.verification {
+                            case .notRequested, .pendingResponse:
+                                self.containerView.bind(
+                                    .left(.right(.right(.right(.right(
+                                                                .pendingPsiCashVerification)))))
+                                )
+                                
+                            case .requestError(_):
+                                // Shows failed to verify purchase message with,
+                                // tap to retry button.
+                                self.containerView.bind(
+                                    .left(.right(.right(.right(.left(
+                                                                .failedToVerifyPsiCashIAPPurchase(retryAction: {
+                                                                    iapStore.send(.checkUnverifiedTransaction)
+                                                                })))))))
+                                
+                            }
+                            
+                        case .notConnected:
+                            // If tunnel is not connected and there is a pending PsiCash IAP,
+                            // then shows the "pending psicash purchase" screen.
+                            self.containerView.bind(
+                                .left(.right(.right(.left(.untunneled(.pendingPsiCashPurchase))))))
+                            
+                        case .connecting, .disconnecting:
+                            fatalError()
+                        }
+                        
+                    } else {
+                        
+                        let allProducts = observed.readerState.allProducts()
+                        
+                        switch allProducts {
+                        case .pending([]):
+                            // Product list is being retrieved from the
+                            // App Store for the first time.
+                            // A spinner is shown.
+                            self.containerView.bind(.left(.right(.left(true))))
+                        case .pending(let lastSuccess):
+                            // Displays product list from previous retrieval.
+
+                            self.containerView.bind(.left(.left(.makeViewModel(purchasables: lastSuccess, accountType: psiCashLibData.accountType))))
+                            
+                        case .completed(let productRequestResult):
+                            // Product list retrieved from App Store.
+                            switch productRequestResult {
+                            case .success(let psiCashCoinProducts):
+                                self.containerView.bind(.left(.left(.makeViewModel(purchasables: psiCashCoinProducts, accountType: psiCashLibData.accountType))))
+                                
+                            case .failure(_):
+                                // Shows failed to load message with tap to retry button.
+                                self.containerView.bind(
+                                    .left(.right(.right(.right(.left(
+                                                                .failedToLoadProductList(retryAction: {
+                                                                    productRequestStore.send(.getProductList)
+                                                                })))))))
+                            }
+                        }
                     }
                     
-                    switch (observed.tunneled, observed.activeTab) {
-                    case (.notConnected, .addPsiCash),
-                         (.connected, .addPsiCash):
+                case (.notConnected, .speedBoost):
+                    
+                    let activeSpeedBoost = observed.readerState.psiCash.activeSpeedBoost(dateCompare)
+                    
+                    switch activeSpeedBoost {
+                    case .none:
+                        // There is no active speed boost.
+                        self.containerView.bind(
+                            .right(.right(.right(.left(
+                                .untunneled(.speedBoostUnavailable(subtitle: .connectToPsiphon)))))))
                         
-                        if let unverifiedPsiCashTx = observed.state.iap.unfinishedPsiCashTx {
-                            switch observed.tunneled {
-                            case .connected:
-                                
-                                // Set view content based on verification state of the
-                                // unverified PsiCash IAP transaction.
-                                switch unverifiedPsiCashTx.verification {
-                                case .notRequested, .pendingResponse:
-                                    self.containerBindable.bind(
-                                        .left(.right(.right(.right(.right(
-                                                                    .pendingPsiCashVerification)))))
-                                    )
-                                    
-                                case .requestError(_):
-                                    // Shows failed to verify purchase message with,
-                                    // tap to retry button.
-                                    self.containerBindable.bind(
-                                        .left(.right(.right(.right(.left(
-                                                                    .failedToVerifyPsiCashIAPPurchase(retryAction: {
-                                                                        iapStore.send(.checkUnverifiedTransaction)
-                                                                    })))))))
-                                    
-                                case .purchaseNotRecordedByAppStore:
-                                    self.containerBindable.bind(.left(.right(.right(.right(.left(.transactionNotRecordedByAppStore(
-                                        isRefreshingReceipt: observed.state.isRefreshingAppStoreReceipt,
-                                        retryAction: {
-                                            appStoreReceiptStore.send(
-                                                .remoteReceiptRefresh(optionalPromise: nil))
-                                        }
-                                    )))))))
-                                }
-                                
-                            case .notConnected:
-                                // If tunnel is not connected and there is a pending PsiCash IAP,
-                                // then shows the "pending psicash purchase" screen.
-                                self.containerBindable.bind(
-                                    .left(.right(.right(.left(.pendingPsiCashPurchase))))
-                                )
-                            case .connecting, .disconnecting:
-                                feedbackLogger.fatalError(
-                                    "tunnelState at this point should not be 'connecting'")
-                                return
+                    case .some(_):
+                        // There is an active speed boost.
+                        self.containerView.bind(
+                            .right(.right(.right(.left(.untunneled(.speedBoostAlreadyActive))))))
+                    }
+                    
+                case (.connected, .speedBoost):
+                    
+                    let activeSpeedBoost = observed.readerState.psiCash.activeSpeedBoost(dateCompare)
+                    
+                    switch activeSpeedBoost {
+                    case .none:
+                        // There is no active speed boost.
+                        let speedBoostPurchasables =
+                            psiCashLibData.purchasePrices.compactMap {
+                                $0.successToOptional()?.speedBoost
                             }
-                            
+                            .map { purchasable -> SpeedBoostPurchasableViewModel in
+                                
+                                let productTitle = purchasable.product.localizedString
+                                    .uppercased(with: self.locale)
+                                
+                                return SpeedBoostPurchasableViewModel(
+                                    purchasable: purchasable,
+                                    localizedProductTitle: productTitle
+                                )
+                            }
+                            .sorted() // Sorts by Comparable impl of SpeedBoostPurchasableViewModel.
+                        
+                        let viewModel = NonEmpty(array: speedBoostPurchasables)
+                        
+                        if let viewModel = viewModel {
+                            // Has Speed Boost products
+                            self.containerView.bind(.right(.left(viewModel)))
                         } else {
                             
-                            
-                            // Subtitle for rewarded video product given tunneled status.
-                            let rewardedVideoClearedForSale: Bool
-                            let rewardedVideoSubtitle: String
-                            switch observed.tunneled {
-                            case .connected:
-                                rewardedVideoClearedForSale = false
-                                rewardedVideoSubtitle =
-                                    UserStrings.Disconnect_from_psiphon_to_watch_and_earn_psicash()
-                            case .notConnected:
-                                rewardedVideoClearedForSale = true
-                                rewardedVideoSubtitle = UserStrings.Watch_rewarded_video_and_earn()
-                            case .connecting, .disconnecting:
-                                feedbackLogger.fatalError("Unexpected state")
-                                return
+                            // If there is no pending PsiCash refresh state, and
+                            // there are no Speed Boost products, shows error message.
+                            if case .pending = observed.readerState.psiCash.pendingPsiCashRefresh {
+                                // Shows spinner while PsiCash refresh state is pending.
+                                self.containerView.bind(.right(.right(.left(true))))
+                            } else {
+                                self.containerView.bind(
+                                    .right(.right(.right(.right(.noSpeedBoostProducts)))))
                             }
                             
-                            let allProducts = observed.state.allProducts(
-                                platform: platform,
-                                rewardedVideoClearedForSale: rewardedVideoClearedForSale,
-                                rewardedVideoSubtitle: rewardedVideoSubtitle
-                            )
-                            
-                            switch allProducts {
-                            case .pending([]):
-                                // Product list is being retrieved from the
-                                // App Store for the first time.
-                                // A spinner is shown.
-                                self.containerBindable.bind(.left(.right(.left(true))))
-                            case .pending(let lastSuccess):
-                                // Displays product list from previous retrieval.
-                                self.containerBindable.bind(.left(.left(lastSuccess)))
-                            case .completed(let productRequestResult):
-                                // Product list retrieved from App Store.
-                                switch productRequestResult {
-                                case .success(let psiCashCoinProducts):
-                                    self.containerBindable.bind(.left(.left(psiCashCoinProducts)))
-                                case .failure(_):
-                                    // Shows failed to load message with tap to retry button.
-                                    self.containerBindable.bind(
-                                        .left(.right(.right(.right(.left(
-                                                                    .failedToLoadProductList(retryAction: {
-                                                                        productRequestStore.send(.getProductList)
-                                                                    })))))))
-                                }
-                            }
                         }
                         
-                    case (.connecting, _):
-                        self.tabControl.isHidden = true
-                        self.containerBindable.bind(
-                            .left(.right(.right(.right(.right(.unavailableWhileConnecting))))))
-                        
-                    case (.disconnecting, _):
-                        self.tabControl.isHidden = true
-                        self.containerBindable.bind(
-                            .left(.right(.right(.right(.right(.unavailableWhileDisconnecting))))))
-                        
-                    case (let tunnelState, .speedBoost):
-                        
-                        let activeSpeedBoost = observed.state.psiCash.activeSpeedBoost
-                        
-                        switch tunnelState {
-                        case .notConnected, .connecting, .disconnecting:
-                            
-                            switch activeSpeedBoost {
-                            case .none:
-                                // There is no active speed boost.
-                                let connectToPsiphonMessage =
-                                    PsiCashMessageViewUntunneled.Message
-                                    .speedBoostUnavailable(subtitle: .connectToPsiphon)
-                                
-                                self.containerBindable.bind(
-                                    .right(.right(.right(.left(connectToPsiphonMessage)))))
-                                
-                            case .some(_):
-                                // There is an active speed boost.
-                                self.containerBindable.bind(
-                                    .right(.right(.right(.left(.speedBoostAlreadyActive)))))
-                            }
-                            
-                            
-                        case .connected:
-                            switch activeSpeedBoost {
-                            case .none:
-                                // There is no active speed boost.
-                                let viewModel = NonEmpty(
-                                    array:observed.state.psiCash.libData.availableProducts
-                                        .items.compactMap { $0.speedBoost }
-                                        .map { purchasable -> SpeedBoostPurchasableViewModel in
-                                            
-                                            let productTitle = purchasable.product.localizedString
-                                                .uppercased(with: self.locale)
-                                            
-                                            return SpeedBoostPurchasableViewModel(
-                                                purchasable: purchasable,
-                                                localizedProductTitle: productTitle
-                                            )
-                                        }
-                                        .sorted())
-                                
-                                if let viewModel = viewModel {
-                                    self.containerBindable.bind(.right(.left(viewModel)))
-                                } else {
-                                    let tryAgainLater = PsiCashMessageViewUntunneled.Message
-                                        .speedBoostUnavailable(subtitle: .tryAgainLater)
-                                    self.containerBindable.bind(
-                                        .right(.right(.right(.left(tryAgainLater)))))
-                                }
-                                
-                            case .some(_):
-                                // There is an active speed boost.
-                                self.containerBindable.bind(
-                                    .right(.right(.right(.right(.speedBoostAlreadyActive)))))
-                            }
-                        }
+                    case .some(_):
+                        // There is an active speed boost.
+                        self.containerView.bind(
+                            .right(.right(.right(.right(.speedBoostAlreadyActive)))))
                     }
                 }
             }
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -498,6 +483,163 @@ final class PsiCashViewController: ReactiveViewController {
         Style.default.statusBarStyle
     }
     
+    /// An incomplete representation of the UI state, used only by the `updateUIState(_:)` method.
+    enum UIState: Equatable {
+        case unknownSubscription
+        case subscribed(PsiCashAccountType)
+        case notSubscribed(TunnelConnectedStatus, PsiCashAccountType, PsiCashState.LoginLogoutPendingValue?)
+    }
+    
+    /// `updateUIState(_:)` updates some parts of the UI.
+    /// This is used alongside the main subscription to the `ObservedState`
+    /// signal in the `init` method to update the UI.
+    /// - Returns: True if containerView state is handled.
+    func updateUIState(_ state: UIState) -> Bool {
+        
+        switch state {
+        
+        case .unknownSubscription:
+            self.accountNameViewWrapper.view.isHidden = true
+            self.balanceViewWrapper.view.isHidden = true
+            self.tabControl.view.isHidden = true
+            self.signupOrLogInView.isHidden = true
+            
+            self.containerView.bind(
+                .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
+            )
+            
+            return true
+            
+        case .subscribed(let psiCashAccountType):
+            // User is subscribed. Only shows the PsiCash balance, and the username (if logged in).
+            switch psiCashAccountType {
+            case .noTokens, .tracker, .account(loggedIn: false):
+                self.accountNameViewWrapper.view.isHidden = true
+            case .account(loggedIn: true):
+                self.accountNameViewWrapper.view.isHidden = false
+            }
+            self.balanceViewWrapper.view.isHidden = false
+            self.tabControl.view.isHidden = true
+            self.signupOrLogInView.isHidden = true
+                        
+            self.containerView.bind(
+                .left(.right(.right(.right(.right(.userSubscribed)))))
+            )
+            
+            return true
+            
+        case let .notSubscribed(tunnelStatus, psiCashAccountType, maybePendingPsiCashLoginLogout):
+            
+            // Blocks UI and displays appropriate message if tunnel is connecting or disconnecting.
+            switch tunnelStatus {
+            case .connecting:
+                self.accountNameViewWrapper.view.isHidden = true
+                self.balanceViewWrapper.view.isHidden = true
+                self.tabControl.view.isHidden = true
+                self.signupOrLogInView.isHidden = true
+                
+                self.containerView.bind(
+                    .left(.right(.right(.right(.right(.unavailableWhileConnecting))))))
+                
+                return true
+                
+            case .disconnecting:
+                
+                self.accountNameViewWrapper.view.isHidden = true
+                self.balanceViewWrapper.view.isHidden = true
+                self.tabControl.view.isHidden = true
+                self.signupOrLogInView.isHidden = true
+                
+                self.containerView.bind(
+                    .left(.right(.right(.right(.right(.unavailableWhileDisconnecting))))))
+             
+                return true
+                
+            default:
+                break
+                
+            }
+            
+            // Blocks UI and displays appropriate message if user is logging in or loggign out.
+            switch maybePendingPsiCashLoginLogout {
+            
+            case .none:
+                break
+                
+            case .login:
+                self.accountNameViewWrapper.view.isHidden = true
+                self.balanceViewWrapper.view.isHidden = true
+                self.tabControl.view.isHidden = true
+                self.signupOrLogInView.isHidden = false
+                
+                self.containerView.bind(
+                    .left(.right(.right(.right(.right(.psiCashAccountsLoggingIn))))))
+                
+                return true
+                
+            case .logout:
+                self.accountNameViewWrapper.view.isHidden = true
+                self.balanceViewWrapper.view.isHidden = true
+                self.tabControl.view.isHidden = true
+                self.signupOrLogInView.isHidden = true
+                
+                self.containerView.bind(
+                    .left(.right(.right(.right(.right(.psiCashAccountsLoggingOut))))))
+                
+                return true
+                
+            }
+            
+            switch psiCashAccountType {
+            case .noTokens:
+                self.accountNameViewWrapper.view.isHidden = true
+                self.balanceViewWrapper.view.isHidden = true
+                self.tabControl.view.isHidden = true
+                self.signupOrLogInView.isHidden = true
+                
+                self.containerView.bind(
+                    .left(.right(.right(.right(.right(.otherErrorTryAgain)))))
+                )
+                
+                return true
+                
+            case .account(loggedIn: false):
+                
+                self.accountNameViewWrapper.view.isHidden = true
+                self.balanceViewWrapper.view.isHidden = true
+                self.tabControl.view.isHidden = true
+                self.signupOrLogInView.isHidden = false
+                
+                self.containerView.bind(
+                    .left(.right(.right(.right(.right(.signupOrLoginToPsiCash)))))
+                )
+                
+                return true
+                
+            case .account(loggedIn: true):
+                
+                self.accountNameViewWrapper.view.isHidden = false
+                self.balanceViewWrapper.view.isHidden = false
+                self.tabControl.view.isHidden = false
+                self.signupOrLogInView.isHidden = true
+                
+                return false
+                
+            case .tracker:
+                
+                self.accountNameViewWrapper.view.isHidden = true
+                self.balanceViewWrapper.view.isHidden = false
+                self.tabControl.view.isHidden = false
+                self.signupOrLogInView.isHidden = false
+                
+                return false
+                
+            }
+            
+        }
+        
+    }
+    
     // Setup and add all the views here
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -505,53 +647,81 @@ final class PsiCashViewController: ReactiveViewController {
         setBackgroundGradient(for: view)
         
         tabControl.setTabHandler { [unowned self] tab in
-            self.activeTab = tab
+            self.store.send(.mainViewAction(.psiCashViewAction(.switchTabs(tab))))
         }
         
         closeButton.setEventHandler { [unowned self] in
             self.dismiss(animated: true, completion: nil)
         }
         
+        vStack.addArrangedSubviews(
+            signupOrLogInView,
+            tabControl.view,
+            containerView.view
+        )
+        
         // Add subviews
-        view.addSubview(balanceView)
-        view.addSubview(closeButton)
-        view.addSubview(tabControl)
-        view.addSubview(containerView)
+        view.addSubviews(
+            accountNameViewWrapper.view,
+            balanceViewWrapper.view,
+            closeButton,
+            vStack
+        )
         
         // Setup layout guide
-        let rootViewLayoutGuide = addSafeAreaLayoutGuide(to: view)
+        let rootViewLayoutGuide = makeSafeAreaLayoutGuide(addToView: view)
         
         let paddedLayoutGuide = UILayoutGuide()
         view.addLayoutGuide(paddedLayoutGuide)
         
         paddedLayoutGuide.activateConstraints {
-            $0.constraint(to: rootViewLayoutGuide, .top(), .bottom(), .centerX()) +
-                [ $0.widthAnchor.constraint(equalTo: rootViewLayoutGuide.widthAnchor,
-                                            multiplier: 0.91) ]
+            $0.constraint(
+                to: rootViewLayoutGuide,
+                .top(Float(Style.default.padding)),
+                .bottom(),
+                .centerX()
+            )
+            +
+            $0.widthAnchor.constraint(
+                toDimension: rootViewLayoutGuide.widthAnchor,
+                ratio: Style.default.layoutWidthToHeightRatio,
+                max: Style.default.layoutMaxWidth
+            )
         }
         
-        // Setup subview constraints
-        setChildrenAutoresizingMaskIntoConstraintsFlagToFalse(forView: view)
+        self.balanceViewWrapper.view.setContentHuggingPriority(
+            higherThan: self.vStack, for: .vertical)
         
-        balanceView.activateConstraints {
-            $0.constraint(to: paddedLayoutGuide, .centerX(), .top(30))
+        self.signupOrLogInView.setContentHuggingPriority(
+            higherThan: self.vStack, for: .vertical)
+        
+        self.accountNameViewWrapper.view.activateConstraints {
+            $0.constraint(to: paddedLayoutGuide, .centerX(), .top(Float(Style.default.padding))) +
+            [
+                $0.leadingAnchor.constraint(greaterThanOrEqualTo: paddedLayoutGuide.leadingAnchor),
+                $0.trailingAnchor.constraint(lessThanOrEqualTo: self.closeButton.leadingAnchor)
+            ]
         }
         
-        closeButton.activateConstraints {[
-            $0.centerYAnchor.constraint(equalTo: balanceView.centerYAnchor),
-            $0.trailingAnchor.constraint(equalTo: paddedLayoutGuide.trailingAnchor),
-        ]}
+        self.closeButton.activateConstraints {
+            $0.constraint(to: paddedLayoutGuide, .trailing(), .top(Float(Style.default.largePadding)))
+        }
+                
+        self.balanceViewWrapper.view.activateConstraints {
+            $0.constraint(to: paddedLayoutGuide, .centerX(0, .belowRequired)) +
+            [
+                $0.topAnchor.constraint(
+                    equalTo: self.accountNameViewWrapper.view.bottomAnchor,
+                    constant: 5.0),
+                $0.leadingAnchor.constraint(greaterThanOrEqualTo: paddedLayoutGuide.leadingAnchor),
+                $0.trailingAnchor.constraint(lessThanOrEqualTo: closeButton.leadingAnchor)
+            ]
+        }
         
-        tabControl.activateConstraints {[
-            $0.topAnchor.constraint(equalTo: balanceView.topAnchor, constant: 50.0),
-            $0.centerXAnchor.constraint(equalTo: paddedLayoutGuide.centerXAnchor),
-            $0.widthAnchor.constraint(equalTo: paddedLayoutGuide.widthAnchor),
-            $0.heightAnchor.constraint(equalToConstant: 44.0)
-        ]}
-        
-        containerView.activateConstraints {
-            $0.constraint(to: paddedLayoutGuide, .bottom(), .leading(), .trailing()) +
-                [ $0.topAnchor.constraint(equalTo: tabControl.bottomAnchor, constant: 15.0) ]
+        self.vStack.activateConstraints {
+            $0.constraint(to: paddedLayoutGuide, .bottom(), .leading(), .trailing()) + [
+                $0.topAnchor.constraint(equalTo: self.balanceViewWrapper.view.bottomAnchor,
+                                        constant: Style.default.largePadding) ]
         }
         
     }
@@ -566,59 +736,67 @@ final class PsiCashViewController: ReactiveViewController {
 // Navigations
 extension PsiCashViewController {
     
-    /// Display an error alert with a single "OK" button.
-    private func displayBasicAlert(errorDesc: ErrorEventDescription<ErrorRepr>) {
-        self.display(errorDesc: errorDesc,
-                     makeAlertController:
-                        .makeSimpleAlertWithOKButton(message: errorDesc.localizedUserDescription))
-    }
-    
-    /// Display error alert if `errorDesc` is a unique alert not in `self.errorAlerts`, and
-    /// the error event `errorDesc.event` date is not before the init date of
-    /// the view controller `viewControllerInitTime`.
-    /// Only if the error is unique `makeAlertController` is called for creating the alert controller.
-    private func display(errorDesc: ErrorEventDescription<ErrorRepr>,
-                         makeAlertController: @autoclosure () -> UIAlertController) {
-        
-        // Displays errors that have been emitted after the init date of the view controller.
-        guard errorDesc.event.date > viewControllerInitTime else {
-            return
-        }
-        
-        // Inserts `errorDesc` into `errorAlerts` set.
-        // If a member of `errorAlerts` is equal to `errorDesc.event.error`, then
-        // that member is removed and `errorDesc` is inserted.
-        let inserted = self.errorAlerts.insert(orReplaceIfEqual: \.event.error, errorDesc)
-        
-        // Prevent display of the same error event.
-        guard inserted else {
-            return
-        }
-        
-        let alertController = makeAlertController()
-        self.presentOnViewDidAppear(alertController, animated: true, completion: nil)
-    }
-    
-    private func display(screen: Screen) {
-        guard self.navigation != screen else {
-            return
-        }
-        self.navigation = screen
-        
-        switch screen {
+    private func dismissPurchasingScreens() {
+        switch self.navigation {
         case .mainScreen:
-            self.presentedViewController?.dismiss(animated: false, completion: nil)
+            return
+        case .psiCashPurchaseDialog, .speedBoostPurchaseDialog:
+            let _ = self.display(screen: .mainScreen)
+        }
+    }
+    
+    private func display(screen: Screen) -> Bool {
+        
+        // Can only navigate to a new screen from the main screen,
+        // otherwise what should be presented is not well-defined.
+        
+        guard self.navigation != screen else {
+            // Already displaying `screen`.
+            return true
+        }
+        
+        if case .mainScreen = screen {
+            guard let presentedViewController = self.presentedViewController else {
+                // There is no presentation to dismiss.
+                return true
+            }
             
-        case .psiCashPurchaseDialog:
-            let purchasingViewController = AlertViewController(viewBuilder:
-                                                                PsiCashPurchasingViewBuilder())
+            UIViewController.safeDismiss(presentedViewController,
+                                         animated: false,
+                                         completion: nil)
             
-            self.presentOnViewDidAppear(purchasingViewController, animated: false,
-                                        completion: nil)
+            self.navigation = .mainScreen
+            return true
             
-        case .speedBoostPurchaseDialog:
-            let vc = AlertViewController(viewBuilder: PurchasingSpeedBoostAlertViewBuilder())
+        } else {
+            
+            // Presenting a new screen is only well-defined current screen is the main screen.
+            guard case .mainScreen = self.navigation else {
+                return false
+            }
+
+            let alertViewBuilder: PurchasingAlertViewBuilder
+            switch screen {
+            case .mainScreen:
+                fatalError()
+            case .psiCashPurchaseDialog:
+                alertViewBuilder = PurchasingAlertViewBuilder(alert: .psiCash, locale: locale)
+            case .speedBoostPurchaseDialog:
+                alertViewBuilder = PurchasingAlertViewBuilder(alert: .speedBoost, locale: locale)
+            }
+            
+            let vc = ViewBuilderViewController(
+                viewBuilder: alertViewBuilder,
+                modalPresentationStyle: .overFullScreen,
+                onDismissed: {
+                    // No-op.
+                }
+            )
+
             self.presentOnViewDidAppear(vc, animated: false, completion: nil)
+            
+            self.navigation = screen
+            return true
         }
     }
     
@@ -642,15 +820,28 @@ extension ErrorEvent where E == IAPError {
                 optionalDescription = "App Store failed to record the purchase"
                 
             case let .error(skEmittedError):
+
                 // Payment cancelled errors are ignored.
                 if case let .right(skError) = skEmittedError,
                    case .paymentCancelled = skError.errorInfo.code {
+
                     optionalDescription = .none
+
                 } else {
+
+                    let desc: String
+                    switch skEmittedError {
+                    case .left(let error):
+                        desc = error.errorInfo.localizedDescription
+                    case .right(let error):
+                        desc = error.errorInfo.localizedDescription
+                    }
+
                     optionalDescription = """
-                        \(UserStrings.Purchase_failed())
-                        (\(skEmittedError.localizedDescription))
+                        \(UserStrings.Operation_failed_please_try_again_alert_message())
+                        (\(desc))
                         """
+
                 }
             }
         }
@@ -662,4 +853,34 @@ extension ErrorEvent where E == IAPError {
                                      localizedUserDescription: description)
     }
     
+}
+
+fileprivate extension PsiCashCoinPurchaseTable.ViewModel {
+    
+    static func makeViewModel(
+        purchasables: [PsiCashPurchasableViewModel], accountType: PsiCashAccountType
+    ) -> Self {
+        let footerText: String?
+        if case .tracker = accountType {
+            footerText = UserStrings.PsiCash_non_account_purchase_notice()
+        } else {
+           footerText = nil
+        }
+        return .init(purchasables: purchasables, footerText: footerText)
+    }
+    
+}
+
+extension PsiCashViewController.ReaderState {
+
+    /// Adds rewarded video product to list of `PsiCashPurchasableViewModel`  retrieved from AppStore.
+    func allProducts() -> PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent<Int>> {
+        
+        return appStorePsiCashProducts.map(
+            pending: { $0.compactMap { $0.viewModel } },
+            completed: { $0.map { $0.compactMap { $0.viewModel } } }
+        )
+
+    }
+
 }

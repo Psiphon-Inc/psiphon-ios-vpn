@@ -108,11 +108,11 @@ func handleAppUpgradeFromVersion(oldVersion: String, userDefaultsConfig: UserDef
             forKey: legacy_175_containerFinishedOnboardingKey)
         
         if finishedOnboarding {
-            let completedStages: [OnboardingStage] = [
-                .languageSelection, .privacyPolicy_v2018_05_15, .vpnConfigPermission
+            let completedStages = [
+                "languageSelection", "privacyPolicy_v2018_05_15", "vpnConfigPermission"
             ]
             
-            userDefaultsConfig.onboardingStagesCompleted = completedStages.map(\.rawValue)
+            userDefaultsConfig.onboardingStagesCompleted = completedStages
         }
         
         UserDefaults.standard.removeObject(forKey: legacy_175_containerFinishedOnboardingKey)

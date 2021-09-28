@@ -27,6 +27,12 @@
 
 NSString * const CellIdentifier = @"cell";
 
+@interface PickerViewController ()
+
+@property (nonatomic, readwrite) NSLocale *locale;
+
+@end
+
 @implementation PickerViewController {
     UITableView *pickerTableView;
     NSArray<NSString *> *_Nonnull labels;
@@ -34,12 +40,14 @@ NSString * const CellIdentifier = @"cell";
 }
 
 - (instancetype)initWithLabels:(NSArray<NSString *> *)pickerLabels
-                     andImages:(NSArray<UIImage *> *_Nullable)pickerImages {
+                     andImages:(NSArray<UIImage *> *_Nullable)pickerImages
+                        locale:(NSLocale *)locale {
 
     self = [super init];
     if (self) {
         labels = pickerLabels;
         images = pickerImages;
+        self.locale = locale;
 
         if (images) {
             assert([labels count] == [images count]);
@@ -55,12 +63,9 @@ NSString * const CellIdentifier = @"cell";
 
     // Navigation bar
     {
-        self.navigationController.navigationBar.barStyle = UIBarStyleBlack;
-        self.navigationController.navigationBar.barTintColor = UIColor.darkBlueColor;
-        self.navigationController.navigationBar.translucent = FALSE;
-
-        // Removes the default iOS bottom border.
-        [self.navigationController.navigationBar setValue:@(TRUE) forKeyPath:@"hidesShadow"];
+        
+        // Apply Psiphon navigation bar styling.
+        [self.navigationController.navigationBar applyPsiphonNavigationBarStyling];
 
         UIBarButtonItem *doneButton = [[UIBarButtonItem alloc]
           initWithTitle:[UserStrings Done_button_title]
@@ -70,10 +75,6 @@ NSString * const CellIdentifier = @"cell";
         doneButton.tintColor = UIColor.whiteColor;
         self.navigationItem.rightBarButtonItem = doneButton;
 
-        self.navigationController.navigationBar.titleTextAttributes = @{
-            NSFontAttributeName: [UIFont avenirNextBold:14.f],
-            NSForegroundColorAttributeName: UIColor.blueGreyColor
-        };
     }
 
     {
@@ -162,6 +163,10 @@ NSString * const CellIdentifier = @"cell";
 
         cell.textLabel.font = [UIFont avenirNextMedium:16.f];
         cell.textLabel.textColor = UIColor.greyishBrown;
+        
+        if (cell.semanticContentAttribute == UISemanticContentAttributeForceRightToLeft) {
+            cell.textLabel.textAlignment = NSTextAlignmentRight;
+        }
 
         cell.separatorInset = UIEdgeInsetsZero;
 

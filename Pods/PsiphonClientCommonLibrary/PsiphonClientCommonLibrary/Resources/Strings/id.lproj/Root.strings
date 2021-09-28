@@ -34,8 +34,8 @@
 /*[UNTRANSLATED] Explanatory text for the "Select server region" setting on the "My connection is bad, help!" settings page. */
 "CONNECTION_HELP_BEST_PERFORMANCE_FOOTER" = "Changing your region to “Best performance” increases your chances of getting connected.";
 
-/*[UNTRANSLATED] Title for screen that allows user to select their desired server region. */
-"SELECT_SERVER_REGION" = "Select server region";
+/* Title for screen that allows user to select their desired server region. */
+"SELECT_SERVER_REGION" = "Pilih wilayah server";
 
 /* Explanatory text for the "Disable Timeouts" setting on the "My connection is bad, help!" settings page. */
 "CONNECTION_HELP_DISABLE_TIMEOUTS_FOOTER" = "Menonaktifkan waktu habis mungkin membantu Anda untuk tetap terhubung di koneksi jelek.";

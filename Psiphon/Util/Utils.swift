@@ -36,3 +36,13 @@ extension URL {
     }
     
 }
+
+extension Optional where Wrapped == NSNumber {
+    
+    var toOptionalBool: Bool? {
+        self.map {
+            $0.boolValue
+        }
+    }
+    
+}

@@ -37,7 +37,7 @@ struct RetriableTestResponse: RetriableHTTPResponse {
     }
     
     init(urlSessionResult: URLSessionResult) {
-        switch urlSessionResult {
+        switch urlSessionResult.result {
         case let .success(r):
             let data = String(bytes: r.data, encoding: .utf8)!
             switch r.metadata.statusCode {
@@ -46,12 +46,11 @@ struct RetriableTestResponse: RetriableHTTPResponse {
             default:
                 self.result = .failure(ErrorEvent(ErrorRepr(
                     repr: "status code: '\(r.metadata.statusCode)' data: '\(data)'"
-                )))
+                ), date: urlSessionResult.date))
             }
-        case let .failure(requestError):
-            self.result = .failure(requestError.errorEvent.map { _ in
-                ErrorRepr(repr: "request error")
-            })
+        case .failure(_):
+            self.result = .failure(ErrorEvent(ErrorRepr(repr: "request error"),
+                                              date: urlSessionResult.date))
         }
     }
     
@@ -111,7 +110,7 @@ func generateRetriableTunneledHttpRequestTest(
     }
 
     // Act
-    let result = request.callAsFunction(
+    let result = request(
         getCurrentTime: currentTimeFunc,
         tunnelStatusSignal: SignalProducer.just(
             values: vpnStatusSeq,
@@ -132,7 +131,7 @@ final class RequestsTests: XCTestCase {
     var echoHttpClient: EchoHTTPClient!
     
     override func setUpWithError() throws {
-        Debugging = .disabled()
+        Debugging = .disabled(buildConfig: .debug)
         echoHttpClient = EchoHTTPClient()
     }
     
@@ -153,7 +152,7 @@ final class RequestsTests: XCTestCase {
         }
         
         // Act
-        let result = request.callAsFunction(
+        let result = request(
             getCurrentTime: { Date() },
             tunnelStatusSignal: SignalProducer.neverComplete(value: .connected),
             tunnelConnectionRefSignal: SignalProducer.neverComplete(value: connectedConnection),
@@ -369,13 +368,13 @@ final class RequestsTests: XCTestCase {
         let expectedResponse = RetriableTestResponse(result: .failure(responseErrorEvent))
                 
         // TODO: Calling generate hinders replayability
-        let httpClientError = ErrorEvent(SystemError.arbitrary.generate, date: errorDate)
+        let httpClientError = SystemError<Int>.arbitrary.generate
         
         // HTTPClient error date should match expected response error date.
         self.echoHttpClient.responseSequence = Generator(sequence:
-            [.failure(HTTPRequestError(partialResponseMetadata: nil, errorEvent: httpClientError)),
-             .failure(HTTPRequestError(partialResponseMetadata: nil, errorEvent: httpClientError)),
-             .failure(HTTPRequestError(partialResponseMetadata: nil, errorEvent: httpClientError))]
+            [.failure(HTTPRequestError(partialResponseMetadata: nil, error: httpClientError)),
+             .failure(HTTPRequestError(partialResponseMetadata: nil, error: httpClientError)),
+             .failure(HTTPRequestError(partialResponseMetadata: nil, error: httpClientError))]
         )
         
         let retryInterval = DispatchTimeInterval.milliseconds(1)
@@ -399,7 +398,7 @@ final class RequestsTests: XCTestCase {
         // Assert
         
         // Checks that every error result is a retriable error for `RetriableTestResponse`.
-        let errorEvent = ErrorEvent(ErrorRepr(repr: "error"))
+        let errorEvent = ErrorEvent(ErrorRepr(repr: "error"), date: errorDate)
         let resultTuple = RetriableTestResponse.unpackRetriableResultError(.failure(errorEvent))
         XCTAssert(resultTuple.retryDueToError == errorEvent)
         
@@ -431,11 +430,11 @@ final class RequestsTests: XCTestCase {
         let expectedResponse = RetriableTestResponse(result: .failure(responseErrorEvent))
                 
         // TODO: Calling generate hinders replay functionality.
-        let httpClientError = ErrorEvent(SystemError.arbitrary.generate, date: errorDate)
+        let httpClientError = SystemError<Int>.arbitrary.generate
         
         // HTTPClient error date should match expected response error date.
         self.echoHttpClient.responseSequence = Generator(sequence:
-            [.failure(HTTPRequestError(partialResponseMetadata: nil, errorEvent: httpClientError)),
+            [.failure(HTTPRequestError(partialResponseMetadata: nil, error: httpClientError)),
              .success(())]
         )
         
@@ -459,7 +458,7 @@ final class RequestsTests: XCTestCase {
         // Assert
         
         // Checks that every error result is a retriable error for `RetriableTestResponse`.
-        let errorEvent = ErrorEvent(ErrorRepr(repr: "error"))
+        let errorEvent = ErrorEvent(ErrorRepr(repr: "error"), date: errorDate)
         let resultTuple = RetriableTestResponse.unpackRetriableResultError(.failure(errorEvent))
         XCTAssert(resultTuple.retryDueToError == errorEvent)
         
