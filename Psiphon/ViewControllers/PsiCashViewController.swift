@@ -202,7 +202,8 @@ final class PsiCashViewController: ReactiveViewController {
             }
             
             guard let psiCashLibData = observed.readerState.psiCash.libData else {
-                fatalError("PsiCash lib not loaded")
+                guard self.updateUIState(.psiCashNotLoaded) else { fatalError() }
+                return
             }
             
             let psiCashIAPPurchase = observed.readerState.iap.purchasing[.psiCash] ?? nil
@@ -485,6 +486,8 @@ final class PsiCashViewController: ReactiveViewController {
     
     /// An incomplete representation of the UI state, used only by the `updateUIState(_:)` method.
     enum UIState: Equatable {
+        // PsiCash library not loaded yet.
+        case psiCashNotLoaded
         case unknownSubscription
         case subscribed(PsiCashAccountType)
         case notSubscribed(TunnelConnectedStatus, PsiCashAccountType, PsiCashState.LoginLogoutPendingValue?)
@@ -497,6 +500,18 @@ final class PsiCashViewController: ReactiveViewController {
     func updateUIState(_ state: UIState) -> Bool {
         
         switch state {
+            
+        case .psiCashNotLoaded:
+            self.accountNameViewWrapper.view.isHidden = true
+            self.balanceViewWrapper.view.isHidden = true
+            self.tabControl.view.isHidden = true
+            self.signupOrLogInView.isHidden = true
+            
+            self.containerView.bind(
+                .left(.right(.right(.right(.right(.psiCashNotLoaded)))))
+            )
+            
+            return true
         
         case .unknownSubscription:
             self.accountNameViewWrapper.view.isHidden = true
