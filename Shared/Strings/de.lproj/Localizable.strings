@@ -475,7 +475,7 @@
 /*[UNTRANSLATED] Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
 "privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-1" = "Estimate future costs: The huge amount of user data we transfer each month is a major factor in our costs. It is vital for us to see and understand usage fluctuations.";
 
-/*[UNTRANSLATED] Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
 "privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-3" = "Determine the nature of major censorship events: Sites and services often get blocked suddenly and without warning, which can lead to huge variations in regional usage of Psiphon. For example, we had up to 20x surges in usage within a day when <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">Brazil blocked WhatsApp</a> or <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">Turkey blocked social media</a>.";
 
 /*[UNTRANSLATED] Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
