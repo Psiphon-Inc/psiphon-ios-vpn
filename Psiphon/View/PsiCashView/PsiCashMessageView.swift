@@ -141,7 +141,7 @@ struct PsiCashMessageView: ViewBuilder {
                 case .noSpeedBoostProducts:
                     imageView.image = UIImage(named: "PsiCashCoinCloud")!
                     title.text = UserStrings.PsiCash_unavailable()
-                    subtitle.text = UserStrings.Something_went_wrong_try_agaig_and_send_feedback()
+                    subtitle.text = UserStrings.Something_went_wrong_try_again_and_send_feedback()
                     subtitle.textAlignment = .center
                     
                 case .psiCashNotLoaded:
