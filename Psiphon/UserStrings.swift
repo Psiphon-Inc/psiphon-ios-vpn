@@ -478,7 +478,7 @@ extension UserStrings {
                                  comment: "Subtitle shown when the current operation failed, asking the user to try again at a later time.")
     }
     
-    static func Something_went_wrong_try_agaig_and_send_feedback() -> String {
+    static func Something_went_wrong_try_again_and_send_feedback() -> String {
         return NSLocalizedString("PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK", tableName: nil, bundle: Bundle.main,
                                  value: "Something went wrong, please try again later.\n\nIf this problem persists, please send a feedback.",
                                  comment: "Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists.")
