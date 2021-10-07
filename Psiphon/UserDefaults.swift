@@ -83,7 +83,7 @@ final class UserDefaultsConfig: PsiCashPersistedValues {
 
 extension UserDefaultsConfig {
     
-    /// Returned `onboardingStagesCompleted` parsed into types.
+    /// Returns `onboardingStagesCompleted` parsed into types.
     /// Drops values that are not recognized by `OnboardingStage`.
     var onboardingStagesCompletedTyped: [OnboardingStage] {
         return self.onboardingStagesCompleted.compactMap(OnboardingStage.init(rawValue:))

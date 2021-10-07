@@ -107,7 +107,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
         
         case .didFinishLaunching:
             // Determines whether onboarding is complete.
-            let stagesNotCompleted = OnboardingStage.findStagesNotCompleted(
+            let stagesNotCompleted = OnboardingStage.stagesToComplete(
                 completedStages: environment.userDefaultsConfig.onboardingStagesCompletedTyped)
             
             state.appDelegateState.onboardingCompleted = stagesNotCompleted.isEmpty
@@ -177,7 +177,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
         return [
             .fireAndForget {
                 environment.userDefaultsConfig.onboardingStagesCompleted =
-                    OnboardingStage.stagesToComplete.map(\.rawValue)
+                    OnboardingStage.allStages.map(\.rawValue)
             }
         ]
         
@@ -1116,7 +1116,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     ) -> OnboardingViewController? {
         
         // Finds stages that are not completed by the user.
-        let stagesNotCompleted = OnboardingStage.findStagesNotCompleted(
+        let stagesNotCompleted = OnboardingStage.stagesToComplete(
             completedStages: self.userDefaultsConfig.onboardingStagesCompletedTyped
         )
         
@@ -1143,7 +1143,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     
     @objc func completedAllOnboardingStages() -> Bool {
         // Finds stages that are not completed by the user.
-        let stagesNotCompleted = OnboardingStage.findStagesNotCompleted(
+        let stagesNotCompleted = OnboardingStage.stagesToComplete(
             completedStages: self.userDefaultsConfig.onboardingStagesCompletedTyped)
         
         return stagesNotCompleted.isEmpty

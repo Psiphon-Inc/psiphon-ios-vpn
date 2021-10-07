@@ -22,30 +22,90 @@ import PsiApi
 import Utilities
 import Promises
 
+/// Enumerates set of all privacy policy versions.
+enum PrivacyPolicyVersion: String, Codable {
+    
+    /// Privacy policy dated 2018-May-15.
+    case privacyPolicy_v2018_05_15
+    
+    /// Privacy policy update on 2021-Oct-06.
+    case privacyPolicy_v2021_10_06
+    
+}
+
 /// Represents different stages of onboarding.
 /// Note that each stage may not be limited to only one screen.
-enum OnboardingStage: String, Codable {
+enum OnboardingStage: Hashable, RawRepresentable {
+    typealias RawValue = String
     
     case languageSelection
-    case privacyPolicy_v2021_09_09
+    case privacyPolicy(PrivacyPolicyVersion)
     case vpnConfigPermission
     case userNotificationPermission
     
-    /// Ordered set of the stages that would have to be completed by the user.
-    static let stagesToComplete: [OnboardingStage] =
+    init?(rawValue: String) {
+        
+        if let privacyPolicyVersion = PrivacyPolicyVersion(rawValue: rawValue) {
+            // rawValue is a privacy policy version
+            self = .privacyPolicy(privacyPolicyVersion)
+        } else {
+            switch rawValue {
+            case "languageSelection":
+                self = .languageSelection
+            case "vpnConfigPermission":
+                self = .vpnConfigPermission
+            case "userNotificationPermission":
+                self = .userNotificationPermission
+            default:
+                return nil
+            }
+        }
+    }
+    
+    var rawValue: String {
+        switch self {
+        case .languageSelection:
+            return "languageSelection"
+        case .privacyPolicy(let version):
+            return version.rawValue
+        case .vpnConfigPermission:
+            return "vpnConfigPermission"
+        case .userNotificationPermission:
+            return "userNotificationPermission"
+        }
+    }
+    
+    /// Ordered set of the stages that would have to be completed
+    /// by the user for this version of the app.
+    static let allStages: [OnboardingStage] =
         [ .languageSelection,
-          .privacyPolicy_v2021_09_09,
+          .privacyPolicy(.privacyPolicy_v2021_10_06),
           .vpnConfigPermission,
           .userNotificationPermission ]
     
     /// Returns ordered set of stages not completed by the user, given `completedStages`.
-    static func findStagesNotCompleted(
+    static func stagesToComplete(
         completedStages: [OnboardingStage]
     ) -> OrderedSet<OnboardingStage> {
-        var stagesNotCompleted = OnboardingStage.stagesToComplete
-        stagesNotCompleted.removeAll {
-            completedStages.contains($0)
+        
+        var stagesNotCompleted = OnboardingStage.allStages
+        
+        stagesNotCompleted.removeAll { completedStages.contains($0) }
+        
+        let hasAcceptedAnyPP = completedStages.contains(where: {
+            if case .privacyPolicy(_) = $0 { return true }
+            return false
+        })
+        
+        // If the user has already accepted a previous privacy policy,
+        // then removes privacy policy stages from `stagesNotCompleted` (if any)
+        if hasAcceptedAnyPP {
+            stagesNotCompleted.removeAll {
+                if case .privacyPolicy(_) = $0 { return true }
+                return false
+            }
         }
+        
         return OrderedSet(stagesNotCompleted)
     }
     
@@ -56,7 +116,7 @@ fileprivate extension OnboardingStage {
     var screens: OrderedSet<OnboardingScreen> {
         switch self {
         case .languageSelection,
-             .privacyPolicy_v2021_09_09:
+             .privacyPolicy(_):
             return [ OnboardingScreen(stage: self, screenIndex: 0) ]
             
         case .vpnConfigPermission,
@@ -80,7 +140,7 @@ fileprivate extension OnboardingScreen {
         switch (self.stage, self.screenIndex) {
         case (.languageSelection, 0):
             return true
-        case (.privacyPolicy_v2021_09_09, 0):
+        case (.privacyPolicy(_), 0):
             return false
         case (.vpnConfigPermission, 0):
             return true
@@ -283,8 +343,8 @@ fileprivate extension OnboardingScreen {
                 self.present(nav, animated: true, completion: nil)
             }
 
-        case (.privacyPolicy_v2021_09_09, 0):
-            onboardingView = makePrivacyPolicyOnboardingView(
+        case (.privacyPolicy(_), 0):
+            onboardingView = makeLatestPrivacyPolicyOnboardingView(
                 onAccepted: { [unowned self] in
                     self.gotoScreenFollowing(screenIndex: currentIndex)
                 },
@@ -460,7 +520,7 @@ fileprivate func makeLanguageSelectionOnboardingView(
     )
 }
 
-fileprivate func makePrivacyPolicyOnboardingView(
+fileprivate func makeLatestPrivacyPolicyOnboardingView(
     onAccepted: @escaping () -> Void,
     onDeclined: @escaping () -> Void
 ) -> OnboardingScrollableView {
@@ -480,7 +540,7 @@ fileprivate func makePrivacyPolicyOnboardingView(
     return OnboardingScrollableView(
         image: UIImage(named: "OnboardingPrivacyPolicy")!,
         withTitle: Strings.privacyPolicyTitle(),
-        withHTMLBody: UserStrings.privacyPolicyHTMLText_v2021_09_09(languageCode: UserDefaultsConfig().localeForAppLanguage.languageCode ?? ""),
+        withHTMLBody: UserStrings.privacyPolicyHTMLText_v2021_10_06(languageCode: UserDefaultsConfig().localeForAppLanguage.languageCode ?? ""),
         withAccessoryView: stackView
     )
 }
