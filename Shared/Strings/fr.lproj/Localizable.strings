@@ -55,8 +55,8 @@
 /* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "CONNECT_TO_USE_SPEED_BOOST" = "Connectez-vous à Psiphon pour utiliser la Survitesse";
 
-/*[UNTRANSLATED] Label text shown to user when the VPN is connecting to a Psiphon server. Do not translate or transliterate 'Psiphon' */
-"CONNECTING_TO_PSIPHON" = "Connecting to Psiphon";
+/* Label text shown to user when the VPN is connecting to a Psiphon server. Do not translate or transliterate 'Psiphon' */
+"CONNECTING_TO_PSIPHON" = "Connexion à Psiphon";
 
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "Votre fichier des réglages de l’appli semble être corrompu. Essayez de réinstaller l’appli pour réparer le fichier.";
@@ -64,8 +64,8 @@
 /* Button label that lets users create a new account. */
 "CREATE_ACCOUNT_BUTTON_TITLE" = "Créer un compte";
 
-/*[UNTRANSLATED] Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
-"CREATE_PSICASH_ACCOUNT_BODY_2" = "We strongly encourage you to make a PsiCash account before buying PsiCash. Having an account allows you to share your balance between devices and protect your purchases.\n\nIMPORTANT: Without an account your PsiCash will not be preserved if you uninstall Psiphon.";
+/* Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
+"CREATE_PSICASH_ACCOUNT_BODY_2" = "Nous vous suggérons fortement de créer un compte PsiCash avant d’acheter du PsiCash. Un compte vous permet de partager votre solde entre appareils et de protéger vos achats.\n\nIMPORTANT : Sans compte, votre PsiCash ne sera pas préservé si vous désinstallez Psiphon.";
 
 /* Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will continue on to the PsiCash store. */
 "CREATE_PSICASH_ACCOUNT_CONTINUE_BUTTON" = "Poursuivre sans compte";
@@ -118,20 +118,20 @@
 /* No comment provided by engineer. */
 "faq-information-collected-answer-para-10" = "Notez que si vous obtenez Psiphon d’un « magasin d’applications », tel que « Play Store » de Google ou « AppStore » d’Amazon, des statistiques supplémentaires pourraient être recueillies par ce magasin d’applications. Voici, par exemple, une description de ce que « Play Store » de Google recueille :";
 
-/*[UNTRANSLATED] No comment provided by engineer. */
-"faq-information-collected-answer-para-11" = "When you send an email request to our email auto-responder server, we are able to see your email address. While your email is being processed it is saved to the email server's disk, and it is deleted as soon as it is processed (usually in a few seconds). Your email address may be written to the server system logs. These logs are deleted after one week.";
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-11" = "Quand vous envoyez une demande par courriel à notre serveur répondeur automatique de courriel, nous pouvons voir votre adresse courriel. Pendant le traitement de votre courriel, cette adresse est enregistrée sur le disque du serveur de courriel, puis elle est supprimée après traitement (habituellement après quelques secondes). Votre adresse courriel pourrait être inscrite dans les journaux système du serveur. Ces journaux sont supprimés après une semaine.";
 
-/*[UNTRANSLATED] No comment provided by engineer. */
-"faq-information-collected-answer-para-12" = "Our email auto-responder server is hosted in the Amazon EC2 cloud. This means that Amazon is able to see the email you send and our response to you.";
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-12" = "Notre serveur répondeur automatique de courriel est hébergé dans le nuage Amazon EC2. Cela signifie qu’Amazon peut voir le courriel que vous avez envoyé et notre réponse.";
 
 /* No comment provided by engineer. */
 "faq-information-collected-answer-para-13" = "Pour chaque courriel reçu nous stockons les renseignements suivants :";
 
 /* No comment provided by engineer. */
-"faq-information-collected-answer-para-13-item-1" = "Horodatage de réception du courriel.";
+"faq-information-collected-answer-para-13-item-1" = "Estampille temporelle de réception de la demande par courriel.";
 
 /* No comment provided by engineer. */
-"faq-information-collected-answer-para-13-item-2" = "Horodatage de la réponse au courriel.";
+"faq-information-collected-answer-para-13-item-2" = "Estampille temporelle de réponse de la demande par courriel.";
 
 /* No comment provided by engineer. */
 "faq-information-collected-answer-para-13-item-3" = "La taille du courriel.";
@@ -199,17 +199,17 @@
 /* Text displayed while app loads */
 "LOADING" = "Chargement…";
 
-/*[UNTRANSLATED] Message shown when a resource (online or offline) fails to load. */
-"LOADING_FAILED" = "Loading failed";
+/* Message shown when a resource (online or offline) fails to load. */
+"LOADING_FAILED" = "Échec de chargement";
 
 /* Title on a button that lets users login to their account with the username and password they have entered. */
 "LOG_IN_BUTTON_TITLE" = "Connexion";
 
-/*[UNTRANSLATED] Message title informing the user that they must sign up for an account or log in to their account */
-"LOG_IN_OR_SIGN_UP" = "Log in or sign up";
+/* Message title informing the user that they must sign up for an account or log in to their account */
+"LOG_IN_OR_SIGN_UP" = "Se connecter ou s’inscrire";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
-"LOG_IN_OR_SIGNUP_TO_CONTINUE" = "Log in or create account to continue using PsiCash";
+/* Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
+"LOG_IN_OR_SIGNUP_TO_CONTINUE" = "Connectez-vous ou créez un compte pour continuer à utiliser le PsiCash";
 
 /* Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed. */
 "LOG_OUT_ANY_WAY_BUTTON_TITLE_2" = "Me déconnecter quand même";
@@ -217,11 +217,11 @@
 /* Title of the button that lets users log out of their account */
 "LOG_OUT_BUTTON_TITLE_2" = "Déconnexion";
 
-/*[UNTRANSLATED] Label indicating to the user that they are logging into their PsiCash account. Use ellipses if it makes sense. */
-"LOGGING_IN_ELLIPSES" = "Logging in ...";
+/* Label indicating to the user that they are logging into their PsiCash account. Use ellipses if it makes sense. */
+"LOGGING_IN_ELLIPSES" = "Connexion…";
 
-/*[UNTRANSLATED] Label indicating to the user that they are logging out of their PsiCash account. Use ellipses if it makes sense. */
-"LOGGING_OUT_ELLIPSES" = "Logging out ...";
+/* Label indicating to the user that they are logging out of their PsiCash account. Use ellipses if it makes sense. */
+"LOGGING_OUT_ELLIPSES" = "Déconnexion…";
 
 /* Button title that takes user to the next page */
 "NEXT_PAGE_BUTTON_TITLE" = "Suivant";
@@ -268,8 +268,8 @@
 /* Subtitle shown when the current operation failed, asking the user to try again at a later time. */
 "PLEASE_TRY_AGAIN_LATER" = "Veuillez réessayer plus tard.";
 
-/*[UNTRANSLATED] Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
-"PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Something went wrong, please try again later.\n\nIf this problem persists, please send a feedback.";
+/* Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
+"PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Un problème est survenu, veuillez réessayer plus tard.\n\nSi le problème persiste, veuillez nous envoyer une rétroaction.";
 
 /* Sub-heading on the Privacy Policy page above the info about what user information is collected by the ads shown in the Psiphon client software */
 "privacy-information-collected-client-ads-head" = "Les réseaux publicitaires du client Psiphon";
@@ -286,8 +286,8 @@
 /*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
 "privacy-information-collected-mypsicash-cookies-para-1" = "my.psi.cash only uses cookies and similar tracking technologies to carry out activities that are essential for the operation of the website. Essential cookies are necessary to ensure basic functions of the website. Cookies are small text files that are stored on your computer and saved by your browser, and do not represent any risk to your device. You can configure your browser settings to personalize how you would like your browser to handle cookies. Disabling essential cookies will degrade the functionality of this website.";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. 'PsiCash' must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-para-1" = "Users create and manage their PsiCash accounts on the <a href=\"https://my.psi.cash\" target=\"_blank\" rel=\"noopener noreferrer\">my.psi.cash</a> website.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-para-1" = "Les utilisateurs créent et gèrent leur compte PsiCash sur le site Web  <a href=\"https://my.psi.cash\" target=\"_blank\" rel=\"noopener noreferrer\">my.psi.cash</a>";
 
 /*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
 "privacy-information-collected-mypsicash-recaptcha-para-1" = "my.psi.cash uses Google’s reCAPTCHA v3 (hereinafter “reCAPTCHA”), which protects websites from spam and abuse by non-human users (i.e., bots). reCAPTCHA collects personal information that is required for the functioning of the technology and is subject to its own privacy policy. Use of my.psi.cash indicates acceptance of Google’s <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">Privacy Policy</a> and <a href=\"https://policies.google.com/terms\" target=\"_blank\" rel=\"noopener noreferrer\">Terms</a>.";
@@ -295,8 +295,8 @@
 /*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
 "privacy-information-collected-mypsicash-recaptcha-para-2" = "Our use of reCAPTCHA is strictly limited to ensuring the continued functioning of my.psi.cash. reCAPTCHA technology performs an automatic analysis for each site request without requiring the user to take any additional actions. This analysis is based on interactions made by the user, and is used to mitigate bot and other malicious behaviour on our website. The data collected during analysis is forwarded to Google, where Google will use this data to determine if you are a human user. This analysis takes place in the background, and users are not advised it is taking place.";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. */
-"privacy-information-collected-mypsicash-recaptcha-para-3" = "For more information about Google’s reCAPTCHA technology, please visit <a href=\"https://www.google.com/recaptcha/about/\" target=\"_blank\" rel=\"noopener noreferrer\">https://www.google.com/recaptcha/about/</a>.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. */
+"privacy-information-collected-mypsicash-recaptcha-para-3" = "Pour plus de précisions sur la technologie reCAPTCHA de Google, veuillez visiter <a href=\"https://www.google.com/recaptcha/about/\" target=\"_blank\" rel=\"noopener noreferrer\">https://www.google.com/recaptcha/about/</a> (site en anglais).";
 
 /* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
 "privacy-information-collected-psicash-para-1" = "Le système PsiCash ne recueille que les renseignements nécessaires pour faire fonctionner le système, en surveiller la santé et en assurer la sécurité.";
@@ -352,8 +352,8 @@
 /* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
 "privacy-information-collected-psicash-para-5" = "Les données individuelles d’utilisateurs ne sont jamais partagées avec des tiers. Des statistiques agrégées brutes pourraient être partagées, mais jamais sous une forme qui identifierait les utilisateurs.";
 
-/*[UNTRANSLATED] Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
-"privacy-information-collected-psicash-para-6" = "PsiCash server resources are stored in AWS, which means Amazon has access to the data.";
+/* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-6" = "Les ressources du serveur PsiCash sont hébergées dans AWS, ce qui signifie qu’Amazon a accès aux données.";
 
 /* Sub-heading for section describing use of logging access to data storage (aka S3 bucket logging). The way to read this is 'creation of logs for user accesses to data storage'. Psiphon 'stores' websites, downloads, and upgrades (the 'data') in Amazon S3 (the 'storage'). Users 'access' the data storage. And, somtimes, we 'log' those accesses. (For example, if we suspect attackers are accessing the storage, or if it seems the storage is blocked by a country.) */
 "privacy-information-collected-s3-logging-head" = "La journalisation de l’accès au stockage";
@@ -476,7 +476,7 @@
 "privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-1" = "D’estimer les coûts futurs : l’énorme quantité de données utilisateur que nous transférons chaque mois est un facteur important de nos coûts. Il est essentiel pour nous de voir et de comprendre les fluctuations d’utilisation.";
 
 /* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-3" = "De déterminer la nature d’importants événements de censure : des sites et des services sont souvent bloqués soudainement et sans avertissement, ce qui peut entraîner d’énormes variations de l’utilisation régionale de Psiphon. Par exemple, nous avons connu, en une journée, une hausse subite d’utilisation vingt fois supérieure quand <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">le Brésil a bloqué WhatsApp</a> ou quand <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">la Turquie a bloqué les médias sociaux</a>.";
+"privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-3" = "De déterminer la nature d’importants événements de censure : des sites et des services sont souvent bloqués soudainement et sans avertissement, ce qui peut entraîner d’énormes variations de l’utilisation régionale de Psiphon. Par exemple, nous avons connu, en une journée, une hausse subite d’utilisation vingt fois supérieure quand le <a href=\"https://psiphon.ca/en/blog/brazil-whatsapp-2015.html\" target=\"_blank\">Brésil a bloqué WhatsApp</a> ou quand </a>la Turquie a bloqué les médias sociaux</a>.";
 
 /* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
 "privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-4" = "De comprendre qui nous devons aider : certains sites et services ne seront jamais bloqués, nulle part, d’autres seront toujours bloqués dans certains pays, et d’autres encore seront parfois bloqués dans certains pays. Pour nous assurer que nos utilisateurs peuvent communiquer et apprendre en toute liberté, nous devons comprendre ces tendances, voir qui est affecté et travailler avec nos partenaires pour nous assurer que leurs services fonctionnent bien avec Psiphon.";
@@ -508,20 +508,20 @@
 /* Message shown when products available for purchase could not be retrieved. */
 "PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "Impossible de récupérer la liste des produits";
 
-/*[UNTRANSLATED] Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
-"PROTECT_YOUR_PURCHASES" = "Protect Your Purchases";
+/* Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
+"PROTECT_YOUR_PURCHASES" = "Protégez vos achats";
 
 /* Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts. */
 "PSICASH_ACCOUNT" = "Compte PsiCash";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
-"PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "Are you sure you want to log out of your PsiCash account?";
+/* Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
+"PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "Voulez-vous vraiment vous déconnecter de votre compte PsiCash?";
 
 /* An alert shown when the user logs out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNT_LOGOUT_COMPLETE_TITLE" = "La déconnexion du compte PsiCash est terminée.";
 
-/*[UNTRANSLATED] Body of modal dialog shown when the user attempts to log out of their PsiCash account and an unexpected error occurs. Please don't modify the link URL. */
-"PSICASH_ACCOUNT_LOGOUT_FAILED_BODY" = "You logout attempt failed unexpectedly. Please try restarting the application.";
+/* Body of modal dialog shown when the user attempts to log out of their PsiCash account and an unexpected error occurs. Please don't modify the link URL. */
+"PSICASH_ACCOUNT_LOGOUT_FAILED_BODY" = "Votre tentative de déconnexion a échoué de manière inattendue. Veuillez tenter de relancer l’application.";
 
 /* Header of a modal dialog that appears when the user tries to log out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNT_LOGOUT_TITLE" = "Déconnexion du compte PsiCash";
@@ -529,8 +529,8 @@
 /* Button title that opens 'PsiCash' account management. */
 "PSICASH_ACCOUNT_MANAGEMENT_2" = "Gérer le compte";
 
-/*[UNTRANSLATED] An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "Your PsiCash login has expired. Please log back in.";
+/* An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "Votre connexion PsiCash est expirée. Veuillez vous reconnecter.";
 
 /* Body text of a modal dialog shown when a PsiCash login succeeds. There is a fixed number of times that a user can merge a pre-account balance into a PsiCash account. This message indicates that the user has hit that limit and the merge that occurred is the last one allowed. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNTS_LAST_MERGE_WARNING_BODY" = "Vous êtes connecté à votre compte PsiCash. Le solde préexistant de cet appareil a été transféré dans votre compte, mais c’est la dernière fois qu’une fusion de solde aura lieu.";
@@ -559,11 +559,11 @@
 /* Body text of a modal dialog shown when the user tries to use (spend, buy, etc.) PsiCash, if they not currently connected. 'Use' here means buy, spend, or otherwise interact with. 'Psiphon' must not be translated/transliterated. 'PsiCash' must not be translated/transliterated. */
 "PSICASH_MUST_BE_CONNECTED" = "Afin utiliser le PsiCash, vous devez être connecté au réseau Psiphon.";
 
-/*[UNTRANSLATED] PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
-"PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon, unless you have created a PsiCash account and are logged into your PsiCash account.";
+/* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
+"PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "IMPORTANT : votre PsiCash ne sera pas préservé si vous désinstallez Psiphon, à moins d’avoir créé un compte Psiphon et d’y être connecté.";
 
-/*[UNTRANSLATED] Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_SPEED_BOOST_PRODUCT_NOT_FOUND_MESSAGE" = "Speed Boost product not found. Your app may be out of date. Please check for updates.";
+/* Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_PRODUCT_NOT_FOUND_MESSAGE" = "Le produit Survitesse est introuvable. Votre appli pourrait être périmée. Veuillez vérifier la présence de mises à jour.";
 
 /* Body of an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. The words 'PsiCash' and 'Psiphon' must not be translated or transliterated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "PSICASH_SPEED_PORT_LIMITS_BODY" = "Si la Survitesse n’est pas activée, votre vitesse est limitée et une partie du trafic Internet n’est pas prise en charge. Activez la Survitesse avec du PsiCash pour libérer le plein potentiel de votre expérience avec Psiphon.";
@@ -571,8 +571,8 @@
 /* Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. Port here refers to port in computer networking. */
 "PSICASH_SPEED_PORT_LIMITS_HEAD" = "Limite de vitesse et de ports";
 
-/*[UNTRANSLATED] A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon */
-"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY" = "Your Psiphon subscription already gives you always-on Speed Boost, so there is no reason to buy more. Your PsiCash balance will be retained should you ever decide to cancel your subscription.\n\nYou can still access your PsiCash account from the settings menu.";
+/* A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon */
+"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY" = "Votre abonnement Psiphon vous donne déjà une Survitesse en tout temps. Il n’y a donc pas à en acheter davantage. Votre solde PsiCash sera conservé si vous décidiez d’annuler votre abonnement.\n\nVous pouvez encore accéder à votre compte PsiCash dans le menu des aux paramètres.";
 
 /* A title message to the premium user (a user with a subscription when they are trying to navigate to PsiCash and Speed Boost screen. Do not translate or transliterate words PsiCash or Psiphon */
 "PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_TITLE" = "Votre abonnement à Psiphon vous donne un accès privilégié.";
@@ -601,8 +601,8 @@
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon n’est pas connecté";
 
-/*[UNTRANSLATED] Alert message that the users purchases have been restored successfully */
-"PURCHASES_RESTORED_SUCCESSFULLY" = "Purchases restored successfully";
+/* Alert message that the users purchases have been restored successfully */
+"PURCHASES_RESTORED_SUCCESSFULLY" = "Les achats ont été restaurées avec succès";
 
 /* Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
 "PURCHASING_PSICASH" = "Achat de PsiCash…";
@@ -619,8 +619,8 @@
 /* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "Vous ne voyez pas un abonnement que vous avez acheté sur cet appareil";
 
-/*[UNTRANSLATED] Button that restores users previous purchases */
-"RESTORE_PURCHASES" = "Restore purchases";
+/* Button that restores users previous purchases */
+"RESTORE_PURCHASES" = "Restaurer les achats";
 
 /* Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "Restaurer un abonnement";
