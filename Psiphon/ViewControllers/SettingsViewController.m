@@ -29,7 +29,6 @@
 #import "UIAlertController+Additions.h"
 #import "AppObservables.h"
 #import "Psiphon-Swift.h"
-#import <SafariServices/SafariServices.h>
 
 // Specifier keys for cells in settings menu
 // These keys are defined in Psiphon/InAppSettings.bundle/Root.inApp.plist
