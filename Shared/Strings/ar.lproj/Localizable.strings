@@ -169,9 +169,6 @@
 /* No comment provided by engineer. */
 "faq-information-collected-answer-para-8-list-start" = "أندرويد:";
 
-/* Heading for a section in our privacy policy. */
-"faq-information-collected-question" = "ما هي المعلومات الخاصة بالمستخدم والتي يقوم برنامج سايفون بجمعها؟ ";
-
 /* Title of screen that lets user to send feedback about the app to Psiphon Inc. Should be kept short. */
 "FEEDBACK_TITLE" = "التعليقات";
 
@@ -271,7 +268,10 @@
 /* Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
 "PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "لقد حدث خطأ ما، يُرجى إعادة المحاولة ﻻحقا.\n\nإذا استمر المشكل، يُرجى إرسال ملاحظاتك.";
 
-/* Sub-heading on the Privacy Policy page above the info about what user information is collected by the ads shown in the Psiphon client software */
+/* No comment provided by engineer. */
+"privacy-canadian-privacy-commission-link-text" = "مكتب مفوضية الخصوصية الكندي ";
+
+/* Sub-heading on the Privacy Policy page above the info about what data categories are collected by the ads shown in the Psiphon client software */
 "privacy-information-collected-client-ads-head" = "شبكات الدعاية والإعلان الخاصة ببرنامج سايفون";
 
 /* No comment provided by engineer. */
@@ -279,6 +279,9 @@
 
 /* No comment provided by engineer. */
 "privacy-information-collected-client-advertising-networks-para-2" = "يمكنك توقيف خدمة إستعمال ملفات تعريف الإرتباط للإعلان على الإنترنت عبر زيارة:";
+
+/*[UNTRANSLATED] Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
+"privacy-information-collected-data-categories-header" = "Data Categories";
 
 /* Header text in the 'my.psi.cash' section of the Privacy page. Refers to the cookies stored by web browsers. */
 "privacy-information-collected-mypsicash-cookies-head" = "الكوكيز";
@@ -493,7 +496,7 @@
 /* No comment provided by engineer. */
 "privacy-information-collected-websites-google-analytics-para-3" = "قدرة غوغل على استخدام وتبادل المعلومات التي تم جمعها من قبل Google Analytics  حول زياراتك لهذا الموقع مقيدة <a href=\"http://www.google.ca/analytics/terms/us.html\" target=\"_blank\"> بشروط استخدام</a> و <a href=\"http://www.google.com/policies/privacy/\" target=\"_blank\">سياسة الخصوصية لجوجل </a> يمكنك إختيار إيقاف الإشتراك  بملفات تعريف الارتباط في إعدادات الخيارات في متصفحك.";
 
-/* Sub-heading on the Privacy Policy page above the info about what user information is collected by the Psiphon websites */
+/* Sub-heading on the Privacy Policy page above the info about what data categories are collected by the Psiphon websites */
 "privacy-information-collected-websites-head" = "صفحات الويب لسايفون";
 
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */

@@ -169,9 +169,6 @@
 /*[UNTRANSLATED] No comment provided by engineer. */
 "faq-information-collected-answer-para-8-list-start" = "Android:";
 
-/* Heading for a section in our privacy policy. */
-"faq-information-collected-question" = "Psiphon hangi kullanıcı bilgilerini toplar?";
-
 /* Title of screen that lets user to send feedback about the app to Psiphon Inc. Should be kept short. */
 "FEEDBACK_TITLE" = "Geri bildirim";
 
@@ -271,7 +268,10 @@
 /* Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
 "PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Bir sorun çıktı. Lütfen bir süre sonra yeniden deneyin.\n\nSorun sürerse, lütfen bize bildirin.";
 
-/* Sub-heading on the Privacy Policy page above the info about what user information is collected by the ads shown in the Psiphon client software */
+/* No comment provided by engineer. */
+"privacy-canadian-privacy-commission-link-text" = "Kanada Kişisel Gizlilik Müdürlüğü Ofisi";
+
+/* Sub-heading on the Privacy Policy page above the info about what data categories are collected by the ads shown in the Psiphon client software */
 "privacy-information-collected-client-ads-head" = "Psiphon uygulaması reklam ağları";
 
 /* No comment provided by engineer. */
@@ -279,6 +279,9 @@
 
 /* No comment provided by engineer. */
 "privacy-information-collected-client-advertising-networks-para-2" = "Reklamların ilgi alanınıza göre seçilmesini istemiyorsanız çerezleri şuradan devre dışı bırakabilirsiniz:";
+
+/* Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
+"privacy-information-collected-data-categories-header" = "Veri kategorileri";
 
 /* Header text in the 'my.psi.cash' section of the Privacy page. Refers to the cookies stored by web browsers. */
 "privacy-information-collected-mypsicash-cookies-head" = "Çerezler";
@@ -476,7 +479,7 @@
 "privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-1" = "Gelecekteki maliyetleri öngörme: Her ay aktardığımız devasa kullanıcı verileri maliyetlerimizin önemli bir bölümünü oluşturuyor. Kullanımdaki dalgalanmaları görüp anlamamız bizim için çok önemli.";
 
 /* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-3" = "Büyük sansür olaylarının kapsamını belirleme: Siteler ve hizmetler sıklıkla aniden ve herhangi bir uyarı olmadan engellenir ve bu da bölgesel Psiphon kullanımında çok büyük değişikliklere neden olabilir. Örneğin, <a href=\"https://psiphon.ca/en/blog/brazil-whatsapp-2015.html\" target=\"_blank\">Brezilya'nın WhatsApp kullanımını engellemesi</a> ya da <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">Türkiye'nin sosyal ağları engellemesi</a> gibi durumlarda, Psiphon kullanımında bir gün içinde 20 kata varan artışlar oldu.";
+"privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-3" = "Büyük sansür olaylarının kapsamını belirleme: Siteler ve hizmetler sıklıkla aniden ve herhangi bir uyarı olmadan engellenir ve bu da bölgesel Psiphon kullanımında çok büyük değişikliklere neden olabilir. Örneğin, <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">Brezilya'nın WhatsApp kullanımını engellemesi</a> ya da <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">Türkiye'nin sosyal ağları engellemesi</a> gibi durumlarda, Psiphon kullanımında bir gün içinde 20 kata varan artışlar oldu.";
 
 /* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
 "privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-4" = "Yardıma gerek duyanları belirleme: Bazı site ve hizmetler hiçbir yerde hiçbir zaman engellenmez, bazıları belirli ülkelerde her zaman engellenir, bazıları ise bazı ülkelerde engellenir. Kullanıcılarımızın özgürce iletişim kurabileceğinden ve bilgi alabileceğinden emin olmak için, bu kalıpları anlamamız, kimlerin etkilendiğini görmemiz ve etkilenen hizmetlerin Psiphon ile en iyi şekilde çalışmasını sağlamak için iş ortaklarımızla birlikte çalışmamız gerekir.";
@@ -493,7 +496,7 @@
 /* No comment provided by engineer. */
 "privacy-information-collected-websites-google-analytics-para-3" = "Bu siteye yapacağınız ziyaretler hakkında Google Analytics tarafından toplanan bilgilerin kullanım ve paylaşma hakları <a href=\"http://www.google.ca/analytics/terms/us.html\" target=\"_blank\">Google Analytics Kullanım Koşulları</a> ve <a href=\"http://www.google.com/policies/privacy/\" target=\"_blank\">Google Gizlilik İlkesi</a> metinlerinde belirlenmiştir. Web tarayıcınızdaki ayarlardan çerezleri kapatarak bu hizmetlerin kapsamı dışına çıkabilirsiniz.";
 
-/* Sub-heading on the Privacy Policy page above the info about what user information is collected by the Psiphon websites */
+/* Sub-heading on the Privacy Policy page above the info about what data categories are collected by the Psiphon websites */
 "privacy-information-collected-websites-head" = "Psiphon web siteleri";
 
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
