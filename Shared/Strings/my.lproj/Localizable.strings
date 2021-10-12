@@ -169,9 +169,6 @@
 /*[UNTRANSLATED] No comment provided by engineer. */
 "faq-information-collected-answer-para-8-list-start" = "Android:";
 
-/* Heading for a section in our privacy policy. */
-"faq-information-collected-question" = "Psiphon သည် အသုံးပြုသူ၏ မည်သည့်သတင်းအချက်အလက်များကောက်ယူသနည်း။";
-
 /* Title of screen that lets user to send feedback about the app to Psiphon Inc. Should be kept short. */
 "FEEDBACK_TITLE" = "အကြံပြုချက်များ";
 
@@ -271,7 +268,10 @@
 /*[UNTRANSLATED] Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
 "PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Something went wrong, please try again later.\n\nIf this problem persists, please send a feedback.";
 
-/*[UNTRANSLATED] Sub-heading on the Privacy Policy page above the info about what user information is collected by the ads shown in the Psiphon client software */
+/* No comment provided by engineer. */
+"privacy-canadian-privacy-commission-link-text" = "ကနေဒါနိုင်ငံ၏ ကိုယ်ရေးကိုယ်တာအချက်အလက်များနှင့် ပုဂ္ဂလလုံခြုံရေးဆိုင်ရာ ကော်မရှင်ရုံး";
+
+/*[UNTRANSLATED] Sub-heading on the Privacy Policy page above the info about what data categories are collected by the ads shown in the Psiphon client software */
 "privacy-information-collected-client-ads-head" = "Psiphon Client Advertising Networks";
 
 /* No comment provided by engineer. */
@@ -279,6 +279,9 @@
 
 /* No comment provided by engineer. */
 "privacy-information-collected-client-advertising-networks-para-2" = "ကွတ်ကီးများအသုံးပြု၍ အသုံးပြုသူများ၏ စိတ်ဝင်စားမှုပေါ်တွင် အခြေခံ၍ ကြေငြာခြင်းများအား အလိုမရှိပါက ဤတွင်ဝင်ရောက်ပါရန် :";
+
+/*[UNTRANSLATED] Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
+"privacy-information-collected-data-categories-header" = "Data Categories";
 
 /* Header text in the 'my.psi.cash' section of the Privacy page. Refers to the cookies stored by web browsers. */
 "privacy-information-collected-mypsicash-cookies-head" = "ကွက်ကီးများ";
@@ -493,7 +496,7 @@
 /* No comment provided by engineer. */
 "privacy-information-collected-websites-google-analytics-para-3" = "ယခုဝက်ဆိုက်ဒ်သို့ ဝင်ရောက်ကြည့်ရှုမှုများနှင့် ပတ်သတ်သော Google Analytics မှတဆင့်ကောက်ယူထားသည့် သတင်းအချက်အလက်များကို Google မှ အသုံးပြုမှုနှင့် ဝေမျှမှု အတွက် ချမှတ်ထားသည့် <a href=\"http://www.google.ca/analytics/terms/us.html\" target=\"_blank\">Google Analytics အသုံးပြုခြင်းဆိုင်ရာ သဘောတူညီချက်များ</a>နှင့် <a href=\"http://www.google.com/policies/privacy/\" target=\"_blank\">Google ကိုယ်ရေးကိုယ်တာအချက်အလက်လုံခြုံရေးမူဝါဒ</a>တို့ဖြင့် ထိန်းချုပ်ကန့်သတ်ထားသည်။ သင်၏ web ဘရောက်ဇာရှိ အပြင်အဆင်များတွင် ကွတ်ကီးများကိုပိတ်ထားခြင်းဖြင့် ထိုသို့ မပြုလုပ်အောင် ရွေးချယ်ထားနိုင်သည်။";
 
-/* Sub-heading on the Privacy Policy page above the info about what user information is collected by the Psiphon websites */
+/* Sub-heading on the Privacy Policy page above the info about what data categories are collected by the Psiphon websites */
 "privacy-information-collected-websites-head" = "Psiphon ၀ဘ်ဆိုဒ်များ";
 
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */

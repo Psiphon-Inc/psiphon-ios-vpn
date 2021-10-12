@@ -169,9 +169,6 @@
 /* No comment provided by engineer. */
 "faq-information-collected-answer-para-8-list-start" = "Android";
 
-/* Heading for a section in our privacy policy. */
-"faq-information-collected-question" = "Ni habari zipi za mtumiaji Psiphon zinakusanya";
-
 /* Title of screen that lets user to send feedback about the app to Psiphon Inc. Should be kept short. */
 "FEEDBACK_TITLE" = "maoni";
 
@@ -271,7 +268,10 @@
 /*[UNTRANSLATED] Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
 "PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Something went wrong, please try again later.\n\nIf this problem persists, please send a feedback.";
 
-/* Sub-heading on the Privacy Policy page above the info about what user information is collected by the ads shown in the Psiphon client software */
+/* No comment provided by engineer. */
+"privacy-canadian-privacy-commission-link-text" = "Ofisi ya kamishna ya faragha ya Canada";
+
+/* Sub-heading on the Privacy Policy page above the info about what data categories are collected by the ads shown in the Psiphon client software */
 "privacy-information-collected-client-ads-head" = "Tangazo la mitandao la Mteja wa Psiphon ";
 
 /* No comment provided by engineer. */
@@ -279,6 +279,9 @@
 
 /* No comment provided by engineer. */
 "privacy-information-collected-client-advertising-networks-para-2" = "Unaweza kuchagua nje ya matumizi ya kuki kwa msingi-riba ya matangazo kwa kutembelea:";
+
+/*[UNTRANSLATED] Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
+"privacy-information-collected-data-categories-header" = "Data Categories";
 
 /*[UNTRANSLATED] Header text in the 'my.psi.cash' section of the Privacy page. Refers to the cookies stored by web browsers. */
 "privacy-information-collected-mypsicash-cookies-head" = "Cookies";
@@ -493,7 +496,7 @@
 /* No comment provided by engineer. */
 "privacy-information-collected-websites-google-analytics-para-3" = "Uwezo wa Google wa kutumia na kushiriki habari zilizokusanywa kwa Uchambuzi wa Google kuhusu utembeleaji wako kwenye hii tovuti imezuiliwa na<a href=\"http://www.google.ca/analytics/terms/us.html\" target=\"_blank\">masharti ya huduma ya kutumia uchambuzi wa Google</a> na ya <a href=\"http://www.google.com/policies/privacy/\" target=\"_blank\">Sera ya Faragha ya Google</a>.Unaweza kuchagua machaguo kwa kuzima kuki kwenye mpangilio wa upendeleo kwenye tovuti kivinjari yako. ";
 
-/* Sub-heading on the Privacy Policy page above the info about what user information is collected by the Psiphon websites */
+/* Sub-heading on the Privacy Policy page above the info about what data categories are collected by the Psiphon websites */
 "privacy-information-collected-websites-head" = "tovuti ya Psiphon";
 
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */

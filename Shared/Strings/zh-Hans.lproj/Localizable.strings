@@ -169,9 +169,6 @@
 /* No comment provided by engineer. */
 "faq-information-collected-answer-para-8-list-start" = "Android：";
 
-/* Heading for a section in our privacy policy. */
-"faq-information-collected-question" = "赛风收集用户的哪些信息？";
-
 /* Title of screen that lets user to send feedback about the app to Psiphon Inc. Should be kept short. */
 "FEEDBACK_TITLE" = "反馈";
 
@@ -271,7 +268,10 @@
 /*[UNTRANSLATED] Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
 "PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Something went wrong, please try again later.\n\nIf this problem persists, please send a feedback.";
 
-/* Sub-heading on the Privacy Policy page above the info about what user information is collected by the ads shown in the Psiphon client software */
+/* No comment provided by engineer. */
+"privacy-canadian-privacy-commission-link-text" = "加拿大隐私专员办公室";
+
+/* Sub-heading on the Privacy Policy page above the info about what data categories are collected by the ads shown in the Psiphon client software */
 "privacy-information-collected-client-ads-head" = "Psiphon 客户端的广告网络";
 
 /* No comment provided by engineer. */
@@ -279,6 +279,9 @@
 
 /* No comment provided by engineer. */
 "privacy-information-collected-client-advertising-networks-para-2" = "基于兴趣的广告使用 cookie，如需选择退出 cookie 使用，请访问：";
+
+/*[UNTRANSLATED] Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
+"privacy-information-collected-data-categories-header" = "Data Categories";
 
 /*[UNTRANSLATED] Header text in the 'my.psi.cash' section of the Privacy page. Refers to the cookies stored by web browsers. */
 "privacy-information-collected-mypsicash-cookies-head" = "Cookies";
@@ -493,7 +496,7 @@
 /* No comment provided by engineer. */
 "privacy-information-collected-websites-google-analytics-para-3" = "对于通过 Google Analytics 收集的本网站用户访问信息，Google 进行使用或分享时应遵循<a href=\"http://www.google.ca/analytics/terms/us.html\" target=\"_blank\"> Google Analytics 使用条款</a>和<a href=\"http://www.google.com/policies/privacy/\" target=\"_blank\">谷歌隐私政策</a>。如需选择退出信息收集，可在浏览器的首选项设置中禁用 cookie。";
 
-/* Sub-heading on the Privacy Policy page above the info about what user information is collected by the Psiphon websites */
+/* Sub-heading on the Privacy Policy page above the info about what data categories are collected by the Psiphon websites */
 "privacy-information-collected-websites-head" = "赛风网站";
 
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
