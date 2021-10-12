@@ -29,7 +29,6 @@
 #import "UIAlertController+Additions.h"
 #import "AppObservables.h"
 #import "Psiphon-Swift.h"
-#import <SafariServices/SafariServices.h>
 
 // Specifier keys for cells in settings menu
 // These keys are defined in Psiphon/InAppSettings.bundle/Root.inApp.plist
@@ -173,7 +172,7 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
             titleForHeaderForSection:(NSInteger)section {
     
     // specifierKey can be nil for section that don't have a key.
-    NSString *_Nullable specifierKey = [self.settingsReader keyForSection:section];
+    NSString *_Nullable specifierKey = [settingsViewController.settingsReader keyForSection:section];
     
     if ([self.customKeys containsObject:specifierKey] == FALSE) {
         return nil;
@@ -305,7 +304,7 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
     }
     
     // Gets cell for current `specifier.key`.
-    NSIndexPath *indexPath = [self.settingsReader indexPathForKey:specifier.key];
+    NSIndexPath *indexPath = [sender.settingsReader indexPathForKey:specifier.key];
     UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
     
     // Deselects given cell.
