@@ -169,9 +169,6 @@
 /* No comment provided by engineer. */
 "faq-information-collected-answer-para-8-list-start" = "Android៖";
 
-/* Heading for a section in our privacy policy. */
-"faq-information-collected-question" = "តើព័ត៌មានអ្នកប្រើ​ប្រាស់អ្វីខ្លះដែល Psiphon ប្រមូល?";
-
 /* Title of screen that lets user to send feedback about the app to Psiphon Inc. Should be kept short. */
 "FEEDBACK_TITLE" = "មតិអ្នកប្រើ";
 
@@ -271,7 +268,10 @@
 /*[UNTRANSLATED] Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
 "PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Something went wrong, please try again later.\n\nIf this problem persists, please send a feedback.";
 
-/* Sub-heading on the Privacy Policy page above the info about what user information is collected by the ads shown in the Psiphon client software */
+/* No comment provided by engineer. */
+"privacy-canadian-privacy-commission-link-text" = "ការិយាល័យស្នងការសិទ្ធិឯកជននៃប្រទេសកាណាដា";
+
+/* Sub-heading on the Privacy Policy page above the info about what data categories are collected by the ads shown in the Psiphon client software */
 "privacy-information-collected-client-ads-head" = "បណ្តាញផ្សាយពាណិជ្ជកម្មរបស់អតិថិជន Psiphon";
 
 /* No comment provided by engineer. */
@@ -279,6 +279,9 @@
 
 /* No comment provided by engineer. */
 "privacy-information-collected-client-advertising-networks-para-2" = "អ្នកអាចច្រានចោលការប្រើប្រាស់ឃូកឃី សម្រាប់ការផ្សាយពាណិជ្ជកម្មផ្អែកលើចំណង់ចំណូលចិត្ត ដោយចូលទៅកាន់៖";
+
+/*[UNTRANSLATED] Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
+"privacy-information-collected-data-categories-header" = "Data Categories";
 
 /* Header text in the 'my.psi.cash' section of the Privacy page. Refers to the cookies stored by web browsers. */
 "privacy-information-collected-mypsicash-cookies-head" = "ខូគី";
@@ -493,7 +496,7 @@
 /* No comment provided by engineer. */
 "privacy-information-collected-websites-google-analytics-para-3" = "សមត្ថភាពរបស់ Google ក្នុងការប្រើ និងចែករំលែកព័ត៌មានតាម Google Analytics អំពីការចូលមើលគេហទំព័រនេះ ត្រូវបានហាមឃាត់ដោយ <a href=\"http://www.google.ca/analytics/terms/us.html\" target=\"_blank\">ល័ក្ខខ័ណ្ឌនៃការប្រើប្រាស់ Google Analytics </a> និង <a href=\"http://www.google.com/policies/privacy/\" target=\"_blank\">គោលការណ៍ឯកជនភាពGoogle </a>។ អ្នកអាចជ្រើសរើសច្រានចោល ដោយបិទឃូកឃី ក្នុងការកំណត់ចំណង់ចំណូលចិត្ត របស់កម្មវិធីរុករករបស់អ្នក។";
 
-/* Sub-heading on the Privacy Policy page above the info about what user information is collected by the Psiphon websites */
+/* Sub-heading on the Privacy Policy page above the info about what data categories are collected by the Psiphon websites */
 "privacy-information-collected-websites-head" = "គេហទំព័រ Psiphon";
 
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */

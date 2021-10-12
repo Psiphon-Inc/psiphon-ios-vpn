@@ -968,6 +968,12 @@ extension UINavigationBar {
         self.setValue(true, forKey: "hidesShadow")
     }
     
+    @objc func applyStandardAppearanceToScrollEdge() {
+        if #available(iOS 13.0, *) {
+            scrollEdgeAppearance = standardAppearance
+        }
+    }
+    
     /// Applies the following appearance changes to UINavigationBar
     /// - Opaque dark blue background
     /// - Sets title color and font
@@ -989,6 +995,8 @@ extension UINavigationBar {
             ]
             
             self.standardAppearance = appearance
+            
+            // Applies standard appearance to scoll edge
             self.scrollEdgeAppearance = self.standardAppearance
             
         } else {
