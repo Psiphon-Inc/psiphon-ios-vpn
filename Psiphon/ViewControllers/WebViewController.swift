@@ -226,7 +226,7 @@ final class WebViewController: ReactiveViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if navigationController != nil {
+        if let navigationController = navigationController {
             
             let closeNavBtn = UIBarButtonItem(title: UserStrings.Close_button_title(),
                                               style: .plain,
@@ -234,6 +234,9 @@ final class WebViewController: ReactiveViewController {
                                               action: #selector(onNavCloseButtonClicked))
             
             self.navigationItem.leftBarButtonItem = closeNavBtn
+            
+            // Fixes navigation bar appearance when scrolling
+            navigationController.navigationBar.applyStandardAppearanceToScrollEdge()
             
         }
         
