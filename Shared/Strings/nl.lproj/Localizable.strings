@@ -169,9 +169,6 @@
 /*[UNTRANSLATED] No comment provided by engineer. */
 "faq-information-collected-answer-para-8-list-start" = "Android:";
 
-/* Heading for a section in our privacy policy. */
-"faq-information-collected-question" = "Welke informatie voor de gebruiker doet Psiphon verzamelen?";
-
 /*[UNTRANSLATED] Title of screen that lets user to send feedback about the app to Psiphon Inc. Should be kept short. */
 "FEEDBACK_TITLE" = "Feedback";
 
@@ -271,7 +268,10 @@
 /*[UNTRANSLATED] Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
 "PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Something went wrong, please try again later.\n\nIf this problem persists, please send a feedback.";
 
-/*[UNTRANSLATED] Sub-heading on the Privacy Policy page above the info about what user information is collected by the ads shown in the Psiphon client software */
+/* No comment provided by engineer. */
+"privacy-canadian-privacy-commission-link-text" = "Bureau van de Privacy Commissaris van Canada";
+
+/*[UNTRANSLATED] Sub-heading on the Privacy Policy page above the info about what data categories are collected by the ads shown in the Psiphon client software */
 "privacy-information-collected-client-ads-head" = "Psiphon Client Advertising Networks";
 
 /* No comment provided by engineer. */
@@ -279,6 +279,9 @@
 
 /* No comment provided by engineer. */
 "privacy-information-collected-client-advertising-networks-para-2" = "U kunt zich afmelden voor het gebruik van cookies voor op interesses gebaseerd adverteren door een bezoek aan:";
+
+/*[UNTRANSLATED] Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
+"privacy-information-collected-data-categories-header" = "Data Categories";
 
 /*[UNTRANSLATED] Header text in the 'my.psi.cash' section of the Privacy page. Refers to the cookies stored by web browsers. */
 "privacy-information-collected-mypsicash-cookies-head" = "Cookies";
@@ -493,7 +496,7 @@
 /* No comment provided by engineer. */
 "privacy-information-collected-websites-google-analytics-para-3" = "Googles kunnen gebruiken en delen van gegevens die door Google Analytics worden verzameld over uw bezoeken aan deze site wordt beperkt door het <a href=\"http://www.google.ca/analytics/terms/us.html\" target=\"_blank\"> Google Analytics gebruiksvoorwaarden</a> en het <a href=\"http://www.google.com/policies/privacy/\" target=\"_blank\"> Privacybeleid van Google</a>. U kunt kiezen voor opt-out door het uitzetten van cookies in de voorkeursinstellingen in uw webbrowser.";
 
-/*[UNTRANSLATED] Sub-heading on the Privacy Policy page above the info about what user information is collected by the Psiphon websites */
+/*[UNTRANSLATED] Sub-heading on the Privacy Policy page above the info about what data categories are collected by the Psiphon websites */
 "privacy-information-collected-websites-head" = "Psiphon Websites";
 
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */

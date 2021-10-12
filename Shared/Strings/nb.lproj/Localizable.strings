@@ -169,17 +169,14 @@
 /*[UNTRANSLATED] No comment provided by engineer. */
 "faq-information-collected-answer-para-8-list-start" = "Android:";
 
-/* Heading for a section in our privacy policy. */
-"faq-information-collected-question" = "Hvilken informasjon samler Psiphon inn?";
-
 /* Title of screen that lets user to send feedback about the app to Psiphon Inc. Should be kept short. */
 "FEEDBACK_TITLE" = "Tilbakemeldinger";
 
 /*[UNTRANSLATED] Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Thank you for helping improve Psiphon!";
 
-/*[UNTRANSLATED] Button title that lets users reset their password if they forgot their account's password. */
-"FORGOT_PASSWORD" = "Forgot password?";
+/* Button title that lets users reset their password if they forgot their account's password. */
+"FORGOT_PASSWORD" = "Har du glemt passordet?";
 
 /*[UNTRANSLATED] Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "Free";
@@ -271,7 +268,10 @@
 /*[UNTRANSLATED] Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
 "PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Something went wrong, please try again later.\n\nIf this problem persists, please send a feedback.";
 
-/*[UNTRANSLATED] Sub-heading on the Privacy Policy page above the info about what user information is collected by the ads shown in the Psiphon client software */
+/* No comment provided by engineer. */
+"privacy-canadian-privacy-commission-link-text" = "Kontoret til kommisjonæren for personvernshensyn i Kanada";
+
+/*[UNTRANSLATED] Sub-heading on the Privacy Policy page above the info about what data categories are collected by the ads shown in the Psiphon client software */
 "privacy-information-collected-client-ads-head" = "Psiphon Client Advertising Networks";
 
 /* No comment provided by engineer. */
@@ -279,6 +279,9 @@
 
 /* No comment provided by engineer. */
 "privacy-information-collected-client-advertising-networks-para-2" = "Du kan melde deg ut av bruken av informasjonskapsler for å servere deg målrettet reklame ved å besøke:";
+
+/*[UNTRANSLATED] Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
+"privacy-information-collected-data-categories-header" = "Data Categories";
 
 /* Header text in the 'my.psi.cash' section of the Privacy page. Refers to the cookies stored by web browsers. */
 "privacy-information-collected-mypsicash-cookies-head" = "Informasjonskapsler";
@@ -475,7 +478,7 @@
 /*[UNTRANSLATED] Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
 "privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-1" = "Estimate future costs: The huge amount of user data we transfer each month is a major factor in our costs. It is vital for us to see and understand usage fluctuations.";
 
-/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+/*[UNTRANSLATED] Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
 "privacy-information-collected-vpndata-whydoespsiphonneed-para-1-item-3" = "Determine the nature of major censorship events: Sites and services often get blocked suddenly and without warning, which can lead to huge variations in regional usage of Psiphon. For example, we had up to 20x surges in usage within a day when <a href=\"https://blog-en.psiphon.ca/2016/07/psiphon-usage-surges-as-brazil-blocks.html\" target=\"_blank\">Brazil blocked WhatsApp</a> or <a href=\"https://blog-en.psiphon.ca/2016/11/social-media-and-internet-ban-in-turkey.html\" target=\"_blank\">Turkey blocked social media</a>.";
 
 /*[UNTRANSLATED] Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
@@ -493,7 +496,7 @@
 /* No comment provided by engineer. */
 "privacy-information-collected-websites-google-analytics-para-3" = "Googles evne til å bruke og dele informasjon innhentet av Google Analytics er beskrevet i <a href=\"http://www.google.ca/analytics/terms/us.html\" target=\"_blank\">Google Analytics tjenestevilkår</a> og <a href=\"http://www.google.com/policies/privacy/\" target=\"_blank\">Google personvernspraksis</a>. \nDu kan velge å skru av informasjonskapsler i innstillingene i din nettleser.\n(Oversettelseskommentar: Google forbeholder seg retten til å endre hva som helst på 14 dagers varsel, der varsel betyr at de i all stillhet oppgraderer teksten i vilkårene. Det anbefales at du skrur av skript hvis du vil blokkere Google Analytics.)";
 
-/*[UNTRANSLATED] Sub-heading on the Privacy Policy page above the info about what user information is collected by the Psiphon websites */
+/*[UNTRANSLATED] Sub-heading on the Privacy Policy page above the info about what data categories are collected by the Psiphon websites */
 "privacy-information-collected-websites-head" = "Psiphon Websites";
 
 /*[UNTRANSLATED] Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
