@@ -2,5 +2,5 @@
 
 set -e -u -x
 
-fastlane ios screenshots
+bundle exec fastlane ios screenshots
 
