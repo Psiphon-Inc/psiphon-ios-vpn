@@ -20,6 +20,62 @@
                ReferencedContainer = "container:Psiphon.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "NO"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "PsiApiTests"
+               BuildableName = "PsiApiTests"
+               BlueprintName = "PsiApiTests"
+               ReferencedContainer = "container:PsiApi">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "NO"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "TestingTests"
+               BuildableName = "TestingTests"
+               BlueprintName = "TestingTests"
+               ReferencedContainer = "container:Testing">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "NO"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "UtilitiesTests"
+               BuildableName = "UtilitiesTests"
+               BlueprintName = "UtilitiesTests"
+               ReferencedContainer = "container:Utilities">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "NO"
+            buildForRunning = "NO"
+            buildForProfiling = "NO"
+            buildForArchiving = "NO"
+            buildForAnalyzing = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "CEA1B777249AA9A0006D9853"
+               BuildableName = "PsiphonTests.xctest"
+               BlueprintName = "PsiphonTests"
+               ReferencedContainer = "container:Psiphon.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -44,46 +100,6 @@
                BlueprintIdentifier = "4E0D88201FA06B2400ADB61E"
                BuildableName = "PsiphonUITests.xctest"
                BlueprintName = "PsiphonUITests"
-               ReferencedContainer = "container:Psiphon.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "PsiApiTests"
-               BuildableName = "PsiApiTests"
-               BlueprintName = "PsiApiTests"
-               ReferencedContainer = "container:PsiApi">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "TestingTests"
-               BuildableName = "TestingTests"
-               BlueprintName = "TestingTests"
-               ReferencedContainer = "container:Testing">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "UtilitiesTests"
-               BuildableName = "UtilitiesTests"
-               BlueprintName = "UtilitiesTests"
-               ReferencedContainer = "container:Utilities">
-            </BuildableReference>
-         </TestableReference>
-         <TestableReference
-            skipped = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "CEA1B777249AA9A0006D9853"
-               BuildableName = "PsiphonTests.xctest"
-               BlueprintName = "PsiphonTests"
                ReferencedContainer = "container:Psiphon.xcodeproj">
             </BuildableReference>
          </TestableReference>

@@ -64,7 +64,7 @@ class PsiphonUITests: XCTestCase {
         XCUIApplication().buttons["settings"].tap() // Go to settings
         snapshot("settings")
 
-        XCUIApplication().cells.element(boundBy: 3).tap() // Go to language selection screen
+        XCUIApplication().cells.element(boundBy: 2).tap() // Go to language selection screen
         snapshot("settings-language")
 
         XCUIApplication().navigationBars.buttons.element(boundBy: 0).tap() // Back to main screen
