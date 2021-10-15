@@ -376,7 +376,7 @@ fileprivate extension OnboardingScreen {
             )
             
         case (.vpnConfigPermission, 1):
-            onboardingView = makeVPNConfigPermissionGuideOnboardingView(platform: platform)
+            onboardingView = makeVPNConfigPermissionGuideOnboardingView()
             
         case (.userNotificationPermission, _):
             
@@ -561,46 +561,20 @@ fileprivate func makePrivacyPolicyDeclinedAlert() -> UIAlertController {
     return alertController
 }
 
-/// Creates view with an arrow pointing to "Allow" button of permission dialog.
+/// Creates view for display under system VPN config permission dialog.
 /// The X and Y centre of the returned view is expected to match the X and Y centre of the screen.
-fileprivate func makeVPNConfigPermissionGuideOnboardingView(platform: Platform) -> UIView {
+fileprivate func makeVPNConfigPermissionGuideOnboardingView() -> UIView {
     let view = UIView()
-    let arrowImage = UIImage(named: "PermissionArrow")!
-    let arrowView = UIImageView(image: arrowImage)
     let label = UILabel.make(text: Strings.vpnInstallGuideText(),
                              fontSize: .h3,
                              typeface: .medium,
                              color: .white,
                              numberOfLines: 0,
                              alignment: .center)
-    
-    switch platform.current {
-    
-    case .iOS:
-        
-        view.addSubviews(arrowView, label)
-        
-        let aspectRatio = arrowImage.size.width / arrowImage.size.height
-        arrowView.activateConstraints {
-            $0.constraint(to: view, .centerX(-60.0), .centerY(160.0)) +
-                [ $0.heightAnchor.constraint(equalToConstant: 84.0),
-                  $0.widthAnchor.constraint(equalTo: $0.heightAnchor, multiplier: aspectRatio) ]
-        }
-        
-        label.activateConstraints {
-            $0.constraint(to: view, .centerX(0), .leading(0), .trailing(0)) +
-                [ $0.topAnchor.constraint(equalTo: arrowView.bottomAnchor, constant: 10.0) ]
-        }
-        
-    case .iOSAppOnMac:
-        
-        view.addSubviews(label)
-        
-        label.activateConstraints {
-            $0.constraint(to: view, .centerX(0), .bottom(-100), .leading(0), .trailing(0))
-        }
+    view.addSubviews(label)
+    label.activateConstraints {
+        $0.constraint(to: view, .centerX(0), .bottom(-100), .leading(0), .trailing(0))
         
     }
-    
     return view
 }
