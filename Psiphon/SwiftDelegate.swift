@@ -1141,12 +1141,20 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         )
     }
     
-    @objc func completedAllOnboardingStages() -> Bool {
-        // Finds stages that are not completed by the user.
-        let stagesNotCompleted = OnboardingStage.stagesToComplete(
-            completedStages: self.userDefaultsConfig.onboardingStagesCompletedTyped)
-        
-        return stagesNotCompleted.isEmpty
+    @objc func completedAllOnboardingStages(_ completionHandler: @escaping (Bool) -> Void) {
+        self.store.$value.signalProducer
+            .map(\.appDelegateState.onboardingCompleted)
+            .filter { maybeOnboardingCompleted in
+                maybeOnboardingCompleted != nil
+            }
+            .take(first: 1)
+            .startWithValues { maybeOnboardingCompleted in
+                precondition(Thread.isMainThread)
+                guard let onboardingCompleted = maybeOnboardingCompleted else {
+                    fatalError()
+                }
+                completionHandler(onboardingCompleted)
+            }
     }
     
     @objc func isNewInstallation() -> Bool {
