@@ -20,7 +20,7 @@
 import Foundation
 
 /// Supported Speed Boost products. Raw value is the distinguisher defined by the PsiCash server.
-public enum SpeedBoostDistinguisher: String {
+public enum SpeedBoostDistinguisher: String, CaseIterable {
     
     // Raw values must match distinguisher values set by the PsiCash server.
     
@@ -39,7 +39,7 @@ public enum SpeedBoostDistinguisher: String {
 extension SpeedBoostDistinguisher {
     
     /// Amount of Speed Boost hours as defined by the Speed Boost distinguisher.
-    var hours: Int {
+    public var hours: Int {
         switch self {
         case .hr1: return 1
         case .hr2: return 2

@@ -99,15 +99,6 @@ let serverRegionReducer = Reducer<ServerRegionState,
             // if available, emits the embedded server regions.
             Effect.deferred { () -> [String]? in
                 
-                #if DEBUG
-                // fake the availability of all regions in the UI for automated screenshots
-                if AppInfo.runningUITest() {
-                    let fakeRegions = (environment.regionAdapter.getRegions() as! [Region])
-                        .compactMap { $0.code }
-                    return fakeRegions
-                }
-                #endif
-                
                 return environment.sharedDB.emittedEgressRegions()
                 
             }.flatMap(.latest, { (emittedEgressRegions: [String]?)

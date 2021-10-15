@@ -437,46 +437,67 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             }
             
         }
-        self.store = Store(
-            initialValue: AppState(),
-            reducer: makeAppReducer(feedbackLogger: self.feedbackLogger),
-            dispatcher: mainDispatcher,
-            environment: { [unowned self] store in
-                let (environment, cleanup) = makeEnvironment(
-                    platform: platform,
-                    store: store,
-                    feedbackLogger: self.feedbackLogger,
-                    sharedDB: self.sharedDB,
-                    sharedAuthCoreData: SharedCoreData_Impl(),
-                    psiCashLib: self.psiCashLib,
-                    regionAdapter: RegionAdapter.sharedInstance(),
-                    embeddedServerEntriesFile: PsiphonConfigReader.embeddedServerEntriesPath,
-                    psiCashFileStoreRoot: self.appSupportFileStore.psiCashFileStoreRootPath,
-                    supportedAppStoreProducts: self.supportedProducts,
-                    userDefaultsConfig: self.userDefaultsConfig,
-                    standardUserDefaults: UserDefaults.standard,
-                    objcBridgeDelegate: objcBridge,
-                    dateCompare: self.dateCompare,
-                    addToDate: { calendarComponent, value, date -> Date? in
-                        Calendar.current.date(byAdding: calendarComponent, value: value, to: date)
-                    },
-                    mainDispatcher: mainDispatcher,
-                    globalDispatcher: globalDispatcher,
-                    getTopActiveViewController: self.getTopActiveViewController,
-                    reloadMainScreen: {
-                        Effect.deferred { fulfill in
-                            AppDelegate.shared().reloadMainViewController(
-                                animated: false,
-                                completion: { fulfill(.unit) })
-                        }
-                    },
-                    clearWebViewDataStore: {
-                        WKWebView.clearWebviewDataStore()
+        
+        let appEnvironment: (Store<AppState, AppAction>) -> AppEnvironment = {
+            [unowned self] store in
+            
+            let (environment, cleanup) = makeEnvironment(
+                platform: platform,
+                store: store,
+                feedbackLogger: self.feedbackLogger,
+                sharedDB: self.sharedDB,
+                sharedAuthCoreData: SharedCoreData_Impl(),
+                psiCashLib: self.psiCashLib,
+                regionAdapter: RegionAdapter.sharedInstance(),
+                embeddedServerEntriesFile: PsiphonConfigReader.embeddedServerEntriesPath,
+                psiCashFileStoreRoot: self.appSupportFileStore.psiCashFileStoreRootPath,
+                supportedAppStoreProducts: self.supportedProducts,
+                userDefaultsConfig: self.userDefaultsConfig,
+                standardUserDefaults: UserDefaults.standard,
+                objcBridgeDelegate: objcBridge,
+                dateCompare: self.dateCompare,
+                addToDate: { calendarComponent, value, date -> Date? in
+                    Calendar.current.date(byAdding: calendarComponent, value: value, to: date)
+                },
+                mainDispatcher: mainDispatcher,
+                globalDispatcher: globalDispatcher,
+                getTopActiveViewController: self.getTopActiveViewController,
+                reloadMainScreen: {
+                    Effect.deferred { fulfill in
+                        AppDelegate.shared().reloadMainViewController(
+                            animated: false,
+                            completion: { fulfill(.unit) })
                     }
-                )
-                self.environmentCleanup = cleanup
-                return environment
-            })
+                },
+                clearWebViewDataStore: {
+                    WKWebView.clearWebviewDataStore()
+                }
+            )
+            self.environmentCleanup = cleanup
+            return environment
+        }
+        
+        
+        if AppInfo.runningUITest() {
+            #if DEBUG
+            self.store = Store(
+                initialValue: makeUITestAppState(
+                    embeddedServerEntriesFile: PsiphonConfigReader.embeddedServerEntriesPath),
+                reducer: makeUITestReducer(),
+                dispatcher: mainDispatcher,
+                environment: appEnvironment
+            )
+            #endif
+        } else {
+
+            self.store = Store(
+                initialValue: AppState(),
+                reducer: makeAppReducer(feedbackLogger: self.feedbackLogger),
+                dispatcher: mainDispatcher,
+                environment: appEnvironment
+            )
+
+        }
         
         self.store.send(.appDelegateAction(.appLifecycleEvent(.didFinishLaunching)))
         self.store.send(vpnAction: .appLaunched)
@@ -1021,6 +1042,14 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func loadingScreenDismissSignal(_ completionHandler: @escaping () -> Void) {
+        
+        // Skips loading screen for screenshot generation.
+        #if DEBUG
+        if AppInfo.runningUITest() {
+            completionHandler()
+            return
+        }
+        #endif
                 
         self.store.$value.signalProducer
             .filter { appState in

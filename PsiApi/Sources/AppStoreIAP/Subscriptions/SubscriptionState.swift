@@ -28,11 +28,13 @@ public enum SubscriptionStatus: Equatable {
 }
 
 public struct SubscriptionState: Equatable {
-    public var status: SubscriptionStatus = .unknown
-
-    public init() {
-        self.status = .unknown
+    
+    public var status: SubscriptionStatus
+    
+    public init(status: SubscriptionStatus = .unknown) {
+        self.status = status
     }
+    
 }
 
 public enum SubscriptionAction {
