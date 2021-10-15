@@ -55,6 +55,10 @@ class PsiphonUITests: XCTestCase {
         // Use recording to get started writing UI tests.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
         snapshot("main")
+        
+        XCUIApplication().buttons["psiCashWidgetSpeedBoostButton"].tap() // Go to Speed Boost screen
+        snapshot("speed-boost")
+        XCUIApplication().buttons["psiCashScreenCloseButton"].tap() // Back to main screen
 
         XCUIApplication().otherElements["regionSelectionButton"].tap() // Go to region selection
         snapshot("settings-region")

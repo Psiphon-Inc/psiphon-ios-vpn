@@ -74,13 +74,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self.view setBackgroundColor:[UIColor blackColor]];
-
-#if DEBUG
-    if ([AppInfo runningUITest]) {
-        [self switchToMainScreenAndStartVPN:FALSE];
-        return;
-    }
-#endif
     
     [SwiftDelegate.bridge completedAllOnboardingStages:^(BOOL onboardingCompleted) {
         if (onboardingCompleted) {
