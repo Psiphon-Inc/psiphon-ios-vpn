@@ -669,6 +669,8 @@ final class PsiCashViewController: ReactiveViewController {
             self.dismiss(animated: true, completion: nil)
         }
         
+        closeButton.accessibilityIdentifier = "psiCashScreenCloseButton"
+        
         vStack.addArrangedSubviews(
             signupOrLogInView,
             tabControl.view,

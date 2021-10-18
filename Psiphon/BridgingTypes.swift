@@ -97,8 +97,9 @@ import PsiphonClientCommonLibrary
         _ completionHandler: @escaping (OnboardingViewController) -> Void
     ) -> OnboardingViewController?
     
-    /// Returns true if all onboarding stages have been completed.
-    @objc func completedAllOnboardingStages() -> Bool
+    /// Call `completionHandler` with `true` if all onboarding stages have been completed.
+    /// `completionHandler` should be called on the main-thread.
+    @objc func completedAllOnboardingStages(_ completionHandler: @escaping (Bool) -> Void)
     
     /// Returns true if current app launch is a new installation.
     /// - Important: It's a fatal error of this method is called before AppUpgrade is checked.
