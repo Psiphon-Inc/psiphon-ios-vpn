@@ -55,6 +55,14 @@ public struct PsiCashState: Equatable {
     public var pendingAccountLoginLogout: PendingAccountLoginLogoutEvent?
     public var pendingPsiCashRefresh: PendingRefresh
     
+    
+    public init(purchasing: PsiCashPurchasingState, libData: PsiCashLibData? = nil, pendingAccountLoginLogout: PsiCashState.PendingAccountLoginLogoutEvent? = nil, pendingPsiCashRefresh: PsiCashState.PendingRefresh) {
+        self.purchasing = purchasing
+        self.libData = libData
+        self.pendingAccountLoginLogout = pendingAccountLoginLogout
+        self.pendingPsiCashRefresh = pendingPsiCashRefresh
+    }
+    
 }
 
 extension PsiCashState {

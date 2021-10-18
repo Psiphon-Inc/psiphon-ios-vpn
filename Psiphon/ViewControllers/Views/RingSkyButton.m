@@ -19,6 +19,7 @@
 
 #import "RingSkyButton.h"
 #import "UIColor+Additions.h"
+#import "UIView+AutoLayoutViewGroup.h"
 
 @implementation RingSkyButton {
     UIImageView *_Nullable chevron;
@@ -47,7 +48,18 @@
     [super layoutSubviews];
 
     if (self.includeChevron && !chevron) {
-        chevron = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"ChevronBlue"]];
+        
+        UIImage *sourceImage = [UIImage imageNamed:@"ChevronBlue"];
+        
+        // Flips image if RTL.
+        if ([self isRTL] == TRUE) {
+            sourceImage = [UIImage imageWithCGImage:sourceImage.CGImage
+                                              scale:sourceImage.scale
+                                        orientation:UIImageOrientationUpMirrored];
+        }
+        
+        chevron = [[UIImageView alloc] initWithImage:sourceImage];
+        
         [self addSubview:chevron];
 
         chevron.translatesAutoresizingMaskIntoConstraints = FALSE;

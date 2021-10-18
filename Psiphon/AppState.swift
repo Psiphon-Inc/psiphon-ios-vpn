@@ -714,7 +714,7 @@ fileprivate func toVPNReducerEnvironment(env: AppEnvironment) -> VPNReducerEnvir
     )
 }
 
-fileprivate func toMainViewReducerEnvironment(env: AppEnvironment) -> MainViewEnvironment {
+func toMainViewReducerEnvironment(env: AppEnvironment) -> MainViewEnvironment {
     MainViewEnvironment(
         psiCashStore: env.psiCashStore,
         psiCashViewEnvironment: PsiCashViewEnvironment(

@@ -74,19 +74,14 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     [self.view setBackgroundColor:[UIColor blackColor]];
-
-#if DEBUG
-    if ([AppInfo runningUITest]) {
-        [self switchToMainScreenAndStartVPN:FALSE];
-        return;
-    }
-#endif
     
-    if ([SwiftDelegate.bridge completedAllOnboardingStages]) {
-        [self switchToMainScreenAndStartVPN:FALSE];
-    } else {
-        [self switchToOnboarding];
-    }
+    [SwiftDelegate.bridge completedAllOnboardingStages:^(BOOL onboardingCompleted) {
+        if (onboardingCompleted) {
+            [self switchToMainScreenAndStartVPN:FALSE];
+        } else {
+            [self switchToOnboarding];
+        }
+    }];
 }
 
 - (void)switchToOnboarding {

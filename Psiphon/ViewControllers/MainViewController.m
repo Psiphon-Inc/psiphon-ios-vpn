@@ -733,6 +733,9 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
                                        action:@selector(speedBoostButtonTapped)
                              forControlEvents:UIControlEventTouchUpInside];
     
+    // Sets accessibilityIdentifier for PsiphonUITests
+    psiCashWidget.speedBoostButton.accessibilityIdentifier = @"psiCashWidgetSpeedBoostButton";
+    
     // Makes balance view tappable
     UITapGestureRecognizer *tapRecognizer = [[UITapGestureRecognizer alloc]
                                              initWithTarget:self
