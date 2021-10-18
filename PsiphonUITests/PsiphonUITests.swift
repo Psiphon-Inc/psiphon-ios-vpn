@@ -54,22 +54,25 @@ class PsiphonUITests: XCTestCase {
     func testGenerateScreenshots() {
         // Use recording to get started writing UI tests.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
-        snapshot("main")
+        
+        // Note that Fastlane orders screenshots lexically for upload to App Store.
+        
+        snapshot("1-main")
         
         XCUIApplication().buttons["psiCashWidgetSpeedBoostButton"].tap() // Go to Speed Boost screen
-        snapshot("speed-boost")
+        snapshot("2-speed-boost")
         XCUIApplication().buttons["psiCashScreenCloseButton"].tap() // Back to main screen
 
         XCUIApplication().otherElements["regionSelectionButton"].tap() // Go to region selection
-        snapshot("settings-region")
+        snapshot("3-settings-region")
         XCUIApplication().navigationBars.buttons.element(boundBy: 0).tap() // Back to main screen
 
 
         XCUIApplication().buttons["settings"].tap() // Go to settings
-        snapshot("settings")
+        snapshot("5-settings")
 
         XCUIApplication().cells.element(boundBy: 2).tap() // Go to language selection screen
-        snapshot("settings-language")
+        snapshot("4-settings-language")
 
         XCUIApplication().navigationBars.buttons.element(boundBy: 0).tap() // Back to main screen
     }
