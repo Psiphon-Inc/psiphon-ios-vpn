@@ -33,6 +33,8 @@
 
 + (BOOL)isiOSAppOnMac;
 
++ (BOOL)isOperatingSystemAtLeastVersion15;
+
 + (BOOL)runningUITest;
 
 @end

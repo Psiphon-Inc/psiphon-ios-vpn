@@ -746,11 +746,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         [self exitGracefully];
     }
 
-    // iOS 15
-    NSOperatingSystemVersion ios15 = {.majorVersion = 15, .minorVersion = 0, .patchVersion = 0};
-    
     NSNumber *fd;
-    if ([[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:ios15]) {
+    if ([AppInfo isOperatingSystemAtLeastVersion15]) {
         // iOS >= 15 or macOS >= 12
         fd = [TunnelFileDescriptor getTunnelFileDescriptor];
     } else {
@@ -854,8 +851,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                                            updatedSharedDB:self.sharedDB];
     }
 
-    // Specific config changes for iOS VPN app on Mac.
-    if ([AppInfo isiOSAppOnMac] == TRUE) {
+    // Specific config changes for iOS VPN app on Mac, and iOS 15+.
+    if ([AppInfo isiOSAppOnMac] == TRUE || [AppInfo isOperatingSystemAtLeastVersion15] == TRUE) {
         [mutableConfigCopy removeObjectForKey:@"LimitIntensiveConnectionWorkers"];
         [mutableConfigCopy removeObjectForKey:@"LimitMeekBufferSizes"];
         [mutableConfigCopy removeObjectForKey:@"StaggerConnectionWorkersMilliseconds"];

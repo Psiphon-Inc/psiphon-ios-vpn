@@ -83,6 +83,11 @@ UserDefaultsKey const AppInfoFastLaneSnapShotBoolKey = @"FASTLANE_SNAPSHOT";
     
 }
 
++ (BOOL)isOperatingSystemAtLeastVersion15 {
+    NSOperatingSystemVersion ios15 = {.majorVersion = 15, .minorVersion = 0, .patchVersion = 0};
+    return [[NSProcessInfo processInfo] isOperatingSystemAtLeastVersion:ios15];
+}
+
 + (BOOL)runningUITest {
 #if DEBUG
     static BOOL runningUITest;
