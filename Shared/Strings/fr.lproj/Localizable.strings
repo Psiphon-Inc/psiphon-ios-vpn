@@ -280,8 +280,8 @@
 /* No comment provided by engineer. */
 "privacy-information-collected-client-advertising-networks-para-2" = "Vous pouvez refuser l’utilisation de témoins pour la publicité axée sur les centres d’intérêt en visitant :";
 
-/*[UNTRANSLATED] Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
-"privacy-information-collected-data-categories-header" = "Data Categories";
+/* Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
+"privacy-information-collected-data-categories-header" = "Catégorie de données";
 
 /* Header text in the 'my.psi.cash' section of the Privacy page. Refers to the cookies stored by web browsers. */
 "privacy-information-collected-mypsicash-cookies-head" = "Témoins";
