@@ -71,7 +71,7 @@
 "CREATE_PSICASH_ACCOUNT_CONTINUE_BUTTON" = "Continuar sin cuenta";
 
 /* Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will be taken to a screen where they can create an account or log into an existing one. */
-"CREATE_PSICASH_ACCOUNT_CREATE_BUTTON" = "Crear o iniciar sesión dentro de la cuenta";
+"CREATE_PSICASH_ACCOUNT_CREATE_BUTTON" = "Crear o iniciar sesión una cuenta";
 
 /* Decline button title */
 "DECLINE_BUTTON_TITLE" = "Declinar";
