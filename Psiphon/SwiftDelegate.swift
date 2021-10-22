@@ -1155,6 +1155,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         
         return OnboardingViewController(
             platform: platform,
+            version: versionLabelText(),
             userDefaultsConfig: self.userDefaultsConfig,
             mainBundle: .main,
             onboardingStages: stagesNotCompleted,
