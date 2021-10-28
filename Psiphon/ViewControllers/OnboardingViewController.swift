@@ -21,6 +21,7 @@ import Foundation
 import PsiApi
 import Utilities
 import Promises
+import UIKit
 
 /// Enumerates set of all privacy policy versions.
 enum PrivacyPolicyVersion: String, Codable {
@@ -176,7 +177,14 @@ fileprivate extension OnboardingScreen {
         screens[currentScreenIndex]
     }
         
+    // mainLayout defines a virtual layout that contains
+    // the main contents of this view controller.
+    // For iPhones the mainLayout is the same as self.view layout constraints,
+    // for iPads / Macs, the mainLayout is set to constant width and height.
+    private let mainLayout = UILayoutGuide()
+    
     // Views
+    private let versionLabel = UIButton()
     private var currentOnboardingView: UIView? = nil
     private let progressView = UIProgressView(progressViewStyle: .bar)
     private let nextButton = SwiftUIButton(type: .system)
@@ -188,6 +196,7 @@ fileprivate extension OnboardingScreen {
 
     init(
         platform: Platform,
+        version: String,
         userDefaultsConfig: UserDefaultsConfig,
         mainBundle: Bundle,
         onboardingStages: OrderedSet<OnboardingStage>,
@@ -198,6 +207,8 @@ fileprivate extension OnboardingScreen {
         guard onboardingStages.count > 0 else {
             fatalError()
         }
+        
+        self.versionLabel.setTitle(version, for: .normal)
         
         self.userDefaultsConfig = userDefaultsConfig
         self.mainBundle = mainBundle
@@ -245,8 +256,27 @@ fileprivate extension OnboardingScreen {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.setNeedsStatusBarAppearanceUpdate()
-        
         self.view.backgroundColor = .darkBlue()
+        
+        view.addLayoutGuide(mainLayout)
+        
+        mainLayout.activateConstraints {
+            return $0.constraint(to: self.view.safeAreaAnchors, .centerX(0), .centerY(0)) +
+             [
+                // mainLayout should always be equal or smaller than safe screen area.
+                $0.topAnchor.constraint(greaterThanOrEqualTo: self.view.safeAreaAnchors.topAnchor).priority(.required),
+                $0.bottomAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaAnchors.bottomAnchor).priority(.required),
+                $0.leadingAnchor.constraint(greaterThanOrEqualTo: self.view.safeAreaAnchors.leadingAnchor).priority(.required),
+                $0.trailingAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaAnchors.trailingAnchor).priority(.required),
+                
+                $0.widthAnchor.constraint(equalToConstant: 468).priority(.belowRequired),
+                $0.heightAnchor.constraint(equalToConstant: 736).priority(.belowRequired),
+                $0.widthAnchor.constraint(lessThanOrEqualToConstant: 468).priority(.required),
+                $0.heightAnchor.constraint(lessThanOrEqualToConstant: 736).priority(.required)
+            ]
+        }
+        
+        
         
         // Adds background clouds
         let cloudsView = CloudsView(forAutoLayout: ())!
@@ -259,7 +289,7 @@ fileprivate extension OnboardingScreen {
         self.view.addSubview(progressView)
         progressView.progressTintColor = .lightishBlue()
         progressView.activateConstraints {
-            $0.constraintToParentSafeArea(.bottom(0), .leading(0), .trailing(0)) +
+            $0.constraint(to: mainLayout, .bottom(0), .leading(0), .trailing(0)) +
                 [$0.heightAnchor.constraint(equalToConstant: 6.0)]
         }
         
@@ -271,8 +301,37 @@ fileprivate extension OnboardingScreen {
         
         self.view.addSubview(nextButton)
         nextButton.activateConstraints {
-            $0.constraintToParentSafeArea(.trailing(-20.0)) +
+            $0.constraint(to: mainLayout, .trailing(-20.0, .required)) +
                 [ $0.bottomAnchor.constraint(equalTo: progressView.topAnchor) ]
+        }
+        
+        // Versiona label
+        let versionLabelPadding: CGFloat = 10.0
+        
+        mutate(versionLabel) {
+            $0.setTitleColor(.nepalGreyBlue(), for: .normal)
+            $0.titleLabel?.adjustsFontSizeToFitWidth = true
+            $0.titleLabel?.font = .avenirNextBold(12.0)
+            $0.isUserInteractionEnabled = false
+            $0.contentEdgeInsets = UIEdgeInsets(
+                top: versionLabelPadding,
+                left: versionLabelPadding,
+                bottom: versionLabelPadding,
+                right: versionLabelPadding
+            )
+            #if DEBUG || DEV_RELEASE
+            if AppInfo.runningUITest() {
+                versionLabel.isHidden = true
+            }
+            #endif
+        }
+        
+        self.view.addSubview(versionLabel)
+        versionLabel.activateConstraints {
+            $0.constraint(to: mainLayout,
+                .top(Float(Style.default.padding), .required),
+                .trailing(Float(-Style.default.padding), .required)
+            )
         }
         
         // Displays first screen.
@@ -376,7 +435,7 @@ fileprivate extension OnboardingScreen {
             )
             
         case (.vpnConfigPermission, 1):
-            onboardingView = makeVPNConfigPermissionGuideOnboardingView(platform: platform)
+            onboardingView = makeVPNConfigPermissionGuideOnboardingView()
             
         case (.userNotificationPermission, _):
             
@@ -494,11 +553,12 @@ fileprivate extension OnboardingScreen {
         }
         
         onboardingView.activateConstraints {
-            $0.constraintToParentSafeArea(.top(15.0), .centerX(0), .leading(0), .trailing(0)) +
-                [   // Max width for large screens
-                    $0.widthAnchor .constraint(lessThanOrEqualToConstant: 500.0),
-                    bottomConstraint
-                ]
+            $0.constraint(to: mainLayout,
+                          .top(Float(Style.default.padding)),
+                          .centerX(0),
+                          .leading(0),
+                          .trailing(0)) +
+            [ bottomConstraint ]
         }
         
     }
@@ -561,46 +621,20 @@ fileprivate func makePrivacyPolicyDeclinedAlert() -> UIAlertController {
     return alertController
 }
 
-/// Creates view with an arrow pointing to "Allow" button of permission dialog.
+/// Creates view for display under system VPN config permission dialog.
 /// The X and Y centre of the returned view is expected to match the X and Y centre of the screen.
-fileprivate func makeVPNConfigPermissionGuideOnboardingView(platform: Platform) -> UIView {
+fileprivate func makeVPNConfigPermissionGuideOnboardingView() -> UIView {
     let view = UIView()
-    let arrowImage = UIImage(named: "PermissionArrow")!
-    let arrowView = UIImageView(image: arrowImage)
     let label = UILabel.make(text: Strings.vpnInstallGuideText(),
                              fontSize: .h3,
                              typeface: .medium,
                              color: .white,
                              numberOfLines: 0,
                              alignment: .center)
-    
-    switch platform.current {
-    
-    case .iOS:
-        
-        view.addSubviews(arrowView, label)
-        
-        let aspectRatio = arrowImage.size.width / arrowImage.size.height
-        arrowView.activateConstraints {
-            $0.constraint(to: view, .centerX(-60.0), .centerY(160.0)) +
-                [ $0.heightAnchor.constraint(equalToConstant: 84.0),
-                  $0.widthAnchor.constraint(equalTo: $0.heightAnchor, multiplier: aspectRatio) ]
-        }
-        
-        label.activateConstraints {
-            $0.constraint(to: view, .centerX(0), .leading(0), .trailing(0)) +
-                [ $0.topAnchor.constraint(equalTo: arrowView.bottomAnchor, constant: 10.0) ]
-        }
-        
-    case .iOSAppOnMac:
-        
-        view.addSubviews(label)
-        
-        label.activateConstraints {
-            $0.constraint(to: view, .centerX(0), .bottom(-100), .leading(0), .trailing(0))
-        }
+    view.addSubviews(label)
+    label.activateConstraints {
+        $0.constraint(to: view, .centerX(0), .bottom(-100), .leading(0), .trailing(0))
         
     }
-    
     return view
 }

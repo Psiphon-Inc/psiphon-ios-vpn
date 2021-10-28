@@ -620,6 +620,19 @@ extension NSLayoutConstraint {
 
 }
 
+extension Array where Element: NSLayoutConstraint {
+    
+    func priority(_ value: UILayoutPriority) -> [NSLayoutConstraint] {
+        self.map { $0.priority(value) }
+    }
+
+    func priority(_ value: Int) -> [NSLayoutConstraint] {
+        return self.priority(UILayoutPriority(rawValue: Float(value)))
+    }
+
+    
+}
+
 // MARK: -
 
 extension UIView {

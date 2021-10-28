@@ -590,10 +590,18 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
     }
 #endif
     
+    NSLayoutConstraint *trailingConstraint;
+    if (@available(iOS 11.0, *)) {
+        trailingConstraint = [versionLabel.trailingAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.trailingAnchor
+                                                                         constant:-15.f];
+    } else {
+        trailingConstraint = [versionLabel.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor
+                                                                         constant:padding + 15.f];
+    }
+    
     // Setup autolayout
     [NSLayoutConstraint activateConstraints:@[
-      [versionLabel.trailingAnchor constraintEqualToAnchor:psiCashWidget.trailingAnchor
-                                                  constant:padding + 15.f],
+      trailingConstraint,
       [versionLabel.topAnchor constraintEqualToAnchor:psiphonTitle.topAnchor constant:-padding]
     ]];
 }
