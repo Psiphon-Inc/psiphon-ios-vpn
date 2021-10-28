@@ -684,13 +684,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 content.title = [NSString localizedUserNotificationStringForKey:@"DISALLOWED_TRAFFIC_NOTIFICATION_TITLE_V2" arguments:nil];
                 content.body = [NSString localizedUserNotificationStringForKey:@"DISALLOWED_TRAFFIC_NOTIFICATION_BODY_V2" arguments:nil];
                 
-                if (@available(iOS 15.0, *)) {
-                    //
-                    // Sets the notification interruption level to time-sensitive.
-                    //
-                    content.interruptionLevel = UNNotificationInterruptionLevelTimeSensitive;
-                }
-                
                 // Delivers the notification immediately.
                 UNNotificationRequest* request = [UNNotificationRequest
                                                   requestWithIdentifier:UserNotificationDisallowedTrafficAlertIdentifier
