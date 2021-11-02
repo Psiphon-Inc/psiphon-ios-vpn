@@ -81,6 +81,9 @@ final class PsiCashAccountViewController: ReactiveViewController {
     
     private let (lifetime, token) = Lifetime.make()
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
 
     init(
         store: Store<ReaderState, ViewControllerAction>,
@@ -119,101 +122,107 @@ final class PsiCashAccountViewController: ReactiveViewController {
             observed.lifeCycle.viewDidLoadOrAppeared
         }
         .startWithValues { [unowned self] observed in
-            
-            if Debugging.mainThreadChecks {
-                guard Thread.isMainThread else {
-                    fatalError()
-                }
+            self.updateUI(observed)
+        }
+    }
+    
+    /// Updates UI based on the observed state.
+    private func updateUI(_ observed: ObservedState) {
+        
+        if Debugging.mainThreadChecks {
+            guard Thread.isMainThread else {
+                fatalError()
             }
-            
-            // Even though the reactive signal has a filter on
-            // `!observed.lifeCycle.viewWillOrDidDisappear`, due to async nature
-            // of the signal it is ambiguous if this closure is called when
-            // `self.lifeCycle.viewWillOrDidDisappear` is true.
-            // Due to this race-condition, the source-of-truth (`self.lifeCycle`),
-            // is checked for whether view will or did disappear.
-            guard !self.lifeCycle.viewWillOrDidDisappear else {
-                return
-            }
+        }
+        
+        // Even though the reactive signal has a filter on
+        // `!observed.lifeCycle.viewWillOrDidDisappear`, due to async nature
+        // of the signal it is ambiguous if this closure is called when
+        // `self.lifeCycle.viewWillOrDidDisappear` is true.
+        // Due to this race-condition, the source-of-truth (`self.lifeCycle`),
+        // is checked for whether view will or did disappear.
+        guard !self.lifeCycle.viewWillOrDidDisappear else {
+            return
+        }
 
-            guard let viewControllerDidLoadDate = self.viewControllerDidLoadDate else {
+        guard let viewControllerDidLoadDate = self.viewControllerDidLoadDate else {
+            fatalError()
+        }
+        
+        if self.lastLoginLogoutEventDate == nil {
+            self.lastLoginLogoutEventDate = viewControllerDidLoadDate
+        }
+        
+        switch observed.readerState.pendingAccountLoginLogout {
+        case .none:
+            self.updateNoPendingLoginEvent()
+            return
+        
+        case .some(let accountLoginEvent):
+
+            defer {
+                self.lastLoginLogoutEventDate = accountLoginEvent.date
+            }
+            
+            guard let lastLoginEventDate = self.lastLoginLogoutEventDate else {
                 fatalError()
             }
             
-            if self.lastLoginLogoutEventDate == nil {
-                self.lastLoginLogoutEventDate = viewControllerDidLoadDate
-            }
+            switch accountLoginEvent.wrapped {
+            case .pending(.login):
+                self.updatePendingLoginEvent()
             
-            switch observed.readerState.pendingAccountLoginLogout {
-            case .none:
-                self.updateNoPendingLoginEvent()
-                return
-            
-            case .some(let accountLoginEvent):
-
-                defer {
-                    self.lastLoginLogoutEventDate = accountLoginEvent.date
-                }
+            case .completed(.left(let completedLogin)):
+                // Login event completed.
                 
-                guard let lastLoginEventDate = self.lastLoginLogoutEventDate else {
-                    fatalError()
-                }
-                
-                switch accountLoginEvent.wrapped {
-                case .pending(.login):
-                    self.updatePendingLoginEvent()
-                
-                case .completed(.left(let completedLogin)):
-                    // Login event completed.
+                switch completedLogin {
+                case .success(_):
                     
-                    switch completedLogin {
-                    case .success(_):
+                    // Ignores previous login event if any.
+                    guard accountLoginEvent.date >= viewControllerDidLoadDate else {
                         
-                        // Ignores previous login event if any.
-                        guard accountLoginEvent.date >= viewControllerDidLoadDate else {
-                            
-                            guard
-                                observed.readerState.psiCashAccountType != .account(loggedIn: true)
-                            else {
-                                // User was already logged in prior to display
-                                // of this view controller.
-                                self.dismiss(animated: true, completion: nil)
-                                return
-                            }
-                            
+                        guard
+                            observed.readerState.psiCashAccountType != .account(loggedIn: true)
+                        else {
+                            // User was already logged in prior to display
+                            // of this view controller.
+                            self.dismiss(animated: true, completion: nil)
                             return
                         }
                         
-                        // In case of lastTrackerMerge, an alert should be displayed.
-                        // This is currently handled outside of this view controller
-                        // (SwiftDelegate.swift).
-                        
-                        // Login was successful, dismisses this view controller.
-                        self.dismiss(animated: true, completion: nil)
-                        
-                    case .failure(_):
-                        
-                        // Login failure (either before or after presentation
-                        // of this view controller).
-                        self.updateNoPendingLoginEvent()
-                        
-                    }
-                    
-                case .pending(.logout), .completed(.right(_)):
-                    
-                    guard accountLoginEvent.date > lastLoginEventDate else {
-                        self.updateNoPendingLoginEvent()
                         return
                     }
                     
-                    // Dismisses current view controller if somehow the user
-                    // is logging out.
-                    DispatchQueue.main.async {
-                        let _ = self.display(screenToPresent: .parent)
-                    }
+                    // In case of lastTrackerMerge, an alert should be displayed.
+                    // This is currently handled outside of this view controller
+                    // (SwiftDelegate.swift).
+                    
+                    // Login was successful, dismisses this view controller.
+                    self.dismiss(animated: true, completion: nil)
+                    
+                case .failure(_):
+                    
+                    // Login failure (either before or after presentation
+                    // of this view controller).
+                    self.updateNoPendingLoginEvent()
+                    
+                }
+                
+            case .pending(.logout), .completed(.right(_)):
+                
+                guard accountLoginEvent.date > lastLoginEventDate else {
+                    self.updateNoPendingLoginEvent()
+                    return
+                }
+                
+                // Dismisses current view controller if somehow the user
+                // is logging out.
+                DispatchQueue.main.async {
+                    let _ = self.display(screenToPresent: .parent)
                 }
             }
         }
+        
     }
     
     /// Updates the UI to a state where there is no pending login event.
@@ -238,10 +247,6 @@ final class PsiCashAccountViewController: ReactiveViewController {
         self.loginButtonSpinner.isHidden = false
         self.loginButtonSpinner.startAnimating()
         self.loginButton.setTitle("", for: .normal)
-    }
-    
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
     }
     
     override func viewDidLoad() {
