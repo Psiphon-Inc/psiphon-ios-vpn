@@ -1448,10 +1448,8 @@ final class CopySettingsToPsiphonDataSharedDB {
     }
     
     func copySelectedRegion() {
-        guard let selectedRegion = RegionAdapter.sharedInstance().getSelectedRegion().code else {
-            fatalError()
-        }
-        sharedDB.setEgressRegion(selectedRegion)
+        let region = RegionAdapter.sharedInstance().getSelectedRegion()
+        sharedDB.setEgressRegion(region?.code)
     }
     
     func copyUpstreamProxySettings() {
