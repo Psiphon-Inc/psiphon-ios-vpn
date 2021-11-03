@@ -107,9 +107,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 #pragma mark - Tunnel core configs
 
+/**
+ Retruns regions set by `-setEgressRegion:`.
+ If the selected region was set to nil, returns best performance region.
+ */
 - (NSString *)getEgressRegion;
 
-- (void)setEgressRegion:(NSString *)regionCode;
+- (void)setEgressRegion:(NSString *_Nullable)regionCode;
 
 - (void)setDisableTimeouts:(BOOL)disableTimeouts;
 
