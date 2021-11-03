@@ -61,8 +61,8 @@
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "Pengaturan aplikasi Anda sepertinya rusak. Coba pasang ulang aplikasi untuk memperbaiki berkas.";
 
-/*[UNTRANSLATED] Button label that lets users create a new account. */
-"CREATE_ACCOUNT_BUTTON_TITLE" = "Create account";
+/* Button label that lets users create a new account. */
+"CREATE_ACCOUNT_BUTTON_TITLE" = "Buat Akun";
 
 /*[UNTRANSLATED] Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
 "CREATE_PSICASH_ACCOUNT_BODY_2" = "We strongly encourage you to make a PsiCash account before buying PsiCash. Having an account allows you to share your balance between devices and protect your purchases.\n\nIMPORTANT: Without an account your PsiCash will not be preserved if you uninstall Psiphon.";
@@ -514,8 +514,8 @@
 /*[UNTRANSLATED] Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
 "PROTECT_YOUR_PURCHASES" = "Protect Your Purchases";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts. */
-"PSICASH_ACCOUNT" = "PsiCash Account";
+/* Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts. */
+"PSICASH_ACCOUNT" = "Akun PsiCash";
 
 /*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
 "PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "Are you sure you want to log out of your PsiCash account?";
@@ -529,8 +529,8 @@
 /*[UNTRANSLATED] Header of a modal dialog that appears when the user tries to log out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNT_LOGOUT_TITLE" = "PsiCash Account Logout";
 
-/*[UNTRANSLATED] Button title that opens 'PsiCash' account management. */
-"PSICASH_ACCOUNT_MANAGEMENT_2" = "Manage account";
+/* Button title that opens 'PsiCash' account management. */
+"PSICASH_ACCOUNT_MANAGEMENT_2" = "Kelola akun";
 
 /*[UNTRANSLATED] An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "Your PsiCash login has expired. Please log back in.";
