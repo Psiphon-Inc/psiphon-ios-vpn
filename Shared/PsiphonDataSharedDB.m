@@ -277,7 +277,7 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
     return egressRegion;
 }
 
-- (void)setEgressRegion:(NSString *)regionCode {
+- (void)setEgressRegion:(NSString *_Nullable)regionCode {
     [sharedDefaults setObject:regionCode forKey:TunnelEgressRegionKey];
 }
 
