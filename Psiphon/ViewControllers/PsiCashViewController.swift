@@ -217,8 +217,8 @@ final class PsiCashViewController: ReactiveViewController {
             return
         }
         
-        guard let psiCashLibData = observed.readerState.psiCash.libData else {
-            guard self.updateUIStateHelper(.psiCashNotLoaded) else { fatalError() }
+        guard case let .success(psiCashLibData) = observed.readerState.psiCash.libData else {
+            guard self.updateUIStateHelper(.psiCashLibFailedInit) else { fatalError() }
             return
         }
         
@@ -302,7 +302,7 @@ final class PsiCashViewController: ReactiveViewController {
         self.balanceViewWrapper.bind(observed.readerState.psiCashBalanceViewModel)
         
         // Sets account username if availalbe
-        if let accountName = observed.readerState.psiCash.libData?.accountUsername {
+        if let accountName = psiCashLibData.accountUsername {
             self.accountNameViewWrapper.bind(accountName)
         }
         
@@ -493,8 +493,7 @@ final class PsiCashViewController: ReactiveViewController {
     
     /// An incomplete representation of the UI state, used only by the `updateUIStateHelper(_:)` method.
     enum _UIState: Equatable {
-        // PsiCash library not loaded yet.
-        case psiCashNotLoaded
+        case psiCashLibFailedInit
         case unknownSubscription
         case subscribed(PsiCashAccountType)
         case notSubscribed(TunnelConnectedStatus, PsiCashAccountType, PsiCashState.LoginLogoutPendingValue?)
@@ -508,14 +507,14 @@ final class PsiCashViewController: ReactiveViewController {
         
         switch state {
             
-        case .psiCashNotLoaded:
+        case .psiCashLibFailedInit:
             self.accountNameViewWrapper.view.isHidden = true
             self.balanceViewWrapper.view.isHidden = true
             self.tabControl.view.isHidden = true
             self.signupOrLogInView.isHidden = true
             
             self.containerView.bind(
-                .left(.right(.right(.right(.right(.psiCashNotLoaded)))))
+                .left(.right(.right(.right(.right(.psiCashLibFailedInit)))))
             )
             
             return true

@@ -144,9 +144,10 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
     }
     
     // PsiCash Login button:
-    // - Shown when not logged in (no tokens, trackers, logged out state)
+    // - Shown when not logged in (no tokens, trackers, logged out state),
+    //   or when PsiCash lib did not initialize successfully.
     // - Not allowed when disconnected (button disabled, not hidden).
-    if (self.viewModel.isPsiCashAccountLoggedIn == TRUE) {
+    if (self.viewModel.isPsiCashInitialized == FALSE || self.viewModel.isPsiCashAccountLoggedIn == TRUE) {
         [hiddenKeys addObject:SettingspsiCashAccountLoginCellSpecifierKey];
     } else {
         [hiddenKeys removeObject:SettingspsiCashAccountLoginCellSpecifierKey];

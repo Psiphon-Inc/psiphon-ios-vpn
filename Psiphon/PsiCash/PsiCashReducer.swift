@@ -73,10 +73,10 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         ]
     
     case ._initialized(let result):
-
+        
         switch result {
         case let .success(libInitSuccess):
-            state.psiCash.libData = libInitSuccess.libData
+            state.psiCash.libData = .success(libInitSuccess.libData)
             state.psiCashBalance = .fromStoredExpectedReward(
                 libData: libInitSuccess.libData, persisted: environment.psiCashPersistedValues)
             
@@ -118,6 +118,9 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             return effects
             
         case let .failure(error):
+            
+            state.psiCash.libData = .failure(error)
+            
             return [
                 environment.feedbackLogger.log(.error, "failed to initialize PsiCash: \(error)")
                     .mapNever()
@@ -127,7 +130,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
     case .setLocale(let locale):
         
         // PsiCash Library must be initialized before setting locale.
-        guard state.psiCash.libData != nil else {
+        guard case .success(_) = state.psiCash.libData else {
             environment.feedbackLogger.fatalError("lib not loaded")
             return []
         }
@@ -142,7 +145,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
     case .buyPsiCashProduct(let purchasableType):
         
         guard
-            state.psiCash.libData != nil,
+            case .success(_) = state.psiCash.libData,
             let tunnelConnection = state.tunnelConnection,
             case .notSubscribed = state.subscription.status,
             state.psiCash.purchasing.completed
@@ -186,7 +189,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             return []
         }
 
-        state.psiCash.libData = purchaseResult.refreshedLibData
+        state.psiCash.libData = .success(purchaseResult.refreshedLibData)
         state.psiCashBalance = .refreshed(refreshedData: purchaseResult.refreshedLibData,
                                           persisted: environment.psiCashPersistedValues)
 
@@ -274,7 +277,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
     case let .refreshPsiCashState(ignoreSubscriptionState):
         
         guard
-            state.psiCash.libData != nil,
+            case .success(_) = state.psiCash.libData,
             let tunnelConnection = state.tunnelConnection,
             case .completed(_) = state.psiCash.pendingPsiCashRefresh
         else {
@@ -310,7 +313,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         switch result {
         case .success(let refreshStateResponse):
             
-            state.psiCash.libData = refreshStateResponse.libData
+            state.psiCash.libData = .success(refreshStateResponse.libData)
             state.psiCashBalance = .refreshed(refreshedData: refreshStateResponse.libData,
                                               persisted: environment.psiCashPersistedValues)
             
@@ -348,11 +351,11 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             }
         }
         
-        guard case .account(loggedIn: true) = state.psiCash.libData?.accountType else {
+        guard case .account(loggedIn: true) = state.psiCash.libData?.successToOptional()?.accountType else {
             return [
                 environment.feedbackLogger.log(.warn ,"""
                     User is not logged in: \
-                    '\(String(describing: state.psiCash.libData?.accountType))'
+                    '\(String(describing: state.psiCash.libData?.successToOptional()?.accountType))'
                     """).mapNever()
             ]
         }
@@ -388,7 +391,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         switch result {
         case .success(let logoutResponse):
             
-            state.psiCash.libData = logoutResponse.libData
+            state.psiCash.libData = .success(logoutResponse.libData)
             state.psiCashBalance = .refreshed(refreshedData: logoutResponse.libData,
                                               persisted: environment.psiCashPersistedValues)
 
@@ -410,6 +413,13 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         }
         
     case let .accountLogin(username, password):
+        
+        guard case .success(_) = state.psiCash.libData else {
+            return [
+                environment.feedbackLogger.log(.error, "PsiCash lib is not initialized")
+                    .mapNever()
+            ]
+        }
         
         if let pendingAccountLogin = state.psiCash.pendingAccountLoginLogout {
             // Guards against another request being send whilst one is in progress.
@@ -559,7 +569,7 @@ extension PsiCashState {
     /// - Note: `psiphondRejected` is set to `false`.
     func getSharedAuthorizationModels() -> Set<SharedAuthorizationModel> {
         Set(
-            libData?.activePurchases.compactMap {
+            libData?.successToOptional()?.activePurchases.compactMap {
                 switch $0 {
                 case .success(.speedBoost(let product)):
                     return SharedAuthorizationModel(
@@ -579,7 +589,7 @@ extension PsiCashState {
     func getPurchases(
         forAuthorizaitonIDs authIds: [AuthorizationID]
     ) -> [PurchasedExpirableProduct<SpeedBoostProduct>] {
-        libData?.activePurchases.compactMap { purchase -> PurchasedExpirableProduct<SpeedBoostProduct>? in
+        libData?.successToOptional()?.activePurchases.compactMap { purchase -> PurchasedExpirableProduct<SpeedBoostProduct>? in
             switch purchase {
             case .success(.speedBoost(let product)):
                 let found = authIds.contains {
