@@ -22,6 +22,7 @@ import UIKit
 struct PsiCashMessageView: ViewBuilder {
 
     enum Message {
+        case psiCashLibFailedInit
         case pendingPsiCashVerification
         case speedBoostAlreadyActive
         case userSubscribed
@@ -32,8 +33,6 @@ struct PsiCashMessageView: ViewBuilder {
         case psiCashAccountsLoggingIn
         case psiCashAccountsLoggingOut
         case noSpeedBoostProducts
-        // PsiCash library no loaded message.
-        case psiCashNotLoaded
     }
 
     func build(_ container: UIView?) -> ImmutableBindableViewable<Message, UIView> {
@@ -86,6 +85,12 @@ struct PsiCashMessageView: ViewBuilder {
         return .init(viewable: wrapper) { [imageView, title, subtitle] _ -> ((PsiCashMessageView.Message) -> Void) in
             return { [imageView, title, subtitle] msg in
                 switch msg {
+                case .psiCashLibFailedInit:
+                    imageView.image =  UIImage(named: "PsiCashCoinCloud")!
+                    title.text = ""
+                    subtitle.text = UserStrings.PsiCash_lib_init_failed_send_feedback()
+                    subtitle.textAlignment = .center
+                    
                 case .pendingPsiCashVerification:
                     imageView.image = UIImage(named: "PsiCashPendingTransaction")
                     title.text = UserStrings.PsiCash_transaction_pending()
@@ -143,12 +148,6 @@ struct PsiCashMessageView: ViewBuilder {
                     title.text = UserStrings.PsiCash_unavailable()
                     subtitle.text = UserStrings.Something_went_wrong_try_again_and_send_feedback()
                     subtitle.textAlignment = .center
-                    
-                case .psiCashNotLoaded:
-                    imageView.image = UIImage(named: "PsiCashCoinCloud")!
-                    title.text = ""
-                    subtitle.text = ""
-                    
                 }
             }
         }

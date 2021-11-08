@@ -285,8 +285,12 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
         }
     }
     
-    func libData() -> PsiCashLibData {
-        return self.psiCashLib.dataModel
+    func libData() -> Result<PsiCashLibData, ErrorRepr> {
+        if self.psiCashLib.initialized {
+            return .success(self.psiCashLib.dataModel)
+        } else {
+            return .failure(ErrorRepr(repr: "PsiCash lib is not initialized"))
+        }
     }
     
     func refreshState(
