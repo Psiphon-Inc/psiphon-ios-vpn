@@ -478,6 +478,12 @@ extension UserStrings {
                                  comment: "Subtitle shown when the current operation failed, asking the user to try again at a later time.")
     }
     
+    static func PsiCash_lib_init_failed_send_feedback() -> String {
+        return NSLocalizedString("PSICASH_LIB_INIT_FAILED_SEND_FEEDBACK", tableName: nil, bundle: Bundle.main,
+                                 value: "PsiCash failed to load.\n\nIf this problem persists, please send a feedback.",
+                                 comment: "Subtitle of an error message shown when the PsiCash feature is unavailable, asking the user to send us a feedback if this problem persists.")
+    }
+    
     static func Something_went_wrong_try_again_and_send_feedback() -> String {
         return NSLocalizedString("PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK", tableName: nil, bundle: Bundle.main,
                                  value: "Something went wrong, please try again later.\n\nIf this problem persists, please send a feedback.",

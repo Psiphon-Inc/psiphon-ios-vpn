@@ -81,7 +81,7 @@ public protocol PsiCashEffectsProtocol {
         tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
     ) -> Effect<PsiCashInitResult>
     
-    func libData() -> PsiCashLibData
+    func libData() -> Result<PsiCashLibData, ErrorRepr>
     
     func refreshState(
         priceClasses: [PsiCashTransactionClass],

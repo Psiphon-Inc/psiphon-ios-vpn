@@ -676,7 +676,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 with: self.store.$value.signalProducer.map(\.psiCashBalanceViewModel).skipRepeats()
             )
             .combineLatest(
-                with: self.store.$value.signalProducer.map(\.psiCashState.libData?.accountType).skipRepeats()
+                with: self.store.$value.signalProducer .map {
+                        $0.psiCashState.libData?.successToOptional()?.accountType
+                    }
             )
             .startWithValues { [unowned objcBridge] (tuple: ((SpeedBoostButton.SpeedBoostButtonViewModel, PsiCashBalanceViewModel), PsiCashAccountType?)) in
                 
@@ -713,7 +715,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             self.store.$value.signalProducer.map(\.appReceipt.remoteReceiptRefreshState)
                 .skipRepeats(),
             self.store.$value.signalProducer.map(\.subscription.status).skipRepeats(),
-            self.store.$value.signalProducer.map(\.psiCashState.libData?.accountType).skipRepeats(),
+            self.store.$value.signalProducer.map(\.psiCashState.libData).skipRepeats(),
             self.store.$value.signalProducer.map(\.psiCashState.isLoggingInOrOut),
             self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus).skipRepeats()
         ).map {
@@ -721,7 +723,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             SettingsViewModel(
                 receiptRefreshState: $0.0,
                 subscriptionState: $0.1,
-                psiCashAccountType: $0.2,
+                psiCashLib: $0.2,
                 isLoggingOut: $0.3 == .logout,
                 vpnStatus: $0.4
             )
@@ -857,7 +859,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .compactMap { psiCashState -> _TokensExpiredData? in
                 
                 // Removes PsiCash library non-initialized value (literal `nil`) from signal.
-                guard let accountType = psiCashState.libData?.accountType else {
+                guard let accountType = psiCashState.libData?.successToOptional()?.accountType else {
                     return nil
                 }
                 

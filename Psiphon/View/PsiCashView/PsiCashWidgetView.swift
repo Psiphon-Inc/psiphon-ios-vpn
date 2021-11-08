@@ -119,14 +119,17 @@ import PsiCashClient
         speedBoostButton.bind(newValue.speedBoostButtonModel)
         
         switch newValue.accountType {
-        case .none, .noTokens, .tracker, .account(loggedIn: false):
+        case .noTokens, .tracker, .account(loggedIn: false):
             // Shows psiCashAccountButton, if not displayed already.
             if psiCashAccountButton.isHidden {
                 topRowHStack.addArrangedSubview(psiCashAccountButton)
                 psiCashAccountButton.isHidden = false
             }
             
-        case .account(loggedIn: true):
+        case .none, .account(loggedIn: true):
+            // PsiCashAccountType is expected to be nil only if PsiCash library fails initialize,
+            // or is still being initialized (although Loading screen is expected to be displayed,
+            // while the library is initializing.)
             // Hides psiCashAccountButton, if not removed already.
             if !psiCashAccountButton.isHidden {
                 topRowHStack.removeArrangedSubview(psiCashAccountButton)
