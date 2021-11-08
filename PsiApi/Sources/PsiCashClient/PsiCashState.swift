@@ -24,6 +24,8 @@ import PsiApi
 
 public struct PsiCashState: Equatable {
     
+    public typealias PsiCashLibState = Result<PsiCashLibData, ErrorRepr>?
+    
     // Failure type matches PsiCashEffects.PsiCashRefreshResult.Failure
     public typealias PendingRefresh =
         PendingResult<Utilities.Unit,
@@ -49,14 +51,14 @@ public struct PsiCashState: Equatable {
     public var purchasing: PsiCashPurchasingState
     
     /// Representation of PsiCash data held by PsiCash library.
-    /// `nil` if library is not initialized
-    public var libData: PsiCashLibData?
+    /// If `nil`, PsiCash library is not initialized yet.
+    public var libData: PsiCashLibState
     
     public var pendingAccountLoginLogout: PendingAccountLoginLogoutEvent?
     public var pendingPsiCashRefresh: PendingRefresh
     
     
-    public init(purchasing: PsiCashPurchasingState, libData: PsiCashLibData? = nil, pendingAccountLoginLogout: PsiCashState.PendingAccountLoginLogoutEvent? = nil, pendingPsiCashRefresh: PsiCashState.PendingRefresh) {
+    public init(purchasing: PsiCashPurchasingState, libData: Result<PsiCashLibData, ErrorRepr>? = nil, pendingAccountLoginLogout: PsiCashState.PendingAccountLoginLogoutEvent? = nil, pendingPsiCashRefresh: PsiCashState.PendingRefresh) {
         self.purchasing = purchasing
         self.libData = libData
         self.pendingAccountLoginLogout = pendingAccountLoginLogout
@@ -112,7 +114,7 @@ extension PsiCashState {
         _ dateCompare: DateCompare
     ) -> PurchasedExpirableProduct<SpeedBoostProduct>? {
         
-        let activeSpeedBoosts = libData?.activePurchases.partitionResults().successes
+        let activeSpeedBoosts = libData?.successToOptional()?.activePurchases.partitionResults().successes
             .compactMap(\.speedBoost)
             .filter { !$0.transaction.isExpired(dateCompare) }
         

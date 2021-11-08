@@ -26,7 +26,7 @@ import PsiCashClient
 struct SettingsViewModel: Equatable {
     let receiptRefreshState: ReceiptState.ReceiptRefreshState
     let subscriptionState: SubscriptionStatus
-    let psiCashAccountType: PsiCashAccountType?
+    let psiCashLib: PsiCashState.PsiCashLibState
     let isLoggingOut: Bool
     let vpnStatus: VPNStatus
 }
@@ -52,10 +52,19 @@ struct SettingsViewModel: Equatable {
         }
     }
     
+    @objc var isPsiCashInitialized: Bool {
+        switch model.psiCashLib {
+        case .none, .failure(_):
+            return false
+        case .success(_):
+            return true
+        }
+    }
+    
     @objc var isPsiCashAccountLoggedIn: Bool {
-        switch model.psiCashAccountType {
+        switch model.psiCashLib?.successToOptional()?.accountType {
         case .none:
-            // PsiCash lib not loaded.
+            // PsiCash lib not initialized.
             return false
         case .account(loggedIn: true):
             return true

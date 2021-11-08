@@ -290,7 +290,9 @@ func makeEnvironment(
         notifier: NotifierObjC(notifier:Notifier.sharedInstance()),
         internetReachabilityStatusSignal: store.$value.signalProducer.map(\.internetReachability.networkStatus),
         tunnelStatusSignal: tunnelStatusSignal,
-        psiCashAccountTypeSignal: store.$value.signalProducer.map(\.psiCashState.libData?.accountType),
+        psiCashAccountTypeSignal: store.$value.signalProducer.map {
+            $0.psiCashState.libData?.successToOptional()?.accountType
+        },
         tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
         subscriptionStatusSignal: store.$value.signalProducer.map(\.subscription.status),
         urlHandler: .default(),
@@ -447,7 +449,7 @@ func makeEnvironment(
                 store: store.projection(
                     value: {
                         PsiCashAccountViewController.ReaderState(
-                            psiCashAccountType: $0.psiCashState.libData?.accountType,
+                            psiCashAccountType: $0.psiCashState.libData?.successToOptional()?.accountType,
                             pendingAccountLoginLogout: $0.psiCashState.pendingAccountLoginLogout
                         )
                     },

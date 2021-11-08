@@ -42,7 +42,7 @@ func makeUITestAppState(embeddedServerEntriesFile: String) -> AppState {
     // NOTE: Assumes the price of each SB product is hrs * 100 PsiCash.
     let allSpeedBoostProducts = SpeedBoostDistinguisher.allCases.map { sbDistinguisher -> PsiCashPurchasableType in
         let sbProduct = SpeedBoostProduct(distinguisher: sbDistinguisher.rawValue)!
-        let price = PsiCashAmount(nanoPsi: Int64(sbDistinguisher.hours * 100_000_000_000))
+        let price = PsiCashAmount(nanoPsi: Int64(sbDistinguisher.hours) * 100_000_000_000)
         return .speedBoost(.init(product: sbProduct, price: price))
     }
     
@@ -76,12 +76,12 @@ func makeUITestAppState(embeddedServerEntriesFile: String) -> AppState {
         ),
         psiCashState: PsiCashState(
             purchasing: .none,
-            libData: PsiCashLibData(
+            libData: .success(PsiCashLibData(
                 accountType: .account(loggedIn: true) /* User is logged in */,
                 accountName: "open_internet_123" /* PsiCash Account username */,
                 balance: psiCashBalance,
                 availableProducts: allSpeedBoostProducts.map(Result.success),
-                activePurchases: []),
+                activePurchases: [])),
             pendingAccountLoginLogout: .none,
             pendingPsiCashRefresh: .completed(.success(.unit))
         ),
