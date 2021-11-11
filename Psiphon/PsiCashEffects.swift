@@ -307,9 +307,8 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
             
             // Updates request metadata before sending the request.
             let maybeError = self.psiCashLib.setRequestMetadata(clientMetaData)
-            guard maybeError == nil else {
-                self.feedbackLogger.fatalError("failed to set request metadata")
-                return
+            if let error = maybeError {
+                self.feedbackLogger.immediate(.error, "Failed to set request metadata: \(error)")
             }
             
             let purchaseClasses = priceClasses.map(\.rawValue)
@@ -354,9 +353,8 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
             
             // Updates request metadata before sending the request.
             let maybeError = self.psiCashLib.setRequestMetadata(clientMetaData)
-            guard maybeError == nil else {
-                self.feedbackLogger.fatalError("failed to set request metadata")
-                return
+            if let error = maybeError {
+                self.feedbackLogger.immediate(.error, "Failed to set request metadata: \(error)")
             }
             
             // Blocking call.

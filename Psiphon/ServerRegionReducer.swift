@@ -125,7 +125,16 @@ let serverRegionReducer = Reducer<ServerRegionState,
                 }
                 
                 guard let selectedRegion = environment.regionAdapter.getSelectedRegion() else {
-                    fatalError("Expected non-nil region")
+                    
+                    // If no region is selected, automatically selects best performance region.
+                    environment.regionAdapter.setSelectedRegion(kPsiphonRegionBestPerformance)
+                    
+                    guard let selectedRegion = environment.regionAdapter.getSelectedRegion() else {
+                        fatalError("Expected non-nil region")
+                    }
+                    
+                    return Effect(value: (selectedRegion, availableRegionCodes))
+                    
                 }
                 
                 return Effect(value: (selectedRegion, availableRegionCodes))
