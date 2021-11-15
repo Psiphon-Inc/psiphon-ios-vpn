@@ -76,7 +76,9 @@ import Foundation
         }
         
         let selectedLang = languages[Int(rowIndex)]
-        handler(rowIndex, selectedLang, self)
+        
+        // Wraps selectedLang in a ObjC class, since handler's second argument is a reference type.
+        handler(rowIndex, LanguageObjcWrapper(selectedLang), self)
         
     }
     
