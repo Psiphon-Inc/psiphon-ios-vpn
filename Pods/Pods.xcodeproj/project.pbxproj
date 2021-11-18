@@ -1481,28 +1481,28 @@
 				A14C8593DE1E10C2B18AC708173DA88D /* RACKVOProxy.h in Headers */,
 				8AAD212FFA7B993B3F05C81D3E337039 /* RACKVOTrampoline.h in Headers */,
 				CD59DD9BC4D7BBD96284987C081B6309 /* RACmetamacros.h in Headers */,
-				FFB3D1542D73A5EEDA67DC5147886034 /* RACMulticastConnection+Private.h in Headers */,
 				0C5EC40310BA08EDBC78763294AB75F2 /* RACMulticastConnection.h in Headers */,
+				FFB3D1542D73A5EEDA67DC5147886034 /* RACMulticastConnection+Private.h in Headers */,
 				2268EC1D0FF492AEAE3C36EF09569A07 /* RACPassthroughSubscriber.h in Headers */,
-				07E53F68A7C31E1EF5C8C3555749BED5 /* RACQueueScheduler+Subclass.h in Headers */,
 				B82C705812B3BC1798B94D5C00FF505F /* RACQueueScheduler.h in Headers */,
+				07E53F68A7C31E1EF5C8C3555749BED5 /* RACQueueScheduler+Subclass.h in Headers */,
 				2AEA965F92D1543EBB1F0980F0AD0C86 /* RACReplaySubject.h in Headers */,
 				EFD47504AFAC73CCD1A3AD0214615099 /* RACReturnSignal.h in Headers */,
+				7274480580290C4DDD317D4F1F584EE9 /* RACScheduler.h in Headers */,
 				080C695DA1DA598DB17C75E8B818D31B /* RACScheduler+Private.h in Headers */,
 				27312615BF99D0135A404D7AB3235E5E /* RACScheduler+Subclass.h in Headers */,
-				7274480580290C4DDD317D4F1F584EE9 /* RACScheduler.h in Headers */,
 				500B784379DD5C522D852E61BD3D8940 /* RACScopedDisposable.h in Headers */,
 				8EFD169F523205C11D0205EC1B7F3EEC /* RACSequence.h in Headers */,
 				336F5CEB3B601E0F8D5D61D960D0BBE9 /* RACSerialDisposable.h in Headers */,
-				C2AD8F9C42333E955B818565C4DED60C /* RACSignal+Operations.h in Headers */,
 				830BCEF08F6517ADEDD51AEA08882066 /* RACSignal.h in Headers */,
+				C2AD8F9C42333E955B818565C4DED60C /* RACSignal+Operations.h in Headers */,
 				4682E1CC39CD25DC27E15B74F4317DEF /* RACSignalSequence.h in Headers */,
-				C54ADC91A91CF75C5B4A819E1A81A63B /* RACStream+Private.h in Headers */,
 				2C0EA138EA41D71C796494FAC5EA9B89 /* RACStream.h in Headers */,
+				C54ADC91A91CF75C5B4A819E1A81A63B /* RACStream+Private.h in Headers */,
 				972E4DDC8EF30CCBFBF7C8E0399E3B83 /* RACStringSequence.h in Headers */,
 				1D3097A5E9ED7D5342FF52FC74FE4467 /* RACSubject.h in Headers */,
-				873C2DCBC6905600B7175ACB14264E64 /* RACSubscriber+Private.h in Headers */,
 				5BF59F4C120415F2D423636EF687CCF5 /* RACSubscriber.h in Headers */,
+				873C2DCBC6905600B7175ACB14264E64 /* RACSubscriber+Private.h in Headers */,
 				766B2BC6FB67F3072A8C0B8D5F50A1B3 /* RACSubscriptingAssignmentTrampoline.h in Headers */,
 				11EFD84A89FD12478A3E6F8E6EFB1130 /* RACSubscriptionScheduler.h in Headers */,
 				9059B8F5B81A577D47153AF2F3E8AA29 /* RACTargetQueueScheduler.h in Headers */,
@@ -1512,8 +1512,8 @@
 				85AB8B86BDF07928F16751766BE17C38 /* RACUnarySequence.h in Headers */,
 				4B4A20816E292092490558EFE6B8C10A /* RACUnit.h in Headers */,
 				BFABB01F4637F0DDD1FCAFDC8E040929 /* RACValueTransformer.h in Headers */,
-				305124FD50D4B05C96E7533722A43807 /* ReactiveObjC-umbrella.h in Headers */,
 				CA36C010EF59746A9C70E370970E0862 /* ReactiveObjC.h in Headers */,
+				305124FD50D4B05C96E7533722A43807 /* ReactiveObjC-umbrella.h in Headers */,
 				C70EAC8D4407B2CB7CA8A37E982CD9BD /* UIActionSheet+RACSignalSupport.h in Headers */,
 				038FE9C5377628D073A10575989E69F5 /* UIAlertView+RACSignalSupport.h in Headers */,
 				62309A477C8CA105A29999EAECEE197E /* UIBarButtonItem+RACCommandSupport.h in Headers */,
@@ -1565,8 +1565,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				631FEEBB4094FB1DD52D4D861266D336 /* MBProgressHUD-umbrella.h in Headers */,
 				AD311580C0DC7D97D2CDF3B0F3742F94 /* MBProgressHUD.h in Headers */,
+				631FEEBB4094FB1DD52D4D861266D336 /* MBProgressHUD-umbrella.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1584,8 +1584,8 @@
 			files = (
 				F58BC9772F7A7C6E335C825CCE3770D2 /* SVIndefiniteAnimatedView.h in Headers */,
 				A8DE555B1437BF1D271B7740603989B9 /* SVProgressAnimatedView.h in Headers */,
-				6551AE203EDBA4D688885A523ECA26D4 /* SVProgressHUD-umbrella.h in Headers */,
 				122C3CAA40B15A200BAF952D8A5658D0 /* SVProgressHUD.h in Headers */,
+				6551AE203EDBA4D688885A523ECA26D4 /* SVProgressHUD-umbrella.h in Headers */,
 				6FCBA883C6D16B1AB287DBA7C509D1FD /* SVRadialGradientLayer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1793,8 +1793,8 @@
 		BFDFE7DC352907FC980B868725387E98 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1100;
-				LastUpgradeCheck = 1100;
+				LastSwiftUpdateCheck = 1240;
+				LastUpgradeCheck = 1240;
 			};
 			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
 			compatibilityVersion = "Xcode 11.0";
@@ -1871,8 +1871,8 @@
 				62110FC14319DE05DA04487804A1EC17 /* de.lproj in Resources */,
 				5E2D2F0E482790F3C5FF88AEE33FD4AE /* el.lproj in Resources */,
 				EFF7AADCF8DB0F5FC364E75DA78C3CF9 /* en.lproj in Resources */,
-				E548FC7138E6BEE29989AD06DDD0A2E2 /* es-MX.lproj in Resources */,
 				A02CE2210DFBCE413AB1890C26479CF1 /* es.lproj in Resources */,
+				E548FC7138E6BEE29989AD06DDD0A2E2 /* es-MX.lproj in Resources */,
 				1A1199DE9DB6D7F5F4CE3A556CAFA9F6 /* fr.lproj in Resources */,
 				9FD53BBE2B19913794BB28AC34AD6D84 /* hr.lproj in Resources */,
 				8FD4859FD15988044F38DB6ED3236F8C /* hu.lproj in Resources */,
@@ -1881,8 +1881,8 @@
 				55792FA19BE7B3F34D4F4AF2D318030F /* nb.lproj in Resources */,
 				C590EAB07A5F648723179B3DA2A38B76 /* nl.lproj in Resources */,
 				818E6B15287E1F01F983839D33B0D66A /* pl.lproj in Resources */,
-				4E347EF65D0E46E858CCF6624469160B /* pt-PT.lproj in Resources */,
 				22F5E8A1E1A848A81B13F6152DFBA2D9 /* pt.lproj in Resources */,
+				4E347EF65D0E46E858CCF6624469160B /* pt-PT.lproj in Resources */,
 				774B391FE826E60A17457BB04F40EE4A /* ru.lproj in Resources */,
 				E539BCA979992327D12D4EA16D30A7E6 /* sv.lproj in Resources */,
 				C393DD1AB8E4BAF5A30710DB7F37F8AD /* th.lproj in Resources */,
@@ -1977,8 +1977,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D6FB566C2D2EB8A07351D10247B86BEC /* MBProgressHUD-dummy.m in Sources */,
 				39BBE61727003EB8F83FAA50A01553EC /* MBProgressHUD.m in Sources */,
+				D6FB566C2D2EB8A07351D10247B86BEC /* MBProgressHUD-dummy.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1995,8 +1995,8 @@
 			files = (
 				FDA98E9D45BF7DBF0BC63BABB567A3C0 /* SVIndefiniteAnimatedView.m in Sources */,
 				19DB674D8C4F99F115EDF55898C4A8CA /* SVProgressAnimatedView.m in Sources */,
-				206588FD03158265577BB8D3EEE825BB /* SVProgressHUD-dummy.m in Sources */,
 				8CBA46A4C6A26BB13788B570CC2B541D /* SVProgressHUD.m in Sources */,
+				206588FD03158265577BB8D3EEE825BB /* SVProgressHUD-dummy.m in Sources */,
 				50A12DCF28CEA4A216E011FD9B7922CB /* SVRadialGradientLayer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2059,8 +2059,8 @@
 				6D38D8C7A07228D6F57E839A6FA73033 /* RACScopedDisposable.m in Sources */,
 				F264C945ED24BC497E5B7C652D79DCFD /* RACSequence.m in Sources */,
 				C0CC0CE0300E184CA286BABB6B0E3B0A /* RACSerialDisposable.m in Sources */,
-				AF06F2C03848D7226042C6CB4E05DD20 /* RACSignal+Operations.m in Sources */,
 				5537CDE1F6D681ABAA22AB75BC24A415 /* RACSignal.m in Sources */,
+				AF06F2C03848D7226042C6CB4E05DD20 /* RACSignal+Operations.m in Sources */,
 				DC67FC87BDA8748CAD59BDE43550D78E /* RACSignalProvider.d in Sources */,
 				7D7F996B2FB821CC8ED278AA48C65409 /* RACSignalSequence.m in Sources */,
 				4F134B79ABC0AD9141F473F0FC736913 /* RACStream.m in Sources */,
