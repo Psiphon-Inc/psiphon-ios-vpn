@@ -196,7 +196,7 @@ struct AppEnvironment {
     
     let makeSettingsViewController: () -> UIViewController
     
-    let makeFeedbackViewController: () -> UIViewController
+    let makeFeedbackViewController: ([String: Any]) -> UIViewController
     
     /// Clears cache and all website data from the webview.
     let clearWebViewDataStore: () -> Effect<Never>
@@ -496,7 +496,7 @@ func makeEnvironment(
 
             return nav
         },
-        makeFeedbackViewController: {
+        makeFeedbackViewController: { (associatedData: [String: Any]) in
 
             // TODO: This is a hack. Ideally IASK should be retired.
             // FeedbackViewController is implemeneted as part of InAppSettingsKit.
@@ -504,6 +504,7 @@ func makeEnvironment(
             // safely from here without providing the  IASKSettingsStore object.
             let commonLibBundle = PsiphonClientCommonLibraryHelpers.commonLibraryBundle()
             let vc = FeedbackViewController()
+            vc.associatedData = associatedData
             vc.delegate = vc
             vc.feedbackDelegate = feedbackViewControllerDelegate
             vc.bundle = commonLibBundle
@@ -699,6 +700,7 @@ fileprivate func toFeedbackReducerEnvironment(env: AppEnvironment) -> FeedbackRe
         subscriptionStatusSignal: env.subscriptionStatusSignal,
         getAppStateFeedbackEntry: env.getAppStateFeedbackEntry,
         sharedDB: env.sharedDB,
+        userConfigs: env.userConfigs,
         appInfo: env.appInfo,
         getPsiphonConfig: env.getPsiphonConfig,
         getCurrentTime: env.dateCompare.getCurrentTime,
@@ -718,6 +720,7 @@ fileprivate func toVPNReducerEnvironment(env: AppEnvironment) -> VPNReducerEnvir
 
 func toMainViewReducerEnvironment(env: AppEnvironment) -> MainViewEnvironment {
     MainViewEnvironment(
+        userConfigs: env.userConfigs,
         psiCashStore: env.psiCashStore,
         psiCashViewEnvironment: PsiCashViewEnvironment(
             feedbackLogger: env.feedbackLogger,

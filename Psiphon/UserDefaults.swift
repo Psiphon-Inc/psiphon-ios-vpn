@@ -45,6 +45,22 @@ final class UserDefaultsConfig: PsiCashPersistedValues {
         self.expectedPsiCashReward = value
     }
     
+    /// Date of last feedback request from the user.
+    /// This is used to throttle requests made to user to send feedback.
+    @UserDefault(.standard, "last_error_condition_feedback_request_date", defaultValue: nil)
+    var lastErrorConditionFeedbackRequestDate: Date?
+    
+    /// Date of the last successful feedback submission.
+    /// Value is `nil` if no feedbacks have been successfully uploaded.
+    @UserDefault(.standard, "last_feedback_submit_time", defaultValue: nil)
+    var lastFeedbackSubmitTime: Date?
+    
+    /// Persisted value to be used for app crash detection.
+    /// Value is should be set to `false` at the earliest possible point in the app startup.
+    /// Value is `true` after `applicationWillTerminate(_:)` callback has been called.
+    @UserDefault(.standard, "did_app_terminate_normally", defaultValue: true)
+    var didAppTerminateNormallyFlag: Bool
+    
     /// App language code.
     /// The value is set by `PsiphonClientCommonLibrary`.
     /// - Note: Value stored at `PsiphonCommonLibConstants.kAppLanguage` is a valid BCP 47 tag.

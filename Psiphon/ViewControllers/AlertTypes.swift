@@ -32,6 +32,9 @@ enum AlertType: Hashable {
 
     case disallowedTrafficAlert
     
+    /// User is asked if they want to submit a feedback after an error condition has been encountered.
+    case reportSeriousErrorAlert
+    
     case submittedFeedbackAlert
 
     case genericOperationFailedTryAgain
@@ -71,6 +74,7 @@ enum DisallowedTrafficAlertAction: Equatable {
     case subscriptionTapped
 }
 
+/// Represents all posbbile actions from a user-facing alert dialog.
 enum AlertAction: Equatable {
 
     /// "Dismissed" or "OK" button tapped.
@@ -78,8 +82,12 @@ enum AlertAction: Equatable {
 
     case addPsiCashTapped
 
-
     case disallowedTrafficAlertAction(DisallowedTrafficAlertAction)
+    
+    /// Opens the feedback screen for the user to send a feedback.
+    /// This alert is presented when an error condition is hit.
+    case sendErrorInitiatedFeedback
+    
 }
 
 extension UIAlertController {
@@ -221,6 +229,18 @@ extension UIAlertController {
                     }
                 ]
             )
+            
+        case .reportSeriousErrorAlert:
+            return .makeAlert(title: UserStrings.Serious_errror_occurred_error_title(),
+                              message: UserStrings.Help_improve_psiphon_by_sending_report(),
+                              actions: [
+                                .dismissButton {
+                                    onActionButtonTapped(alertEvent, .dismissTapped)
+                                },
+                                .defaultButton(title: UserStrings.Report_button_title(), handler: {
+                                    onActionButtonTapped(alertEvent, .sendErrorInitiatedFeedback)
+                                })
+                              ])
             
         case .submittedFeedbackAlert:
             return .makeAlert(title: "",
