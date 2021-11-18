@@ -31,8 +31,8 @@
 /* Settings item text. Leads to info about Psiphon Inc. */
 "SETTINGS_ABOUT" = "Tentang";
 
-/*[UNTRANSLATED] Explanatory text for the "Select server region" setting on the "My connection is bad, help!" settings page. */
-"CONNECTION_HELP_BEST_PERFORMANCE_FOOTER" = "Changing your region to “Best performance” increases your chances of getting connected.";
+/* Explanatory text for the "Select server region" setting on the "My connection is bad, help!" settings page. */
+"CONNECTION_HELP_BEST_PERFORMANCE_FOOTER" = "Mengubah wilayah Anda menjadi “Kinerja terbaik” dapat meningkatkan peluang anda untuk terhubung.";
 
 /* Title for screen that allows user to select their desired server region. */
 "SELECT_SERVER_REGION" = "Pilih wilayah server";

@@ -44,6 +44,14 @@
     UIFont *_headerAndFooterFont;
 }
 
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        self.associatedData = nil;
+    }
+    return self;
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -88,8 +96,8 @@
         [self isMovingFromParentViewController]) {
         
         id<FeedbackViewControllerDelegate> strongDelegate = self.feedbackDelegate;
-        if ([strongDelegate respondsToSelector:@selector(feedbackViewControllerWillDismiss)]) {
-            [strongDelegate feedbackViewControllerWillDismiss];
+        if ([strongDelegate respondsToSelector:@selector(feedbackViewControllerWillDismiss:)]) {
+            [strongDelegate feedbackViewControllerWillDismiss:self];
         }
         
     }
@@ -106,8 +114,8 @@
     BOOL uploadDiagnostics = [userDefaults boolForKey:kSendDiagnosticsSpecifierKey];
     
     id<FeedbackViewControllerDelegate> strongDelegate = self.feedbackDelegate;
-    if ([strongDelegate respondsToSelector:@selector(userSubmittedFeedback:comments:email:uploadDiagnostics:)]) {
-        [strongDelegate userSubmittedFeedback:selectedThumbIndex comments:comments email:emailAddress uploadDiagnostics:uploadDiagnostics];
+    if ([strongDelegate respondsToSelector:@selector(userSubmittedFeedback:comments:email:uploadDiagnostics:viewController:)]) {
+        [strongDelegate userSubmittedFeedback:selectedThumbIndex comments:comments email:emailAddress uploadDiagnostics:uploadDiagnostics viewController:self];
     }
     
     [self dismissOrPopFeedbackViewController];
