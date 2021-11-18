@@ -103,7 +103,7 @@ func makeUITestAppState(embeddedServerEntriesFile: String) -> AppState {
             psiCashViewState: .none,
             isPsiCashAccountScreenShown: .completed(false),
             isSettingsScreenShown: .completed(false),
-            isModalFeedbackScreenShown: .completed(false)
+            isModalFeedbackScreenShown: .completed(.none)
         ),
         serverRegionState: ServerRegionState(
             selectedRegion: selectedRegion,

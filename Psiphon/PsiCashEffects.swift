@@ -308,7 +308,8 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
             // Updates request metadata before sending the request.
             let maybeError = self.psiCashLib.setRequestMetadata(clientMetaData)
             if let error = maybeError {
-                self.feedbackLogger.immediate(.error, "Failed to set request metadata: \(error)")
+                self.feedbackLogger.immediate(.error, report: true,
+                                              "Failed to set request metadata: \(error)")
             }
             
             let purchaseClasses = priceClasses.map(\.rawValue)
@@ -354,7 +355,8 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
             // Updates request metadata before sending the request.
             let maybeError = self.psiCashLib.setRequestMetadata(clientMetaData)
             if let error = maybeError {
-                self.feedbackLogger.immediate(.error, "Failed to set request metadata: \(error)")
+                self.feedbackLogger.immediate(.error, report: true,
+                                              "Failed to set request metadata: \(error)")
             }
             
             // Blocking call.
@@ -384,7 +386,8 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
             case .success(let modifiedURL):
                 return URL(string: modifiedURL)!
             case .failure(let error):
-                self.feedbackLogger.immediate(.error, "failed to modify url: '\(error))'")
+                self.feedbackLogger.immediate(.error, report: true,
+                                              "failed to modify url: '\(error))'")
                 return url
             }
         }
@@ -475,7 +478,8 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
             guard let error = self.psiCashLib.setLocale(locale) else {
                 return
             }
-            self.feedbackLogger.immediate(.error, "setLocale failed: \(error)")
+            self.feedbackLogger.immediate(.error, report: true,
+                                          "setLocale failed: \(error)")
         }
         
     }

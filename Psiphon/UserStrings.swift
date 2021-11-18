@@ -800,13 +800,33 @@ extension UserStrings {
     }
 }
 
-// MARK: Feedback upload
+// MARK: Feedback
 extension UserStrings {
+    
+    static func Serious_errror_occurred_error_title() -> String {
+        return NSLocalizedString("SERIOUS_ERROR_OCCURRED", tableName: nil, bundle: Bundle.main,
+                                 value: "A serious error occurred",
+                                 comment: "Title of an error dialog shown to the user when a serious error occurs in the app")
+    }
+    
+    static func Help_improve_psiphon_by_sending_report() -> String {
+        return NSLocalizedString("HELP_IMPROVE_PSIPHON_BY_SENDING_REPORT", tableName: nil, bundle: Bundle.main,
+                                 value: "Help improve Psiphon by sending a report of this error.",
+                                 comment: "Body of an error dialog asking the user to send Psiphon a report. Do not translate or transliterate 'Psiphon'")
+    }
+    
+    static func Report_button_title() -> String {
+        return NSLocalizedString("REPORT_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Report...",
+                                 comment: "Title of a button that enables the user to report an error that they faced to us.")
+    }
+    
     static func Submitted_feedback() -> String {
         return NSLocalizedString("FEEDBACK_UPLOAD_SUCCESSFUL_TITLE", tableName: nil, bundle: Bundle.main,
                                  value: "Thank you for helping improve Psiphon!",
                                  comment: "Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback.")
     }
+    
 }
 
 // MARK: PsiCash product titles
