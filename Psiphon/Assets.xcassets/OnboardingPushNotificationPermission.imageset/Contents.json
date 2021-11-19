@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "MacOS Notification Permission.png",
+      "filename" : "group.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "MacOS Notification Permission@2x.png",
+      "filename" : "group@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "MacOS Notification Permission@3x.png",
+      "filename" : "group@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
