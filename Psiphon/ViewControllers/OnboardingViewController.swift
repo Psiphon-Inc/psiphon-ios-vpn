@@ -419,16 +419,8 @@ fileprivate extension OnboardingScreen {
 
         case (.vpnConfigPermission, 0):
             
-            let image: UIImage
-            switch platform.current {
-            case .iOS:
-                image = UIImage(named: "iOS-OnboardingVPNPermission")!
-            case .iOSAppOnMac:
-                image = UIImage(named: "macOS-OnboardingVPNPermission")!
-            }
-            
             onboardingView = OnboardingView(
-                image: image,
+                image: UIImage(named: "OnboardingVPNPermission")!,
                 withTitle: Strings.onboardingGettingStartedHeaderText(),
                 withBody: Strings.onboardingGettingStartedBodyText(),
                 withAccessoryView: nil
@@ -439,16 +431,8 @@ fileprivate extension OnboardingScreen {
             
         case (.userNotificationPermission, _):
             
-            let image: UIImage
-            switch platform.current {
-            case .iOS:
-                image = UIImage(named: "iOS-OnboardingPushNotificationPermission")!
-            case .iOSAppOnMac:
-                image = UIImage(named: "macOS-OnboardingPushNotificationPermission")!
-            }
-            
             onboardingView = OnboardingView(
-                image: image,
+                image: UIImage(named: "OnboardingPushNotificationPermission")!,
                 withTitle: UserStrings.Onboarding_user_notification_permission_title(),
                 withBody: UserStrings.Onboarding_user_notification_permission_body(),
                 withAccessoryView: nil
@@ -503,28 +487,8 @@ fileprivate extension OnboardingScreen {
             }
             
         case OnboardingScreen(stage: .userNotificationPermission, screenIndex: 1):
-            let centre = UNUserNotificationCenter.current()
-            centre.getNotificationSettings { settings in
-                guard settings.authorizationStatus == .notDetermined else {
-                    DispatchQueue.main.async {
-                        self.gotoScreenFollowing(screenIndex: currentIndex)
-                    }
-                    return
-                }
-                
-                centre.requestAuthorization(options: [.alert, .badge]) { granted, maybeError in
-                    self.feedbackLogger.immediate(
-                        .info, "UserNotification authorization granted: \(granted)")
-                    
-                    if let error = maybeError {
-                        self.feedbackLogger.immediate(
-                            .error, "user notification authorization error: '\(error)'")
-                    }
-                    
-                    DispatchQueue.main.async {
-                        self.gotoScreenFollowing(screenIndex: currentIndex)
-                    }
-                }
+            requestUserNotificationPermission(feedbackLogger: self.feedbackLogger) {
+                self.gotoScreenFollowing(screenIndex: currentIndex)
             }
             
         default:
@@ -637,4 +601,33 @@ fileprivate func makeVPNConfigPermissionGuideOnboardingView() -> UIView {
         
     }
     return view
+}
+
+fileprivate func requestUserNotificationPermission(
+    feedbackLogger: FeedbackLogger,
+    completionHandler: @escaping () -> Void
+) {
+    let centre = UNUserNotificationCenter.current()
+    centre.getNotificationSettings { settings in
+        guard settings.authorizationStatus == .notDetermined else {
+            DispatchQueue.main.async {
+                completionHandler()
+            }
+            return
+        }
+        
+        centre.requestAuthorization(options: [.alert, .badge]) { granted, maybeError in
+            feedbackLogger.immediate(
+                .info, "UserNotification authorization granted: \(granted)")
+            
+            if let error = maybeError {
+                feedbackLogger.immediate(
+                    .error, "user notification authorization error: '\(error)'")
+            }
+            
+            DispatchQueue.main.async {
+                completionHandler()
+            }
+        }
+    }
 }
