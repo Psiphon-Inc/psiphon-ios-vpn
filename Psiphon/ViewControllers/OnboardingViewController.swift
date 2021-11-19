@@ -84,8 +84,10 @@ enum OnboardingStage: Hashable, RawRepresentable {
           .vpnConfigPermission,
           .userNotificationPermission ]
     
-    /// Returns ordered set of stages not completed by the user, given `completedStages`.
+    /// Returns ordered set of stages not completed by the user, given `completedStages`,
+    /// and the current `platform`.
     static func stagesToComplete(
+        platform: Platform,
         completedStages: [OnboardingStage]
     ) -> OrderedSet<OnboardingStage> {
         
@@ -105,6 +107,12 @@ enum OnboardingStage: Hashable, RawRepresentable {
                 if case .privacyPolicy(_) = $0 { return true }
                 return false
             }
+        }
+        
+        // Removes user notification for Mac.
+        stagesNotCompleted.removeAll {
+            if case .userNotificationPermission = $0 { return true }
+            return false
         }
         
         return OrderedSet(stagesNotCompleted)
