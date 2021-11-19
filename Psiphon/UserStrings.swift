@@ -538,6 +538,12 @@ extension UserStrings {
                                  comment: "Button title that lets users reset their password if they forgot their account's password.")
     }
     
+    static func Forgot_username_or_password_button_title() -> String {
+        return NSLocalizedString("FORGOT_USERNAME_OR_PASSWORD", tableName: nil, bundle: Bundle.main,
+                                 value: "Forgot your password or username?",
+                                 comment: "Button title that lets users reset their username or password if they forgot their account's username or password.")
+    }
+    
     static func Or() -> String {
         return NSLocalizedString("OR_SIGNUP_SIGNIN", tableName: nil, bundle: Bundle.main,
                                  value: "OR",

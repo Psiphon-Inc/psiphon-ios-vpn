@@ -180,6 +180,9 @@
 /* Button title that lets users reset their password if they forgot their account's password. */
 "FORGOT_PASSWORD" = "Forgot password?";
 
+/* Button title that lets users reset their username or password if they forgot their account's username or password. */
+"FORGOT_USERNAME_OR_PASSWORD" = "Forgot your password or username?";
+
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "Free";
 

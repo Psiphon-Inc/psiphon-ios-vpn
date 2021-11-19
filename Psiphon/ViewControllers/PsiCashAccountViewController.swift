@@ -355,7 +355,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
         
         let forgotPasswordButton = UIButton()
         mutate(forgotPasswordButton) {
-            $0.setTitle(UserStrings.Forgot_password_button_title(), for: .normal)
+            $0.setTitle(UserStrings.Forgot_username_or_password_button_title(), for: .normal)
             $0.setTitleColor(.white, for: .normal)
             $0.setTitleColor(.whiteHighlighted(), for: .highlighted)
             $0.titleLabel!.apply(fontSize: .normal,
