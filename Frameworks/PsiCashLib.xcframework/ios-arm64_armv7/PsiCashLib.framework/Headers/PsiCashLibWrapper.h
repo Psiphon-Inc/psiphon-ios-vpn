@@ -223,7 +223,7 @@ typedef NS_ENUM(NSInteger, PSIStatus) {
 
 /// Set values that will be included in the request metadata. This includes
 /// client_version, client_region, sponsor_id, and propagation_channel_id.
-- (PSIError *_Nullable)setRequestMetadataItem:(NSString *)key withValue:(NSString *)value WARN_UNUSED_RESULT;
+- (PSIError *_Nullable)setRequestMetadataItems:(NSDictionary<NSString*, NSString*>*)items WARN_UNUSED_RESULT;
 
 /// Set current UI locale.
 - (PSIError *_Nullable)setLocale:(NSString *)locale WARN_UNUSED_RESULT;
