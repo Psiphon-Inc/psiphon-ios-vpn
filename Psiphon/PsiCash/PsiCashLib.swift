@@ -232,41 +232,17 @@ final class PsiCashLib {
     }
     
     func setRequestMetadata(_ metadata: ClientMetaData) -> PsiCashLibError? {
-        var err: PSIError?
         
-        err = self.client.setRequestMetadataItem(
-            PsiCashRequestMetadataKey.clientVersion.rawValue,
-            withValue: metadata.clientVersion
-        )
-        guard err == nil else {
-            return PsiCashLibError(err)
-        }
+        let error = self.client.setRequestMetadataItems([
+            PsiCashRequestMetadataKey.clientVersion.rawValue: metadata.clientVersion,
+            PsiCashRequestMetadataKey.clientRegion.rawValue: metadata.clientRegion,
+            PsiCashRequestMetadataKey.propagationChannelId.rawValue: metadata.propagationChannelId,
+            PsiCashRequestMetadataKey.sponsorId.rawValue: metadata.sponsorId
+            
+        ])
         
-        err = self.client.setRequestMetadataItem(
-            PsiCashRequestMetadataKey.clientRegion.rawValue,
-            withValue: metadata.clientRegion
-        )
-        guard err == nil else {
-            return PsiCashLibError(err)
-        }
+        return PsiCashLibError(error)
         
-        err = self.client.setRequestMetadataItem(
-            PsiCashRequestMetadataKey.propagationChannelId.rawValue,
-            withValue: metadata.propagationChannelId
-        )
-        guard err == nil else {
-            return PsiCashLibError(err)
-        }
-        
-        err = self.client.setRequestMetadataItem(
-            PsiCashRequestMetadataKey.sponsorId.rawValue,
-            withValue: metadata.sponsorId
-        )
-        guard err == nil else {
-            return PsiCashLibError(err)
-        }
-    
-        return nil
     }
     
     /// Sets current UI Locale.
