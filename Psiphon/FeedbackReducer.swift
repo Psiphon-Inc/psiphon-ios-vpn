@@ -23,12 +23,16 @@ import Promises
 import AppStoreIAP
 import PsiApi
 
-/// Represents data associated with user action to submit a feedback.
+/// Represents data associated with a feedback.
 struct SubmitFeedbackData: Equatable {
     let selectedThumbIndex: Int
     let comments: String
     let email: String
     let uploadDiagnostics: Bool
+    
+    /// `True` if the app asked the user to send a feedback due to an error condition.
+    let errorInitiated: Bool
+    
 }
 
 enum FeedbackAction {
@@ -71,6 +75,7 @@ struct FeedbackReducerEnvironment {
     let subscriptionStatusSignal: SignalProducer<AppStoreIAP.SubscriptionStatus, Never>
     let getAppStateFeedbackEntry:  SignalProducer<DiagnosticEntry, Never>
     let sharedDB: PsiphonDataSharedDB
+    let userConfigs: UserDefaultsConfig
     let appInfo: () -> AppInfoProvider
     let getPsiphonConfig: () -> [AnyHashable: Any]?
     let getCurrentTime: () -> Date
@@ -85,6 +90,7 @@ struct FeedbackReducerEnvironment {
         subscriptionStatusSignal: SignalProducer<AppStoreIAP.SubscriptionStatus, Never>,
         getAppStateFeedbackEntry: SignalProducer<DiagnosticEntry, Never>,
         sharedDB: PsiphonDataSharedDB,
+        userConfigs: UserDefaultsConfig,
         appInfo: @escaping () -> AppInfoProvider,
         getPsiphonConfig: @escaping () -> [AnyHashable: Any]?,
         getCurrentTime: @escaping () -> Date,
@@ -98,6 +104,7 @@ struct FeedbackReducerEnvironment {
         self.subscriptionStatusSignal = subscriptionStatusSignal
         self.getAppStateFeedbackEntry = getAppStateFeedbackEntry
         self.sharedDB = sharedDB
+        self.userConfigs = userConfigs
         self.appInfo = appInfo
         self.getPsiphonConfig = getPsiphonConfig
         self.getCurrentTime = getCurrentTime
@@ -121,7 +128,7 @@ let feedbackReducer = Reducer<FeedbackReducerState,
                                                  timestamp: notice.timestamp).mapNever()
         ]
     case ._feedbackUploadProviderCompleted(let error):
-        state.queuedFeedbacks.removeFirst()
+        let userFeedback = state.queuedFeedbacks.removeFirst()
 
         var effects = [Effect<FeedbackAction>]()
 
@@ -139,7 +146,13 @@ let feedbackReducer = Reducer<FeedbackReducerState,
             ] + effects
         } else {
             return [
-                environment.feedbackLogger.log(.info, LogMessage(stringLiteral: "upload succeeded")).mapNever()
+                environment.feedbackLogger.log(.info, "upload succeeded").mapNever(),
+                
+                // Records date of last successful feedback submit time.
+                .fireAndForget {
+                    environment.userConfigs.lastFeedbackSubmitTime = userFeedback.submitTime
+                }
+                
             ] + effects
         }
     case ._sendNextFeedback:
@@ -179,7 +192,8 @@ let feedbackReducer = Reducer<FeedbackReducerState,
                 email: submitFeedbackData.email,
                 uploadDiagnostics: submitFeedbackData.uploadDiagnostics,
                 feedbackId: randomFeedbackId,
-                submitTime: currentTime
+                submitTime: currentTime,
+                errorInitiated: submitFeedbackData.errorInitiated
             )
         )
         

@@ -108,6 +108,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
         case .didFinishLaunching:
             // Determines whether onboarding is complete.
             let stagesNotCompleted = OnboardingStage.stagesToComplete(
+                platform: environment.platform,
                 completedStages: environment.userDefaultsConfig.onboardingStagesCompletedTyped)
             
             state.appDelegateState.onboardingCompleted = stagesNotCompleted.isEmpty
@@ -189,6 +190,8 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
 @objc final class SwiftDelegate: NSObject {
     
     static let instance = SwiftDelegate()
+    
+    private var didPreviousLaunchOfAppTerminateNormally = true
 
     private var platform: Platform!
     private var deepLinkingNavigator = DeepLinkingNavigator()
@@ -378,8 +381,14 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         launchOptions: [UIApplication.LaunchOptionsKey : Any]?,
         objcBridge: ObjCBridgeDelegate
     ) -> Bool {
-
+        
         print("Build Configuration: '\(String(describing: Debugging.buildConfig))'")
+        
+        // Stores value of app crash detection flag.
+        self.didPreviousLaunchOfAppTerminateNormally = self.userDefaultsConfig.didAppTerminateNormallyFlag
+        
+        // Sets the app crash detection flag.
+        self.userDefaultsConfig.didAppTerminateNormallyFlag = false
 
         self.objcBridge = objcBridge
         
@@ -499,9 +508,22 @@ extension SwiftDelegate: SwiftBridgeDelegate {
 
         }
         
+        self.feedbackLogger.handler.setReportedLogSubscriber { reportedLogDate in
+            let alertEvent = AlertEvent(.reportSeriousErrorAlert, date: reportedLogDate)
+            self.store.send(.mainViewAction(.presentAlert(alertEvent)))
+        }
+        
         self.store.send(.appDelegateAction(.appLifecycleEvent(.didFinishLaunching)))
         self.store.send(vpnAction: .appLaunched)
         self.store.send(.psiCash(.initialize))
+        
+        // App crash detection
+        // Presents an alert asking the user to send a feedback if the app
+        // has not terminated normally.
+        if !self.didPreviousLaunchOfAppTerminateNormally {
+            let alertEvent = AlertEvent(.reportSeriousErrorAlert, date: Date())
+            self.store.send(.mainViewAction(MainViewAction.presentAlert(alertEvent)))
+        }
         
         if appUpgrade.firstRunOfVersion == true {
             self.store.send(.serverRegionAction(.updateAvailableRegions))
@@ -523,7 +545,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             return true
         }
         deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.feedbackDeepLink ]) { [unowned self] in
-            self.store.send(.mainViewAction(.presentModalFeedbackScreen))
+            self.store.send(.mainViewAction(.presentModalFeedbackScreen(errorInitiated: false)))
             return true
         }
         
@@ -983,6 +1005,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     
     @objc func applicationDidEnterBackground(_ application: UIApplication) {
         
+        // Application might terminate normally, resets the crash detection flag.
+        self.userDefaultsConfig.didAppTerminateNormallyFlag = true
+        
         guard case .iOS = platform.current else {
             return
         }
@@ -991,6 +1016,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     }
     
     @objc func applicationWillTerminate(_ application: UIApplication) {
+        
+        // Application is terminating normally, resets the crash detection flag.
+        self.userDefaultsConfig.didAppTerminateNormallyFlag = true
         
         if let observer = self.appLangChangeObserver {
             NotificationCenter.default.removeObserver(observer)
@@ -1148,6 +1176,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         
         // Finds stages that are not completed by the user.
         let stagesNotCompleted = OnboardingStage.stagesToComplete(
+            platform: self.platform,
             completedStages: self.userDefaultsConfig.onboardingStagesCompletedTyped
         )
         

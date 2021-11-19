@@ -19,15 +19,31 @@
 
 import Foundation
 import PsiApi
+import Utilities
 
 final class PsiphonRotatingFileFeedbackLogHandler: FeedbackLogHandler {
+    
+    private var lastReportedLog: Date? = nil
+    private var reportedLogSubscriber: ((Date) -> Void)? = nil
+    
+    func setReportedLogSubscriber(_ subscriber: @escaping (Date) -> Void) {
+        guard self.reportedLogSubscriber == nil else {
+            Swift.fatalError()
+        }
+        self.reportedLogSubscriber = subscriber
+        if let lastReportedLog = lastReportedLog {
+            subscriber(lastReportedLog)
+        }
+    }
     
     func fatalError(type: String, message: String) {
         PsiFeedbackLogger.fatalError(withType: type, message: message)
         Swift.fatalError(type)
     }
     
-    func feedbackLog(level: NonFatalLogLevel, type: String, message: String) {
+    /// - Parameter report: If `true` then
+    func feedbackLog(level: NonFatalLogLevel, report: Bool, type: String, message: String) {
+        
         switch level {
         case .info:
             PsiFeedbackLogger.info(withType: type, message: message)
@@ -36,6 +52,21 @@ final class PsiphonRotatingFileFeedbackLogHandler: FeedbackLogHandler {
         case .error:
             PsiFeedbackLogger.error(withType: type, message: message)
         }
+        
+        if report {
+            
+            // TODO: PsiFeedbackLogger creates it's own date object for this log.
+            // Create only one Date object, and share.
+            let logDate = Date()
+            
+            lastReportedLog = logDate
+            
+            if let subscriber = self.reportedLogSubscriber {
+                subscriber(logDate)
+            }
+            
+        }
+        
     }
 
     func feedbackLogNotice(type: String, message: String, timestamp: String) {

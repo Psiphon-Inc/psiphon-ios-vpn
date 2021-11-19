@@ -21,6 +21,7 @@ import Foundation
 import AppStoreIAP
 import PsiApi
 import ReactiveSwift
+import PsiphonClientCommonLibrary
 
 /// A type that can be used for uploading feedback data.
 public protocol FeedbackUploadProvider {
@@ -51,16 +52,21 @@ public struct UserFeedback: Equatable {
     let uploadDiagnostics: Bool
     let submitTime: Date
     let feedbackId: String
+    
+    /// `true` if the feedback submitted is initiated due to an error condition
+    let errorInitiated: Bool
 
     public init(selectedThumbIndex: Int, comments: String, email: String,
-                uploadDiagnostics: Bool, feedbackId: String, submitTime: Date) {
+                uploadDiagnostics: Bool, feedbackId: String, submitTime: Date,
+                errorInitiated: Bool) {
 
         self.selectedThumbIndex = selectedThumbIndex
         self.comments = comments
         self.email = email
         self.uploadDiagnostics = uploadDiagnostics
         self.feedbackId = feedbackId
-        self.submitTime = submitTime;
+        self.submitTime = submitTime
+        self.errorInitiated = errorInitiated
     }
 }
 
@@ -258,14 +264,28 @@ func feedbackJSON(userFeedback: UserFeedback,
                   sharedDB: PsiphonDataSharedDB,
                   getCurrentTime: () -> Date,
                   reachabilityStatus: ReachabilityStatus) -> Result<String, Error> {
-
+    
+    let result = getFeedbackLogs(
+        for: Set(FeedbackLogSource.allCases),
+           dataRootDirectory: PsiphonDataSharedDB.dataRootDirectory(),
+           getCurrentTime: getCurrentTime)
+    
     // Only capture diagnostics logged before user submitted feedback.
-    var diagnosticEntries = sharedDB.getAllLogs().filter { entry in
+    var diagnosticEntries = result.0.filter { entry in
         return entry.timestamp.compare(userFeedback.submitTime) == .orderedAscending
     }
-
+    
+    // Capture parse failures too.
+    let parseFailureEntries = result.1.map {
+        DiagnosticEntry($0.message, andTimestamp: $0.timestamp)!
+    }
+    diagnosticEntries.append(contentsOf: parseFailureEntries)
+    
+    // Adds a log line if the feedback is initiated due to an error condition in the app.
+    diagnosticEntries.append(
+        DiagnosticEntry("Error initiated feedback", andTimestamp: getCurrentTime()))
+    
     // Add jetsam metrics log.
-
     let binRanges = [
         // [0, 30s)
         BinRange(range: MakeCBinRange(0.00, 30.00)),

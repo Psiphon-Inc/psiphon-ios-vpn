@@ -21,21 +21,27 @@
 #import <UIKit/UIKit.h>
 #import "IASKAppSettingsViewController.h"
 
+@class FeedbackViewController;
+
 @protocol FeedbackViewControllerDelegate <NSObject>
 
 - (void)userSubmittedFeedback:(NSInteger)selectedThumbIndex
                      comments:(NSString*)comments
                         email:(NSString*)email
-            uploadDiagnostics:(BOOL)uploadDiagnostics;
+            uploadDiagnostics:(BOOL)uploadDiagnostics
+               viewController:(FeedbackViewController*)viewController;
 
 - (void)userPressedURL:(NSURL*)URL;
 
 @optional
 
-- (void)feedbackViewControllerWillDismiss;
+- (void)feedbackViewControllerWillDismiss:(FeedbackViewController*)viewController;
 
 @end
 
 @interface FeedbackViewController : IASKAppSettingsViewController <UITableViewDelegate, IASKSettingsDelegate, UITextViewDelegate>
 @property (weak, nonatomic) id<FeedbackViewControllerDelegate> feedbackDelegate;
+
+@property (strong, nonatomic, nullable) NSDictionary* associatedData;
+
 @end

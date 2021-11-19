@@ -122,7 +122,8 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             state.psiCash.libData = .failure(error)
             
             return [
-                environment.feedbackLogger.log(.error, "failed to initialize PsiCash: \(error)")
+                environment.feedbackLogger.log(
+                    .error, report: true, "failed to initialize PsiCash: \(error)")
                     .mapNever()
             ]
         }
