@@ -390,12 +390,12 @@ fileprivate extension OnboardingScreen {
                 
                 langSelectionViewController.selectionHandler = { _, selectedLang, viewController in
                     
-                    guard let selectedLang = selectedLang as? Language else {
+                    guard let selectedLang = selectedLang as? LanguageObjcWrapper else {
                         fatalError()
                     }
                     
                     // Updates user's default app language.
-                    userDefaultsConfig.appLanguage = selectedLang.code
+                    userDefaultsConfig.appLanguage = selectedLang.value.code
                     
                     viewController.dismiss(animated: true, completion: nil)
                     // Reload the onboarding to reflect the newly selected language.

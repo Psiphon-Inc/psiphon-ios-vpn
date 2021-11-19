@@ -38,6 +38,14 @@ extension Language {
     
 }
 
+/// Objcective-C wrapper for the Language struct.
+@objc final class LanguageObjcWrapper: NSObject {
+    let value: Language
+    init(_ value: Language) {
+        self.value = value
+    }
+}
+
 final class SupportedLocalizations {
     
     private(set) var languages: [Language]? = nil
