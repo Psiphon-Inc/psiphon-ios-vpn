@@ -110,8 +110,6 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     LOG_DEBUG();
     
     [SwiftDelegate.bridge applicationDidFinishLaunching:application];
-    
-    [AppObservables.shared appLaunched];
 
     // Override point for customization after application launch.
     self.window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
@@ -142,6 +140,8 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // to return before making the window visible on the screen.
     [self.window makeKeyAndVisible];
     
+    [AppObservables.shared appLaunched];
+   
     return YES;
 }
 

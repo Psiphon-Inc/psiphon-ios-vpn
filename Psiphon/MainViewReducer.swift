@@ -66,9 +66,18 @@ enum MainViewAction: Equatable {
     // MARK: Feedback screen
     /// Presents feedback screen modally. This is separate from feedback screen
     /// presented by `InAppSettingsKit` thourght `PsiphonSettingsViewController`.
-    case presentModalFeedbackScreen
+    /// - Parameter errorInitiated: `True` if the feedback dialog is initiated due to an error condition.
+    case presentModalFeedbackScreen(errorInitiated: Bool)
     case _presentModalFeedbackScreenResult(willPresent: Bool)
     case dismissedModalFeedbackScreen
+    
+}
+
+/// Represents the view state of the modal feedback dialog.
+struct ModalFeedbackViewState: Equatable {
+    
+    /// True if the feedback modal is initiated by an error condition within the app.
+    var isErrorInitiated: Bool
     
 }
 
@@ -89,7 +98,10 @@ struct MainViewState: Equatable {
     /// Represents presentation state of the feedback screen.
     /// This is state of a modally presented feedback screen, and is separate
     /// from `FeedbackViewController` presented by the `PsiphonSettingsViewController`.
-    var isModalFeedbackScreenShown: Pending<Bool> = .completed(false)
+    ///
+    /// - Note: `.completed(.none)` represents a state where feedback dialog is not displayed.
+    ///
+    var isModalFeedbackScreenShown: PendingValue<ModalFeedbackViewState, ModalFeedbackViewState?> = .completed(.none)
     
 }
 
@@ -120,6 +132,8 @@ extension MainViewReducerState {
 }
 
 struct MainViewEnvironment {
+    
+    let userConfigs: UserDefaultsConfig
     let psiCashStore: (PsiCashAction) -> Effect<Never>
     let psiCashViewEnvironment: PsiCashViewEnvironment
     let getTopActiveViewController: () -> UIViewController
@@ -146,7 +160,7 @@ struct MainViewEnvironment {
     let makeSettingsViewController: () -> UIViewController
     
     /// Makes `FeedbackViewController` as root of a `UINavigationController`.
-    let makeFeedbackViewController: () -> UIViewController
+    let makeFeedbackViewController: ([String: Any]) -> UIViewController
     
 }
 
@@ -221,6 +235,29 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         ]
 
     case let .presentAlert(alertEvent):
+        
+        if case .reportSeriousErrorAlert = alertEvent.wrapped {
+            
+            // Ignores present alert action if the feedback screen is already displayed.
+            guard case .completed(.none) = state.mainView.isModalFeedbackScreenShown else {
+                return []
+            }
+            
+            // Adds 24 hours to the last time the alert was presented (if any),
+            // If less 24 hours has passed, the request to present an alert is ignored.
+            // This is important so that if the app misbehaves, the users are not bombarded
+            // with this type of alert.
+            if let lastErrorAlertDate = environment.userConfigs.lastErrorConditionFeedbackRequestDate {
+                if let nextAllowedDate = environment.addToDate(.hour, 24, lastErrorAlertDate) {
+                    if environment.dateCompare.compareDates(alertEvent.date, nextAllowedDate, .second) == .orderedAscending {
+                        return []
+                    }
+                }
+            }
+            
+            environment.userConfigs.lastErrorConditionFeedbackRequestDate = alertEvent.date
+            
+        }
 
         // Heuristic for bounds-check with and garbage collection on alertMessages set.
         // Removes old alert messages that have already been presented.
@@ -396,8 +433,8 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             switch a {
             case .speedBoostTapped:
                 return [ Effect(value: .presentPsiCashScreen(initialTab: .speedBoost)) ]
+                
             case .subscriptionTapped:
-
                 return [
                     .fireAndForget {
                         let topVC = environment.getTopActiveViewController()
@@ -416,6 +453,10 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                     }
                 ]
             }
+            
+        case .sendErrorInitiatedFeedback:
+            return [ Effect(value: .presentModalFeedbackScreen(errorInitiated: true)) ]
+            
         }
         
     case .presentPsiCashAccountManagement:
@@ -664,13 +705,16 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         
         return effects
         
-    case .presentModalFeedbackScreen:
+    case .presentModalFeedbackScreen(errorInitiated: let errorInitiated):
         
-        guard case .completed(false) = state.mainView.isModalFeedbackScreenShown else {
+        guard case .completed(.none) = state.mainView.isModalFeedbackScreenShown else {
             return []
         }
         
-        state.mainView.isModalFeedbackScreenShown = .pending
+        state.mainView.isModalFeedbackScreenShown =
+            .pending(ModalFeedbackViewState(isErrorInitiated: errorInitiated))
+        
+        let associatedData: [String: Any] = ["errorInitiated": NSNumber(value: errorInitiated)]
         
         return [
             Effect.deferred {
@@ -680,7 +724,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                 
                 switch searchResult {
                 case .notPresent:
-                    let settingsViewController = environment.makeFeedbackViewController()
+                    let settingsViewController = environment.makeFeedbackViewController(associatedData)
                     topVC.present(settingsViewController, animated: true, completion: nil)
                     return ._presentModalFeedbackScreenResult(willPresent: true)
                 case .presentInStack(_), .presentTopOfStack(_):
@@ -691,25 +735,33 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         
     case ._presentModalFeedbackScreenResult(willPresent: let willPresent):
         
-        state.mainView.isModalFeedbackScreenShown = .completed(willPresent)
-        if !willPresent {
+        // `isModalFeedbackScreenShown` is expected to be in a `.pending(_)` state.
+        guard case let .pending(feedbackViewState) = state.mainView.isModalFeedbackScreenShown else {
+            fatalError()
+        }
+        
+        // `willPresent` is taken to guarantee that the feedback screen will be presented.
+        if willPresent {
+            state.mainView.isModalFeedbackScreenShown = .completed(feedbackViewState)
+            return []
+        } else {
+            state.mainView.isModalFeedbackScreenShown = .completed(.none)
             return [
                 environment.feedbackLogger.log(
                     .warn, "Will not present feedback screen")
                     .mapNever()
             ]
         }
-        return []
         
     case .dismissedModalFeedbackScreen:
         
-        guard state.mainView.isModalFeedbackScreenShown != .completed(false) else {
+        guard state.mainView.isModalFeedbackScreenShown != .completed(.none) else {
             // Feedback screen was not presented modally, instead
             // it was presented through PsiphonSettingsViewController.
             return []
         }
         
-        state.mainView.isModalFeedbackScreenShown = .completed(false)
+        state.mainView.isModalFeedbackScreenShown = .completed(.none)
         return []
         
     }
@@ -726,14 +778,18 @@ final class PsiphonFeedbackDelegate: StoreDelegate<AppAction>, FeedbackViewContr
         _ selectedThumbIndex: Int,
         comments: String!,
         email: String!,
-        uploadDiagnostics: Bool
+        uploadDiagnostics: Bool,
+        viewController: FeedbackViewController!
     ) {
+        
+        let errorInitiated = viewController.associatedData?["errorInitiated"] as? NSNumber
         
         let submitFeedbackData = SubmitFeedbackData(
             selectedThumbIndex: selectedThumbIndex,
             comments: comments ?? "",
             email: email ?? "",
-            uploadDiagnostics: uploadDiagnostics
+            uploadDiagnostics: uploadDiagnostics,
+            errorInitiated: errorInitiated?.boolValue ?? false
         )
         
         storeSend(.feedbackAction(.userSubmittedFeedback(submitFeedbackData)))
@@ -793,10 +849,11 @@ final class PsiphonSettingsDelegate: StoreDelegate<AppAction>, PsiphonSettingsVi
         _ selectedThumbIndex: Int,
         comments: String!,
         email: String!,
-        uploadDiagnostics: Bool
+        uploadDiagnostics: Bool,
+        viewController: FeedbackViewController!
     ) {
         feedbackDelegate.userSubmittedFeedback(
-            selectedThumbIndex, comments: comments, email: email, uploadDiagnostics: uploadDiagnostics)
+            selectedThumbIndex, comments: comments, email: email, uploadDiagnostics: uploadDiagnostics, viewController: viewController)
     }
     
     func userPressedURL(_ URL: URL!) {

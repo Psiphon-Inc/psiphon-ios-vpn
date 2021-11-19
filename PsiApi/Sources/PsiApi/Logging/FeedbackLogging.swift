@@ -34,9 +34,17 @@ enum LogLevel: Equatable {
 
 public protocol FeedbackLogHandler {
     
+    /// Sets subscriber for reported logs.
+    /// If there have been any reported logs before subscriber is set, subscriber is called once,
+    /// with the date of the last reported log.
+    ///  - Note: There can only be one subscriber.
+    func setReportedLogSubscriber(_ subscriber: @escaping (Date) -> Void)
+    
     func fatalError(type: String, message: String)
     
-    func feedbackLog(level: NonFatalLogLevel, type: String, message: String)
+    /// Logs feedback.
+    /// - Parameter report: Whether or not to report this log back (e.g. through asking the user to send a feedback).
+    func feedbackLog(level: NonFatalLogLevel, report: Bool, type: String, message: String)
 
     func feedbackLogNotice(type: String, message: String, timestamp: String)
     
@@ -44,12 +52,16 @@ public protocol FeedbackLogHandler {
 
 public struct StdoutFeedbackLogger: FeedbackLogHandler {
     
+    public func setReportedLogSubscriber(_ subscriber: @escaping (Date) -> Void) {
+        
+    }
+    
     public func fatalError(type: String, message: String) {
         print("[FatalError] type: '\(type)' message: '\(message)'")
     }
     
-    public func feedbackLog(level: NonFatalLogLevel, type: String, message: String) {
-        print("[\(String(describing: level))] type: '\(type)' message: '\(message)'")
+    public func feedbackLog(level: NonFatalLogLevel, report: Bool, type: String, message: String) {
+        print("[\(String(describing: level))] report:'\(report)' type: '\(type)' message: '\(message)'")
     }
 
     public func feedbackLogNotice(type: String, message: String, timestamp: String) {
@@ -69,11 +81,15 @@ final class ArrayFeedbackLogHandler: FeedbackLogHandler {
     
     var logs = [Log]()
     
+    public func setReportedLogSubscriber(_ subscriber: @escaping (Date) -> Void) {
+        
+    }
+    
     func fatalError(type: String, message: String) {
         logs.append(Log(level: .fatal, type: type, message: message, timestamp: .none))
     }
     
-    func feedbackLog(level: NonFatalLogLevel, type: String, message: String) {
+    func feedbackLog(level: NonFatalLogLevel, report: Bool, type: String, message: String) {
         logs.append(Log(level: .nonFatal(level), type: type, message: message, timestamp: .none))
     }
 
@@ -105,7 +121,7 @@ Equatable, CustomStringConvertible, CustomStringFeedbackDescription, FeedbackDes
 
 public struct FeedbackLogger {
     
-    let handler: FeedbackLogHandler
+    public let handler: FeedbackLogHandler
     
     public init(_ handler: FeedbackLogHandler) {
         self.handler = handler
@@ -135,42 +151,42 @@ public struct FeedbackLogger {
     }
 
     public func log(
-        _ level: NonFatalLogLevel, file: String = #file, line: Int = #line, _ message: LogMessage
+        _ level: NonFatalLogLevel, report: Bool = false, file: String = #file, line: Int = #line, _ message: LogMessage
     ) -> Effect<Never> {
-        log(level, type: "\(file.lastPathComponent):\(line)", value: message.description)
+        log(level, report: report, type: "\(file.lastPathComponent):\(line)", value: message.description)
     }
 
     public func log<T: FeedbackDescription>(
-        _ level: NonFatalLogLevel, file: String = #file, line: Int = #line, _ value: T
+        _ level: NonFatalLogLevel, report: Bool = false, file: String = #file, line: Int = #line, _ value: T
     ) -> Effect<Never> {
-        log(level, type: "\(file.lastPathComponent):\(line)", value: String(describing: value))
+        log(level, report: report, type: "\(file.lastPathComponent):\(line)", value: String(describing: value))
     }
 
     public func log<T: CustomFieldFeedbackDescription>(
-        _ level: NonFatalLogLevel, file: String = #file, line: Int = #line, _ value: T
+        _ level: NonFatalLogLevel, report: Bool, file: String = #file, line: Int = #line, _ value: T
     ) -> Effect<Never> {
-        log(level, type: "\(file.lastPathComponent):\(line)", value: value.description)
+        log(level, report: report, type: "\(file.lastPathComponent):\(line)", value: value.description)
     }
 
-    public func log(_ level: NonFatalLogLevel, tag: LogTag, _ message: LogMessage) -> Effect<Never> {
-        log(level, type: tag, value: message.description)
+    public func log(_ level: NonFatalLogLevel, report: Bool = false, tag: LogTag, _ message: LogMessage) -> Effect<Never> {
+        log(level, report: report, type: tag, value: message.description)
     }
 
     public func log<T: FeedbackDescription>(
-        _ level: NonFatalLogLevel, tag: LogTag, _ value: T
+        _ level: NonFatalLogLevel, report: Bool = false, tag: LogTag, _ value: T
     ) -> Effect<Never> {
-        log(level, type: tag, value: String(describing: value))
+        log(level, report: report, type: tag, value: String(describing: value))
     }
 
     public func log<T: CustomFieldFeedbackDescription>(
-        _ level: NonFatalLogLevel, tag: LogTag,  _ value: T
+        _ level: NonFatalLogLevel, report: Bool = false, tag: LogTag,  _ value: T
     ) -> Effect<Never> {
-        log(level, type: tag, value: value.description)
+        log(level, report: report, type: tag, value: value.description)
     }
 
-    private func log(_ level: NonFatalLogLevel, type: String, value: String) -> Effect<Never> {
+    private func log(_ level: NonFatalLogLevel, report: Bool, type: String, value: String) -> Effect<Never> {
         .fireAndForget {
-            self.handler.feedbackLog(level: level, type: type, message: value)
+            self.handler.feedbackLog(level: level, report: report, type: type, message: value)
         }
     }
 
@@ -181,11 +197,11 @@ public struct FeedbackLogger {
     }
 
     public func immediate(
-        _ level: NonFatalLogLevel, _ value: LogMessage, file: String = #file, line: UInt = #line
+        _ level: NonFatalLogLevel, report: Bool = false, _ value: LogMessage, file: String = #file, line: UInt = #line
     ) {
         let tag = "\(file.lastPathComponent):\(line)"
         let message = makeFeedbackEntry(value)
-        handler.feedbackLog(level: level, type: tag, message: message)
+        handler.feedbackLog(level: level, report: report, type: tag, message: message)
     }
     
 }

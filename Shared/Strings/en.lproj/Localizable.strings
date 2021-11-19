@@ -186,6 +186,9 @@
 /* Generic alert shown when purchase of a product fails. */
 "GENERIC_PURCHASE_FAILED" = "Purchase Failed";
 
+/* Body of an error dialog asking the user to send Psiphon a report. Do not translate or transliterate 'Psiphon' */
+"HELP_IMPROVE_PSIPHON_BY_SENDING_REPORT" = "Help improve Psiphon by sending a report of this error.";
+
 /* Body text of a modal dialog shown when a PsiCash login fails due to bad username or password. */
 "INCORRECT_USERNAME_OR_PASSWORD" = "The username or password entered was incorrect.";
 
@@ -627,6 +630,9 @@
 /* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "You cannot see a subscription you purchased on this device";
 
+/* Title of a button that enables the user to report an error that they faced to us. */
+"REPORT_BUTTON_TITLE" = "Report...";
+
 /* Button that restores users previous purchases */
 "RESTORE_PURCHASES" = "Restore purchases";
 
@@ -650,6 +656,9 @@
 
 /* Title for screen that allows user to select their desired server region. */
 "SELECT_SERVER_REGION" = "Select server region";
+
+/* Title of an error dialog shown to the user when a serious error occurs in the app */
+"SERIOUS_ERROR_OCCURRED" = "A serious error occurred";
 
 /* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Reinstall VPN profile";

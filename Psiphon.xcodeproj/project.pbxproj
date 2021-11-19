@@ -18,6 +18,7 @@
 		291C0BA2269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m in Sources */ = {isa = PBXBuildFile; fileRef = 291C0B9E269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m */; };
 		291C0BA5269CC21F0075FAB7 /* PersistentContainerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 291C0BA4269CC21F0075FAB7 /* PersistentContainerWrapper.m */; };
 		291C0BA6269CC21F0075FAB7 /* PersistentContainerWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 291C0BA4269CC21F0075FAB7 /* PersistentContainerWrapper.m */; };
+		2927D234274579BE00FF493D /* FeedbackReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2927D233274579BE00FF493D /* FeedbackReader.swift */; };
 		292B531E2620DFCB00C0C44A /* SettingsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */; };
 		29587A8026C5ACD80015A79A /* FadingScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29587A7F26C5ACD80015A79A /* FadingScrollView.swift */; };
 		295E329A2718B63100C77BEA /* UITestAppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 295E32992718B63100C77BEA /* UITestAppState.swift */; };
@@ -399,6 +400,7 @@
 		291C0B9E269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = "SharedAuthorization+CoreDataProperties.m"; path = "Shared/CoreData/Model/SharedAuthorization+CoreDataProperties.m"; sourceTree = SOURCE_ROOT; };
 		291C0BA3269CC21F0075FAB7 /* PersistentContainerWrapper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PersistentContainerWrapper.h; sourceTree = "<group>"; };
 		291C0BA4269CC21F0075FAB7 /* PersistentContainerWrapper.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PersistentContainerWrapper.m; sourceTree = "<group>"; };
+		2927D233274579BE00FF493D /* FeedbackReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FeedbackReader.swift; sourceTree = "<group>"; };
 		292B531D2620DFCB00C0C44A /* SettingsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewModel.swift; sourceTree = "<group>"; };
 		29587A7F26C5ACD80015A79A /* FadingScrollView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FadingScrollView.swift; sourceTree = "<group>"; };
 		295E32992718B63100C77BEA /* UITestAppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestAppState.swift; sourceTree = "<group>"; };
@@ -1110,6 +1112,7 @@
 		4E5BD4F62061982C00AD4724 /* Feedback */ = {
 			isa = PBXGroup;
 			children = (
+				2927D233274579BE00FF493D /* FeedbackReader.swift */,
 				CE234A7524F46AEC0007709A /* Feedback.swift */,
 				CE234A7324F439CB0007709A /* FeedbackReducer.swift */,
 				CE551C6924FBFB8E00011C51 /* PsiphonFeedback+FeedbackUploadProvider.swift */,
@@ -2198,6 +2201,7 @@
 				8D4ACD32247E3626008E404C /* AppStoreIAP+Additions.swift in Sources */,
 				A84082260CE7662A93697CFF /* LoadingCircleLayer.m in Sources */,
 				A8408AACE30F860F2C961A04 /* WhiteSkyButton.m in Sources */,
+				2927D234274579BE00FF493D /* FeedbackReader.swift in Sources */,
 				A8408008B18277F93286799F /* PsiphonProgressView.m in Sources */,
 				8D9E603524366D71003A46D8 /* Types+FeedbackDescription.swift in Sources */,
 				8D26455F24D4842E000F46C0 /* DeepLinkingNavigator.swift in Sources */,

@@ -34,6 +34,7 @@
 #import "PsiFeedbackLogger.h"
 #import <PsiphonTunnel/PsiphonTunnel.h>
 #import "EmbeddedServerEntries.h"
+#import "FileUtils.h"
 
 // UI
 #import "UIColor+Additions.h"

@@ -29,7 +29,7 @@ enum ParsedPsiCashAppStorePurchasable: Equatable {
 
 extension ParsedPsiCashAppStorePurchasable {
     
-    var viewModel: PsiCashPurchasableViewModel? {
+var viewModel: PsiCashPurchasableViewModel? {
         guard case let .purchasable(value) = self else {
             return nil
         }
