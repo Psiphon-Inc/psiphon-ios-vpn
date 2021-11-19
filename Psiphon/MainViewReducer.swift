@@ -255,8 +255,6 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                 }
             }
             
-            environment.userConfigs.lastErrorConditionFeedbackRequestDate = alertEvent.date
-            
         }
 
         // Heuristic for bounds-check with and garbage collection on alertMessages set.
@@ -303,6 +301,13 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                     with: PresentationState(alertEvent, state: .failedToPresent(.applicationNotActive))
                 )
                 return []
+            }
+            
+            // It is expected that the alert will be presented successfully.
+            // So `lastErrorConditionFeedbackRequestDate` is updated after `appLifeCycle`
+            // check.
+            if case .reportSeriousErrorAlert = alertEvent.wrapped {
+                environment.userConfigs.lastErrorConditionFeedbackRequestDate = alertEvent.date
             }
 
             // Alert is either new, or failed to present previously.
