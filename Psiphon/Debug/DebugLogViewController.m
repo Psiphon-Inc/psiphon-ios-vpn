@@ -23,6 +23,7 @@
 #import "Logging.h"
 #import "PsiFeedbackLogger.h"
 #import "FileUtils.h"
+#import "Psiphon-Swift.h"
 
 // Initial maximum number of logs to load.
 #define MAX_LOGS_LOAD 250
@@ -148,8 +149,7 @@
         if (logData && ([logData length] > 0)) {
 
             self->bytesReadFileOffset = newBytesReadFileOffset;
-            NSMutableArray *newEntries = [[NSMutableArray alloc] init];
-            [self->sharedDB readLogsData:logData intoArray:newEntries];
+            NSArray<DiagnosticEntry *> *newEntries = [ParseLogs parseLogs:logData];
 
             // On the first load, truncate array entries to MAX_LOGS_LOAD
             if (isFirstLogRead && ([newEntries count] > MAX_LOGS_LOAD)) {

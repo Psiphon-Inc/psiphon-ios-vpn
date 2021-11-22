@@ -97,14 +97,6 @@ NS_ASSUME_NONNULL_BEGIN
 /// Path at which PsiphonTunnel will rotate log notices to.
 - (NSString *_Nullable)rotatingOlderLogNoticesPath;
 
-#if !(TARGET_IS_EXTENSION)
-
-- (void)readLogsData:(NSString *)logLines intoArray:(NSMutableArray<DiagnosticEntry *> *)entries;
-
-- (NSArray<DiagnosticEntry*>*)getAllLogs;
-
-#endif
-
 #pragma mark - Tunnel core configs
 
 /**

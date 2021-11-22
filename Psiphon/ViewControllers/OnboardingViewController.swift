@@ -110,9 +110,11 @@ enum OnboardingStage: Hashable, RawRepresentable {
         }
         
         // Removes user notification for Mac.
-        stagesNotCompleted.removeAll {
-            if case .userNotificationPermission = $0 { return true }
-            return false
+        if case .iOSAppOnMac = platform.current {
+            stagesNotCompleted.removeAll {
+                if case .userNotificationPermission = $0 { return true }
+                return false
+            }
         }
         
         return OrderedSet(stagesNotCompleted)
