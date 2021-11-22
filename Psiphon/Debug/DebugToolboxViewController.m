@@ -106,7 +106,7 @@ NSString * const StateCellIdentifier = @"StateCell";
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
-        case 0: return 6; // CONTAINER
+        case 0: return 7; // CONTAINER
         case 1: return 1; // PSIPHON TUNNEL
         case 2: return 3; // EXTENSION
         case 3: return 2; // PPROF
@@ -177,6 +177,12 @@ NSString * const StateCellIdentifier = @"StateCell";
                 cell.textLabel.text = @"Delete PsiCash store directory";
                 cell.textLabel.textColor = UIColor.radicalRed;
                 action = @selector(onDeletePsiCashStore);
+                break;
+            }
+            case 6: {
+                cell.textLabel.text = @"Force crash app";
+                cell.textLabel.textColor = UIColor.radicalRed;
+                action = @selector(onForceCrashApp);
                 break;
             }
         }
@@ -357,6 +363,10 @@ NSString * const StateCellIdentifier = @"StateCell";
         [self presentAlertWithTitle:@"Success" andMessage:@"Deleted PsiCash store dir"];
     }
     
+}
+
+- (void)onForceCrashApp {
+    [NSException raise:@"Force crash test" format:@""];
 }
 
 - (void)presentAlertWithTitle:(NSString *)title andMessage:(NSString *)message {
