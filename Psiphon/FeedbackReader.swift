@@ -199,3 +199,13 @@ func getFeedbackLogs(
     return (entries, parseErrors)
     
 }
+
+// MARK: Objective-C wrappers
+
+@objc final class ParseLogs: NSObject {
+    
+    @objc static func parseLogs(_ data: String) -> [DiagnosticEntry] {
+        return Psiphon.parseLogs(data, getCurrentTime: { Date () }).0
+    }
+    
+}
