@@ -227,10 +227,10 @@ WWAN or vice versa or VPN state changed
 - (void)onClientRegion:(NSString * _Nonnull)region;
 
 /*!
- Called to report that split tunnel is on for the given region.
- @param region  The region split tunnel is on for.
+ Called to report that split tunnel is on for the given regions.
+ @param regions  The regions split tunnel is on for.
  */
-- (void)onSplitTunnelRegion:(NSString * _Nonnull)region;
+- (void)onSplitTunnelRegions:(NSArray * _Nonnull)regions;
 
 /*!
  Called to indicate that an address has been classified as being within the
@@ -284,7 +284,7 @@ WWAN or vice versa or VPN state changed
  @param reason The reason for the alert.
  @param subject Additional context or classification of the reason; blank for none.
  */
-- (void)onServerAlert:(NSString * _Nonnull)reason :(NSString * _Nonnull)subject;
+- (void)onServerAlert:(NSString * _Nonnull)reason :(NSString * _Nonnull)subject :(NSArray * _Nonnull)actionURLs;
 
 @end
 
