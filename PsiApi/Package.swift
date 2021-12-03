@@ -18,7 +18,7 @@ let package = Package(
     dependencies: [
         // Dependencies declare other packages that this package depends on.
         // .package(url: /* package url */, from: "1.0.0"),
-        .package(url: "https://github.com/ReactiveCocoa/ReactiveSwift.git", from: "6.1.0"),
+        .package(url: "https://github.com/ReactiveCocoa/ReactiveSwift.git", from: "6.7.0"),
         .package(url: "https://github.com/google/promises.git", from: "1.2.10"),
         .package(url: "https://github.com/typelift/SwiftCheck.git", from: "0.12.0"),
         .package(path: "../Utilities"),
