@@ -931,7 +931,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     });
 }
 
-- (void)onServerAlert:(NSString *)reason :(NSString *)subject {
+- (void)onServerAlert:(NSString * _Nonnull)reason :(NSString * _Nonnull)subject :(NSArray * _Nonnull)actionURLs {
     dispatch_async(self->workQueue, ^{
         if ([reason isEqualToString:@"disallowed-traffic"] && [subject isEqualToString:@""]) {
             

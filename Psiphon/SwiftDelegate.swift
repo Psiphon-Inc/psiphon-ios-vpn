@@ -387,6 +387,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // Stores value of app crash detection flag.
         self.didPreviousLaunchOfAppTerminateNormally = self.userDefaultsConfig.didAppTerminateNormallyFlag
         
+        // Logs if the previous launch of the app crashed.
+        if !self.didPreviousLaunchOfAppTerminateNormally {
+            self.feedbackLogger.immediate(.warn, "Previous app launch crashed")
+        }
+
         // Sets the app crash detection flag.
         self.userDefaultsConfig.didAppTerminateNormallyFlag = false
 
