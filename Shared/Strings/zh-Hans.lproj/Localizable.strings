@@ -55,17 +55,17 @@
 /* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "CONNECT_TO_USE_SPEED_BOOST" = "连接至Psiphon以使用加速功能。";
 
-/*[UNTRANSLATED] Label text shown to user when the VPN is connecting to a Psiphon server. Do not translate or transliterate 'Psiphon' */
-"CONNECTING_TO_PSIPHON" = "Connecting to Psiphon";
+/* Label text shown to user when the VPN is connecting to a Psiphon server. Do not translate or transliterate 'Psiphon' */
+"CONNECTING_TO_PSIPHON" = "正在连接赛风";
 
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "您的应用设置文件似乎已损坏。请尝试重新安装应用来修复设置文件。";
 
-/*[UNTRANSLATED] Button label that lets users create a new account. */
-"CREATE_ACCOUNT_BUTTON_TITLE" = "Create account";
+/* Button label that lets users create a new account. */
+"CREATE_ACCOUNT_BUTTON_TITLE" = "创建账户";
 
-/*[UNTRANSLATED] Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
-"CREATE_PSICASH_ACCOUNT_BODY_2" = "We strongly encourage you to make a PsiCash account before buying PsiCash. Having an account allows you to share your balance between devices and protect your purchases.\n\nIMPORTANT: Without an account your PsiCash will not be preserved if you uninstall Psiphon.";
+/* Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
+"CREATE_PSICASH_ACCOUNT_BODY_2" = "我们强烈建议您在购买PsiCash之前创建一个PsiCash账户。拥有一个账户可以允许您在您的设备之间共享您的余额并且保护您的购买。\n\n重要：如果您卸载了赛风并且没有账户，您的PsiCash将不会被保留。";
 
 /* Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will continue on to the PsiCash store. */
 "CREATE_PSICASH_ACCOUNT_CONTINUE_BUTTON" = "继续无账户体验";
@@ -118,8 +118,8 @@
 /* No comment provided by engineer. */
 "faq-information-collected-answer-para-10" = "请注意，如果您的赛风来自 Google Play 商店或是亚马逊应用商店，该应用商店可能收集其他统计信息。例如，Google Play 收集信息的说明如下：";
 
-/*[UNTRANSLATED] No comment provided by engineer. */
-"faq-information-collected-answer-para-11" = "When you send an email request to our email auto-responder server, we are able to see your email address. While your email is being processed it is saved to the email server's disk, and it is deleted as soon as it is processed (usually in a few seconds). Your email address may be written to the server system logs. These logs are deleted after one week.";
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-11" = "当您发送邮件到我们自动回复的邮箱，我们能看见你的邮箱地址。当您的邮件在被处理的过程中，邮箱地址会被储存到邮件服务器的硬盘上，在处理之后就会马上被删除（通常需要花费几秒）。您的邮箱地址有可能会被记录在服务器系统的日志中。这些日志每一周删除一次。";
 
 /* No comment provided by engineer. */
 "faq-information-collected-answer-para-12" = "我们的自动回复邮件服务器托管在Amazon EC2云端。这意味着亚马逊可以看见您发给我们邮件以及我们给您的回复。";
@@ -175,14 +175,20 @@
 /* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "感谢您帮助改进 Psiphon！";
 
-/*[UNTRANSLATED] Button title that lets users reset their password if they forgot their account's password. */
-"FORGOT_PASSWORD" = "Forgot password?";
+/* Button title that lets users reset their password if they forgot their account's password. */
+"FORGOT_PASSWORD" = "忘记密码？";
+
+/* Button title that lets users reset their username or password if they forgot their account's username or password. */
+"FORGOT_USERNAME_OR_PASSWORD" = "忘记用户名或者密码？";
 
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "免费";
 
 /* Generic alert shown when purchase of a product fails. */
 "GENERIC_PURCHASE_FAILED" = "购买失败";
+
+/* Body of an error dialog asking the user to send Psiphon a report. Do not translate or transliterate 'Psiphon' */
+"HELP_IMPROVE_PSIPHON_BY_SENDING_REPORT" = "请发送一个错误报告帮助Psiphon改进。";
 
 /* Body text of a modal dialog shown when a PsiCash login fails due to bad username or password. */
 "INCORRECT_USERNAME_OR_PASSWORD" = "输入的用户名或者密码不正确";
@@ -196,29 +202,29 @@
 /* Text displayed while app loads */
 "LOADING" = "加载中...";
 
-/*[UNTRANSLATED] Message shown when a resource (online or offline) fails to load. */
-"LOADING_FAILED" = "Loading failed";
+/* Message shown when a resource (online or offline) fails to load. */
+"LOADING_FAILED" = "登录失败";
 
-/*[UNTRANSLATED] Title on a button that lets users login to their account with the username and password they have entered. */
-"LOG_IN_BUTTON_TITLE" = "Log in";
+/* Title on a button that lets users login to their account with the username and password they have entered. */
+"LOG_IN_BUTTON_TITLE" = "登录";
 
-/*[UNTRANSLATED] Message title informing the user that they must sign up for an account or log in to their account */
-"LOG_IN_OR_SIGN_UP" = "Log in or sign up";
+/* Message title informing the user that they must sign up for an account or log in to their account */
+"LOG_IN_OR_SIGN_UP" = "登录或注册";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
-"LOG_IN_OR_SIGNUP_TO_CONTINUE" = "Log in or create account to continue using PsiCash";
+/* Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
+"LOG_IN_OR_SIGNUP_TO_CONTINUE" = "登录或者创建账号从而继续使用PsiCash";
 
 /* Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed. */
 "LOG_OUT_ANY_WAY_BUTTON_TITLE_2" = "继续登出";
 
-/*[UNTRANSLATED] Title of the button that lets users log out of their account */
-"LOG_OUT_BUTTON_TITLE_2" = "Log out";
+/* Title of the button that lets users log out of their account */
+"LOG_OUT_BUTTON_TITLE_2" = "登出";
 
-/*[UNTRANSLATED] Label indicating to the user that they are logging into their PsiCash account. Use ellipses if it makes sense. */
-"LOGGING_IN_ELLIPSES" = "Logging in ...";
+/* Label indicating to the user that they are logging into their PsiCash account. Use ellipses if it makes sense. */
+"LOGGING_IN_ELLIPSES" = "登录中...";
 
-/*[UNTRANSLATED] Label indicating to the user that they are logging out of their PsiCash account. Use ellipses if it makes sense. */
-"LOGGING_OUT_ELLIPSES" = "Logging out ...";
+/* Label indicating to the user that they are logging out of their PsiCash account. Use ellipses if it makes sense. */
+"LOGGING_OUT_ELLIPSES" = "登出中...";
 
 /* Button title that takes user to the next page */
 "NEXT_PAGE_BUTTON_TITLE" = "下一步";
@@ -253,8 +259,8 @@
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "请打开 Psiphon 应用来完成连接";
 
-/*[UNTRANSLATED] Capitalize where it makes sense. Label visually separating Sign up section and sign in section of the app. */
-"OR_SIGNUP_SIGNIN" = "OR";
+/* Capitalize where it makes sense. Label visually separating Sign up section and sign in section of the app. */
+"OR_SIGNUP_SIGNIN" = "或者";
 
 /* Text field label where users can enter their account's password */
 "PASSWORD_TEXT_FIELD" = "密码";
@@ -265,8 +271,8 @@
 /* Subtitle shown when the current operation failed, asking the user to try again at a later time. */
 "PLEASE_TRY_AGAIN_LATER" = "请稍后重试。";
 
-/*[UNTRANSLATED] Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
-"PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Something went wrong, please try again later.\n\nIf this problem persists, please send a feedback.";
+/* Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
+"PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "有些问题，请稍后再尝试。\n\n如果这个问题还是存在，请发送一个反馈。";
 
 /* No comment provided by engineer. */
 "privacy-canadian-privacy-commission-link-text" = "加拿大隐私专员办公室";
@@ -280,26 +286,26 @@
 /* No comment provided by engineer. */
 "privacy-information-collected-client-advertising-networks-para-2" = "基于兴趣的广告使用 cookie，如需选择退出 cookie 使用，请访问：";
 
-/*[UNTRANSLATED] Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
-"privacy-information-collected-data-categories-header" = "Data Categories";
+/* Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
+"privacy-information-collected-data-categories-header" = "数据类别";
 
-/*[UNTRANSLATED] Header text in the 'my.psi.cash' section of the Privacy page. Refers to the cookies stored by web browsers. */
-"privacy-information-collected-mypsicash-cookies-head" = "Cookies";
+/* Header text in the 'my.psi.cash' section of the Privacy page. Refers to the cookies stored by web browsers. */
+"privacy-information-collected-mypsicash-cookies-head" = "缓存";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-cookies-para-1" = "my.psi.cash only uses cookies and similar tracking technologies to carry out activities that are essential for the operation of the website. Essential cookies are necessary to ensure basic functions of the website. Cookies are small text files that are stored on your computer and saved by your browser, and do not represent any risk to your device. You can configure your browser settings to personalize how you would like your browser to handle cookies. Disabling essential cookies will degrade the functionality of this website.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-cookies-para-1" = "my.psi.cash 只在必要的网站运行的活动中使用缓存或者其他类似跟踪技术。重要的缓存对于保证网站的基本功能是必须的。缓存是存储在你电脑上的小型文件并且会被您的浏览器保存。缓存不代表您的设备存在任何风险。您可以调整您的浏览器设置去个性化您的浏览器如何处理缓存。禁止必要的缓存会给网站的功能带来负面影响。";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. 'PsiCash' must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-para-1" = "Users create and manage their PsiCash accounts on the <a href=\"https://my.psi.cash\" target=\"_blank\" rel=\"noopener noreferrer\">my.psi.cash</a> website.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-para-1" = "用户们在<a href=\"https://my.psi.cash\" target=\"_blank\" rel=\"noopener noreferrer\">my.psi.cash</a>网站创建并管理他们的PsiCash账户。";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-recaptcha-para-1" = "my.psi.cash uses Google’s reCAPTCHA v3 (hereinafter “reCAPTCHA”), which protects websites from spam and abuse by non-human users (i.e., bots). reCAPTCHA collects personal information that is required for the functioning of the technology and is subject to its own privacy policy. Use of my.psi.cash indicates acceptance of Google’s <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">Privacy Policy</a> and <a href=\"https://policies.google.com/terms\" target=\"_blank\" rel=\"noopener noreferrer\">Terms</a>.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-recaptcha-para-1" = "my.psi.cash使用谷歌的reCAPTCHA v3 (以后用reCAPTCHA指代)。这项服务可以从垃圾邮件和非人类的滥用中保护网站。reCAPTCHA收集关于这项技术功能的基本个人信息，并且受制于它自己的隐私政策。使用my.psi.cash表示接受谷歌的<a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">隐私政策</a>和<a href=\"https://policies.google.com/terms\" target=\"_blank\" rel=\"noopener noreferrer\">条款</a>。";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-recaptcha-para-2" = "Our use of reCAPTCHA is strictly limited to ensuring the continued functioning of my.psi.cash. reCAPTCHA technology performs an automatic analysis for each site request without requiring the user to take any additional actions. This analysis is based on interactions made by the user, and is used to mitigate bot and other malicious behaviour on our website. The data collected during analysis is forwarded to Google, where Google will use this data to determine if you are a human user. This analysis takes place in the background, and users are not advised it is taking place.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-recaptcha-para-2" = "我们对于reCAPTCHA的使用将被严格显示在确保my.psi.cash的持续运作。reCAPTCHA技术将在不需要使用者做任何事的情况下自动分析每个网站的请求。此分析是基于使用者过去的操作，并且会被用来缓解针对我们网站机器以及其他有恶意的行为。在分析期间收集的数据会被转发到谷歌，谷歌将会利用这些数据判断用户是否是人类。这个分析将在后台运行，用户不会意识到这个分析正在发生。";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. */
-"privacy-information-collected-mypsicash-recaptcha-para-3" = "For more information about Google’s reCAPTCHA technology, please visit <a href=\"https://www.google.com/recaptcha/about/\" target=\"_blank\" rel=\"noopener noreferrer\">https://www.google.com/recaptcha/about/</a>.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. */
+"privacy-information-collected-mypsicash-recaptcha-para-3" = "更多关于谷歌的reCAPTCHA技术请浏览<a href=\"https://www.google.com/recaptcha/about/\" target=\"_blank\" rel=\"noopener noreferrer\">https://www.google.com/recaptcha/about/</a>。";
 
 /* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
 "privacy-information-collected-psicash-para-1" = "PsiCash 系统只会出于保证系统正常运行、监控系统情况和确保系统安全的目的收集必要的数据。";
@@ -322,8 +328,8 @@
 /* Paragraph text in the 'PsiCash' section of the Privacy page. This is preamble to a detailed bullet list. 'PsiCash' must not be translated or transliterated. */
 "privacy-information-collected-psicash-para-2-list-start" = "PsiCash 服务器储存着每一用户的信息以供系统运作，包括：";
 
-/*[UNTRANSLATED] Paragraph text on the Privacy Policy page. Describes the user data requirements for PsiCash accounts. 'PsiCash' must not be translated or transliterated. 'Psiphon' must not be translated or transliterated. */
-"privacy-information-collected-psicash-para-2b" = "Creating a PsiCash account is optional. If an account is created, account-specific information such as username, password, and email address (if provided) are stored on the server. When logged in to a Psiphon client, the username is also stored locally.";
+/* Paragraph text on the Privacy Policy page. Describes the user data requirements for PsiCash accounts. 'PsiCash' must not be translated or transliterated. 'Psiphon' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-2b" = "创建PsiCash账户不是强制的。如果一个账户被创建，账户相关的具体信息比如说用户，密码，和邮箱地址（如果提供了）将被存储在服务器上。当登入近Psiphon客户端，用户名也将被本地存储。";
 
 /* Bullet list item in the 'data stored in web browser' list. This item refers to randomly generated values that allow a user to access and utilize the system. */
 "privacy-information-collected-psicash-para-3-item-1" = "已生成的用户访问令牌";
@@ -511,29 +517,29 @@
 /* Message shown when products available for purchase could not be retrieved. */
 "PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "产品清单不可更改";
 
-/*[UNTRANSLATED] Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
-"PROTECT_YOUR_PURCHASES" = "Protect Your Purchases";
+/* Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
+"PROTECT_YOUR_PURCHASES" = "保护您的购买";
 
 /* Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts. */
 "PSICASH_ACCOUNT" = "PsiCash账户";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
-"PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "Are you sure you want to log out of your PsiCash account?";
+/* Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
+"PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "您确定想登出你的PsiCash账户？";
 
 /* An alert shown when the user logs out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNT_LOGOUT_COMPLETE_TITLE" = "PsiCash账户已完全登出";
 
-/*[UNTRANSLATED] Body of modal dialog shown when the user attempts to log out of their PsiCash account and an unexpected error occurs. Please don't modify the link URL. */
-"PSICASH_ACCOUNT_LOGOUT_FAILED_BODY" = "You logout attempt failed unexpectedly. Please try restarting the application.";
+/* Body of modal dialog shown when the user attempts to log out of their PsiCash account and an unexpected error occurs. Please don't modify the link URL. */
+"PSICASH_ACCOUNT_LOGOUT_FAILED_BODY" = "您的登出尝试失败。请尝试重启软件。";
 
 /* Header of a modal dialog that appears when the user tries to log out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNT_LOGOUT_TITLE" = "PsiCash账户登出";
 
-/*[UNTRANSLATED] Button title that opens 'PsiCash' account management. */
-"PSICASH_ACCOUNT_MANAGEMENT_2" = "Manage account";
+/* Button title that opens 'PsiCash' account management. */
+"PSICASH_ACCOUNT_MANAGEMENT_2" = "管理账号";
 
-/*[UNTRANSLATED] An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "Your PsiCash login has expired. Please log back in.";
+/* An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "您的PsiCash账号登录已经过期。请重新登录。";
 
 /* Body text of a modal dialog shown when a PsiCash login succeeds. There is a fixed number of times that a user can merge a pre-account balance into a PsiCash account. This message indicates that the user has hit that limit and the merge that occurred is the last one allowed. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNTS_LAST_MERGE_WARNING_BODY" = "您已经登陆您的PsiCash账户。预先存在在这个设备上的余额已经转入您的帐户，但是这是最后一次余额合并。";
@@ -541,8 +547,11 @@
 /* PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
 "PSICASH_BALANCE" = "PsiCash余额：";
 
-/*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash account login fails due to a 'bad request' error. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_LOGIN_BAD_REQUEST_ERROR_BODY" = "The PsiCash server indicated that the login request was invalid. Please try again later.";
+/* Subtitle of an error message shown when the PsiCash feature is unavailable, asking the user to send us a feedback if this problem persists. */
+"PSICASH_LIB_INIT_FAILED_SEND_FEEDBACK" = "PsiCash加载失败。\n\n如果这个这个问题持续存在，请发送反馈。";
+
+/* Body text of a modal dialog shown when a PsiCash account login fails due to a 'bad request' error. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_BAD_REQUEST_ERROR_BODY" = "PsiCash服务器显示您的登录请求无效。请稍后再尝试。";
 
 /* Body text of a modal dialog shown when a PsiCash login fails without a specific reason. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_LOGIN_CATASTROPHIC_ERROR_BODY" = "您的PsiCash登录尝试失败。";
@@ -562,8 +571,8 @@
 /* Body text of a modal dialog shown when the user tries to use (spend, buy, etc.) PsiCash, if they not currently connected. 'Use' here means buy, spend, or otherwise interact with. 'Psiphon' must not be translated/transliterated. 'PsiCash' must not be translated/transliterated. */
 "PSICASH_MUST_BE_CONNECTED" = "您必须连接至赛风服务器，才能使用PsiCash";
 
-/*[UNTRANSLATED] PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
-"PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon, unless you have created a PsiCash account and are logged into your PsiCash account.";
+/* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
+"PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "重要事项：如果您卸载Psiphon，您的PsiCash将不会被保存，除非您建立了PsiCash账户并且登录了您的PsiCash账户。";
 
 /* Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "PSICASH_SPEED_BOOST_PRODUCT_NOT_FOUND_MESSAGE" = "加速产品未被找到。您的程序可能已经过程。请检查更新。";
@@ -574,8 +583,8 @@
 /* Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. Port here refers to port in computer networking. */
 "PSICASH_SPEED_PORT_LIMITS_HEAD" = "速度和端口限制";
 
-/*[UNTRANSLATED] A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon */
-"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY" = "Your Psiphon subscription already gives you always-on Speed Boost, so there is no reason to buy more. Your PsiCash balance will be retained should you ever decide to cancel your subscription.\n\nYou can still access your PsiCash account from the settings menu.";
+/* A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon */
+"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY" = "您的赛风订阅已经包括了永远开启的Speed Boost，所以您不必再额外购买。您的PsiCash余额将会被保留如果您决定取消您的订阅。\n\n您可以在设置菜单访问您的PsiCash账户。";
 
 /* A title message to the premium user (a user with a subscription when they are trying to navigate to PsiCash and Speed Boost screen. Do not translate or transliterate words PsiCash or Psiphon */
 "PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_TITLE" = "您的赛风订阅将给您高级访问！";
@@ -604,8 +613,8 @@
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "未连接至Psiphon";
 
-/*[UNTRANSLATED] Alert message that the users purchases have been restored successfully */
-"PURCHASES_RESTORED_SUCCESSFULLY" = "Purchases restored successfully";
+/* Alert message that the users purchases have been restored successfully */
+"PURCHASES_RESTORED_SUCCESSFULLY" = "购买成功恢复";
 
 /* Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
 "PURCHASING_PSICASH" = "购买PsiCash...";
@@ -622,8 +631,11 @@
 /* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "无法在本设备上看到你购买的订阅";
 
-/*[UNTRANSLATED] Button that restores users previous purchases */
-"RESTORE_PURCHASES" = "Restore purchases";
+/* Title of a button that enables the user to report an error that they faced to us. */
+"REPORT_BUTTON_TITLE" = "发送报告";
+
+/* Button that restores users previous purchases */
+"RESTORE_PURCHASES" = "恢复购买";
 
 /* Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "恢复订阅";
@@ -645,6 +657,9 @@
 
 /* Title for screen that allows user to select their desired server region. */
 "SELECT_SERVER_REGION" = "选择服务器地区";
+
+/* Title of an error dialog shown to the user when a serious error occurs in the app */
+"SERIOUS_ERROR_OCCURRED" = "发生严重错误";
 
 /* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "重新安装 VPN 配置文件";
