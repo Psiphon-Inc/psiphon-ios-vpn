@@ -178,11 +178,17 @@
 /* Button title that lets users reset their password if they forgot their account's password. */
 "FORGOT_PASSWORD" = "ลืมรหัสผ่านใช่ไหม?";
 
+/*[UNTRANSLATED] Button title that lets users reset their username or password if they forgot their account's username or password. */
+"FORGOT_USERNAME_OR_PASSWORD" = "Forgot your password or username?";
+
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "ฟรี";
 
 /*[UNTRANSLATED] Generic alert shown when purchase of a product fails. */
 "GENERIC_PURCHASE_FAILED" = "Purchase Failed";
+
+/*[UNTRANSLATED] Body of an error dialog asking the user to send Psiphon a report. Do not translate or transliterate 'Psiphon' */
+"HELP_IMPROVE_PSIPHON_BY_SENDING_REPORT" = "Help improve Psiphon by sending a report of this error.";
 
 /*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash login fails due to bad username or password. */
 "INCORRECT_USERNAME_OR_PASSWORD" = "The username or password entered was incorrect.";
@@ -541,6 +547,9 @@
 /*[UNTRANSLATED] PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
 "PSICASH_BALANCE" = "PsiCash Balance:";
 
+/*[UNTRANSLATED] Subtitle of an error message shown when the PsiCash feature is unavailable, asking the user to send us a feedback if this problem persists. */
+"PSICASH_LIB_INIT_FAILED_SEND_FEEDBACK" = "PsiCash failed to load.\n\nIf this problem persists, please send a feedback.";
+
 /*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash account login fails due to a 'bad request' error. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_LOGIN_BAD_REQUEST_ERROR_BODY" = "The PsiCash server indicated that the login request was invalid. Please try again later.";
 
@@ -622,6 +631,9 @@
 /*[UNTRANSLATED] Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "You cannot see a subscription you purchased on this device";
 
+/*[UNTRANSLATED] Title of a button that enables the user to report an error that they faced to us. */
+"REPORT_BUTTON_TITLE" = "Report...";
+
 /*[UNTRANSLATED] Button that restores users previous purchases */
 "RESTORE_PURCHASES" = "Restore purchases";
 
@@ -645,6 +657,9 @@
 
 /*[UNTRANSLATED] Title for screen that allows user to select their desired server region. */
 "SELECT_SERVER_REGION" = "Select server region";
+
+/*[UNTRANSLATED] Title of an error dialog shown to the user when a serious error occurs in the app */
+"SERIOUS_ERROR_OCCURRED" = "A serious error occurred";
 
 /*[UNTRANSLATED] Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "Reinstall VPN profile";
