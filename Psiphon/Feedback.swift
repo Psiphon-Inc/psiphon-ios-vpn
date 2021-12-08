@@ -282,8 +282,10 @@ func feedbackJSON(userFeedback: UserFeedback,
     diagnosticEntries.append(contentsOf: parseFailureEntries)
     
     // Adds a log line if the feedback is initiated due to an error condition in the app.
-    diagnosticEntries.append(
-        DiagnosticEntry("Error initiated feedback", andTimestamp: getCurrentTime()))
+    if userFeedback.errorInitiated {
+        diagnosticEntries.append(
+            DiagnosticEntry("Error initiated feedback", andTimestamp: getCurrentTime()))
+    }
     
     // Add jetsam metrics log.
     let binRanges = [
