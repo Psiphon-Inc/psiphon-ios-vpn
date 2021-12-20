@@ -50,38 +50,43 @@ struct EitherView<A: ViewBuilder, B: ViewBuilder>: ViewBuilder {
         guard let container = container else {
             fatalError("EitherView build `container` not passed in")
         }
-        return .init(viewable: .none) { viewable -> ((BindingType) -> EitherViewable?) in
-            return { newValue in
-                let newViewable: EitherViewable?
+        return MutableBindableViewable<BindingType, EitherViewable>(viewable: .none) { viewable -> ((BindingType) -> EitherViewable?) in
+            return { (newValue: BindingType) in
+                
                 switch newValue {
+                    
                 case .left(let value):
-                    var bindableViewable: A.BuildType
+                    
+                    let binding: A.BuildType
+                    
                     switch viewable {
                     case .right(_), .none:
-                        bindableViewable = A.BuildType.build(with: self.leftBuilder,
-                                                             addTo: container)
-                        newViewable = .left(bindableViewable)
-                    case .left(let leftBindableViewable):
-                        newViewable = viewable!
-                        bindableViewable = leftBindableViewable
+                        binding = self.leftBuilder.buildView(addTo: container)
+                    case .left(let leftBinding):
+                        binding = leftBinding
                     }
-                    bindableViewable.bind(value)
+                    
+                    binding.bind(value)
+                    
+                    return .left(binding)
 
                 case .right(let value):
-                    var bindableViewable: B.BuildType
+                    
+                    let binding: B.BuildType
+                    
                     switch viewable {
                     case .left(_), .none:
-                        bindableViewable = B.BuildType.build(with: self.rightBuilder,
-                                                             addTo: container)
-                        newViewable = .right(bindableViewable)
-                    case .right(let rightBindableViewable):
-                        newViewable = viewable!
-                        bindableViewable = rightBindableViewable
+                        binding = self.rightBuilder.buildView(addTo: container)
+                    case .right(let rightBinding):
+                        binding = rightBinding
                     }
-                    bindableViewable.bind(value)
+                    
+                    binding.bind(value)
+                    
+                    return .right(binding)
 
                 }
-                return newViewable
+                
             }
         }
     }

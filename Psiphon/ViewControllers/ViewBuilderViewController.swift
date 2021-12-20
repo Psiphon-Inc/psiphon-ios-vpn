@@ -67,7 +67,7 @@ final class ViewBuilderViewController<T: ViewBuilder>: ReactiveViewController {
                 ]
         }
 
-        self.bindable = T.BuildType.build(with: viewBuilder, addTo: containerView)
+        self.bindable = viewBuilder.buildView(addTo: containerView)
     }
 
 }
