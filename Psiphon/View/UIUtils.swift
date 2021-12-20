@@ -709,8 +709,6 @@ extension UIColor {
 
 protocol BindableViewable: AnyObject, Bindable, ViewWrapper {
     associatedtype WrappedView: ViewWrapper
-
-    static func build<Builder>(with builder: Builder, addTo container: UIView) -> Builder.BuildType where Builder: ViewBuilder, Builder.BuildType == Self
 }
 
 /// A ViewBuilder is a type which has all necessary information to build a `BindableView`.
@@ -726,6 +724,42 @@ protocol ViewBuilder {
     /// - A `MutableBindableViewable` should add it's views to the passed in `container`.
     /// In this case the passed in `container` will always be non-nil.
     func build(_ container: UIView?) -> BuildType
+}
+
+extension ViewBuilder {
+    
+    func buildView(addTo container: UIView) -> BuildType {
+        
+        container.translatesAutoresizingMaskIntoConstraints = false
+        
+        // Cleans up the container
+        container.subviews.forEach { $0.removeFromSuperview() }
+        
+        let binding = self.build(container)
+        
+        switch binding {
+            
+        case is MutableBindableViewable<BuildType.BindingType, BuildType.WrappedView>:
+            return binding
+            
+        case is ImmutableBindableViewable<BuildType.BindingType, BuildType.WrappedView>:
+
+            container.addSubview(binding.view)
+            binding.view.activateConstraints {
+                $0.constraintToParent(.top(0, .belowRequired),
+                                      .bottom(0, .belowRequired),
+                                      .leading(0, .belowRequired),
+                                      .trailing(0, .belowRequired))
+            }
+            
+            return binding
+            
+        default:
+            fatalError("not implemented")
+        }
+        
+    }
+    
 }
 
 /// A type that wraps a `UIView` object.
@@ -764,27 +798,6 @@ final class ImmutableBindableViewable<BindingType: Equatable, WrappedView: ViewW
         binding(newValue)
     }
 
-    /// Nil is passed to `builder`s `build`  function, as this ViewBuilder type doesn't allow mutating the container.
-    /// TODO: This nil passing shows that this is not a good abstraction.
-    static func build<Builder: ViewBuilder>(
-        with builder: Builder, addTo container: UIView
-    ) -> Builder.BuildType where BindingType == Builder.BuildType.BindingType {
-        
-        container.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Cleans up the container.
-        container.subviews.forEach { $0.removeFromSuperview() }
-
-        let bindableViewable = builder.build(nil)
-        container.addSubview(bindableViewable.view)
-        bindableViewable.view.activateConstraints {
-            $0.constraintToParent(.top(0, .belowRequired),
-                                  .bottom(0, .belowRequired),
-                                  .leading(0, .belowRequired),
-                                  .trailing(0, .belowRequired))
-        }
-        return bindableViewable
-    }
 }
 
 /// Wraps a `Viewable` that can be mutated.
@@ -813,15 +826,6 @@ final class MutableBindableViewable<BindingType: Equatable, WrappedView: ViewWra
         self.state = newValue
         
         viewable = bindingWrapper(viewable)(newValue)
-    }
-
-    // Calls the `builder` build function with the passed in `container`.
-    static func build<Builder: ViewBuilder>(
-        with builder: Builder, addTo container: UIView
-    ) -> Builder.BuildType where MutableBindableViewable == Builder.BuildType {
-        container.translatesAutoresizingMaskIntoConstraints = false
-        container.subviews.forEach { $0.removeFromSuperview() }
-        return builder.build(container)
     }
 
 }
