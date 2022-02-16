@@ -65,14 +65,8 @@ final class WebViewController: ReactiveViewController {
     private var containerView: ViewBuilderContainerView<
         EitherView<PlaceholderView<WKWebView>, BlockerView>>!
     
-    /// isLoadingMainFrame is `true` if URL being loaded is for main frame,
-    /// and `false` if not for the main frame.
-    /// Invariant: It is `nil` after a webView:decidePolicyForNavigationAction: is called,
-    ///  but before a decision has been made.
-    private var isLoadingMainFrame: Bool? = .none
-    
     /// State of loading content for the main frame.
-    @State private var webViewLoading: WebViewLoadingState = .pending
+    @State private var mainFrameLoadState: WebViewLoadingState = .pending
     
     init(
         baseURL: URL,
@@ -117,7 +111,7 @@ final class WebViewController: ReactiveViewController {
             }
         
         self.lifetime += SignalProducer.combineLatest(
-            self.$webViewLoading.signalProducer,
+            self.$mainFrameLoadState.signalProducer,
             tunnelStatusSignal,
             self.$lifeCycle.signalProducer
         ).map(ObservedState.init)
@@ -255,7 +249,7 @@ final class WebViewController: ReactiveViewController {
     // Only use this function for loading or relading a url.
     // Do not directly call `self.webView`.
     private func load(url: URL) {
-        self.webViewLoading = .pending
+        self.mainFrameLoadState = .pending
         self.webView.load(URLRequest(url: url))
     }
     
@@ -304,16 +298,7 @@ extension WebViewController: WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         // Tells the delegate that an error occurred during navigation.
         
-        guard case .some(let isLoadingMainFrame) = self.isLoadingMainFrame else {
-            fatalError("Illegal state")
-        }
-        
-        guard isLoadingMainFrame else {
-            self.feedbackLogger.immediate(.warn, "navigation failed")
-            return
-        }
-                
-        self.webViewLoading = .completed(
+        self.mainFrameLoadState = .completed(
             .failure(
                 ErrorEvent(
                     .didFail(SystemError<Int>.make(error as NSError)),
@@ -332,26 +317,17 @@ extension WebViewController: WKNavigationDelegate {
         // This callback is *not* always called after
         // webView:decidePolicyForNavigationResponse:decisionHandler:.
         
-        guard case .some(let isLoadingMainFrame) = self.isLoadingMainFrame else {
-            fatalError("Illegal state")
-        }
-        
-        guard isLoadingMainFrame else {
-            self.feedbackLogger.immediate(.warn, "provisional navigation failed")
-            return
-        }
-        
         // If an error value has been set by
         // webView:decidePolicyForNavigationResponse:decisionHandler:,
         // then returns immediately.
-        if case .completed(.failure(_)) = self.webViewLoading {
+        if case .completed(.failure(_)) = self.mainFrameLoadState {
             return
         }
         
         // Tells the delegate that an error occurred during the early navigation process.
         let systemError = SystemError<Int>.make(error as NSError)
         
-        self.webViewLoading = .completed(
+        self.mainFrameLoadState = .completed(
             .failure(
                 ErrorEvent(
                     .didFailProvisionalNavigation(systemError),
@@ -364,17 +340,7 @@ extension WebViewController: WKNavigationDelegate {
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         // Tells the delegate that navigation is complete.
-        
-        guard case .some(let isLoadingMainFrame) = self.isLoadingMainFrame else {
-            fatalError("Illegal state")
-        }
-        
-        guard isLoadingMainFrame else {
-            return
-        }
-        
-        self.webViewLoading = .completed(.success(.unit))
-        
+        self.mainFrameLoadState = .completed(.success(.unit))
     }
     
     func webView(
@@ -385,11 +351,7 @@ extension WebViewController: WKNavigationDelegate {
         // Asks the delegate for permission to navigate to new content
         // after the response to the navigation request is known.
         
-        guard case .some(let isLoadingMainFrame) = self.isLoadingMainFrame else {
-            fatalError("Illegal state")
-        }
-                
-        guard isLoadingMainFrame else {
+        guard navigationResponse.isForMainFrame else {
             decisionHandler(.allow)
             return
         }
@@ -404,7 +366,7 @@ extension WebViewController: WKNavigationDelegate {
         case 400..<500, // Client error
              500..<600: // Server error
                         
-            self.webViewLoading = .completed(
+            self.mainFrameLoadState = .completed(
                 .failure(
                     ErrorEvent(
                         .httpError(ErrorMessage("received HTTP status \(httpStatus)")),
@@ -416,7 +378,7 @@ extension WebViewController: WKNavigationDelegate {
             decisionHandler(.cancel)
             
         default:
-            self.webViewLoading = .pending
+            self.mainFrameLoadState = .pending
             decisionHandler(.allow)
         }
         
@@ -443,19 +405,12 @@ extension WebViewController: WKNavigationDelegate {
             return
         }
         
-        let isTargetFrameMainFrame = targetFrame.isMainFrame
-        
-        self.isLoadingMainFrame = .none
-        
         tunnelProviderRefSignal
             .take(first: 1)
             .startWithValues { [unowned self] tunnelConnection in
                 
                 switch tunnelConnection?.tunneled {
                 case .connected:
-                    
-                    // Updates `isLoadingMainFrame` since navigation is allowed.
-                    self.isLoadingMainFrame = isTargetFrameMainFrame
                     
                     // Navigation action is allowed only if the tunnel is connected.
                     decisionHandler(.allow)
