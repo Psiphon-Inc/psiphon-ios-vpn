@@ -520,9 +520,9 @@ extension UserStrings {
                                  comment: "Title on a button that lets users login to their account with the username and password they have entered.")
     }
     
-    static func Username() -> String {
-        return NSLocalizedString("USERNAME_TEXT_FIELD", tableName: nil, bundle: Bundle.main,
-                                 value: "Username",
+    static func PsiCash_username() -> String {
+        return NSLocalizedString("PSICASH_USERNAME_TEXT_FIELD", tableName: nil, bundle: Bundle.main,
+                                 value: "PsiCash username",
                                  comment: "Text field label where users can enter their account's username")
     }
     
