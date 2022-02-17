@@ -204,6 +204,11 @@ final class PsiCashAccountViewController: ReactiveViewController {
                     
                     // Login failure (either before or after presentation
                     // of this view controller).
+                    
+                    // Empties the password text field after unsuccessful login.
+                    // This is to prevent users from spamming the login button.
+                    self.passwordTextField.textField.text = ""
+                    
                     self.updateNoPendingLoginEvent()
                     
                 }
