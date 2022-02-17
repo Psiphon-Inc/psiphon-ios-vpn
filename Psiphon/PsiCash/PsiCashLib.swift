@@ -562,7 +562,7 @@ final class PsiCashLib {
     */
     func accountLogin(
         username: String, password: SecretString
-    ) -> Result<AccountLoginResponse, PsiCashAccountLoginError> {
+    ) -> Result<AccountLoginSuccessResponse, PsiCashAccountLoginError> {
         
         password.unsafeMap { passwordValue in
             
@@ -583,7 +583,7 @@ final class PsiCashLib {
                 switch statusResult {
                 case .success(()):
                     return .success(
-                        AccountLoginResponse(
+                        AccountLoginSuccessResponse(
                             lastTrackerMerge: $0.lastTrackerMerge.toOptionalBool ?? false
                         )
                     )
