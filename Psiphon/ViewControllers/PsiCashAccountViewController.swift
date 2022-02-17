@@ -102,7 +102,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
         self.forgotPasswordURL = forgotPasswordURL
         
         self.loginOnly = loginOnly
-        self.usernameTextField = SkyTextField(placeHolder: UserStrings.Username())
+        self.usernameTextField = SkyTextField(placeHolder: UserStrings.PsiCash_username())
         self.passwordTextField = SkyTextField(placeHolder: UserStrings.Password())
         self.loginButtonSpinner = .init(style: .gray)
         self.loginButton = GradientButton(gradient: .grey)
