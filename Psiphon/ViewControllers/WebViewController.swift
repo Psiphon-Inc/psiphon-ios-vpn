@@ -396,7 +396,7 @@ extension WebViewController: WKNavigationDelegate {
         
         // If the target of the navigation is a new window,
         // navigationAction.targetFrame property is nil.
-        guard let targetFrame = navigationAction.targetFrame else {
+        guard let _ = navigationAction.targetFrame else {
             // Handles links with `target="_blank"` attribute by opening
             // the URL in a new SFSafariViewController presented
             // on top of this view controller.
@@ -407,7 +407,7 @@ extension WebViewController: WKNavigationDelegate {
         
         tunnelProviderRefSignal
             .take(first: 1)
-            .startWithValues { [unowned self] tunnelConnection in
+            .startWithValues { tunnelConnection in
                 
                 switch tunnelConnection?.tunneled {
                 case .connected:
