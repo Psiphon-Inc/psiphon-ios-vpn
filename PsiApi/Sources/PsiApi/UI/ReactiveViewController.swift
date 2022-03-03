@@ -101,11 +101,15 @@ open class ReactiveViewController: UIViewController {
     /// with the current value of this variable.
     @State public private(set) var lifeCycle: ViewControllerLifeCycle = .initing
 
-    private let onDismissed: () -> Void
+    private var onDidLoad: (() -> Void)?
+    private var onDismissed: (() -> Void)?
     
-    /// - Parameter onDismissed: Called once after the view controller is either dismissed.
+    /// - Parameter onDidLoad: Called whenever `viewDidLoad(_:)` gets called on this view controller.
+    /// - Parameter onDismissed: Called once after this view controller, or the parent container view controller is dismissed.
     /// - Note: `onDimissed` is not called if `viewDidAppear(_:)` is never called.
-    public init(onDismissed: @escaping () -> Void) {
+    ///         Presenting view controller is not a parent view controller.
+    public init(onDidLoad: (() -> Void)?, onDismissed: (() -> Void)?) {
+        self.onDidLoad = onDidLoad
         self.onDismissed = onDismissed
         
         super.init(nibName: nil, bundle: nil)
@@ -119,6 +123,9 @@ open class ReactiveViewController: UIViewController {
         self.viewControllerDidLoadDate = Date()
         super.viewDidLoad()
         lifeCycle = .viewDidLoad
+        if let onDidLoad = onDidLoad {
+            onDidLoad()
+        }
     }
     
     open override func viewWillAppear(_ animated: Bool) {
@@ -137,21 +144,32 @@ open class ReactiveViewController: UIViewController {
     }
     
     open override func viewDidDisappear(_ animated: Bool) {
+        
         super.viewDidDisappear(animated)
         lifeCycle = .viewDidDisappear(animated: animated)
 
         // Invariant to hold: onDismissed should be called only once, and only if
         // this view controller will be removed from the view controller hierarchy.
         //
-        // If this view controller is being removed from view controller hierarchy
-        // and it is a child of a another view controller `self.isBeingDismissed`
-        // will evaluate to false, however `self.parent?.isBeingDismissed` will evaluate to true.
-        // If however, this view controller has no parent, `self.isBeingDismissed` will
-        // evaluate to true.
-
-        if self.isBeingDismissed || (self.parent?.isBeingDismissed ?? false) {
-            onDismissed()
+        // A view controller is either presented modally, or is a child of parent
+        // container view controller.
+        //
+        // If this view controller was presented modally and is being dismissed,
+        // `self.isBeingDismissed` is set to true.
+        // If this view controller is a child of a container view controller
+        // (e.g. UINavigationController), then self.isMovingFromParent is set to true.
+        
+        if self.parent?.isBeingDismissed ?? false {
+            print("** Parent is being dismissed: self.isBeingDismissed:\(self.isBeingDismissed)")
         }
+
+        if self.isBeingDismissed || (self.parent?.isBeingDismissed ?? false) || self.isMovingFromParent {
+            if let onDismissed = onDismissed {
+                onDismissed()
+                self.onDismissed = nil
+            }
+        }
+        
     }
     
     /// Presents `viewControllerToPresent` only after `viewDidAppear(_:)` has been called
@@ -173,6 +191,17 @@ open class ReactiveViewController: UIViewController {
                 }
                 self.present(viewControllerToPresent, animated: flag, completion: completion)
             }
+    }
+    
+}
+
+extension ReactiveViewController: ChildViewControllerDismissedDelegate {
+    
+    public func parentIsDimissed() {
+        if let onDismissed = onDismissed {
+            onDismissed()
+            self.onDismissed = nil
+        }
     }
     
 }

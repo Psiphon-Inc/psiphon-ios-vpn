@@ -52,6 +52,8 @@ struct Styling {
     
     var disabledButtonAlpha = 0.7
     
+    var defaultBackgroundColor = UIColor.darkBlue()
+    
 }
 
 enum Gradients: Int {
@@ -917,6 +919,18 @@ struct PresentationState<ViewModel: Hashable>: Hashable {
 }
 
 extension UIViewController {
+
+    func topMostController() -> UIViewController {
+        var topController: UIViewController? = self
+        while (topController?.presentedViewController) != nil {
+            topController = topController?.presentedViewController
+        }
+        return topController!
+    }
+
+}
+
+extension UIViewController {
     
     /// Represents result of traversing presenting stack search for view controller with type `ViewController`.
     enum ViewControllerPresent<ViewController: UIViewController> : Equatable {
@@ -930,7 +944,7 @@ extension UIViewController {
     
     func traversePresentingStackFor<ViewController: UIViewController>(
         type: ViewController.Type,
-        searchChildren: Bool = false
+        searchChildren: Bool = true
     ) -> ViewControllerPresent<ViewController> {
         
         if let viewController = UIViewController.traversePresentingStackFor(
@@ -952,7 +966,7 @@ extension UIViewController {
     static func traversePresentingStackFor<ViewController: UIViewController>(
         viewControllerType: ViewController.Type,
         startingFrom topViewController: UIViewController,
-        searchChildren: Bool = false
+        searchChildren: Bool = true
     ) -> ViewController? {
         
         if let viewController = topViewController as? ViewController {

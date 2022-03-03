@@ -58,8 +58,8 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
 
 @implementation SettingsViewController
 
-- (instancetype)init {
-    self = [super init];
+- (instancetype)initWithStyle:(UITableViewStyle)style {
+    self = [super initWithStyle:style];
     if (self) {
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
         
@@ -331,7 +331,7 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
     } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
         
         // PsiCash button
-        [self openPsiCashViewController];
+        [self presentPsiCashStore];
         
     } else if ([specifier.key isEqualToString:SettingsPsiCashAccountManagementSpecifierKey]) {
         
@@ -354,8 +354,8 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
 
 #pragma mark - Callbacks
 
-- (void)openPsiCashViewController {
-    [SwiftDelegate.bridge presentPsiCashViewController:PsiCashScreenTabAddPsiCash];
+- (void)presentPsiCashStore {
+    [SwiftDelegate.bridge presentPsiCashStoreViewController:PsiCashScreenTabAddPsiCash];
 }
 
 - (void)openPsiCashAccountManagement {

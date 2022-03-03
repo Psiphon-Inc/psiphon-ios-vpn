@@ -82,7 +82,7 @@ import PsiphonClientCommonLibrary
     
     @objc func presentPsiCashAccountViewController(withPsiCashScreen: Bool)
     
-    @objc func presentPsiCashViewController(_ initialTab: PsiCashScreenTab)
+    @objc func presentPsiCashStoreViewController(_ initialTab: PsiCashScreenTab)
     
     @objc func presentPsiCashAccountManagement()
     
