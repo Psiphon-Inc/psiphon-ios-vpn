@@ -67,7 +67,7 @@ public protocol PsiCashEffectsProtocol {
     typealias PsiCashRefreshResult = Result<RefreshStateResponse, ErrorEvent<PsiCashRefreshError>>
     
     typealias PsiCashAccountLoginResult =
-        Result<AccountLoginResponse,
+        Result<AccountLoginSuccessResponse,
                ErrorEvent<TunneledPsiCashRequestError<PsiCashAccountLoginError>>>
     
     typealias PsiCashAccountLogoutResult =

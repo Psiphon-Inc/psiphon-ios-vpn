@@ -128,7 +128,7 @@ public struct NewExpiringPurchaseResponse: Equatable {
 }
 
 /// Represents a successful account login response.
-public struct AccountLoginResponse: Equatable {
+public struct AccountLoginSuccessResponse: Equatable {
     
     public let lastTrackerMerge: Bool
     

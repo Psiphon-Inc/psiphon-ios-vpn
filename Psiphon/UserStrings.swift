@@ -299,6 +299,13 @@ import Foundation
                                  comment: "Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated.")
     }
     
+    static func Protect_your_psicash_title() -> String {
+        return NSLocalizedString("PROTECT_YOUR_PSICASH", tableName: nil, bundle: Bundle.main,
+                                 value: "Protect your PsiCash",
+                                 comment: "Title of screen encouraging the user to create a PsiCash account so that their PsiCash balance is protected. Do not translate or transliterate 'PsiCash'")
+    }
+
+    
     static func Log_in_or_sign_up() -> String {
         return NSLocalizedString("LOG_IN_OR_SIGN_UP", tableName: nil, bundle: Bundle.main,
                                  value: "Log in or sign up",
@@ -425,6 +432,18 @@ import Foundation
                                  comment: "Body of an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. The words 'PsiCash' and 'Psiphon' must not be translated or transliterated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.")
     }
     
+    static func Psicash_account_explainer_text() -> String {
+        return NSLocalizedString("PSICASH_ACCOUNT_PRODUCT_DESCRIPTION", tableName: nil, bundle: Bundle.main,
+                                 value: "Creating a PsiCash account will help preserve your PsiCash if you reinstall the app or use Psiphon on another device.",
+                                 comment: "Explanation text that appears below 'Create account' button on the PsiCash sign in screen. Do not translate or transliterate terms PsiCash or Psiphon")
+    }
+    
+    static func Already_have_an_account() -> String {
+        return NSLocalizedString("ALREADY_HAVE_AN_ACCOUNT", tableName: nil, bundle: Bundle.main,
+                                 value: "Already have an account?",
+                                 comment: "Text that appears above the 'Log in' button on the PsiCash sign in screen.")
+    }
+    
     static func Feedback_title() -> String {
         return NSLocalizedString("FEEDBACK_TITLE", tableName: nil, bundle: Bundle.main,
                                  value: "Feedback",
@@ -520,9 +539,9 @@ extension UserStrings {
                                  comment: "Title on a button that lets users login to their account with the username and password they have entered.")
     }
     
-    static func Username() -> String {
-        return NSLocalizedString("USERNAME_TEXT_FIELD", tableName: nil, bundle: Bundle.main,
-                                 value: "Username",
+    static func PsiCash_username() -> String {
+        return NSLocalizedString("PSICASH_USERNAME_TEXT_FIELD", tableName: nil, bundle: Bundle.main,
+                                 value: "PsiCash username",
                                  comment: "Text field label where users can enter their account's username")
     }
     
@@ -602,6 +621,20 @@ extension UserStrings {
                                  value: "Done",
                                  comment: "Title of the button that dismisses a screen or a dialog")
     }
+    
+    
+    @objc static func Back_button_title() -> String {
+        return NSLocalizedString("BACK_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Back",
+                                 comment: "Title of the navigation button shown with an arrow that takes the user to the previous screen.")
+    }
+    
+    @objc static func Learn_more_title() -> String {
+        return NSLocalizedString("LEARN_MORE_BUTTON", tableName: nil, bundle: Bundle.main,
+                                 value: "Learn more",
+                                 comment: "Title of button that takes the user to a screen where more detailed explanation of a feature is provided.")
+    }
+    
 }
 
 // MARK: VPN strings

@@ -506,7 +506,7 @@
 "privacy-information-collected-websites-head" = "Les sites Web Psiphon";
 
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
-"PRIVACY_POLICY_DECLINED_ALERT_BODY" = "Vous devez accepter notre politique de confidentialité avant de poursuivre l’utilisation de Psiphon.";
+"PRIVACY_POLICY_DECLINED_ALERT_BODY" = "Vous devez accepter notre Politique de confidentialité avant de poursuivre l’utilisation de Psiphon.";
 
 /* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
 "PRIVACY_POLICY_URL" = "https://psiphon.ca/fr/privacy.html";
@@ -782,7 +782,7 @@
 "VPN_START_FAIL_TITLE" = "Impossible de démarrer";
 
 /* ('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon') */
-"VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon a besoin de votre permission pour installer un profil RPV afin de se connecter.\n\nPsiphon est déterminé à protéger les renseignements personnels de ses utilisateurs. Vous pouvez examiner notre politique de confidentialité en touchant « Politique de confidentialité ».";
+"VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon a besoin de votre permission pour installer un profil RPV afin de se connecter.\n\nPsiphon est déterminé à protéger les renseignements personnels de ses utilisateurs. Vous pouvez examiner notre Politique de confidentialité en touchant « Politique de confidentialité ».";
 
 /* Button label taking user's to our Privacy Policy page */
 "VPN_START_PRIVACY_POLICY_BUTTON" = "Politique de confidentialité";

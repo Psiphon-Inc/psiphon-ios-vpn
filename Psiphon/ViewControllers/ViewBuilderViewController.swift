@@ -29,10 +29,11 @@ final class ViewBuilderViewController<T: ViewBuilder>: ReactiveViewController {
     init(
         viewBuilder: T,
         modalPresentationStyle: UIModalPresentationStyle,
-        onDismissed: @escaping () -> Void
+        onDidLoad: (() -> Void)?,
+        onDismissed: (() -> Void)?
     ) {
         self.viewBuilder = viewBuilder
-        super.init(onDismissed: onDismissed)
+        super.init(onDidLoad: onDidLoad, onDismissed: onDismissed)
 
         self.modalPresentationStyle = modalPresentationStyle
     }

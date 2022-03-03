@@ -84,8 +84,7 @@ struct PsiCashPurchasingConfirmViewBuilder: ViewBuilder {
             $0.setTitle(UserStrings.Continue_without_account(), for: .normal)
             $0.setTitleColor(.white, for: .normal)
             $0.titleLabel!.apply(fontSize: .normal,
-                                 typeface: .medium,
-                                 color: .white)
+                                 typeface: .medium)
             $0.setEventHandler(self.continueWithoutAccountHandler)
         }
         

@@ -24,6 +24,9 @@ enum PsiCashHardCodedValues {
     static let videoAdRewardTitle = "35"
     /// Amount of time to wait for PsiCash to have an earner token for modifying .
     static let getEarnerTokenTimeout: DispatchTimeInterval = .seconds(5)
+    
+    static let accountsLearnMoreURL = URL(string: "https://psiphon.ca/faq.html#psicash-account")!
+    
 }
 
 // There is no point to load an interstitial after the user
