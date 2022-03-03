@@ -258,13 +258,15 @@ final class PsiCashAccountLoginViewController: ReactiveViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        self.store.send(.mainViewAction(.screenDidLoad(.psiCashAccountLogin)))
-        
         guard let navigationController = self.navigationController else {
             fatalError()
         }
+
+        self.store.send(.mainViewAction(.screenDidLoad(.psiCashAccountLogin)))
         
         self.navigation = .completed(.mainScreen)
+        
+        self.title = UserStrings.Psicash_account()
         
         // Adds cancel button if this view controller is the root view controller.
         if navigationController.children.count == 1 {
