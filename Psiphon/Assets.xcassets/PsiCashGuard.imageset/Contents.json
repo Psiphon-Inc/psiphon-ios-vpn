@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "PsiCashCoin.png",
+      "filename" : "group2.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "PsiCashCoin@2x.png",
+      "filename" : "group2@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "PsiCashCoin@3x.png",
+      "filename" : "group2@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }

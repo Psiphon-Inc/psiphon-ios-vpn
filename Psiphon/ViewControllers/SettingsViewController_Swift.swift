@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Psiphon Inc.
+ * Copyright (c) 2022, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,17 +17,18 @@
  *
  */
 
-import UIKit
+import Foundation
+import PsiApi
 
-
-extension UIViewController {
-
-    func topMostController() -> UIViewController {
-        var topController: UIViewController? = self
-        while (topController?.presentedViewController) != nil {
-            topController = topController?.presentedViewController
-        }
-        return topController!
+/// Wraps `SettingsViewController` to conform to Swift protocols.
+final class SettingsViewController_Swift: SettingsViewController,
+                                          ChildViewControllerDismissedDelegate {
+    
+    func parentIsDimissed() {
+        // Manually calls `settingsWillDismiss(withForceReconnect:)` delegate callback
+        // if this view controller is a child of a parent container controller that is
+        // dismissed. (e.g. a UINavigationController).
+        self.settingsDelegate.settingsWillDismiss(withForceReconnect: false)
     }
-
+    
 }

@@ -246,9 +246,7 @@ fileprivate extension OnboardingScreen {
         
         self.onOnboardingFinished = onOnboardingFinished
         
-        super.init(onDismissed: {
-            // No-op.
-        })
+        super.init(onDidLoad: nil, onDismissed: nil)
     }
     
     required init?(coder: NSCoder) {
@@ -412,7 +410,7 @@ fileprivate extension OnboardingScreen {
                     AppDelegate.shared().reloadOnboardingViewController()
                 }
                 
-                let nav = UINavigationController(rootViewController: langSelectionViewController)
+                let nav = PsiNavigationController(rootViewController: langSelectionViewController)
                 self.present(nav, animated: true, completion: nil)
             }
 

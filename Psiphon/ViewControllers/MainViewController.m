@@ -78,7 +78,6 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
     NSLayoutConstraint *startButtonHeight;
     
     // Settings
-    PsiphonSettingsViewController *__weak appSettingsViewController;
     AnimatedUIButton *settingsButton;
 
     // Psiphon Logo
@@ -357,7 +356,7 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
           }
       };
 
-    UINavigationController *navController = [[UINavigationController alloc]
+    PsiNavigationController *navController = [[PsiNavigationController alloc]
       initWithRootViewController:regionViewController];
     [self presentViewController:navController animated:YES completion:nil];
 }
@@ -647,7 +646,7 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 #pragma mark - PsiCash UI
 
 - (void)addPsiCashButtonTapped {
-    [SwiftDelegate.bridge presentPsiCashViewController:PsiCashScreenTabAddPsiCash];
+    [SwiftDelegate.bridge presentPsiCashStoreViewController:PsiCashScreenTabAddPsiCash];
 }
 
 - (void)psiCashAccountButtonTapped {
@@ -655,7 +654,7 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 }
 
 - (void)speedBoostButtonTapped {
-    [SwiftDelegate.bridge presentPsiCashViewController:PsiCashScreenTabSpeedBoost];
+    [SwiftDelegate.bridge presentPsiCashStoreViewController:PsiCashScreenTabSpeedBoost];
 }
 
 - (void)setupPsiphonLogoView {

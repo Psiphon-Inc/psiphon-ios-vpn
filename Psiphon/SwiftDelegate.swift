@@ -537,12 +537,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         // Registers accepted deep linking URLs.
         deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.legacyBuyPsiCashDeepLink,
                                              PsiphonDeepLinking.buyPsiCashDeepLink ]) { [unowned self] in
-            self.store.send(.mainViewAction(.presentPsiCashScreen(initialTab: .addPsiCash)))
+            self.store.send(.mainViewAction(.presentPsiCashStore(initialTab: .addPsiCash)))
             return true
         }
         deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.legacySpeedBoostDeepLink,
                                               PsiphonDeepLinking.speedBoostDeepLink ]) { [unowned self] in
-            self.store.send(.mainViewAction(.presentPsiCashScreen(initialTab: .speedBoost)))
+            self.store.send(.mainViewAction(.presentPsiCashStore(initialTab: .speedBoost)))
             return true
         }
         deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.settingsDeepLink ]) { [unowned self] in
@@ -969,7 +969,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         if Debugging.printAppState {
 
             self.lifetime += self.store.$value.signalProducer
-                .map(\AppState.vpnState.value.tunnelIntent)
+                .map(\AppState.mainView)
                 .skipRepeats()
                 .startWithValues { value in
                     var output = ""
@@ -1057,15 +1057,15 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         
         if withPsiCashScreen {
             self.store.send(.mainViewAction(
-                                .presentPsiCashScreen(initialTab: .speedBoost, animated: true)))
+                                .presentPsiCashStore(initialTab: .speedBoost, animated: true)))
         }
         
-        self.store.send(.mainViewAction(.presentPsiCashAccountScreen))
+        self.store.send(.mainViewAction(.presentPsiCashAccountExplainer))
         
     }
     
-    @objc func presentPsiCashViewController(_ initialTab: PsiCashScreenTab) {
-        self.store.send(.mainViewAction(.presentPsiCashScreen(initialTab: initialTab)))
+    @objc func presentPsiCashStoreViewController(_ initialTab: PsiCashScreenTab) {
+        self.store.send(.mainViewAction(.presentPsiCashStore(initialTab: initialTab)))
     }
     
     @objc func presentPsiCashAccountManagement() {

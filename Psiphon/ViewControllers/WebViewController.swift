@@ -73,7 +73,8 @@ final class WebViewController: ReactiveViewController {
         feedbackLogger: FeedbackLogger,
         tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
         tunnelProviderRefSignal: SignalProducer<TunnelConnection?, Never>,
-        onDismissed: @escaping () -> Void
+        onDidLoad: (() -> Void)?,
+        onDismissed: (() -> Void)?
     ) {
         
         self.baseURL = baseURL
@@ -82,7 +83,7 @@ final class WebViewController: ReactiveViewController {
         
         self.webView = WKWebView(frame: .zero)
         
-        super.init(onDismissed: onDismissed)
+        super.init(onDidLoad: onDidLoad, onDismissed: onDismissed)
         
         mutate(self.webView) {
             $0.uiDelegate = self
@@ -220,20 +221,6 @@ final class WebViewController: ReactiveViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let navigationController = navigationController {
-            
-            let closeNavBtn = UIBarButtonItem(title: UserStrings.Close_button_title(),
-                                              style: .plain,
-                                              target: self,
-                                              action: #selector(onNavCloseButtonClicked))
-            
-            self.navigationItem.leftBarButtonItem = closeNavBtn
-            
-            // Fixes navigation bar appearance when scrolling
-            navigationController.navigationBar.applyStandardAppearanceToScrollEdge()
-            
-        }
-        
         self.view.addSubview(self.containerView.view)
         
         // Setup Auto Layout
@@ -251,11 +238,6 @@ final class WebViewController: ReactiveViewController {
     private func load(url: URL) {
         self.mainFrameLoadState = .pending
         self.webView.load(URLRequest(url: url))
-    }
-    
-    // Navigation bar close button click handler.
-    @objc private func onNavCloseButtonClicked() {
-        self.dismiss(animated: true, completion: nil)
     }
     
     private func presentInNewWindow(url: URL) {

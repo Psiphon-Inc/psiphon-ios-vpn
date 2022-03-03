@@ -186,17 +186,12 @@ struct AppEnvironment {
     
     let reloadMainScreen: () -> Effect<Utilities.Unit>
 
-    let makePsiCashViewController: () -> PsiCashViewController
-
-    /// Makes an `IAPViewController` as root of UINavigationController.
-    let makeSubscriptionViewController: () -> UIViewController
-
-    /// Makes a `PsiCashAccountViewController` as root of UINavigationController.
-    let makePsiCashAccountViewController: () -> UIViewController
-    
-    let makeSettingsViewController: () -> UIViewController
-    
-    let makeFeedbackViewController: ([String: Any]) -> UIViewController
+    let makePsiCashStoreViewController: () -> PsiCashStoreViewController
+    let makeSubscriptionViewController: () -> IAPViewController
+    let makePsiCashAccountLoginViewController: () -> PsiCashAccountLoginViewController
+    let makePsiCashAccountExplainerViewController: () -> PsiCashAccountExplainerViewController
+    let makeSettingsViewController: () -> NavigationController
+    let makeFeedbackViewController: ([String: Any]) -> NavigationController
     
     /// Clears cache and all website data from the webview.
     let clearWebViewDataStore: () -> Effect<Never>
@@ -259,7 +254,7 @@ func makeEnvironment(
     
     let feedbackViewControllerDelegate = PsiphonFeedbackDelegate(store: store.stateless())
     
-    let settingsViewControllerDelegate = PsiphonSettingsDelegate(
+    let settingsViewControllerDelegate = SettingsViewControllerDelegate(
         store: store.stateless(),
         feedbackDelegate: feedbackViewControllerDelegate,
         shouldEnableSettingsLinks: true)
@@ -270,6 +265,39 @@ func makeEnvironment(
     
     let tunnelStatusSignal = store.$value.signalProducer
         .map(\.vpnState.value.providerVPNStatus)
+    
+    // These view controller builders should take onDimissed as a param.
+    let makePsiCashAccountLoginViewController: () -> PsiCashAccountLoginViewController = { [unowned store] in
+        PsiCashAccountLoginViewController(
+            store: store.projection(
+                value: {
+                    PsiCashAccountLoginViewController.ReaderState(
+                        psiCashAccountType: $0.psiCashState.libData?.successToOptional()?.accountType,
+                        pendingAccountLoginLogout: $0.psiCashState.pendingAccountLoginLogout
+                    )
+                },
+                action: {
+                    switch $0 {
+                    case .psiCashAction(let action):
+                        return .psiCash(action)
+                    case .mainViewAction(let action):
+                        return .mainViewAction(action)
+                    }
+                }
+            ),
+            feedbackLogger: feedbackLogger,
+            tunnelStatusSignal: tunnelStatusSignal,
+            tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
+            createNewAccountURL: psiCashLib.getUserSiteURL(.accountSignup, webview:true),
+            forgotPasswordURL: psiCashLib.getUserSiteURL(.forgotAccount, webview:true),
+            onDidLoad: { [unowned store] in
+                store.send(.mainViewAction(.screenDidLoad(.psiCashAccountLogin)))
+            },
+            onDismissed: { [unowned store] in
+                store.send(.mainViewAction(.screenDismissed(.psiCashAccountLogin)))
+            }
+        )
+    }
     
     let environment = AppEnvironment(
         platform: platform,
@@ -413,12 +441,12 @@ func makeEnvironment(
         getFeedbackUpload: { PsiphonTunnelFeedback() },
         getTopActiveViewController: getTopActiveViewController,
         reloadMainScreen: reloadMainScreen,
-        makePsiCashViewController: { [unowned store] in
-            PsiCashViewController(
+        makePsiCashStoreViewController: { [unowned store] in
+            PsiCashStoreViewController(
                 platform: platform,
                 locale: userDefaultsConfig.localeForAppLanguage,
                 store: store.projection(
-                    value: { $0.psiCashViewControllerReaderState },
+                    value: { $0.psiCashStoreViewControllerReaderState },
                     action: {
                         switch $0 {
                         case let .mainViewAction(action):
@@ -436,46 +464,33 @@ func makeEnvironment(
                 feedbackLogger: feedbackLogger,
                 tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
                 objCBridgeDelegate: objcBridgeDelegate,
+                onDidLoad: { [unowned store] in
+                    store.send(.mainViewAction(.screenDidLoad(.psiCashStore)))
+                },
                 onDismissed: { [unowned store] in
-                    store.send(.mainViewAction(.dismissedPsiCashScreen))
+                    store.send(.mainViewAction(.screenDismissed(.psiCashStore)))
                 }
             )
         },
         makeSubscriptionViewController: {
-            UINavigationController(rootViewController: IAPViewController())
+            IAPViewController()
         },
-        makePsiCashAccountViewController: { [unowned store] in
-            let v = PsiCashAccountViewController(
-                store: store.projection(
-                    value: {
-                        PsiCashAccountViewController.ReaderState(
-                            psiCashAccountType: $0.psiCashState.libData?.successToOptional()?.accountType,
-                            pendingAccountLoginLogout: $0.psiCashState.pendingAccountLoginLogout
-                        )
-                    },
-                    action: {
-                        switch $0 {
-                        case .psiCashAction(let action):
-                            return .psiCash(action)
-                        case .mainViewAction(let action):
-                            return .mainViewAction(action)
-                        }
-                    }
-                ),
-                feedbackLogger: feedbackLogger,
+        makePsiCashAccountLoginViewController: {
+            makePsiCashAccountLoginViewController()
+        },
+        makePsiCashAccountExplainerViewController: {
+            PsiCashAccountExplainerViewController(
+                makePsiCashAccountLoginViewController: makePsiCashAccountLoginViewController,
+                createNewAccountURL: psiCashLib.getUserSiteURL(.accountSignup, webview: true),
+                learnMorePsiCashAccountURL: PsiCashHardCodedValues.accountsLearnMoreURL,
+                psiCashStore: store.projection(action: { .psiCash($0) }),
                 tunnelStatusSignal: tunnelStatusSignal,
                 tunnelConnectionRefSignal: store.$value.signalProducer.map(\.tunnelConnection),
-                createNewAccountURL: psiCashLib.getUserSiteURL(.accountSignup, webview:true),
-                forgotPasswordURL: psiCashLib.getUserSiteURL(.forgotAccount, webview:true),
-                onDismissed: { [unowned store] in
-                    store.send(.mainViewAction(.dismissedPsiCashAccountScreen))
-                })
-
-            let nav = UINavigationController(rootViewController: v)
-            return nav
+                feedbackLogger: feedbackLogger
+            )
         },
         makeSettingsViewController: {
-            let vc = SettingsViewController()
+            let vc = SettingsViewController_Swift()
             vc.delegate = vc;
             vc.showCreditsFooter = false;
             vc.showDoneButton = true;
@@ -483,16 +498,16 @@ func makeEnvironment(
             vc.settingsDelegate = settingsViewControllerDelegate
             vc.preferencesSnapshot = UserDefaults.standard.dictionaryRepresentation()
 
-            let nav = UINavigationController(rootViewController: vc)
-                // The default navigation controller in the iOS 13 SDK is not fullscreen and can be
-                // dismissed by swiping it away.
-                //
-                // PsiphonSettingsViewController depends on being dismissed with the "done" button, which
-                // is hooked into the InAppSettingsKit lifecycle. Swiping away the settings menu bypasses
-                // this and results in the VPN not being restarted if: a new region was selected, the
-                // disable timeouts settings was changed, etc. The solution is to force fullscreen
-                // presentation until the settings menu can be refactored.
-                nav.modalPresentationStyle = .fullScreen
+            let nav = NavigationController(rootViewController: vc)
+            // The default navigation controller in the iOS 13 SDK is not fullscreen and can be
+            // dismissed by swiping it away.
+            //
+            // PsiphonSettingsViewController depends on being dismissed with the "done" button, which
+            // is hooked into the InAppSettingsKit lifecycle. Swiping away the settings menu bypasses
+            // this and results in the VPN not being restarted if: a new region was selected, the
+            // disable timeouts settings was changed, etc. The solution is to force fullscreen
+            // presentation until the settings menu can be refactored.
+            nav.modalPresentationStyle = .fullScreen
 
             return nav
         },
@@ -515,8 +530,7 @@ func makeEnvironment(
             // Default title value is "Settings"
             vc.title = UserStrings.Feedback_title()
             
-            let nav = UINavigationController(rootViewController: vc)
-            
+            let nav = NavigationController(rootViewController: vc)
             return nav
             
         },
@@ -722,7 +736,7 @@ func toMainViewReducerEnvironment(env: AppEnvironment) -> MainViewEnvironment {
     MainViewEnvironment(
         userConfigs: env.userConfigs,
         psiCashStore: env.psiCashStore,
-        psiCashViewEnvironment: PsiCashViewEnvironment(
+        psiCashStoreViewEnvironment: PsiCashStoreViewEnvironment(
             feedbackLogger: env.feedbackLogger,
             iapStore: env.iapStore,
             mainViewStore: env.mainViewStore,
@@ -732,7 +746,6 @@ func toMainViewReducerEnvironment(env: AppEnvironment) -> MainViewEnvironment {
         getTopActiveViewController: env.getTopActiveViewController,
         feedbackLogger: env.feedbackLogger,
         rxDateScheduler: env.rxDateScheduler,
-        makePsiCashViewController: env.makePsiCashViewController,
         makeSubscriptionViewController: env.makeSubscriptionViewController,
         dateCompare: env.dateCompare,
         addToDate: env.addToDate,
@@ -742,7 +755,8 @@ func toMainViewReducerEnvironment(env: AppEnvironment) -> MainViewEnvironment {
         tunnelIntentStore: env.tunnelIntentStore,
         serverRegionStore: env.serverRegionStore,
         reloadMainScreen: env.reloadMainScreen,
-        makePsiCashAccountViewController: env.makePsiCashAccountViewController,
+        makePsiCashStoreViewController: env.makePsiCashStoreViewController,
+        makePsiCashAccountExplainerViewController: env.makePsiCashAccountExplainerViewController,
         makeSettingsViewController: env.makeSettingsViewController,
         makeFeedbackViewController: env.makeFeedbackViewController
     )
