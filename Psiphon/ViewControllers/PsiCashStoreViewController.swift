@@ -27,7 +27,7 @@ import Utilities
 import AppStoreIAP
 import PsiCashClient
 
-final class PsiCashViewController: ReactiveViewController {
+final class PsiCashStoreViewController: ReactiveViewController {
     
     typealias AddPsiCashViewType =
         EitherView<PsiCashCoinPurchaseTable,
@@ -117,7 +117,8 @@ final class PsiCashViewController: ReactiveViewController {
         feedbackLogger: FeedbackLogger,
         tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
         objCBridgeDelegate: ObjCBridgeDelegate,
-        onDismissed: @escaping () -> Void
+        onDidLoad: (() -> Void)?,
+        onDismissed: (() -> Void)?
     ) {
         self.platform = platform
         self.locale = locale
@@ -174,11 +175,11 @@ final class PsiCashViewController: ReactiveViewController {
                                EitherView(messageViewWithAction, PsiCashMessageView()))))
         )
         
-        super.init(onDismissed: onDismissed)
+        super.init(onDidLoad: onDidLoad, onDismissed: onDismissed)
         
         // Handler for "Sign Up or Log In" button.
         self.signupOrLogInView.onLogInTapped { [unowned self] in
-            self.store.send(.mainViewAction(.presentPsiCashAccountScreen))
+            self.store.send(.mainViewAction(.presentPsiCashAccountExplainer))
         }
 
         // Updates UI by merging all necessary signals.
@@ -211,7 +212,7 @@ final class PsiCashViewController: ReactiveViewController {
             return
         }
 
-        guard let psiCashViewState = observed.readerState.mainViewState.psiCashViewState else {
+        guard let psiCashViewState = observed.readerState.mainViewState.psiCashStoreViewState else {
             // View controller state has been set to nil,
             // and it will be dismissed (if not already).
             return
@@ -757,7 +758,7 @@ final class PsiCashViewController: ReactiveViewController {
 }
 
 // Navigations
-extension PsiCashViewController {
+extension PsiCashStoreViewController {
     
     private func dismissPurchasingScreens() {
         switch self.navigation {
@@ -811,9 +812,8 @@ extension PsiCashViewController {
             let vc = ViewBuilderViewController(
                 viewBuilder: alertViewBuilder,
                 modalPresentationStyle: .overFullScreen,
-                onDismissed: {
-                    // No-op.
-                }
+                onDidLoad: nil,
+                onDismissed: nil
             )
 
             self.presentOnViewDidAppear(vc, animated: false, completion: nil)
@@ -894,7 +894,7 @@ fileprivate extension PsiCashCoinPurchaseTable.ViewModel {
     
 }
 
-extension PsiCashViewController.ReaderState {
+extension PsiCashStoreViewController.ReaderState {
 
     /// Adds rewarded video product to list of `PsiCashPurchasableViewModel`  retrieved from AppStore.
     func allProducts() -> PendingWithLastSuccess<[PsiCashPurchasableViewModel], SystemErrorEvent<Int>> {

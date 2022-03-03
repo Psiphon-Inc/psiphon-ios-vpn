@@ -53,7 +53,7 @@ enum PsiCashViewAction: Equatable {
     }
 }
 
-struct PsiCashViewState: Equatable {
+struct PsiCashStoreViewState: Equatable {
 
     /// Represents purchasing states, before actual purchase request is made.
     enum PurchaseRequestStateValues: Equatable {
@@ -70,13 +70,13 @@ struct PsiCashViewState: Equatable {
     
 }
 
-struct PsiCashViewReducerState: Equatable {
-    var viewState: PsiCashViewState
+struct PsiCashStoreViewReducerState: Equatable {
+    var viewState: PsiCashStoreViewState
     let psiCashAccountType: PsiCashAccountType?
     let tunnelConnectedStatus: TunnelConnectedStatus
 }
 
-struct PsiCashViewEnvironment {
+struct PsiCashStoreViewEnvironment {
     let feedbackLogger: FeedbackLogger
     let iapStore: (IAPAction) -> Effect<Never>
     let mainViewStore: (MainViewAction) -> Effect<Never>
@@ -86,9 +86,9 @@ struct PsiCashViewEnvironment {
     let dateCompare: DateCompare
 }
 
-let psiCashViewReducer = Reducer<PsiCashViewReducerState,
+let psiCashStoreViewReducer = Reducer<PsiCashStoreViewReducerState,
                                  PsiCashViewAction,
-                                 PsiCashViewEnvironment> {
+                                 PsiCashStoreViewEnvironment> {
     state, action, environment in
     
     switch action {
@@ -156,6 +156,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
                             }
                         ),
                         modalPresentationStyle: .overFullScreen,
+                        onDidLoad: nil,
                         onDismissed: { [observer] in
                             // Sends 'onCompleted' event.
                             // Note: This effect will never complete if onDismissed
@@ -248,7 +249,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
                 }
             }.flatMap(.latest) { (displayPsiCashAccountsScreen: Bool) -> Effect<Never> in
                 if displayPsiCashAccountsScreen {
-                    return environment.mainViewStore(.presentPsiCashAccountScreen)
+                    return environment.mainViewStore(.presentPsiCashAccountExplainer)
                 } else {
                     return Effect.empty
                 }
@@ -256,7 +257,7 @@ let psiCashViewReducer = Reducer<PsiCashViewReducerState,
             ]
         } else {
             return [
-                environment.mainViewStore(.presentPsiCashAccountScreen).mapNever()
+                environment.mainViewStore(.presentPsiCashAccountExplainer).mapNever()
             ]
         }
         

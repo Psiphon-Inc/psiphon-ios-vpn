@@ -73,7 +73,8 @@ final class WebViewController: ReactiveViewController {
         feedbackLogger: FeedbackLogger,
         tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
         tunnelProviderRefSignal: SignalProducer<TunnelConnection?, Never>,
-        onDismissed: @escaping () -> Void
+        onDidLoad: (() -> Void)?,
+        onDismissed: (() -> Void)?
     ) {
         
         self.baseURL = baseURL
@@ -82,7 +83,7 @@ final class WebViewController: ReactiveViewController {
         
         self.webView = WKWebView(frame: .zero)
         
-        super.init(onDismissed: onDismissed)
+        super.init(onDidLoad: onDidLoad, onDismissed: onDismissed)
         
         mutate(self.webView) {
             $0.uiDelegate = self
@@ -220,18 +221,12 @@ final class WebViewController: ReactiveViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if let navigationController = navigationController {
-            
-            let closeNavBtn = UIBarButtonItem(title: UserStrings.Close_button_title(),
-                                              style: .plain,
-                                              target: self,
-                                              action: #selector(onNavCloseButtonClicked))
-            
-            self.navigationItem.leftBarButtonItem = closeNavBtn
-            
-            // Fixes navigation bar appearance when scrolling
-            navigationController.navigationBar.applyStandardAppearanceToScrollEdge()
-            
+        // Adds 'Done' button to the navigation bar if it is the root view controller.
+        if self.isRootViewController {
+            let navDoneBtn = UIBarButtonItem(title: UserStrings.Done_button_title(),
+                                             style: .plain,
+                                             target: self, action: #selector(onNavDone))
+            self.navigationItem.rightBarButtonItem = navDoneBtn
         }
         
         self.view.addSubview(self.containerView.view)
@@ -253,14 +248,13 @@ final class WebViewController: ReactiveViewController {
         self.webView.load(URLRequest(url: url))
     }
     
-    // Navigation bar close button click handler.
-    @objc private func onNavCloseButtonClicked() {
-        self.dismiss(animated: true, completion: nil)
-    }
-    
     private func presentInNewWindow(url: URL) {
         let safari = SFSafariViewController(url: url)
         self.present(safari, animated: true, completion: nil)
+    }
+    
+    @objc func onNavDone() {
+        self.dismiss(animated: true, completion: nil)
     }
     
 }
@@ -396,7 +390,7 @@ extension WebViewController: WKNavigationDelegate {
         
         // If the target of the navigation is a new window,
         // navigationAction.targetFrame property is nil.
-        guard let targetFrame = navigationAction.targetFrame else {
+        guard let _ = navigationAction.targetFrame else {
             // Handles links with `target="_blank"` attribute by opening
             // the URL in a new SFSafariViewController presented
             // on top of this view controller.
@@ -407,7 +401,7 @@ extension WebViewController: WKNavigationDelegate {
         
         tunnelProviderRefSignal
             .take(first: 1)
-            .startWithValues { [unowned self] tunnelConnection in
+            .startWithValues { tunnelConnection in
                 
                 switch tunnelConnection?.tunneled {
                 case .connected:

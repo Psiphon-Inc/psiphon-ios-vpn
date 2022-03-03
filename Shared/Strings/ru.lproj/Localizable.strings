@@ -676,26 +676,26 @@
 /* Label on a button. Clicking this button will buy 2 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_2HR" = "2 часа";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 3 hours of Speed Boost. Translate number as well. */
-"SPEED_BOOST_3HR" = "3 hours";
+/* Label on a button. Clicking this button will buy 3 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_3HR" = "3 часа";
 
 /* Label on a button. Clicking this button will buy 4 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_4HR" = "4 часа";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 5 hours of Speed Boost. Translate number as well. */
-"SPEED_BOOST_5HR" = "5 hours";
+/* Label on a button. Clicking this button will buy 5 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_5HR" = "5 часов";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 6 hours of Speed Boost. Translate number as well. */
-"SPEED_BOOST_6HR" = "6 hours";
+/* Label on a button. Clicking this button will buy 6 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_6HR" = "6 часов";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 7 hours of Speed Boost. Translate number as well. */
-"SPEED_BOOST_7HR" = "7 hours";
+/* Label on a button. Clicking this button will buy 7 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_7HR" = "7 часов";
 
 /* Label on a button. Clicking this button will buy 8 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_8HR" = "8 часов";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 9 hours of Speed Boost. Translate number as well. */
-"SPEED_BOOST_9HR" = "9 hours";
+/* Label on a button. Clicking this button will buy 9 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_9HR" = "9 часов";
 
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST_ACTIVE" = "Турбоскорость активирована";

@@ -100,10 +100,10 @@ func makeUITestAppState(embeddedServerEntriesFile: String) -> AppState {
         queuedFeedbacks: [],
         mainView: MainViewState(
             alertMessages: Set(),
-            psiCashViewState: .none,
-            isPsiCashAccountScreenShown: .completed(false),
-            isSettingsScreenShown: .completed(false),
-            isModalFeedbackScreenShown: .completed(.none)
+            psiCashStoreViewState: .none,
+            psiCashAccountLoginIsPresented: .completed(false),
+            settingsIsPresented: .completed(false),
+            feedbackModalIsPresented: .completed(.none)
         ),
         serverRegionState: ServerRegionState(
             selectedRegion: selectedRegion,

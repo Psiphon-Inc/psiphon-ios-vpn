@@ -351,7 +351,7 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 {
     switch (screen) {
         case DismissibleScreenPsiCash:
-            [self.window.rootViewController dismissViewControllerType:PsiCashViewController.class
+            [self.window.rootViewController dismissViewControllerType:PsiCashStoreViewController.class
                                                            completion:completion];
             break;
         case DismissibleScreenSettings:

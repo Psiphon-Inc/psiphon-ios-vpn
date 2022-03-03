@@ -16,8 +16,8 @@
 /*[UNTRANSLATED] Alert dialog title. */
 "ALERT_TITLE_OPERATION_FAILED" = "Operation Failed";
 
-/*[UNTRANSLATED] Title of the button which takes the user to the previous screen. Text should be short and one word when possible. */
-"BACK_BUTTON" = "Back";
+/* Title of the button which takes the user to the previous screen. Text should be short and one word when possible. */
+"BACK_BUTTON" = "Кері қайту";
 
 /*[UNTRANSLATED] Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
 "BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Dismiss";

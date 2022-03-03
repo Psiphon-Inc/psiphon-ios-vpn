@@ -24,7 +24,7 @@ import Utilities
 import PsiCashClient
 import ReactiveSwift
 
-final class PsiCashAccountViewController: ReactiveViewController {
+final class PsiCashAccountLoginViewController: ReactiveViewController {
     
     struct ReaderState: Equatable {
         let psiCashAccountType: PsiCashAccountType?
@@ -65,7 +65,6 @@ final class PsiCashAccountViewController: ReactiveViewController {
     private let forgotPasswordURL: URL
     private let loginOnly: Bool
     
-    private let backgroundColour = UIColor.darkBlue()
     private let divider = DividerView(colour: .white(withAlpha: 0.25))
     private let createAccountButton = GradientButton(gradient: .grey)
     private let usernameTextField: SkyTextField<UITextField>
@@ -77,6 +76,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
     
     /// Nil implies that no view controllers are presented.
     @State private var navigation: NavigationState<PresentedScreen> = .pending(.mainScreen)
+    
     private var lastLoginLogoutEventDate: Date? = nil
     
     private let (lifetime, token) = Lifetime.make()
@@ -93,7 +93,8 @@ final class PsiCashAccountViewController: ReactiveViewController {
         createNewAccountURL: URL,
         forgotPasswordURL: URL,
         loginOnly: Bool = false,
-        onDismissed: @escaping () -> Void
+        onDidLoad: (() -> Void)?,
+        onDismissed: (() -> Void)?
     ) {
         self.store = store
         
@@ -102,7 +103,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
         self.forgotPasswordURL = forgotPasswordURL
         
         self.loginOnly = loginOnly
-        self.usernameTextField = SkyTextField(placeHolder: UserStrings.Username())
+        self.usernameTextField = SkyTextField(placeHolder: UserStrings.PsiCash_username())
         self.passwordTextField = SkyTextField(placeHolder: UserStrings.Password())
         self.loginButtonSpinner = .init(style: .gray)
         self.loginButton = GradientButton(gradient: .grey)
@@ -110,7 +111,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
         self.tunnelStatusSignal = tunnelStatusSignal
         self.tunnelConnectionRefSignal = tunnelConnectionRefSignal
         
-        super.init(onDismissed: onDismissed)
+        super.init(onDidLoad: onDidLoad, onDismissed: onDismissed)
         
         self.lifetime += SignalProducer.combineLatest(
             store.$value.signalProducer,
@@ -204,6 +205,11 @@ final class PsiCashAccountViewController: ReactiveViewController {
                     
                     // Login failure (either before or after presentation
                     // of this view controller).
+                    
+                    // Empties the password text field after unsuccessful login.
+                    // This is to prevent users from spamming the login button.
+                    self.passwordTextField.textField.text = ""
+                    
                     self.updateNoPendingLoginEvent()
                     
                 }
@@ -255,21 +261,19 @@ final class PsiCashAccountViewController: ReactiveViewController {
         guard let navigationController = self.navigationController else {
             fatalError()
         }
+
+        self.store.send(.mainViewAction(.screenDidLoad(.psiCashAccountLogin)))
         
         self.navigation = .completed(.mainScreen)
         
-        // Customize navigation controller
-        navigationController.navigationBar.applyPsiphonNavigationBarStyling()
-                
-        let navCancelBtn = UIBarButtonItem(title: "Cancel", style: .plain,
-                                           target: self, action: #selector(onCancel))
+        self.title = UserStrings.Psicash_account()
         
-        mutate(navCancelBtn) {
-            $0.tintColor = .white
-        }
-        
-        mutate(self.navigationItem) {
-            $0.leftBarButtonItem = navCancelBtn
+        // Adds cancel button if this view controller is the root view controller.
+        if navigationController.children.count == 1 {
+            let navCancelButton = UIBarButtonItem(title: UserStrings.Cancel_button_title(),
+                                                  style: .plain,
+                                                  target: self, action: #selector(onCancel))
+            self.navigationItem.leftBarButtonItem = navCancelButton
         }
         
         // Setup views
@@ -308,7 +312,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
                 color: .white(withAlpha: 0.8),
                 alignment: .center
             ),
-            backgroundColor: self.backgroundColour,
+            backgroundColor: Style.default.defaultBackgroundColor,
             padding: Padding(top: 0, bottom: 0, leading: 10, trailing: 10)
         )
         
@@ -385,7 +389,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
         self.loginButton.addSubview(self.loginButtonSpinner)
         
         mutate(self.view) {
-            $0.backgroundColor = self.backgroundColour
+            $0.backgroundColor = Style.default.defaultBackgroundColor
             $0.addSubviews(vStack)
         }
         
@@ -459,6 +463,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
     }
     
     @objc func onLogIn() {
+        
         guard let username = self.usernameTextField.textField.text else {
             return
         }
@@ -471,6 +476,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
         
         self.store.send(
             .psiCashAction(.accountLogin(username: username, password: password)))
+        
     }
     
     @objc func onForgotPassword() {
@@ -567,6 +573,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
             let presentedScreen = PresentedScreen(screen: screenToPresent,
                                                   viewControllerRef: viewControllerToPresent)
             
+            // Presents view controller modally.
             self.present(viewControllerToPresent, animated: true) {
                 // Finished presenting view controller.
                 self.navigation = .completed(.presented(presentedScreen))
@@ -599,6 +606,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
             feedbackLogger: self.feedbackLogger,
             tunnelStatusSignal: self.tunnelStatusSignal,
             tunnelProviderRefSignal: self.tunnelConnectionRefSignal,
+            onDidLoad: nil,
             onDismissed: {
                 
                 // PsiCash RefreshState after dismissal of Account Management screen.
@@ -612,7 +620,7 @@ final class PsiCashAccountViewController: ReactiveViewController {
         
         webViewViewController.title = UserStrings.Psicash_account()
         
-        return UINavigationController(rootViewController: webViewViewController)
+        return PsiNavigationController(rootViewController: webViewViewController)
         
     }
     
@@ -623,7 +631,25 @@ final class PsiCashAccountViewController: ReactiveViewController {
     
 }
 
-extension PsiCashAccountViewController: UITextFieldDelegate {
+extension PsiCashAccountLoginViewController: UITextFieldDelegate {
+    
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        
+        if self.usernameTextField.textField === textField {
+            
+            // Disallowed whitespace characters in the username text field
+            
+            let invalidChars = CharacterSet.whitespacesAndNewlines
+            return string.unicodeScalars.allSatisfy {
+                !invalidChars.contains($0)
+            }
+            
+            
+        }
+        
+        return true
+        
+    }
     
     @objc func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
@@ -642,10 +668,10 @@ extension PsiCashAccountViewController: UITextFieldDelegate {
 }
 
 fileprivate extension Navigation where
-    PresentedScreen == PsiCashAccountViewController.PresentedScreen {
+    PresentedScreen == PsiCashAccountLoginViewController.PresentedScreen {
     
     /// Maps `Navigation<PresentedScreen>` to type `Navigation<Screen>`.
-    var toNavigationScreen: Navigation<PsiCashAccountViewController.Screen> {
+    var toNavigationScreen: Navigation<PsiCashAccountLoginViewController.Screen> {
         switch self {
         case .mainScreen: return .mainScreen
         case .parent: return .parent
