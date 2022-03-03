@@ -631,6 +631,24 @@ final class PsiCashAccountLoginViewController: ReactiveViewController {
 
 extension PsiCashAccountLoginViewController: UITextFieldDelegate {
     
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        
+        if self.usernameTextField.textField === textField {
+            
+            // Disallowed whitespace characters in the username text field
+            
+            let invalidChars = CharacterSet.whitespacesAndNewlines
+            return string.unicodeScalars.allSatisfy {
+                !invalidChars.contains($0)
+            }
+            
+            
+        }
+        
+        return true
+        
+    }
+    
     @objc func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         
         if self.usernameTextField.textField === textField {
