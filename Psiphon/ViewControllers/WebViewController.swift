@@ -221,6 +221,14 @@ final class WebViewController: ReactiveViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // Adds 'Done' button to the navigation bar if it is the root view controller.
+        if self.isRootViewController {
+            let navDoneBtn = UIBarButtonItem(title: UserStrings.Done_button_title(),
+                                             style: .plain,
+                                             target: self, action: #selector(onNavDone))
+            self.navigationItem.rightBarButtonItem = navDoneBtn
+        }
+        
         self.view.addSubview(self.containerView.view)
         
         // Setup Auto Layout
@@ -243,6 +251,10 @@ final class WebViewController: ReactiveViewController {
     private func presentInNewWindow(url: URL) {
         let safari = SFSafariViewController(url: url)
         self.present(safari, animated: true, completion: nil)
+    }
+    
+    @objc func onNavDone() {
+        self.dismiss(animated: true, completion: nil)
     }
     
 }

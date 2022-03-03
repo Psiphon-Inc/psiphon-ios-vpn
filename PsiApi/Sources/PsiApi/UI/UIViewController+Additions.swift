@@ -32,6 +32,15 @@ public extension UIViewController {
     ) {
         viewControllerToDismiss.dismiss(animated: flag, completion: completion)
     }
+    
+    /// `true` if this view controller is the root of the parent navigation controller, `false` otherwise.
+    var isRootViewController: Bool {
+        if let navigationController = self.navigationController {
+            return navigationController.children[0] === self
+        } else {
+            return false
+        }
+    }
 
 }
 
