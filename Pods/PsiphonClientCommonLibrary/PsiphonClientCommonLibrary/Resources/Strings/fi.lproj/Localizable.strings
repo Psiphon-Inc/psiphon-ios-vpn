@@ -10,8 +10,8 @@
 /* FAQ link text */
 "FAQ_LINK_TEXT" = "Usein Kysytyt Kysymykset";
 
-/*[UNTRANSLATED] External link to the FAQ page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/faq.html for french. */
-"FAQ_URL" = "https://psiphon.ca/en/faq.html";
+/* External link to the FAQ page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/faq.html for french. */
+"FAQ_URL" = "";
 
 /*[UNTRANSLATED] Comments section placeholder text */
 "FEEDBACK_COMMENTS_PLACEHOLDER" = "What's on your mind? Please leave us your feedback";
@@ -40,8 +40,8 @@
 /*[UNTRANSLATED] Text explaining thumbs up choice in feedback. DO NOT translate the word 'Psiphon'. */
 "FEEDBACK_THUMBS_UP_TEXT" = "Psiphon connects\nand performs the\nway I want it to.";
 
-/*[UNTRANSLATED] External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
-"LICENSE_PAGE_URL" = "https://psiphon.ca/en/license.html";
+/* External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
+"LICENSE_PAGE_URL" = "";
 
 /* Title of screen that displays logs */
 "LOGS_TITLE" = "Logitiedostot";
@@ -58,8 +58,8 @@
 /*[UNTRANSLATED] Privacy Policy link text */
 "PRIVACY_POLICY_LINK_TEXT" = "Privacy Policy";
 
-/*[UNTRANSLATED] External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
-"PRIVACY_POLICY_URL" = "https://psiphon.ca/en/privacy.html";
+/* External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french. */
+"PRIVACY_POLICY_URL" = "";
 
 /*[UNTRANSLATED] Name of a country/region where Psiphon servers are located. The user can choose to only use servers in that country. */
 "SERVER_REGION_AE" = "United Arab Emirates";

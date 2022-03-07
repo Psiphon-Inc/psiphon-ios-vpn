@@ -52,6 +52,7 @@
 #import "RootContainerController.h"
 #import "IAPViewController.h"
 #import "SettingsViewController.h"
+#import "SkyRegionSelectionViewController.h"
 
 // Data stores
 #import "PsiphonConfigReader.h"

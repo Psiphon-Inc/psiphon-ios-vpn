@@ -267,6 +267,9 @@
 /* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
 "ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "You’ll need to allow Psiphon to add VPN configurations in order to connect.";
 
+/* Title of a button that open a URL on the device's web browser. */
+"OPEN_IN_BROWSER_BUTTON_TITLE" = "Open in Browser";
+
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Please open Psiphon app to finish connecting.";
 
@@ -632,6 +635,9 @@
 
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon is not connected";
+
+/* Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
+"PSIPHON_MUST_BE_CONNECTED_INFO" = "Psiphon must be connected to show this content";
 
 /* Alert message that the users purchases have been restored successfully */
 "PURCHASES_RESTORED_SUCCESSFULLY" = "Purchases restored successfully";
