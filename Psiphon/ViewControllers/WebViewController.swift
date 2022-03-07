@@ -150,7 +150,7 @@ final class WebViewController: ReactiveViewController {
                     .right(
                         BlockerView.DisplayOption(
                             animateSpinner: false,
-                            viewOptions: .label(text: UserStrings.Psiphon_is_not_connected()))))
+                            viewOptions: .label(text: UserStrings.Psiphon_must_be_connected_to_show_this_content()))))
                 
             case .connecting:
                 
@@ -158,7 +158,7 @@ final class WebViewController: ReactiveViewController {
                     .right(
                         BlockerView.DisplayOption(
                             animateSpinner: true,
-                            viewOptions: .label(text: UserStrings.Connecting_to_psiphon()))))
+                            viewOptions: .label(text: UserStrings.Psiphon_must_be_connected_to_show_this_content()))))
                 
             case .disconnecting:
                 
@@ -166,7 +166,7 @@ final class WebViewController: ReactiveViewController {
                     .right(
                         BlockerView.DisplayOption(
                             animateSpinner: false,
-                            viewOptions: .label(text: UserStrings.Psiphon_is_not_connected()))))
+                            viewOptions: .label(text: UserStrings.Psiphon_must_be_connected_to_show_this_content()))))
                 
             case .connected:
                 
