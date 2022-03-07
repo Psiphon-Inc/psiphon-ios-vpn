@@ -286,7 +286,7 @@ BOOL linksEnabled;
     if (url != nil) {
         [self userPressedURL:[NSURL URLWithString:url]];
     }
-    [self settingsViewControllerDidEnd:nil];
+    
 }
 
 - (CGFloat)tableView:(UITableView*)tableView heightForSpecifier:(IASKSpecifier*)specifier

@@ -82,11 +82,13 @@
         NSMutableArray *diagnosticHistoryArray = [[NSMutableArray alloc] init];
 
         for (DiagnosticEntry *d in diagnosticEntries) {
+            
             NSDictionary *entry = @{
-                                    @"data": [d data],
-                                    @"msg": [d message],
-                                    @"timestamp!!timestamp": [d getTimestampISO8601]
-                                    };
+                @"data": ([d data] == nil ? NSNull.null : [d data]),
+                @"msg": [d message],
+                @"timestamp!!timestamp": [d getTimestampISO8601]
+            };
+            
             [diagnosticHistoryArray addObject:entry];
         }
 

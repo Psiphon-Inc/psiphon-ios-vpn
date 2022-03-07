@@ -70,6 +70,8 @@
                 [jsonObject setObject:nameValuePairs[i*2+1] forKey:nameValuePairs[i*2]];
             }
             _data = jsonObject;
+        } else {
+            _data = nil;
         }
     }
     
@@ -80,7 +82,7 @@
     self = [super init];
     
     if (self) {
-        DiagnosticEntry *result = [[DiagnosticEntry alloc] init:msg nameValuePairs:@[@"msg", msg]];
+        DiagnosticEntry *result = [[DiagnosticEntry alloc] init:msg nameValuePairs:nil];
         _timestamp = result.timestamp;
         _message = result.message;
         _data = result.data;
@@ -93,7 +95,7 @@
     self = [super init];
     
     if (self) {
-        DiagnosticEntry *result = [[DiagnosticEntry alloc] init:msg nameValuePairs:@[@"msg", msg]];
+        DiagnosticEntry *result = [[DiagnosticEntry alloc] init:msg nameValuePairs:nil];
         
         _timestamp = timestamp;
         _message = result.message;

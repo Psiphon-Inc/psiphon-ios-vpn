@@ -103,8 +103,8 @@
 /*[UNTRANSLATED] Placeholder text for the upstream proxy authentication domain. This should convey to the user that a domain name should be used in this field. Text should be kept short. */
 "EXAMPLE_HOSTNAME" = "example.com";
 
-/*[UNTRANSLATED] Settings item text. Leads to settings specific to the custom headers. */
-"PSIPHON_CUSTOM_HEADERS_SUBSETTINGS_LABEL" = "Custom HTTP headers";
+/* Settings item text. Leads to settings specific to the custom headers. */
+"PSIPHON_CUSTOM_HEADERS_SUBSETTINGS_LABEL" = "Benutzerdefinierte HTTP-Kopfzeilen";
 
 /*[UNTRANSLATED] Explanatory text for the "Use custom headers" setting. */
 "CUSTOM_HEADERS_FOOTER" = "Some network configurations may require custom HTTP headers in order to connect successfully.";
