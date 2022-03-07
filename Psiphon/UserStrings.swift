@@ -196,6 +196,12 @@ import Foundation
                                  comment: "Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon'")
     }
     
+    static func Psiphon_must_be_connected_to_show_this_content() -> String {
+        return NSLocalizedString("PSIPHON_MUST_BE_CONNECTED_INFO", tableName: nil, bundle: Bundle.main,
+                                 value: "Psiphon must be connected to show this content",
+                                 comment: "Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon'")
+    }
+    
     static func Connecting_to_psiphon() -> String {
         return NSLocalizedString("CONNECTING_TO_PSIPHON", tableName: nil, bundle: Bundle.main,
                                  value: "Connecting to Psiphon",
