@@ -23,7 +23,7 @@
 "FEEDBACK_FOOTER_DATA_COLLECTION" = "Topladığımız veriler hakkında ayrıntılı bilgi almak için %@ bölümüne bakabilirsiniz.";
 
 /* Feedback footer text. DO NOT translate the word 'Psiphon'. */
-"FEEDBACK_FOOTER_DIAGNOSTIC" = "Bu tanılama verilerinde kimliğinizle ilgili bir bilgi bulunmaz. Yalnız Psiphon uygulamasının sorunsuz çalışmasına yardımcı olacak bilgiler bulunur.";
+"FEEDBACK_FOOTER_DIAGNOSTIC" = "Bu tanılama verilerinde kimliğinizle ilgili bir bilgi bulunmaz. Yalnızca Psiphon uygulamasının sorunsuz çalışmasına yardımcı olacak bilgiler bulunur.";
 
 /* Feedback footer text referring users to feedback email. %@ is where the separate translation for the email will be placed. */
 "FEEDBACK_FOOTER_EMAIL" = "Yukarıdaki form çalışmıyorsa ya da ekran görüntüsü göndermek istiyorsanız %@ adresine e-posta gönderebilirsiniz.";
