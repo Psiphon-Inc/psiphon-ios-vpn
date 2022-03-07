@@ -60,6 +60,7 @@ final class WebViewController: ReactiveViewController {
     private let feedbackLogger: FeedbackLogger
     
     private let baseURL: URL
+    private let showOpenInBrowser: Bool
     
     private let webView: WKWebView
     private var containerView: ViewBuilderContainerView<
@@ -68,8 +69,10 @@ final class WebViewController: ReactiveViewController {
     /// State of loading content for the main frame.
     @State private var mainFrameLoadState: WebViewLoadingState = .pending
     
+    /// - Parameter showOpenInBrowser: Adds "Open in Browser" button to navigation's right hand-side.
     init(
         baseURL: URL,
+        showOpenInBrowser: Bool = false,
         feedbackLogger: FeedbackLogger,
         tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
         tunnelProviderRefSignal: SignalProducer<TunnelConnection?, Never>,
@@ -78,6 +81,7 @@ final class WebViewController: ReactiveViewController {
     ) {
         
         self.baseURL = baseURL
+        self.showOpenInBrowser = showOpenInBrowser
         self.tunnelProviderRefSignal = tunnelProviderRefSignal
         self.feedbackLogger = feedbackLogger
         
@@ -226,7 +230,20 @@ final class WebViewController: ReactiveViewController {
             let navDoneBtn = UIBarButtonItem(title: UserStrings.Done_button_title(),
                                              style: .plain,
                                              target: self, action: #selector(onNavDone))
-            self.navigationItem.rightBarButtonItem = navDoneBtn
+            self.navigationItem.leftBarButtonItem = navDoneBtn
+        }
+        
+        // Adds "Open in Browser" button if present.
+        if self.showOpenInBrowser {
+            
+            let openInBrowserBtn = UIBarButtonItem(
+                title: UserStrings.Open_in_browser_button_title(),
+                style: .plain,
+                target: self,
+                action: #selector(onOpenInBrowser))
+            
+           self.navigationItem.rightBarButtonItem = openInBrowserBtn
+            
         }
         
         self.view.addSubview(self.containerView.view)
@@ -255,6 +272,11 @@ final class WebViewController: ReactiveViewController {
     
     @objc func onNavDone() {
         self.dismiss(animated: true, completion: nil)
+    }
+    
+    @objc func onOpenInBrowser() {
+        // Opens the link externally.
+        UIApplication.shared.open(self.baseURL, completionHandler: nil)
     }
     
 }

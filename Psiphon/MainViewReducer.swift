@@ -224,9 +224,22 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
     case .openExternalURL(let url):
         return [
             .fireAndForget {
+                
+                let webview = WebViewController(
+                    baseURL: url,
+                    showOpenInBrowser: true,
+                    feedbackLogger: environment.feedbackLogger,
+                    tunnelStatusSignal: environment.tunnelStatusSignal,
+                    tunnelProviderRefSignal: environment.tunnelConnectionRefSignal,
+                    onDidLoad: nil,
+                    onDismissed: nil
+                )
+                
                 let topVC = environment.getTopActiveViewController()
-                let safariVC = SFSafariViewController(url: url)
-                topVC.present(safariVC, animated: true, completion: nil)
+                let nav = PsiNavigationController(rootViewController: webview,
+                                                  applyPsiphonStyling: false)
+                topVC.present(nav, animated: true, completion: nil)
+                
             }
         ]
 

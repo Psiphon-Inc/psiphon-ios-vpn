@@ -450,6 +450,12 @@ import Foundation
                                  comment: "Title of screen that lets user to send feedback about the app to Psiphon Inc. Should be kept short.")
     }
     
+    static func Open_in_browser_button_title() -> String {
+        return NSLocalizedString("OPEN_IN_BROWSER_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Open in Browser",
+                                 comment: "Title of a button that open a URL on the device's web browser.")
+    }
+    
 }
 
 // MARK: Internet reachability
