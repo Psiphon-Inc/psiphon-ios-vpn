@@ -988,6 +988,44 @@ extension UIViewController {
         return .none
     }
     
+    /// Presents view controller of type `T` if it is not aleady present in the view controller stack,
+    /// either as a view controller that was presented modally or as a view controller presented as
+    /// child of a container view controller (e.g. `UINavigationController`).
+    ///  - Parameter navigationBar: if `true` wraps view controller returned by `builder`
+    ///  in a `PsiNavigationController`.
+    ///  - Returns: The top view controller of type `T` if already present in the stack,
+    ///  or view controller created by calling `builder`.
+    func presentIfTypeNotPresent<T: UIViewController>(
+        builder: () -> T, navigationBar: Bool = false, animated: Bool = true
+    ) -> T {
+        
+        // This view controller should be on top of the stack.
+        precondition(self.presentedViewController == nil)
+        precondition(T.self != UIViewController.self, "Expected a subtype of UIViewController")
+        
+        let searchResult = self.traversePresentingStackFor(type: T.self, searchChildren: true)
+        
+        switch searchResult {
+        case .presentInStack(let vc):
+            return vc
+            
+        case .presentTopOfStack(let vc):
+            return vc
+            
+        case .notPresent:
+            let vc = builder()
+            if navigationBar {
+                let nav = PsiNavigationController(rootViewController: vc)
+                self.present(nav, animated: animated, completion: nil)
+            } else {
+                self.present(vc, animated: animated, completion: nil)
+            }
+            return vc
+            
+        }
+        
+    }
+    
 }
 
 // MARK: -

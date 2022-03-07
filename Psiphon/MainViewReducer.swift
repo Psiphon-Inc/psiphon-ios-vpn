@@ -628,10 +628,6 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         
     case .presentPsiCashAccountExplainer:
         
-        guard case .completed(false) = state.mainView.psiCashAccountLoginIsPresented else {
-            return []
-        }
-        
         // Skips presenting PsiCash Account screen if tunnel is not connected.
         // Note that this is a quick check for informing the user,
         // and PsiCash Account screen performs it's own last second tunnel checks
@@ -655,10 +651,11 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         
         return [
             .fireAndForget {
-                let topVC = environment.getTopActiveViewController()
-                let rootVC = environment.makePsiCashAccountExplainerViewController()
-                let nav = PsiNavigationController(rootViewController: rootVC)
-                topVC.present(nav, animated: true, completion: nil)
+                _ = environment.getTopActiveViewController()
+                    .presentIfTypeNotPresent(
+                        builder: environment.makePsiCashAccountExplainerViewController,
+                        navigationBar: true
+                    )
             }
         ]
         
