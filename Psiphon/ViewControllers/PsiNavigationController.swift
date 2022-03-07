@@ -18,21 +18,39 @@
  */
 
 import Foundation
+import UIKit
 import PsiApi
 
 /// Modified `NavigationController` with default app styling.
-@objc public final class PsiNavigationController: NavigationController {
+@objc final class PsiNavigationController: NavigationController {
+    
+    private let applyPsiphonStyling: Bool
+    
+    override init(rootViewController: UIViewController) {
+        self.applyPsiphonStyling = true
+        super.init(rootViewController: rootViewController)
+    }
+    
+    init(rootViewController: UIViewController, applyPsiphonStyling: Bool) {
+        self.applyPsiphonStyling = applyPsiphonStyling
+        super.init(rootViewController: rootViewController)
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     public override func viewDidLoad() {
         
         super.viewDidLoad()
         
-        self.navigationBar.tintColor = .white
-        
         // Fixes navigation bar appearance when scrolling.
         self.navigationBar.applyStandardAppearanceToScrollEdge()
 
-        self.navigationBar.applyPsiphonNavigationBarStyling()
+        if self.applyPsiphonStyling {
+            self.navigationBar.tintColor = .white
+            self.navigationBar.applyPsiphonNavigationBarStyling()
+        }
         
     }
     
