@@ -228,7 +228,7 @@ final class WebViewController: ReactiveViewController {
         // Adds 'Done' button to the navigation bar if it is the root view controller.
         if self.isRootViewController {
             let navDoneBtn = UIBarButtonItem(title: UserStrings.Done_button_title(),
-                                             style: .plain,
+                                             style: .done,
                                              target: self, action: #selector(onNavDone))
             self.navigationItem.leftBarButtonItem = navDoneBtn
         }

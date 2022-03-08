@@ -37,11 +37,9 @@
               handler:^(UIAlertAction *action) {
 
          NSString *urlString = [Strings privacyPolicyURLString];
-         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:urlString]
-                                            options:@{}
-                                  completionHandler:^(BOOL success) {
-                                      // Do nothing.
-                                  }];
+        
+        [SwiftDelegate.bridge openExternalURL:[NSURL URLWithString:urlString]];
+        
      }];
 
     UIAlertAction *dismissAction = [UIAlertAction actionWithTitle:[UserStrings Dismiss_button_title]
