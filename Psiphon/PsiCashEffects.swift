@@ -320,7 +320,7 @@ final class PsiCashEffects: PsiCashEffectsProtocol {
             
             // Logs lite diagnostic info
             self.feedbackLogger.immediate(
-                .info, "PsiCash diagnostics: RefreshState: \(self.psiCashLib.getDiagnosticInfo(lite: true))")
+                .info, "PsiCash diagnostics: RefreshState(localOnly:\(localOnly)): \(self.psiCashLib.getDiagnosticInfo(lite: true))")
             
             fulfilled(
                 result.mapError {
