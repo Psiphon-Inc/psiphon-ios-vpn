@@ -32,3 +32,11 @@ final class SettingsViewController_Swift: SettingsViewController,
     }
     
 }
+
+extension FeedbackViewController: ChildViewControllerDismissedDelegate {
+    
+    public func parentIsDimissed() {
+        // No-op
+    }
+    
+}
