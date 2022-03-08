@@ -789,14 +789,7 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
 - (void)openURL:(NSURL*)url {
     if (url != nil) {
-        dispatch_async(dispatch_get_main_queue(), ^{
-            // Not officially documented by Apple, however a runtime warning is generated sometimes
-            // stating that [UIApplication openURL:options:completionHandler:] must be used from
-            // the main thread only.
-            [[UIApplication sharedApplication] openURL:url
-                                               options:@{}
-                                     completionHandler:nil];
-        });
+        [SwiftDelegate.bridge openExternalURL:url];
     }
 }
 
