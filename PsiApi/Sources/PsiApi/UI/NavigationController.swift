@@ -67,10 +67,9 @@ open class NavigationController: UINavigationController {
         // A UINavigationController is only presented modally.
         if self.isBeingDismissed {
             for childVC in self.children {
-                guard let childVC = childVC as? ChildViewControllerDismissedDelegate else {
-                    fatalError()
+                if let childVC = childVC as? ChildViewControllerDismissedDelegate {
+                    childVC.parentIsDimissed()
                 }
-                childVC.parentIsDimissed()
             }
         }
         
