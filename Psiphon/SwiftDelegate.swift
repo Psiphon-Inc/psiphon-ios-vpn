@@ -1076,6 +1076,10 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.store.send(.mainViewAction(.presentSettingsScreen))
     }
     
+    @objc func openExternalURL(_ url: URL) {
+        self.store.send(.mainViewAction(.openExternalURL(url)))
+    }
+    
     @objc func loadingScreenDismissSignal(_ completionHandler: @escaping () -> Void) {
         
         // Skips loading screen for screenshot generation.

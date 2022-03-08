@@ -88,6 +88,9 @@ import PsiphonClientCommonLibrary
     
     @objc func presentSettingsViewController()
     
+    // Opens URL in a safe tunneled webview.
+    @objc func openExternalURL(_ url: URL)
+    
     @objc func loadingScreenDismissSignal(_ completionHandler: @escaping () -> Void)
     
     @objc func makeSubscriptionBarView() -> SubscriptionBarView
