@@ -19,7 +19,6 @@
 
 #import "SettingsViewController.h"
 #import "AppDelegate.h"
-#import "IAPViewController.h"
 #import "RACSignal.h"
 #import "RACCompoundDisposable.h"
 #import "RACReplaySubject.h"
@@ -315,7 +314,7 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
     if ([specifier.key isEqualToString:SettingsSubscriptionCellSpecifierKey]) {
         
         // Subscription button
-        [self openIAPViewController];
+        [SwiftDelegate.bridge presentSubscriptionScreen];
         
     } else if ([specifier.key isEqualToString:SettingsRestorePurchases]) {
         
@@ -364,12 +363,6 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
 
 - (void)onPsiCashAccountLoginTapped {
     [SwiftDelegate.bridge presentPsiCashAccountViewControllerWithPsiCashScreen:FALSE];
-}
-
-- (void)openIAPViewController {
-    IAPViewController *iapViewController = [[IAPViewController alloc]init];
-    iapViewController.openedFromSettings = YES;
-    [self.navigationController pushViewController:iapViewController animated:YES];
 }
 
 - (void)onPsiCashAccountLogOutWithSourceView:(UIView *_Nonnull)sourceView {

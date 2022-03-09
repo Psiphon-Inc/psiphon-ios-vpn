@@ -64,6 +64,8 @@ enum MainViewAction: Equatable {
     
     case presentPsiCashAccountManagement
     
+    case presentSubscriptionScreen
+    
     case presentSettingsScreen
     
     /// Presents feedback screen modally.
@@ -140,7 +142,7 @@ struct MainViewEnvironment {
     let getTopActiveViewController: () -> UIViewController
     let feedbackLogger: FeedbackLogger
     let rxDateScheduler: DateScheduler
-    let makeSubscriptionViewController: () -> UIViewController
+    let makeSubscriptionViewController: () -> SubscriptionViewController
     let dateCompare: DateCompare
     let addToDate: (Calendar.Component, Int, Date) -> Date?
     let tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
@@ -449,23 +451,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                 return [ Effect(value: .presentPsiCashStore(initialTab: .speedBoost)) ]
                 
             case .subscriptionTapped:
-                return [
-                    .fireAndForget {
-                        let topVC = environment.getTopActiveViewController()
-
-                        let found = topVC
-                            .traversePresentingStackFor(type: IAPViewController.self, searchChildren: true)
-
-                        switch found {
-                        case .presentTopOfStack(_), .presentInStack(_):
-                            // NO-OP
-                            break
-                        case .notPresent:
-                            let vc = environment.makeSubscriptionViewController()
-                            topVC.present(vc, animated: true, completion: nil)
-                        }
-                    }
-                ]
+                return [ Effect(value: .presentSubscriptionScreen) ]
             }
             
         case .sendErrorInitiatedFeedback:
@@ -668,6 +654,19 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                     .presentIfTypeNotPresent(
                         builder: environment.makePsiCashAccountExplainerViewController,
                         navigationBar: true
+                    )
+            }
+        ]
+        
+    case .presentSubscriptionScreen:
+        
+        return [
+            .fireAndForget {
+                _ = environment.getTopActiveViewController()
+                    .presentIfTypeNotPresent(
+                        builder: environment.makeSubscriptionViewController,
+                        navigationBar: true,
+                        animated: true
                     )
             }
         ]
