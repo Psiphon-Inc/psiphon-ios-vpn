@@ -52,8 +52,6 @@ import PsiphonClientCommonLibrary
 
     @objc func dismiss(screen: DismissibleScreen, completion: (() -> Void)?)
     
-    @objc func presentSubscriptionIAPViewController()
-    
 }
 
 /// Interface for AppDelegate functionality implemented in Swift and called from ObjC.
@@ -85,6 +83,9 @@ import PsiphonClientCommonLibrary
     @objc func presentPsiCashStoreViewController(_ initialTab: PsiCashScreenTab)
     
     @objc func presentPsiCashAccountManagement()
+    
+    // Presents subscription screen modally.
+    @objc func presentSubscriptionScreen()
     
     @objc func presentSettingsViewController()
     

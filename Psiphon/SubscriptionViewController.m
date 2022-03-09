@@ -17,14 +17,14 @@
  *
  */
 
-#import "IAPViewController.h"
+#import "SubscriptionViewController.h"
 #import "AppDelegate.h"
 #import "MBProgressHUD.h"
 #import "NSDate+Comparator.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
-#import "IAPHelpViewController.h"
+#import "SubscriptionHelpViewController.h"
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
 #import "Strings.h"
@@ -45,7 +45,7 @@
 
 static NSString *iapCellID = @"IAPTableCellID";
 
-@interface IAPViewController () <UITableViewDataSource, UITableViewDelegate,
+@interface SubscriptionViewController () <UITableViewDataSource, UITableViewDelegate,
 SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
 @property (nonatomic) UITableView *tableView;
@@ -64,7 +64,7 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
 @end
 
-@implementation IAPViewController {
+@implementation SubscriptionViewController {
     FBLPromise<ObjCIAPResult *> *_Nullable pendingPurchasePromise;
     MBProgressHUD *buyProgressAlert;
     NSTimer *buyProgressAlertTimer;
@@ -107,9 +107,9 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 #pragma mark - SKProductsRequestDelegate
 
 - (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response {
-    IAPViewController *__weak weakSelf = self;
+    SubscriptionViewController *__weak weakSelf = self;
     dispatch_async_main(^{
-        IAPViewController *__strong strongSelf = weakSelf;
+        SubscriptionViewController *__strong strongSelf = weakSelf;
         if (strongSelf != nil) {
             NSSortDescriptor *mySortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"price" ascending:YES];
             NSMutableArray *sortArray = [[NSMutableArray alloc] initWithArray:response.products];
@@ -123,9 +123,9 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 }
 
 - (void)request:(SKRequest *)request didFailWithError:(NSError *)error {
-    IAPViewController *__weak weakSelf = self;
+    SubscriptionViewController *__weak weakSelf = self;
     dispatch_async_main(^{
-        IAPViewController *__strong strongSelf = weakSelf;
+        SubscriptionViewController *__strong strongSelf = weakSelf;
         if (strongSelf != nil) {
             strongSelf.pendingProductRequestResponse = FALSE;
             [strongSelf reloadTableData];
@@ -758,10 +758,10 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 #pragma mark -
 
 - (void)buyButtonPressed:(UISegmentedControl *)sender {
-    IAPViewController *__weak weakSelf = self;
+    SubscriptionViewController *__weak weakSelf = self;
 
     void (^handlePromise)(void) = ^{
-        IAPViewController *__strong strongSelf = weakSelf;
+        SubscriptionViewController *__strong strongSelf = weakSelf;
         if (strongSelf) {
             [strongSelf dismissProgressSpinnerAndUnblockUI];
             strongSelf->_pendingProductIdentifier = nil;
@@ -802,7 +802,7 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 }
 
 - (void)onSubscriptionHelpTap {
-    IAPHelpViewController *vc = [[IAPHelpViewController alloc]init];
+    SubscriptionHelpViewController *vc = [[SubscriptionHelpViewController alloc]init];
     [self.navigationController pushViewController:vc animated:TRUE];
 }
 
@@ -825,9 +825,9 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     UIView *topView = [SwiftDelegate.bridge getTopActiveViewController].view;
     buyProgressAlert = [MBProgressHUD showHUDAddedTo:topView animated:YES];
 
-    __weak IAPViewController *weakSelf = self;
+    __weak SubscriptionViewController *weakSelf = self;
     buyProgressAlertTimer = [NSTimer scheduledTimerWithTimeInterval:60 repeats:NO block:^(NSTimer * _Nonnull timer) {
-        __strong IAPViewController *strongSelf = weakSelf;
+        __strong SubscriptionViewController *strongSelf = weakSelf;
         if (strongSelf == nil) {
             return;
         }

@@ -1076,6 +1076,10 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.store.send(.mainViewAction(.presentSettingsScreen))
     }
     
+    @objc func presentSubscriptionScreen() {
+        self.store.send(.mainViewAction(.presentSubscriptionScreen))
+    }
+    
     @objc func openExternalURL(_ url: URL) {
         self.store.send(.mainViewAction(.openExternalURL(url)))
     }
@@ -1173,8 +1177,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         SubscriptionBarView { [unowned objcBridge, store] state in
             switch state.authState {
             case .notSubscribed, .subscribedWithAuth:
-                objcBridge?.presentSubscriptionIAPViewController()
-
+                store?.send(.mainViewAction(.presentSubscriptionScreen))
+                
             case .failedRetry:
                 store?.send(.appReceipt(.readLocalReceiptFile))
 
