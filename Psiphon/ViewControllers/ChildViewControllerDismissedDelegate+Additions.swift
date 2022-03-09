@@ -33,6 +33,28 @@ final class SettingsViewController_Swift: SettingsViewController,
     
 }
 
+// Adds conformance to`ChildViewControllerDismissedDelegate` to satisfy
+// `NavigationController` child view controller requirements.
+extension SkyRegionSelectionViewController: ChildViewControllerDismissedDelegate {
+    
+    public func parentIsDimissed() {
+        // No-op.
+    }
+    
+}
+
+// Adds conformance to`ChildViewControllerDismissedDelegate` to satisfy
+// `NavigationController` child view controller requirements.
+extension SubscriptionViewController: ChildViewControllerDismissedDelegate {
+    
+    public func parentIsDimissed() {
+        // No-op.
+    }
+    
+}
+
+// Adds conformance to`ChildViewControllerDismissedDelegate` to satisfy
+// `NavigationController` child view controller requirements.
 extension FeedbackViewController: ChildViewControllerDismissedDelegate {
     
     public func parentIsDimissed() {

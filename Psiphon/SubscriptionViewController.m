@@ -17,14 +17,14 @@
  *
  */
 
-#import "IAPViewController.h"
+#import "SubscriptionViewController.h"
 #import "AppDelegate.h"
 #import "MBProgressHUD.h"
 #import "NSDate+Comparator.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
 #import "PsiphonDataSharedDB.h"
 #import "SharedConstants.h"
-#import "IAPHelpViewController.h"
+#import "SubscriptionHelpViewController.h"
 #import "UIColor+Additions.h"
 #import "UIFont+Additions.h"
 #import "Strings.h"
@@ -45,7 +45,7 @@
 
 static NSString *iapCellID = @"IAPTableCellID";
 
-@interface IAPViewController () <UITableViewDataSource, UITableViewDelegate,
+@interface SubscriptionViewController () <UITableViewDataSource, UITableViewDelegate,
 SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
 @property (nonatomic) UITableView *tableView;
@@ -64,7 +64,7 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 
 @end
 
-@implementation IAPViewController {
+@implementation SubscriptionViewController {
     FBLPromise<ObjCIAPResult *> *_Nullable pendingPurchasePromise;
     MBProgressHUD *buyProgressAlert;
     NSTimer *buyProgressAlertTimer;
@@ -107,9 +107,9 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 #pragma mark - SKProductsRequestDelegate
 
 - (void)productsRequest:(SKProductsRequest *)request didReceiveResponse:(SKProductsResponse *)response {
-    IAPViewController *__weak weakSelf = self;
+    SubscriptionViewController *__weak weakSelf = self;
     dispatch_async_main(^{
-        IAPViewController *__strong strongSelf = weakSelf;
+        SubscriptionViewController *__strong strongSelf = weakSelf;
         if (strongSelf != nil) {
             NSSortDescriptor *mySortDescriptor = [[NSSortDescriptor alloc] initWithKey:@"price" ascending:YES];
             NSMutableArray *sortArray = [[NSMutableArray alloc] initWithArray:response.products];
@@ -123,9 +123,9 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 }
 
 - (void)request:(SKRequest *)request didFailWithError:(NSError *)error {
-    IAPViewController *__weak weakSelf = self;
+    SubscriptionViewController *__weak weakSelf = self;
     dispatch_async_main(^{
-        IAPViewController *__strong strongSelf = weakSelf;
+        SubscriptionViewController *__strong strongSelf = weakSelf;
         if (strongSelf != nil) {
             strongSelf.pendingProductRequestResponse = FALSE;
             [strongSelf reloadTableData];
@@ -758,10 +758,10 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 #pragma mark -
 
 - (void)buyButtonPressed:(UISegmentedControl *)sender {
-    IAPViewController *__weak weakSelf = self;
+    SubscriptionViewController *__weak weakSelf = self;
 
     void (^handlePromise)(void) = ^{
-        IAPViewController *__strong strongSelf = weakSelf;
+        SubscriptionViewController *__strong strongSelf = weakSelf;
         if (strongSelf) {
             [strongSelf dismissProgressSpinnerAndUnblockUI];
             strongSelf->_pendingProductIdentifier = nil;
@@ -787,30 +787,22 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     }
 }
 
-- (void)openURL:(NSURL*)url {
-    if (url != nil) {
-        [SwiftDelegate.bridge openExternalURL:url];
-    }
-}
-
 - (void)openPrivacyPolicy {
     NSURL *url = [NSURL URLWithString:NSLocalizedStringWithDefaultValue(@"PRIVACY_POLICY_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/privacy.html", @"External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french.")];
-    [self openURL:url];
+    [SwiftDelegate.bridge openExternalURL:url];
 }
 
 - (void)openToS {
     NSURL *url = [NSURL URLWithString:NSLocalizedStringWithDefaultValue(@"LICENSE_PAGE_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/license.html", "External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french.")];
-    [self openURL:url];
+    [SwiftDelegate.bridge openExternalURL:url];
 }
 
 - (void)onManageSubscriptionTap {
-    // The official way to open subscription management screen has been presented in
-    // https://developer.apple.com/videos/play/wwdc2018/705/
-    [self openURL:[NSURL URLWithString:@"https://apps.apple.com/account/subscriptions"]];
+    [SwiftDelegate.bridge openAppleSubscriptionMgmtURL];
 }
 
 - (void)onSubscriptionHelpTap {
-    IAPHelpViewController *vc = [[IAPHelpViewController alloc]init];
+    SubscriptionHelpViewController *vc = [[SubscriptionHelpViewController alloc]init];
     [self.navigationController pushViewController:vc animated:TRUE];
 }
 
@@ -833,9 +825,9 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     UIView *topView = [SwiftDelegate.bridge getTopActiveViewController].view;
     buyProgressAlert = [MBProgressHUD showHUDAddedTo:topView animated:YES];
 
-    __weak IAPViewController *weakSelf = self;
+    __weak SubscriptionViewController *weakSelf = self;
     buyProgressAlertTimer = [NSTimer scheduledTimerWithTimeInterval:60 repeats:NO block:^(NSTimer * _Nonnull timer) {
-        __strong IAPViewController *strongSelf = weakSelf;
+        __strong SubscriptionViewController *strongSelf = weakSelf;
         if (strongSelf == nil) {
             return;
         }

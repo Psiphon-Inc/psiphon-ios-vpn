@@ -17,18 +17,18 @@
  *
  */
 
-#import "IAPHelpViewController.h"
+#import "SubscriptionHelpViewController.h"
 #import "UIFont+Additions.h"
 #import <FBLPromises.h>
 #import "Psiphon-Swift.h"
 
-@interface IAPHelpViewController () <UITableViewDataSource, UITableViewDelegate>
+@interface SubscriptionHelpViewController () <UITableViewDataSource, UITableViewDelegate>
 
 @property (nonatomic) UITableView *tableView;
 
 @end
 
-@implementation IAPHelpViewController {
+@implementation SubscriptionHelpViewController {
     FBLPromise<NSError *> *_Nullable pendingRefreshReceipt;
     MBProgressHUD *buyProgressAlert;
     NSTimer *buyProgressAlertTimer;
@@ -184,10 +184,10 @@
 #pragma mark -
 
 - (void)refreshReceiptAction {
-    IAPHelpViewController *__weak weakSelf = self;
+    SubscriptionHelpViewController *__weak weakSelf = self;
 
     void (^handlePromise)(void) = ^{
-        IAPHelpViewController *__strong strongSelf = weakSelf;
+        SubscriptionHelpViewController *__strong strongSelf = weakSelf;
         if (strongSelf) {
             [strongSelf dismissProgressSpinnerAndUnblockUI];
             strongSelf->pendingRefreshReceipt = nil;
@@ -217,9 +217,9 @@
     UIView *topView = [SwiftDelegate.bridge getTopActiveViewController].view;
     buyProgressAlert = [MBProgressHUD showHUDAddedTo:topView animated:YES];
 
-    __weak IAPHelpViewController *weakSelf = self;
+    __weak SubscriptionHelpViewController *weakSelf = self;
     buyProgressAlertTimer = [NSTimer scheduledTimerWithTimeInterval:60 repeats:NO block:^(NSTimer * _Nonnull timer) {
-        __strong IAPHelpViewController *strongSelf = weakSelf;
+        __strong SubscriptionHelpViewController *strongSelf = weakSelf;
         if (strongSelf == nil) {
             return;
         }

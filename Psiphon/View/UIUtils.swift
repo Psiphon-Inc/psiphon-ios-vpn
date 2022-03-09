@@ -1001,6 +1001,10 @@ extension UIViewController {
         
         // This view controller should be on top of the stack.
         precondition(self.presentedViewController == nil)
+        
+        // When a view controller is presented with this method,
+        // it's identity is tied to it's type. Therefore T should be an
+        // identifiable type and not a type that is subclassed (e.g. UIViewController).
         precondition(T.self != UIViewController.self, "Expected a subtype of UIViewController")
         
         let searchResult = self.traversePresentingStackFor(type: T.self, searchChildren: true)
