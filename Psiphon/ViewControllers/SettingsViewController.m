@@ -367,9 +367,9 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
 }
 
 - (void)openIAPViewController {
-    IAPViewController *iapViewController = [[IAPViewController alloc]init];
-    iapViewController.openedFromSettings = YES;
-    [self.navigationController pushViewController:iapViewController animated:YES];
+    IAPViewController *vc = [[IAPViewController alloc]init];
+    vc.openedFromSettings = YES;
+    [self presentViewController:vc animated:TRUE completion:nil];
 }
 
 - (void)onPsiCashAccountLogOutWithSourceView:(UIView *_Nonnull)sourceView {
