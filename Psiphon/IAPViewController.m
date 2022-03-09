@@ -787,26 +787,18 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     }
 }
 
-- (void)openURL:(NSURL*)url {
-    if (url != nil) {
-        [SwiftDelegate.bridge openExternalURL:url];
-    }
-}
-
 - (void)openPrivacyPolicy {
     NSURL *url = [NSURL URLWithString:NSLocalizedStringWithDefaultValue(@"PRIVACY_POLICY_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/privacy.html", @"External link to the privacy policy page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/privacy.html for french.")];
-    [self openURL:url];
+    [SwiftDelegate.bridge openExternalURL:url];
 }
 
 - (void)openToS {
     NSURL *url = [NSURL URLWithString:NSLocalizedStringWithDefaultValue(@"LICENSE_PAGE_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/license.html", "External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french.")];
-    [self openURL:url];
+    [SwiftDelegate.bridge openExternalURL:url];
 }
 
 - (void)onManageSubscriptionTap {
-    // The official way to open subscription management screen has been presented in
-    // https://developer.apple.com/videos/play/wwdc2018/705/
-    [self openURL:[NSURL URLWithString:@"https://apps.apple.com/account/subscriptions"]];
+    [SwiftDelegate.bridge openAppleSubscriptionMgmtURL];
 }
 
 - (void)onSubscriptionHelpTap {

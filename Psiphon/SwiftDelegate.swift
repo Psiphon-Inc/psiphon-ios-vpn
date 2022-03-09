@@ -1080,6 +1080,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         self.store.send(.mainViewAction(.openExternalURL(url)))
     }
     
+    @objc func openAppleSubscriptionMgmtURL() {
+        UIApplication.shared.open(appleSubscriptionsManagementURL,
+                                  options: [:],
+                                  completionHandler: nil)
+    }
+    
     @objc func loadingScreenDismissSignal(_ completionHandler: @escaping () -> Void) {
         
         // Skips loading screen for screenshot generation.
