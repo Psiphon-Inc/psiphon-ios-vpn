@@ -187,7 +187,7 @@ struct AppEnvironment {
     let reloadMainScreen: () -> Effect<Utilities.Unit>
 
     let makePsiCashStoreViewController: () -> PsiCashStoreViewController
-    let makeSubscriptionViewController: () -> IAPViewController
+    let makeSubscriptionViewController: () -> SubscriptionViewController
     let makePsiCashAccountLoginViewController: () -> PsiCashAccountLoginViewController
     let makePsiCashAccountExplainerViewController: () -> PsiCashAccountExplainerViewController
     let makeSettingsViewController: () -> NavigationController
@@ -473,7 +473,7 @@ func makeEnvironment(
             )
         },
         makeSubscriptionViewController: {
-            IAPViewController()
+            SubscriptionViewController()
         },
         makePsiCashAccountLoginViewController: {
             makePsiCashAccountLoginViewController()

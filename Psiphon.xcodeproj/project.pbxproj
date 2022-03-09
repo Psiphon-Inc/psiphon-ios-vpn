@@ -30,8 +30,7 @@
 		2974E99E27CE858000DA0918 /* PsiNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2974E99D27CE858000DA0918 /* PsiNavigationController.swift */; };
 		29923FDA264EFC720078E8BB /* PsiCashLib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; };
 		29923FDB264EFC720078E8BB /* PsiCashLib.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		29A7075227CE9198006DE45A /* SettingsViewController_Swift.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A7075127CE9198006DE45A /* SettingsViewController_Swift.swift */; };
-		29A7075627D684B7006DE45A /* SkyRegionSelectionViewController+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A7075527D684B6006DE45A /* SkyRegionSelectionViewController+Additions.swift */; };
+		29A7075227CE9198006DE45A /* ChildViewControllerDismissedDelegate+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A7075127CE9198006DE45A /* ChildViewControllerDismissedDelegate+Additions.swift */; };
 		29BA6DA1268630A9001445EA /* TunnelFileDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 29BA6DA0268630A9001445EA /* TunnelFileDescriptor.m */; };
 		29BE0BE327C54828003BC17B /* PsiCashAccountExplainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29BE0BE227C54828003BC17B /* PsiCashAccountExplainerViewController.swift */; };
 		29C3220A26B1C17D0075BB34 /* AppInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920720F3DA190033114B /* AppInfo.m */; };
@@ -83,7 +82,7 @@
 		4E1FE1CB1FB213860031211C /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E1FE1CA1FB213860031211C /* SnapshotHelper.swift */; };
 		4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */; };
 		4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */; };
-		4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263CA2072984D0021FEF5 /* IAPViewController.m */; };
+		4E5263CD2072984D0021FEF5 /* SubscriptionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5263CA2072984D0021FEF5 /* SubscriptionViewController.m */; };
 		4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */; };
 		4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526220AB8DBE000B4BEA /* Pastel.m */; };
 		4EC5526620AB8DCD000B4BEA /* PastelView.m in Sources */ = {isa = PBXBuildFile; fileRef = 4EC5526520AB8DCD000B4BEA /* PastelView.m */; };
@@ -183,7 +182,7 @@
 		9BFEC2458D1346F537E9089E /* Nullity.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECCCF429898FD903B69A6 /* Nullity.m */; };
 		9BFEC4F02A47FF8265635803 /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFECC62159FBEAA1A69F4F9 /* BasePacketTunnelProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */; };
-		9BFECD174E254989EC97A437 /* IAPHelpViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */; };
+		9BFECD174E254989EC97A437 /* SubscriptionHelpViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC220C067BBE75AF970C1 /* SubscriptionHelpViewController.m */; };
 		9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC91ED4A1C511520E9948 /* Notifier.m */; };
 		9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */; };
 		9BFECEA225F023F895CC8DA1 /* Authorization.m in Sources */ = {isa = PBXBuildFile; fileRef = 9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */; };
@@ -413,8 +412,7 @@
 		296A1A88267A01E70068B115 /* CopyableLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyableLabel.swift; sourceTree = "<group>"; };
 		2974E99D27CE858000DA0918 /* PsiNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiNavigationController.swift; sourceTree = "<group>"; };
 		29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = PsiCashLib.xcframework; path = Frameworks/PsiCashLib.xcframework; sourceTree = "<group>"; };
-		29A7075127CE9198006DE45A /* SettingsViewController_Swift.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController_Swift.swift; sourceTree = "<group>"; };
-		29A7075527D684B6006DE45A /* SkyRegionSelectionViewController+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "SkyRegionSelectionViewController+Additions.swift"; sourceTree = "<group>"; };
+		29A7075127CE9198006DE45A /* ChildViewControllerDismissedDelegate+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChildViewControllerDismissedDelegate+Additions.swift"; sourceTree = "<group>"; };
 		29BA6D9F268630A9001445EA /* TunnelFileDescriptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TunnelFileDescriptor.h; sourceTree = "<group>"; };
 		29BA6DA0268630A9001445EA /* TunnelFileDescriptor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TunnelFileDescriptor.m; sourceTree = "<group>"; };
 		29BE0BE227C54828003BC17B /* PsiCashAccountExplainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashAccountExplainerViewController.swift; sourceTree = "<group>"; };
@@ -520,8 +518,8 @@
 		4E5263B6207290360021FEF5 /* EmbeddedServerEntriesHelpers.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = EmbeddedServerEntriesHelpers.c; sourceTree = "<group>"; };
 		4E5263BF207292920021FEF5 /* EmbeddedServerEntries.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EmbeddedServerEntries.m; sourceTree = "<group>"; };
 		4E5263C6207294550021FEF5 /* EmbeddedServerEntries.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EmbeddedServerEntries.h; sourceTree = "<group>"; };
-		4E5263CA2072984D0021FEF5 /* IAPViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPViewController.m; sourceTree = "<group>"; };
-		4E5263CB2072984D0021FEF5 /* IAPViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPViewController.h; sourceTree = "<group>"; };
+		4E5263CA2072984D0021FEF5 /* SubscriptionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionViewController.m; sourceTree = "<group>"; };
+		4E5263CB2072984D0021FEF5 /* SubscriptionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionViewController.h; sourceTree = "<group>"; };
 		4E5DAE6320A942A300E06342 /* UILabel+GetLabelHeight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UILabel+GetLabelHeight.h"; sourceTree = "<group>"; };
 		4E5DAE6420A942A300E06342 /* UILabel+GetLabelHeight.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UILabel+GetLabelHeight.m"; sourceTree = "<group>"; };
 		4EC5526120AB8DB9000B4BEA /* Pastel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Pastel.h; sourceTree = "<group>"; };
@@ -678,7 +676,7 @@
 		9876294EDE951EF39C9F97BE /* Pods-PsiApi-Testing-Utilities.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Testing-Utilities.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Testing-Utilities/Pods-PsiApi-Testing-Utilities.release.xcconfig"; sourceTree = "<group>"; };
 		9A06EEF4B515E4AE40E5CA93 /* Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-PsiApi-Utilities-UtilitiesTests/Pods-PsiApi-Utilities-UtilitiesTests.release.xcconfig"; sourceTree = "<group>"; };
 		9BFEC1C9F506CE1DF07306D2 /* NEBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NEBridge.h; sourceTree = "<group>"; };
-		9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IAPHelpViewController.m; sourceTree = "<group>"; };
+		9BFEC220C067BBE75AF970C1 /* SubscriptionHelpViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubscriptionHelpViewController.m; sourceTree = "<group>"; };
 		9BFEC3165745A5D14C8C3C08 /* Notifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Notifier.h; sourceTree = "<group>"; };
 		9BFEC31B61584FD2EAAF5DE6 /* Authorization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Authorization.m; sourceTree = "<group>"; };
 		9BFEC4D609BFCD0DC812BDB3 /* Asserts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Asserts.h; sourceTree = "<group>"; };
@@ -686,7 +684,7 @@
 		9BFEC72C282F6060193B2E87 /* UIColor+Additions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor+Additions.m"; sourceTree = "<group>"; };
 		9BFEC8783D4222F2272E50E7 /* BasePacketTunnelProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BasePacketTunnelProvider.h; sourceTree = "<group>"; };
 		9BFEC91ED4A1C511520E9948 /* Notifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Notifier.m; sourceTree = "<group>"; };
-		9BFECB09D7F866F34551DBD4 /* IAPHelpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IAPHelpViewController.h; sourceTree = "<group>"; };
+		9BFECB09D7F866F34551DBD4 /* SubscriptionHelpViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubscriptionHelpViewController.h; sourceTree = "<group>"; };
 		9BFECC3FADE9C8A76A0913DE /* BasePacketTunnelProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BasePacketTunnelProvider.m; sourceTree = "<group>"; };
 		9BFECC9B2B9F2BFBD4F8A47B /* UserDefaults.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UserDefaults.h; sourceTree = "<group>"; };
 		9BFECCCF429898FD903B69A6 /* Nullity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Nullity.m; sourceTree = "<group>"; };
@@ -1055,10 +1053,10 @@
 				CEED7834247703DD002D9D55 /* AppReceiptReducer.swift */,
 				445F239420E1817B00D004E9 /* AppStoreParsedReceiptData.h */,
 				445F239520E1817C00D004E9 /* AppStoreParsedReceiptData.m */,
-				4E5263CB2072984D0021FEF5 /* IAPViewController.h */,
-				4E5263CA2072984D0021FEF5 /* IAPViewController.m */,
-				9BFEC220C067BBE75AF970C1 /* IAPHelpViewController.m */,
-				9BFECB09D7F866F34551DBD4 /* IAPHelpViewController.h */,
+				4E5263CB2072984D0021FEF5 /* SubscriptionViewController.h */,
+				4E5263CA2072984D0021FEF5 /* SubscriptionViewController.m */,
+				9BFEC220C067BBE75AF970C1 /* SubscriptionHelpViewController.m */,
+				9BFECB09D7F866F34551DBD4 /* SubscriptionHelpViewController.h */,
 				8D417EDC2419DBA100FEE587 /* ProductRequest.swift */,
 				8D1F62BD247DC1690028AFAF /* Receipt+AppStore.swift */,
 				8D4ACD31247E3626008E404C /* AppStoreIAP+Additions.swift */,
@@ -1165,8 +1163,7 @@
 				2911A794263D6C6D001A0A4D /* WebViewController.swift */,
 				29BE0BE227C54828003BC17B /* PsiCashAccountExplainerViewController.swift */,
 				2974E99D27CE858000DA0918 /* PsiNavigationController.swift */,
-				29A7075127CE9198006DE45A /* SettingsViewController_Swift.swift */,
-				29A7075527D684B6006DE45A /* SkyRegionSelectionViewController+Additions.swift */,
+				29A7075127CE9198006DE45A /* ChildViewControllerDismissedDelegate+Additions.swift */,
 			);
 			path = ViewControllers;
 			sourceTree = "<group>";
@@ -2091,7 +2088,6 @@
 				29587A8026C5ACD80015A79A /* FadingScrollView.swift in Sources */,
 				4E5DAE6520A942A300E06342 /* UILabel+GetLabelHeight.m in Sources */,
 				EFC2F5CB202267B1007B52F9 /* PsiphonConfigReader.m in Sources */,
-				29A7075627D684B7006DE45A /* SkyRegionSelectionViewController+Additions.swift in Sources */,
 				EF90D7A7204F22C900228A63 /* NSDate+PSIDateExtension.m in Sources */,
 				CE8420482522823D00796032 /* DebugToolboxViewController.m in Sources */,
 				8D82F0DE2541FB4A002D37E7 /* PsiCashPurchasingConfirmViewBuilder.swift in Sources */,
@@ -2117,7 +2113,7 @@
 				4E5263C7207294600021FEF5 /* EmbeddedServerEntries.m in Sources */,
 				52A2466D23A172A800A01FF1 /* ViewBuilderViewController.swift in Sources */,
 				5246800D22D65926009AEC6E /* UIUtils.swift in Sources */,
-				4E5263CD2072984D0021FEF5 /* IAPViewController.m in Sources */,
+				4E5263CD2072984D0021FEF5 /* SubscriptionViewController.m in Sources */,
 				8D7789B9247491CA0038BFDA /* PsiphonBundle.swift in Sources */,
 				291C0BA1269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m in Sources */,
 				445F24D720E1A5BA00D004E9 /* per_support.c in Sources */,
@@ -2180,7 +2176,7 @@
 				8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */,
 				8D7789BD247493300038BFDA /* VPNState.swift in Sources */,
 				29F8536E26D4549000533472 /* Requests+Additions.swift in Sources */,
-				9BFECD174E254989EC97A437 /* IAPHelpViewController.m in Sources */,
+				9BFECD174E254989EC97A437 /* SubscriptionHelpViewController.m in Sources */,
 				52055D04230C823100244F9E /* GradientButton.swift in Sources */,
 				8D9D9BCC247C6A9D0093220E /* PsiphonRotatingFileFeedbackLogger.swift in Sources */,
 				52CAC4312385D06600A92842 /* Spinner.swift in Sources */,
@@ -2192,7 +2188,7 @@
 				52D363CB230DEBED002C2221 /* CloseButton.swift in Sources */,
 				445F24DB20E1A5BA00D004E9 /* ber_decoder.c in Sources */,
 				CED6790E24A4F82400C4CA81 /* JetsamTracking.m in Sources */,
-				29A7075227CE9198006DE45A /* SettingsViewController_Swift.swift in Sources */,
+				29A7075227CE9198006DE45A /* ChildViewControllerDismissedDelegate+Additions.swift in Sources */,
 				52D2581122BADE1900CA956A /* SwiftDelegate.swift in Sources */,
 				5202011D2360D34000D00C8E /* EitherView.swift in Sources */,
 				52DF5E9A23CE835100A1B067 /* UserStrings.swift in Sources */,

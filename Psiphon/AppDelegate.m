@@ -26,7 +26,6 @@
 #import "AppDelegate.h"
 #import "AppInfo.h"
 #import "EmbeddedServerEntries.h"
-#import "IAPViewController.h"
 #import "Logging.h"
 #import "Notifier.h"
 #import "PsiphonClientCommonLibraryHelpers.h"
@@ -359,18 +358,6 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
                                                            completion:completion];
             break;
     }
-}
-
-- (void)presentSubscriptionIAPViewController {
-    IAPViewController* iapViewController = [[IAPViewController alloc] init];
-    iapViewController.openedFromSettings = FALSE;
-    
-    UINavigationController* navCtrl = [[UINavigationController alloc]
-                                       initWithRootViewController:iapViewController];
-    
-    [[SwiftDelegate.bridge getTopActiveViewController] presentViewController:navCtrl
-                                                                    animated:TRUE
-                                                                  completion:nil];
 }
 
 @end

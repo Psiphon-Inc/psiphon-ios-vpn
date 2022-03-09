@@ -50,7 +50,7 @@
 #import "AlertDialogs.h"
 #import "SubscriptionStatusView.h"
 #import "RootContainerController.h"
-#import "IAPViewController.h"
+#import "SubscriptionViewController.h"
 #import "SettingsViewController.h"
 #import "SkyRegionSelectionViewController.h"
 

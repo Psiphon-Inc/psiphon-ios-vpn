@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2017, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,16 +17,10 @@
  *
  */
 
-#import <Foundation/Foundation.h>
-#import "IAPViewController.h"
-#import "AppDelegate.h"
-#import "MBProgressHUD.h"
-#import "NSDate+Comparator.h"
-#import "PsiphonClientCommonLibraryHelpers.h"
-#import "PsiphonDataSharedDB.h"
-#import "SharedConstants.h"
-#import "UIColor+Additions.h"
+#import <UIKit/UIKit.h>
 
-@interface IAPHelpViewController : UIViewController
+@interface SubscriptionViewController : UIViewController
+
+@property (nonatomic, assign)  BOOL openedFromSettings;
 
 @end
