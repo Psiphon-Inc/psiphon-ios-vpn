@@ -32,3 +32,7 @@ enum PsiCashHardCodedValues {
 // There is no point to load an interstitial after the user
 // presses the disconnected button.
 let InterstitialDelayAfterDisconnection: TimeInterval = 5.0  // 5 seconds.
+
+// The official way to open subscription management screen.
+// https://developer.apple.com/videos/play/wwdc2018/705/
+let appleSubscriptionsManagementURL = URL(string: "https://apps.apple.com/account/subscriptions")!
