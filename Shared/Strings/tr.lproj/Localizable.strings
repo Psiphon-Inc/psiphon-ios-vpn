@@ -16,8 +16,14 @@
 /* Alert dialog title. */
 "ALERT_TITLE_OPERATION_FAILED" = "İşlem tamamlanamadı";
 
+/* Text that appears above the 'Log in' button on the PsiCash sign in screen. */
+"ALREADY_HAVE_AN_ACCOUNT" = "Zaten bir hesabınız var mı?";
+
 /* Title of the button which takes the user to the previous screen. Text should be short and one word when possible. */
 "BACK_BUTTON" = "Geri";
+
+/* Title of the navigation button shown with an arrow that takes the user to the previous screen. */
+"BACK_BUTTON_TITLE" = "Geri";
 
 /* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
 "BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Yok say";
@@ -32,7 +38,7 @@
 "CANCEL_BUTTON_TITLE" = "İptal";
 
 /* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
-"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Etkin bir aboneliğiniz yok.\nAbone olmadığınız için ya da abonelik süreniz sona ermiş olduğundan, Psiphon yalnız Psiphon uygulaması içinden başlatılabilir.\n\nLütfen başlatmak için Psiphon uygulamasını açın.";
+"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "Etkin bir aboneliğiniz yok.\nAbone olmadığınız için ya da abonelik süreniz sona ermiş olduğundan, Psiphon yalnızca Psiphon uygulaması içinden başlatılabilir.\n\nLütfen başlatmak için Psiphon uygulamasını açın.";
 
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
 "CHECK_UPSTREAM_PROXY_SETTING" = "Psiphon bir giden vekil sunucu kullanmak üzere yapılandırılmış.\nAncak bu vekil sunucu üzerinden bir Psiphon sunucusu ile bağlantı kurulamadı.\nLütfen ayarları düzeltip yeniden deneyin.";
@@ -65,7 +71,7 @@
 "CREATE_ACCOUNT_BUTTON_TITLE" = "Hesap açın";
 
 /* Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
-"CREATE_PSICASH_ACCOUNT_BODY_2" = "PsiCash satın almadan önce bir PsiCash hesabı oluşturmanızı önemle öneririz. Bir hesap açarak, bakiyenizi aygıtlarınız arasında paylalabilir ve satın aldığınız PsiCash bakiyenizi koruyabilirsiniz.\n\nÖNEMLİ: Bir hesabınız olmadan, Psiphon uygulamasını kaldırırsanız PsiCash bakiyenizi kaybedersiniz.";
+"CREATE_PSICASH_ACCOUNT_BODY_2" = "PsiCash satın almadan önce bir PsiCash hesabı oluşturmanızı önemle öneririz. Bir hesap açarak, birikiminizi aygıtlarınız arasında paylalabilir ve satın aldığınız PsiCash birikiminizi koruyabilirsiniz.\n\nÖNEMLİ: Bir hesabınız olmadan, Psiphon uygulamasını kaldırırsanız PsiCash birikiminizi kaybedersiniz.";
 
 /* Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will continue on to the PsiCash store. */
 "CREATE_PSICASH_ACCOUNT_CONTINUE_BUTTON" = "Hesap açmadan ilerle";
@@ -140,7 +146,7 @@
 "faq-information-collected-answer-para-13-item-4" = "E-posta isteğinin geldiği e-posta sunucusu (Etki alanının sondan üç parçası. Örneğin, <code>ne1.ornek.com</code>, <code>web120113.mail.ne1.ornek.com</code> değil).";
 
 /* No comment provided by engineer. */
-"faq-information-collected-answer-para-6" = "Psiphon üzerinden geri bildirim gönderirseniz, tanılama verilerini eklemeyi seçebilirsiniz. Bu verileri yaşadığınız sorunları anlamak ve Psiphon uygulamasının sorunsuz çalışmasını sağlamak için kullanıyoruz. Veriler bize gönderilmeden önce şifrelenir ve yalnız bizim tarafımızdan açılabilir. Verilerde platforma göre değişmekle birlikte şu bilgiler bulunabilir:";
+"faq-information-collected-answer-para-6" = "Psiphon üzerinden geri bildirim gönderirseniz, tanılama verilerini eklemeyi seçebilirsiniz. Bu verileri yaşadığınız sorunları anlamak ve Psiphon uygulamasının sorunsuz çalışmasını sağlamak için kullanıyoruz. Veriler bize gönderilmeden önce şifrelenir ve yalnızca bizim tarafımızdan açılabilir. Verilerde platforma göre değişmekle birlikte şu bilgiler bulunabilir:";
 
 /* No comment provided by engineer. */
 "faq-information-collected-answer-para-7-item-1" = "İşletim sistemi sürümü";
@@ -194,7 +200,10 @@
 "INCORRECT_USERNAME_OR_PASSWORD" = "Yazdığınız kullanıcı adı ya da parola hatalı.";
 
 /* User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
-"INSUFFICIENT_PSICASH_BALANCE" = "PsiCash bakiyesi yetersiz";
+"INSUFFICIENT_PSICASH_BALANCE" = "PsiCash birikiminiz yetersiz";
+
+/* Title of button that takes the user to a screen where more detailed explanation of a feature is provided. */
+"LEARN_MORE_BUTTON" = "Ayrıntılı bilgi alın";
 
 /* External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
 "LICENSE_PAGE_URL" = "https://psiphon.ca/tr/license.html";
@@ -256,6 +265,9 @@
 /* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
 "ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "Bağlantı kurabilmek için Psiphon uygulamasına VPN yapılandırması ekleme izni vermelisiniz.";
 
+/* Title of a button that open a URL on the device's web browser. */
+"OPEN_IN_BROWSER_BUTTON_TITLE" = "Web tarayıcıda aç";
+
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Lütfen bağlantıyı tamamlamak için Psiphon uygulamasını açın.";
 
@@ -293,7 +305,7 @@
 "privacy-information-collected-mypsicash-cookies-head" = "Çerezler";
 
 /* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-cookies-para-1" = "my.psi.cash, web sitesinin çalışması için gereken işlemleri yapabilmek amacıyla yalnız çerezleri ve benzer izleme teknolojilerini kullanır. Web sitesinin temel işlevlerini sağlamak için temel çerezler gereklidir. Çerezler, bilgisayarınızda saklanan ve web tarayıcınız tarafından kaydedilen küçük metin dosyalarıdır ve aygıtınız için herhangi bir risk oluşturmaz. Web tarayıcınızın çerezleri işleme şeklini, tarayıcı ayarlarınızdan isteğinize göre yapılandırabilirsiniz. Temel çerezleri devre dışı bırakmak, bu web sitesinin işlevselliğini azaltır.";
+"privacy-information-collected-mypsicash-cookies-para-1" = "my.psi.cash, web sitesinin çalışması için gereken işlemleri yapabilmek amacıyla yalnızca çerezleri ve benzer izleme teknolojilerini kullanır. Web sitesinin temel işlevlerini sağlamak için temel çerezler gereklidir. Çerezler, bilgisayarınızda saklanan ve web tarayıcınız tarafından kaydedilen küçük metin dosyalarıdır ve aygıtınız için herhangi bir risk oluşturmaz. Web tarayıcınızın çerezleri işleme şeklini, tarayıcı ayarlarınızdan isteğinize göre yapılandırabilirsiniz. Temel çerezleri devre dışı bırakmak, bu web sitesinin işlevselliğini azaltır.";
 
 /* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. 'PsiCash' must not be translated or transliterated. */
 "privacy-information-collected-mypsicash-para-1" = "Kullanıcılar <a href=\"https://my.psi.cash\" target=\"_blank\" rel=\"noopener noreferrer\">my.psi.cash</a> web sitesinden PsiCash hesaplarını açar ve yönetir.";
@@ -308,13 +320,13 @@
 "privacy-information-collected-mypsicash-recaptcha-para-3" = "Google reCAPTCHA teknolojisi hakkında ayrıntılı bilgi almak için <a href=\"https://www.google.com/recaptcha/about/\" target=\"_blank\" rel=\"noopener noreferrer\">https://www.google.com/recaptcha/about/</a> adresine bakabilirsiniz.";
 
 /* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
-"privacy-information-collected-psicash-para-1" = "Psicash sistemi yalnız sistemi çalıştırmak ve güvenliğini sağlamak için gerekli izleme verilerini toplar. ";
+"privacy-information-collected-psicash-para-1" = "Psicash sistemi yalnızca sistemi çalıştırmak ve güvenliğini sağlamak için gerekli izleme verilerini toplar. ";
 
 /* Bullet list item in the 'operation of the system' list. This item refers to randomly generated values that allow a user to access and utilize the system. */
 "privacy-information-collected-psicash-para-2-item-1" = "üretilmiş kullanıcı erişimi kodları";
 
 /* Bullet list item in the 'operation of the system' list. This item refers to the user PsiCash balance -- i.e., how much they have available to spend. */
-"privacy-information-collected-psicash-para-2-item-2" = "bakiye";
+"privacy-information-collected-psicash-para-2-item-2" = "birikiminiz";
 
 /* Bullet list item in the 'operation of the system' list. This item refers to the date and time that the user last earned or spent PsiCash. */
 "privacy-information-collected-psicash-para-2-item-3" = "son işlemin zaman damgası";
@@ -344,7 +356,7 @@
 "privacy-information-collected-psicash-para-4-item-1" = "kullanıcının ülkesi";
 
 /* Bullet list item in the 'operation of the system' list. This item refers to the user PsiCash balance -- i.e., how much they have available to spend. */
-"privacy-information-collected-psicash-para-4-item-2" = "bakiye";
+"privacy-information-collected-psicash-para-4-item-2" = "birikiminiz";
 
 /* Bullet list item in the 'operation of the system' list. This item refers to 'user agent string' of the client software used to perform an action. This can be either a web browser or the Psiphon client itself. */
 "privacy-information-collected-psicash-para-4-item-3" = "kullanıcı uygulaması dizgesi";
@@ -371,10 +383,10 @@
 "privacy-information-collected-s3-logging-para-1" = "Psiphon sunucu keşif listeleri, web sitesi dosyaları gibi ögeleri depolamak için Amazon S3 hizmetini kullanıyoruz. Bazen bu dosyaların indirilme durumlarını izlemek için günlük kayıtlarını etkinleştiriyoruz. Bu günlükleri inceleyerek \"Sunucu keşif listesini indirmeye başlayan ancak tamamlayamayan kaç kullanıcı var\", \"İndirilen veriler içinde, web sitesi dosyaları ile sunucu keşif listeleri oranı nedir\" ve \"web sitelerimize bir saldırgan tarafından DoS (denial-of-service) saldırısı yapılıyor mu\" gibi soruların yanıtlarını alabiliyoruz.";
 
 /* No comment provided by engineer. */
-"privacy-information-collected-s3-logging-para-2" = "S3 <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/LogFormat.html\" target=\"_blank\">buket erişimi günlük kayıtlarında</a>, IP adresleri, kullanıcı uygulamaları ve zaman damgaları tutulur. Bu günlükler S3 üzerinde depolandığından, Amazon bu günlüklere erişebilir (aslında Amazon tüm dosyaları da barındırdığından, bu bilgileri kendisi de oluşturabilir). Psiphon geliştiricileri günlükleri indirip derleyerek veriyi inceledikten sonra siler. Ham veriler yalnız gerekli miktara ulaşana kadar saklanır ve üçüncü partiler ile paylaşılmaz.";
+"privacy-information-collected-s3-logging-para-2" = "S3 <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/LogFormat.html\" target=\"_blank\">buket erişimi günlük kayıtlarında</a>, IP adresleri, kullanıcı uygulamaları ve zaman damgaları tutulur. Bu günlükler S3 üzerinde depolandığından, Amazon bu günlüklere erişebilir (aslında Amazon tüm dosyaları da barındırdığından, bu bilgileri kendisi de oluşturabilir). Psiphon geliştiricileri günlükleri indirip derleyerek veriyi inceledikten sonra siler. Ham veriler yalnızca gerekli miktara ulaşana kadar saklanır ve üçüncü partiler ile paylaşılmaz.";
 
 /* Paragraph text in the 'Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-aggdata-para-1" = "Veriler, kullanıcıya özel işlem verileri çıkarıldıktan sonra yalnız kabaca istatistiksel veriler elde etmek için bir araya getirilerek “derlenir”. Derlenen kullanıcı işlemi verileri silinir.";
+"privacy-information-collected-vpndata-aggdata-para-1" = "Veriler, kullanıcıya özel işlem verileri çıkarıldıktan sonra yalnızca kabaca istatistiksel veriler elde etmek için bir araya getirilerek “derlenir”. Derlenen kullanıcı işlemi verileri silinir.";
 
 /* Paragraph text in the 'Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
 "privacy-information-collected-vpndata-aggdata-para-2" = "Örneğin derlenen veriler şöyle olabilir: Belirli bir günde, Türk Telekom bağlantısını kullanarak Ankara'dan 250 kişi bağlandı ve <code>youtube.com</code> üzerinden toplam 500GB verinin 200GB kadarını aktardı.";
@@ -395,7 +407,7 @@
 "privacy-information-collected-vpndata-kindsofdata-subhead" = "Psiphon ne tür kullanıcı verileri topluyor?";
 
 /* Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-shareable-para-1" = "Derlenen veriler üçüncü taraflar ile paylaşılırken, verilerde kullanıcı kimliğinin açığa çıkmasına neden olabilecek bilgilerin bulunmadığından emin oluruz. Örneğin, belirli bir günde bir ülkeden yalnız bir kaç kişi bağlanmış ise bu verileri paylaşmayız. Verilerin anonimleştirilmiş olduğundan emin oluruz. ";
+"privacy-information-collected-vpndata-shareable-para-1" = "Derlenen veriler üçüncü taraflar ile paylaşılırken, verilerde kullanıcı kimliğinin açığa çıkmasına neden olabilecek bilgilerin bulunmadığından emin oluruz. Örneğin, belirli bir günde bir ülkeden yalnızca bir kaç kişi bağlanmış ise bu verileri paylaşmayız. Verilerin anonimleştirilmiş olduğundan emin oluruz. ";
 
 /* Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
 "privacy-information-collected-vpndata-shareable-para-2" = "Ayrıca etki alanı ile ilgili bilgileri asla üçüncü taraflar ile paylaşmayız.";
@@ -410,7 +422,7 @@
 "privacy-information-collected-vpndata-shareable-subhead" = "Paylaşılabilir derlenmiş veriler";
 
 /* Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-useractivity-para-1" = "Bir aygıt Psiphon tünelini kullanırken, kullanıcının nasıl kullandığı hakkında bazı bilgiler toplarız. Psiphon bağlantısı kurmak için kullanılan iletişim kuralı, aygıtın ne kadar süreyle bağlı kaldığı, oturum süresince aktarılan bayt sayısı ve bağlantının kurulduğu, il, ülke ve İnternet Hizmeti Sağlayıcı bilgilerini kaydediyoruz. Ziyaret edilen bazı (ancak çok az sayıda) etki alanı ya da sunucu IP adresleri (bilinen zararlı yazılım sunucuları gibi) için aktarılan bayt sayısını da kaydediyoruz (Ancak asla tam adresi ya da herhangi bir kişisel önemi olan bilgiyi kaydetmiyoruz. Ayrıca bunu tüm etki alanları için değil yalnız genel olarak ilgi çeken etki alanları için yapıyoruz).";
+"privacy-information-collected-vpndata-useractivity-para-1" = "Bir aygıt Psiphon tünelini kullanırken, kullanıcının nasıl kullandığı hakkında bazı bilgiler toplarız. Psiphon bağlantısı kurmak için kullanılan iletişim kuralı, aygıtın ne kadar süreyle bağlı kaldığı, oturum süresince aktarılan bayt sayısı ve bağlantının kurulduğu, il, ülke ve İnternet Hizmeti Sağlayıcı bilgilerini kaydediyoruz. Ziyaret edilen bazı (ancak çok az sayıda) etki alanı ya da sunucu IP adresleri (bilinen zararlı yazılım sunucuları gibi) için aktarılan bayt sayısını da kaydediyoruz (Ancak asla tam adresi ya da herhangi bir kişisel önemi olan bilgiyi kaydetmiyoruz. Ayrıca bunu tüm etki alanları için değil yalnızca genel olarak ilgi çeken etki alanları için yapıyoruz).";
 
 /* Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
 "privacy-information-collected-vpndata-useractivity-para-2" = "Coğrafi konum ve İnternet Hizmeti Sağlayıcı bilgileri, bu bilgiler alındıktan sonra hemen silinen kullanıcı IP adresinden türetilir.";
@@ -464,7 +476,7 @@
 "privacy-information-collected-vpndata-whopsiphonshareswith-para-2-item-3" = "Bir ülke halkının açık İnternete erişme kararlığının ölçüsünün ne olduğu.";
 
 /* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-whopsiphonshareswith-para-3-v2" = "Yeniden vurgularsak, üçüncü taraflar ile yalnız anonimleştirilmiş paylaşılabilecek derlenmiş verileri paylaşıyoruz. ";
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-3-v2" = "Yeniden vurgularsak, üçüncü taraflar ile yalnızca anonimleştirilmiş paylaşılabilecek derlenmiş verileri paylaşıyoruz. ";
 
 /* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
 "privacy-information-collected-vpndata-whopsiphonshareswith-subhead-v2" = "Psiphon, derlenen verileri kimlerle paylaşıyor?";
@@ -473,7 +485,7 @@
 "privacy-information-collected-vpndata-whycare-para-1" = "Bir VPN ya da vekil sunucu kullanırken, hizmet sağlayıcının verilerinizde görebilecekleri ve onlardan derlenerek yapılabilecekler hakkında endişelenmelisiniz.";
 
 /* Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. '<em>' is an 'emphasis' (like italics) HTML tag, which can be used if it makes sense in your language. */
-"privacy-information-collected-vpndata-whycare-para-2" = "VPN kullanırken aygıtınıza gelen ve giden verilerin tümü VPN üzerinden aktarılır. Şifrelenmemiş HTTP kullanan bir web sitesini ziyaret ettiğinizde web sitesi ile ilgili bilgilerin tümü VPN tarafından görülebilir. Şifrelenmiş HTTPS kullanan bir web sitesini ziyaret ettiğinizde, site içeriği şifrelenir ancak site ile ilgili bazı bilgiler VPN tarafından görülebilir. Aygıtınızdaki diğer uygulama ve hizmetler de verileri şifrelenmiş ya da şifrelenmemiş olarak aktarır (Bunun tüm VPN ağları tarafından sağlanan şifrelemeden ayrı olduğunu unutmayın. Burada yalnız VPN tüneli <em>içindeki</em> şifrelenmiş ya da şifrelenmemiş veriler için endişeleniyoruz).";
+"privacy-information-collected-vpndata-whycare-para-2" = "VPN kullanırken aygıtınıza gelen ve giden verilerin tümü VPN üzerinden aktarılır. Şifrelenmemiş HTTP kullanan bir web sitesini ziyaret ettiğinizde web sitesi ile ilgili bilgilerin tümü VPN tarafından görülebilir. Şifrelenmiş HTTPS kullanan bir web sitesini ziyaret ettiğinizde, site içeriği şifrelenir ancak site ile ilgili bazı bilgiler VPN tarafından görülebilir. Aygıtınızdaki diğer uygulama ve hizmetler de verileri şifrelenmiş ya da şifrelenmemiş olarak aktarır (Bunun tüm VPN ağları tarafından sağlanan şifrelemeden ayrı olduğunu unutmayın. Burada yalnızca VPN tüneli <em>içindeki</em> şifrelenmiş ya da şifrelenmemiş veriler için endişeleniyoruz).";
 
 /* Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
 "privacy-information-collected-vpndata-whycare-para-3" = "Şifrelenmemiş hizmetler kullanılırken, VPN sağlayıcı verilerinizi görebilir, toplayabilir ve değiştirebilir (reklam eklemek gibi). Şifrelenmiş hizmetlerde ise VPN ziyaret edilen web sitelerinin üst veri bilgilerini ve yapılan işlemleri toplayabilir. Ayrıca VPN hizmeti sağlayıcının verilerinizi üçüncü taraflar ile paylaşıp paylaşmadığını bilemezsiniz.";
@@ -494,7 +506,7 @@
 "privacy-information-collected-websites-google-analytics-head" = "Google Analytics";
 
 /* No comment provided by engineer. */
-"privacy-information-collected-websites-google-analytics-para-1" = "Kullanımları hakkında bilgi toplamak için web sitelerimizin bazılarında Google Analytics kullanıyoruz. Google Analytics tarafından toplanan bu bilgiler yalnız belirli bir web sitesindeki gezinme davranışlarınızın istatistiksel sonuçlarını görmek için kullanılır. Google Analytics bilgilerinde, doğrudan ya da başka kaynaklardaki bilgiler ile birleştirilerek kim olduğunuzu ortaya çıkarabilecek veriler bulunmaz.";
+"privacy-information-collected-websites-google-analytics-para-1" = "Kullanımları hakkında bilgi toplamak için web sitelerimizin bazılarında Google Analytics kullanıyoruz. Google Analytics tarafından toplanan bu bilgiler yalnızca belirli bir web sitesindeki gezinme davranışlarınızın istatistiksel sonuçlarını görmek için kullanılır. Google Analytics bilgilerinde, doğrudan ya da başka kaynaklardaki bilgiler ile birleştirilerek kim olduğunuzu ortaya çıkarabilecek veriler bulunmaz.";
 
 /* No comment provided by engineer. */
 "privacy-information-collected-websites-google-analytics-para-2" = "Google Analytics, bu siteyi sonraki ziyaretinizde sizi tekil kullanıcı olarak tanımlayabilmek için web tarayıcınıza kalıcı bir çerez yerleştirir. Ancak bu çerez Google dışında herhangi biri tarafından kullanılamaz ve toplanan veriler diğer sunuculardaki başka hizmetler tarafından alınamaz ya da değiştirilemez.";
@@ -517,6 +529,9 @@
 /* Message shown when products available for purchase could not be retrieved. */
 "PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "Ürün listesi alınamadı";
 
+/* Title of screen encouraging the user to create a PsiCash account so that their PsiCash balance is protected. Do not translate or transliterate 'PsiCash' */
+"PROTECT_YOUR_PSICASH" = "PsiCash birikiminizi koruyun";
+
 /* Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
 "PROTECT_YOUR_PURCHASES" = "Satın almalarınızı koruyun";
 
@@ -538,14 +553,17 @@
 /* Button title that opens 'PsiCash' account management. */
 "PSICASH_ACCOUNT_MANAGEMENT_2" = "Hesap yönetimi";
 
+/* Explanation text that appears below 'Create account' button on the PsiCash sign in screen. Do not translate or transliterate terms PsiCash or Psiphon */
+"PSICASH_ACCOUNT_PRODUCT_DESCRIPTION" = "Bir PsiCash hesabı oluşturmanız, uygulamayı yeniden kurmanız ya da başka bir aygıtta Psiphon kullanmanız durumunda PsiCash birikiminizi korumanızı sağlar.";
+
 /* An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "PsiCash oturumunuz zaman aşımına uğramış. Lütfen yeniden oturum açın.";
 
 /* Body text of a modal dialog shown when a PsiCash login succeeds. There is a fixed number of times that a user can merge a pre-account balance into a PsiCash account. This message indicates that the user has hit that limit and the merge that occurred is the last one allowed. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_ACCOUNTS_LAST_MERGE_WARNING_BODY" = "PsiCash hesabınıza oturum açtınız. Bu aygıttaki bakiyeniz hesabınıza aktarıldı. Ancak bu bakiye aktarımı işlemi son kez yapıldı.";
+"PSICASH_ACCOUNTS_LAST_MERGE_WARNING_BODY" = "PsiCash hesabınıza oturum açtınız. Bu aygıttaki birikiminiz hesabınıza aktarıldı. Ancak bu birikim aktarım işlemi son kez yapıldı.";
 
 /* PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
-"PSICASH_BALANCE" = "PsiCash bakiyesi:";
+"PSICASH_BALANCE" = "PsiCash birikiminiz:";
 
 /* Subtitle of an error message shown when the PsiCash feature is unavailable, asking the user to send us a feedback if this problem persists. */
 "PSICASH_LIB_INIT_FAILED_SEND_FEEDBACK" = "PsiCash yüklenemedi.\n\nBu sorun sürerse, lütfen bize geri bildirim gönderin.";
@@ -572,7 +590,7 @@
 "PSICASH_MUST_BE_CONNECTED" = "PsiCash kullanabilmeniz için, Psiphon ağına bağlı olmalısınız.";
 
 /* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
-"PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "ÖNEMLİ: Bir PsiCash hesabı oluşturup PsiCash hesabınızla oturum açmadıkça, Psiphon uygulamasını kaldırdığınızda PsiCash bakiyenizi kaybedersiniz.";
+"PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "ÖNEMLİ: Bir PsiCash hesabı oluşturup PsiCash hesabınızla oturum açmadıkça, Psiphon uygulamasını kaldırdığınızda PsiCash birikiminizi kaybedersiniz.";
 
 /* Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "PSICASH_SPEED_BOOST_PRODUCT_NOT_FOUND_MESSAGE" = "Speed Boost ürünü bulunamadı. Uygulamanız eski olabilir. Lütfen güncellemeleri denetleyin.";
@@ -584,7 +602,7 @@
 "PSICASH_SPEED_PORT_LIMITS_HEAD" = "Hız ve kapı kısıtlamaları";
 
 /* A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon */
-"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY" = "Psiphon aboneliğiniz size sürekli Speed Boost kullanımı sağlıyor. Bu yüzden daha fazlasını satın almanıza gerek yok. Aboneliğinizi sonlandırmak isteyebilirsiniz diye PsiCash bakiyeniz tutulacak.\n\nPsiCash hesabınıza ayarlar menüsünden ulaşabilirsiniz.";
+"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY" = "Psiphon aboneliğiniz size sürekli Speed Boost kullanımı sağlıyor. Bu yüzden daha fazlasını satın almanıza gerek yok. Aboneliğinizi sonlandırmak isteyebilirsiniz diye PsiCash birikiminiz korunacak.\n\nPsiCash hesabınıza ayarlar menüsünden ulaşabilirsiniz.";
 
 /* A title message to the premium user (a user with a subscription when they are trying to navigate to PsiCash and Speed Boost screen. Do not translate or transliterate words PsiCash or Psiphon */
 "PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_TITLE" = "Psiphon aboneliğiniz size ayrıcalıklı erişim sunuyor!";
@@ -604,6 +622,9 @@
 /* 'PsiCash' features are unavailable while the user has a subscription. Do not translate or transliterate 'PsiCash' */
 "PSICASH_UNAVAILABLE_WHILE_SUBSCRIBED" = "Abone olunmuşken PsiCash kullanılamaz";
 
+/* Text field label where users can enter their account's username */
+"PSICASH_USERNAME_TEXT_FIELD" = "PsiCash kullanıcı adı";
+
 /* Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
 "PSICASH_WAIT_TRANSACTION_VERIFIED" = "Lütfen işleminiz doğrulanırken bekleyin";
 
@@ -612,6 +633,9 @@
 
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon bağlantısı yok";
+
+/* Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
+"PSIPHON_MUST_BE_CONNECTED_INFO" = "Bu içeriğin görüntülenebilmesi için Psiphon bağlı olmalıdır";
 
 /* Alert message that the users purchases have been restored successfully */
 "PURCHASES_RESTORED_SUCCESSFULLY" = "Satın almalarınız geri yüklendi";
@@ -768,9 +792,6 @@
 
 /* Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
 "UPGRADE_PSIPHON" = "Psiphon uygulamasını yükseltin";
-
-/* Text field label where users can enter their account's username */
-"USERNAME_TEXT_FIELD" = "Kullanıcı adı";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "Psiphon başlatılırken bir sorun çıktı. Lütfen yeniden deneyin.";

@@ -16,8 +16,14 @@
 /*[UNTRANSLATED] Alert dialog title. */
 "ALERT_TITLE_OPERATION_FAILED" = "Operation Failed";
 
+/* Text that appears above the 'Log in' button on the PsiCash sign in screen. */
+"ALREADY_HAVE_AN_ACCOUNT" = "Bereits ein Konto vorhanden?";
+
 /* Title of the button which takes the user to the previous screen. Text should be short and one word when possible. */
 "BACK_BUTTON" = "Zurück";
+
+/* Title of the navigation button shown with an arrow that takes the user to the previous screen. */
+"BACK_BUTTON_TITLE" = "Zurück";
 
 /* Title of button on alert view which shows the progress of the user's buy request. Hitting this button dismisses the alert and the buy request continues processing in the background. */
 "BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Verwerfen";
@@ -196,6 +202,9 @@
 /*[UNTRANSLATED] User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
 "INSUFFICIENT_PSICASH_BALANCE" = "Insufficient PsiCash balance";
 
+/* Title of button that takes the user to a screen where more detailed explanation of a feature is provided. */
+"LEARN_MORE_BUTTON" = "Mehr erfahren";
+
 /* External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french. */
 "LICENSE_PAGE_URL" = "https://psiphon.ca/de/license.html";
 
@@ -255,6 +264,9 @@
 
 /*[UNTRANSLATED] Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
 "ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "You’ll need to allow Psiphon to add VPN configurations in order to connect.";
+
+/*[UNTRANSLATED] Title of a button that open a URL on the device's web browser. */
+"OPEN_IN_BROWSER_BUTTON_TITLE" = "Open in Browser";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Bitte öffnen Sie die Psiphon-App, um die Verbindung zu beenden.";
@@ -517,6 +529,9 @@
 /*[UNTRANSLATED] Message shown when products available for purchase could not be retrieved. */
 "PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "Product list could not be retrieved";
 
+/*[UNTRANSLATED] Title of screen encouraging the user to create a PsiCash account so that their PsiCash balance is protected. Do not translate or transliterate 'PsiCash' */
+"PROTECT_YOUR_PSICASH" = "Protect your PsiCash";
+
 /*[UNTRANSLATED] Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
 "PROTECT_YOUR_PURCHASES" = "Protect Your Purchases";
 
@@ -537,6 +552,9 @@
 
 /*[UNTRANSLATED] Button title that opens 'PsiCash' account management. */
 "PSICASH_ACCOUNT_MANAGEMENT_2" = "Manage account";
+
+/*[UNTRANSLATED] Explanation text that appears below 'Create account' button on the PsiCash sign in screen. Do not translate or transliterate terms PsiCash or Psiphon */
+"PSICASH_ACCOUNT_PRODUCT_DESCRIPTION" = "Creating a PsiCash account will help preserve your PsiCash if you reinstall the app or use Psiphon on another device.";
 
 /*[UNTRANSLATED] An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "Your PsiCash login has expired. Please log back in.";
@@ -604,6 +622,9 @@
 /*[UNTRANSLATED] 'PsiCash' features are unavailable while the user has a subscription. Do not translate or transliterate 'PsiCash' */
 "PSICASH_UNAVAILABLE_WHILE_SUBSCRIBED" = "PsiCash is unavailable while subscribed";
 
+/*[UNTRANSLATED] Text field label where users can enter their account's username */
+"PSICASH_USERNAME_TEXT_FIELD" = "PsiCash username";
+
 /*[UNTRANSLATED] Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
 "PSICASH_WAIT_TRANSACTION_VERIFIED" = "Please wait while your transaction is being verified";
 
@@ -612,6 +633,9 @@
 
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon ist nicht verbunden";
+
+/*[UNTRANSLATED] Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
+"PSIPHON_MUST_BE_CONNECTED_INFO" = "Psiphon must be connected to show this content";
 
 /*[UNTRANSLATED] Alert message that the users purchases have been restored successfully */
 "PURCHASES_RESTORED_SUCCESSFULLY" = "Purchases restored successfully";
@@ -768,9 +792,6 @@
 
 /*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
 "UPGRADE_PSIPHON" = "Upgrade Psiphon";
-
-/* Text field label where users can enter their account's username */
-"USERNAME_TEXT_FIELD" = "Benutzername";
 
 /*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "An error occurred while starting Psiphon. Please try again.";
