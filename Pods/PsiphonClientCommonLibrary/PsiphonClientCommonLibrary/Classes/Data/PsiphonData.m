@@ -71,7 +71,7 @@
             }
             _data = jsonObject;
         } else {
-            _data = nil;
+            _data = [NSDictionary dictionary];
         }
     }
     
