@@ -124,11 +124,11 @@
 /* No comment provided by engineer. */
 "faq-information-collected-answer-para-10" = "Если вы устанавливаете Psiphon из \"магазина приложений\" типа Google Play или Amazon AppStore, имейте в виду, что магазины могут собирать дополнительную статистику. Например, вот что собирает Google Play:";
 
-/*[UNTRANSLATED] No comment provided by engineer. */
-"faq-information-collected-answer-para-11" = "When you send an email request to our email auto-responder server, we are able to see your email address. While your email is being processed it is saved to the email server's disk, and it is deleted as soon as it is processed (usually in a few seconds). Your email address may be written to the server system logs. These logs are deleted after one week.";
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-11" = "Когда вы отправляете запрос по электронной почте на наш сервер автоответчика электронной почты, мы можем видеть ваш адрес электронной почты. Пока ваше электронное письмо обрабатывается, оно сохраняется на диске почтового сервера и удаляется сразу после обработки (обычно через несколько секунд). Ваш адрес электронной почты может быть записан в системные журналы сервера. Эти журналы удаляются через одну неделю.";
 
-/*[UNTRANSLATED] No comment provided by engineer. */
-"faq-information-collected-answer-para-12" = "Our email auto-responder server is hosted in the Amazon EC2 cloud. This means that Amazon is able to see the email you send and our response to you.";
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-12" = "Наш сервер автоответчика электронной почты размещен в облаке Amazon EC2. Это означает, что Amazon может видеть отправленное вами электронное письмо и наш ответ вам.";
 
 /* No comment provided by engineer. */
 "faq-information-collected-answer-para-13" = "Данные, которые сохраняются нами для каждого входящего письма:";
@@ -298,26 +298,26 @@
 /* No comment provided by engineer. */
 "privacy-information-collected-client-advertising-networks-para-2" = "Вы можете запретить использование cookies рекламными объявлениями, посетив:";
 
-/*[UNTRANSLATED] Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
-"privacy-information-collected-data-categories-header" = "Data Categories";
+/* Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
+"privacy-information-collected-data-categories-header" = "Категории данных";
 
 /* Header text in the 'my.psi.cash' section of the Privacy page. Refers to the cookies stored by web browsers. */
 "privacy-information-collected-mypsicash-cookies-head" = "Файлы cookie";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-cookies-para-1" = "my.psi.cash only uses cookies and similar tracking technologies to carry out activities that are essential for the operation of the website. Essential cookies are necessary to ensure basic functions of the website. Cookies are small text files that are stored on your computer and saved by your browser, and do not represent any risk to your device. You can configure your browser settings to personalize how you would like your browser to handle cookies. Disabling essential cookies will degrade the functionality of this website.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-cookies-para-1" = "my.psi.cash использует файлы cookie и аналогичные технологии отслеживания только для выполнения действий, которые необходимы для работы веб-сайта. Основные файлы cookie необходимы для обеспечения основных функций веб-сайта. Файлы cookie - это небольшие текстовые файлы, которые хранятся на вашем компьютере и сохраняются вашим браузером и не представляют никакого риска для вашего устройства. Вы можете настроить настройки своего браузера таким образом, чтобы настроить способ обработки файлов cookie вашим браузером. Отключение основных файлов cookie приведет к ухудшению функциональности этого веб-сайта.";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. 'PsiCash' must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-para-1" = "Users create and manage their PsiCash accounts on the <a href=\"https://my.psi.cash\" target=\"_blank\" rel=\"noopener noreferrer\">my.psi.cash</a> website.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-para-1" = "Пользователи создают и управляют своими учетными записями PsiCash на сайте <a href=\"https://my.psi.cash\" target=\"_blank\" rel=\"noopener noreferrer\">my.psi.cash</a>.";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-recaptcha-para-1" = "my.psi.cash uses Google’s reCAPTCHA v3 (hereinafter “reCAPTCHA”), which protects websites from spam and abuse by non-human users (i.e., bots). reCAPTCHA collects personal information that is required for the functioning of the technology and is subject to its own privacy policy. Use of my.psi.cash indicates acceptance of Google’s <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">Privacy Policy</a> and <a href=\"https://policies.google.com/terms\" target=\"_blank\" rel=\"noopener noreferrer\">Terms</a>.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-recaptcha-para-1" = "my.psi.cash использует Google reCAPTCHA v3 (далее “reCAPTCHA”), которая защищает веб-сайты от спама и злоупотреблений со стороны пользователей, не являющихся людьми (т.е. ботов). reCAPTCHA собирает личную информацию, которая необходима для функционирования технологии и регулируется ее собственной политикой конфиденциальности. Использование my.psi.cash означает принятие  <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">политики конфиденциальности</a> и <a href=\"https://policies.google.com/terms\" target=\"_blank\" rel=\"noopener noreferrer\">условий</a> Google.";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-recaptcha-para-2" = "Our use of reCAPTCHA is strictly limited to ensuring the continued functioning of my.psi.cash. reCAPTCHA technology performs an automatic analysis for each site request without requiring the user to take any additional actions. This analysis is based on interactions made by the user, and is used to mitigate bot and other malicious behaviour on our website. The data collected during analysis is forwarded to Google, where Google will use this data to determine if you are a human user. This analysis takes place in the background, and users are not advised it is taking place.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-recaptcha-para-2" = "Наше использование reCAPTCHA строго ограничено обеспечением непрерывного функционирования my.psi.cash. Технология reCAPTCHA выполняет автоматический анализ для каждого запроса сайта, не требуя от пользователя выполнения каких-либо дополнительных действий. Этот анализ основан на взаимодействиях, совершенных пользователем, и используется для предотвращения ботов и другого вредоносного поведения на нашем веб-сайте. Данные, собранные в ходе анализа, передаются в Google, где Google будет использовать эти данные, чтобы определить, являетесь ли вы пользователем-человеком. Этот анализ выполняется в фоновом режиме, и пользователям не сообщается, что он выполняется.";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. */
-"privacy-information-collected-mypsicash-recaptcha-para-3" = "For more information about Google’s reCAPTCHA technology, please visit <a href=\"https://www.google.com/recaptcha/about/\" target=\"_blank\" rel=\"noopener noreferrer\">https://www.google.com/recaptcha/about/</a>.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. */
+"privacy-information-collected-mypsicash-recaptcha-para-3" = "Для получения дополнительной информации о технологии Google reCAPTCHA, пожалуйста, посетите <a href=\"https://www.google.com/recaptcha/about/\" target=\"_blank\" rel=\"noopener noreferrer\">https://www.google.com/recaptcha/about/</a>.";
 
 /* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
 "privacy-information-collected-psicash-para-1" = "В системе PsiCash собираются только те данные, которые необходимы для функционирования самой системы, мониторинга ее работы и обеспечения безопасности.";
@@ -340,8 +340,8 @@
 /* Paragraph text in the 'PsiCash' section of the Privacy page. This is preamble to a detailed bullet list. 'PsiCash' must not be translated or transliterated. */
 "privacy-information-collected-psicash-para-2-list-start" = "Сервер PsiCash хранит данные конкретных пользователей для своей нормальной работы, в их числе:";
 
-/*[UNTRANSLATED] Paragraph text on the Privacy Policy page. Describes the user data requirements for PsiCash accounts. 'PsiCash' must not be translated or transliterated. 'Psiphon' must not be translated or transliterated. */
-"privacy-information-collected-psicash-para-2b" = "Creating a PsiCash account is optional. If an account is created, account-specific information such as username, password, and email address (if provided) are stored on the server. When logged in to a Psiphon client, the username is also stored locally.";
+/* Paragraph text on the Privacy Policy page. Describes the user data requirements for PsiCash accounts. 'PsiCash' must not be translated or transliterated. 'Psiphon' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-2b" = "Создание учетной записи PsiCash необязательно. Если учетная запись создана, на сервере сохраняется информация, относящаяся к конкретной учетной записи, такая как имя пользователя, пароль и адрес электронной почты (если он указан). При входе в клиент Psiphon имя пользователя также сохраняется локально.";
 
 /* Bullet list item in the 'data stored in web browser' list. This item refers to randomly generated values that allow a user to access and utilize the system. */
 "privacy-information-collected-psicash-para-3-item-1" = "сгенерированные токены пользовательского доступа";
@@ -373,8 +373,8 @@
 /* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
 "privacy-information-collected-psicash-para-5" = "Данные отдельных пользователей никогда не передаются третьим сторонам. Передаваться может лишь обобщенная статистика, но идентификация пользователей исключается.";
 
-/*[UNTRANSLATED] Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
-"privacy-information-collected-psicash-para-6" = "PsiCash server resources are stored in AWS, which means Amazon has access to the data.";
+/* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-6" = "Ресурсы сервера PsiCash хранятся в AWS, что означает, что Amazon имеет доступ к данным.";
 
 /* Sub-heading for section describing use of logging access to data storage (aka S3 bucket logging). The way to read this is 'creation of logs for user accesses to data storage'. Psiphon 'stores' websites, downloads, and upgrades (the 'data') in Amazon S3 (the 'storage'). Users 'access' the data storage. And, somtimes, we 'log' those accesses. (For example, if we suspect attackers are accessing the storage, or if it seems the storage is blocked by a country.) */
 "privacy-information-collected-s3-logging-head" = "Логи доступа к хранилищу";
