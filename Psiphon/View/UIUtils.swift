@@ -920,12 +920,13 @@ struct PresentationState<ViewModel: Hashable>: Hashable {
 
 extension UIViewController {
 
-    func topMostController() -> UIViewController {
-        var topController: UIViewController? = self
-        while (topController?.presentedViewController) != nil {
-            topController = topController?.presentedViewController
+    /// Returns top most active (i.e. not being dismissed) view controller.
+    func topActiveViewController() -> UIViewController {
+        var vc = self
+        while let presentedVC = vc.presentedViewController, !presentedVC.isBeingDismissed {
+            vc = presentedVC
         }
-        return topController!
+        return vc
     }
 
 }
