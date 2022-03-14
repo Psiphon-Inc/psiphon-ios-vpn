@@ -75,7 +75,7 @@ final class PsiCashAccountLoginViewController: ReactiveViewController {
     private var controls = [UIControl]()
     
     /// Nil implies that no view controllers are presented.
-    @State private var navigation: NavigationState<PresentedScreen> = .pending(.mainScreen)
+    @MainState private var navigation: NavigationState<PresentedScreen> = .pending(.mainScreen)
     
     private var lastLoginLogoutEventDate: Date? = nil
     
