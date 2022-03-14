@@ -67,7 +67,7 @@ final class WebViewController: ReactiveViewController {
         EitherView<PlaceholderView<WKWebView>, BlockerView>>!
     
     /// State of loading content for the main frame.
-    @State private var mainFrameLoadState: WebViewLoadingState = .pending
+    @MainState private var mainFrameLoadState: WebViewLoadingState = .pending
     
     /// - Parameter showOpenInBrowser: Adds "Open in Browser" button to navigation's right hand-side.
     init(

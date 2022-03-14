@@ -20,8 +20,10 @@
 import Foundation
 import ReactiveSwift
 
+/// A property manager that reads and writes values on the main-thread,
+/// and provides utilities to observe changes in value.
 @propertyWrapper
-public final class State<Value> {
+public final class MainState<Value> {
     private let passthroughSubject = Signal<Value, Never>.pipe()
 
     private var value: Value {
@@ -32,27 +34,37 @@ public final class State<Value> {
 
     public var wrappedValue: Value {
         get {
-            value
+            precondition(Thread.isMainThread)
+            return value
         }
         set {
+            precondition(Thread.isMainThread)
             value = newValue
         }
     }
 
-    public var projectedValue: State<Value> { self }
+    public var projectedValue: MainState<Value> { self }
 
     public var signal: Signal<Value, Never> {
         return passthroughSubject.output
     }
 
     public var signalProducer: SignalProducer<Value, Never> {
-        return SignalProducer { [unowned self] observer, lifetime in
-            observer.send(value: self.wrappedValue)
-            lifetime += self.passthroughSubject.output.observe(observer)
+        SignalProducer { [unowned self] observer, lifetime in
+            if Thread.isMainThread {
+                observer.send(value: self.wrappedValue)
+                lifetime += self.passthroughSubject.output.observe(observer)
+            } else {
+                DispatchQueue.main.async {
+                    observer.send(value: self.wrappedValue)
+                    lifetime += self.passthroughSubject.output.observe(observer)
+                }
+            }
         }
     }
 
     public init(wrappedValue: Value) {
+        precondition(Thread.isMainThread)
         self.value = wrappedValue
     }
 
