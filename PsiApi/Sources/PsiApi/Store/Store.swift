@@ -85,7 +85,7 @@ public extension Reducer {
 public final class Store<Value: Equatable, Action> {
 
     /// - Note: Accessing current value is not thread-safe.
-    @State public private(set) var value: Value
+    @MainState public private(set) var value: Value
 
     private let dispatcher: Dispatcher
     private var reducer: Reducer<Value, Action, ()>!

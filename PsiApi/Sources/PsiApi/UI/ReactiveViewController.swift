@@ -99,7 +99,7 @@ open class ReactiveViewController: UIViewController {
     /// Value of the last UIViewController lifecycle call. The property wrapper provides
     /// an interface to obtain a stream of UIViewController lifecycle call values, which starts
     /// with the current value of this variable.
-    @State public private(set) var lifeCycle: ViewControllerLifeCycle = .initing
+    @MainState public private(set) var lifeCycle: ViewControllerLifeCycle = .initing
 
     private var onDidLoad: (() -> Void)?
     private var onDismissed: (() -> Void)?
