@@ -62,3 +62,13 @@ extension FeedbackViewController: ChildViewControllerDismissedDelegate {
     }
     
 }
+
+// Adds conformance to`ChildViewControllerDismissedDelegate` to satisfy
+// `NavigationController` child view controller requirements.
+extension LanguageSelectionViewController: ChildViewControllerDismissedDelegate {
+    
+    public func parentIsDimissed() {
+        // No-op
+    }
+    
+}
