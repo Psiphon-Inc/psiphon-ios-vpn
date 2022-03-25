@@ -26,16 +26,18 @@ import PsiApi
     
     private let applyPsiphonStyling: Bool
     
-    override init(rootViewController: UIViewController) {
+    // Patch for Swift bug on iOS 12.
+    // @unavailable(iOS 13, *)
+    override init(nibName: String?, bundle: Bundle?) {
         self.applyPsiphonStyling = true
-        super.init(rootViewController: rootViewController)
+        super.init(nibName: nibName, bundle: bundle)
     }
     
-    init(rootViewController: UIViewController, applyPsiphonStyling: Bool) {
+    @objc init(rootViewController: UIViewController, applyPsiphonStyling: Bool = true) {
         self.applyPsiphonStyling = applyPsiphonStyling
         super.init(rootViewController: rootViewController)
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
