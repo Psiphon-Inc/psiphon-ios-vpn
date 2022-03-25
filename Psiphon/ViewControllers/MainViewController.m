@@ -357,7 +357,7 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
       };
 
     PsiNavigationController *navController = [[PsiNavigationController alloc]
-      initWithRootViewController:regionViewController];
+      initWithRootViewController:regionViewController applyPsiphonStyling:TRUE];
     [self presentViewController:navController animated:YES completion:nil];
 }
 
