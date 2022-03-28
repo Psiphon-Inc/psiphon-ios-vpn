@@ -26,7 +26,7 @@ import PsiApi
 import PsiCashClient
 
 public enum IAPAction: Equatable {
-    case checkUnverifiedTransaction
+    case retryUnverifiedTransaction
     case purchase(product: AppStoreProduct, resultPromise: Promise<ObjCIAPResult>? = nil)
     case appReceiptDataUpdated(ReceiptData?)
     case _psiCashConsumableVerificationRequestResult(
@@ -59,15 +59,18 @@ extension TransactionUpdate {
 
 public struct IAPReducerState: Equatable {
     public var iap: IAPState
+    public let receiptData: ReceiptData??
     public var psiCashBalance: PsiCashBalance
     public let psiCashAccountType: PsiCashAccountType?
     
     public init(
         iap: IAPState,
+        receiptData: ReceiptData??,
         psiCashBalance: PsiCashBalance,
         psiCashAccountType: PsiCashAccountType?
     ) {
         self.iap = iap
+        self.receiptData = receiptData
         self.psiCashBalance = psiCashBalance
         self.psiCashAccountType = psiCashAccountType
     }
@@ -121,14 +124,20 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
     state, action, environment in
     
     switch action {
-    case .checkUnverifiedTransaction:
+        
+    case .retryUnverifiedTransaction:
         // Checks if there is an unverified transaction.
         guard state.iap.unfinishedPsiCashTx != nil else {
             return []
         }
         
+        // state.receiptData is `.none` if the receipt file has never been read by the app.
+        guard let readReceipt = state.receiptData else {
+            return []
+        }
+        
         return [
-            environment.appReceiptStore(.readLocalReceiptFile).mapNever()
+            Effect(value: .appReceiptDataUpdated(readReceipt))
         ]
         
     case let .purchase(product: product, resultPromise: maybeObjcSubscriptionPromise):
