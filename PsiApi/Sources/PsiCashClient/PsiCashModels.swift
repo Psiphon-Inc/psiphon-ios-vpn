@@ -24,6 +24,7 @@ import PsiApi
 // that model PsiCash library's Objective-C data models,
 // perhaps with some additions.
 
+/// Custom data must be Base 64 string without padding.
 public typealias CustomData = String
 
 public enum PsiCashParseError: HashableError {
