@@ -377,7 +377,7 @@ final class PsiCashStoreViewController: ReactiveViewController {
                             self.containerView.bind(
                                 .left(.right(.right(.right(.left(
                                                             .failedToVerifyPsiCashIAPPurchase(retryAction: {
-                                                                self.iapStore.send(.checkUnverifiedTransaction)
+                                                                self.iapStore.send(.retryUnverifiedTransaction)
                                                             })))))))
                             
                         }

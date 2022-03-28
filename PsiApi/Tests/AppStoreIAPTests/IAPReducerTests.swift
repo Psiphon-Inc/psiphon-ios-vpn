@@ -70,7 +70,7 @@ final class IAPReducerTests: XCTestCase {
                                 
                 // Act
                 let (nextState, effectsResults) = testReducer(initState,
-                                                              .checkUnverifiedTransaction,
+                                                              .retryUnverifiedTransaction,
                                                               env, iapReducer)
                 
                 // Assert
