@@ -22,9 +22,12 @@ import ReactiveSwift
 import PsiApi
 
 public struct SubscriptionValidationRequest: Codable {
+    
     public let originalTransactionID: OriginalTransactionID
     public let webOrderLineItemID: WebOrderLineItemID
     public let productID: ProductID
+    
+    /// Base64 encoded string with padding.
     public let receiptData: String
     
     public init(
