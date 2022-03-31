@@ -38,3 +38,16 @@ extension Array {
     }
     
 }
+
+extension Set {
+    
+    /// Treats the `Set` as a singleton and returns it's element.
+    /// If the set is not a singleton then `nil` is returned.
+    public var singletonElement: Element? {
+        guard count == 1, let elem = self.first else {
+            return nil
+        }
+        return elem
+    }
+    
+}
