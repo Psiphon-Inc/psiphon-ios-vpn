@@ -126,8 +126,12 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
     switch action {
         
     case .retryUnverifiedTransaction:
+        
         // Checks if there is an unverified transaction.
-        guard state.iap.unfinishedPsiCashTx != nil else {
+        guard
+            let unifinishedConsumableTx = state.iap.unfinishedPsiCashTx,
+            unifinishedConsumableTx.verificationState != .pendingResponse
+        else {
             return []
         }
         
@@ -201,6 +205,17 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
         ]
         
     case .appReceiptDataUpdated(let maybeReceiptData):
+        
+        // If there are is an unfinished consumable transaction announced by the default
+        // `SKPaymentQueue`, then is it checked against the local app receipt (which is
+        // assumed to contain this unfinished transaction).
+        //
+        // Note that `finishTransaction(_:)` is called immediately after a new
+        // subscription transaction is observed. Whereas the PsiCash consumable
+        // transactions are first submitted to the purchase-verifier server,
+        // where the user's account gets credited, and `finishTransaction(_:)`
+        // is only called after a 200 OK response.
+        
         guard let unfinishedPsiCashTx = state.iap.unfinishedPsiCashTx else {
             return []
         }
@@ -227,22 +242,15 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
             ]
         }
         
-        let purchaseIsInReceipt = receiptData.consumableInAppPurchases.contains { purchase in
-            purchase.matches(paymentTransaction: unfinishedPsiCashTx.transaction)
+        // Finds matching transaction in the receipt file.
+        // We expect to find only one such transaction in the receipt.
+        let purchaseInReceiptMaybe = receiptData.consumableInAppPurchases.filter {
+            $0.matches(paymentTransaction: unfinishedPsiCashTx.transaction)
         }
         
-        guard purchaseIsInReceipt else {
-            
-            state.iap.unfinishedPsiCashTx = .none
-            
-            return [
-                environment.paymentQueue.finishTransaction(unfinishedPsiCashTx.transaction)
-                    .mapNever(),
-                environment.feedbackLogger.log(.error, """
-                Finishing transaction since not found in the app receipt: \(unfinishedPsiCashTx)
-                """)
-                .mapNever()
-            ]
+        guard let consumableIAP = purchaseInReceiptMaybe.singletonElement else {
+            environment.feedbackLogger.fatalError("Matched more than one transaction in the receipt. \(purchaseInReceiptMaybe)")
+            return []
         }
         
         guard let customData = environment.psiCashEffects.rewardedVideoCustomData() else {
@@ -271,6 +279,7 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
         let req = PurchaseVerifierServer.psiCash(
             requestBody: PsiCashValidationRequest(
                 productID: unfinishedPsiCashTx.transaction.productID(),
+                transactionID: consumableIAP.transactionID,
                 receipt: receiptData,
                 customData: customData
             ),
