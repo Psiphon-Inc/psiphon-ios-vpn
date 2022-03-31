@@ -179,6 +179,10 @@ extension RecordedIAPPurchase {
     
     /// Determines whether or not `paymentTransaction` matches this in-app purchase recorded
     /// in the App Store receipt.
+    /// - Note: Note that transaction identifier of an `SKPaymentTransaction` object
+    /// is not guaranteed to match the `transaction_id` field in the receipt.
+    /// Therefore we rely on a combination of purchase date and product identifier.
+    /// https://developer.apple.com/documentation/storekit/skpaymenttransaction/1411288-transactionidentifier
     /// - Returns: `false` if `paymentTransaction` is not completed,
     /// otherwise matches transaction date and product ID.
     public func matches(paymentTransaction: PaymentTransaction) -> Bool {

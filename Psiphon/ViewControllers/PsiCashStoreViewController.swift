@@ -364,7 +364,7 @@ final class PsiCashStoreViewController: ReactiveViewController {
                         
                         // Set view content based on verification state of the
                         // unverified PsiCash IAP transaction.
-                        switch unverifiedPsiCashTx.verification {
+                        switch unverifiedPsiCashTx.verificationState {
                         case .notRequested, .pendingResponse:
                             self.containerView.bind(
                                 .left(.right(.right(.right(.right(
