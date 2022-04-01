@@ -196,6 +196,8 @@ public struct SupportedAppStoreProducts: Equatable {
     }
 }
 
+/// Wraps a `SKPaymentTransaction` object and provides better typing of it's state.
+/// A payment transaction represents an object in the payment queue.
 public struct PaymentTransaction: Equatable {
 
     /// Refines `SKPaymentTransaction` state.
