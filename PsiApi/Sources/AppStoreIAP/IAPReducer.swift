@@ -126,8 +126,12 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
     switch action {
         
     case .retryUnverifiedTransaction:
+        
         // Checks if there is an unverified transaction.
-        guard state.iap.unfinishedPsiCashTx != nil else {
+        guard
+            let unifinishedConsumableTx = state.iap.unfinishedPsiCashTx,
+            unifinishedConsumableTx.verificationState != .pendingResponse
+        else {
             return []
         }
         
@@ -201,19 +205,29 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
         ]
         
     case .appReceiptDataUpdated(let maybeReceiptData):
+        
+        // If there are is an unfinished consumable transaction announced by the default
+        // `SKPaymentQueue`, then is it checked against the local app receipt (which is
+        // assumed to contain this unfinished transaction).
+        //
+        // Note that `finishTransaction(_:)` is called immediately after a new
+        // subscription transaction is observed. Whereas the PsiCash consumable
+        // transactions are first submitted to the purchase-verifier server,
+        // where the user's account gets credited, and `finishTransaction(_:)`
+        // is only called after a 200 OK response.
+        
         guard let unfinishedPsiCashTx = state.iap.unfinishedPsiCashTx else {
             return []
         }
         
-        // Requests verification only if one has not been made, or it failed.
-        if case .pendingResponse = unfinishedPsiCashTx.verification {
-            // A verification request has already been made.
+        // Guards against sending the same request twice.
+        if case .pendingResponse = unfinishedPsiCashTx.verificationState {
             return []
         }
         
         guard let receiptData = maybeReceiptData else {
             
-            state.iap.unfinishedPsiCashTx?.verification = .requestError(
+            state.iap.unfinishedPsiCashTx?.verificationState = .requestError(
                 ErrorEvent(ErrorRepr(repr: "nil receipt"), date: environment.getCurrentTime())
             )
             
@@ -227,27 +241,20 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
             ]
         }
         
-        let purchaseIsInReceipt = receiptData.consumableInAppPurchases.contains { purchase in
-            purchase.matches(paymentTransaction: unfinishedPsiCashTx.transaction)
+        // Finds matching transaction in the receipt file.
+        // We expect to find only one such transaction in the receipt.
+        let purchaseInReceiptMaybe = receiptData.consumableInAppPurchases.filter {
+            $0.matches(paymentTransaction: unfinishedPsiCashTx.transaction)
         }
         
-        guard purchaseIsInReceipt else {
-            
-            state.iap.unfinishedPsiCashTx = .none
-            
-            return [
-                environment.paymentQueue.finishTransaction(unfinishedPsiCashTx.transaction)
-                    .mapNever(),
-                environment.feedbackLogger.log(.error, """
-                Finishing transaction since not found in the app receipt: \(unfinishedPsiCashTx)
-                """)
-                .mapNever()
-            ]
+        guard let consumableIAP = purchaseInReceiptMaybe.singletonElement else {
+            environment.feedbackLogger.fatalError("Matched more than one transaction in the receipt. \(purchaseInReceiptMaybe)")
+            return []
         }
         
         guard let customData = environment.psiCashEffects.rewardedVideoCustomData() else {
             
-            state.iap.unfinishedPsiCashTx?.verification = .requestError(
+            state.iap.unfinishedPsiCashTx?.verificationState = .requestError(
                 ErrorEvent(
                     ErrorRepr(repr: "nil custom data"),
                     date: environment.getCurrentTime()
@@ -264,13 +271,14 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
             ]
         }
         
-        state.iap.unfinishedPsiCashTx?.verification = .pendingResponse
+        state.iap.unfinishedPsiCashTx?.verificationState = .pendingResponse
         
         // Creates request to verify PsiCash AppStore IAP purchase.
         
         let req = PurchaseVerifierServer.psiCash(
             requestBody: PsiCashValidationRequest(
                 productID: unfinishedPsiCashTx.transaction.productID(),
+                transactionID: consumableIAP.transactionID,
                 receipt: receiptData,
                 customData: customData
             ),
@@ -312,12 +320,13 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
         ]
         
     case let ._psiCashConsumableVerificationRequestResult(requestResult, requestTransaction):
+        
         guard let unfinishedPsiCashTx = state.iap.unfinishedPsiCashTx else {
             environment.feedbackLogger.fatalError("expected non-nil 'unverifiedPsiCashTx'")
             return []
         }
         
-        guard case .pendingResponse = unfinishedPsiCashTx.verification else {
+        guard case .pendingResponse = unfinishedPsiCashTx.verificationState else {
             environment.feedbackLogger.fatalError("""
                 unexpected state for unverified PsiCash IAP transaction \
                 '\(String(describing: state.iap.unfinishedPsiCashTx))'
@@ -367,7 +376,7 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
             case .failure(let errorEvent):
                 // Request failed or received a non-200 OK response.
                 
-                state.iap.unfinishedPsiCashTx?.verification = .requestError(
+                state.iap.unfinishedPsiCashTx?.verificationState = .requestError(
                     errorEvent.eraseToRepr())
                 
                 var effects = [Effect<IAPAction>]()
@@ -425,12 +434,13 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
                 environment.feedbackLogger.log(
                     .info, "transactionUpdate: '\(makeFeedbackEntry(tx))'").mapNever()
             
-            let iapPurchasingResult = IAPPurchasing.makeGiven(
+            let iapPurchasingResult = IAPPurchasing.make(
                 productType: productType,
                 transaction: tx,
                 existingConsumableTransaction: { paymentTx -> Bool? in
                     guard let existingTransaction = state.iap.unfinishedPsiCashTx else {
-                        return nil
+                        // No consumable transaction has been previously observed.
+                        return .none
                     }
                     
                     guard
@@ -452,7 +462,9 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
                 state.iap.purchasing[productType] = iapPurchasing
                 
                 if let unfinishedTx = maybeUnfinishedConsumableTx {
+                    
                     state.iap.unfinishedPsiCashTx = unfinishedTx
+                    
                     state.psiCashBalance.waitingForExpectedIncrease(
                         withAddedReward: .zero,
                         reason: .purchasedPsiCash,

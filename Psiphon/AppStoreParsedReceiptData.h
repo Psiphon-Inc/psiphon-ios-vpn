@@ -84,6 +84,13 @@
  */
 @property (nonatomic, strong, readonly) NSString *_Nonnull bundleIdentifier;
 
+/**
+ This corresponds to the value of CFBundleVersion (in iOS) or CFBundleShortVersionString (in macOS) in the Info.plist file when the purchase was originally made.
+
+ In the sandbox environment, the value of this field is always “1.0”
+ */
+@property (nonatomic, strong, readonly) NSString *_Nonnull originalApplicationVersion;
+
 /** Set of in-app purchases. Contains subscriptions and other consumable transactions present in the receipt file.
  This corresponds to the values in the "in_app" field of of JSON object retrieved from AppStore receipt verify servers.
  Returned array is empty if there are no purchases recorded in the receipt.

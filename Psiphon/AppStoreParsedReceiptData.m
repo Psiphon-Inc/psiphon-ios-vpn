@@ -34,6 +34,7 @@ PsiFeedbackLogType const AppReceipt = @"AppReceipt";
 
 NSInteger const ReceiptASN1TypeBundleIdentifier = 2;
 NSInteger const ReceiptASN1TypeInAppPurchaseReceipt = 17;
+NSInteger const ReceiptASN1TypeOriginalApplicationVersion = 19;
 NSInteger const ReceiptASN1TypeProductIdentifier = 1702;
 NSInteger const ReceiptASN1TypeTransactionID = 1703;
 NSInteger const ReceiptASN1TypePurchaseDate =  1704;
@@ -194,10 +195,14 @@ static BOOL ASN1ReadIntegerAsBool(const uint8_t *bytes, long length) {
                 case ReceiptASN1TypeBundleIdentifier:
                     self->_bundleIdentifier = ASN1ReadUTF8String(data.bytes, data.length);
                     break;
+                case ReceiptASN1TypeOriginalApplicationVersion:
+                    self->_originalApplicationVersion = ASN1ReadUTF8String(data.bytes, data.length);
+                    break;
                 case ReceiptASN1TypeInAppPurchaseReceipt: {
                     AppStoreParsedIAP *iapPurchase = [[AppStoreParsedIAP alloc]
                                                        initWithASN1Data:data];
                     [mutablePurchases addObject: iapPurchase];
+                    break;
                 }
                 default:
                     break;

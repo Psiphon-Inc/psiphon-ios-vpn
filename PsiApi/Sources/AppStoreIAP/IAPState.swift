@@ -70,14 +70,24 @@ public struct IAPPurchasing: Hashable, FeedbackDescription {
     }
  
     /// Creates `IAPPurchasing` value given updated transaction.
-    /// Returns `nil` if the transaction has completed successfully, and hence no longer in a purchasing state.
-    public static func makeGiven(
+    ///
+    /// - Parameter existingConsumableTransaction: Called for consumable transactions.
+    ///  It should return `.none` if the passed in `PaymentTransaction` is a new unique transaction,
+    ///  `.some(true)` if a consumable transaction has already been observed with the same payment transaction id,
+    ///  and `.some(false)` if a consumable transaction has already been observed but with a different payment transaction id
+    ///  or the transaction state is not  "purchased" (i.e. `SKPaymentTransactionStatePurchased`) yet
+    ///
+    /// - Note: that payment transaction id is not the same as transaction id present in the receipt file.
+    /// - Returns: `nil` if the transaction has completed successfully, and hence no longer in a purchasing state.
+    public static func make(
         productType: AppStoreProductType,
         transaction tx: PaymentTransaction,
         existingConsumableTransaction: (PaymentTransaction) -> Bool?,
         getCurrentTime: () -> Date
-        ) -> Result<TransactionUniqueness, FatalError> {
+    ) -> Result<TransactionUniqueness, FatalError> {
+        
         switch tx.transactionState() {
+            
         case .pending(_):
             let iapPurchasing = IAPPurchasing(productType: productType,
                                               productID: tx.productID(),
@@ -118,7 +128,8 @@ public struct IAPPurchasing: Hashable, FeedbackDescription {
     
 }
 
-/// Represents  a consumable transaction has not been finished, pending verification by the purchase-verifier server.
+/// Represents  a consumable transaction with transaction state `SKPaymentTransactionState.purchased`
+/// that has not been finished, pending verification by the purchase-verifier server.
 public struct UnfinishedConsumableTransaction: Equatable, FeedbackDescription {
     
     public enum VerificationRequestState: Equatable {
@@ -134,28 +145,44 @@ public struct UnfinishedConsumableTransaction: Equatable, FeedbackDescription {
         
     }
     
-    public let transaction: PaymentTransaction
-    public let completedTransaction: PaymentTransaction.CompletedTransaction
-    public var verification: VerificationRequestState
-    
-    public init?(completedTransaction: PaymentTransaction,
-                 verificationState: VerificationRequestState) {
-        // An uncompleted transaction is not verifiable.
+    public var completedTransaction: PaymentTransaction.CompletedTransaction {
         guard
-            case .completed(.success(let completedTx)) = completedTransaction.transactionState()
+            case .completed(.success(let completedTx)) = self.transaction.transactionState()
+        else {
+            fatalError()
+        }
+        return completedTx
+    }
+    
+    // Wraps the SKPaymentTransaction object.
+    public let transaction: PaymentTransaction
+    
+    // Represents verification state of this transaction against the purchase-verifier server.
+    public var verificationState: VerificationRequestState
+    
+    public init?(
+        completedTransaction: PaymentTransaction,
+        verificationState: VerificationRequestState
+    ) {
+        
+        // Only transactions with SKPaymentTransactionState of
+        // SKPaymentTransactionStatePurchased or SKPaymentTransactionStateRestored
+        // can be verified. i.e. the payment for the purchase has been completed by the user.
+        guard
+            case .completed(.success(_)) = completedTransaction.transactionState()
         else {
             return nil
         }
         
         self.transaction = completedTransaction
-        self.completedTransaction = completedTx
-        self.verification = verificationState
+        self.verificationState = verificationState
     }
 }
 
 public struct IAPState: Equatable {
     
     /// PsiCash consumable transaction pending server verification.
+    /// We only ever expect a single unfinished consumable transaction as per Apple documentation.
     public var unfinishedPsiCashTx: UnfinishedConsumableTransaction?
     
     /// Contains products currently being purchased.

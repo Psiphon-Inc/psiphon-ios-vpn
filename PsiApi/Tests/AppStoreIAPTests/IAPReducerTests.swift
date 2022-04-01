@@ -308,14 +308,14 @@ final class IAPReducerTests: XCTestCase {
                     
                     // IAPReducer.receiptUpdated action does not create a second verification request
                     // for a consumable if one is already pending
-                    (initState.iap.unfinishedPsiCashTx?.verification == .pendingResponse) ==> {
+                    (initState.iap.unfinishedPsiCashTx?.verificationState == .pendingResponse) ==> {
                         return (nextState ==== initState) ^&&^ (effectsResults ==== [])
                     },
                     
                     // IAPReducer.receiptUpdated logs error if receipt is nil but there is a
                     // consumable transaction pending verification
                     (initState.iap.unfinishedPsiCashTx != nil &&
-                        initState.iap.unfinishedPsiCashTx?.verification != .pendingResponse &&
+                        initState.iap.unfinishedPsiCashTx?.verificationState != .pendingResponse &&
                         receipt == nil) ==> {
                             
                             var expectedNext = initState
@@ -340,7 +340,7 @@ final class IAPReducerTests: XCTestCase {
                     // IAPReducer.receiptUpdated creates a network request to verify
                     // consumable purchase if all conditions set below are met.
                     (initState.iap.unfinishedPsiCashTx != nil &&
-                        initState.iap.unfinishedPsiCashTx?.verification != .pendingResponse &&
+                        initState.iap.unfinishedPsiCashTx?.verificationState != .pendingResponse &&
                         receipt != nil &&
                         receiptContainsPurchase == .some(true)) ==> {
                             
@@ -449,7 +449,7 @@ final class IAPReducerTests: XCTestCase {
                     // iapReducer causes fatal error if unfinishedPsiCashTx is not in a pending
                     // state after receiving this action.
                     (initState.iap.unfinishedPsiCashTx != nil &&
-                        initState.iap.unfinishedPsiCashTx?.verification != .pendingResponse) ==> {
+                        initState.iap.unfinishedPsiCashTx?.verificationState != .pendingResponse) ==> {
                             return (nextState ==== initState)
                                 ^&&^
                                 (effectsResults ==== [])
@@ -462,7 +462,7 @@ final class IAPReducerTests: XCTestCase {
                     // iapReducer should expect this action to refer to the same unverified
                     // transaction that exists in the state.
                     (initState.iap.unfinishedPsiCashTx != nil &&
-                        initState.iap.unfinishedPsiCashTx?.verification == .pendingResponse &&
+                        initState.iap.unfinishedPsiCashTx?.verificationState == .pendingResponse &&
                         initState.iap.unfinishedPsiCashTx?.transaction != paymentTransaction) ==> {
                             return (nextState ==== initState)
                                 ^&&^
@@ -476,7 +476,7 @@ final class IAPReducerTests: XCTestCase {
                     // iapReducer updates states according to verification result,
                     // if state indicates that there is an unverified transaction pending response.
                     (initState.iap.unfinishedPsiCashTx != nil &&
-                        initState.iap.unfinishedPsiCashTx?.verification == .pendingResponse &&
+                        initState.iap.unfinishedPsiCashTx?.verificationState == .pendingResponse &&
                         initState.iap.unfinishedPsiCashTx?.transaction == paymentTransaction) ==> {
 
                             switch requestResult {

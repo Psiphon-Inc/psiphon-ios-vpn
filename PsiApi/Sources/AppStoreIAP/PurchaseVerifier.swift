@@ -23,7 +23,7 @@ import PsiApi
 
 /// Each server endpoint should be defined as an extension
 /// in a separate file (e.g. PurchaseVerifier+PsiCash.swift)
-public struct PurchaseVerifierServer {
+public enum PurchaseVerifierServer {
 
     public static func req<R>(
         url: URL,
