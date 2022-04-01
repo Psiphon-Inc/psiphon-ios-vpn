@@ -144,6 +144,7 @@ fileprivate func notifyUpdatedReceiptData<NeverAction>(
         
         environment.iapStore(.appReceiptDataUpdated(receiptData)).mapNever(),
         
+        // Logs receipt data.
         environment.feedbackLogger.log(
             .info, LogMessage(stringLiteral: makeFeedbackEntry(receiptData))
         ).mapNever()

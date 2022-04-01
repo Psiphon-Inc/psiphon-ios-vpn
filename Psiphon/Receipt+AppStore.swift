@@ -55,16 +55,14 @@ extension ReceiptData {
             return .none
         }
         
-        // Removed receipt bundle validation, since bundleIdentifier is sometimes nil on iOS 15.
-        // Since the receipt and the subscription is ultimately checked on the purchase-verifier
-        // server, removing this validation does not introduce any risks.
-//        // Validate bundle identifier.
-//        guard parsedData.bundleIdentifier == appBundle.bundleIdentifier else {
-//            fatalError("""
-//                Receipt bundle identifier '\(String(describing: parsedData.bundleIdentifier))'
-//                does not match app bundle identifier '\(appBundle.bundleIdentifier)'
-//                """)
-//        }
+        let originalAppVersion: ReceiptData.OriginalApplicationVersion
+        switch parsedData.originalApplicationVersion {
+        case "1.0":
+            // In the sandbox environment, the value of this field is always "1.0".
+            originalAppVersion = .sandbox
+        default:
+            originalAppVersion = .production(version: parsedData.originalApplicationVersion)
+        }
         
         // Computes whether any of subscription purchases in the receipt
         // have the "is_in_intro_offer_period" set to true.
@@ -119,10 +117,15 @@ extension ReceiptData {
                 )
         })
                 
-        return ReceiptData(filename: receiptURL.lastPathComponent,
-                           subscriptionInAppPurchases: subscriptionPurchases,
-                           consumableInAppPurchases: consumablePurchases,
-                           data: data, readDate: readDate)
+        return ReceiptData(
+            filename: receiptURL.lastPathComponent,
+            originalApplicationVersion: originalAppVersion,
+            subscriptionInAppPurchases: subscriptionPurchases,
+            consumableInAppPurchases: consumablePurchases,
+            data: data,
+            readDate: readDate
+        )
+        
     }
     
 }

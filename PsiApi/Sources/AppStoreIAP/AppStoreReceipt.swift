@@ -89,16 +89,36 @@ public struct ProductID: TypedIdentifier {
 }
 
 public struct ReceiptData: Hashable {
+    
+    /// Represents possible values of ASN.1 Field Type 19 in the local app receipt.
+    public enum OriginalApplicationVersion: Equatable {
+        /// Value is "1.0" which indicates this receipt was generated in sandbox environment.
+        case sandbox
+        /// Receipt was generated in production.
+        /// Contains value of CFBundleVersion (in iOS) or CFBundleShortVersionString (in macOS)
+        case production(version: String)
+    }
+    
     /// Receipt file name.
     /// In debug build and Test Flight `filename` is expected to be "sandboxReceipt", however in production
     /// it is expected to be "receipt".
     public let filename: String
+    
+    /// The version of the app that was originally purchased.
+    ///
+    /// - ASN.1 Field Type: 19
+    /// - JSON Field Name: `original_application_version`
+    public let originalApplicationVersion: OriginalApplicationVersion
+    
     /// Subscription in-app purchases within the receipt that have not expired at the time of `readDate`.
     public let subscriptionInAppPurchases: Set<SubscriptionIAPPurchase>
+    
     /// Consumables in-app purchases within the receipt.
     public let consumableInAppPurchases: Set<ConsumableIAPPurchase>
+    
     /// Receipt bytes.
     public let data: Data
+    
     /// Date at which the receipt `data` was read.
     public let readDate: Date
     
@@ -117,12 +137,14 @@ public struct ReceiptData: Hashable {
     
     public init(
         filename: String,
+        originalApplicationVersion: OriginalApplicationVersion,
         subscriptionInAppPurchases: Set<SubscriptionIAPPurchase>,
         consumableInAppPurchases: Set<ConsumableIAPPurchase>,
         data: Data,
         readDate: Date
     ) {
         self.filename = filename
+        self.originalApplicationVersion = originalApplicationVersion
         self.subscriptionInAppPurchases = subscriptionInAppPurchases
         self.consumableInAppPurchases = consumableInAppPurchases
         self.data = data
