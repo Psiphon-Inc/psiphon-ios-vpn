@@ -679,8 +679,8 @@
 /* Select language button title. */
 "SELECT_LANG_BUTTON_TITLE" = "選取語言";
 
-/*[UNTRANSLATED] Title for screen that allows user to select their desired server region. */
-"SELECT_SERVER_REGION" = "Select server region";
+/* Title for screen that allows user to select their desired server region. */
+"SELECT_SERVER_REGION" = "選擇伺服器地區";
 
 /*[UNTRANSLATED] Title of an error dialog shown to the user when a serious error occurs in the app */
 "SERIOUS_ERROR_OCCURRED" = "A serious error occurred";
