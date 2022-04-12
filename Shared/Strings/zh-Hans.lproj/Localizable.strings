@@ -16,8 +16,8 @@
 /* Alert dialog title. */
 "ALERT_TITLE_OPERATION_FAILED" = "操作失败";
 
-/*[UNTRANSLATED] Text that appears above the 'Log in' button on the PsiCash sign in screen. */
-"ALREADY_HAVE_AN_ACCOUNT" = "Already have an account?";
+/* Text that appears above the 'Log in' button on the PsiCash sign in screen. */
+"ALREADY_HAVE_AN_ACCOUNT" = "已注册过帐户？";
 
 /* Title of the button which takes the user to the previous screen. Text should be short and one word when possible. */
 "BACK_BUTTON" = "返回";
@@ -622,8 +622,8 @@
 /* 'PsiCash' features are unavailable while the user has a subscription. Do not translate or transliterate 'PsiCash' */
 "PSICASH_UNAVAILABLE_WHILE_SUBSCRIBED" = "在订阅时PsiCash不可用";
 
-/*[UNTRANSLATED] Text field label where users can enter their account's username */
-"PSICASH_USERNAME_TEXT_FIELD" = "PsiCash username";
+/* Text field label where users can enter their account's username */
+"PSICASH_USERNAME_TEXT_FIELD" = "PsiCash 用户名";
 
 /* Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
 "PSICASH_WAIT_TRANSACTION_VERIFIED" = "请耐心等待您的交易验证";
