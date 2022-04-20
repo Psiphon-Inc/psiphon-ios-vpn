@@ -134,10 +134,23 @@ typedef NS_ERROR_ENUM(RotatingFileErrorDomain, RotatingFileErrorCode) {
         }
 
         // Appends data to the file, and syncs.
-        [fh seekToEndOfFile];
-        [fh writeData:data];
-
         if (@available(iOS 13.0, *)) {
+            [fh seekToEndReturningOffset:nil error:&err];
+            if (err != nil) {
+                *outError = [NSError errorWithDomain:RotatingFileErrorDomain
+                                                code:RotatingFileErrorWriteFileFailed
+                                 withUnderlyingError:err];
+                return;
+            }
+            
+            [fh writeData:data error:&err];
+            if (err != nil) {
+                *outError = [NSError errorWithDomain:RotatingFileErrorDomain
+                                                code:RotatingFileErrorWriteFileFailed
+                                 withUnderlyingError:err];
+                return;
+            }
+            
             [fh synchronizeAndReturnError:&err];
             if (err != nil) {
                 *outError = [NSError errorWithDomain:RotatingFileErrorDomain
@@ -147,6 +160,8 @@ typedef NS_ERROR_ENUM(RotatingFileErrorDomain, RotatingFileErrorCode) {
             }
         } else {
             // Fallback on earlier versions
+            [fh seekToEndOfFile];
+            [fh writeData:data];
             [fh synchronizeFile];
         }
 
