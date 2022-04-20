@@ -159,10 +159,6 @@ open class ReactiveViewController: UIViewController {
         // If this view controller is a child of a container view controller
         // (e.g. UINavigationController), then self.isMovingFromParent is set to true.
         
-        if self.parent?.isBeingDismissed ?? false {
-            print("** Parent is being dismissed: self.isBeingDismissed:\(self.isBeingDismissed)")
-        }
-
         if self.isBeingDismissed || (self.parent?.isBeingDismissed ?? false) || self.isMovingFromParent {
             if let onDismissed = onDismissed {
                 onDismissed()
