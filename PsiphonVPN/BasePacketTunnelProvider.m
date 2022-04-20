@@ -214,8 +214,12 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
                                                                errorHandler:^(NSError *_Nullable error)
         {
             if (error) {
-                self->vpnStartCompletionHandler(error);
-                self->vpnStartCompletionHandler = nil;
+                if (self->vpnStartCompletionHandler != nil) {
+                    // Note that -stopTunnelWithReason:completionHandler: might
+                    // get called before this error handler.
+                    self->vpnStartCompletionHandler(error);
+                    self->vpnStartCompletionHandler = nil;
+                }
             }
         }];
 
