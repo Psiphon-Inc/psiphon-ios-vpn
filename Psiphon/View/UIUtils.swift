@@ -919,6 +919,18 @@ struct PresentationState<ViewModel: Hashable>: Hashable {
 }
 
 extension UIViewController {
+    
+    var isTopViewController: Bool {
+        if let presentedVC = presentedViewController {
+            // If the presented view controller is being dismissed then this
+            // view controller can be considered the top view controller
+            // (i.e. self.present(_:animated:completion:) will present successfully).
+            return presentedVC.isBeingDismissed
+        } else {
+            // presentedViewController is false
+            return true
+        }
+    }
 
     /// Returns top most active (i.e. not being dismissed) view controller.
     func topActiveViewController() -> UIViewController {
@@ -1001,7 +1013,7 @@ extension UIViewController {
     ) -> T {
         
         // This view controller should be on top of the stack.
-        precondition(self.presentedViewController == nil)
+        precondition(self.isTopViewController)
         
         // When a view controller is presented with this method,
         // it's identity is tied to it's type. Therefore T should be an
