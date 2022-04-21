@@ -1043,22 +1043,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
     /// Retruns top-most view controller that can present another view controller (i.e. is not being dismissed)
     @objc func getTopActiveViewController() -> UIViewController {
         
-        let rootVC: UIViewController
-        
-        if #available(iOS 13.0, *) {
-            
-            guard let scene = UIApplication.shared.connectedScenes.first as? UIWindowScene else {
-                fatalError()
-            }
-            
-            guard let keyWindow = scene.windows.first else { fatalError() }
-            
-            rootVC = keyWindow.rootViewController!
-            
-        } else {
-            // Fallback on earlier versions
-            rootVC = UIApplication.shared.keyWindow!.rootViewController!
-        }
+        // Solution based on https://developer.apple.com/forums/thread/695932?answerId=697052022#697052022
+        let keyWindow = AppDelegate.shared().window
+        let rootVC = keyWindow.rootViewController!
         
         return rootVC.topActiveViewController()
         
