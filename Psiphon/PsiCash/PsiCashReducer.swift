@@ -132,8 +132,10 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         
         // PsiCash Library must be initialized before setting locale.
         guard case .success(_) = state.psiCash.libData else {
-            environment.feedbackLogger.fatalError("lib not loaded")
-            return []
+            return [
+                environment.feedbackLogger.log(.error, "lib not loaded")
+                    .mapNever()
+            ]
         }
         
         return [
@@ -341,6 +343,10 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         }
         
     case .accountLogout:
+        
+        guard case .success(_) = state.psiCash.libData else {
+            fatalError()
+        }
         
         if let pendingAccountLogin = state.psiCash.pendingAccountLoginLogout {
             // Guards against another request being send whilst one is in progress.
