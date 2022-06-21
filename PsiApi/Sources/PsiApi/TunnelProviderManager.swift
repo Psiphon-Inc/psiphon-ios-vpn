@@ -314,7 +314,9 @@ public final class PsiphonTPM: TunnelProviderManager {
             
             if #available(iOS 14.0, *) {
                 self.wrappedManager.protocolConfiguration!.includeAllNetworks = true
-                
+            }
+            
+            if #available(iOS 14.2, *) {
                 // Excludes local network on both iOS and macOS running on Apple Silicon.
                 self.wrappedManager.protocolConfiguration!.excludeLocalNetworks = true
             }
