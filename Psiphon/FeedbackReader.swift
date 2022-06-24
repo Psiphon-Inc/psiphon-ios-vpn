@@ -204,8 +204,15 @@ func getFeedbackLogs(
 
 @objc final class ParseLogs: NSObject {
     
+    /// Objc-C wrapper for `Psiphon.parseLogs(_:getCurrentTime:)`.
+    /// Parse errors (type `FeedbackLogParseError`) are mapped to list of
+    /// `DiagnosticEntry` and appended to returned array.
     @objc static func parseLogs(_ data: String) -> [DiagnosticEntry] {
-        return Psiphon.parseLogs(data, getCurrentTime: { Date () }).0
+        let result = Psiphon.parseLogs(data, getCurrentTime: { Date () })
+        let parseErrs = result.1.map {
+            DiagnosticEntry($0.message, andTimestamp: $0.timestamp)!
+        }
+        return result.0 + parseErrs
     }
     
 }
