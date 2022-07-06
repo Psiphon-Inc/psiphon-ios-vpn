@@ -409,9 +409,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (NSNumber *)isNetworkReachable {
-    NetworkStatus status;
+    NetworkReachability status;
     if ([self.psiphonTunnel getNetworkReachabilityStatus:&status]) {
-        return [NSNumber numberWithBool:status != NotReachable];
+        return [NSNumber numberWithBool:status != NetworkReachabilityNotReachable];
     }
     return [NSNumber numberWithBool:FALSE];
 }
@@ -978,9 +978,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
 }
 
-- (void)onInternetReachabilityChanged:(Reachability* _Nonnull)reachability {
-    NetworkStatus s = [reachability currentReachabilityStatus];
-    if (s == NotReachable) {
+- (void)onInternetReachabilityChanged:(NetworkReachability)s {
+    if (s == NetworkReachabilityNotReachable) {
         self.postedNetworkConnectivityFailed = TRUE;
         [[Notifier sharedInstance] post:NotifierNetworkConnectivityFailed];
 
@@ -988,7 +987,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         self.postedNetworkConnectivityFailed = FALSE;
         [[Notifier sharedInstance] post:NotifierNetworkConnectivityResolved];
     }
-    LOG_DEBUG(@"onInternetReachabilityChanged: %@", [reachability currentReachabilityFlagsToString]);
+    LOG_DEBUG(@"onInternetReachabilityChanged: %ld", (long)s);
 }
 
 - (void)onDiagnosticMessage:(NSString *_Nonnull)message withTimestamp:(NSString *_Nonnull)timestamp {
