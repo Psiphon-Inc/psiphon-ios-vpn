@@ -545,6 +545,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             self.store.send(.mainViewAction(.presentPsiCashStore(initialTab: .speedBoost)))
             return true
         }
+        deepLinkingNavigator.register(
+            urls: [PsiphonDeepLinking.subscribeDeepLink, PsiphonDeepLinking.subscribeDeepLink2]
+        ) { [unowned self] in
+            self.store.send(.mainViewAction(.presentSubscriptionScreen))
+            return true
+        }
         deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.settingsDeepLink ]) { [unowned self] in
             self.store.send(.mainViewAction(.presentSettingsScreen))
             return true
