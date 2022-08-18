@@ -20,8 +20,8 @@
 
 @implementation VPNStrings
 
-+ (NSString *)disallowed_traffic_simple_alert_message {
-    return NSLocalizedStringWithDefaultValue(@"DISALLOWED_TRAFFIC_EXTENSION_ALERT", nil, [NSBundle mainBundle], @"Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.", @"Alert dialog which is shown to the user when if unsupported Internet traffic has been requested");
++ (NSString *)psiphon {
+    return @"Psiphon";
 }
 
 + (NSString *)disallowed_traffic_notification_title {
@@ -42,7 +42,7 @@
     return NSLocalizedStringWithDefaultValue(@"CORRUPT_SETTINGS_MESSAGE", nil, [NSBundle mainBundle], @"Your app settings file appears to be corrupt. Try reinstalling the app to repair the file.", @"Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app.");
 }
 
-+ (NSString *)cannotStartTunnelDueToSubscription {
++ (NSString *)mustStartVPNFromApp {
     return NSLocalizedStringWithDefaultValue(@"CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION", nil, [NSBundle mainBundle], @"You don't have an active subscription.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app to start.", @"Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'.");
 }
 
