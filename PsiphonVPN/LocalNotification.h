@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Psiphon Inc.
+ * Copyright (c) 2022, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -21,23 +21,21 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface VPNStrings : NSObject
+@interface LocalNotification : NSObject
 
-+ (NSString *)psiphon;
++ (void)requestOpenContainerToConnectNotification;
 
-+ (NSString *)disallowed_traffic_notification_title;
++ (void)requestCorruptSettingsFileNotification;
 
-+ (NSString *)disallowed_traffic_alert_notification_body;
++ (void)requestSubscriptionExpiredNotification;
 
-+ (NSString *)corruptSettingsFileAlertMessage;
++ (void)requestSelectedRegionUnavailableNotification;
 
-+ (NSString *)mustStartVPNFromApp;
++ (void)requestUpstreamProxyErrorNotification:(NSString *)message;
 
-+ (NSString *)openPsiphonAppToFinishConnecting;
++ (void)requestDisallowedTrafficNotification;
 
-+ (NSString *)upstreamProxySettingsErrorMessage;
-
-+ (NSString *)subscriptionExpiredAlertMessage;
++ (void)requestCannotStartWithoutActiveSubscription;
 
 @end
 
