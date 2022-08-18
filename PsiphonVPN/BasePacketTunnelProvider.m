@@ -42,8 +42,6 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
 
 @property (nonatomic, readwrite) ExtensionStartMethodEnum extensionStartMethod;
 
-@property (nonatomic, readwrite) BOOL VPNStarted;
-
 @property (nonatomic, readwrite) PsiphonDataSharedDB *sharedDB;
 
 @end
@@ -253,7 +251,6 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
         if (vpnStartCompletionHandler) {
             vpnStartCompletionHandler(nil);
             vpnStartCompletionHandler = nil;
-            self.VPNStarted = TRUE;
             return TRUE;
         }
         return FALSE;

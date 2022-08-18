@@ -90,8 +90,6 @@ typedef NS_ENUM(NSInteger, ExtensionStartMethodEnum) {
 
 @property (nonatomic, readonly) ExtensionStartMethodEnum extensionStartMethod;
 
-@property (nonatomic, readonly) BOOL VPNStarted;
-
 @property (nonatomic, readonly) PsiphonDataSharedDB *sharedDB;
 
 /**
