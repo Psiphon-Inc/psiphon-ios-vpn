@@ -36,6 +36,7 @@
 		29BA6DA1268630A9001445EA /* TunnelFileDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 29BA6DA0268630A9001445EA /* TunnelFileDescriptor.m */; };
 		29BE0BE327C54828003BC17B /* PsiCashAccountExplainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29BE0BE227C54828003BC17B /* PsiCashAccountExplainerViewController.swift */; };
 		29C3220A26B1C17D0075BB34 /* AppInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920720F3DA190033114B /* AppInfo.m */; };
+		29DE99C628B43E2400445DED /* SubscriptionPurchaseRequiredPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29DE99C528B43E2400445DED /* SubscriptionPurchaseRequiredPrompt.swift */; };
 		29EE50B726ACDC0E00DB8A60 /* AppFiles.m in Sources */ = {isa = PBXBuildFile; fileRef = 29EE50B626ACDC0E00DB8A60 /* AppFiles.m */; };
 		29EE50B826ACDC0E00DB8A60 /* AppFiles.m in Sources */ = {isa = PBXBuildFile; fileRef = 29EE50B626ACDC0E00DB8A60 /* AppFiles.m */; };
 		29F8536E26D4549000533472 /* Requests+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F8536D26D4549000533472 /* Requests+Additions.swift */; };
@@ -419,6 +420,7 @@
 		29BA6D9F268630A9001445EA /* TunnelFileDescriptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TunnelFileDescriptor.h; sourceTree = "<group>"; };
 		29BA6DA0268630A9001445EA /* TunnelFileDescriptor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TunnelFileDescriptor.m; sourceTree = "<group>"; };
 		29BE0BE227C54828003BC17B /* PsiCashAccountExplainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashAccountExplainerViewController.swift; sourceTree = "<group>"; };
+		29DE99C528B43E2400445DED /* SubscriptionPurchaseRequiredPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPurchaseRequiredPrompt.swift; sourceTree = "<group>"; };
 		29EE50B526ACDC0E00DB8A60 /* AppFiles.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppFiles.h; sourceTree = "<group>"; };
 		29EE50B626ACDC0E00DB8A60 /* AppFiles.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppFiles.m; sourceTree = "<group>"; };
 		29F8536D26D4549000533472 /* Requests+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Requests+Additions.swift"; sourceTree = "<group>"; };
@@ -1225,6 +1227,7 @@
 				8D13232E25310661005F83C8 /* SecretValueTextField.swift */,
 				2911A792263D5DED001A0A4D /* ViewBuilderContainerView.swift */,
 				296A1A88267A01E70068B115 /* CopyableLabel.swift */,
+				29DE99C528B43E2400445DED /* SubscriptionPurchaseRequiredPrompt.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -2158,6 +2161,7 @@
 				445F24ED20E1A5BA00D004E9 /* ber_tlv_tag.c in Sources */,
 				4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */,
 				8D7789C5247496F60038BFDA /* PsiCashLib.swift in Sources */,
+				29DE99C628B43E2400445DED /* SubscriptionPurchaseRequiredPrompt.swift in Sources */,
 				CE84204A2522823D00796032 /* DebugDirectoryViewerViewController.m in Sources */,
 				4E10920820F3DA190033114B /* AppInfo.m in Sources */,
 				445F24EE20E1A5BA00D004E9 /* asn_codecs_prim.c in Sources */,

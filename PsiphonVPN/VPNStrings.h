@@ -39,6 +39,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)subscriptionExpiredAlertMessage;
 
++ (NSString *)purchaseRequiredNotificationMessage;
+
 @end
 
 NS_ASSUME_NONNULL_END

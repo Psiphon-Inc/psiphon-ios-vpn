@@ -58,4 +58,8 @@
     return NSLocalizedStringWithDefaultValue(@"EXTENSION_EXPIRED_SUBSCRIPTION_ALERT", nil, [NSBundle mainBundle], @"Your Psiphon subscription has expired.\n\n Please open Psiphon app to renew your subscription.", @"");
 }
 
++ (NSString *)purchaseRequiredNotificationMessage {
+    return NSLocalizedStringWithDefaultValue(@"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE", nil, [NSBundle mainBundle], @"Please purchase a subscription to continue using Psiphon", @"Do not translate or transliterate 'Psiphon'. Text of notification shown when a subscription is required to continue using the servive.");
+}
+
 @end

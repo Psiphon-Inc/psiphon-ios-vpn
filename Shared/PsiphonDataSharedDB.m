@@ -45,8 +45,16 @@ UserDefaultsKey const ContainerTunnelIntentStatusIntKey = @"container_tunnel_int
 UserDefaultsKey const ExtensionDisallowedTrafficAlertWriteSeqIntKey =
 @"extension_disallowed_traffic_alert_write_seq_int";
 
+UserDefaultsKey const ExtensionPurchaseRequiredPromptWriteSeqIntKey =
+@"extension_purchase_required_prompt_write_seq_int";
+
+UserDefaultsKey const ExtensionPurchaseRequiredPromptEventTimestampKey =
+@"extension_purchase_required_prompt_event_timestamp";
+
 UserDefaultsKey const ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey =
 @"container_disallowed_traffic_alert_read_at_least_up_to_seq_int";
+
+UserDefaultsKey const ContainerPurchaseRequiredReadAtLeastUpToSeqIntKey = @"container_purchase_required_read_at_least_up_to_seq_int";
 
 UserDefaultsKey const TunnelEgressRegionKey = @"Tunnel-EgressRegion";
 
@@ -255,6 +263,14 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
 - (NSInteger)getContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum {
     return [sharedDefaults integerForKey:ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey];
 }
+
+- (void)setContainerPurchaseRequiredReadAtLeastUpToSequenceNum:(NSInteger)seq {
+    [sharedDefaults setInteger:seq forKey:ContainerPurchaseRequiredReadAtLeastUpToSeqIntKey];
+}
+
+- (NSInteger)getContainerPurchaseRequiredReadAtLeastUpToSequenceNum {
+    return [sharedDefaults integerForKey:ContainerPurchaseRequiredReadAtLeastUpToSeqIntKey];
+}
 #endif
 
 #pragma mark - Extension Data (Data originating in the extension)
@@ -296,6 +312,29 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
 
 - (NSInteger)getDisallowedTrafficAlertWriteSequenceNum {
     return [sharedDefaults integerForKey:ExtensionDisallowedTrafficAlertWriteSeqIntKey];
+}
+
+- (void)incrementPurchaseRequiredPromptWriteSequenceNum {
+    NSInteger lastSeq = [self getPurchaseRequiredPromptWriteSequenceNum];
+    [sharedDefaults setInteger:(lastSeq + 1)
+                        forKey:ExtensionPurchaseRequiredPromptWriteSeqIntKey];
+}
+
+- (NSInteger)getPurchaseRequiredPromptWriteSequenceNum {
+    return [sharedDefaults integerForKey:ExtensionPurchaseRequiredPromptWriteSeqIntKey];
+}
+
+- (void)setPurchaseRequiredPromptEventTimestamp:(NSDate *)date {
+    NSString *rfc3339Date = [date RFC3339String];
+    [sharedDefaults setObject:rfc3339Date forKey:ExtensionPurchaseRequiredPromptEventTimestampKey];
+}
+
+- (NSDate * _Nullable)getPurchaseRequiredPromptEventTimestamp {
+    NSString * _Nullable rfc3339Date = [sharedDefaults stringForKey:ExtensionPurchaseRequiredPromptEventTimestampKey];
+    if (!rfc3339Date) {
+        return nil;
+    }
+    return [NSDate fromRFC3339String:rfc3339Date];
 }
 
 - (NSArray<Homepage *> *_Nullable)getHomepages {

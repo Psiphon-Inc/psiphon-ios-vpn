@@ -27,6 +27,18 @@ public enum SubscriptionStatus: Equatable {
     case unknown
 }
 
+extension SubscriptionStatus {
+    
+    /// `true` if subscribed, `false` otherwise or if uknown.
+    public var subscribed: Bool {
+        if case .subscribed(_) = self {
+            return true
+        }
+        return false
+    }
+    
+}
+
 public struct SubscriptionState: Equatable {
     
     public var status: SubscriptionStatus

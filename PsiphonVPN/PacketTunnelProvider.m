@@ -535,6 +535,21 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 @end
 
+#pragma mark -  PacketTunnelProvider utility functions
+@interface PacketTunnelProvider(Utils)
+@end
+
+@implementation PacketTunnelProvider (Utils)
+
+// Returns true if the user has bought subscription (verified or not) or SpeedBoost.
+- (BOOL)hasUserMadePurchase {
+    BOOL purchased = self.startWithSubscriptionCheckSponsorID ||
+    [self->authorizationStore hasActiveSubscriptionOrSpeedBoost];
+    return purchased;
+}
+
+@end
+
 #pragma mark - TunneledAppDelegate
 
 @interface PacketTunnelProvider (AppDelegateExtension) <TunneledAppDelegate>
@@ -752,10 +767,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     dispatch_async(self->workQueue, ^{
         if ([reason isEqualToString:@"disallowed-traffic"] && [subject isEqualToString:@""]) {
             
-            // Alert can be displayed if the user has a subscription (verified or not),
+            // Alert can be displayed if the user doesn't have a subscription (verified or not),
             // or an active Speed Boost.
-            BOOL canDisplayAlert = !self.startWithSubscriptionCheckSponsorID &&
-            ![self->authorizationStore hasActiveSubscriptionOrSpeedBoost];
+            BOOL canDisplayAlert = ![self hasUserMadePurchase];
             
             [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
                                      format:@"disallowed-traffic server alert: notify user: %@",
@@ -772,6 +786,29 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             }
         }
     });
+}
+
+- (void)onApplicationParameter:(NSString * _Nonnull)key :(id)value {
+    if ([key isEqualToString:@"ShowPurchaseRequiredPrompt"]) {
+        if ([value isKindOfClass:[NSNumber class]]) {
+            
+            NSDate *timestamp = [NSDate date];
+            
+            BOOL purchaseRequired = [(NSNumber *)value boolValue];
+            if (purchaseRequired && ![self hasUserMadePurchase]) {
+                
+                // Record timestamp of event and increment seq number.
+                [self.sharedDB setPurchaseRequiredPromptEventTimestamp:timestamp];
+                [self.sharedDB incrementPurchaseRequiredPromptWriteSequenceNum];
+                [[Notifier sharedInstance] post:NotifierPurchaseRequired];
+                
+                // Display location notification.
+                [LocalNotification requestPurchaseRequiredPrompt];
+            }
+        } else {
+            [PsiFeedbackLogger error:@"Expected bool for ApplicationParameter key 'ShowPurchaseRequiredPrompt'"];
+        }
+    }
 }
 
 - (void)onAvailableEgressRegions:(NSArray *)regions {

@@ -75,6 +75,7 @@ public protocol EffectObserver {
 
 extension Signal.Observer: EffectObserver {
 
+    /// Puts `value` event into self and completes  self.
     public func fulfill(value: Value) {
         self.send(value: value)
         self.sendCompleted()
