@@ -232,7 +232,7 @@ import AppStoreIAP
             print("* nil context")
             return
         }
-        let allData = SharedAuthorization.fetchRequest() as! NSFetchRequest<SharedAuthorization>
+        let allData = SharedAuthorization.fetchRequest()
         do {
             let allData = try context.fetch(allData)
             for (i, data) in allData.enumerated() {
