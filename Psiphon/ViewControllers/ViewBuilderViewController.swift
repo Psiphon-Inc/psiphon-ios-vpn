@@ -27,15 +27,16 @@ final class ViewBuilderViewController<T: ViewBuilder>: ReactiveViewController {
     var bindable: T.BuildType?
 
     init(
-        viewBuilder: T,
         modalPresentationStyle: UIModalPresentationStyle,
+        modalTransitionStyle: UIModalTransitionStyle = .coverVertical,
+        viewBuilder: T,
         onDidLoad: (() -> Void)?,
         onDismissed: (() -> Void)?
     ) {
         self.viewBuilder = viewBuilder
         super.init(onDidLoad: onDidLoad, onDismissed: onDismissed)
-
         self.modalPresentationStyle = modalPresentationStyle
+        self.modalTransitionStyle = modalTransitionStyle
     }
 
     required init?(coder: NSCoder) {
@@ -60,7 +61,7 @@ final class ViewBuilderViewController<T: ViewBuilder>: ReactiveViewController {
         containerView.activateConstraints {
             $0.constraint(to: rootViewLayoutGuide, .centerX(), .centerY()) +
                 $0.widthAnchor.constraint(toDimension: rootViewLayoutGuide.widthAnchor,
-                                          ratio: 0.8,
+                                          ratio: 0.9,
                                           max: 400) +
                 [
                     $0.heightAnchor.constraint(lessThanOrEqualTo: rootViewLayoutGuide.heightAnchor,

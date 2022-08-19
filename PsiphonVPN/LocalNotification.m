@@ -30,6 +30,7 @@ NSString *_Nonnull const NotificationIdRegionUnavailable = @"RegionUnavailable";
 NSString *_Nonnull const NotificationIdUpstreamProxyError = @"UpstreamProxyError";
 NSString *_Nonnull const NotificationIdDisallowedTraffic = @"DisallowedTraffic";
 NSString *_Nonnull const NotificationIdMustStartVPNFromApp = @"MustStartVPNFromApp";
+NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
 
 @implementation LocalNotification
 
@@ -147,7 +148,23 @@ NSString *_Nonnull const NotificationIdMustStartVPNFromApp = @"MustStartVPNFromA
     
     UNNotificationRequest *request = [UNNotificationRequest
                                       requestWithIdentifier:NotificationIdMustStartVPNFromApp
-                                      requestWithIdentifier:NotificationIdDisallowedTraffic
+                                      content:content
+                                      trigger:nil];
+    
+    [center addNotificationRequest:request withCompletionHandler:^(NSError * _Nullable error) {
+        // Do nothing;
+    }];
+}
+
++ (void)requestPurchaseRequiredPrompt {
+    UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
+    
+    UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
+    content.title = [VPNStrings psiphon];
+    content.body = [VPNStrings purchaseRequiredNotificationMessage];
+    
+    UNNotificationRequest *request = [UNNotificationRequest
+                                      requestWithIdentifier:NotificationIdPurchaseRequired
                                       content:content
                                       trigger:nil];
     

@@ -144,6 +144,8 @@ let psiCashStoreViewReducer = Reducer<PsiCashStoreViewReducerState,
                     let topVC = environment.getTopActiveViewController()
 
                     let vc = ViewBuilderViewController(
+                        modalPresentationStyle: .overFullScreen,
+                        modalTransitionStyle: .crossDissolve,
                         viewBuilder: PsiCashPurchasingConfirmViewBuilder(
                             closeButtonHandler: { [observer] in
                                 observer.send(value: .purchaseAccountConfirmationDismissed)
@@ -155,7 +157,6 @@ let psiCashStoreViewReducer = Reducer<PsiCashStoreViewReducerState,
                                 observer.send(value: .continuePurchaseWithoutAccountTapped)
                             }
                         ),
-                        modalPresentationStyle: .overFullScreen,
                         onDidLoad: nil,
                         onDismissed: { [observer] in
                             // Sends 'onCompleted' event.
@@ -164,8 +165,6 @@ let psiCashStoreViewReducer = Reducer<PsiCashStoreViewReducerState,
                             observer.fulfill(value: .purchaseAccountConfirmationDismissed)
                         }
                     )
-
-                    vc.modalTransitionStyle = .crossDissolve
 
                     topVC.present(vc, animated: true, completion: nil)
 

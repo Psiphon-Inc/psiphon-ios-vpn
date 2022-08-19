@@ -92,8 +92,14 @@ extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
             ExtensionDisallowedTrafficAlertWriteSeqIntKey:
                 self.getDisallowedTrafficAlertWriteSequenceNum(),
             
+            ExtensionPurchaseRequiredPromptWriteSeqIntKey:
+                self.getPurchaseRequiredPromptWriteSequenceNum(),
+            
             ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey:
-                self.getContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum()
+                self.getContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum(),
+            
+            ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey:
+                self.getContainerPurchaseRequiredReadAtLeastUpToSequenceNum()
         ]
         
         #if DEBUG

@@ -29,9 +29,13 @@ enum PsiCashHardCodedValues {
     
 }
 
-// There is no point to load an interstitial after the user
-// presses the disconnected button.
-let InterstitialDelayAfterDisconnection: TimeInterval = 5.0  // 5 seconds.
+// Delay from receiving `ShowPurchaseRequiredPrompt` application parameter
+// to when the UI prompt is presented.
+#if DEBUG || DEV_RELEASE
+let PurchaseRequiredPromptDelay: TimeInterval = 30.0  // 10 secs.
+#else
+let PurchaseRequiredPromptDelay: TimeInterval = 180.0  // 3 mins.
+#endif
 
 // The official way to open subscription management screen.
 // https://developer.apple.com/videos/play/wwdc2018/705/

@@ -40,7 +40,9 @@ extern UserDefaultsKey const _Nonnull ExtensionIsZombieBoolKey;
 extern UserDefaultsKey const _Nonnull ContainerForegroundStateBoolKey;
 extern UserDefaultsKey const _Nonnull ContainerTunnelIntentStatusIntKey;
 extern UserDefaultsKey const _Nonnull ExtensionDisallowedTrafficAlertWriteSeqIntKey;
+extern UserDefaultsKey const _Nonnull ExtensionPurchaseRequiredPromptWriteSeqIntKey;
 extern UserDefaultsKey const _Nonnull ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey;
+extern UserDefaultsKey const _Nonnull ContainerPurchaseRequiredReadAtLeastUpToSeqIntKey;
 extern UserDefaultsKey const _Nonnull SharedDataExtensionCrashedBeforeStopBoolKey;
 extern UserDefaultsKey const _Nonnull SharedDataExtensionJetsamCounterIntegerKey;
 extern UserDefaultsKey const _Nonnull DebugMemoryProfileBoolKey;
@@ -161,8 +163,15 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 #endif
 
 #if !(TARGET_IS_EXTENSION)
+
+// Disallowed traffic alert
 - (void)setContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum:(NSInteger)seq;
 - (NSInteger)getContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum;
+
+// Purchase required prompt
+- (void)setContainerPurchaseRequiredReadAtLeastUpToSequenceNum:(NSInteger)seq;
+- (NSInteger)getContainerPurchaseRequiredReadAtLeastUpToSequenceNum;
+
 #endif
 
 #pragma mark - Extension Data (Data originating in the extension)
@@ -225,6 +234,14 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 #endif
 
 - (NSInteger)getDisallowedTrafficAlertWriteSequenceNum;
+
+#if TARGET_IS_EXTENSION
+- (void)incrementPurchaseRequiredPromptWriteSequenceNum;
+- (void)setPurchaseRequiredPromptEventTimestamp:(NSDate *)date;
+#endif
+
+- (NSInteger)getPurchaseRequiredPromptWriteSequenceNum;
+- (NSDate * _Nullable)getPurchaseRequiredPromptEventTimestamp;
 
 #pragma mark - Jetsam counter
 
