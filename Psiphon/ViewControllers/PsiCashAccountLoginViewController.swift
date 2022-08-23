@@ -31,7 +31,7 @@ final class PsiCashAccountLoginViewController: ReactiveViewController {
         let pendingAccountLoginLogout: PsiCashState.PendingAccountLoginLogoutEvent?
     }
 
-    enum ViewControllerAction: Equatable {
+    enum ViewControllerAction {
         case psiCashAction(PsiCashAction)
         case mainViewAction(MainViewAction)
     }

@@ -246,7 +246,9 @@ extension AppState {
         get {
             AppDelegateReducerState(
                 appDelegateState: self.appDelegateState,
-                subscriptionState: self.subscription
+                subscriptionState: self.subscription,
+                psiCashState: self.psiCashState,
+                tunnelConnectedStatus: self.vpnState.value.providerVPNStatus.tunneled
             )
         }
         set {
@@ -308,6 +310,7 @@ extension AppState {
             MainViewReducerState(
                 mainView: self.mainView,
                 subscriptionState: self.subscription,
+                psiCashState: self.psiCashState,
                 psiCashAccountType: self.psiCashState.libData?.successToOptional()?.accountType,
                 appLifecycle: self.appDelegateState.appLifecycle,
                 tunnelConnectedStatus: self.vpnState.value.providerVPNStatus.tunneled
