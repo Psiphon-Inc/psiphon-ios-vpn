@@ -176,42 +176,50 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
         // Handles `ShowPurchaseRequiredPrompt` application parameter.
         if let purchaseRequiredSeq = purchaseRequiredSeq {
             
-            let speedBoosted = state.psiCashState.activeSpeedBoost(environment.dateCompare) != nil
+            let vpnSession = environment.sharedDB.getVPNSessionNumber()
+            let lastHandledVPNSession =
+            environment.sharedDB.getContainerPurchaseRequiredHandledEventLatestVPNSessionNumber()
             
             // Updates purchase required prompt handled seq number.
             effects += Effect.fireAndForget {
                 NEEventType.requiredPurchasePrompt
                     .setEventHandled(environment.sharedDB, purchaseRequiredSeq)
+                environment.sharedDB.setContainerPurchaseRequiredHandledEventVPNSessionNumber(vpnSession)
             }
             
-            // Presents prompt if the user is not (subscribed or speed boosted) and
-            // is(connected or connecting).
-            if speedBoosted ||
-                state.subscriptionState.status.subscribed ||
-                (state.tunnelConnectedStatus != .connected && state.tunnelConnectedStatus != .connecting)
-            {
-                effects += environment.feedbackLogger
-                    .log(.info, "Purchase required prompt will not presented").mapNever()
-            } else {
+            // If the event is for a VPN session that is already handled, it is ignored.
+            if vpnSession > lastHandledVPNSession {
                 
-                let timestamp = environment.sharedDB.getPurchaseRequiredPromptEventTimestamp()
-                let timeLeft = (timestamp?.timeIntervalSinceNow ?? 0.0) + PurchaseRequiredPromptDelay
-                let promptDelay = max(0.0, timeLeft)
+                let speedBoosted = state.psiCashState.activeSpeedBoost(environment.dateCompare) != nil
                 
-                effects += [
-                    environment.feedbackLogger
-                        .log(.info, "Presenting purchase required prompt in \(PurchaseRequiredPromptDelay) seconds")
-                        .mapNever(),
+                // Presents prompt if the user is not (subscribed or speed boosted) and
+                // is(connected or connecting).
+                if speedBoosted ||
+                    state.subscriptionState.status.subscribed ||
+                    (state.tunnelConnectedStatus != .connected && state.tunnelConnectedStatus != .connecting)
+                {
+                    effects += environment.feedbackLogger
+                        .log(.info, "Purchase required prompt will not presented").mapNever()
+                } else {
                     
-                    // Present effect only after PurchaseRequiredPromptDelay.
-                    // `handledEffect` is expected to be executed once the prompt is presented.
-                    Effect(value: ())
-                        .delay(promptDelay, on: QueueScheduler.main)
-                        .then(environment.mainViewStore(.presentPurchaseRequiredPrompt))
-                        .mapNever()
-                ]
-            }
-            
+                    let timestamp = environment.sharedDB.getPurchaseRequiredPromptEventTimestamp()
+                    let timeLeft = (timestamp?.timeIntervalSinceNow ?? 0.0) + PurchaseRequiredPromptDelay
+                    let promptDelay = max(0.0, timeLeft)
+                    
+                    effects += [
+                        environment.feedbackLogger
+                            .log(.info, "Presenting purchase required prompt in \(PurchaseRequiredPromptDelay) seconds")
+                            .mapNever(),
+                        
+                        // Present effect only after PurchaseRequiredPromptDelay.
+                        // `handledEffect` is expected to be executed once the prompt is presented.
+                        Effect(value: ())
+                            .delay(promptDelay, on: QueueScheduler.main)
+                            .then(environment.mainViewStore(.presentPurchaseRequiredPrompt))
+                            .mapNever()
+                    ]
+                }
+            }            
         }
 
         return effects
