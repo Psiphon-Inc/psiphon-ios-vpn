@@ -396,7 +396,7 @@ fileprivate extension OnboardingScreen {
                     )
                 )
                 
-                langSelectionViewController.selectionHandler = { _, selectedLang, viewController in
+                langSelectionViewController.selectionHandler = { [self] _, selectedLang, viewController in
                     
                     guard let selectedLang = selectedLang as? LanguageObjcWrapper else {
                         fatalError()

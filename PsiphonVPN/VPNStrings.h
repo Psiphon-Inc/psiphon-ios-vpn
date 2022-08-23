@@ -23,8 +23,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface VPNStrings : NSObject
 
-// Simple alert message when user notification cannot be displayed.
-+ (NSString *)disallowed_traffic_simple_alert_message;
++ (NSString *)psiphon;
 
 + (NSString *)disallowed_traffic_notification_title;
 
@@ -32,13 +31,15 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)corruptSettingsFileAlertMessage;
 
-+ (NSString *)cannotStartTunnelDueToSubscription;
++ (NSString *)mustStartVPNFromApp;
 
 + (NSString *)openPsiphonAppToFinishConnecting;
 
 + (NSString *)upstreamProxySettingsErrorMessage;
 
 + (NSString *)subscriptionExpiredAlertMessage;
+
++ (NSString *)purchaseRequiredNotificationMessage;
 
 @end
 

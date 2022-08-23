@@ -54,7 +54,7 @@ final class PsiCashStoreViewController: ReactiveViewController {
         let isRefreshingAppStoreReceipt: Bool
     }
 
-    enum ViewControllerAction: Equatable {
+    enum ViewControllerAction {
         case psiCashAction(PsiCashAction)
         case mainViewAction(MainViewAction)
     }
@@ -810,8 +810,8 @@ extension PsiCashStoreViewController {
             }
             
             let vc = ViewBuilderViewController(
-                viewBuilder: alertViewBuilder,
                 modalPresentationStyle: .overFullScreen,
+                viewBuilder: alertViewBuilder,
                 onDidLoad: nil,
                 onDismissed: nil
             )

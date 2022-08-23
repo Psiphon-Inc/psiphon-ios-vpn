@@ -36,6 +36,11 @@ UserDefaultsKey const TunnelSponsorIDStringKey = @"current_sponsor_id";
 
 UserDefaultsKey const ServerTimestampStringKey = @"server_timestamp";
 
+UserDefaultsKey const ExtensionVPNSessionNumberIntKey = @"extension_vpn_session_number";
+
+UserDefaultsKey const ConstainerPurchaseRequiredVPNSessionHandledIntKey =
+@"container_purchase_required_handled_vpn_session_num";
+
 UserDefaultsKey const ExtensionIsZombieBoolKey = @"extension_zombie";
 
 UserDefaultsKey const ContainerForegroundStateBoolKey = @"container_foreground_state_bool_key";
@@ -45,8 +50,16 @@ UserDefaultsKey const ContainerTunnelIntentStatusIntKey = @"container_tunnel_int
 UserDefaultsKey const ExtensionDisallowedTrafficAlertWriteSeqIntKey =
 @"extension_disallowed_traffic_alert_write_seq_int";
 
+UserDefaultsKey const ExtensionPurchaseRequiredPromptWriteSeqIntKey =
+@"extension_purchase_required_prompt_write_seq_int";
+
+UserDefaultsKey const ExtensionPurchaseRequiredPromptEventTimestampKey =
+@"extension_purchase_required_prompt_event_timestamp";
+
 UserDefaultsKey const ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey =
 @"container_disallowed_traffic_alert_read_at_least_up_to_seq_int";
+
+UserDefaultsKey const ContainerPurchaseRequiredReadAtLeastUpToSeqIntKey = @"container_purchase_required_read_at_least_up_to_seq_int";
 
 UserDefaultsKey const TunnelEgressRegionKey = @"Tunnel-EgressRegion";
 
@@ -255,9 +268,36 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
 - (NSInteger)getContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum {
     return [sharedDefaults integerForKey:ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey];
 }
+
+- (void)setContainerPurchaseRequiredReadAtLeastUpToSequenceNum:(NSInteger)seq {
+    [sharedDefaults setInteger:seq forKey:ContainerPurchaseRequiredReadAtLeastUpToSeqIntKey];
+}
+
+- (NSInteger)getContainerPurchaseRequiredReadAtLeastUpToSequenceNum {
+    return [sharedDefaults integerForKey:ContainerPurchaseRequiredReadAtLeastUpToSeqIntKey];
+}
+
+- (void)setContainerPurchaseRequiredHandledEventVPNSessionNumber:(NSInteger)sessionNum {
+    [sharedDefaults setInteger:sessionNum forKey:ConstainerPurchaseRequiredVPNSessionHandledIntKey];
+}
+
+- (NSInteger)getContainerPurchaseRequiredHandledEventLatestVPNSessionNumber {
+    return [sharedDefaults integerForKey:ConstainerPurchaseRequiredVPNSessionHandledIntKey];
+}
+
 #endif
 
 #pragma mark - Extension Data (Data originating in the extension)
+
+- (void)incrementVPNSessionNumber {
+    NSInteger lastSessionNum = [self getVPNSessionNumber];
+    [sharedDefaults setInteger:(lastSessionNum + 1)
+                        forKey:ExtensionVPNSessionNumberIntKey];
+}
+
+- (NSInteger)getVPNSessionNumber {
+    return [sharedDefaults integerForKey:ExtensionVPNSessionNumberIntKey];
+}
 
 // TODO: is timestamp needed? Maybe we can use this to detect staleness later
 - (BOOL)setEmittedEgressRegions:(NSArray<NSString *> *)regions {
@@ -296,6 +336,29 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
 
 - (NSInteger)getDisallowedTrafficAlertWriteSequenceNum {
     return [sharedDefaults integerForKey:ExtensionDisallowedTrafficAlertWriteSeqIntKey];
+}
+
+- (void)incrementPurchaseRequiredPromptWriteSequenceNum {
+    NSInteger lastSeq = [self getPurchaseRequiredPromptWriteSequenceNum];
+    [sharedDefaults setInteger:(lastSeq + 1)
+                        forKey:ExtensionPurchaseRequiredPromptWriteSeqIntKey];
+}
+
+- (NSInteger)getPurchaseRequiredPromptWriteSequenceNum {
+    return [sharedDefaults integerForKey:ExtensionPurchaseRequiredPromptWriteSeqIntKey];
+}
+
+- (void)setPurchaseRequiredPromptEventTimestamp:(NSDate *)date {
+    NSString *rfc3339Date = [date RFC3339String];
+    [sharedDefaults setObject:rfc3339Date forKey:ExtensionPurchaseRequiredPromptEventTimestampKey];
+}
+
+- (NSDate * _Nullable)getPurchaseRequiredPromptEventTimestamp {
+    NSString * _Nullable rfc3339Date = [sharedDefaults stringForKey:ExtensionPurchaseRequiredPromptEventTimestampKey];
+    if (!rfc3339Date) {
+        return nil;
+    }
+    return [NSDate fromRFC3339String:rfc3339Date];
 }
 
 - (NSArray<Homepage *> *_Nullable)getHomepages {

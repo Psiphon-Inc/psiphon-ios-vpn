@@ -27,7 +27,7 @@ import UIKit
 import PsiphonClientCommonLibrary
 import SafariServices
 
-enum MainViewAction: Equatable {
+enum MainViewAction {
 
     case psiCashViewAction(PsiCashViewAction)
     
@@ -48,7 +48,7 @@ enum MainViewAction: Equatable {
         case psiCashStore
         case psiCashAccountLogin
         case psiCashAccountMgmt
-        
+        case purchaseRequiredPrompt
         /// - Parameter forceReconnect: non-nil value when the settings screen is dismissed, otherwise `nil`.
         case settings(forceReconnect: Bool?)
         
@@ -65,6 +65,14 @@ enum MainViewAction: Equatable {
     case presentPsiCashAccountManagement
     
     case presentSubscriptionScreen
+    
+    // Purchase required prompt
+    enum PurchaseRequiredAction {
+        case subscribe
+        case disconnect
+    }
+    case presentPurchaseRequiredPrompt
+    case purchaseRequiredPromptButton(PurchaseRequiredAction)
     
     case presentSettingsScreen
     
@@ -95,6 +103,9 @@ struct MainViewState: Equatable {
     /// Represents presentation state of PsiCash accounts screen.
     var psiCashAccountLoginIsPresented: Pending<Bool> = .completed(false)
     
+    /// Represents presentation of state of subscription required purchase prompt.
+    var purchaseRequiredPromptPresented: Pending<Bool> = .completed(false)
+    
     /// Represents presentation state of the settings screen.
     var settingsIsPresented: Pending<Bool> = .completed(false)
     
@@ -111,6 +122,7 @@ struct MainViewState: Equatable {
 struct MainViewReducerState: Equatable {
     var mainView: MainViewState
     let subscriptionState: SubscriptionState
+    let psiCashState: PsiCashState
     let psiCashAccountType: PsiCashAccountType?
     let appLifecycle: AppLifecycle
     let tunnelConnectedStatus: TunnelConnectedStatus
@@ -136,7 +148,9 @@ extension MainViewReducerState {
 
 struct MainViewEnvironment {
     
+    let vpnActionStore: (VPNPublicAction) -> Effect<Never>
     let userConfigs: UserDefaultsConfig
+    let sharedDB: PsiphonDataSharedDB
     let psiCashStore: (PsiCashAction) -> Effect<Never>
     let psiCashStoreViewEnvironment: PsiCashStoreViewEnvironment
     let getTopActiveViewController: () -> UIViewController
@@ -478,6 +492,10 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             state.mainView.psiCashAccountLoginIsPresented = .completed(true)
             return []
             
+        case .purchaseRequiredPrompt:
+            state.mainView.purchaseRequiredPromptPresented = .completed(true)
+            return []
+            
         case .settings(forceReconnect: _):
             state.mainView.settingsIsPresented = .completed(true)
             return []
@@ -526,6 +544,10 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                 
                 return effects.map { $0.map { MainViewAction.psiCashViewAction($0) } }
             }
+            
+        case .purchaseRequiredPrompt:
+            state.mainView.purchaseRequiredPromptPresented = .completed(false)
+            return []
             
         case .settings(let forceReconnect):
             state.mainView.settingsIsPresented = .completed(false)
@@ -671,6 +693,90 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             }
         ]
         
+    case .presentPurchaseRequiredPrompt:
+        
+        guard case .completed(false) = state.mainView.purchaseRequiredPromptPresented else {
+            return []
+        }
+        
+        // TODO: Check if a traffic alert is presented. This applies to presentation
+        // of traffic-alert as well.
+        
+        let speedBoosted = state.psiCashState.activeSpeedBoost(environment.dateCompare) != nil
+        
+        // Prompt is not presented if the user is not (subscribed or speed-boosted)
+        // or is not connected.
+        if speedBoosted ||
+            state.subscriptionState.status.subscribed ||
+            (state.tunnelConnectedStatus != .connected && state.tunnelConnectedStatus != .connecting)
+        {
+            
+            return []
+            
+        }
+        
+        state.mainView.purchaseRequiredPromptPresented = .pending
+        
+        // Presents purchase required prompt.
+        return [
+            Effect { observer, _ in
+
+                let topVC = environment.getTopActiveViewController()
+
+                let vc = ViewBuilderViewController(
+                    modalPresentationStyle: .overFullScreen,
+                    modalTransitionStyle: .crossDissolve,
+                    viewBuilder: SubscriptionPurchaseRequiredPrompt(
+                        subscribeButtonHandler: { [observer] in
+                            observer.send(value: .purchaseRequiredPromptButton(.subscribe))
+                        },
+                        disconnectButtonHandler: { [observer] in
+                            observer.send(value: .purchaseRequiredPromptButton(.disconnect))
+                        }
+                    ),
+                    onDidLoad: { [observer] in
+                        observer.send(value: .screenDidLoad(.purchaseRequiredPrompt))
+                    },
+                    onDismissed: { [observer] in
+                        observer.fulfill(value: .screenDismissed(.purchaseRequiredPrompt))
+                    }
+                )
+
+                topVC.present(vc, animated: true, completion: nil)
+
+            }
+            
+        ]
+        
+    case .purchaseRequiredPromptButton(let buttonTapped):
+        
+        let dismissEffect = Effect<Never>.fireAndForget {
+            let topVC = environment.getTopActiveViewController()
+            let searchResult = topVC.traversePresentingStackFor(
+                type: ViewBuilderViewController<SubscriptionPurchaseRequiredPrompt>.self,
+                searchChildren: true
+            )
+            
+            switch searchResult {
+            case .notPresent:
+                // No-op.
+                return
+            case .presentInStack(let viewController),
+                    .presentTopOfStack(let viewController):
+                viewController.dismiss(animated: true, completion: nil)
+            }
+        }
+        
+        switch buttonTapped {
+        case .subscribe:
+            return [
+                Effect(value: .presentSubscriptionScreen)
+            ] + dismissEffect.mapNever()
+        case .disconnect:
+            return [
+                environment.vpnActionStore(.tunnelStateIntent(intent: .stop, reason: .userInitiated)).mapNever()
+            ] + dismissEffect.mapNever()
+        }
         
     case .presentSettingsScreen:
         

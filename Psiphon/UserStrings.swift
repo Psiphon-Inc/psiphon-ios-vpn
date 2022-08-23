@@ -730,6 +730,12 @@ extension UserStrings {
                                  comment: "Status when the VPN is restarting.")
     }
     
+    static func Vpn_disconnect_button_title() -> String {
+        return NSLocalizedString("VPN_DISCONNECT_BUTTON_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Disconnect",
+                                 comment: "Title of button that disconnects the VPN.")
+    }
+    
 }
 
 // MARK: Subscription-related Strings
@@ -849,6 +855,23 @@ extension UserStrings {
                                  value: "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.",
                                  comment: "Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request.")
     }
+}
+
+// MARK: Purchase required prompt
+extension UserStrings {
+    
+    static func Psiphon_is_no_longer_free_in_your_region_title() -> String {
+        return NSLocalizedString("PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_TITLE", tableName: nil, bundle: Bundle.main,
+                                 value: "Psiphon is no longer free in your region",
+                                 comment: "Do not translate or transliterate 'Psiphon'. An alert with this title is shown when the user connects from a region where free service is no longer offered, asking the user to subscribe.")
+    }
+    
+    static func Psiphon_is_no_longer_free_in_your_region_body() -> String {
+        return NSLocalizedString("PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_BODY", tableName: nil, bundle: Bundle.main,
+                                 value: "Help keep Psiphon free for those who need it most! Subscribe now.",
+                                 comment: "Do not translate or transliterate 'Psiphon'. Body of an alert that is shown to the user when they connect from a region where free service is no longer offered, asking the user to subscribe.")
+    }
+    
 }
 
 // MARK: Feedback

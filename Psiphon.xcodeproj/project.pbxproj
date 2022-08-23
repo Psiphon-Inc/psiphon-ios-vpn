@@ -31,9 +31,12 @@
 		29923FDA264EFC720078E8BB /* PsiCashLib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; };
 		29923FDB264EFC720078E8BB /* PsiCashLib.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		29A7075227CE9198006DE45A /* ChildViewControllerDismissedDelegate+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A7075127CE9198006DE45A /* ChildViewControllerDismissedDelegate+Additions.swift */; };
+		29AEC21328AD85110063003C /* LocalNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 29AEC21228AD85110063003C /* LocalNotification.m */; };
+		29AEC21428B014AF0063003C /* Strings.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083974C8CF9DDFE7A341D /* Strings.m */; };
 		29BA6DA1268630A9001445EA /* TunnelFileDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 29BA6DA0268630A9001445EA /* TunnelFileDescriptor.m */; };
 		29BE0BE327C54828003BC17B /* PsiCashAccountExplainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29BE0BE227C54828003BC17B /* PsiCashAccountExplainerViewController.swift */; };
 		29C3220A26B1C17D0075BB34 /* AppInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920720F3DA190033114B /* AppInfo.m */; };
+		29DE99C628B43E2400445DED /* SubscriptionPurchaseRequiredPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29DE99C528B43E2400445DED /* SubscriptionPurchaseRequiredPrompt.swift */; };
 		29EE50B726ACDC0E00DB8A60 /* AppFiles.m in Sources */ = {isa = PBXBuildFile; fileRef = 29EE50B626ACDC0E00DB8A60 /* AppFiles.m */; };
 		29EE50B826ACDC0E00DB8A60 /* AppFiles.m in Sources */ = {isa = PBXBuildFile; fileRef = 29EE50B626ACDC0E00DB8A60 /* AppFiles.m */; };
 		29F8536E26D4549000533472 /* Requests+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29F8536D26D4549000533472 /* Requests+Additions.swift */; };
@@ -212,7 +215,6 @@
 		A8408E611665FC60D5DFF339 /* SubscriptionStatusView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408BA05DC0D983E6740558 /* SubscriptionStatusView.m */; };
 		A8408EB13777DDCBEF7DE3C0 /* SwoopView.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408B9A66413A25FC1A2BE1 /* SwoopView.m */; };
 		A8408EB1E9DABE35016580A7 /* ImageUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408A0C4220563DA1FE3048 /* ImageUtils.m */; };
-		A8408F5F45CDBDF42701063E /* Strings.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083974C8CF9DDFE7A341D /* Strings.m */; };
 		A8408FA13890CD67154033C6 /* RegionSelectionButton.m in Sources */ = {isa = PBXBuildFile; fileRef = A8408C84138113DE79F0DCD0 /* RegionSelectionButton.m */; };
 		C825DCB5AEAFE8906B75CEAD /* libPods-Psiphon.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 26CC89C48571FA25723AB91D /* libPods-Psiphon.a */; };
 		CE234A7424F439CB0007709A /* FeedbackReducer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE234A7324F439CB0007709A /* FeedbackReducer.swift */; };
@@ -413,9 +415,12 @@
 		2974E99D27CE858000DA0918 /* PsiNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiNavigationController.swift; sourceTree = "<group>"; };
 		29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = PsiCashLib.xcframework; path = Frameworks/PsiCashLib.xcframework; sourceTree = "<group>"; };
 		29A7075127CE9198006DE45A /* ChildViewControllerDismissedDelegate+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChildViewControllerDismissedDelegate+Additions.swift"; sourceTree = "<group>"; };
+		29AEC21128AD85110063003C /* LocalNotification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocalNotification.h; sourceTree = "<group>"; };
+		29AEC21228AD85110063003C /* LocalNotification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LocalNotification.m; sourceTree = "<group>"; };
 		29BA6D9F268630A9001445EA /* TunnelFileDescriptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TunnelFileDescriptor.h; sourceTree = "<group>"; };
 		29BA6DA0268630A9001445EA /* TunnelFileDescriptor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TunnelFileDescriptor.m; sourceTree = "<group>"; };
 		29BE0BE227C54828003BC17B /* PsiCashAccountExplainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashAccountExplainerViewController.swift; sourceTree = "<group>"; };
+		29DE99C528B43E2400445DED /* SubscriptionPurchaseRequiredPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SubscriptionPurchaseRequiredPrompt.swift; sourceTree = "<group>"; };
 		29EE50B526ACDC0E00DB8A60 /* AppFiles.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppFiles.h; sourceTree = "<group>"; };
 		29EE50B626ACDC0E00DB8A60 /* AppFiles.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppFiles.m; sourceTree = "<group>"; };
 		29F8536D26D4549000533472 /* Requests+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Requests+Additions.swift"; sourceTree = "<group>"; };
@@ -1222,6 +1227,7 @@
 				8D13232E25310661005F83C8 /* SecretValueTextField.swift */,
 				2911A792263D5DED001A0A4D /* ViewBuilderContainerView.swift */,
 				296A1A88267A01E70068B115 /* CopyableLabel.swift */,
+				29DE99C528B43E2400445DED /* SubscriptionPurchaseRequiredPrompt.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -1440,6 +1446,8 @@
 				8D0017D624DB233200EC3409 /* VPNStrings.m */,
 				29BA6D9F268630A9001445EA /* TunnelFileDescriptor.h */,
 				29BA6DA0268630A9001445EA /* TunnelFileDescriptor.m */,
+				29AEC21128AD85110063003C /* LocalNotification.h */,
+				29AEC21228AD85110063003C /* LocalNotification.m */,
 			);
 			path = PsiphonVPN;
 			sourceTree = "<group>";
@@ -2153,6 +2161,7 @@
 				445F24ED20E1A5BA00D004E9 /* ber_tlv_tag.c in Sources */,
 				4E5263B7207290360021FEF5 /* EmbeddedServerEntriesHelpers.c in Sources */,
 				8D7789C5247496F60038BFDA /* PsiCashLib.swift in Sources */,
+				29DE99C628B43E2400445DED /* SubscriptionPurchaseRequiredPrompt.swift in Sources */,
 				CE84204A2522823D00796032 /* DebugDirectoryViewerViewController.m in Sources */,
 				4E10920820F3DA190033114B /* AppInfo.m in Sources */,
 				445F24EE20E1A5BA00D004E9 /* asn_codecs_prim.c in Sources */,
@@ -2277,6 +2286,7 @@
 				CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */,
 				EF90D7B1204F231E00228A63 /* timestamp_tm.c in Sources */,
 				8D90FD5724C748E000E11C66 /* FeedbackUtils.m in Sources */,
+				29AEC21328AD85110063003C /* LocalNotification.m in Sources */,
 				8D0017D724DB233200EC3409 /* VPNStrings.m in Sources */,
 				291C0B8F269CBF720075FAB7 /* SharedModel.xcdatamodeld in Sources */,
 				291C0BA2269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m in Sources */,
@@ -2286,6 +2296,7 @@
 				CED6797024A4FAF400C4CA81 /* NSUserDefaults+KeyedDataStore.m in Sources */,
 				EF90D7B8204F236400228A63 /* NSError+Convenience.m in Sources */,
 				EF90D7B5204F234700228A63 /* NSDate+PSIDateExtension.m in Sources */,
+				29AEC21428B014AF0063003C /* Strings.m in Sources */,
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,
 				521FD0FF219E0E2600F748EC /* AppStats.m in Sources */,
 				4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */,
@@ -2319,7 +2330,6 @@
 				291C0BA6269CC21F0075FAB7 /* PersistentContainerWrapper.m in Sources */,
 				CED6790F24A4F82400C4CA81 /* JetsamTracking.m in Sources */,
 				521FD100219E0E3800F748EC /* DebugUtils.m in Sources */,
-				A8408F5F45CDBDF42701063E /* Strings.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

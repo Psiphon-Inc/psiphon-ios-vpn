@@ -52,15 +52,23 @@ extension AppLifecycle {
     
 }
 
-enum AppDelegateAction {
+enum AppDelegateAction: Equatable {
+    
     case appLifecycleEvent(AppLifecycle)
-    case checkForDisallowedTrafficAlertNotification
+    
+    /// Check for events recorded by NE that should be handled by the host app.
+    /// Handles disallowed-traffic alert and ShowPurchaseRequiredPrompt application parameter.
+    case checkNEEvents
+    
     case onboardingCompleted
+    
 }
 
 struct AppDelegateReducerState: Equatable {
     var appDelegateState: AppDelegateState
     let subscriptionState: SubscriptionState
+    let psiCashState: PsiCashState
+    let tunnelConnectedStatus: TunnelConnectedStatus
 }
 
 struct AppDelegateState: Equatable {
@@ -89,6 +97,7 @@ struct AppDelegateEnvironment {
     let paymentTransactionDelegate: PaymentTransactionDelegate
     let mainDispatcher: MainDispatcher
     let getCurrentTime: () -> Date
+    let dateCompare: DateCompare
     let userDefaultsConfig: UserDefaultsConfig
 }
 
@@ -120,7 +129,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
         
         case .didBecomeActive:
             return [
-                Effect(value: .checkForDisallowedTrafficAlertNotification),
+                Effect(value: .checkNEEvents),
                 
                 // Available regions may have changed in the background.
                 environment.serverRegionStore(.updateAvailableRegions).mapNever()
@@ -131,42 +140,86 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
             
         }
         
-    case .checkForDisallowedTrafficAlertNotification:
-
-        let lastReadSeq = environment.sharedDB
-            .getContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum()
+    case .checkNEEvents:
         
-        // Last sequence number written by the extension
-        let writeSeq = environment.sharedDB.getDisallowedTrafficAlertWriteSequenceNum()
-        
-        guard writeSeq > lastReadSeq else {
-            return []
-        }
-        
-        // TODO: The `date` of this event should really be the same as the last seq number read.
-        // In the implementation below two AlertEvents for the same seq number, are not equal.
-        let alertEvent = AlertEvent(.disallowedTrafficAlert,
-                                    date: environment.getCurrentTime())
-
         var effects = [Effect<AppDelegateAction>]()
-
-        // Updates disallowed traffic alert read seq number.
-        effects += .fireAndForget {
-            environment.sharedDB.setContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum(
-                environment.sharedDB.getDisallowedTrafficAlertWriteSequenceNum())
+        
+        let disallowedTrafficSeq = NEEventType.disallowedTraffic.unhandledEventSeq(environment.sharedDB)
+         
+        let purchaseRequiredSeq = NEEventType.requiredPurchasePrompt.unhandledEventSeq(environment.sharedDB)
+        
+        // Handles `disallowed-traffic` server alert.
+        if let disallowedTrafficSeq = disallowedTrafficSeq {
+            
+            // Updates disallowed traffic alert handled seq number.
+            NEEventType.disallowedTraffic.setEventHandled(environment.sharedDB, disallowedTrafficSeq)
+            
+            // TODO: The `date` of this event should really be the same as the last seq number read.
+            // In the implementation below two AlertEvents for the same seq number, are not equal.
+            let alertEvent = AlertEvent(.disallowedTrafficAlert, date: environment.getCurrentTime())
+            
+            // Presents disallowed traffic alert only if the user is not subscribed.
+            if state.subscriptionState.status.subscribed {
+                effects += environment.feedbackLogger
+                    .log(.info, "Disallowed traffic alert not presented.").mapNever()
+            } else {
+                effects += [
+                    environment.feedbackLogger
+                        .log(.info, "Presenting disallowed traffic alert").mapNever(),
+                    
+                    environment.mainViewStore(.presentAlert(alertEvent)).mapNever(),
+                ]
+            }
+            
         }
-
-        // Presents disallowed traffic alert only if the user is not subscribed.
-        if case .subscribed(_) = state.subscriptionState.status {
-            effects += environment.feedbackLogger
-                .log(.info, "Disallowed traffic alert not presented.")
-                .mapNever()
-        } else {
-            effects += [
-                environment.feedbackLogger.log(.info, "Presenting disallowed traffic alert")
-                    .mapNever(),
-                environment.mainViewStore(.presentAlert(alertEvent)).mapNever(),
-            ]
+        
+        // Handles `ShowPurchaseRequiredPrompt` application parameter.
+        if let purchaseRequiredSeq = purchaseRequiredSeq {
+            
+            let vpnSession = environment.sharedDB.getVPNSessionNumber()
+            let lastHandledVPNSession =
+            environment.sharedDB.getContainerPurchaseRequiredHandledEventLatestVPNSessionNumber()
+            
+            // Updates purchase required prompt handled seq number.
+            effects += Effect.fireAndForget {
+                NEEventType.requiredPurchasePrompt
+                    .setEventHandled(environment.sharedDB, purchaseRequiredSeq)
+                environment.sharedDB.setContainerPurchaseRequiredHandledEventVPNSessionNumber(vpnSession)
+            }
+            
+            // If the event is for a VPN session that is already handled, it is ignored.
+            if vpnSession > lastHandledVPNSession {
+                
+                let speedBoosted = state.psiCashState.activeSpeedBoost(environment.dateCompare) != nil
+                
+                // Presents prompt if the user is not (subscribed or speed boosted) and
+                // is(connected or connecting).
+                if speedBoosted ||
+                    state.subscriptionState.status.subscribed ||
+                    (state.tunnelConnectedStatus != .connected && state.tunnelConnectedStatus != .connecting)
+                {
+                    effects += environment.feedbackLogger
+                        .log(.info, "Purchase required prompt will not presented").mapNever()
+                } else {
+                    
+                    let timestamp = environment.sharedDB.getPurchaseRequiredPromptEventTimestamp()
+                    let timeLeft = (timestamp?.timeIntervalSinceNow ?? 0.0) + PurchaseRequiredPromptDelay
+                    let promptDelay = max(0.0, timeLeft)
+                    
+                    effects += [
+                        environment.feedbackLogger
+                            .log(.info, "Presenting purchase required prompt in \(PurchaseRequiredPromptDelay) seconds")
+                            .mapNever(),
+                        
+                        // Present effect only after PurchaseRequiredPromptDelay.
+                        // `handledEffect` is expected to be executed once the prompt is presented.
+                        Effect(value: ())
+                            .delay(promptDelay, on: QueueScheduler.main)
+                            .then(environment.mainViewStore(.presentPurchaseRequiredPrompt))
+                            .mapNever()
+                    ]
+                }
+            }            
         }
 
         return effects
@@ -543,6 +596,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.legacySpeedBoostDeepLink,
                                               PsiphonDeepLinking.speedBoostDeepLink ]) { [unowned self] in
             self.store.send(.mainViewAction(.presentPsiCashStore(initialTab: .speedBoost)))
+            return true
+        }
+        deepLinkingNavigator.register(
+            urls: [PsiphonDeepLinking.subscribeDeepLink, PsiphonDeepLinking.subscribeDeepLink2]
+        ) { [unowned self] in
+            self.store.send(.mainViewAction(.presentSubscriptionScreen))
             return true
         }
         deepLinkingNavigator.register(urls: [ PsiphonDeepLinking.settingsDeepLink ]) { [unowned self] in
@@ -1436,8 +1495,8 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         case .networkConnectivityFailed, .networkConnectivityResolved:
             break
             
-        case .disallowedTrafficAlert:
-            self.store.send(.appDelegateAction(.checkForDisallowedTrafficAlertNotification))
+        case .disallowedTrafficAlert, .purchaseRequired:
+            self.store.send(.appDelegateAction(.checkNEEvents))
             
         case .isHostAppProcessRunning:
             Notifier.sharedInstance().post(NotifierHostAppProcessRunning)
@@ -1508,6 +1567,48 @@ final class CopySettingsToPsiphonDataSharedDB {
     func copyCustomHttpHeaders() {
         let customHeaders = UpstreamProxySettings.sharedInstance().getUpstreamProxyCustomHeaders()
         sharedDB.setCustomHttpHeaders(customHeaders)
+    }
+    
+}
+
+
+enum NEEventType: Equatable {
+    case disallowedTraffic
+    case requiredPurchasePrompt
+}
+
+extension NEEventType {
+    
+    func unhandledEventSeq(_ sharedDB: PsiphonDataSharedDB) -> Int? {
+        
+        let lastHandledSeq: Int
+        let lastWrittenSeq: Int
+        
+        switch self {
+        case .disallowedTraffic:
+            lastHandledSeq = sharedDB.getContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum()
+            lastWrittenSeq = sharedDB.getDisallowedTrafficAlertWriteSequenceNum()
+            
+        case .requiredPurchasePrompt:
+            lastHandledSeq = sharedDB.getContainerPurchaseRequiredReadAtLeastUpToSequenceNum()
+            lastWrittenSeq = sharedDB.getPurchaseRequiredPromptWriteSequenceNum()
+        }
+        
+        if lastWrittenSeq > lastHandledSeq {
+            return lastWrittenSeq
+        } else {
+            return nil
+        }
+        
+    }
+    
+    func setEventHandled(_ sharedDB: PsiphonDataSharedDB, _ seq: Int) {
+        switch self {
+        case .disallowedTraffic:
+            sharedDB.setContainerPurchaseRequiredReadAtLeastUpToSequenceNum(seq)
+        case .requiredPurchasePrompt:
+            sharedDB.setContainerPurchaseRequiredReadAtLeastUpToSequenceNum(seq)
+        }
     }
     
 }

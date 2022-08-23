@@ -700,6 +700,7 @@ fileprivate func toAppDelegateReducerEnvironment(env: AppEnvironment) -> AppDele
         paymentTransactionDelegate: env.paymentTransactionDelegate,
         mainDispatcher: env.mainDispatcher,
         getCurrentTime: env.dateCompare.getCurrentTime,
+        dateCompare: env.dateCompare,
         userDefaultsConfig: env.userConfigs
     )
 }
@@ -734,7 +735,9 @@ fileprivate func toVPNReducerEnvironment(env: AppEnvironment) -> VPNReducerEnvir
 
 func toMainViewReducerEnvironment(env: AppEnvironment) -> MainViewEnvironment {
     MainViewEnvironment(
+        vpnActionStore: env.vpnActionStore,
         userConfigs: env.userConfigs,
+        sharedDB: env.sharedDB,
         psiCashStore: env.psiCashStore,
         psiCashStoreViewEnvironment: PsiCashStoreViewEnvironment(
             feedbackLogger: env.feedbackLogger,

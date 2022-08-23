@@ -40,7 +40,9 @@ extern UserDefaultsKey const _Nonnull ExtensionIsZombieBoolKey;
 extern UserDefaultsKey const _Nonnull ContainerForegroundStateBoolKey;
 extern UserDefaultsKey const _Nonnull ContainerTunnelIntentStatusIntKey;
 extern UserDefaultsKey const _Nonnull ExtensionDisallowedTrafficAlertWriteSeqIntKey;
+extern UserDefaultsKey const _Nonnull ExtensionPurchaseRequiredPromptWriteSeqIntKey;
 extern UserDefaultsKey const _Nonnull ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey;
+extern UserDefaultsKey const _Nonnull ContainerPurchaseRequiredReadAtLeastUpToSeqIntKey;
 extern UserDefaultsKey const _Nonnull SharedDataExtensionCrashedBeforeStopBoolKey;
 extern UserDefaultsKey const _Nonnull SharedDataExtensionJetsamCounterIntegerKey;
 extern UserDefaultsKey const _Nonnull DebugMemoryProfileBoolKey;
@@ -161,15 +163,32 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 #endif
 
 #if !(TARGET_IS_EXTENSION)
+
+// Disallowed traffic alert
 - (void)setContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum:(NSInteger)seq;
 - (NSInteger)getContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum;
+
+// Purchase required prompt
+- (void)setContainerPurchaseRequiredReadAtLeastUpToSequenceNum:(NSInteger)seq;
+- (NSInteger)getContainerPurchaseRequiredReadAtLeastUpToSequenceNum;
+
+// Purchase requried prompt handled vpn session number.
+- (void)setContainerPurchaseRequiredHandledEventVPNSessionNumber:(NSInteger)sessionNum;
+- (NSInteger)getContainerPurchaseRequiredHandledEventLatestVPNSessionNumber;
+
 #endif
 
 #pragma mark - Extension Data (Data originating in the extension)
 
+#if TARGET_IS_EXTENSION
+- (void)incrementVPNSessionNumber;
+#endif
+- (NSInteger)getVPNSessionNumber;
+
 - (NSString *_Nullable)emittedClientRegion;
 
 - (NSString *_Nullable)getCurrentSponsorId;
+
 
 #if TARGET_IS_EXTENSION
 
@@ -225,6 +244,14 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 #endif
 
 - (NSInteger)getDisallowedTrafficAlertWriteSequenceNum;
+
+#if TARGET_IS_EXTENSION
+- (void)incrementPurchaseRequiredPromptWriteSequenceNum;
+- (void)setPurchaseRequiredPromptEventTimestamp:(NSDate *)date;
+#endif
+
+- (NSInteger)getPurchaseRequiredPromptWriteSequenceNum;
+- (NSDate * _Nullable)getPurchaseRequiredPromptEventTimestamp;
 
 #pragma mark - Jetsam counter
 

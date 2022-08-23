@@ -58,12 +58,15 @@ struct Styling {
 
 enum Gradients: Int {
     
+    case pureWhite
     case grey
     case blue
     case vividBlue
 
     var colors: [CGColor] {
         switch self {
+        case .pureWhite:
+            return [.white, .white].cgColors
         case .grey:
             return [.white, .softGrey1()].cgColors
         case .blue:

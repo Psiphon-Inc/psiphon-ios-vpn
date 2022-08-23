@@ -40,6 +40,7 @@ NotifierMessage const NotifierNetworkConnectivityFailed = PSIPHON_VPN_GROUP @".N
 NotifierMessage const NotifierNetworkConnectivityResolved = PSIPHON_VPN_GROUP @".NetworkConnectivityResolved";
 NotifierMessage const NotifierDisallowedTrafficAlert = PSIPHON_VPN_GROUP @".DisallowedTrafficAlert";
 NotifierMessage const NotifierIsHostAppProcessRunning = PSIPHON_VPN_GROUP @".IsHostAppProcessRunning";
+NotifierMessage const NotifierPurchaseRequired = PSIPHON_VPN_GROUP @".PurchaseRequired";
 
 // Messages sent by the container.
 NotifierMessage const NotifierStartVPN               = PSIPHON_GROUP @".StartVPN";
@@ -135,6 +136,7 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierNetworkConnectivityResolved);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDisallowedTrafficAlert);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierIsHostAppProcessRunning);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierPurchaseRequired);
 
 #if DEBUG
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierDebugPsiphonTunnelState);
