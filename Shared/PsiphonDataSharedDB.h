@@ -172,13 +172,23 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 - (void)setContainerPurchaseRequiredReadAtLeastUpToSequenceNum:(NSInteger)seq;
 - (NSInteger)getContainerPurchaseRequiredReadAtLeastUpToSequenceNum;
 
+// Purchase requried prompt handled vpn session number.
+- (void)setContainerPurchaseRequiredHandledEventVPNSessionNumber:(NSInteger)sessionNum;
+- (NSInteger)getContainerPurchaseRequiredHandledEventLatestVPNSessionNumber;
+
 #endif
 
 #pragma mark - Extension Data (Data originating in the extension)
 
+#if TARGET_IS_EXTENSION
+- (void)incrementVPNSessionNumber;
+#endif
+- (NSInteger)getVPNSessionNumber;
+
 - (NSString *_Nullable)emittedClientRegion;
 
 - (NSString *_Nullable)getCurrentSponsorId;
+
 
 #if TARGET_IS_EXTENSION
 

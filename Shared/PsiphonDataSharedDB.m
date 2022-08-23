@@ -36,6 +36,11 @@ UserDefaultsKey const TunnelSponsorIDStringKey = @"current_sponsor_id";
 
 UserDefaultsKey const ServerTimestampStringKey = @"server_timestamp";
 
+UserDefaultsKey const ExtensionVPNSessionNumberIntKey = @"extension_vpn_session_number";
+
+UserDefaultsKey const ConstainerPurchaseRequiredVPNSessionHandledIntKey =
+@"container_purchase_required_handled_vpn_session_num";
+
 UserDefaultsKey const ExtensionIsZombieBoolKey = @"extension_zombie";
 
 UserDefaultsKey const ContainerForegroundStateBoolKey = @"container_foreground_state_bool_key";
@@ -271,9 +276,28 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
 - (NSInteger)getContainerPurchaseRequiredReadAtLeastUpToSequenceNum {
     return [sharedDefaults integerForKey:ContainerPurchaseRequiredReadAtLeastUpToSeqIntKey];
 }
+
+- (void)setContainerPurchaseRequiredHandledEventVPNSessionNumber:(NSInteger)sessionNum {
+    [sharedDefaults setInteger:sessionNum forKey:ConstainerPurchaseRequiredVPNSessionHandledIntKey];
+}
+
+- (NSInteger)getContainerPurchaseRequiredHandledEventLatestVPNSessionNumber {
+    return [sharedDefaults integerForKey:ConstainerPurchaseRequiredVPNSessionHandledIntKey];
+}
+
 #endif
 
 #pragma mark - Extension Data (Data originating in the extension)
+
+- (void)incrementVPNSessionNumber {
+    NSInteger lastSessionNum = [self getVPNSessionNumber];
+    [sharedDefaults setInteger:(lastSessionNum + 1)
+                        forKey:ExtensionVPNSessionNumberIntKey];
+}
+
+- (NSInteger)getVPNSessionNumber {
+    return [sharedDefaults integerForKey:ExtensionVPNSessionNumberIntKey];
+}
 
 // TODO: is timestamp needed? Maybe we can use this to detect staleness later
 - (BOOL)setEmittedEgressRegions:(NSArray<NSString *> *)regions {

@@ -242,6 +242,15 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     }
     
     BOOL hasSubscriptionAuth = [authorizationStore hasSubscriptionAuth];
+    
+    // Increments "VPN Session" number when the network extension is started
+    // from the container or other methods.
+    // Note: This implies that network extension process start after a detected carsh
+    //       or from boot do not increment the "VPN Session" number.
+    if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
+        self.extensionStartMethod == ExtensionStartMethodOther) {
+        [self.sharedDB incrementVPNSessionNumber];
+    }
 
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
         self.extensionStartMethod == ExtensionStartMethodFromBoot ||
@@ -803,6 +812,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 [[Notifier sharedInstance] post:NotifierPurchaseRequired];
                 
                 // Display location notification.
+                // TODO: This notification is not debounced for the current VPN session.
                 [LocalNotification requestPurchaseRequiredPrompt];
             }
         } else {
