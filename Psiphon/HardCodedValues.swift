@@ -32,7 +32,7 @@ enum PsiCashHardCodedValues {
 // Delay from receiving `ShowPurchaseRequiredPrompt` application parameter
 // to when the UI prompt is presented.
 #if DEBUG || DEV_RELEASE
-let PurchaseRequiredPromptDelay: TimeInterval = 30.0  // 10 secs.
+let PurchaseRequiredPromptDelay: TimeInterval = 30.0  // 30 secs.
 #else
 let PurchaseRequiredPromptDelay: TimeInterval = 180.0  // 3 mins.
 #endif
