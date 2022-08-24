@@ -46,3 +46,21 @@ extension Optional where Wrapped == NSNumber {
     }
     
 }
+
+extension Optional where Wrapped: UIViewController {
+    
+    /// If `self` has a value, then the view controller is dimissed and `completion` block is called,
+    /// otherwise, the `completion` block is called immediately.
+    func dismissThen(
+        animated: Bool,
+        completion: @escaping () -> Void
+    ) {
+        switch self {
+        case .none:
+            completion()
+        case .some(let viewController):
+            viewController.dismiss(animated: true, completion: completion)
+        }
+    }
+    
+}
