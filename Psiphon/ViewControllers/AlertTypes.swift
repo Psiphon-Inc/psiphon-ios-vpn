@@ -30,8 +30,6 @@ enum AlertType: Hashable {
 
     case psiCashAccountAlert(PsiCashAccountAlert)
 
-    case disallowedTrafficAlert
-    
     /// User is asked if they want to submit a feedback after an error condition has been encountered.
     case reportSeriousErrorAlert
     
@@ -69,11 +67,6 @@ enum PsiCashAccountAlert: Hashable {
     case accountTokensExpiredAlert
 }
 
-enum DisallowedTrafficAlertAction: Equatable {
-    case speedBoostTapped
-    case subscriptionTapped
-}
-
 /// Represents all posbbile actions from a user-facing alert dialog.
 enum AlertAction: Equatable {
 
@@ -82,8 +75,6 @@ enum AlertAction: Equatable {
 
     case addPsiCashTapped
 
-    case disallowedTrafficAlertAction(DisallowedTrafficAlertAction)
-    
     /// Opens the feedback screen for the user to send a feedback.
     /// This alert is presented when an error condition is hit.
     case sendErrorInitiatedFeedback
@@ -211,25 +202,6 @@ extension UIAlertController {
                     ])
             }
 
-        case .disallowedTrafficAlert:
-            return .makeAlert(
-                title: UserStrings.Upgrade_psiphon(),
-                message: UserStrings.Disallowed_traffic_alert_message(),
-                actions: [
-                    .defaultButton(title: UserStrings.Subscribe_action_button_title()) {
-                        onActionButtonTapped(alertEvent,
-                                             .disallowedTrafficAlertAction(.subscriptionTapped))
-                    },
-                    .defaultButton(title: UserStrings.Speed_boost()) {
-                        onActionButtonTapped(alertEvent,
-                                             .disallowedTrafficAlertAction(.speedBoostTapped))
-                    },
-                    .dismissButton {
-                        onActionButtonTapped(alertEvent, .dismissTapped)
-                    }
-                ]
-            )
-            
         case .reportSeriousErrorAlert:
             return .makeAlert(title: UserStrings.Serious_errror_occurred_error_title(),
                               message: UserStrings.Help_improve_psiphon_by_sending_report(),
