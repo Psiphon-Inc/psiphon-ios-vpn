@@ -160,6 +160,8 @@ extension MainViewReducerState {
 
 struct MainViewEnvironment {
     
+    var presentedViewControllers: PresentedViewControllers
+    
     let vpnActionStore: (VPNPublicAction) -> Effect<Never>
     let userConfigs: UserDefaultsConfig
     let sharedDB: PsiphonDataSharedDB
@@ -751,6 +753,8 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                         }
                     ]
                 )
+                
+                environment.presentedViewControllers.disallowedTraffic = vc
 
                 topVC.present(vc, animated: true, completion: nil)
             }
@@ -791,9 +795,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         // Presents purchase required prompt.
         return [
             Effect { observer, _ in
-
-                let topVC = environment.getTopActiveViewController()
-
+                
                 let vc = ViewBuilderViewController(
                     modalPresentationStyle: .overFullScreen,
                     modalTransitionStyle: .crossDissolve,
@@ -812,8 +814,12 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                         observer.fulfill(value: .screenDismissed(.purchaseRequiredPrompt))
                     }
                 )
-
-                topVC.present(vc, animated: true, completion: nil)
+                
+                // If disallowed traffic alert is present, dismiss it.
+                environment.presentedViewControllers.disallowedTraffic.dismissThen(animated: true) {
+                    let topVC = environment.getTopActiveViewController()
+                    topVC.present(vc, animated: true, completion: nil)
+                }
 
             }
             

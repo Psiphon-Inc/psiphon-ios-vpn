@@ -129,6 +129,9 @@ enum AppAction {
 // MARK: Environment
 
 struct AppEnvironment {
+    
+    let presentedViewControllers: PresentedViewControllers
+    
     let platform: Platform
     let appBundle: PsiphonBundle
     let feedbackLogger: FeedbackLogger
@@ -300,6 +303,7 @@ func makeEnvironment(
     }
     
     let environment = AppEnvironment(
+        presentedViewControllers: PresentedViewControllers(),
         platform: platform,
         appBundle: PsiphonBundle.from(bundle: Bundle.main),
         feedbackLogger: feedbackLogger,
@@ -735,6 +739,7 @@ fileprivate func toVPNReducerEnvironment(env: AppEnvironment) -> VPNReducerEnvir
 
 func toMainViewReducerEnvironment(env: AppEnvironment) -> MainViewEnvironment {
     MainViewEnvironment(
+        presentedViewControllers: env.presentedViewControllers,
         vpnActionStore: env.vpnActionStore,
         userConfigs: env.userConfigs,
         sharedDB: env.sharedDB,
@@ -836,6 +841,15 @@ func makeAppReducer(
             action: \.serverRegionAction,
             environment: toSelectedRegionReducerEnvironment(env:))
     )
+}
+
+// MARK: PresentedViewControllers
+
+/// Holds references to presented view controllers.
+final class PresentedViewControllers {
+    
+    weak var disallowedTraffic: UIAlertController?
+    
 }
 
 // MARK: Store
