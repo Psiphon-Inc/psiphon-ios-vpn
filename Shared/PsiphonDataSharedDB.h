@@ -185,6 +185,11 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 #endif
 - (NSInteger)getVPNSessionNumber;
 
+#if TARGET_IS_EXTENSION
+- (void)setApplicationParameters:(NSString *)key value:(id _Nullable)value;
+#endif
+- (NSDictionary<NSString *, id> *_Nonnull)getApplicationParameters;
+
 - (NSString *_Nullable)emittedClientRegion;
 
 - (NSString *_Nullable)getCurrentSponsorId;

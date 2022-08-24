@@ -50,7 +50,7 @@
 #import "ExtensionDataStore.h"
 #import "HostAppProtocol.h"
 #import "NSString+Additions.h"
-#import "LocalNotification.h"
+#import "LocalNotificationService.h"
 
 NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
 
@@ -303,7 +303,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         }];
 
         // Notify user that VPN is not active.
-        [LocalNotification requestCannotStartWithoutActiveSubscription];
+        [[LocalNotificationService shared] requestCannotStartWithoutActiveSubscription];
     }
 }
 
@@ -364,7 +364,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             NSInteger tunnelIntent = [self.sharedDB getContainerTunnelIntentStatus];
             
             if (tunnelIntent == TUNNEL_INTENT_START || tunnelIntent == TUNNEL_INTENT_RESTART) {
-                [LocalNotification requestOpenContainerToConnectNotification];
+                [[LocalNotificationService shared] requestOpenContainerToConnectNotification];
             }
             
         }
@@ -525,7 +525,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         [self.hostAppProtocol isHostAppProcessRunning:^(BOOL isProcessRunning) {
             
             if (isProcessRunning == FALSE) {
-                [LocalNotification requestOpenContainerToConnectNotification];
+                [[LocalNotificationService shared] requestOpenContainerToConnectNotification];
             }
             
         }];
@@ -585,7 +585,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     if (psiphonConfigReader.config == nil) {
         [PsiFeedbackLogger errorWithType:PsiphonTunnelDelegateLogType
                                   format:@"Failed to get config"];
-        [LocalNotification requestCorruptSettingsFileNotification];
+        [[LocalNotificationService shared] requestCorruptSettingsFileNotification];
         [self exitGracefully];
     }
 
@@ -636,7 +636,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     if (dataRootDirectory == nil) {
         [PsiFeedbackLogger errorWithType:PsiphonTunnelDelegateLogType
                                   format:@"Failed to get data root directory"];
-        [LocalNotification requestCorruptSettingsFileNotification];
+        [[LocalNotificationService shared] requestCorruptSettingsFileNotification];
         [self exitGracefully];
     }
 
@@ -646,7 +646,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         [PsiFeedbackLogger errorWithType:PsiphonTunnelDelegateLogType
                                  message:@"Failed to create data root directory"
                                   object:err];
-        [LocalNotification requestCorruptSettingsFileNotification];
+        [[LocalNotificationService shared] requestCorruptSettingsFileNotification];
         [self exitGracefully];
     }
 
@@ -742,7 +742,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         // Displays an alert to the user for the expired subscription,
         // only if the container is in background.
         if (subscriptionRejected && [strongSelf.sharedDB getAppForegroundState] == FALSE) {
-            [LocalNotification requestSubscriptionExpiredNotification];
+            [[LocalNotificationService shared] requestSubscriptionExpiredNotification];
         }
         
     });
@@ -791,7 +791,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 [[Notifier sharedInstance] post:NotifierDisallowedTrafficAlert];
                 
                 // Displays notification to the user.
-                [LocalNotification requestDisallowedTrafficNotification];
+                [[LocalNotificationService shared] requestDisallowedTrafficNotification];
             }
         }
     });
@@ -800,6 +800,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 - (void)onApplicationParameter:(NSString * _Nonnull)key :(id)value {
     if ([key isEqualToString:@"ShowPurchaseRequiredPrompt"]) {
         if ([value isKindOfClass:[NSNumber class]]) {
+            
+            // Persist application parameter.
+            [self.sharedDB setApplicationParameters:key value:value];
             
             NSDate *timestamp = [NSDate date];
             
@@ -813,7 +816,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 
                 // Display location notification.
                 // TODO: This notification is not debounced for the current VPN session.
-                [LocalNotification requestPurchaseRequiredPrompt];
+                [[LocalNotificationService shared] requestPurchaseRequiredPrompt];
             }
         } else {
             [PsiFeedbackLogger error:@"Expected bool for ApplicationParameter key 'ShowPurchaseRequiredPrompt'"];
@@ -833,7 +836,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         [self.sharedDB setEgressRegion:kPsiphonRegionBestPerformance];
 
         dispatch_async(self->workQueue, ^{
-            [LocalNotification requestSelectedRegionUnavailableNotification];
+            [[LocalNotificationService shared] requestSelectedRegionUnavailableNotification];
             
             // Starting the tunnel with "Best Performance" region.
             [self startPsiphonTunnel];
@@ -859,7 +862,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 - (void)onUpstreamProxyError:(NSString *_Nonnull)message {
     // onUpstreamProxyError may be called concurrently.
-    [LocalNotification requestUpstreamProxyErrorNotification:message];
+    [[LocalNotificationService shared] requestUpstreamProxyErrorNotification:message];
 }
 
 - (void)onClientRegion:(NSString *)region {

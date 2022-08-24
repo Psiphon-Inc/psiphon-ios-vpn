@@ -29,14 +29,6 @@ enum PsiCashHardCodedValues {
     
 }
 
-// Delay from receiving `ShowPurchaseRequiredPrompt` application parameter
-// to when the UI prompt is presented.
-#if DEBUG || DEV_RELEASE
-let PurchaseRequiredPromptDelay: TimeInterval = 30.0  // 10 secs.
-#else
-let PurchaseRequiredPromptDelay: TimeInterval = 180.0  // 3 mins.
-#endif
-
 // The official way to open subscription management screen.
 // https://developer.apple.com/videos/play/wwdc2018/705/
 let appleSubscriptionsManagementURL = URL(string: "https://apps.apple.com/account/subscriptions")!

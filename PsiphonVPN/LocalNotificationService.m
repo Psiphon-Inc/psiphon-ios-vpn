@@ -18,9 +18,12 @@
  */
 
 #import <UserNotifications/UserNotifications.h>
-#import "LocalNotification.h"
+#import "LocalNotificationService.h"
 #import "VPNStrings.h"
 #import "Strings.h"
+#import "Logging.h"
+#import "PsiphonDataSharedDB.h"
+#import "SharedConstants.h"
 
 // UserNotifications identifiers.
 NSString *_Nonnull const NotificationIdOpenContainer = @"OpenContainer";
@@ -32,9 +35,30 @@ NSString *_Nonnull const NotificationIdDisallowedTraffic = @"DisallowedTraffic";
 NSString *_Nonnull const NotificationIdMustStartVPNFromApp = @"MustStartVPNFromApp";
 NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
 
-@implementation LocalNotification
+@implementation LocalNotificationService {
+    NSMutableSet<NSString *> *requesetdNotifications;
+    PsiphonDataSharedDB *sharedDB;
+}
 
-+ (void)requestOpenContainerToConnectNotification {
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        requesetdNotifications = [NSMutableSet set];
+        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
+    }
+    return self;
+}
+
++ (instancetype)shared {
+    static dispatch_once_t once;
+    static id sharedInstance;
+    dispatch_once(&once, ^{
+        sharedInstance = [[LocalNotificationService alloc] init];
+    });
+    return sharedInstance;
+}
+
+- (void)requestOpenContainerToConnectNotification {
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
@@ -52,7 +76,7 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
     }];
 }
 
-+ (void)requestCorruptSettingsFileNotification {
+- (void)requestCorruptSettingsFileNotification {
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
@@ -69,7 +93,14 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
     }];
 }
 
-+ (void)requestSubscriptionExpiredNotification {
+- (void)requestSubscriptionExpiredNotification {
+    
+    if ([self->requesetdNotifications containsObject:NotificationIdSubscriptionExpired]) {
+        return;
+    }
+    
+    [self->requesetdNotifications addObject:NotificationIdSubscriptionExpired];
+    
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
@@ -86,7 +117,7 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
     }];
 }
 
-+ (void)requestSelectedRegionUnavailableNotification {
+- (void)requestSelectedRegionUnavailableNotification {
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
@@ -104,7 +135,7 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
     }];
 }
 
-+ (void)requestUpstreamProxyErrorNotification:(NSString *)message {
+- (void)requestUpstreamProxyErrorNotification:(NSString *)message {
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
@@ -122,7 +153,19 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
     }];
 }
 
-+ (void)requestDisallowedTrafficNotification {
+- (void)requestDisallowedTrafficNotification {
+    // Skips the notification if the app is foregrounded.
+    if ([sharedDB getAppForegroundState] == TRUE) {
+        return;
+    }
+    
+    // Notification should only be presented once per tunnel session.
+    if ([self->requesetdNotifications containsObject:NotificationIdDisallowedTraffic]) {
+        return;
+    }
+    
+    [self->requesetdNotifications addObject:NotificationIdDisallowedTraffic];
+    
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
@@ -139,7 +182,7 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
     }];
 }
 
-+ (void)requestCannotStartWithoutActiveSubscription {
+- (void)requestCannotStartWithoutActiveSubscription {
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
@@ -156,7 +199,19 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
     }];
 }
 
-+ (void)requestPurchaseRequiredPrompt {
+- (void)requestPurchaseRequiredPrompt {
+    // Skips the notification if the app is foregrounded.
+    if ([sharedDB getAppForegroundState] == TRUE) {
+        return;
+    }
+    
+    // Notification should only be presented once per tunnel session.
+    if ([self->requesetdNotifications containsObject:NotificationIdPurchaseRequired]) {
+        return;
+    }
+    
+    [self->requesetdNotifications addObject:NotificationIdPurchaseRequired];
+    
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];

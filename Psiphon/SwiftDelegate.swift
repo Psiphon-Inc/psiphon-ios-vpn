@@ -154,21 +154,23 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
             // Updates disallowed traffic alert handled seq number.
             NEEventType.disallowedTraffic.setEventHandled(environment.sharedDB, disallowedTrafficSeq)
             
-            // TODO: The `date` of this event should really be the same as the last seq number read.
-            // In the implementation below two AlertEvents for the same seq number, are not equal.
-            let alertEvent = AlertEvent(.disallowedTrafficAlert, date: environment.getCurrentTime())
-            
-            // Presents disallowed traffic alert only if the user is not subscribed.
-            if state.subscriptionState.status.subscribed {
+            // Prompt is presented if the user is not (subscribed or speed-boosted)
+            // and is connected (or connecting).
+            if DisallowedTrafficPrompt.canPresent(
+                dateCompare: environment.dateCompare,
+                psiCashState: state.psiCashState,
+                subscriptionStatus: state.subscriptionState.status,
+                tunnelConnectedStatus: state.tunnelConnectedStatus
+            ) {
+                effects += [
+                    environment.mainViewStore(.presentDisallowedTrafficPrompt).mapNever(),
+                    
+                    environment.feedbackLogger
+                        .log(.info, "Presenting disallowed traffic alert").mapNever()
+                ]
+            } else {
                 effects += environment.feedbackLogger
                     .log(.info, "Disallowed traffic alert not presented.").mapNever()
-            } else {
-                effects += [
-                    environment.feedbackLogger
-                        .log(.info, "Presenting disallowed traffic alert").mapNever(),
-                    
-                    environment.mainViewStore(.presentAlert(alertEvent)).mapNever(),
-                ]
             }
             
         }
@@ -180,46 +182,35 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
             let lastHandledVPNSession =
             environment.sharedDB.getContainerPurchaseRequiredHandledEventLatestVPNSessionNumber()
             
-            // Updates purchase required prompt handled seq number.
-            effects += Effect.fireAndForget {
-                NEEventType.requiredPurchasePrompt
-                    .setEventHandled(environment.sharedDB, purchaseRequiredSeq)
-                environment.sharedDB.setContainerPurchaseRequiredHandledEventVPNSessionNumber(vpnSession)
-            }
+            // Updates PsiphonDataSharedDB that this event was handled.
+            NEEventType.requiredPurchasePrompt
+                .setEventHandled(environment.sharedDB, purchaseRequiredSeq)
+            environment.sharedDB.setContainerPurchaseRequiredHandledEventVPNSessionNumber(vpnSession)
             
             // If the event is for a VPN session that is already handled, it is ignored.
             if vpnSession > lastHandledVPNSession {
                 
-                let speedBoosted = state.psiCashState.activeSpeedBoost(environment.dateCompare) != nil
-                
-                // Presents prompt if the user is not (subscribed or speed boosted) and
-                // is(connected or connecting).
-                if speedBoosted ||
-                    state.subscriptionState.status.subscribed ||
-                    (state.tunnelConnectedStatus != .connected && state.tunnelConnectedStatus != .connecting)
-                {
-                    effects += environment.feedbackLogger
-                        .log(.info, "Purchase required prompt will not presented").mapNever()
-                } else {
-                    
-                    let timestamp = environment.sharedDB.getPurchaseRequiredPromptEventTimestamp()
-                    let timeLeft = (timestamp?.timeIntervalSinceNow ?? 0.0) + PurchaseRequiredPromptDelay
-                    let promptDelay = max(0.0, timeLeft)
-                    
+                // Prompt is presented if the user is not (subscribed or speed-boosted)
+                // and is connected (or connecting).
+                if PurchaseRequiredPrompt.canPresent(
+                    dateCompare: environment.dateCompare,
+                    psiCashState: state.psiCashState,
+                    subscriptionStatus: state.subscriptionState.status,
+                    tunnelConnectedStatus: state.tunnelConnectedStatus
+                ) {
                     effects += [
-                        environment.feedbackLogger
-                            .log(.info, "Presenting purchase required prompt in \(PurchaseRequiredPromptDelay) seconds")
-                            .mapNever(),
+                        environment.mainViewStore(.presentPurchaseRequiredPrompt).mapNever(),
                         
-                        // Present effect only after PurchaseRequiredPromptDelay.
-                        // `handledEffect` is expected to be executed once the prompt is presented.
-                        Effect(value: ())
-                            .delay(promptDelay, on: QueueScheduler.main)
-                            .then(environment.mainViewStore(.presentPurchaseRequiredPrompt))
+                        environment.feedbackLogger
+                            .log(.info, "Presenting purchase required prompt")
                             .mapNever()
                     ]
+                } else {
+                    effects += environment.feedbackLogger
+                        .log(.info, "Purchase required prompt will not presented").mapNever()
                 }
-            }            
+                
+            }
         }
 
         return effects
@@ -1567,48 +1558,6 @@ final class CopySettingsToPsiphonDataSharedDB {
     func copyCustomHttpHeaders() {
         let customHeaders = UpstreamProxySettings.sharedInstance().getUpstreamProxyCustomHeaders()
         sharedDB.setCustomHttpHeaders(customHeaders)
-    }
-    
-}
-
-
-enum NEEventType: Equatable {
-    case disallowedTraffic
-    case requiredPurchasePrompt
-}
-
-extension NEEventType {
-    
-    func unhandledEventSeq(_ sharedDB: PsiphonDataSharedDB) -> Int? {
-        
-        let lastHandledSeq: Int
-        let lastWrittenSeq: Int
-        
-        switch self {
-        case .disallowedTraffic:
-            lastHandledSeq = sharedDB.getContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum()
-            lastWrittenSeq = sharedDB.getDisallowedTrafficAlertWriteSequenceNum()
-            
-        case .requiredPurchasePrompt:
-            lastHandledSeq = sharedDB.getContainerPurchaseRequiredReadAtLeastUpToSequenceNum()
-            lastWrittenSeq = sharedDB.getPurchaseRequiredPromptWriteSequenceNum()
-        }
-        
-        if lastWrittenSeq > lastHandledSeq {
-            return lastWrittenSeq
-        } else {
-            return nil
-        }
-        
-    }
-    
-    func setEventHandled(_ sharedDB: PsiphonDataSharedDB, _ seq: Int) {
-        switch self {
-        case .disallowedTraffic:
-            sharedDB.setContainerPurchaseRequiredReadAtLeastUpToSequenceNum(seq)
-        case .requiredPurchasePrompt:
-            sharedDB.setContainerPurchaseRequiredReadAtLeastUpToSequenceNum(seq)
-        }
     }
     
 }
