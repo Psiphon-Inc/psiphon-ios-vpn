@@ -22,6 +22,8 @@
 #import "VPNStrings.h"
 #import "Strings.h"
 #import "Logging.h"
+#import "PsiphonDataSharedDB.h"
+#import "SharedConstants.h"
 
 // UserNotifications identifiers.
 NSString *_Nonnull const NotificationIdOpenContainer = @"OpenContainer";
@@ -35,12 +37,14 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
 
 @implementation LocalNotificationService {
     NSMutableSet<NSString *> *requesetdNotifications;
+    PsiphonDataSharedDB *sharedDB;
 }
 
 - (instancetype)init {
     self = [super init];
     if (self) {
         requesetdNotifications = [NSMutableSet set];
+        sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
     }
     return self;
 }
@@ -150,7 +154,12 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
 }
 
 - (void)requestDisallowedTrafficNotification {
+    // Skips the notification if the app is foregrounded.
+    if ([sharedDB getAppForegroundState] == TRUE) {
+        return;
+    }
     
+    // Notification should only be presented once per tunnel session.
     if ([self->requesetdNotifications containsObject:NotificationIdDisallowedTraffic]) {
         return;
     }
@@ -191,6 +200,10 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
 }
 
 - (void)requestPurchaseRequiredPrompt {
+    // Skips the notification if the app is foregrounded.
+    if ([sharedDB getAppForegroundState] == TRUE) {
+        return;
+    }
     
     // Notification should only be presented once per tunnel session.
     if ([self->requesetdNotifications containsObject:NotificationIdPurchaseRequired]) {
