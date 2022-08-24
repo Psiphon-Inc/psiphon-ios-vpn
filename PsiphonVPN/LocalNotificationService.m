@@ -191,6 +191,14 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
 }
 
 - (void)requestPurchaseRequiredPrompt {
+    
+    // Notification should only be presented once per tunnel session.
+    if ([self->requesetdNotifications containsObject:NotificationIdPurchaseRequired]) {
+        return;
+    }
+    
+    [self->requesetdNotifications addObject:NotificationIdPurchaseRequired];
+    
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
