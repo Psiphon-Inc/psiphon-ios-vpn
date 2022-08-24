@@ -596,42 +596,37 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             
             Effect { observer, _ in
                 
-                let topVC = environment.getTopActiveViewController()
-                
-                let found = topVC
-                    .traversePresentingStackFor(type: WebViewController.self, searchChildren: true)
-
-                switch found {
-                case .presentTopOfStack(_), .presentInStack(_):
-                    // NO-OP
+                guard environment.presentedViewControllers.psiCashAccountManagement == nil else {
                     observer.sendCompleted()
                     return
-                    
-                case .notPresent:
-                    
-                    let url = environment.psiCashEffects
-                        .getUserSiteURL(.accountManagement, webview: true)
-                    
-                    let webViewViewController = WebViewController(
-                        baseURL: url,
-                        feedbackLogger: environment.feedbackLogger,
-                        tunnelStatusSignal: environment.tunnelStatusSignal,
-                        tunnelProviderRefSignal: environment.tunnelConnectionRefSignal,
-                        onDidLoad: {
-                            observer.send(value: .screenDidLoad(.psiCashAccountMgmt))
-                        },
-                        onDismissed: {
-                            observer.send(value: .screenDismissed(.psiCashAccountMgmt))
-                            observer.sendCompleted()
-                        }
-                    )
-    
-                    webViewViewController.title = UserStrings.Psicash_account()
-    
-                    let vc = PsiNavigationController(rootViewController: webViewViewController)
-                    topVC.present(vc, animated: true, completion: nil)
-                    
                 }
+                
+                let topVC = environment.getTopActiveViewController()
+                
+                let url = environment.psiCashEffects
+                    .getUserSiteURL(.accountManagement, webview: true)
+                
+                let webViewViewController = WebViewController(
+                    baseURL: url,
+                    feedbackLogger: environment.feedbackLogger,
+                    tunnelStatusSignal: environment.tunnelStatusSignal,
+                    tunnelProviderRefSignal: environment.tunnelConnectionRefSignal,
+                    onDidLoad: {
+                        observer.send(value: .screenDidLoad(.psiCashAccountMgmt))
+                    },
+                    onDismissed: {
+                        observer.send(value: .screenDismissed(.psiCashAccountMgmt))
+                        observer.sendCompleted()
+                    }
+                )
+                
+                webViewViewController.title = UserStrings.Psicash_account()
+                
+                let vc = PsiNavigationController(rootViewController: webViewViewController)
+                
+                environment.presentedViewControllers.psiCashAccountManagement = vc
+                
+                topVC.present(vc, animated: true, completion: nil)
                 
             }
             
