@@ -32,7 +32,7 @@
 		29923FDA264EFC720078E8BB /* PsiCashLib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; };
 		29923FDB264EFC720078E8BB /* PsiCashLib.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		29A7075227CE9198006DE45A /* ChildViewControllerDismissedDelegate+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A7075127CE9198006DE45A /* ChildViewControllerDismissedDelegate+Additions.swift */; };
-		29AEC21328AD85110063003C /* LocalNotification.m in Sources */ = {isa = PBXBuildFile; fileRef = 29AEC21228AD85110063003C /* LocalNotification.m */; };
+		29AEC21328AD85110063003C /* LocalNotificationService.m in Sources */ = {isa = PBXBuildFile; fileRef = 29AEC21228AD85110063003C /* LocalNotificationService.m */; };
 		29AEC21428B014AF0063003C /* Strings.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083974C8CF9DDFE7A341D /* Strings.m */; };
 		29BA6DA1268630A9001445EA /* TunnelFileDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 29BA6DA0268630A9001445EA /* TunnelFileDescriptor.m */; };
 		29BE0BE327C54828003BC17B /* PsiCashAccountExplainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29BE0BE227C54828003BC17B /* PsiCashAccountExplainerViewController.swift */; };
@@ -417,8 +417,8 @@
 		2974E99D27CE858000DA0918 /* PsiNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiNavigationController.swift; sourceTree = "<group>"; };
 		29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = PsiCashLib.xcframework; path = Frameworks/PsiCashLib.xcframework; sourceTree = "<group>"; };
 		29A7075127CE9198006DE45A /* ChildViewControllerDismissedDelegate+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChildViewControllerDismissedDelegate+Additions.swift"; sourceTree = "<group>"; };
-		29AEC21128AD85110063003C /* LocalNotification.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocalNotification.h; sourceTree = "<group>"; };
-		29AEC21228AD85110063003C /* LocalNotification.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LocalNotification.m; sourceTree = "<group>"; };
+		29AEC21128AD85110063003C /* LocalNotificationService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocalNotificationService.h; sourceTree = "<group>"; };
+		29AEC21228AD85110063003C /* LocalNotificationService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LocalNotificationService.m; sourceTree = "<group>"; };
 		29BA6D9F268630A9001445EA /* TunnelFileDescriptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TunnelFileDescriptor.h; sourceTree = "<group>"; };
 		29BA6DA0268630A9001445EA /* TunnelFileDescriptor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TunnelFileDescriptor.m; sourceTree = "<group>"; };
 		29BE0BE227C54828003BC17B /* PsiCashAccountExplainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashAccountExplainerViewController.swift; sourceTree = "<group>"; };
@@ -1449,8 +1449,8 @@
 				8D0017D624DB233200EC3409 /* VPNStrings.m */,
 				29BA6D9F268630A9001445EA /* TunnelFileDescriptor.h */,
 				29BA6DA0268630A9001445EA /* TunnelFileDescriptor.m */,
-				29AEC21128AD85110063003C /* LocalNotification.h */,
-				29AEC21228AD85110063003C /* LocalNotification.m */,
+				29AEC21128AD85110063003C /* LocalNotificationService.h */,
+				29AEC21228AD85110063003C /* LocalNotificationService.m */,
 			);
 			path = PsiphonVPN;
 			sourceTree = "<group>";
@@ -2290,7 +2290,7 @@
 				CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */,
 				EF90D7B1204F231E00228A63 /* timestamp_tm.c in Sources */,
 				8D90FD5724C748E000E11C66 /* FeedbackUtils.m in Sources */,
-				29AEC21328AD85110063003C /* LocalNotification.m in Sources */,
+				29AEC21328AD85110063003C /* LocalNotificationService.m in Sources */,
 				8D0017D724DB233200EC3409 /* VPNStrings.m in Sources */,
 				291C0B8F269CBF720075FAB7 /* SharedModel.xcdatamodeld in Sources */,
 				291C0BA2269CC19B0075FAB7 /* SharedAuthorization+CoreDataProperties.m in Sources */,
