@@ -801,6 +801,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     if ([key isEqualToString:@"ShowPurchaseRequiredPrompt"]) {
         if ([value isKindOfClass:[NSNumber class]]) {
             
+            // Persist application parameter.
+            [self.sharedDB setApplicationParameters:key value:value];
+            
             NSDate *timestamp = [NSDate date];
             
             BOOL purchaseRequired = [(NSNumber *)value boolValue];
