@@ -38,6 +38,8 @@ UserDefaultsKey const ServerTimestampStringKey = @"server_timestamp";
 
 UserDefaultsKey const ExtensionVPNSessionNumberIntKey = @"extension_vpn_session_number";
 
+UserDefaultsKey const ExtensionApplicationParametersDictKey = @"server_application_parameters";
+
 UserDefaultsKey const ConstainerPurchaseRequiredVPNSessionHandledIntKey =
 @"container_purchase_required_handled_vpn_session_num";
 
@@ -297,6 +299,23 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
 
 - (NSInteger)getVPNSessionNumber {
     return [sharedDefaults integerForKey:ExtensionVPNSessionNumberIntKey];
+}
+
+- (void)setApplicationParameters:(NSString *)key value:(id _Nullable)value {
+    NSMutableDictionary *dict = [NSMutableDictionary
+                                 dictionaryWithDictionary:[self getApplicationParameters]];
+    id _Nonnull nsnullValue = value == nil ? [NSNull null] : value;
+    [dict setObject:nsnullValue forKey:key];
+    [sharedDefaults setObject:dict forKey:ExtensionApplicationParametersDictKey];
+}
+
+- (NSDictionary<NSString *, id> *_Nonnull)getApplicationParameters {
+    NSDictionary *_Nullable dict = [sharedDefaults dictionaryForKey:ExtensionApplicationParametersDictKey];
+    if (dict == nil) {
+        return [NSDictionary dictionary];
+    } else {
+        return dict;
+    }
 }
 
 // TODO: is timestamp needed? Maybe we can use this to detect staleness later
