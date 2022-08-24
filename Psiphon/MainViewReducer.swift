@@ -48,6 +48,7 @@ enum MainViewAction {
         case psiCashStore
         case psiCashAccountLogin
         case psiCashAccountMgmt
+        case disallowedTrafficPrompt
         case purchaseRequiredPrompt
         /// - Parameter forceReconnect: non-nil value when the settings screen is dismissed, otherwise `nil`.
         case settings(forceReconnect: Bool?)
@@ -66,13 +67,21 @@ enum MainViewAction {
     
     case presentSubscriptionScreen
     
+    // Disallowed traffic prompt
+    enum DisallowedTrafficTapAction {
+        case speedBoostTapped
+        case subscribeTapped
+    }
+    case presentDisallowedTrafficPrompt
+    case disallowedTrafficPromptButton(DisallowedTrafficTapAction)
+
     // Purchase required prompt
-    enum PurchaseRequiredAction {
-        case subscribe
-        case disconnect
+    enum PurchaseRequiredTapAction {
+        case subscribeTapped
+        case disconnectTapped
     }
     case presentPurchaseRequiredPrompt
-    case purchaseRequiredPromptButton(PurchaseRequiredAction)
+    case purchaseRequiredPromptButton(PurchaseRequiredTapAction)
     
     case presentSettingsScreen
     
@@ -103,7 +112,10 @@ struct MainViewState: Equatable {
     /// Represents presentation state of PsiCash accounts screen.
     var psiCashAccountLoginIsPresented: Pending<Bool> = .completed(false)
     
-    /// Represents presentation of state of subscription required purchase prompt.
+    /// Represents presentation state of disallowed-traffic prompt.
+    var disallowedTrafficPromptPresented: Pending<Bool> = .completed(false)
+    
+    /// Represents presentation state of subscription required purchase prompt.
     var purchaseRequiredPromptPresented: Pending<Bool> = .completed(false)
     
     /// Represents presentation state of the settings screen.
@@ -458,15 +470,6 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             // Note that "Add PsiCash" tab is only displayed only if PsiCashStoreViewController
             // is already presented (i.e. state.mainView.psiCashStoreViewState is not nil).
             return [ Effect(value: .psiCashViewAction(.switchTabs(.addPsiCash))) ]
-
-        case let .disallowedTrafficAlertAction(a):
-            switch a {
-            case .speedBoostTapped:
-                return [ Effect(value: .presentPsiCashStore(initialTab: .speedBoost)) ]
-                
-            case .subscriptionTapped:
-                return [ Effect(value: .presentSubscriptionScreen) ]
-            }
             
         case .sendErrorInitiatedFeedback:
             return [ Effect(value: .presentModalFeedbackScreen(errorInitiated: true)) ]
@@ -490,6 +493,10 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             
         case .psiCashAccountLogin:
             state.mainView.psiCashAccountLoginIsPresented = .completed(true)
+            return []
+            
+        case .disallowedTrafficPrompt:
+            state.mainView.disallowedTrafficPromptPresented = .completed(true)
             return []
             
         case .purchaseRequiredPrompt:
@@ -544,6 +551,10 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                 
                 return effects.map { $0.map { MainViewAction.psiCashViewAction($0) } }
             }
+            
+        case .disallowedTrafficPrompt:
+            state.mainView.disallowedTrafficPromptPresented = .completed(false)
+            return []
             
         case .purchaseRequiredPrompt:
             state.mainView.purchaseRequiredPromptPresented = .completed(false)
@@ -693,6 +704,63 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             }
         ]
         
+    case .presentDisallowedTrafficPrompt:
+        
+        guard case .completed(false) = state.mainView.disallowedTrafficPromptPresented else {
+            return []
+        }
+        
+        // Prompt is presented if the user is not (subscribed or speed-boosted)
+        // and is connected (or connecting).
+        guard DisallowedTrafficPrompt.canPresent(
+            dateCompare: environment.dateCompare,
+            psiCashState: state.psiCashState,
+            subscriptionStatus: state.subscriptionState.status,
+            tunnelConnectedStatus: state.tunnelConnectedStatus
+        )  else {
+            return []
+        }
+        
+        state.mainView.disallowedTrafficPromptPresented = .pending
+        
+        return [
+            
+            Effect { observer, _ in
+
+                let topVC = environment.getTopActiveViewController()
+                
+                let vc = UIAlertController.makeAlert(
+                    title: UserStrings.Upgrade_psiphon(),
+                    message: UserStrings.Disallowed_traffic_alert_message(),
+                    actions: [
+                        .defaultButton(title: UserStrings.Subscribe_action_button_title()) { [observer] in
+                            observer.send(value: .disallowedTrafficPromptButton(.subscribeTapped))
+                            observer.fulfill(value: .screenDismissed(.purchaseRequiredPrompt))
+                        },
+                        .defaultButton(title: UserStrings.Speed_boost()) { [observer] in
+                            observer.send(value: .disallowedTrafficPromptButton(.speedBoostTapped))
+                            observer.fulfill(value: .screenDismissed(.purchaseRequiredPrompt))
+                        },
+                        .dismissButton { [observer] in
+                            observer.fulfill(value: .screenDismissed(.purchaseRequiredPrompt))
+                        }
+                    ]
+                )
+
+                topVC.present(vc, animated: true, completion: nil)
+            }
+        ]
+    
+    case .disallowedTrafficPromptButton(let buttonTapped):
+        
+        switch buttonTapped {
+        case .subscribeTapped:
+            return [ Effect(value: .presentSubscriptionScreen) ]
+            
+        case .speedBoostTapped:
+            return [ Effect(value: .presentPsiCashStore(initialTab: .speedBoost)) ]
+        }
+        
     case .presentPurchaseRequiredPrompt:
         
         guard case .completed(false) = state.mainView.purchaseRequiredPromptPresented else {
@@ -702,14 +770,14 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         // TODO: Check if a traffic alert is presented. This applies to presentation
         // of traffic-alert as well.
         
-        // Prompt is not presented if the user is not (subscribed or speed-boosted)
-        // or is not connected.
-        if !PurchaseRequiredPrompt.canPresent(
+        // Prompt is presented if the user is not (subscribed or speed-boosted)
+        // and is connected (or connecting).
+        guard PurchaseRequiredPrompt.canPresent(
             dateCompare: environment.dateCompare,
             psiCashState: state.psiCashState,
             subscriptionStatus: state.subscriptionState.status,
             tunnelConnectedStatus: state.tunnelConnectedStatus
-        ) {
+        )  else {
             return []
         }
         
@@ -726,10 +794,10 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                     modalTransitionStyle: .crossDissolve,
                     viewBuilder: SubscriptionPurchaseRequiredPrompt(
                         subscribeButtonHandler: { [observer] in
-                            observer.send(value: .purchaseRequiredPromptButton(.subscribe))
+                            observer.send(value: .purchaseRequiredPromptButton(.subscribeTapped))
                         },
                         disconnectButtonHandler: { [observer] in
-                            observer.send(value: .purchaseRequiredPromptButton(.disconnect))
+                            observer.send(value: .purchaseRequiredPromptButton(.disconnectTapped))
                         }
                     ),
                     onDidLoad: { [observer] in
@@ -766,11 +834,11 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         }
         
         switch buttonTapped {
-        case .subscribe:
+        case .subscribeTapped:
             return [
                 Effect(value: .presentSubscriptionScreen)
             ] + dismissEffect.mapNever()
-        case .disconnect:
+        case .disconnectTapped:
             return [
                 environment.vpnActionStore(.tunnelStateIntent(intent: .stop, reason: .userInitiated)).mapNever()
             ] + dismissEffect.mapNever()
