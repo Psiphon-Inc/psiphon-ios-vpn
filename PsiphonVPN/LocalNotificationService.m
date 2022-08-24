@@ -18,9 +18,10 @@
  */
 
 #import <UserNotifications/UserNotifications.h>
-#import "LocalNotification.h"
+#import "LocalNotificationService.h"
 #import "VPNStrings.h"
 #import "Strings.h"
+#import "Logging.h"
 
 // UserNotifications identifiers.
 NSString *_Nonnull const NotificationIdOpenContainer = @"OpenContainer";
@@ -32,9 +33,28 @@ NSString *_Nonnull const NotificationIdDisallowedTraffic = @"DisallowedTraffic";
 NSString *_Nonnull const NotificationIdMustStartVPNFromApp = @"MustStartVPNFromApp";
 NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
 
-@implementation LocalNotification
+@implementation LocalNotificationService {
+    NSMutableSet<NSString *> *requesetdNotifications;
+}
 
-+ (void)requestOpenContainerToConnectNotification {
+- (instancetype)init {
+    self = [super init];
+    if (self) {
+        requesetdNotifications = [NSMutableSet set];
+    }
+    return self;
+}
+
++ (instancetype)shared {
+    static dispatch_once_t once;
+    static id sharedInstance;
+    dispatch_once(&once, ^{
+        sharedInstance = [[LocalNotificationService alloc] init];
+    });
+    return sharedInstance;
+}
+
+- (void)requestOpenContainerToConnectNotification {
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
@@ -52,7 +72,7 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
     }];
 }
 
-+ (void)requestCorruptSettingsFileNotification {
+- (void)requestCorruptSettingsFileNotification {
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
@@ -69,7 +89,14 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
     }];
 }
 
-+ (void)requestSubscriptionExpiredNotification {
+- (void)requestSubscriptionExpiredNotification {
+    
+    if ([self->requesetdNotifications containsObject:NotificationIdSubscriptionExpired]) {
+        return;
+    }
+    
+    [self->requesetdNotifications addObject:NotificationIdSubscriptionExpired];
+    
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
@@ -86,7 +113,7 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
     }];
 }
 
-+ (void)requestSelectedRegionUnavailableNotification {
+- (void)requestSelectedRegionUnavailableNotification {
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
@@ -104,7 +131,7 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
     }];
 }
 
-+ (void)requestUpstreamProxyErrorNotification:(NSString *)message {
+- (void)requestUpstreamProxyErrorNotification:(NSString *)message {
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
@@ -122,7 +149,14 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
     }];
 }
 
-+ (void)requestDisallowedTrafficNotification {
+- (void)requestDisallowedTrafficNotification {
+    
+    if ([self->requesetdNotifications containsObject:NotificationIdDisallowedTraffic]) {
+        return;
+    }
+    
+    [self->requesetdNotifications addObject:NotificationIdDisallowedTraffic];
+    
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
@@ -139,7 +173,7 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
     }];
 }
 
-+ (void)requestCannotStartWithoutActiveSubscription {
+- (void)requestCannotStartWithoutActiveSubscription {
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];
@@ -156,7 +190,7 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
     }];
 }
 
-+ (void)requestPurchaseRequiredPrompt {
+- (void)requestPurchaseRequiredPrompt {
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
     UNMutableNotificationContent *content = [[UNMutableNotificationContent alloc] init];

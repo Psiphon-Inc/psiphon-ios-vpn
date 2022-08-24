@@ -21,23 +21,25 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface LocalNotification : NSObject
+@interface LocalNotificationService : NSObject
 
-+ (void)requestOpenContainerToConnectNotification;
++ (instancetype)shared;
 
-+ (void)requestCorruptSettingsFileNotification;
+- (void)requestOpenContainerToConnectNotification;
 
-+ (void)requestSubscriptionExpiredNotification;
+- (void)requestCorruptSettingsFileNotification;
 
-+ (void)requestSelectedRegionUnavailableNotification;
+- (void)requestSubscriptionExpiredNotification;
 
-+ (void)requestUpstreamProxyErrorNotification:(NSString *)message;
+- (void)requestSelectedRegionUnavailableNotification;
 
-+ (void)requestDisallowedTrafficNotification;
+- (void)requestUpstreamProxyErrorNotification:(NSString *)message;
 
-+ (void)requestCannotStartWithoutActiveSubscription;
+- (void)requestDisallowedTrafficNotification;
 
-+ (void)requestPurchaseRequiredPrompt;
+- (void)requestCannotStartWithoutActiveSubscription;
+
+- (void)requestPurchaseRequiredPrompt;
 
 @end
 
