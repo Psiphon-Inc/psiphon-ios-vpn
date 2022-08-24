@@ -710,6 +710,11 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             return []
         }
         
+        // Only present if purchase required prompt is not presented.
+        guard case .completed(false) = state.mainView.purchaseRequiredPromptPresented else {
+            return []
+        }
+        
         // Prompt is presented if the user is not (subscribed or speed-boosted)
         // and is connected (or connecting).
         guard DisallowedTrafficPrompt.canPresent(
