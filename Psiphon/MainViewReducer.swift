@@ -702,17 +702,15 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         // TODO: Check if a traffic alert is presented. This applies to presentation
         // of traffic-alert as well.
         
-        let speedBoosted = state.psiCashState.activeSpeedBoost(environment.dateCompare) != nil
-        
         // Prompt is not presented if the user is not (subscribed or speed-boosted)
         // or is not connected.
-        if speedBoosted ||
-            state.subscriptionState.status.subscribed ||
-            (state.tunnelConnectedStatus != .connected && state.tunnelConnectedStatus != .connecting)
-        {
-            
+        if !PurchaseRequiredPrompt.canPresent(
+            dateCompare: environment.dateCompare,
+            psiCashState: state.psiCashState,
+            subscriptionStatus: state.subscriptionState.status,
+            tunnelConnectedStatus: state.tunnelConnectedStatus
+        ) {
             return []
-            
         }
         
         state.mainView.purchaseRequiredPromptPresented = .pending
