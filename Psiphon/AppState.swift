@@ -846,9 +846,12 @@ func makeAppReducer(
 // MARK: PresentedViewControllers
 
 /// Holds references to presented view controllers.
+// TODO: Not all view controllers are stored here, this should replace all uses of `presentIfTypeNotPresent` and potentially `traversePresentingStackFor` APIs.
 final class PresentedViewControllers {
     
     weak var disallowedTraffic: UIAlertController?
+    
+    weak var psiCashAccountManagement: PsiNavigationController?
     
 }
 
