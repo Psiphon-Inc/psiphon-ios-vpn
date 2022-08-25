@@ -78,7 +78,7 @@ extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
             
             TunnelStartTimeStringKey: String(describing: self.getContainerTunnelStartTime()),
             
-            TunnelSponsorIDStringKey:  String(describing: self.getCurrentSponsorId()),
+            TunnelSponsorIDStringKey: String(describing: self.getCurrentSponsorId()),
             
             ServerTimestampStringKey: String(describing: self.getServerTimestamp()),
             
@@ -92,13 +92,13 @@ extension PsiphonDataSharedDB: CustomFieldFeedbackDescription {
             ExtensionDisallowedTrafficAlertWriteSeqIntKey:
                 self.getDisallowedTrafficAlertWriteSequenceNum(),
             
-            ExtensionPurchaseRequiredPromptWriteSeqIntKey:
-                self.getPurchaseRequiredPromptWriteSequenceNum(),
-            
             ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey:
                 self.getContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum(),
             
-            ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey:
+            ExtensionPurchaseRequiredPromptWriteSeqIntKey:
+                self.getPurchaseRequiredPromptWriteSequenceNum(),
+
+            ContainerPurchaseRequiredReadAtLeastUpToSeqIntKey:
                 self.getContainerPurchaseRequiredReadAtLeastUpToSequenceNum()
         ]
         
