@@ -705,7 +705,8 @@ fileprivate func toAppDelegateReducerEnvironment(env: AppEnvironment) -> AppDele
         mainDispatcher: env.mainDispatcher,
         getCurrentTime: env.dateCompare.getCurrentTime,
         dateCompare: env.dateCompare,
-        userDefaultsConfig: env.userConfigs
+        userDefaultsConfig: env.userConfigs,
+        tunnelStatusSignal: env.tunnelStatusSignal
     )
 }
 
