@@ -92,7 +92,7 @@ extension NEEventType {
     func setEventHandled(_ sharedDB: PsiphonDataSharedDB, _ seq: Int) {
         switch self {
         case .disallowedTraffic:
-            sharedDB.setContainerPurchaseRequiredReadAtLeastUpToSequenceNum(seq)
+            sharedDB.setContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum(seq)
         case .requiredPurchasePrompt:
             sharedDB.setContainerPurchaseRequiredReadAtLeastUpToSequenceNum(seq)
         }

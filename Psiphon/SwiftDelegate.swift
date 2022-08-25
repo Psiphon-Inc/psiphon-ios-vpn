@@ -99,6 +99,7 @@ struct AppDelegateEnvironment {
     let getCurrentTime: () -> Date
     let dateCompare: DateCompare
     let userDefaultsConfig: UserDefaultsConfig
+    let tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
 }
 
 let appDelegateReducer = Reducer<AppDelegateReducerState,
@@ -198,8 +199,18 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
                     subscriptionStatus: state.subscriptionState.status,
                     tunnelConnectedStatus: state.tunnelConnectedStatus
                 ) {
+                    
+                    // If VPN is in connecting state, waits for the VPN to connect first.
                     effects += [
-                        environment.mainViewStore(.presentPurchaseRequiredPrompt).mapNever(),
+                        environment.tunnelStatusSignal
+                            .filter {
+                                $0 == .connected
+                            }
+                            .take(first: 1)
+                            .then(
+                                environment.mainViewStore(.presentPurchaseRequiredPrompt)
+                                    .mapNever()
+                            ),
                         
                         environment.feedbackLogger
                             .log(.info, "Presenting purchase required prompt")
