@@ -536,31 +536,30 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     cell.backgroundColor = UIColor.clearColor;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
 
-    // "Manage your subscription" button
-    RoyalSkyButton *manageSubsButton = [[RoyalSkyButton alloc] initForAutoLayout];
-    [manageSubsButton setFontSize:16.0];
-    [manageSubsButton setTitle:Strings.manageYourSubscriptionButtonTitle];
-    [manageSubsButton addTarget:self action:@selector(onManageSubscriptionTap) forControlEvents:UIControlEventTouchUpInside];
-    [cell.contentView addSubview:manageSubsButton];
-
-    // "Manage your subscription" button constraints
-    manageSubsButton.translatesAutoresizingMaskIntoConstraints = FALSE;
-    [NSLayoutConstraint activateConstraints:@[
-        [manageSubsButton.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor constant:16.0],
-        [manageSubsButton.centerXAnchor constraintEqualToAnchor:cell.contentView.centerXAnchor],
-        [manageSubsButton.heightAnchor constraintEqualToConstant:50],
-        [manageSubsButton.widthAnchor constraintEqualToAnchor:cell.contentView.widthAnchor
-                                                   multiplier:CellContentWithMultiplier],
-    ]];
-
+    // "Manage your subscription" button if user is subscribed
     if (self.hasActiveSubscription) {
+        RoyalSkyButton *manageSubsButton = [[RoyalSkyButton alloc] initForAutoLayout];
+        [manageSubsButton setFontSize:16.0];
+        [manageSubsButton setTitle:Strings.manageYourSubscriptionButtonTitle];
+        [manageSubsButton addTarget:self action:@selector(onManageSubscriptionTap) forControlEvents:UIControlEventTouchUpInside];
+        [cell.contentView addSubview:manageSubsButton];
+        
+        // "Manage your subscription" button constraints
+        manageSubsButton.translatesAutoresizingMaskIntoConstraints = FALSE;
+        [NSLayoutConstraint activateConstraints:@[
+            [manageSubsButton.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor
+                                                       constant:16.0],
+            [manageSubsButton.centerXAnchor constraintEqualToAnchor:cell.contentView.centerXAnchor],
+            [manageSubsButton.heightAnchor constraintEqualToConstant:50],
+            [manageSubsButton.widthAnchor constraintEqualToAnchor:cell.contentView.widthAnchor
+                                                       multiplier:CellContentWithMultiplier],
+        ]];
+        
         // Pins manageSubsButton to cell's bottom, since restoreSubsButton will no longer be displayed.
         [manageSubsButton.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor
                                                       constant:-16.f].active = TRUE;
-    }
-
+    } else {
     // Restore subscription button is added if there is no active subscription.
-    if (!self.hasActiveSubscription) {
         UIButton *restoreSubsButton = [UIButton buttonWithType:UIButtonTypeSystem];
         [restoreSubsButton setTitle:Strings.iDontSeeMySubscriptionButtonTitle
                            forState:UIControlStateNormal];
@@ -575,7 +574,7 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
         [NSLayoutConstraint activateConstraints:@[
             [restoreSubsButton.centerXAnchor constraintEqualToAnchor:cell.contentView.centerXAnchor],
             [restoreSubsButton.heightAnchor constraintEqualToConstant:30],
-            [restoreSubsButton.topAnchor constraintEqualToAnchor:manageSubsButton.bottomAnchor
+            [restoreSubsButton.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor
                                                         constant:16.0],
             [restoreSubsButton.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor
                                                            constant:-16.f],

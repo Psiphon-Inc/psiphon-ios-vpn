@@ -36,7 +36,7 @@ extern NotifierMessage const NotifierNetworkConnectivityFailed;
 extern NotifierMessage const NotifierNetworkConnectivityResolved;
 extern NotifierMessage const NotifierDisallowedTrafficAlert;
 extern NotifierMessage const NotifierIsHostAppProcessRunning;
-extern NotifierMessage const NotifierPurchaseRequired;
+extern NotifierMessage const NotifierApplicationParametersUpdated;
 
 // Messages sent by the container.
 extern NotifierMessage const NotifierStartVPN;

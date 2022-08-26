@@ -28,6 +28,7 @@ fileprivate let landingPageTag = LogTag("LandingPage")
 struct LandingPageReducerState: Equatable {
     var pendingLandingPageOpening: Bool
     let tunnelConnection: TunnelConnection?
+    let applicationParameters: ApplicationParameters
 }
 
 enum LandingPageAction {
@@ -51,6 +52,12 @@ let landingPageReducer = Reducer<LandingPageReducerState
     
     switch action {
     case .tunnelConnectedAfterIntentSwitchedToStart:
+        guard !state.applicationParameters.showPurchaseRequiredPurchasePrompt else {
+            return [
+                environment.feedbackLogger
+                    .log(.info, "skipping landing page (ShowPurchaseRequiredPrompt)").mapNever()
+            ]
+        }
         guard !state.pendingLandingPageOpening else {
             return [
                 environment.feedbackLogger.log(

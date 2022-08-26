@@ -40,9 +40,7 @@ extern UserDefaultsKey const _Nonnull ExtensionIsZombieBoolKey;
 extern UserDefaultsKey const _Nonnull ContainerForegroundStateBoolKey;
 extern UserDefaultsKey const _Nonnull ContainerTunnelIntentStatusIntKey;
 extern UserDefaultsKey const _Nonnull ExtensionDisallowedTrafficAlertWriteSeqIntKey;
-extern UserDefaultsKey const _Nonnull ExtensionPurchaseRequiredPromptWriteSeqIntKey;
 extern UserDefaultsKey const _Nonnull ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey;
-extern UserDefaultsKey const _Nonnull ContainerPurchaseRequiredReadAtLeastUpToSeqIntKey;
 extern UserDefaultsKey const _Nonnull SharedDataExtensionCrashedBeforeStopBoolKey;
 extern UserDefaultsKey const _Nonnull SharedDataExtensionJetsamCounterIntegerKey;
 extern UserDefaultsKey const _Nonnull DebugMemoryProfileBoolKey;
@@ -168,10 +166,6 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 - (void)setContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum:(NSInteger)seq;
 - (NSInteger)getContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum;
 
-// Purchase required prompt
-- (void)setContainerPurchaseRequiredReadAtLeastUpToSequenceNum:(NSInteger)seq;
-- (NSInteger)getContainerPurchaseRequiredReadAtLeastUpToSequenceNum;
-
 // Purchase requried prompt handled vpn session number.
 - (void)setContainerPurchaseRequiredHandledEventVPNSessionNumber:(NSInteger)sessionNum;
 - (NSInteger)getContainerPurchaseRequiredHandledEventLatestVPNSessionNumber;
@@ -181,12 +175,15 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 #pragma mark - Extension Data (Data originating in the extension)
 
 #if TARGET_IS_EXTENSION
-- (void)incrementVPNSessionNumber;
+// Returns updated VPN session number.
+- (NSInteger)incrementVPNSessionNumber;
 #endif
 - (NSInteger)getVPNSessionNumber;
 
 #if TARGET_IS_EXTENSION
-- (void)setApplicationParameters:(NSString *)key value:(id _Nullable)value;
+// Adds staging application parameters to persisted value.
+// Returns updated application parameters dictionary.
+- (NSDictionary<NSString *, id> *_Nonnull)addApplicationParameters:(NSDictionary<NSString *, id> *_Nonnull)staging;
 #endif
 - (NSDictionary<NSString *, id> *_Nonnull)getApplicationParameters;
 
@@ -251,12 +248,9 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 - (NSInteger)getDisallowedTrafficAlertWriteSequenceNum;
 
 #if TARGET_IS_EXTENSION
-- (void)incrementPurchaseRequiredPromptWriteSequenceNum;
-- (void)setPurchaseRequiredPromptEventTimestamp:(NSDate *)date;
+- (void)setApplicationParametersChangeTimestamp:(NSDate *)date;
 #endif
-
-- (NSInteger)getPurchaseRequiredPromptWriteSequenceNum;
-- (NSDate * _Nullable)getPurchaseRequiredPromptEventTimestamp;
+- (NSDate * _Nullable)getApplicationParametersChangeTimestamp;
 
 #pragma mark - Jetsam counter
 

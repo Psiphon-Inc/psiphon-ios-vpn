@@ -260,7 +260,8 @@ extension AppState {
         get {
             LandingPageReducerState(
                 pendingLandingPageOpening: self.pendingLandingPageOpening,
-                tunnelConnection: self.tunnelConnection
+                tunnelConnection: self.tunnelConnection,
+                applicationParameters: self.appDelegateState.applicationParameters
             )
         }
         set {
@@ -313,7 +314,8 @@ extension AppState {
                 psiCashState: self.psiCashState,
                 psiCashAccountType: self.psiCashState.libData?.successToOptional()?.accountType,
                 appLifecycle: self.appDelegateState.appLifecycle,
-                tunnelConnectedStatus: self.vpnState.value.providerVPNStatus.tunneled
+                tunnelConnectedStatus: self.vpnState.value.providerVPNStatus.tunneled,
+                applicationParameters: self.appDelegateState.applicationParameters
             )
         }
         set {
