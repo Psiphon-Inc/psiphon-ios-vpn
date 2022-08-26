@@ -51,6 +51,7 @@
 #import "HostAppProtocol.h"
 #import "NSString+Additions.h"
 #import "LocalNotificationService.h"
+#import "PNEApplicationParameters.h"
 
 NSErrorDomain _Nonnull const PsiphonTunnelErrorDomain = @"PsiphonTunnelErrorDomain";
 
@@ -117,6 +118,11 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     ExtensionDataStore *_Nonnull localDataStore;
     
     PsiphonConfigSponsorIds *_Nullable psiphonConfigSponsorIds;
+    
+    // Staging area for application parameters.
+    // Values are stored here and committed to disk after on onConnected.
+    // Access should be protected by `workQueue`.
+    NSMutableDictionary<NSString *, id> *_Nonnull staging_applicationParameters;
 }
 
 - (id)init {
@@ -141,6 +147,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         localDataStore = [ExtensionDataStore standard];
         
         _hostAppProtocol = [[HostAppProtocol alloc] init];
+        
+        staging_applicationParameters = [NSMutableDictionary dictionary];
     }
     return self;
 }
@@ -757,6 +765,24 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             return;
         }
         
+        // Commit ApplicationParameters staging area.
+        [self.sharedDB setApplicationParametersChangeTimestamp:[NSDate date]];
+        self->staging_applicationParameters[ApplicationParamKeyVPNSessionNumber] =
+            [NSNumber numberWithInteger:[self.sharedDB getVPNSessionNumber]];
+        NSDictionary *updatedParams = [self.sharedDB addApplicationParameters:self->staging_applicationParameters];
+        // Staging area is cleared, since its objects are no longer required to be in memory.
+        [self->staging_applicationParameters removeAllObjects];
+        // Notifies host app that application parameters has been updated.
+        [[Notifier sharedInstance] post:NotifierApplicationParametersUpdated];
+        
+        // TODO: Allow for the possiblity that parameters are changed after onConnected.
+        
+        // Shows notification for required purchase prompt.
+        PNEApplicationParameters *params = [PNEApplicationParameters load:updatedParams];
+        if (params.showRequiredPurchasePrompt == TRUE && ![self hasUserMadePurchase]) {
+            [[LocalNotificationService shared] requestPurchaseRequiredPrompt];
+        }
+        
         [AppProfiler logMemoryReportWithTag:@"onConnected"];
         [[Notifier sharedInstance] post:NotifierTunnelConnected];
         [self tryStartVPN];
@@ -798,30 +824,16 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 }
 
 - (void)onApplicationParameter:(NSString * _Nonnull)key :(id)value {
-    if ([key isEqualToString:@"ShowPurchaseRequiredPrompt"]) {
-        if ([value isKindOfClass:[NSNumber class]]) {
-            
-            // Persist application parameter.
-            [self.sharedDB setApplicationParameters:key value:value];
-            
-            NSDate *timestamp = [NSDate date];
-            
-            BOOL purchaseRequired = [(NSNumber *)value boolValue];
-            if (purchaseRequired && ![self hasUserMadePurchase]) {
-                
-                // Record timestamp of event and increment seq number.
-                [self.sharedDB setPurchaseRequiredPromptEventTimestamp:timestamp];
-                [self.sharedDB incrementPurchaseRequiredPromptWriteSequenceNum];
-                [[Notifier sharedInstance] post:NotifierPurchaseRequired];
-                
-                // Display location notification.
-                // TODO: This notification is not debounced for the current VPN session.
-                [[LocalNotificationService shared] requestPurchaseRequiredPrompt];
-            }
+    dispatch_async(self->workQueue, ^{
+        if ([key isEqualToString:ApplicationParamKeyShowRequiredPurchasePrompt] &&
+            [value isKindOfClass:[NSNumber class]])
+        {
+            // Store key-value in staging area.
+            self->staging_applicationParameters[key] = value;
         } else {
             [PsiFeedbackLogger error:@"Expected bool for ApplicationParameter key 'ShowPurchaseRequiredPrompt'"];
         }
-    }
+    });
 }
 
 - (void)onAvailableEgressRegions:(NSArray *)regions {
