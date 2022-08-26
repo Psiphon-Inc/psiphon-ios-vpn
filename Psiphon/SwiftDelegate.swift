@@ -62,8 +62,8 @@ enum AppDelegateAction: Equatable {
     /// Handles disallowed-traffic alert and ShowPurchaseRequiredPrompt application parameter.
     case checkNEEvents
     
-    /// Application parameters have been updated by NE.
-    case applicationParametersUpdated(ApplicationParameters)
+    /// Reload persisted application parameters.
+    case checkApplicationParameters
     
 }
 
@@ -150,6 +150,9 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
             return [
                 Effect(value: .checkNEEvents),
                 
+                // Re-load persisted ApplicationParameters.
+                Effect(value: .checkApplicationParameters),
+  
                 // Available regions may have changed in the background.
                 environment.serverRegionStore(.updateAvailableRegions).mapNever()
             ]
@@ -194,7 +197,12 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
 
         return effects
         
-    case .applicationParametersUpdated(let appParams):
+    case .checkApplicationParameters:
+        
+        let appParams = ApplicationParameters.create(
+            PNEApplicationParameters.load(
+                environment.sharedDB.getApplicationParameters()
+            ))
         
         // Updates self state
         state.appDelegateState.applicationParameters = appParams
@@ -654,6 +662,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             .skipRepeats()
             .filter { $0 == .connected }
             .startWithValues { _ in
+                
+                // Check ApplicationParameters
+                self.store.send(.appDelegateAction(.checkApplicationParameters))
                 
                 // PsiCash RefreshState
                 self.store.send(.psiCash(.refreshPsiCashState()))
@@ -1521,9 +1532,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             Notifier.sharedInstance().post(NotifierHostAppProcessRunning)
             
         case .applicationParametersUpdated:
-            let appParams = ApplicationParameters.create(
-                PNEApplicationParameters.load(self.sharedDB.getApplicationParameters()))
-            self.store.send(.appDelegateAction(.applicationParametersUpdated(appParams)))
+            self.store.send(.appDelegateAction(.checkApplicationParameters))
 
         default:
             feedbackLogger.immediate(.error, "Unknown Notifier message: '\(message)'")
