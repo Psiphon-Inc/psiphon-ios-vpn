@@ -35,6 +35,7 @@
 #import <PsiphonTunnel/PsiphonTunnel.h>
 #import "EmbeddedServerEntries.h"
 #import "FileUtils.h"
+#import "PNEApplicationParameters.h"
 
 // UI
 #import "UIColor+Additions.h"

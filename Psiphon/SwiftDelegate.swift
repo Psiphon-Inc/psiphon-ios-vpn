@@ -54,13 +54,16 @@ extension AppLifecycle {
 
 enum AppDelegateAction: Equatable {
     
+    case onboardingCompleted
+    
     case appLifecycleEvent(AppLifecycle)
     
     /// Check for events recorded by NE that should be handled by the host app.
     /// Handles disallowed-traffic alert and ShowPurchaseRequiredPrompt application parameter.
     case checkNEEvents
     
-    case onboardingCompleted
+    /// Application parameters have been updated by NE.
+    case applicationParametersUpdated(ApplicationParameters)
     
 }
 
@@ -72,6 +75,10 @@ struct AppDelegateReducerState: Equatable {
 }
 
 struct AppDelegateState: Equatable {
+    
+    /// ApplicationParameters updated by NE.
+    /// `nil` at app start.
+    var applicationParameters = ApplicationParameters()
     
     var appLifecycle: AppLifecycle = .inited
         
@@ -108,6 +115,17 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
     state, action, environment in
     
     switch action {
+        
+    case .onboardingCompleted:
+        
+        state.appDelegateState.onboardingCompleted = true
+        
+        return [
+            .fireAndForget {
+                environment.userDefaultsConfig.onboardingStagesCompleted =
+                    OnboardingStage.allStages.map(\.rawValue)
+            }
+        ]
     
     case .appLifecycleEvent(let lifecycle):
         
@@ -147,8 +165,6 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
         
         let disallowedTrafficSeq = NEEventType.disallowedTraffic.unhandledEventSeq(environment.sharedDB)
          
-        let purchaseRequiredSeq = NEEventType.requiredPurchasePrompt.unhandledEventSeq(environment.sharedDB)
-        
         // Handles `disallowed-traffic` server alert.
         if let disallowedTrafficSeq = disallowedTrafficSeq {
             
@@ -175,21 +191,27 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
             }
             
         }
+
+        return effects
         
-        // Handles `ShowPurchaseRequiredPrompt` application parameter.
-        if let purchaseRequiredSeq = purchaseRequiredSeq {
+    case .applicationParametersUpdated(let appParams):
+        
+        // Updates self state
+        state.appDelegateState.applicationParameters = appParams
+        
+        var effects = [Effect<AppDelegateAction>]()
+        
+        // Handles ShowPurchaseRequiredPrompt.
+        if appParams.showPurchaseRequiredPurchasePrompt {
             
-            let vpnSession = environment.sharedDB.getVPNSessionNumber()
-            let lastHandledVPNSession =
-            environment.sharedDB.getContainerPurchaseRequiredHandledEventLatestVPNSessionNumber()
+            let lastHandledVPNSession = environment.sharedDB
+                .getContainerPurchaseRequiredHandledEventLatestVPNSessionNumber()
             
             // Updates PsiphonDataSharedDB that this event was handled.
-            NEEventType.requiredPurchasePrompt
-                .setEventHandled(environment.sharedDB, purchaseRequiredSeq)
-            environment.sharedDB.setContainerPurchaseRequiredHandledEventVPNSessionNumber(vpnSession)
+            environment.sharedDB
+                .setContainerPurchaseRequiredHandledEventVPNSessionNumber(appParams.vpnSessionNumber)
             
-            // If the event is for a VPN session that is already handled, it is ignored.
-            if vpnSession > lastHandledVPNSession {
+            if appParams.vpnSessionNumber > lastHandledVPNSession {
                 
                 // Prompt is presented if the user is not (subscribed or speed-boosted)
                 // and is connected (or connecting).
@@ -213,7 +235,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
                             ),
                         
                         environment.feedbackLogger
-                            .log(.info, "Presenting purchase required prompt")
+                            .log(.info, "Will present purchase required prompt once connected")
                             .mapNever()
                     ]
                 } else {
@@ -223,19 +245,8 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
                 
             }
         }
-
+        
         return effects
-        
-    case .onboardingCompleted:
-        
-        state.appDelegateState.onboardingCompleted = true
-        
-        return [
-            .fireAndForget {
-                environment.userDefaultsConfig.onboardingStagesCompleted =
-                    OnboardingStage.allStages.map(\.rawValue)
-            }
-        ]
         
     }
     
@@ -558,9 +569,14 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             )
             #endif
         } else {
+            
+            let appParams = ApplicationParameters.create(
+                PNEApplicationParameters.load(self.sharedDB.getApplicationParameters()))
 
             self.store = Store(
-                initialValue: AppState(),
+                initialValue: AppState(
+                    appDelegateState: AppDelegateState(applicationParameters: appParams)
+                ),
                 reducer: makeAppReducer(feedbackLogger: self.feedbackLogger),
                 dispatcher: mainDispatcher,
                 environment: appEnvironment
@@ -573,6 +589,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             self.store.send(.mainViewAction(.presentAlert(alertEvent)))
         }
         
+        // Initialization messages
         self.store.send(.appDelegateAction(.appLifecycleEvent(.didFinishLaunching)))
         self.store.send(vpnAction: .appLaunched)
         self.store.send(.psiCash(.initialize))
@@ -1497,11 +1514,16 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         case .networkConnectivityFailed, .networkConnectivityResolved:
             break
             
-        case .disallowedTrafficAlert, .purchaseRequired:
+        case .disallowedTrafficAlert:
             self.store.send(.appDelegateAction(.checkNEEvents))
             
         case .isHostAppProcessRunning:
             Notifier.sharedInstance().post(NotifierHostAppProcessRunning)
+            
+        case .applicationParametersUpdated:
+            let appParams = ApplicationParameters.create(
+                PNEApplicationParameters.load(self.sharedDB.getApplicationParameters()))
+            self.store.send(.appDelegateAction(.applicationParametersUpdated(appParams)))
 
         default:
             feedbackLogger.immediate(.error, "Unknown Notifier message: '\(message)'")
