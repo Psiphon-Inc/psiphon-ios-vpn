@@ -59,7 +59,7 @@
 }
 
 + (NSString *)purchaseRequiredNotificationMessage {
-    return NSLocalizedStringWithDefaultValue(@"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE", nil, [NSBundle mainBundle], @"Please purchase a subscription to continue using Psiphon", @"Do not translate or transliterate 'Psiphon'. Text of notification shown when a subscription is required to continue using the servive.");
+    return NSLocalizedStringWithDefaultValue(@"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE", nil, [NSBundle mainBundle], @"Please purchase a subscription to continue using Psiphon.", @"Do not translate or transliterate 'Psiphon'. Text of notification shown when a subscription is required to continue using the servive.");
 }
 
 @end

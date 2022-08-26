@@ -52,16 +52,11 @@ UserDefaultsKey const ContainerTunnelIntentStatusIntKey = @"container_tunnel_int
 UserDefaultsKey const ExtensionDisallowedTrafficAlertWriteSeqIntKey =
 @"extension_disallowed_traffic_alert_write_seq_int";
 
-UserDefaultsKey const ExtensionPurchaseRequiredPromptWriteSeqIntKey =
-@"extension_purchase_required_prompt_write_seq_int";
-
-UserDefaultsKey const ExtensionPurchaseRequiredPromptEventTimestampKey =
-@"extension_purchase_required_prompt_event_timestamp";
+UserDefaultsKey const ExtensionApplicationParametersChangeTimestamp =
+@"extension_application_parameters_timestamp";
 
 UserDefaultsKey const ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey =
 @"container_disallowed_traffic_alert_read_at_least_up_to_seq_int";
-
-UserDefaultsKey const ContainerPurchaseRequiredReadAtLeastUpToSeqIntKey = @"container_purchase_required_read_at_least_up_to_seq_int";
 
 UserDefaultsKey const TunnelEgressRegionKey = @"Tunnel-EgressRegion";
 
@@ -271,14 +266,6 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
     return [sharedDefaults integerForKey:ContainerDisallowedTrafficAlertReadAtLeastUpToSeqIntKey];
 }
 
-- (void)setContainerPurchaseRequiredReadAtLeastUpToSequenceNum:(NSInteger)seq {
-    [sharedDefaults setInteger:seq forKey:ContainerPurchaseRequiredReadAtLeastUpToSeqIntKey];
-}
-
-- (NSInteger)getContainerPurchaseRequiredReadAtLeastUpToSequenceNum {
-    return [sharedDefaults integerForKey:ContainerPurchaseRequiredReadAtLeastUpToSeqIntKey];
-}
-
 - (void)setContainerPurchaseRequiredHandledEventVPNSessionNumber:(NSInteger)sessionNum {
     [sharedDefaults setInteger:sessionNum forKey:ConstainerPurchaseRequiredVPNSessionHandledIntKey];
 }
@@ -291,22 +278,24 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
 
 #pragma mark - Extension Data (Data originating in the extension)
 
-- (void)incrementVPNSessionNumber {
-    NSInteger lastSessionNum = [self getVPNSessionNumber];
-    [sharedDefaults setInteger:(lastSessionNum + 1)
+- (NSInteger)incrementVPNSessionNumber {
+    NSInteger newValue = [self getVPNSessionNumber] + 1;
+    [sharedDefaults setInteger:newValue
                         forKey:ExtensionVPNSessionNumberIntKey];
+    return newValue;
 }
 
 - (NSInteger)getVPNSessionNumber {
     return [sharedDefaults integerForKey:ExtensionVPNSessionNumberIntKey];
 }
 
-- (void)setApplicationParameters:(NSString *)key value:(id _Nullable)value {
-    NSMutableDictionary *dict = [NSMutableDictionary
+- (NSDictionary<NSString *, id> *_Nonnull)addApplicationParameters:(NSDictionary<NSString *, id> *_Nonnull)staging {
+    NSMutableDictionary *head = [NSMutableDictionary
                                  dictionaryWithDictionary:[self getApplicationParameters]];
-    id _Nonnull nsnullValue = value == nil ? [NSNull null] : value;
-    [dict setObject:nsnullValue forKey:key];
-    [sharedDefaults setObject:dict forKey:ExtensionApplicationParametersDictKey];
+    // For the same key, staging value takes the place of value in head.
+    [head addEntriesFromDictionary:staging];
+    [sharedDefaults setObject:head forKey:ExtensionApplicationParametersDictKey];
+    return head;
 }
 
 - (NSDictionary<NSString *, id> *_Nonnull)getApplicationParameters {
@@ -357,23 +346,13 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
     return [sharedDefaults integerForKey:ExtensionDisallowedTrafficAlertWriteSeqIntKey];
 }
 
-- (void)incrementPurchaseRequiredPromptWriteSequenceNum {
-    NSInteger lastSeq = [self getPurchaseRequiredPromptWriteSequenceNum];
-    [sharedDefaults setInteger:(lastSeq + 1)
-                        forKey:ExtensionPurchaseRequiredPromptWriteSeqIntKey];
-}
-
-- (NSInteger)getPurchaseRequiredPromptWriteSequenceNum {
-    return [sharedDefaults integerForKey:ExtensionPurchaseRequiredPromptWriteSeqIntKey];
-}
-
-- (void)setPurchaseRequiredPromptEventTimestamp:(NSDate *)date {
+- (void)setApplicationParametersChangeTimestamp:(NSDate *)date {
     NSString *rfc3339Date = [date RFC3339String];
-    [sharedDefaults setObject:rfc3339Date forKey:ExtensionPurchaseRequiredPromptEventTimestampKey];
+    [sharedDefaults setObject:rfc3339Date forKey:ExtensionApplicationParametersChangeTimestamp];
 }
 
-- (NSDate * _Nullable)getPurchaseRequiredPromptEventTimestamp {
-    NSString * _Nullable rfc3339Date = [sharedDefaults stringForKey:ExtensionPurchaseRequiredPromptEventTimestampKey];
+- (NSDate * _Nullable)getApplicationParametersChangeTimestamp {
+    NSString * _Nullable rfc3339Date = [sharedDefaults stringForKey:ExtensionApplicationParametersChangeTimestamp];
     if (!rfc3339Date) {
         return nil;
     }

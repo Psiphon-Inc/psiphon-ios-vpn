@@ -138,6 +138,7 @@ struct MainViewReducerState: Equatable {
     let psiCashAccountType: PsiCashAccountType?
     let appLifecycle: AppLifecycle
     let tunnelConnectedStatus: TunnelConnectedStatus
+    let applicationParameters: ApplicationParameters
 }
 
 extension MainViewReducerState {
@@ -767,12 +768,14 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         
     case .presentPurchaseRequiredPrompt:
         
-        guard case .completed(false) = state.mainView.purchaseRequiredPromptPresented else {
+        // Re-check Application Parameter again before presenting prompt.
+        guard state.applicationParameters.showPurchaseRequiredPurchasePrompt else {
             return []
         }
         
-        // TODO: Check if a traffic alert is presented. This applies to presentation
-        // of traffic-alert as well.
+        guard case .completed(false) = state.mainView.purchaseRequiredPromptPresented else {
+            return []
+        }
         
         // Prompt is presented if the user is not (subscribed or speed-boosted)
         // and is connected (or connecting).

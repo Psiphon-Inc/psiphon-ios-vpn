@@ -61,7 +61,6 @@ enum DisallowedTrafficPrompt {
 // TODO: Move NEEvents data to a shared database with the network extension.
 enum NEEventType: Equatable {
     case disallowedTraffic
-    case requiredPurchasePrompt
 }
 
 extension NEEventType {
@@ -75,10 +74,6 @@ extension NEEventType {
         case .disallowedTraffic:
             lastHandledSeq = sharedDB.getContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum()
             lastWrittenSeq = sharedDB.getDisallowedTrafficAlertWriteSequenceNum()
-            
-        case .requiredPurchasePrompt:
-            lastHandledSeq = sharedDB.getContainerPurchaseRequiredReadAtLeastUpToSequenceNum()
-            lastWrittenSeq = sharedDB.getPurchaseRequiredPromptWriteSequenceNum()
         }
         
         if lastWrittenSeq > lastHandledSeq {
@@ -93,8 +88,6 @@ extension NEEventType {
         switch self {
         case .disallowedTraffic:
             sharedDB.setContainerDisallowedTrafficAlertReadAtLeastUpToSequenceNum(seq)
-        case .requiredPurchasePrompt:
-            sharedDB.setContainerPurchaseRequiredReadAtLeastUpToSequenceNum(seq)
         }
     }
     

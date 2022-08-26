@@ -347,8 +347,8 @@ enum NotifierNetworkExtensionMessage {
     case networkConnectivityFailed
     case networkConnectivityResolved
     case disallowedTrafficAlert
-    case purchaseRequired
     case isHostAppProcessRunning
+    case applicationParametersUpdated
     
     init?(rawValue: String) {
         switch rawValue {
@@ -362,10 +362,10 @@ enum NotifierNetworkExtensionMessage {
             self = .networkConnectivityResolved
         case NotifierDisallowedTrafficAlert:
             self = .disallowedTrafficAlert
-        case NotifierPurchaseRequired:
-            self = .purchaseRequired
         case NotifierIsHostAppProcessRunning:
             self = .isHostAppProcessRunning
+        case NotifierApplicationParametersUpdated:
+            self = .applicationParametersUpdated
         default:
             return nil
         }
