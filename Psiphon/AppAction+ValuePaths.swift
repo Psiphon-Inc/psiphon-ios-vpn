@@ -260,7 +260,8 @@ extension AppState {
         get {
             LandingPageReducerState(
                 pendingLandingPageOpening: self.pendingLandingPageOpening,
-                tunnelConnection: self.tunnelConnection
+                tunnelConnection: self.tunnelConnection,
+                applicationParameters: self.appDelegateState.applicationParameters
             )
         }
         set {
