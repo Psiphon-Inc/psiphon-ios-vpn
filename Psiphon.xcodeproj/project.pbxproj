@@ -26,6 +26,7 @@
 		295D765E28B8164700AF6AC8 /* PNEApplicationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 295D765D28B8164700AF6AC8 /* PNEApplicationParameters.m */; };
 		295D765F28B8164700AF6AC8 /* PNEApplicationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 295D765D28B8164700AF6AC8 /* PNEApplicationParameters.m */; };
 		295D767328BD409000AF6AC8 /* LocalNotificationService.m in Sources */ = {isa = PBXBuildFile; fileRef = 29AEC21228AD85110063003C /* LocalNotificationService.m */; };
+		295D767528BD533800AF6AC8 /* UserNotifications.swift in Sources */ = {isa = PBXBuildFile; fileRef = 295D767428BD533800AF6AC8 /* UserNotifications.swift */; };
 		295E329A2718B63100C77BEA /* UITestAppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 295E32992718B63100C77BEA /* UITestAppState.swift */; };
 		296054AA265307770001E72D /* PsiCashAccountNameViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296054A9265307770001E72D /* PsiCashAccountNameViewWrapper.swift */; };
 		296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296622B425E8A554004635A1 /* LaunchScreenViewController.swift */; };
@@ -416,6 +417,7 @@
 		295D765628B80AEC00AF6AC8 /* ApplicationParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ApplicationParameters.swift; sourceTree = "<group>"; };
 		295D765C28B8164700AF6AC8 /* PNEApplicationParameters.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PNEApplicationParameters.h; sourceTree = "<group>"; };
 		295D765D28B8164700AF6AC8 /* PNEApplicationParameters.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PNEApplicationParameters.m; sourceTree = "<group>"; };
+		295D767428BD533800AF6AC8 /* UserNotifications.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserNotifications.swift; sourceTree = "<group>"; };
 		295E32992718B63100C77BEA /* UITestAppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UITestAppState.swift; sourceTree = "<group>"; };
 		296054A9265307770001E72D /* PsiCashAccountNameViewWrapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashAccountNameViewWrapper.swift; sourceTree = "<group>"; };
 		296622B425E8A554004635A1 /* LaunchScreenViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreenViewController.swift; sourceTree = "<group>"; };
@@ -1436,6 +1438,7 @@
 				296950A926DD363F0052330F /* ServerRegionReducer.swift */,
 				295D765228B67C1E00AF6AC8 /* NEEvents.swift */,
 				295D765628B80AEC00AF6AC8 /* ApplicationParameters.swift */,
+				295D767428BD533800AF6AC8 /* UserNotifications.swift */,
 			);
 			path = Psiphon;
 			sourceTree = "<group>";
@@ -2165,6 +2168,7 @@
 				EF90D7A3204F22C900228A63 /* timestamp_tm.c in Sources */,
 				52D363CD230EEBAC002C2221 /* AnimatedUIButton.swift in Sources */,
 				445F24E020E1A5BA00D004E9 /* INTEGER.c in Sources */,
+				295D767528BD533800AF6AC8 /* UserNotifications.swift in Sources */,
 				445F24DD20E1A5BA00D004E9 /* per_encoder.c in Sources */,
 				8DB6C638242A4D06005E2F4C /* DuskButton.swift in Sources */,
 				4EC5526320AB8DBE000B4BEA /* Pastel.m in Sources */,

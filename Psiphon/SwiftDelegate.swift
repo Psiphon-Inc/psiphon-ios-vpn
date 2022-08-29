@@ -154,7 +154,27 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
                 Effect(value: .checkApplicationParameters),
   
                 // Available regions may have changed in the background.
-                environment.serverRegionStore(.updateAvailableRegions).mapNever()
+                environment.serverRegionStore(.updateAvailableRegions).mapNever(),
+                
+                // Dismiss delivered notifications.
+                .fireAndForget {
+                    UNUserNotificationCenter.current().getDeliveredNotifications { (notifList: [UNNotification]) in
+                        
+                        // List of notifications to remove.
+                        let removeList = notifList.filter { notification in
+                            let notifId = LocalNotificationIdentifier(rawValue: notification.request.identifier)
+                            guard let notifId = notifId else {
+                                // Notification is not known (probably legacy), remove it.
+                                return true
+                            }
+                            return notifId.dismissDeliveredNotifOnForeground
+                        }
+                        
+                        UNUserNotificationCenter.current()
+                            .removeDeliveredNotifications(withIdentifiers: removeList.map(\.request.identifier))
+                        
+                    }
+                }
             ]
             
         default:
@@ -438,18 +458,27 @@ extension SwiftDelegate: UNUserNotificationCenterDelegate {
             received user notification: identifier: '\(notification.request.identifier)'
             """)
         
-        // Silences notification to open container (since it is already on the foreground).
-        guard notification.request.identifier != NotificationIdOpenContainer else {
+        let notifId = LocalNotificationIdentifier(rawValue: notification.request.identifier)
+        
+        // If notification Id is not known (e.g. from legacy client), silences it.
+        guard let notifId = notifId else {
             completionHandler([])
             return
         }
-        
-        // Present the notification in the Notification Center.
-        if #available(iOS 14.0, *) {
-            completionHandler(.banner)
+
+        // Checks if notification should be silenced or presented in the Notification Center.
+        if notifId.silenceNotificationIfOnForeground {
+            // Notification should be silenced.
+            completionHandler([])
         } else {
-            completionHandler(.alert)
+            // Present the notification in the Notification Center.
+            if #available(iOS 14.0, *) {
+                completionHandler(.banner)
+            } else {
+                completionHandler(.alert)
+            }
         }
+        
     }
     
 }
