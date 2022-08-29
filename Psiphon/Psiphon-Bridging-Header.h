@@ -36,6 +36,7 @@
 #import "EmbeddedServerEntries.h"
 #import "FileUtils.h"
 #import "PNEApplicationParameters.h"
+#import "LocalNotificationService.h"
 
 // UI
 #import "UIColor+Additions.h"

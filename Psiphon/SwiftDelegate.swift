@@ -428,17 +428,28 @@ extension SwiftDelegate {
     
 }
 
+// Handles local notifications from NE.
 extension SwiftDelegate: UNUserNotificationCenterDelegate {
     
-    func userNotificationCenter(
-        _ center: UNUserNotificationCenter,
-        didReceive response: UNNotificationResponse,
-        withCompletionHandler completionHandler: @escaping () -> Void
-    ) {
+    // Asks the delegate how to handle a notification that arrived while the app was running in the foreground.
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        
         self.feedbackLogger.immediate(.info, """
-            received user notification: identifier: '\(response.notification.request.identifier)'
+            received user notification: identifier: '\(notification.request.identifier)'
             """)
-        completionHandler()
+        
+        // Silences notification to open container (since it is already on the foreground).
+        guard notification.request.identifier != NotificationIdOpenContainer else {
+            completionHandler([])
+            return
+        }
+        
+        // Present the notification in the Notification Center.
+        if #available(iOS 14.0, *) {
+            completionHandler(.banner)
+        } else {
+            completionHandler(.alert)
+        }
     }
     
 }
@@ -478,6 +489,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                                         appInfo: AppInfoObjC(),
                                         feedbackLogger: self.feedbackLogger)
         
+        // Setup UNUserNotification delegate for handling local notifications from NE.
         UNUserNotificationCenter.current().delegate = self
         
         return true
