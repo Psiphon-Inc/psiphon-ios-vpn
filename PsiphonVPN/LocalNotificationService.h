@@ -21,6 +21,17 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString *_Nonnull const NotificationIdOpenContainer;
+extern NSString *_Nonnull const NotificationIdCorruptSettings;
+extern NSString *_Nonnull const NotificationIdSubscriptionExpired;
+extern NSString *_Nonnull const NotificationIdRegionUnavailable;
+extern NSString *_Nonnull const NotificationIdUpstreamProxyError;
+extern NSString *_Nonnull const NotificationIdDisallowedTraffic;
+extern NSString *_Nonnull const NotificationIdMustStartVPNFromApp;
+extern NSString *_Nonnull const NotificationIdPurchaseRequired;
+
+#if TARGET_IS_EXTENSION
+// NE notification service.
 @interface LocalNotificationService : NSObject
 
 + (instancetype)shared;
@@ -42,5 +53,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)requestPurchaseRequiredPrompt;
 
 @end
+#endif
 
 NS_ASSUME_NONNULL_END
