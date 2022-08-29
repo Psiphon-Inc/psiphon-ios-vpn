@@ -25,6 +25,7 @@
 		295D765728B80AEC00AF6AC8 /* ApplicationParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 295D765628B80AEC00AF6AC8 /* ApplicationParameters.swift */; };
 		295D765E28B8164700AF6AC8 /* PNEApplicationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 295D765D28B8164700AF6AC8 /* PNEApplicationParameters.m */; };
 		295D765F28B8164700AF6AC8 /* PNEApplicationParameters.m in Sources */ = {isa = PBXBuildFile; fileRef = 295D765D28B8164700AF6AC8 /* PNEApplicationParameters.m */; };
+		295D767328BD409000AF6AC8 /* LocalNotificationService.m in Sources */ = {isa = PBXBuildFile; fileRef = 29AEC21228AD85110063003C /* LocalNotificationService.m */; };
 		295E329A2718B63100C77BEA /* UITestAppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 295E32992718B63100C77BEA /* UITestAppState.swift */; };
 		296054AA265307770001E72D /* PsiCashAccountNameViewWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296054A9265307770001E72D /* PsiCashAccountNameViewWrapper.swift */; };
 		296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 296622B425E8A554004635A1 /* LaunchScreenViewController.swift */; };
@@ -2095,6 +2096,7 @@
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
 				445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */,
 				296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */,
+				295D767328BD409000AF6AC8 /* LocalNotificationService.m in Sources */,
 				52A2466F23A1769300A01FF1 /* PsiCashMessageViewWithButton.swift in Sources */,
 				8D0017D924DB4B1200EC3409 /* OnboardingViewController.swift in Sources */,
 				295D765728B80AEC00AF6AC8 /* ApplicationParameters.swift in Sources */,

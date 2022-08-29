@@ -35,6 +35,8 @@ NSString *_Nonnull const NotificationIdDisallowedTraffic = @"DisallowedTraffic";
 NSString *_Nonnull const NotificationIdMustStartVPNFromApp = @"MustStartVPNFromApp";
 NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
 
+#if TARGET_IS_EXTENSION
+
 @implementation LocalNotificationService {
     NSMutableSet<NSString *> *requesetdNotifications;
     PsiphonDataSharedDB *sharedDB;
@@ -229,3 +231,5 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
 }
 
 @end
+
+#endif
