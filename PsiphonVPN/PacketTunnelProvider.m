@@ -539,13 +539,18 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         }];
         
         return FALSE;
+        
+    } else {
+        // waitForContainerStartVPNCommand is FALSE. VPN can be started.
+        
+        if ([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
+            [self startVPN];
+            self.reasserting = FALSE;
+            return TRUE;
+        }
+       
     }
 
-    if ([self.psiphonTunnel getConnectionState] == PsiphonConnectionStateConnected) {
-        [self startVPN];
-        self.reasserting = FALSE;
-        return TRUE;
-    }
 
     return FALSE;
 }
