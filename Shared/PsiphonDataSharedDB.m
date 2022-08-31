@@ -289,13 +289,8 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
     return [sharedDefaults integerForKey:ExtensionVPNSessionNumberIntKey];
 }
 
-- (NSDictionary<NSString *, id> *_Nonnull)addApplicationParameters:(NSDictionary<NSString *, id> *_Nonnull)staging {
-    NSMutableDictionary *head = [NSMutableDictionary
-                                 dictionaryWithDictionary:[self getApplicationParameters]];
-    // For the same key, staging value takes the place of value in head.
-    [head addEntriesFromDictionary:staging];
-    [sharedDefaults setObject:head forKey:ExtensionApplicationParametersDictKey];
-    return head;
+- (void)setApplicationParameters:(NSDictionary<NSString *, id> *_Nonnull)params {
+    [sharedDefaults setObject:params forKey:ExtensionApplicationParametersDictKey];
 }
 
 - (NSDictionary<NSString *, id> *_Nonnull)getApplicationParameters {
