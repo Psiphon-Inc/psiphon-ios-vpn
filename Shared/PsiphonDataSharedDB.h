@@ -181,9 +181,8 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 - (NSInteger)getVPNSessionNumber;
 
 #if TARGET_IS_EXTENSION
-// Adds staging application parameters to persisted value.
-// Returns updated application parameters dictionary.
-- (NSDictionary<NSString *, id> *_Nonnull)addApplicationParameters:(NSDictionary<NSString *, id> *_Nonnull)staging;
+// Overrides previously persisted application parameters.
+- (void)setApplicationParameters:(NSDictionary<NSString *, id> *_Nonnull)params;
 #endif
 - (NSDictionary<NSString *, id> *_Nonnull)getApplicationParameters;
 

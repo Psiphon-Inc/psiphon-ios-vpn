@@ -119,7 +119,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     
     PsiphonConfigSponsorIds *_Nullable psiphonConfigSponsorIds;
     
-    // Staging area for application parameters.
+    // ApplicationParameters staging dictionary.
     // Values are stored here and committed to disk after on onConnected.
     // Access should be protected by `workQueue`.
     NSMutableDictionary<NSString *, id> *_Nonnull staging_applicationParameters;
@@ -770,23 +770,26 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             return;
         }
         
-        // Commit ApplicationParameters staging area.
+        // TODO: Allow for the possiblity that parameters are changed after onConnected.
+        //       as of now application parameters are overwritten.
+        
+        // Persists ApplicationParameters staging dictionary.
         [self.sharedDB setApplicationParametersChangeTimestamp:[NSDate date]];
         self->staging_applicationParameters[ApplicationParamKeyVPNSessionNumber] =
-            [NSNumber numberWithInteger:[self.sharedDB getVPNSessionNumber]];
-        NSDictionary *updatedParams = [self.sharedDB addApplicationParameters:self->staging_applicationParameters];
-        // Staging area is cleared, since its objects are no longer required to be in memory.
-        [self->staging_applicationParameters removeAllObjects];
-        // Notifies host app that application parameters has been updated.
+        [NSNumber numberWithInteger:[self.sharedDB getVPNSessionNumber]];
+        [self.sharedDB setApplicationParameters:self->staging_applicationParameters];
+        
+        // Notifies host app that persisted application parameters has been updated.
         [[Notifier sharedInstance] post:NotifierApplicationParametersUpdated];
         
-        // TODO: Allow for the possiblity that parameters are changed after onConnected.
-        
-        // Shows notification for required purchase prompt.
-        PNEApplicationParameters *params = [PNEApplicationParameters load:updatedParams];
+        // Request notification if purchase required.
+        PNEApplicationParameters *params = [PNEApplicationParameters
+                                            load:self->staging_applicationParameters];
         if (params.showRequiredPurchasePrompt == TRUE && ![self hasUserMadePurchase]) {
             [[LocalNotificationService shared] requestPurchaseRequiredPrompt];
         }
+        
+        [self->staging_applicationParameters removeAllObjects];
         
         [AppProfiler logMemoryReportWithTag:@"onConnected"];
         [[Notifier sharedInstance] post:NotifierTunnelConnected];
