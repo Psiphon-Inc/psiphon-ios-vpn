@@ -335,7 +335,7 @@ final class PsiCashLib {
             // Programming fault
             fatalError()
         }
-        return result.map(CustomData.init)
+        return result.map(CustomData.init(stringLiteral:))
     }
     
     // MARK: API Server Requests
