@@ -1799,8 +1799,8 @@
 		BFDFE7DC352907FC980B868725387E98 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1240;
-				LastUpgradeCheck = 1240;
+				LastSwiftUpdateCheck = 1300;
+				LastUpgradeCheck = 1300;
 			};
 			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
 			compatibilityVersion = "Xcode 11.0";
@@ -2316,6 +2316,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 72B307DD65AC858E4AF7780265CF5CA1 /* ReactiveObjC.release.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -2342,6 +2343,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = D6C455DCC918A8DD2B108A44F5DB32E1 /* SVProgressHUD.debug.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -2367,6 +2369,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 77EF3B25883CCFE21C5F47C4A4D4ED42 /* EFCountingLabel.debug.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -2392,6 +2395,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 36FD66C635A85AE2DE6ACE40DD65F893 /* PsiphonClientCommonLibrary.release.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -2480,6 +2484,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 36C10AC45D250BC4CDAA22547D628016 /* InAppSettingsKit.release.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/InAppSettingsKit";
 				ENABLE_BITCODE = NO;
 				IBSC_MODULE = InAppSettingsKit;
@@ -2497,6 +2502,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 08268FFA3C90E3EE24D45066DC0E753A /* PsiphonClientCommonLibrary.debug.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -2523,6 +2529,7 @@
 			baseConfigurationReference = 36FD66C635A85AE2DE6ACE40DD65F893 /* PsiphonClientCommonLibrary.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/PsiphonClientCommonLibrary";
 				ENABLE_BITCODE = NO;
 				IBSC_MODULE = PsiphonClientCommonLibrary;
@@ -2603,6 +2610,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 08268FFA3C90E3EE24D45066DC0E753A /* PsiphonClientCommonLibrary.debug.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/PsiphonClientCommonLibrary";
 				ENABLE_BITCODE = NO;
 				IBSC_MODULE = PsiphonClientCommonLibrary;
@@ -2620,6 +2628,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B2026D68A9CA65A49A506A662C83797C /* InAppSettingsKit.debug.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/InAppSettingsKit";
 				ENABLE_BITCODE = NO;
 				IBSC_MODULE = InAppSettingsKit;
@@ -2637,6 +2646,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9EBF2A6C3697AAF9096A64575130E03D /* EFCountingLabel.release.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -2663,6 +2673,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 58D4E8B8DC90EF72B526E6826702CF4F /* MBProgressHUD.release.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -2691,6 +2702,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -2713,6 +2725,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 36FD66C635A85AE2DE6ACE40DD65F893 /* PsiphonClientCommonLibrary.release.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/PsiphonClientCommonLibrary";
 				ENABLE_BITCODE = NO;
 				IBSC_MODULE = PsiphonClientCommonLibrary;
@@ -2730,6 +2743,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9C1A457DA6C6421A16DA6A0FB2A62E09 /* SVProgressHUD.release.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -2758,6 +2772,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -2780,6 +2795,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 72B307DD65AC858E4AF7780265CF5CA1 /* ReactiveObjC.release.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -2806,6 +2822,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 36C10AC45D250BC4CDAA22547D628016 /* InAppSettingsKit.release.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -2832,6 +2849,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 36C10AC45D250BC4CDAA22547D628016 /* InAppSettingsKit.release.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -2858,6 +2876,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9EBF2A6C3697AAF9096A64575130E03D /* EFCountingLabel.release.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -2884,6 +2903,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B2026D68A9CA65A49A506A662C83797C /* InAppSettingsKit.debug.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -2910,6 +2930,7 @@
 			baseConfigurationReference = 36C10AC45D250BC4CDAA22547D628016 /* InAppSettingsKit.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
 				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/InAppSettingsKit";
 				ENABLE_BITCODE = NO;
 				IBSC_MODULE = InAppSettingsKit;
@@ -2928,6 +2949,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 36FD66C635A85AE2DE6ACE40DD65F893 /* PsiphonClientCommonLibrary.release.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -2954,6 +2976,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 58D4E8B8DC90EF72B526E6826702CF4F /* MBProgressHUD.release.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -2980,6 +3003,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9C1A457DA6C6421A16DA6A0FB2A62E09 /* SVProgressHUD.release.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -3006,6 +3030,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 3B79F4F4EB2B387EE1714E3E136FE524 /* MBProgressHUD.debug.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -3097,6 +3122,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 43039CC27763EE5B82ECFC8DB5274210 /* ReactiveObjC.debug.xcconfig */;
 			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
@@ -3124,6 +3150,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
 				"CODE_SIGN_IDENTITY[sdk=appletvos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "";
