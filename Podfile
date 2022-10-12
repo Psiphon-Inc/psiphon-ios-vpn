@@ -24,6 +24,7 @@ post_install do |installer|
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '10.2'
       config.build_settings['ENABLE_BITCODE'] = 'NO'
+      config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO' # https://github.com/CocoaPods/CocoaPods/issues/11402#issuecomment-1201464693
     end
   end
 end
