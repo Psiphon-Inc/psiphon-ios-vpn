@@ -196,7 +196,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
             
             // Prompt is presented if the user is not (subscribed or speed-boosted)
             // and is connected (or connecting).
-            if DisallowedTrafficPrompt.canPresent(
+            if NEEvent.canPresentDisallowedTrafficPrompt(
                 dateCompare: environment.dateCompare,
                 psiCashState: state.psiCashState,
                 subscriptionStatus: state.subscriptionState.status,
@@ -243,7 +243,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
                 
                 // Prompt is presented if the user is not (subscribed or speed-boosted)
                 // and is connected (or connecting).
-                if PurchaseRequiredPrompt.canPresent(
+                if NEEvent.canPresentPurchaseRequiredPrompt(
                     dateCompare: environment.dateCompare,
                     psiCashState: state.psiCashState,
                     subscriptionStatus: state.subscriptionState.status,

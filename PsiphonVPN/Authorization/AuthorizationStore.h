@@ -20,6 +20,7 @@
 #import <Foundation/Foundation.h>
 #import "PsiphonConfigReader.h"
 #import "PsiphonDataSharedDB.h"
+#import "Authorization.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -42,8 +43,8 @@ NS_ASSUME_NONNULL_BEGIN
 /// Flags authorization that are rejected by the Psiphon server.
 /// Should be called in onActiveAuthorizationIDs.
 ///
-/// - Returns: TRUE if an apple-subscription authorization was rejected.
-- (BOOL)setActiveAuthorizations:(NSArray<NSString *> *)activeAuthorizationIds;
+/// - Returns: Set of Authorizations that were rejected.
+- (NSSet<Authorization *> *)setActiveAuthorizations:(NSArray<NSString *> *)activeAuthorizationIds;
 
 /// Returns TRUE if either a subscription or speed-boost authorization have been used.
 - (BOOL)hasActiveSubscriptionOrSpeedBoost;
