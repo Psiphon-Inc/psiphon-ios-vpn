@@ -89,8 +89,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (NSString *)inactiveSubscriptionBannerSubtitle;
 
-+ (NSString *)manageYourSubscriptionButtonTitle;
-
 + (NSString *)iDontSeeMySubscriptionButtonTitle;
 
 + (NSString *)subscriptionScreenNoticeText;
