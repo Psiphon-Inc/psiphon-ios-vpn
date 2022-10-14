@@ -85,9 +85,6 @@
 /* Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
 "DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "部分网络流量可能并不支持免费版本的Psiphon。购买订阅或者加速可以解锁赛风的全部潜力。";
 
-/* Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
-"DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "部分网络流量可能并不支持免费版本的Psiphon。购买订阅或者加速可以解锁赛风的全部潜力。";
-
 /* Appears in the notification area when Psiphon disallows some non-web internet traffic. The user needs to purchase Speed Boost or subscription in order to full app compatibilty and more speed. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "DISALLOWED_TRAFFIC_NOTIFICATION_BODY_V2" = "程序无法运行？激活加速或者购买订阅从而解锁赛风体验的全部潜能。";
 
@@ -631,11 +628,20 @@
 /* Alert message informing user that a Psiphon connection is required */
 "PSIPHON_CONNECTION_REQUIRED" = "需要连接至赛风";
 
+/* Do not translate or transliterate 'Psiphon'. Body of an alert that is shown to the user when they connect from a region where free service is no longer offered, asking the user to subscribe. */
+"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_BODY" = "Help keep Psiphon free for those who need it most! Subscribe now.";
+
+/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. An alert with this title is shown when the user connects from a region where free service is no longer offered, asking the user to subscribe. */
+"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_TITLE" = "Psiphon is no longer free in your region";
+
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "未连接至Psiphon";
 
 /*[UNTRANSLATED] Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_MUST_BE_CONNECTED_INFO" = "Psiphon must be connected to show this content";
+
+/* Do not translate or transliterate 'Psiphon'. Text of notification shown when a subscription is required to continue using the servive. */
+"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE" = "Please purchase a subscription to continue using Psiphon.";
 
 /* Alert message that the users purchases have been restored successfully */
 "PURCHASES_RESTORED_SUCCESSFULLY" = "购买成功恢复";
@@ -792,6 +798,9 @@
 
 /* Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
 "UPGRADE_PSIPHON" = "升级赛风";
+
+/* Title of button that disconnects the VPN. */
+"VPN_DISCONNECT_BUTTON_TITLE" = "中断连接";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "连接赛风时一个错误出现。\n请再次尝试连接。";
