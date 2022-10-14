@@ -78,6 +78,7 @@ enum MainViewAction {
     // Purchase required prompt
     enum PurchaseRequiredTapAction {
         case subscribeTapped
+        case speedBoostTapped
         case disconnectTapped
     }
     case presentPurchaseRequiredPrompt
@@ -715,7 +716,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         
         // Prompt is presented if the user is not (subscribed or speed-boosted)
         // and is connected (or connecting).
-        guard DisallowedTrafficPrompt.canPresent(
+        guard NEEvent.canPresentDisallowedTrafficPrompt(
             dateCompare: environment.dateCompare,
             psiCashState: state.psiCashState,
             subscriptionStatus: state.subscriptionState.status,
@@ -779,7 +780,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         
         // Prompt is presented if the user is not (subscribed or speed-boosted)
         // and is connected (or connecting).
-        guard PurchaseRequiredPrompt.canPresent(
+        guard NEEvent.canPresentPurchaseRequiredPrompt(
             dateCompare: environment.dateCompare,
             psiCashState: state.psiCashState,
             subscriptionStatus: state.subscriptionState.status,
@@ -797,9 +798,12 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                 let vc = ViewBuilderViewController(
                     modalPresentationStyle: .overFullScreen,
                     modalTransitionStyle: .crossDissolve,
-                    viewBuilder: SubscriptionPurchaseRequiredPrompt(
+                    viewBuilder: PurchaseRequiredPrompt(
                         subscribeButtonHandler: { [observer] in
                             observer.send(value: .purchaseRequiredPromptButton(.subscribeTapped))
+                        },
+                        speedBoostButtonHandler: { [observer] in
+                            observer.send(value: .purchaseRequiredPromptButton(.speedBoostTapped))
                         },
                         disconnectButtonHandler: { [observer] in
                             observer.send(value: .purchaseRequiredPromptButton(.disconnectTapped))
@@ -828,7 +832,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         let dismissEffect = Effect<Never>.fireAndForget {
             let topVC = environment.getTopActiveViewController()
             let searchResult = topVC.traversePresentingStackFor(
-                type: ViewBuilderViewController<SubscriptionPurchaseRequiredPrompt>.self,
+                type: ViewBuilderViewController<PurchaseRequiredPrompt>.self,
                 searchChildren: true
             )
             
@@ -846,6 +850,10 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         case .subscribeTapped:
             return [
                 Effect(value: .presentSubscriptionScreen)
+            ] + dismissEffect.mapNever()
+        case .speedBoostTapped:
+            return[
+                Effect(value: .presentPsiCashStore(initialTab: .speedBoost, animated: true))
             ] + dismissEffect.mapNever()
         case .disconnectTapped:
             return [

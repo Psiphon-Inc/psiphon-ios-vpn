@@ -749,8 +749,30 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             return;
         }
         
-        BOOL subscriptionRejected = [strongSelf->authorizationStore
+        NSSet<Authorization *> *rejectedAuths = [strongSelf->authorizationStore
                                      setActiveAuthorizations:authorizationIds];
+        
+        BOOL subscriptionRejected = FALSE;
+        BOOL speedBoostRejected = FALSE;
+        
+        for (Authorization* rejectedAuth in rejectedAuths) {
+            
+            if ([rejectedAuth accessTypeValue] == AuthorizationAccessTypeAppleSubscription ||
+                [rejectedAuth accessTypeValue] == AuthorizationAccessTypeAppleSubscriptionTest) {
+                subscriptionRejected = TRUE;
+            }
+            
+            if ([rejectedAuth accessTypeValue] == AuthorizationAccessTypeSpeedBoost ||
+                [rejectedAuth accessTypeValue] == AuthorizationAccessTypeSpeedBoostTest) {
+                speedBoostRejected = TRUE;
+            }
+
+        }
+        // If self.reasserting is true and an authorization was rejected,
+        // we will assume that tunnel reconnected due to expired authorization.
+        if ((speedBoostRejected || subscriptionRejected) && self.reasserting) {
+            [self.sharedDB incrementVPNSessionNumber];
+        }
         
         // Displays an alert to the user for the expired subscription,
         // only if the container is in background.
@@ -788,8 +810,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         if (params.showRequiredPurchasePrompt == TRUE && ![self hasUserMadePurchase]) {
             [[LocalNotificationService shared] requestPurchaseRequiredPrompt];
         }
-        
-        [self->staging_applicationParameters removeAllObjects];
         
         [AppProfiler logMemoryReportWithTag:@"onConnected"];
         [[Notifier sharedInstance] post:NotifierTunnelConnected];
