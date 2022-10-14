@@ -175,14 +175,6 @@
     return NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_PAGE_BANNER_SUBTITLE", nil, [NSBundle mainBundle], @"No commitment, cancel anytime.", @"Subtitle of the banner on the subscriptions page informing the user that the subscriptions require no commitment, and can be cancelled anytime");
 }
 
-+ (NSString *)manageYourSubscriptionButtonTitle {
-    return NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_PAGE_MANAGE_SUBSCRIPTION_BUTTON",
-    nil,
-    [NSBundle mainBundle],
-    @"Manage your subscription",
-                                             @"Title of the button on the subscriptions page which takes the user of of the app to iTunes where they can view detailed information about their subscription");
-}
-
 + (NSString *)iDontSeeMySubscriptionButtonTitle {
     return NSLocalizedStringWithDefaultValue(@"SUBSCRIPTIONS_PAGE_RESTORE_SUBSCRIPTION_BUTTON",
     nil,
