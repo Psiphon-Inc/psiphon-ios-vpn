@@ -798,7 +798,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         // Persists ApplicationParameters staging dictionary.
         [self.sharedDB setApplicationParametersChangeTimestamp:[NSDate date]];
         self->staging_applicationParameters[ApplicationParamKeyVPNSessionNumber] =
-        [NSNumber numberWithInteger:[self.sharedDB getVPNSessionNumber]];
+            [NSNumber numberWithInteger:[self.sharedDB getVPNSessionNumber]];
         [self.sharedDB setApplicationParameters:self->staging_applicationParameters];
         
         // Notifies host app that persisted application parameters has been updated.
@@ -851,16 +851,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     });
 }
 
-- (void)onApplicationParameter:(NSString * _Nonnull)key :(id)value {
+- (void)onApplicationParameters:(NSDictionary *_Nonnull)parameters {
     dispatch_async(self->workQueue, ^{
-        if ([key isEqualToString:ApplicationParamKeyShowRequiredPurchasePrompt] &&
-            [value isKindOfClass:[NSNumber class]])
-        {
-            // Store key-value in staging area.
-            self->staging_applicationParameters[key] = value;
-        } else {
-            [PsiFeedbackLogger error:@"Expected bool for ApplicationParameter key 'ShowPurchaseRequiredPrompt'"];
-        }
+        // Copies the parameters to the staging dictionary.
+        [self->staging_applicationParameters setDictionary:parameters];
     });
 }
 
