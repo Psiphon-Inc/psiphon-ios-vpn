@@ -216,7 +216,7 @@ PsiFeedbackLogType const AuthorizationStoreLogType = @"AuthorizationStore";
     
 }
 
-- (BOOL)setActiveAuthorizations:(NSArray<NSString *> *_Nonnull)activeAuthorizationIds {
+- (NSSet<Authorization *> *)setActiveAuthorizations:(NSArray<NSString *> *_Nonnull)activeAuthorizationIds {
     
     @synchronized (self) {
         
@@ -227,21 +227,22 @@ PsiFeedbackLogType const AuthorizationStoreLogType = @"AuthorizationStore";
         NSManagedObjectContext *context = [self getManagedObjectContext];
         
         if (context == nil) {
-            return FALSE;
+            return [NSSet set];
         }
         
-        // This flag indicates if one of the rejected authorization was an
-        // apple-subscription authorization.
-        __block BOOL subscriptionRejected = FALSE;
+        // Set of rejected authorization that will be returned from this method.
+        __block NSMutableSet<Authorization *> *rejectedAuths = [NSMutableSet set];
         
         [context performBlockAndWait:^{
             
             NSMutableArray<NSString *> *rejectedAuthIDs = [NSMutableArray array];
             
-            // If an authorization has not been rejected, it is expected
+            // If an authorization has not been rejected by the server, it is expected
             // for activeAuthorizationIds array to contain it's ID.
             for (Authorization *auth in [selectedAuthorizations allValues]) {
                 if ([activeAuthorizationIds containsObject:auth.ID] == FALSE) {
+                    
+                    [rejectedAuths addObject:auth];
                     [rejectedAuthIDs addObject:auth.ID];
                     // Authorization is removed from selectedAuthorizations dictionary.
                     // This ensures the next call to -getNewAuthorizations does not return
@@ -276,13 +277,9 @@ PsiFeedbackLogType const AuthorizationStoreLogType = @"AuthorizationStore";
                 return;
             }
             
-            // Sets value of "psiphondRejected" field to true.
+            // Updates persisted "psiphondRejected" field for the rejected authorizations.
             for (SharedAuthorization *obj in fetchResult) {
                 obj.psiphondRejected = TRUE;
-                if (obj.accessTypeValue == AuthorizationAccessTypeAppleSubscription ||
-                    obj.accessTypeValue == AuthorizationAccessTypeAppleSubscriptionTest) {
-                    subscriptionRejected = TRUE;
-                }
             }
             
             // Saves any changes that have been made.
@@ -298,7 +295,7 @@ PsiFeedbackLogType const AuthorizationStoreLogType = @"AuthorizationStore";
             
         }];
         
-        return subscriptionRejected;
+        return rejectedAuths;
         
     }
     

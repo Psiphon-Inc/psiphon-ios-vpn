@@ -22,11 +22,11 @@ import PsiApi
 import AppStoreIAP
 import PsiCashClient
 
-enum PurchaseRequiredPrompt {
+enum NEEvent {
     
     /// Predicate for whether a required purchase prompt can be presented if
     /// `"ShowPurchaseRequiredPrompt": true` value was received from Psiphon server.
-    static func canPresent(
+    static func canPresentPurchaseRequiredPrompt(
         dateCompare: DateCompare,
         psiCashState: PsiCashState,
         subscriptionStatus: SubscriptionStatus,
@@ -38,13 +38,9 @@ enum PurchaseRequiredPrompt {
                (tunnelConnectedStatus == .connected || tunnelConnectedStatus == .connecting)
     }
     
-}
-
-enum DisallowedTrafficPrompt {
-    
     /// Predicate for whether a disallowed-traffic prompt can be presented if
     /// `"disallowed-traffic"` server alert was received from Psiphon server.
-    static func canPresent(
+    static func canPresentDisallowedTrafficPrompt(
         dateCompare: DateCompare,
         psiCashState: PsiCashState,
         subscriptionStatus: SubscriptionStatus,

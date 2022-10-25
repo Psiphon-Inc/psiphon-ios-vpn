@@ -749,8 +749,30 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             return;
         }
         
-        BOOL subscriptionRejected = [strongSelf->authorizationStore
+        NSSet<Authorization *> *rejectedAuths = [strongSelf->authorizationStore
                                      setActiveAuthorizations:authorizationIds];
+        
+        BOOL subscriptionRejected = FALSE;
+        BOOL speedBoostRejected = FALSE;
+        
+        for (Authorization* rejectedAuth in rejectedAuths) {
+            
+            if ([rejectedAuth accessTypeValue] == AuthorizationAccessTypeAppleSubscription ||
+                [rejectedAuth accessTypeValue] == AuthorizationAccessTypeAppleSubscriptionTest) {
+                subscriptionRejected = TRUE;
+            }
+            
+            if ([rejectedAuth accessTypeValue] == AuthorizationAccessTypeSpeedBoost ||
+                [rejectedAuth accessTypeValue] == AuthorizationAccessTypeSpeedBoostTest) {
+                speedBoostRejected = TRUE;
+            }
+
+        }
+        // If self.reasserting is true and an authorization was rejected,
+        // we will assume that tunnel reconnected due to expired authorization.
+        if ((speedBoostRejected || subscriptionRejected) && self.reasserting) {
+            [self.sharedDB incrementVPNSessionNumber];
+        }
         
         // Displays an alert to the user for the expired subscription,
         // only if the container is in background.
@@ -776,7 +798,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         // Persists ApplicationParameters staging dictionary.
         [self.sharedDB setApplicationParametersChangeTimestamp:[NSDate date]];
         self->staging_applicationParameters[ApplicationParamKeyVPNSessionNumber] =
-        [NSNumber numberWithInteger:[self.sharedDB getVPNSessionNumber]];
+            [NSNumber numberWithInteger:[self.sharedDB getVPNSessionNumber]];
         [self.sharedDB setApplicationParameters:self->staging_applicationParameters];
         
         // Notifies host app that persisted application parameters has been updated.
@@ -788,8 +810,6 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         if (params.showRequiredPurchasePrompt == TRUE && ![self hasUserMadePurchase]) {
             [[LocalNotificationService shared] requestPurchaseRequiredPrompt];
         }
-        
-        [self->staging_applicationParameters removeAllObjects];
         
         [AppProfiler logMemoryReportWithTag:@"onConnected"];
         [[Notifier sharedInstance] post:NotifierTunnelConnected];
@@ -831,16 +851,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     });
 }
 
-- (void)onApplicationParameter:(NSString * _Nonnull)key :(id)value {
+- (void)onApplicationParameters:(NSDictionary *_Nonnull)parameters {
     dispatch_async(self->workQueue, ^{
-        if ([key isEqualToString:ApplicationParamKeyShowRequiredPurchasePrompt] &&
-            [value isKindOfClass:[NSNumber class]])
-        {
-            // Store key-value in staging area.
-            self->staging_applicationParameters[key] = value;
-        } else {
-            [PsiFeedbackLogger error:@"Expected bool for ApplicationParameter key 'ShowPurchaseRequiredPrompt'"];
-        }
+        // Copies the parameters to the staging dictionary.
+        [self->staging_applicationParameters setDictionary:parameters];
     });
 }
 

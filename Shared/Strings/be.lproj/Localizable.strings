@@ -35,7 +35,7 @@
 "BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "A subscription is auto-renewable which means that once purchased it will be automatically renewed until you cancel it 24 hours prior to the end of the current period.\n\nYour iTunes Account will be charged for renewal within 24-hours prior to the end of the current period with the cost of the subscription.";
 
 /* Title for a button that cancels an action. This should be generic enough to make sense whenever a cancel button is used. */
-"CANCEL_BUTTON_TITLE" = "Адмена";
+"CANCEL_BUTTON_TITLE" = "Скасаваць";
 
 /*[UNTRANSLATED] Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
 "CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "You don't have an active subscription.\nSince you're not a subscriber or your subscription has expired, Psiphon can only be started from the Psiphon app.\n\nPlease open the Psiphon app to start.";
@@ -73,8 +73,8 @@
 /*[UNTRANSLATED] Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
 "CREATE_PSICASH_ACCOUNT_BODY_2" = "We strongly encourage you to make a PsiCash account before buying PsiCash. Having an account allows you to share your balance between devices and protect your purchases.\n\nIMPORTANT: Without an account your PsiCash will not be preserved if you uninstall Psiphon.";
 
-/*[UNTRANSLATED] Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will continue on to the PsiCash store. */
-"CREATE_PSICASH_ACCOUNT_CONTINUE_BUTTON" = "Continue without account";
+/* Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will continue on to the PsiCash store. */
+"CREATE_PSICASH_ACCOUNT_CONTINUE_BUTTON" = "Працягнуць без уліковага запісу";
 
 /*[UNTRANSLATED] Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will be taken to a screen where they can create an account or log into an existing one. */
 "CREATE_PSICASH_ACCOUNT_CREATE_BUTTON" = "Create or log into account";
@@ -84,9 +84,6 @@
 
 /*[UNTRANSLATED] Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
 "DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
-
-/*[UNTRANSLATED] Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
-"DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
 
 /*[UNTRANSLATED] Appears in the notification area when Psiphon disallows some non-web internet traffic. The user needs to purchase Speed Boost or subscription in order to full app compatibilty and more speed. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "DISALLOWED_TRAFFIC_NOTIFICATION_BODY_V2" = "Apps not working? Activate Speed Boost or purchase subscription to unlock the full potential of your Psiphon experience.";
@@ -631,11 +628,20 @@
 /*[UNTRANSLATED] Alert message informing user that a Psiphon connection is required */
 "PSIPHON_CONNECTION_REQUIRED" = "Psiphon Connection Required";
 
+/* Do not translate or transliterate 'Psiphon'. Body of an alert that is shown to the user when they connect from a region where free service is no longer offered, asking the user to subscribe. */
+"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_BODY" = "Help keep Psiphon free for those who need it most! Subscribe now.";
+
+/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. An alert with this title is shown when the user connects from a region where free service is no longer offered, asking the user to subscribe. */
+"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_TITLE" = "Psiphon is no longer free in your region";
+
 /*[UNTRANSLATED] Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon is not connected";
 
 /*[UNTRANSLATED] Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_MUST_BE_CONNECTED_INFO" = "Psiphon must be connected to show this content";
+
+/* Do not translate or transliterate 'Psiphon'. Text of notification shown when a subscription is required to continue using the servive. */
+"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE" = "Please purchase a subscription to continue using Psiphon.";
 
 /*[UNTRANSLATED] Alert message that the users purchases have been restored successfully */
 "PURCHASES_RESTORED_SUCCESSFULLY" = "Purchases restored successfully";
@@ -694,8 +700,8 @@
 /*[UNTRANSLATED] Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST" = "Speed Boost";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 1 hour of Speed Boost. Translate number as well. */
-"SPEED_BOOST_1HR" = "1 hour";
+/* Label on a button. Clicking this button will buy 1 hour of Speed Boost. Translate number as well. */
+"SPEED_BOOST_1HR" = "1 гадзіна";
 
 /*[UNTRANSLATED] Label on a button. Clicking this button will buy 2 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_2HR" = "2 hours";
@@ -769,7 +775,7 @@
 /*[UNTRANSLATED] Title of the banner on the subscriptions page advertising that subscriptions enable no ads and maximum speed. */
 "SUBSCRIPTIONS_PAGE_BANNER_TITLE_2" = "No ads and maximum speed.";
 
-/*[UNTRANSLATED] Title of the button on the subscriptions page which takes the user of of the app to iTunes where they can view detailed information about their subscription */
+/* Title of the button on the subscriptions page which takes the user of of the app to iTunes where they can view detailed information about their subscription */
 "SUBSCRIPTIONS_PAGE_MANAGE_SUBSCRIPTION_BUTTON" = "Manage your subscription";
 
 /*[UNTRANSLATED] Title of the button on the subscriptions page which, when pressed, navigates the user to the page where they can restore their existing subscription */
@@ -792,6 +798,9 @@
 
 /*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
 "UPGRADE_PSIPHON" = "Upgrade Psiphon";
+
+/* Title of button that disconnects the VPN. */
+"VPN_DISCONNECT_BUTTON_TITLE" = "Адлучыць";
 
 /*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "An error occurred while starting Psiphon. Please try again.";
