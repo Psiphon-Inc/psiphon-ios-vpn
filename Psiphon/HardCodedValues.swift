@@ -28,7 +28,3 @@ enum PsiCashHardCodedValues {
     static let accountsLearnMoreURL = URL(string: "https://psiphon.ca/faq.html#psicash-account")!
     
 }
-
-// The official way to open subscription management screen.
-// https://developer.apple.com/videos/play/wwdc2018/705/
-let appleSubscriptionsManagementURL = URL(string: "https://apps.apple.com/account/subscriptions")!

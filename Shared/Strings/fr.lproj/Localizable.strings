@@ -85,9 +85,6 @@
 /* Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
 "DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "Une partie du trafic Internet n’est pas prise en charge par la version gratuite de Psiphon. Achetez un abonnement ou de la Survitesse afin de libérer le plein potentiel de votre expérience Psiphon.";
 
-/* Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
-"DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "Une partie du trafic Internet n’est pas prise en charge par la version gratuite de Psiphon. Achetez un abonnement ou de la Survitesse afin de libérer le plein potentiel de votre expérience Psiphon.";
-
 /* Appears in the notification area when Psiphon disallows some non-web internet traffic. The user needs to purchase Speed Boost or subscription in order to full app compatibilty and more speed. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "DISALLOWED_TRAFFIC_NOTIFICATION_BODY_V2" = "L’appli ne fonctionne-t-elle pas? Activez la Survitesse ou achetez un abonnement afin de libérer le plein potentiel de votre expérience Psiphon.";
 
@@ -265,8 +262,8 @@
 /* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
 "ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "Vous devrez autoriser Psiphon à ajouter des configurations de RPV afin de se connecter.";
 
-/*[UNTRANSLATED] Title of a button that open a URL on the device's web browser. */
-"OPEN_IN_BROWSER_BUTTON_TITLE" = "Open in Browser";
+/* Title of a button that open a URL on the device's web browser. */
+"OPEN_IN_BROWSER_BUTTON_TITLE" = "Ouvrir dans le navigateur";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Veuillez ouvrir l’appli Psiphon pour finir de vous connecter.";
@@ -631,11 +628,20 @@
 /* Alert message informing user that a Psiphon connection is required */
 "PSIPHON_CONNECTION_REQUIRED" = "La connexion à Psiphon est exigée";
 
+/* Do not translate or transliterate 'Psiphon'. Body of an alert that is shown to the user when they connect from a region where free service is no longer offered, asking the user to subscribe. */
+"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_BODY" = "Aidez à garder Psiphon gratuit pour ceux qui en ont le plus besoin. Abonnez-vous maintenant.";
+
+/* Do not translate or transliterate 'Psiphon'. An alert with this title is shown when the user connects from a region where free service is no longer offered, asking the user to subscribe. */
+"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_TITLE" = "Psiphon n’est plus gratuit dans votre région";
+
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon n’est pas connecté";
 
-/*[UNTRANSLATED] Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
-"PSIPHON_MUST_BE_CONNECTED_INFO" = "Psiphon must be connected to show this content";
+/* Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
+"PSIPHON_MUST_BE_CONNECTED_INFO" = "Pour afficher ce contenu, Psiphon doit être connecté";
+
+/* Do not translate or transliterate 'Psiphon'. Text of notification shown when a subscription is required to continue using the servive. */
+"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE" = "Please purchase a subscription to continue using Psiphon.";
 
 /* Alert message that the users purchases have been restored successfully */
 "PURCHASES_RESTORED_SUCCESSFULLY" = "Les achats ont été restaurées avec succès";
@@ -792,6 +798,9 @@
 
 /* Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
 "UPGRADE_PSIPHON" = "Surclasser Psiphon";
+
+/* Title of button that disconnects the VPN. */
+"VPN_DISCONNECT_BUTTON_TITLE" = "Se déconnecter";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "Une erreur est survenue lors du démarrage de Psiphon. Veuillez réessayer.";

@@ -85,9 +85,6 @@
 /* Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
 "DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "Psiphon uygulamasının ücretsiz sürümünde bazı İnternet trafiği türleri desteklenmez. Psiphon deneyimini tam olarak yaşamak için bir abonelik veya Hız Artışı satın alın.";
 
-/* Alert dialog which is shown to the user when if unsupported Internet traffic has been requested */
-"DISALLOWED_TRAFFIC_EXTENSION_ALERT" = "Psiphon uygulamasının ücretsiz sürümünde bazı İnternet trafiği türleri desteklenmez. Psiphon deneyimini tam olarak yaşamak için bir abonelik veya Hız Artışı satın alın.";
-
 /* Appears in the notification area when Psiphon disallows some non-web internet traffic. The user needs to purchase Speed Boost or subscription in order to full app compatibilty and more speed. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "DISALLOWED_TRAFFIC_NOTIFICATION_BODY_V2" = "Uygulamalar çalışmıyor mu? Psiphon deneyimini tam olarak yaşamak için PsiCash kullanarak Speed Boost özelliğini etkinleştirin.";
 
@@ -578,7 +575,7 @@
 "PSICASH_LOGIN_FAILED_TITLE" = "PsiCash oturumu açılamadı";
 
 /* Body text of a modal dialog shown when a PsiCash account login fails due to a server error. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_LOGIN_SERVER_ERROR_BODY" = "Oturum açılmaya çalışılırken PsiCash sunucusundan bir hata yanıtı alındı. Lütfen bir süre sonra yeniden deneyin.";
+"PSICASH_LOGIN_SERVER_ERROR_BODY" = "Oturum açılmaya çalışılırken PsiCash sunucusundan bir sorun bildirimi alındı. Lütfen bir süre sonra yeniden deneyin.";
 
 /* Title of modal dialog shown when the PsiCash account login attempt succeeds, if additional information needs to be conveyed. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_LOGIN_SUCCESS_TITLE" = "PsiCash oturumu açıldı";
@@ -599,7 +596,7 @@
 "PSICASH_SPEED_PORT_LIMITS_BODY" = "Speed Boost etkinleştirilmediğinde hızınız sınırlı olur ve bazı İnternet trafiği türlerini de kullanamazsınız. Psiphon deneyimini tam olarak yaşamak için PsiCash kullanarak Speed Boost özelliğini etkinleştirin.";
 
 /* Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. Port here refers to port in computer networking. */
-"PSICASH_SPEED_PORT_LIMITS_HEAD" = "Hız ve kapı kısıtlamaları";
+"PSICASH_SPEED_PORT_LIMITS_HEAD" = "Hız ve bağlantı noktası kısıtlamaları";
 
 /* A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon */
 "PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY" = "Psiphon aboneliğiniz size sürekli Speed Boost kullanımı sağlıyor. Bu yüzden daha fazlasını satın almanıza gerek yok. Aboneliğinizi sonlandırmak isteyebilirsiniz diye PsiCash birikiminiz korunacak.\n\nPsiCash hesabınıza ayarlar menüsünden ulaşabilirsiniz.";
@@ -631,11 +628,20 @@
 /* Alert message informing user that a Psiphon connection is required */
 "PSIPHON_CONNECTION_REQUIRED" = "Psiphon bağlantısı gerekli";
 
+/* Do not translate or transliterate 'Psiphon'. Body of an alert that is shown to the user when they connect from a region where free service is no longer offered, asking the user to subscribe. */
+"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_BODY" = "Abone olarak Psiphon uygulamasının en çok ihtiyaç duyanlar için özgür ve ücretsiz kalmasına yardımcı olun.";
+
+/* Do not translate or transliterate 'Psiphon'. An alert with this title is shown when the user connects from a region where free service is no longer offered, asking the user to subscribe. */
+"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_TITLE" = "Psiphon artık bölgenizde ücretsiz olarak sunulmuyor";
+
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon bağlantısı yok";
 
 /* Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_MUST_BE_CONNECTED_INFO" = "Bu içeriğin görüntülenebilmesi için Psiphon bağlı olmalıdır";
+
+/* Do not translate or transliterate 'Psiphon'. Text of notification shown when a subscription is required to continue using the servive. */
+"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE" = "Lütfen Psiphon kullanmayı sürdürmek için bir abonelik satın alın.";
 
 /* Alert message that the users purchases have been restored successfully */
 "PURCHASES_RESTORED_SUCCESSFULLY" = "Satın almalarınız geri yüklendi";
@@ -792,6 +798,9 @@
 
 /* Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
 "UPGRADE_PSIPHON" = "Psiphon uygulamasını yükseltin";
+
+/* Title of button that disconnects the VPN. */
+"VPN_DISCONNECT_BUTTON_TITLE" = "Bağlantıyı kes";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "Psiphon başlatılırken bir sorun çıktı. Lütfen yeniden deneyin.";

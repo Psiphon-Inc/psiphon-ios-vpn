@@ -315,10 +315,11 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
         return 0;
     }
 
-    NSInteger numRows = 2;  // Start count with number of rows that are always visible.
+    NSInteger numRows = 1;  // Start count with number of rows that are always visible.
 
     if (!self.hasActiveSubscription) {
         numRows += [self.storeProducts count];
+        numRows += 1;  // Restore subscription button
     }
 
     return numRows;
@@ -530,59 +531,35 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
     return button;
 }
 
-// Helper method that creates views to add to manage subscription cell.
-- (void)createManageSubscriptionCellContent:(UITableViewCell *)cell {
+// Adds the restore subscription button to the given UITableViewCell.
+- (void)addRestoreSubscriptionButton:(UITableViewCell *)cell {
 
     cell.backgroundColor = UIColor.clearColor;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
 
-    // "Manage your subscription" button if user is subscribed
-    if (self.hasActiveSubscription) {
-        RoyalSkyButton *manageSubsButton = [[RoyalSkyButton alloc] initForAutoLayout];
-        [manageSubsButton setFontSize:16.0];
-        [manageSubsButton setTitle:Strings.manageYourSubscriptionButtonTitle];
-        [manageSubsButton addTarget:self action:@selector(onManageSubscriptionTap) forControlEvents:UIControlEventTouchUpInside];
-        [cell.contentView addSubview:manageSubsButton];
-        
-        // "Manage your subscription" button constraints
-        manageSubsButton.translatesAutoresizingMaskIntoConstraints = FALSE;
-        [NSLayoutConstraint activateConstraints:@[
-            [manageSubsButton.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor
-                                                       constant:16.0],
-            [manageSubsButton.centerXAnchor constraintEqualToAnchor:cell.contentView.centerXAnchor],
-            [manageSubsButton.heightAnchor constraintEqualToConstant:50],
-            [manageSubsButton.widthAnchor constraintEqualToAnchor:cell.contentView.widthAnchor
-                                                       multiplier:CellContentWithMultiplier],
-        ]];
-        
-        // Pins manageSubsButton to cell's bottom, since restoreSubsButton will no longer be displayed.
-        [manageSubsButton.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor
-                                                      constant:-16.f].active = TRUE;
-    } else {
     // Restore subscription button is added if there is no active subscription.
-        UIButton *restoreSubsButton = [UIButton buttonWithType:UIButtonTypeSystem];
-        [restoreSubsButton setTitle:Strings.iDontSeeMySubscriptionButtonTitle
-                           forState:UIControlStateNormal];
-        [restoreSubsButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
-        restoreSubsButton.titleLabel.font = [UIFont avenirNextDemiBold:16.f];
-        [restoreSubsButton addTarget:self action:@selector(onSubscriptionHelpTap) forControlEvents:UIControlEventTouchUpInside];
-        [cell.contentView addSubview:restoreSubsButton];
+    UIButton *restoreSubsButton = [UIButton buttonWithType:UIButtonTypeSystem];
+    [restoreSubsButton setTitle:Strings.iDontSeeMySubscriptionButtonTitle
+                       forState:UIControlStateNormal];
+    [restoreSubsButton setTitleColor:UIColor.whiteColor forState:UIControlStateNormal];
+    restoreSubsButton.titleLabel.font = [UIFont avenirNextDemiBold:16.f];
+    [restoreSubsButton addTarget:self action:@selector(onSubscriptionHelpTap) forControlEvents:UIControlEventTouchUpInside];
+    [cell.contentView addSubview:restoreSubsButton];
 
-        // Restore subscription button constraints
-        restoreSubsButton.translatesAutoresizingMaskIntoConstraints = FALSE;
+    // Restore subscription button constraints
+    restoreSubsButton.translatesAutoresizingMaskIntoConstraints = FALSE;
 
-        [NSLayoutConstraint activateConstraints:@[
-            [restoreSubsButton.centerXAnchor constraintEqualToAnchor:cell.contentView.centerXAnchor],
-            [restoreSubsButton.heightAnchor constraintEqualToConstant:30],
-            [restoreSubsButton.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor
-                                                        constant:16.0],
-            [restoreSubsButton.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor
-                                                           constant:-16.f],
-            [restoreSubsButton.widthAnchor constraintEqualToAnchor:cell.contentView.widthAnchor
-                                                        multiplier:CellContentWithMultiplier],
-        ]];
+    [NSLayoutConstraint activateConstraints:@[
+        [restoreSubsButton.centerXAnchor constraintEqualToAnchor:cell.contentView.centerXAnchor],
+        [restoreSubsButton.heightAnchor constraintEqualToConstant:30],
+        [restoreSubsButton.topAnchor constraintEqualToAnchor:cell.contentView.topAnchor
+                                                    constant:16.0],
+        [restoreSubsButton.bottomAnchor constraintEqualToAnchor:cell.contentView.bottomAnchor
+                                                       constant:-16.f],
+        [restoreSubsButton.widthAnchor constraintEqualToAnchor:cell.contentView.widthAnchor
+                                                    multiplier:CellContentWithMultiplier],
+    ]];
 
-    }
 }
 
 // Helper method that create subscription detail text
@@ -616,15 +593,15 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-
+    
     NSInteger numRows = [tableView numberOfRowsInSection:0];
 
-    // If index is at the third last row, adds the "Manage subscription" button.
-    if (indexPath.row == numRows - 2) {
+    // If index is at the third last row and not subscribed, adds the restore subscription button.
+    if (indexPath.row == numRows - 2 && !self.hasActiveSubscription) {
 
         // Manage subscription cell (contains manage subscription and subscription restore buttons).
         UITableViewCell *cell = [[UITableViewCell alloc] init];
-        [self createManageSubscriptionCellContent:cell];
+        [self addRestoreSubscriptionButton:cell];
         return cell;
     }
 
@@ -635,8 +612,8 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
         return cell;
     }
 
-    UITableViewCell *cell = [[UITableViewCell alloc] init];
     if (!self.hasActiveSubscription) {
+        UITableViewCell *cell = [[UITableViewCell alloc] init];
         
         SKProduct *product = self.storeProducts[indexPath.row];
 
@@ -662,9 +639,12 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
                                              multiplier:CellContentWithMultiplier],
         ]];
 
+        return cell;
     }
+    
+    NSAssert(false, @"unreachable");
+    return nil;
 
-    return cell;
 }
 
 #pragma mark - Footer
@@ -794,10 +774,6 @@ SKProductsRequestDelegate, SKPaymentTransactionObserver>
 - (void)openToS {
     NSURL *url = [NSURL URLWithString:NSLocalizedStringWithDefaultValue(@"LICENSE_PAGE_URL", nil, [PsiphonClientCommonLibraryHelpers commonLibraryBundle], @"https://psiphon.ca/en/license.html", "External link to the license page. Please update this with the correct language specific link (if available) e.g. https://psiphon.ca/fr/license.html for french.")];
     [SwiftDelegate.bridge openExternalURL:url];
-}
-
-- (void)onManageSubscriptionTap {
-    [SwiftDelegate.bridge openAppleSubscriptionMgmtURL];
 }
 
 - (void)onSubscriptionHelpTap {
