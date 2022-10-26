@@ -22,32 +22,46 @@
 NSString* ApplicationParamKeyVPNSessionNumber = @"VPNSessionNumber";
 NSString* ApplicationParamKeyShowRequiredPurchasePrompt = @"ShowPurchaseRequiredPrompt";
 
-@interface PNEApplicationParameters ()
-@property (readwrite, nonatomic) NSInteger vpnSessionNumber;
-@property (readwrite, nonatomic) BOOL showRequiredPurchasePrompt;
-@end
+@implementation PNEApplicationParameters {
+    // Values received directly form tunnel-core.
+    NSDictionary<NSString *, id> *values;
+}
 
-@implementation PNEApplicationParameters
++ (NSMutableDictionary *)getDefaultDictionary {
+    return [NSMutableDictionary dictionaryWithDictionary: @{
+        ApplicationParamKeyVPNSessionNumber: @0,
+        ApplicationParamKeyShowRequiredPurchasePrompt: @FALSE
+    }];
+}
 
-+ (instancetype)load:(NSDictionary<NSString *, id> *_Nonnull)params {
-    PNEApplicationParameters *instance = [[PNEApplicationParameters alloc] init];
-    
-    id vpnSessionNumber = params[ApplicationParamKeyVPNSessionNumber];
-    if ([vpnSessionNumber isKindOfClass:[NSNumber class]]) {
-        instance.vpnSessionNumber = [(NSNumber*)vpnSessionNumber integerValue];
-    } else {
-        instance.vpnSessionNumber = 0;
+- (instancetype)initDefaults {
+    self = [super init];
+    if (self) {
+        // Default values are defined here.
+        values = [PNEApplicationParameters getDefaultDictionary];
     }
-    
-    id showRequiredPurchasePrompt = params[ApplicationParamKeyShowRequiredPurchasePrompt];
-    if ([showRequiredPurchasePrompt isKindOfClass:[NSNumber class]]) {
-        instance.showRequiredPurchasePrompt = [(NSNumber*)showRequiredPurchasePrompt boolValue];
-    } else {
-        // Default value.
-        instance.showRequiredPurchasePrompt = FALSE;
+    return self;
+}
+
+- (instancetype)initWithDict:(NSDictionary<NSString *, id> *)values {
+    self = [super init];
+    if (self) {
+        NSMutableDictionary *dict = [PNEApplicationParameters getDefaultDictionary];
+        [dict addEntriesFromDictionary:values];
+        self->values = dict;
+        self->_vpnSessionNumber = [(NSNumber*)dict[ApplicationParamKeyVPNSessionNumber] integerValue];
     }
-    
-    return instance;
+    return self;
+}
+
+- (BOOL)showRequiredPurchasePrompt {
+    return [(NSNumber*)values[ApplicationParamKeyShowRequiredPurchasePrompt] boolValue];
+}
+
+- (NSDictionary<NSString *, id> *_Nonnull)asDictionary {
+    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary:values];
+    dict[ApplicationParamKeyVPNSessionNumber] = [NSNumber numberWithInteger:self.vpnSessionNumber];
+    return  dict;
 }
 
 @end

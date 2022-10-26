@@ -59,7 +59,7 @@
 }
 
 + (NSString *)purchaseRequiredNotificationMessage {
-    return NSLocalizedStringWithDefaultValue(@"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE_2", nil, [NSBundle mainBundle], @"Please purchase a subscription or Speed Boost to continue using Psiphon.", @"Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. Conform to translation under key 'SPEED_BOOST'. Text of notification shown when a subscription or Speed Boost purchase is required to continue using the servive.");
+    return NSLocalizedStringWithDefaultValue(@"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE_3", nil, [NSBundle mainBundle], @"Psiphon is no longer free in your region, open the app to learn more.", @"Do not translate or transliterate 'Psiphon'. Notification message shown to the user indicating that Psiphon's service is no longer free in theri region, and that should open the app to learn more.");
 }
 
 @end
