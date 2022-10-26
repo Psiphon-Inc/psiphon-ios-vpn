@@ -642,8 +642,8 @@
 /* Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_MUST_BE_CONNECTED_INFO" = "Psiphon must be connected to show this content";
 
-/* Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. Conform to translation under key 'SPEED_BOOST'. Text of notification shown when a subscription or Speed Boost purchase is required to continue using the servive. */
-"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE_2" = "Please purchase a subscription or Speed Boost to continue using Psiphon.";
+/* Do not translate or transliterate 'Psiphon'. Notification message shown to the user indicating that Psiphon's service is no longer free in theri region, and that should open the app to learn more. */
+"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE_3" = "Psiphon is no longer free in your region, open the app to learn more.";
 
 /* Alert message that the users purchases have been restored successfully */
 "PURCHASES_RESTORED_SUCCESSFULLY" = "Purchases restored successfully";

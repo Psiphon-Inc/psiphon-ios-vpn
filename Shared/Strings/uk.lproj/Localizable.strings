@@ -73,11 +73,11 @@
 /*[UNTRANSLATED] Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
 "CREATE_PSICASH_ACCOUNT_BODY_2" = "We strongly encourage you to make a PsiCash account before buying PsiCash. Having an account allows you to share your balance between devices and protect your purchases.\n\nIMPORTANT: Without an account your PsiCash will not be preserved if you uninstall Psiphon.";
 
-/*[UNTRANSLATED] Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will continue on to the PsiCash store. */
-"CREATE_PSICASH_ACCOUNT_CONTINUE_BUTTON" = "Continue without account";
+/* Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will continue on to the PsiCash store. */
+"CREATE_PSICASH_ACCOUNT_CONTINUE_BUTTON" = "Продовжити без облікового запису";
 
-/*[UNTRANSLATED] Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will be taken to a screen where they can create an account or log into an existing one. */
-"CREATE_PSICASH_ACCOUNT_CREATE_BUTTON" = "Create or log into account";
+/* Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will be taken to a screen where they can create an account or log into an existing one. */
+"CREATE_PSICASH_ACCOUNT_CREATE_BUTTON" = "Створіть або увійдіть в обліковий запис";
 
 /* Decline button title */
 "DECLINE_BUTTON_TITLE" = "Відхилити";
@@ -181,8 +181,8 @@
 /* Button title that lets users reset their password if they forgot their account's password. */
 "FORGOT_PASSWORD" = "Забули пароль?";
 
-/*[UNTRANSLATED] Button title that lets users reset their username or password if they forgot their account's username or password. */
-"FORGOT_USERNAME_OR_PASSWORD" = "Forgot your password or username?";
+/* Button title that lets users reset their username or password if they forgot their account's username or password. */
+"FORGOT_USERNAME_OR_PASSWORD" = "Забули свій пароль чи ім'я користувача?";
 
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "Безкоштовно";
@@ -193,8 +193,8 @@
 /*[UNTRANSLATED] Body of an error dialog asking the user to send Psiphon a report. Do not translate or transliterate 'Psiphon' */
 "HELP_IMPROVE_PSIPHON_BY_SENDING_REPORT" = "Help improve Psiphon by sending a report of this error.";
 
-/*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash login fails due to bad username or password. */
-"INCORRECT_USERNAME_OR_PASSWORD" = "The username or password entered was incorrect.";
+/* Body text of a modal dialog shown when a PsiCash login fails due to bad username or password. */
+"INCORRECT_USERNAME_OR_PASSWORD" = "Введено неправильне ім'я користувача або пароль.";
 
 /* User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
 "INSUFFICIENT_PSICASH_BALANCE" = "Недостатній баланс PsiCash";
@@ -220,8 +220,8 @@
 /*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
 "LOG_IN_OR_SIGNUP_TO_CONTINUE" = "Log in or create account to continue using PsiCash";
 
-/*[UNTRANSLATED] Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed. */
-"LOG_OUT_ANY_WAY_BUTTON_TITLE_2" = "Log out anyway";
+/* Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed. */
+"LOG_OUT_ANY_WAY_BUTTON_TITLE_2" = "Все одно вийти";
 
 /* Title of the button that lets users log out of their account */
 "LOG_OUT_BUTTON_TITLE_2" = "Вийти";
@@ -532,20 +532,20 @@
 /*[UNTRANSLATED] Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
 "PROTECT_YOUR_PURCHASES" = "Protect Your Purchases";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts. */
-"PSICASH_ACCOUNT" = "PsiCash Account";
+/* Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts. */
+"PSICASH_ACCOUNT" = "Обліковий запис PsiCash";
 
 /*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
 "PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "Are you sure you want to log out of your PsiCash account?";
 
-/*[UNTRANSLATED] An alert shown when the user logs out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_ACCOUNT_LOGOUT_COMPLETE_TITLE" = "PsiCash account logout complete.";
+/* An alert shown when the user logs out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNT_LOGOUT_COMPLETE_TITLE" = "Вихід із облікового запису PsiCash завершено.";
 
 /*[UNTRANSLATED] Body of modal dialog shown when the user attempts to log out of their PsiCash account and an unexpected error occurs. Please don't modify the link URL. */
 "PSICASH_ACCOUNT_LOGOUT_FAILED_BODY" = "You logout attempt failed unexpectedly. Please try restarting the application.";
 
-/*[UNTRANSLATED] Header of a modal dialog that appears when the user tries to log out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_ACCOUNT_LOGOUT_TITLE" = "PsiCash Account Logout";
+/* Header of a modal dialog that appears when the user tries to log out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNT_LOGOUT_TITLE" = "Вихід з облікового запису PsiCash";
 
 /*[UNTRANSLATED] Button title that opens 'PsiCash' account management. */
 "PSICASH_ACCOUNT_MANAGEMENT_2" = "Manage account";
@@ -556,8 +556,8 @@
 /*[UNTRANSLATED] An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "Your PsiCash login has expired. Please log back in.";
 
-/*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash login succeeds. There is a fixed number of times that a user can merge a pre-account balance into a PsiCash account. This message indicates that the user has hit that limit and the merge that occurred is the last one allowed. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_ACCOUNTS_LAST_MERGE_WARNING_BODY" = "You are logged into your PsiCash account. The preexisting balance from this device has been transferred into your account, but this is the last time a balance merge will occur.";
+/* Body text of a modal dialog shown when a PsiCash login succeeds. There is a fixed number of times that a user can merge a pre-account balance into a PsiCash account. This message indicates that the user has hit that limit and the merge that occurred is the last one allowed. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNTS_LAST_MERGE_WARNING_BODY" = "Ви увійшли у свій обліковий запис PsiCash. Попередній баланс із цього пристрою було переведено на ваш обліковий запис, але це останній раз, коли баланс буде об’єднано.";
 
 /*[UNTRANSLATED] PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
 "PSICASH_BALANCE" = "PsiCash Balance:";
@@ -568,23 +568,23 @@
 /*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash account login fails due to a 'bad request' error. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_LOGIN_BAD_REQUEST_ERROR_BODY" = "The PsiCash server indicated that the login request was invalid. Please try again later.";
 
-/*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash login fails without a specific reason. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_LOGIN_CATASTROPHIC_ERROR_BODY" = "Your PsiCash login attempt failed unexpectedly.";
+/* Body text of a modal dialog shown when a PsiCash login fails without a specific reason. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_CATASTROPHIC_ERROR_BODY" = "Ваша спроба входу в PsiCash неочікувано провалилася.";
 
-/*[UNTRANSLATED] Title of modal dialog shown when the PsiCash account login attempt fails for some reason. Text within the modal will explain why. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_LOGIN_FAILED_TITLE" = "PsiCash Login Failed";
+/* Title of modal dialog shown when the PsiCash account login attempt fails for some reason. Text within the modal will explain why. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_FAILED_TITLE" = "Помилка входу в PsiCash";
 
-/*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash account login fails due to a server error. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_LOGIN_SERVER_ERROR_BODY" = "The PsiCash server responded with an error while trying to log you in. Please try again later.";
+/* Body text of a modal dialog shown when a PsiCash account login fails due to a server error. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_SERVER_ERROR_BODY" = "Під час входу сервер PsiCash видав помилку. Спробуйте повторити пізніше.";
 
-/*[UNTRANSLATED] Title of modal dialog shown when the PsiCash account login attempt succeeds, if additional information needs to be conveyed. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_LOGIN_SUCCESS_TITLE" = "PsiCash Login Success";
+/* Title of modal dialog shown when the PsiCash account login attempt succeeds, if additional information needs to be conveyed. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_SUCCESS_TITLE" = "Успішний вхід у PsiCash";
 
-/*[UNTRANSLATED] Body of a modal dialog that appears when the user tries to log out of thier PsiCash account while not currently connected to the Psiphon network. We don't allow PsiCash network requests when not connected, so only an inferior localy-only logout is available. 'Psiphon' must not be translated/transliterated. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_LOGOUT_OFFLINE_BODY" = "Being connected to the Psiphon network enables a more secure PsiCash logout. Would you like to connect before logging out?";
+/* Body of a modal dialog that appears when the user tries to log out of thier PsiCash account while not currently connected to the Psiphon network. We don't allow PsiCash network requests when not connected, so only an inferior localy-only logout is available. 'Psiphon' must not be translated/transliterated. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGOUT_OFFLINE_BODY" = "Підключення до мережі Psiphon дає змогу безпечніше вийти з PsiCash. Бажаєте підключитися, перш ніж вийти?";
 
-/*[UNTRANSLATED] Body text of a modal dialog shown when the user tries to use (spend, buy, etc.) PsiCash, if they not currently connected. 'Use' here means buy, spend, or otherwise interact with. 'Psiphon' must not be translated/transliterated. 'PsiCash' must not be translated/transliterated. */
-"PSICASH_MUST_BE_CONNECTED" = "In order to use PsiCash, you must be connected to the Psiphon network.";
+/* Body text of a modal dialog shown when the user tries to use (spend, buy, etc.) PsiCash, if they not currently connected. 'Use' here means buy, spend, or otherwise interact with. 'Psiphon' must not be translated/transliterated. 'PsiCash' must not be translated/transliterated. */
+"PSICASH_MUST_BE_CONNECTED" = "Щоб користуватися PsiCash, ви повинні бути підключені до мережі Psiphon.";
 
 /*[UNTRANSLATED] PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
 "PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon, unless you have created a PsiCash account and are logged into your PsiCash account.";
@@ -592,11 +592,11 @@
 /*[UNTRANSLATED] Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "PSICASH_SPEED_BOOST_PRODUCT_NOT_FOUND_MESSAGE" = "Speed Boost product not found. Your app may be out of date. Please check for updates.";
 
-/*[UNTRANSLATED] Body of an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. The words 'PsiCash' and 'Psiphon' must not be translated or transliterated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_SPEED_PORT_LIMITS_BODY" = "Without active Speed Boost, your speed is limited and some internet traffic is not supported. Activate Speed Boost with PsiCash to unlock the full potential of your Psiphon experience.";
+/* Body of an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. The words 'PsiCash' and 'Psiphon' must not be translated or transliterated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_PORT_LIMITS_BODY" = "Без активного підвищення швидкості ваша швидкість обмежена, а деякий Інтернет-трафік не підтримується. Активуйте підвищення швидкості (Speed Boost) за допомогою PsiCash, щоб розкрити весь потенціал Psiphon.";
 
-/*[UNTRANSLATED] Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. Port here refers to port in computer networking. */
-"PSICASH_SPEED_PORT_LIMITS_HEAD" = "Speed and Port Limits";
+/* Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. Port here refers to port in computer networking. */
+"PSICASH_SPEED_PORT_LIMITS_HEAD" = "Обмеження швидкості та портів";
 
 /*[UNTRANSLATED] A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon */
 "PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY" = "Your Psiphon subscription already gives you always-on Speed Boost, so there is no reason to buy more. Your PsiCash balance will be retained should you ever decide to cancel your subscription.\n\nYou can still access your PsiCash account from the settings menu.";
@@ -619,8 +619,8 @@
 /*[UNTRANSLATED] 'PsiCash' features are unavailable while the user has a subscription. Do not translate or transliterate 'PsiCash' */
 "PSICASH_UNAVAILABLE_WHILE_SUBSCRIBED" = "PsiCash is unavailable while subscribed";
 
-/*[UNTRANSLATED] Text field label where users can enter their account's username */
-"PSICASH_USERNAME_TEXT_FIELD" = "PsiCash username";
+/* Text field label where users can enter their account's username */
+"PSICASH_USERNAME_TEXT_FIELD" = "Ім'я користувача PsiCash";
 
 /*[UNTRANSLATED] Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
 "PSICASH_WAIT_TRANSACTION_VERIFIED" = "Please wait while your transaction is being verified";
@@ -628,8 +628,8 @@
 /* Alert message informing user that a Psiphon connection is required */
 "PSIPHON_CONNECTION_REQUIRED" = "Psiphon з'єднання необхідне";
 
-/* Do not translate or transliterate 'Psiphon'. Body of an alert that is shown to the user when they connect from a region where free service is no longer offered, asking the user to subscribe. */
-"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_BODY" = "Help keep Psiphon free for those who need it most! Subscribe now.";
+/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost', conform to translation under key 'SPEED_BOOST'. Body of an alert that is shown to the user when they connect from a region where free service is no longer offered, asking the user to subscribe or purchase Speed Boost. */
+"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_BUY_SUB_OR_SPEEDBOOST_BODY" = "Help keep Psiphon free for those who need it most! Subscribe now or purchase a Speed Boost.";
 
 /*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. An alert with this title is shown when the user connects from a region where free service is no longer offered, asking the user to subscribe. */
 "PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_TITLE" = "Psiphon is no longer free in your region";
@@ -640,8 +640,8 @@
 /*[UNTRANSLATED] Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_MUST_BE_CONNECTED_INFO" = "Psiphon must be connected to show this content";
 
-/* Do not translate or transliterate 'Psiphon'. Text of notification shown when a subscription is required to continue using the servive. */
-"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE" = "Please purchase a subscription to continue using Psiphon.";
+/* Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. Conform to translation under key 'SPEED_BOOST'. Text of notification shown when a subscription or Speed Boost purchase is required to continue using the servive. */
+"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE_2" = "Please purchase a subscription or Speed Boost to continue using Psiphon.";
 
 /*[UNTRANSLATED] Alert message that the users purchases have been restored successfully */
 "PURCHASES_RESTORED_SUCCESSFULLY" = "Purchases restored successfully";
@@ -774,9 +774,6 @@
 
 /*[UNTRANSLATED] Title of the banner on the subscriptions page advertising that subscriptions enable no ads and maximum speed. */
 "SUBSCRIPTIONS_PAGE_BANNER_TITLE_2" = "No ads and maximum speed.";
-
-/* Title of the button on the subscriptions page which takes the user of of the app to iTunes where they can view detailed information about their subscription */
-"SUBSCRIPTIONS_PAGE_MANAGE_SUBSCRIPTION_BUTTON" = "Управління вашою підпискою";
 
 /* Title of the button on the subscriptions page which, when pressed, navigates the user to the page where they can restore their existing subscription */
 "SUBSCRIPTIONS_PAGE_RESTORE_SUBSCRIPTION_BUTTON" = "Я не бачу моєї підписки";

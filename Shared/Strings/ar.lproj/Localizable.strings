@@ -121,11 +121,11 @@
 /* No comment provided by engineer. */
 "faq-information-collected-answer-para-10" = "ملاحظة: إذا حملت سايفون من متجر تطبيقات، كمتجر Google Play  أو متجر أمازون للتطبيقات، قد يجمع عنك المزيد من المعلومات من هذا المتجر.  هذا مثلا ما يمكن أن يجمعه عنك متجر Google Play: ";
 
-/*[UNTRANSLATED] No comment provided by engineer. */
-"faq-information-collected-answer-para-11" = "When you send an email request to our email auto-responder server, we are able to see your email address. While your email is being processed it is saved to the email server's disk, and it is deleted as soon as it is processed (usually in a few seconds). Your email address may be written to the server system logs. These logs are deleted after one week.";
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-11" = "يمكننا عرض عنوان بريدك الإلكتروني عندما ترسل طلبًا بالبريد الإلكتروني إلى بريدنا الإلكتروني المستجيب التلقائي. أثناء معالجة بريدك الإلكتروني ، يتم حفظه على قرص خادم البريد الإلكتروني ، وسيتم حذفه عند معالجته (عادةً في بضع ثوانٍ). قد تتم كتابة عنوان بريدك الإلكتروني في سجلات نظام الخادم. يتم حذف هذه السجلات بعد أسبوع واحد.";
 
-/*[UNTRANSLATED] No comment provided by engineer. */
-"faq-information-collected-answer-para-12" = "Our email auto-responder server is hosted in the Amazon EC2 cloud. This means that Amazon is able to see the email you send and our response to you.";
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-12" = "يتم استضافة خادم الاستجابة التلقائية لبريدك الإلكتروني في خادم Amazon EC2. هذا يعني أن Amazon قادرة على رؤية البريد الإلكتروني الذي ترسله وردنا عليك.";
 
 /* No comment provided by engineer. */
 "faq-information-collected-answer-para-13" = "لكل رسالة إلكترونية تصلنا نخزن المعلومات التالية:";
@@ -181,8 +181,8 @@
 /* Button title that lets users reset their password if they forgot their account's password. */
 "FORGOT_PASSWORD" = "نسيت كلمة السر؟";
 
-/*[UNTRANSLATED] Button title that lets users reset their username or password if they forgot their account's username or password. */
-"FORGOT_USERNAME_OR_PASSWORD" = "Forgot your password or username?";
+/* Button title that lets users reset their username or password if they forgot their account's username or password. */
+"FORGOT_USERNAME_OR_PASSWORD" = "نسيت اسم المستخدم وكلمة المرور؟";
 
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "مجّانًا";
@@ -190,8 +190,8 @@
 /* Generic alert shown when purchase of a product fails. */
 "GENERIC_PURCHASE_FAILED" = "عملية الشراء فشلت";
 
-/*[UNTRANSLATED] Body of an error dialog asking the user to send Psiphon a report. Do not translate or transliterate 'Psiphon' */
-"HELP_IMPROVE_PSIPHON_BY_SENDING_REPORT" = "Help improve Psiphon by sending a report of this error.";
+/* Body of an error dialog asking the user to send Psiphon a report. Do not translate or transliterate 'Psiphon' */
+"HELP_IMPROVE_PSIPHON_BY_SENDING_REPORT" = "ساعد في تحسين تطبيق Psiphon بإرسال تقرير عن هذا الخطأ.";
 
 /* Body text of a modal dialog shown when a PsiCash login fails due to bad username or password. */
 "INCORRECT_USERNAME_OR_PASSWORD" = "اسم المستخدم غير صحيح أو كلمة السر غير صحيحة.";
@@ -262,8 +262,8 @@
 /* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
 "ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "ستحتاج إلى السماح لـ Psiphon بإضافة اعدادات الVPN للاتصال.";
 
-/*[UNTRANSLATED] Title of a button that open a URL on the device's web browser. */
-"OPEN_IN_BROWSER_BUTTON_TITLE" = "Open in Browser";
+/* Title of a button that open a URL on the device's web browser. */
+"OPEN_IN_BROWSER_BUTTON_TITLE" = "افتح في المتصفح";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "يُرجى فتح تطبيق سايفون لإنهاء الاتصال.";
@@ -295,26 +295,26 @@
 /* No comment provided by engineer. */
 "privacy-information-collected-client-advertising-networks-para-2" = "يمكنك توقيف خدمة إستعمال ملفات تعريف الإرتباط للإعلان على الإنترنت عبر زيارة:";
 
-/*[UNTRANSLATED] Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
-"privacy-information-collected-data-categories-header" = "Data Categories";
+/* Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
+"privacy-information-collected-data-categories-header" = "فئات البيانات";
 
 /* Header text in the 'my.psi.cash' section of the Privacy page. Refers to the cookies stored by web browsers. */
 "privacy-information-collected-mypsicash-cookies-head" = "الكوكيز";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-cookies-para-1" = "my.psi.cash only uses cookies and similar tracking technologies to carry out activities that are essential for the operation of the website. Essential cookies are necessary to ensure basic functions of the website. Cookies are small text files that are stored on your computer and saved by your browser, and do not represent any risk to your device. You can configure your browser settings to personalize how you would like your browser to handle cookies. Disabling essential cookies will degrade the functionality of this website.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-cookies-para-1" = "ستخدم my.psi.cash ملفات تعريف الارتباط وتقنيات التتبع المماثلة فقط لتنفيذ الأنشطة الضرورية لتشغيل الموقع. يستخدم my.psi.cash ملفات تعريف الارتباط وتقنيات التتبع المماثلة فقط لتنفيذ الأنشطة الضرورية لتشغيل الموقع. تعد ملفات تعريف الارتباط الأساسية ضرورية لضمان الوظائف الأساسية للموقع. ملفات تعريف الارتباط هي ملفات نصية صغيرة يتم تخزينها على جهاز الكمبيوتر الخاص بك وحفظها بواسطة متصفحك ، ولا تمثل أي خطر على جهازك. سيؤدي تعطيل ملفات تعريف الارتباط الأساسية إلى تدهور وظائف هذا الموقع.";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. 'PsiCash' must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-para-1" = "Users create and manage their PsiCash accounts on the <a href=\"https://my.psi.cash\" target=\"_blank\" rel=\"noopener noreferrer\">my.psi.cash</a> website.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-para-1" = "يمكن للمستخدمين إنشاء حسابات PsiCash وإدارتها على موقع الويب my.psi.cash.";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-recaptcha-para-1" = "my.psi.cash uses Google’s reCAPTCHA v3 (hereinafter “reCAPTCHA”), which protects websites from spam and abuse by non-human users (i.e., bots). reCAPTCHA collects personal information that is required for the functioning of the technology and is subject to its own privacy policy. Use of my.psi.cash indicates acceptance of Google’s <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">Privacy Policy</a> and <a href=\"https://policies.google.com/terms\" target=\"_blank\" rel=\"noopener noreferrer\">Terms</a>.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-recaptcha-para-1" = "يستخدم my.psi.cash برنامج reCAPTCHA v3 الخاص بـ Google (المشار إليه فيما يلي بـ \"reCAPTCHA\") ، والذي يحمي مواقع الويب من الرسائل غير المرغوب فيها وإساءة الاستخدام من قبل المستخدمين غير البشر (مثل: برامج السير). تجمع reCAPTCHA المعلومات الشخصية المطلوبة لتشغيل التكنولوجيا وتخضع لسياسة الخصوصية الخاصة بها. يشير استخدام my.psi.cash إلى قبول <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">سياسة الخصوصية</a> و <a href=\"https://policies.google.com/terms\" target=\"_blank\" rel=\"noopener noreferrer\">شروط</a> Google.";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-recaptcha-para-2" = "Our use of reCAPTCHA is strictly limited to ensuring the continued functioning of my.psi.cash. reCAPTCHA technology performs an automatic analysis for each site request without requiring the user to take any additional actions. This analysis is based on interactions made by the user, and is used to mitigate bot and other malicious behaviour on our website. The data collected during analysis is forwarded to Google, where Google will use this data to determine if you are a human user. This analysis takes place in the background, and users are not advised it is taking place.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-recaptcha-para-2" = "نحن نستخدم reCAPTCHA بشكل صارم لضمان استمرار عمل my.psi.cash. تقوم تقنية reCAPTCHA بإجراء تحليل تلقائي لكل طلب موقع دون مطالبة المستخدم باتخاذ أي إجراءات إضافية. يعتمد هذا التحليل على التفاعلات التي أجراها المستخدم ، ويستخدم للتخفيف من السلوكيات الضارة والسيرالأخرى على موقعنا. يتم إعادة توجيه البيانات التي يتم جمعها أثناء التحليل إلى Google ، حيث ستستخدم Google هذه البيانات لتحديد ما إذا كنت مستخدمًا حقيقيًا أم لا. يتم إجراء هذا التحليل في الخلفية ، ولا يُنصح المستخدمون بأنه يتم إجراؤه.";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. */
-"privacy-information-collected-mypsicash-recaptcha-para-3" = "For more information about Google’s reCAPTCHA technology, please visit <a href=\"https://www.google.com/recaptcha/about/\" target=\"_blank\" rel=\"noopener noreferrer\">https://www.google.com/recaptcha/about/</a>.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. */
+"privacy-information-collected-mypsicash-recaptcha-para-3" = "لمزيد من المعلومات حول تقنية reCAPTCHA من Google ، يرجى زيارة <a href=\"https://www.google.com/recaptcha/about/\" target=\"_blank\" rel=\"noopener noreferrer\"> https://www.google.com/recaptcha/about/</a>.";
 
 /* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
 "privacy-information-collected-psicash-para-1" = "يقوم نظام PsiCash بجمع المعلومات اللازمة لتشغيل النظام ، ومراقبة سلامة النظام ، وضمان أمن النظام فقط.";
@@ -337,8 +337,8 @@
 /* Paragraph text in the 'PsiCash' section of the Privacy page. This is preamble to a detailed bullet list. 'PsiCash' must not be translated or transliterated. */
 "privacy-information-collected-psicash-para-2-list-start" = "يخزن خادم PsiCash معلومات كل مستخدم للسماح بتشغيل النظام ، بما في ذلك:";
 
-/*[UNTRANSLATED] Paragraph text on the Privacy Policy page. Describes the user data requirements for PsiCash accounts. 'PsiCash' must not be translated or transliterated. 'Psiphon' must not be translated or transliterated. */
-"privacy-information-collected-psicash-para-2b" = "Creating a PsiCash account is optional. If an account is created, account-specific information such as username, password, and email address (if provided) are stored on the server. When logged in to a Psiphon client, the username is also stored locally.";
+/* Paragraph text on the Privacy Policy page. Describes the user data requirements for PsiCash accounts. 'PsiCash' must not be translated or transliterated. 'Psiphon' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-2b" = "فتح حساب PsiCash اختياري. إذا تم إنشاء حساب ، يتم تخزين معلومات الحساب مثل اسم المستخدم وكلمة المرور وعنوان البريد الإلكتروني (إذا تم توفيره) على الخادم. عند تسجيل الدخول إلى عميل Psiphon ، يتم تخزين اسم المستخدم محليًا.";
 
 /* Bullet list item in the 'data stored in web browser' list. This item refers to randomly generated values that allow a user to access and utilize the system. */
 "privacy-information-collected-psicash-para-3-item-1" = "الرموز المولدة لاتصال المستخدم";
@@ -370,8 +370,8 @@
 /* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
 "privacy-information-collected-psicash-para-5" = "لا يتم مشاركة بيانات المستخدم مع الجهات الخارجية مُطْلَقاً. قد تتم مشاركة إحصاءات تجميعية غير محددة (خام) ، ولكن في شكل لا يمكن أن يحدد هوية المستخدمين.";
 
-/*[UNTRANSLATED] Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
-"privacy-information-collected-psicash-para-6" = "PsiCash server resources are stored in AWS, which means Amazon has access to the data.";
+/* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-6" = "يتم تخزين موارد خادم PsiCash في AWS ، مما يعني أن Amazon لديها حق الوصول إلى البيانات.";
 
 /* Sub-heading for section describing use of logging access to data storage (aka S3 bucket logging). The way to read this is 'creation of logs for user accesses to data storage'. Psiphon 'stores' websites, downloads, and upgrades (the 'data') in Amazon S3 (the 'storage'). Users 'access' the data storage. And, somtimes, we 'log' those accesses. (For example, if we suspect attackers are accessing the storage, or if it seems the storage is blocked by a country.) */
 "privacy-information-collected-s3-logging-head" = "تسجيل تخزين الوصول";
@@ -427,8 +427,8 @@
 /* Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
 "privacy-information-collected-vpndata-useractivity-para-3" = "مثال على بيانات أنشطة المستخدم: فى وقت محدد اتصل مستخدم من مدينة نيويورك، من خلال Comcast، ونقل 100 ميجا بايت من <code>youtube.com</code> والإجمالي 300 ميجا بايت.";
 
-/*[UNTRANSLATED] Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-useractivity-para-4.1" = "We consider user activity data the most sensitive category of data. We never, ever share this data with third parties. We keep user activity data for at most 90 days, and then we aggregate it and delete it. Backups of that data are kept for a reasonable amount of time.";
+/* Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-useractivity-para-4.1" = "نحن نعتبر بيانات نشاط المستخدم هي أكثر فئات البيانات حساسية. نحن لا نشارك أبدًا هذه البيانات مع أطراف ثالثة. نحتفظ ببيانات نشاط المستخدم لمدة 90 يومًا على الأكثر ، ثم نقوم بتجميعها وحذفها. يتم الاحتفاظ بنسخ احتياطية من تلك البيانات لفترة زمنية معقولة.";
 
 /* Sub-heading for the definition of 'User Activity Data' under the 'User Activity and VPN Data' section of the Privacy Policy page. */
 "privacy-information-collected-vpndata-useractivity-subhead" = "بيانات أنشطة المستخدم";
@@ -526,8 +526,8 @@
 /* Message shown when products available for purchase could not be retrieved. */
 "PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "تعذر استرداد قائمة المنتجات";
 
-/*[UNTRANSLATED] Title of screen encouraging the user to create a PsiCash account so that their PsiCash balance is protected. Do not translate or transliterate 'PsiCash' */
-"PROTECT_YOUR_PSICASH" = "Protect your PsiCash";
+/* Title of screen encouraging the user to create a PsiCash account so that their PsiCash balance is protected. Do not translate or transliterate 'PsiCash' */
+"PROTECT_YOUR_PSICASH" = "احمي PsiCash الخاص بك";
 
 /* Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
 "PROTECT_YOUR_PURCHASES" = "حماية مشترياتك";
@@ -550,8 +550,8 @@
 /* Button title that opens 'PsiCash' account management. */
 "PSICASH_ACCOUNT_MANAGEMENT_2" = "إدارة الحساب";
 
-/*[UNTRANSLATED] Explanation text that appears below 'Create account' button on the PsiCash sign in screen. Do not translate or transliterate terms PsiCash or Psiphon */
-"PSICASH_ACCOUNT_PRODUCT_DESCRIPTION" = "Creating a PsiCash account will help preserve your PsiCash if you reinstall the app or use Psiphon on another device.";
+/* Explanation text that appears below 'Create account' button on the PsiCash sign in screen. Do not translate or transliterate terms PsiCash or Psiphon */
+"PSICASH_ACCOUNT_PRODUCT_DESCRIPTION" = "سيساعد إنشاء حساب PsiCash في الحفاظ على PsiCash إذا قمت بتثبيت التطبيق مرة أخرى أو استخدام Psiphon على جهاز آخر.";
 
 /* An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "انتهت مهلة ولوجك إلى PsiCash. يٌرجى إعادة الولوج مرة أخرى.";
@@ -562,8 +562,8 @@
 /* PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
 "PSICASH_BALANCE" = "رصيد الPsiCash";
 
-/*[UNTRANSLATED] Subtitle of an error message shown when the PsiCash feature is unavailable, asking the user to send us a feedback if this problem persists. */
-"PSICASH_LIB_INIT_FAILED_SEND_FEEDBACK" = "PsiCash failed to load.\n\nIf this problem persists, please send a feedback.";
+/* Subtitle of an error message shown when the PsiCash feature is unavailable, asking the user to send us a feedback if this problem persists. */
+"PSICASH_LIB_INIT_FAILED_SEND_FEEDBACK" = "فشل تحميل PsiCash.\n\nإذا استمرت هذه المشكلة ، يرجى إرسال تعليقات إلينا.";
 
 /* Body text of a modal dialog shown when a PsiCash account login fails due to a 'bad request' error. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_LOGIN_BAD_REQUEST_ERROR_BODY" = "لقد ذكر خادم PsiCash أن طلب الولوج كان غير صالح. يُرجى المحاولة مرة أخرى لاحقا.";
@@ -619,8 +619,8 @@
 /* 'PsiCash' features are unavailable while the user has a subscription. Do not translate or transliterate 'PsiCash' */
 "PSICASH_UNAVAILABLE_WHILE_SUBSCRIBED" = "PsiCash غير متاح في حالة الاشتراك";
 
-/*[UNTRANSLATED] Text field label where users can enter their account's username */
-"PSICASH_USERNAME_TEXT_FIELD" = "PsiCash username";
+/* Text field label where users can enter their account's username */
+"PSICASH_USERNAME_TEXT_FIELD" = "اسم مستخدم Psicash";
 
 /* Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
 "PSICASH_WAIT_TRANSACTION_VERIFIED" = "يُرجى الانتظار ريثما يتم التحقق من معاملتك";
@@ -628,20 +628,20 @@
 /* Alert message informing user that a Psiphon connection is required */
 "PSIPHON_CONNECTION_REQUIRED" = "يلزم الاتصال ب Psiphon";
 
-/* Do not translate or transliterate 'Psiphon'. Body of an alert that is shown to the user when they connect from a region where free service is no longer offered, asking the user to subscribe. */
-"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_BODY" = "Help keep Psiphon free for those who need it most! Subscribe now.";
+/* Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost', conform to translation under key 'SPEED_BOOST'. Body of an alert that is shown to the user when they connect from a region where free service is no longer offered, asking the user to subscribe or purchase Speed Boost. */
+"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_BUY_SUB_OR_SPEEDBOOST_BODY" = "ساعد في ان يكون Psiphon مجانيا لهولاء اللذين في امس الحاجه اليه! اشترك الآن أو قم بشراء Speed Boost.";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. An alert with this title is shown when the user connects from a region where free service is no longer offered, asking the user to subscribe. */
-"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_TITLE" = "Psiphon is no longer free in your region";
+/* Do not translate or transliterate 'Psiphon'. An alert with this title is shown when the user connects from a region where free service is no longer offered, asking the user to subscribe. */
+"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_TITLE" = "Psiphon ليس مجانيًا في منطقتك";
 
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon غير متصل";
 
-/*[UNTRANSLATED] Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
-"PSIPHON_MUST_BE_CONNECTED_INFO" = "Psiphon must be connected to show this content";
+/* Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
+"PSIPHON_MUST_BE_CONNECTED_INFO" = "يجب أن يكون برنامج Psiphon متصلًا لعرض هذا المحتوى";
 
-/* Do not translate or transliterate 'Psiphon'. Text of notification shown when a subscription is required to continue using the servive. */
-"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE" = "Please purchase a subscription to continue using Psiphon.";
+/* Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. Conform to translation under key 'SPEED_BOOST'. Text of notification shown when a subscription or Speed Boost purchase is required to continue using the servive. */
+"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE_2" = "يرجى شراء خطة اشتراك أو استخدام Speed Boost لمتابعة استخدام تطبيق Psiphon.";
 
 /* Alert message that the users purchases have been restored successfully */
 "PURCHASES_RESTORED_SUCCESSFULLY" = "لقد تمت استعادة المشتريات بنجاح";
@@ -661,8 +661,8 @@
 /* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "لا يمكنك رؤية أية اشتراك قمت بشرائه على هذا الجهاز";
 
-/*[UNTRANSLATED] Title of a button that enables the user to report an error that they faced to us. */
-"REPORT_BUTTON_TITLE" = "Report...";
+/* Title of a button that enables the user to report an error that they faced to us. */
+"REPORT_BUTTON_TITLE" = "الرجاء الإبلاغ عن ...";
 
 /* Button that restores users previous purchases */
 "RESTORE_PURCHASES" = "استعادة المشتريات";
@@ -688,8 +688,8 @@
 /* Title for screen that allows user to select their desired server region. */
 "SELECT_SERVER_REGION" = "تحديد منطقة الخادوم";
 
-/*[UNTRANSLATED] Title of an error dialog shown to the user when a serious error occurs in the app */
-"SERIOUS_ERROR_OCCURRED" = "A serious error occurred";
+/* Title of an error dialog shown to the user when a serious error occurs in the app */
+"SERIOUS_ERROR_OCCURRED" = "حدث خطأ جسيم";
 
 /* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "اعادة تثبيت ملف تعريف الـ VPN";
@@ -774,9 +774,6 @@
 
 /* Title of the banner on the subscriptions page advertising that subscriptions enable no ads and maximum speed. */
 "SUBSCRIPTIONS_PAGE_BANNER_TITLE_2" = "لا إعلانات و سرعة قصوى.";
-
-/* Title of the button on the subscriptions page which takes the user of of the app to iTunes where they can view detailed information about their subscription */
-"SUBSCRIPTIONS_PAGE_MANAGE_SUBSCRIPTION_BUTTON" = "تحكم الاشتراك";
 
 /* Title of the button on the subscriptions page which, when pressed, navigates the user to the page where they can restore their existing subscription */
 "SUBSCRIPTIONS_PAGE_RESTORE_SUBSCRIPTION_BUTTON" = "لا أرى اشتراكي";
