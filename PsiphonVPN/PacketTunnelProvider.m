@@ -119,10 +119,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     
     PsiphonConfigSponsorIds *_Nullable psiphonConfigSponsorIds;
     
-    // ApplicationParameters staging dictionary.
+    // ApplicationParameters.
     // Values are stored here and committed to disk after on onConnected.
     // Access should be protected by `workQueue`.
-    NSMutableDictionary<NSString *, id> *_Nonnull staging_applicationParameters;
+    PNEApplicationParameters *_Nonnull applicationParameters;
 }
 
 - (id)init {
@@ -148,7 +148,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         
         _hostAppProtocol = [[HostAppProtocol alloc] init];
         
-        staging_applicationParameters = [NSMutableDictionary dictionary];
+        applicationParameters = [[PNEApplicationParameters alloc] initDefaults];
     }
     return self;
 }
@@ -532,7 +532,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         // is presented by the network extension.
         [self.hostAppProtocol isHostAppProcessRunning:^(BOOL isProcessRunning) {
             
-            if (isProcessRunning == FALSE) {
+            // If showRequiredPurchasePrompt is True, the user will already get a notification
+            // to open the app trigerred by showRequiredPurchasePrompt in `onConnected`.
+            if (isProcessRunning == FALSE && self->applicationParameters.showRequiredPurchasePrompt == FALSE) {
                 [[LocalNotificationService shared] requestOpenContainerToConnectNotification];
             }
             
@@ -795,19 +797,18 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         // TODO: Allow for the possiblity that parameters are changed after onConnected.
         //       as of now application parameters are overwritten.
         
-        // Persists ApplicationParameters staging dictionary.
+        // Persists ApplicationParameters.
         [self.sharedDB setApplicationParametersChangeTimestamp:[NSDate date]];
-        self->staging_applicationParameters[ApplicationParamKeyVPNSessionNumber] =
-            [NSNumber numberWithInteger:[self.sharedDB getVPNSessionNumber]];
-        [self.sharedDB setApplicationParameters:self->staging_applicationParameters];
+        [self->applicationParameters setVpnSessionNumber:[self.sharedDB getVPNSessionNumber]];
+        [self.sharedDB setApplicationParameters:[self->applicationParameters asDictionary]];
         
         // Notifies host app that persisted application parameters has been updated.
         [[Notifier sharedInstance] post:NotifierApplicationParametersUpdated];
         
         // Request notification if purchase required.
-        PNEApplicationParameters *params = [PNEApplicationParameters
-                                            load:self->staging_applicationParameters];
-        if (params.showRequiredPurchasePrompt == TRUE && ![self hasUserMadePurchase]) {
+        if (self->applicationParameters.showRequiredPurchasePrompt == TRUE
+            && ![self hasUserMadePurchase])
+        {
             [[LocalNotificationService shared] requestPurchaseRequiredPrompt];
         }
         
@@ -853,8 +854,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 - (void)onApplicationParameters:(NSDictionary *_Nonnull)parameters {
     dispatch_async(self->workQueue, ^{
-        // Copies the parameters to the staging dictionary.
-        [self->staging_applicationParameters setDictionary:parameters];
+        self->applicationParameters = [[PNEApplicationParameters alloc] initWithDict:parameters];
     });
 }
 

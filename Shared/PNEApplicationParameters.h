@@ -29,14 +29,18 @@ extern NSString* ApplicationParamKeyShowRequiredPurchasePrompt;
 
 /// VPN session number is defined in the NE.
 /// Value is `0` before the first connected tunnel.
-@property (readonly, nonatomic) NSInteger vpnSessionNumber;
+@property (nonatomic) NSInteger vpnSessionNumber;
 @property (readonly, nonatomic) BOOL showRequiredPurchasePrompt;
 
-/**
- Parses given params dictionary and create an ApplicationParameters object.
- If a persisted value is not found for a given key, it's default value will be used.
- */
-+ (instancetype)load:(NSDictionary<NSString *, id> *_Nonnull)params;
+- (instancetype)init NS_UNAVAILABLE;
+
+- (instancetype)initDefaults;
+
+- (instancetype)initWithDict:(NSDictionary<NSString *, id> *)values;
+
+/// Returns ApplicationParameters dict given by tunnel-core (or default if none provided),
+/// along with `vpnSessionNumber`.
+- (NSDictionary<NSString *, id> *_Nonnull)asDictionary;
 
 @end
 
