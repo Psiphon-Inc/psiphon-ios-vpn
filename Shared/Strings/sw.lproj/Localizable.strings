@@ -628,8 +628,8 @@
 /* Alert message informing user that a Psiphon connection is required */
 "PSIPHON_CONNECTION_REQUIRED" = "Psiphon inahitaji kuunganishwa";
 
-/* Do not translate or transliterate 'Psiphon'. Body of an alert that is shown to the user when they connect from a region where free service is no longer offered, asking the user to subscribe. */
-"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_BODY" = "Help keep Psiphon free for those who need it most! Subscribe now.";
+/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost', conform to translation under key 'SPEED_BOOST'. Body of an alert that is shown to the user when they connect from a region where free service is no longer offered, asking the user to subscribe or purchase Speed Boost. */
+"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_BUY_SUB_OR_SPEEDBOOST_BODY" = "Help keep Psiphon free for those who need it most! Subscribe now or purchase a Speed Boost.";
 
 /*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. An alert with this title is shown when the user connects from a region where free service is no longer offered, asking the user to subscribe. */
 "PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_TITLE" = "Psiphon is no longer free in your region";
@@ -640,8 +640,8 @@
 /*[UNTRANSLATED] Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_MUST_BE_CONNECTED_INFO" = "Psiphon must be connected to show this content";
 
-/* Do not translate or transliterate 'Psiphon'. Text of notification shown when a subscription is required to continue using the servive. */
-"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE" = "Please purchase a subscription to continue using Psiphon.";
+/* Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. Conform to translation under key 'SPEED_BOOST'. Text of notification shown when a subscription or Speed Boost purchase is required to continue using the servive. */
+"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE_2" = "Please purchase a subscription or Speed Boost to continue using Psiphon.";
 
 /*[UNTRANSLATED] Alert message that the users purchases have been restored successfully */
 "PURCHASES_RESTORED_SUCCESSFULLY" = "Purchases restored successfully";
@@ -774,9 +774,6 @@
 
 /* Title of the banner on the subscriptions page advertising that subscriptions enable no ads and maximum speed. */
 "SUBSCRIPTIONS_PAGE_BANNER_TITLE_2" = "Hakuna ads na kasi ya kiwango cha juu.";
-
-/* Title of the button on the subscriptions page which takes the user of of the app to iTunes where they can view detailed information about their subscription */
-"SUBSCRIPTIONS_PAGE_MANAGE_SUBSCRIPTION_BUTTON" = "Simamia michango yako";
 
 /* Title of the button on the subscriptions page which, when pressed, navigates the user to the page where they can restore their existing subscription */
 "SUBSCRIPTIONS_PAGE_RESTORE_SUBSCRIPTION_BUTTON" = "Sioni michango yangu";
