@@ -826,14 +826,9 @@ extension SpeedBoostProduct {
     var localizedString: String {
         switch self.distinguisher {
         case .hr1: return UserStrings.Speed_boost_1_hour()
-        case .hr2: return UserStrings.Speed_boost_2_hours()
-        case .hr3: return UserStrings.Speed_boost_3_hours()
-        case .hr4: return UserStrings.Speed_boost_4_hours()
-        case .hr5: return UserStrings.Speed_boost_5_hours()
-        case .hr6: return UserStrings.Speed_boost_6_hours()
-        case .hr7: return UserStrings.Speed_boost_7_hours()
-        case .hr8: return UserStrings.Speed_boost_8_hours()
-        case .hr9: return UserStrings.Speed_boost_9_hours()
+        case .hr24: return UserStrings.Speed_boost_24_hour()
+        case .day7: return UserStrings.Speed_boost_7_day()
+        case .day31: return UserStrings.Speed_boost_31_day()
         }
     }
         

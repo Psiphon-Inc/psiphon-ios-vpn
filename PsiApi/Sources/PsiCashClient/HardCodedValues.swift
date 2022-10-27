@@ -23,16 +23,10 @@ import Foundation
 public enum SpeedBoostDistinguisher: String, CaseIterable {
     
     // Raw values must match distinguisher values set by the PsiCash server.
-    
     case hr1 = "1hr"
-    case hr2 = "2hr"
-    case hr3 = "3hr"
-    case hr4 = "4hr"
-    case hr5 = "5hr"
-    case hr6 = "6hr"
-    case hr7 = "7hr"
-    case hr8 = "8hr"
-    case hr9 = "9hr"
+    case hr24 = "24hr"
+    case day7 = "7day"
+    case day31 = "31day"
     
 }
 
@@ -42,14 +36,9 @@ extension SpeedBoostDistinguisher {
     public var hours: Int {
         switch self {
         case .hr1: return 1
-        case .hr2: return 2
-        case .hr3: return 3
-        case .hr4: return 4
-        case .hr5: return 5
-        case .hr6: return 6
-        case .hr7: return 7
-        case .hr8: return 8
-        case .hr9: return 9
+        case .hr24: return 24
+        case .day7: return 24 * 7
+        case .day31: return 24 * 31
         }
     }
     
