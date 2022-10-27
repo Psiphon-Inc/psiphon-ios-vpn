@@ -961,6 +961,24 @@ extension UserStrings {
                                  comment: "Label on a button. Clicking this button will buy 9 hours of Speed Boost. Translate number as well.")
     }
     
+    static func Speed_boost_24_hour() -> String {
+        return NSLocalizedString("SPEED_BOOST_24HR", tableName: nil, bundle: Bundle.main,
+                                 value: "1 Day",
+                                 comment: "Label on a button. Clicking this button will buy 1 day (24 hr) of Speed Boost. Translate number as well.")
+    }
+    
+    static func Speed_boost_7_day() -> String {
+        return NSLocalizedString("SPEED_BOOST_7DAY", tableName: nil, bundle: Bundle.main,
+                                 value: "1 Week",
+                                 comment: "Label on a button. Clicking this button will buy 1 week (7 days) of Speed Boost. Translate number as well.")
+    }
+
+    static func Speed_boost_31_day() -> String {
+        return NSLocalizedString("SPEED_BOOST_31DAY", tableName: nil, bundle: Bundle.main,
+                                 value: "1 Month",
+                                 comment: "Label on a button. Clicking this button will buy 1 month (31 days) of Speed Boost. Translate number as well.")
+    }
+    
 }
 
 // MARK: Privacy Policy
