@@ -452,6 +452,7 @@ final class PsiCashStoreViewController: ReactiveViewController {
                         psiCashLibData.purchasePrices.compactMap {
                             $0.successToOptional()?.speedBoost
                         }
+                        .filter { $0.product.distinguisher.availableForSale }
                         .map { purchasable -> SpeedBoostPurchasableViewModel in
                             
                             let productTitle = purchasable.product.localizedString
