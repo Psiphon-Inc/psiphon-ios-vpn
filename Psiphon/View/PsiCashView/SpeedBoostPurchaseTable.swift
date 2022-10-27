@@ -419,6 +419,14 @@ enum SpeedBoostPurchaseBackground: String, CaseIterable {
     static func background(speedBoostDistinguisher: SpeedBoostDistinguisher) -> Self {
         switch speedBoostDistinguisher {
         case .hr1: return .orange
+        case .hr2: return .pink
+        case .hr3: return .purple
+        case .hr4: return .darkBlue
+        case .hr5: return .blue
+        case .hr6: return .green
+        case .hr7: return .lightOrange
+        case .hr8: return .yellow
+        case .hr9: return .limeGreen
         case .hr24: return .pink
         case .day7: return .purple
         case .day31: return .darkBlue
