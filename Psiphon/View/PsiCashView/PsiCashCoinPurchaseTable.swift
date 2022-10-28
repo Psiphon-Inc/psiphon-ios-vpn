@@ -172,7 +172,6 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
     private let bottomPad: Float = -14
     private let priceFormatter: CurrencyFormatter
     private let titleLabel: UILabel
-    private let subtitleLabel: UILabel
     private let button: GradientButton
     private let spinner: UIActivityIndicatorView
     private let clickHandler: (PsiCashPurchasableViewModel.ProductType) -> Void
@@ -183,7 +182,6 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
         self.clickHandler = clickHandler
         
         titleLabel = UILabel.make(fontSize: .h3, typeface: .bold)
-        subtitleLabel = UILabel.make(fontSize: .subtitle, numberOfLines: 0)
         button = GradientButton(shadow: .light, contentShadow: false, gradient: .grey)
         spinner = .init(style: .gray)
         super.init(frame: .zero)
@@ -226,8 +224,7 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
         }
         
         titleStack.addArrangedSubviews(
-            titleLabel,
-            subtitleLabel
+            titleLabel
         )
         
         hStack.addArrangedSubviews(
@@ -280,11 +277,9 @@ fileprivate final class PurchaseCellContent: UIView, Bindable {
         // Forces title and subtitle text alignment, since they may not have translations.
         if case .rightToLeft = UIApplication.shared.userInterfaceLayoutDirection {
             titleLabel.textAlignment = .right
-            subtitleLabel.textAlignment = .right
         }
         
         titleLabel.text = newValue.title
-        subtitleLabel.text = newValue.subtitle
 
         button.setEventHandler { [unowned self] in
             self.clickHandler(newValue.product)
