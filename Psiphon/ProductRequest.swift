@@ -45,14 +45,14 @@ var viewModel: PsiCashPurchasableViewModel? {
                 '\(product.productID)' is not a supported product
                 """)
         }
-        guard let title = formatter.string(from: psiCashProductID.psiCashAmount) else {
+        guard let formattedPsiCashAmount = formatter.string(from: psiCashProductID.psiCashAmount) else {
             return .parseError(reason:
                                 "Failed to format '\(psiCashProductID.psiCashAmount)' into string")
         }
         return .purchasable(
             PsiCashPurchasableViewModel(
                 product: .product(product),
-                title: title,
+                title: UserStrings.PsiCash_with_amount(formattedPsiCashAmount),
                 subtitle: product.localizedDescription,
                 localizedPrice: product.price,
                 clearedForSale: true

@@ -38,6 +38,14 @@ import Foundation
         return "PsiCash"
     }
     
+    @objc static func PsiCash_with_amount(_ amount: String) -> String {
+        let format = NSLocalizedString("PSICASH_WITH_AMOUNT", tableName: nil, bundle: .main,
+                                 value: "%@ PsiCash",
+                                 comment: "Do not translate or transliterate 'PsiCash'. PsiCash is a unit of currency here. Reorder the format specifier '%@' if in the translated language ordering of unit and amount is different from English.")
+        
+        return String.localizedStringWithFormat(format, amount);
+    }
+    
     static func PsiCash_balance() -> String {
         return NSLocalizedString("PSICASH_BALANCE", tableName: nil, bundle: Bundle.main,
                                  value: "PsiCash Balance:",
