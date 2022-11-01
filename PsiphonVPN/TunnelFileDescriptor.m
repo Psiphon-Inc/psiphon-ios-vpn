@@ -71,8 +71,10 @@ struct sockaddr_ctl {
 
 + (NSNumber *_Nullable)getTunnelFileDescriptor {
     
-    struct ctl_info ctlInfo;
-    strcpy(ctlInfo.ctl_name, "com.apple.net.utun_control");
+    struct ctl_info ctlInfo = {
+        .ctl_id = 0,
+        .ctl_name = "com.apple.net.utun_control"
+    };
     
     for (int32_t fd = 0; fd <= 1024; fd++) {
         
