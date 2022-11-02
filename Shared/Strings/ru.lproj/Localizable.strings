@@ -625,6 +625,9 @@
 /* Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
 "PSICASH_WAIT_TRANSACTION_VERIFIED" = "Пожалуйста, подождите окончания проверки транзакции";
 
+/*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. PsiCash is a unit of currency here. Reorder the format specifier '%@' if in the translated language ordering of unit and amount is different from English. */
+"PSICASH_WITH_AMOUNT" = "%@ PsiCash";
+
 /* Alert message informing user that a Psiphon connection is required */
 "PSIPHON_CONNECTION_REQUIRED" = "Требуется соединение Psiphon";
 
@@ -640,8 +643,8 @@
 /*[UNTRANSLATED] Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_MUST_BE_CONNECTED_INFO" = "Psiphon must be connected to show this content";
 
-/* Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. Conform to translation under key 'SPEED_BOOST'. Text of notification shown when a subscription or Speed Boost purchase is required to continue using the servive. */
-"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE_2" = "Please purchase a subscription or Speed Boost to continue using Psiphon.";
+/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. Notification message shown to the user indicating that Psiphon's service is no longer free in theri region, and that should open the app to learn more. */
+"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE_3" = "Psiphon is no longer free in your region, open the app to learn more.";
 
 /*[UNTRANSLATED] Alert message that the users purchases have been restored successfully */
 "PURCHASES_RESTORED_SUCCESSFULLY" = "Purchases restored successfully";
@@ -703,8 +706,14 @@
 /* Label on a button. Clicking this button will buy 1 hour of Speed Boost. Translate number as well. */
 "SPEED_BOOST_1HR" = "1 час";
 
+/*[UNTRANSLATED] Label on a button. Clicking this button will buy 1 day (24 hr) of Speed Boost. Translate number as well. */
+"SPEED_BOOST_24HR" = "1 Day";
+
 /* Label on a button. Clicking this button will buy 2 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_2HR" = "2 часа";
+
+/*[UNTRANSLATED] Label on a button. Clicking this button will buy 1 month (31 days) of Speed Boost. Translate number as well. */
+"SPEED_BOOST_31DAY" = "1 Month";
 
 /* Label on a button. Clicking this button will buy 3 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_3HR" = "3 часа";
@@ -717,6 +726,9 @@
 
 /* Label on a button. Clicking this button will buy 6 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_6HR" = "6 часов";
+
+/*[UNTRANSLATED] Label on a button. Clicking this button will buy 1 week (7 days) of Speed Boost. Translate number as well. */
+"SPEED_BOOST_7DAY" = "1 Week";
 
 /* Label on a button. Clicking this button will buy 7 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_7HR" = "7 часов";
