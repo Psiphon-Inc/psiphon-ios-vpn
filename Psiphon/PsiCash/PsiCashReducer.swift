@@ -156,11 +156,6 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             return []
         }
         
-        guard let purchasable = purchasableType.speedBoost else {
-            environment.feedbackLogger.fatalError(
-                "Expected a PsiCashPurchasable in '\(purchasableType)'")
-            return []
-        }
         state.psiCash.purchasing = .speedBoost(purchasable)
         return [
             environment.psiCashEffects
