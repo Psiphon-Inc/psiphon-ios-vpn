@@ -587,6 +587,7 @@ fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment
         notifier: env.notifier,
         notifierUpdatedAuthorizationsMessage: NotifierUpdatedAuthorizations,
         vpnActionStore: env.vpnActionStore,
+        tunnelStatusSignal: env.tunnelStatusSignal,
         tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
         objcBridgeDelegate: env.objcBridgeDelegate,
         metadata: { ClientMetaData(env.appInfo()) },

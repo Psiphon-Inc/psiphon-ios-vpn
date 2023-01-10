@@ -75,7 +75,7 @@ func makeUITestAppState(embeddedServerEntriesFile: String) -> AppState {
             lastRefreshBalance: psiCashBalance
         ),
         psiCashState: PsiCashState(
-            purchasing: .none,
+            purchase: .none,
             libData: .success(PsiCashLibData(
                 accountType: .account(loggedIn: true) /* User is logged in */,
                 accountName: "open_internet_123" /* PsiCash Account username */,

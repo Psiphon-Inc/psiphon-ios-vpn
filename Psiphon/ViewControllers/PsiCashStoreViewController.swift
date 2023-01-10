@@ -65,8 +65,7 @@ final class PsiCashStoreViewController: ReactiveViewController {
         let lifeCycle: ViewControllerLifeCycle
     }
     
-    enum Screen: Equatable {
-        case mainScreen
+    enum DialogScreen: Equatable {
         case psiCashPurchaseDialog
         case speedBoostPurchaseDialog
     }
@@ -87,7 +86,7 @@ final class PsiCashStoreViewController: ReactiveViewController {
     
     // VC-specific UI state
     
-    private var navigation: Screen = .mainScreen
+    private var presentedDialog: DialogScreen? = .none
     
     // Views
     private let accountNameViewWrapper = PsiCashAccountNameViewWrapper()
@@ -222,23 +221,27 @@ final class PsiCashStoreViewController: ReactiveViewController {
         
         let psiCashIAPPurchase = observed.readerState.iap.purchasing[.psiCash] ?? nil
         let purchasingNavState = (psiCashIAPPurchase?.purchasingState,
-                                  observed.readerState.psiCash.purchasing,
-                                  self.navigation)
+                                  observed.readerState.psiCash.purchase,
+                                  self.presentedDialog)
+        
         
         switch purchasingNavState {
         case (.none, .none, _):
             self.dismissPurchasingScreens()
             
-        case (.pending(_), _, .mainScreen):
-            let _ = self.display(screen: .psiCashPurchaseDialog)
+        case (.pending(_), _, .none):
+            let _ = self.presentDialogScreen(.psiCashPurchaseDialog)
             
         case (.pending(_), _, .psiCashPurchaseDialog):
             break
             
-        case (_, .speedBoost(_), .mainScreen):
-            let _ = self.display(screen: .speedBoostPurchaseDialog)
+        case (_, .pending(_), .none):
+            let _ = self.presentDialogScreen(.speedBoostPurchaseDialog)
             
-        case (_, .speedBoost(_), .speedBoostPurchaseDialog):
+        case (_, .pending(_), .speedBoostPurchaseDialog):
+            break
+            
+        case (_, .deferred(_), .none):
             break
             
         case (_, .error(let psiCashErrorEvent), _):
@@ -421,64 +424,84 @@ final class PsiCashStoreViewController: ReactiveViewController {
                     }
                 }
                 
-            case (.notConnected, .speedBoost):
-                
-                let activeSpeedBoost = observed.readerState.psiCash.activeSpeedBoost(self.dateCompare)
-                
-                switch activeSpeedBoost {
-                case .none:
-                    // There is no active speed boost.
-                    self.containerView.bind(
-                        .right(.right(.right(.left(
-                            .untunneled(.speedBoostUnavailable(subtitle: .connectToPsiphon)))))))
-                    
-                case .some(_):
-                    // There is an active speed boost.
-                    self.containerView.bind(
-                        .right(.right(.right(.left(.untunneled(.speedBoostAlreadyActive))))))
-                }
-                
-            case (.connected, .speedBoost):
+            case (.connected, .speedBoost),
+                 (.notConnected, .speedBoost):
                 
                 let activeSpeedBoost = observed.readerState.psiCash.activeSpeedBoost(dateCompare)
                 
                 switch activeSpeedBoost {
                 case .none:
                     // There is no active speed boost.
-                    let speedBoostPurchasables =
-                        psiCashLibData.purchasePrices.compactMap {
-                            $0.successToOptional()?.speedBoost
-                        }
-                        .filter { $0.product.distinguisher.availableForSale }
-                        .map { purchasable -> SpeedBoostPurchasableViewModel in
-                            
-                            let productTitle = purchasable.product.localizedString
-                                .uppercased(with: self.locale)
-                            
-                            return SpeedBoostPurchasableViewModel(
-                                purchasable: purchasable,
-                                localizedProductTitle: productTitle
-                            )
-                        }
-                        .sorted() // Sorts by Comparable impl of SpeedBoostPurchasableViewModel.
+                    // The user might have a deferred Speed Boost purchase.
                     
-                    let viewModel = NonEmpty(array: speedBoostPurchasables)
-                    
-                    if let viewModel = viewModel {
-                        // Has Speed Boost products
-                        self.containerView.bind(.right(.left(viewModel)))
-                    } else {
+                    // PsiCash deferred purchase
+                    switch observed.readerState.psiCash.purchase {
                         
-                        // If there is no pending PsiCash refresh state, and
-                        // there are no Speed Boost products, shows error message.
-                        if case .pending = observed.readerState.psiCash.pendingPsiCashRefresh {
-                            // Shows spinner while PsiCash refresh state is pending.
-                            self.containerView.bind(.right(.right(.left(true))))
-                        } else {
+                    case .deferred(_):
+                        
+                        switch observed.tunneled {
+                            
+                        case .notConnected:
+                            // Deferred purchase, while untunneled.
+                            // User is asked to connect to finish their transaction.
                             self.containerView.bind(
-                                .right(.right(.right(.right(.noSpeedBoostProducts)))))
+                                .right(.right(.right(.left(
+                                    .untunneled(.speedBoostPurchaseDeferred))))))
+                            
+                        case .connected:
+                            // Transitory stage. A deferred purchase will soon be
+                            // pending after the tunnel has connected.
+                            break
+                            
+                        default:
+                            fatalError()
                         }
                         
+                    case .none, .error(_), .pending(_):
+                        // There is no deferred PsiCash purchase.
+                        // In case of a pending purchase Speed Boost purchase dialog
+                        // is presented.
+                        
+                        let sbProducts = SpeedBoostPurchasableViewModel
+                            .makeArray(psiCashLibData, self.locale)
+                        
+                        if let viewModel = NonEmpty(array: sbProducts) {
+                            
+                            // Has Speed Boost products
+                            self.containerView.bind(.right(.left(viewModel)))
+                            
+                        } else {
+                            
+                            // If there is no pending PsiCash refresh state, and
+                            // there are no Speed Boost products, shows error message.
+                            if case .pending = observed.readerState.psiCash.pendingPsiCashRefresh {
+                                // Shows spinner while PsiCash refresh state is pending.
+                                self.containerView.bind(.right(.right(.left(true))))
+                            } else {
+                                // Error state: PsiCash (Speed Boost) purchase prices are not available.
+                                // If tunneled, asks the user to connect, otherwise shows
+                                // no Speed Boost product available.
+                                switch observed.tunneled {
+                                case .connected:
+                                    // Shows message that Speed Boost purchase prices
+                                    // have not been fetched.
+                                    self.containerView.bind(
+                                        .right(.right(.right(.right(.noSpeedBoostProducts)))))
+                                    
+                                case .notConnected:
+                                    // Shows message that Speed Boost purchasing is unavailable
+                                    // and asks the user to connect.
+                                    self.containerView.bind(
+                                        .right(.right(.right(.left(
+                                            .untunneled(.speedBoostUnavailable(subtitle: .connectToPsiphon)))))))
+                                    
+                                case .connecting, .disconnecting:
+                                    // Should have already been handled!
+                                    fatalError("unexpected state")
+                                }
+                            }
+                            
+                        }
                     }
                     
                 case .some(_):
@@ -492,10 +515,19 @@ final class PsiCashStoreViewController: ReactiveViewController {
     
     /// An incomplete representation of the UI state, used only by the `updateUIStateHelper(_:)` method.
     enum _UIState: Equatable {
+        
         case psiCashLibFailedInit
+        
         case unknownSubscription
+        
         case subscribed(PsiCashAccountType)
-        case notSubscribed(TunnelConnectedStatus, PsiCashAccountType, PsiCashState.LoginLogoutPendingValue?)
+        
+        case notSubscribed(
+            TunnelConnectedStatus,
+            PsiCashAccountType,
+            PsiCashState.LoginLogoutPendingValue?
+        )
+        
     }
     
     /// `updateUIStateHelper(_:)` updates some parts of the UI.
@@ -548,7 +580,8 @@ final class PsiCashStoreViewController: ReactiveViewController {
             
             return true
             
-        case let .notSubscribed(tunnelStatus, psiCashAccountType, maybePendingPsiCashLoginLogout):
+        case let .notSubscribed(
+            tunnelStatus, psiCashAccountType, maybePendingPsiCashLoginLogout):
             
             // Blocks UI and displays appropriate message if tunnel is connecting or disconnecting.
             switch tunnelStatus {
@@ -559,7 +592,7 @@ final class PsiCashStoreViewController: ReactiveViewController {
                 self.signupOrLogInView.isHidden = true
                 
                 self.containerView.bind(
-                    .left(.right(.right(.right(.right(.unavailableWhileConnecting))))))
+                    .left(.right(.right(.right(.right(.psiphonIsConnecting))))))
                 
                 return true
                 
@@ -759,25 +792,25 @@ final class PsiCashStoreViewController: ReactiveViewController {
 extension PsiCashStoreViewController {
     
     private func dismissPurchasingScreens() {
-        switch self.navigation {
-        case .mainScreen:
+        switch self.presentedDialog {
+        case .none:
             return
         case .psiCashPurchaseDialog, .speedBoostPurchaseDialog:
-            let _ = self.display(screen: .mainScreen)
+            let _ = self.presentDialogScreen(.none)
         }
     }
     
-    private func display(screen: Screen) -> Bool {
+    private func presentDialogScreen(_ screen: DialogScreen?) -> Bool {
         
         // Can only navigate to a new screen from the main screen,
         // otherwise what should be presented is not well-defined.
         
-        guard self.navigation != screen else {
+        guard self.presentedDialog != screen else {
             // Already displaying `screen`.
             return true
         }
         
-        if case .mainScreen = screen {
+        if case .none = screen {
             guard let presentedViewController = self.presentedViewController else {
                 // There is no presentation to dismiss.
                 return true
@@ -787,19 +820,19 @@ extension PsiCashStoreViewController {
                                          animated: false,
                                          completion: nil)
             
-            self.navigation = .mainScreen
+            self.presentedDialog = .none
             return true
             
         } else {
             
             // Presenting a new screen is only well-defined current screen is the main screen.
-            guard case .mainScreen = self.navigation else {
+            guard case .none = self.presentedDialog else {
                 return false
             }
 
             let alertViewBuilder: PurchasingAlertViewBuilder
             switch screen {
-            case .mainScreen:
+            case .none:
                 fatalError()
             case .psiCashPurchaseDialog:
                 alertViewBuilder = PurchasingAlertViewBuilder(alert: .psiCash, locale: locale)
@@ -816,7 +849,7 @@ extension PsiCashStoreViewController {
 
             self.presentOnViewDidAppear(vc, animated: false, completion: nil)
             
-            self.navigation = screen
+            self.presentedDialog = screen
             return true
         }
     }
@@ -904,4 +937,35 @@ extension PsiCashStoreViewController.ReaderState {
 
     }
 
+}
+
+extension SpeedBoostPurchasableViewModel {
+    
+    // Convenience function to create view model for the Speed Boost products.
+    static func makeArray(
+        _ psiCashLibData: PsiCashLibData,
+        _ locale: Locale
+    ) -> [Self] {
+        
+        let speedBoostPurchasables = psiCashLibData.purchasePrices.compactMap {
+            $0.successToOptional()?.speedBoost
+        }
+        .filter { $0.product.distinguisher.availableForSale }
+        .map { purchasable -> SpeedBoostPurchasableViewModel in
+            
+            let productTitle = purchasable.product.localizedString
+                .uppercased(with: locale)
+            
+            return SpeedBoostPurchasableViewModel(
+                purchasable: purchasable,
+                localizedProductTitle: productTitle
+            )
+            
+        }
+        .sorted() // Sorts by Comparable impl of SpeedBoostPurchasableViewModel.
+        
+        return speedBoostPurchasables
+        
+    }
+    
 }
