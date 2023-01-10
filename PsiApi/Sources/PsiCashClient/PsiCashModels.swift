@@ -279,6 +279,14 @@ public enum PsiCashPurchasableType: Equatable {
         guard case let .speedBoost(value) = self else { return .none }
         return value
     }
+    
+    /// Convinience accessor.
+    public var expectedPrice: PsiCashAmount {
+        switch self {
+        case .speedBoost(let purchasable):
+            return purchasable.expectedPrice
+        }
+    }
 
 }
 

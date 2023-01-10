@@ -172,12 +172,32 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         // No-op if there is a pending purchase.
         // Note: Last deferred purchase will be replaced (if any).
         guard
-            case .success(_) = state.psiCash.libData,
+            case .success(let libData) = state.psiCash.libData,
             let tunnelConnection = state.tunnelConnection,
             case .notSubscribed = state.subscription.status,
             !state.psiCash.purchase.pending
         else {
             return []
+        }
+        
+        // Checks if there is sufficient funds (even if balance is not up-to-date).
+        guard libData.balance >= purchasableType.expectedPrice else {
+            
+            // Creates insufficient error event of the same type as the actual server response.
+            let errorEvent = NewExpiringPurchaseResult.ErrorType.init(
+                .requestError(.errorStatus(.insufficientBalance)),
+                date: environment.getCurrentTime()
+            )
+            
+            state.psiCash.purchase = .error(errorEvent)
+            
+            return [
+                environment.feedbackLogger.log(.info, """
+                    insufficient balance
+                    \(purchasableType.expectedPrice.inPsi) > \(libData.balance.inPsi)
+                    """).mapNever()
+            ]
+            
         }
         
         // Purchase should be deferred if the tunnel is not connected.
