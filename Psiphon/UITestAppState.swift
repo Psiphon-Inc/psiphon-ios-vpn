@@ -42,8 +42,8 @@ func makeUITestAppState(embeddedServerEntriesFile: String) -> AppState {
     // NOTE: Assumes the price of each SB product is hrs * 100 PsiCash.
     let allSpeedBoostProducts = SpeedBoostDistinguisher.allCases.map { sbDistinguisher -> PsiCashPurchasableType in
         let sbProduct = SpeedBoostProduct(distinguisher: sbDistinguisher.rawValue)!
-        let price = PsiCashAmount(nanoPsi: Int64(sbDistinguisher.hours) * 100_000_000_000)
-        return .speedBoost(.init(product: sbProduct, price: price))
+        let expectedPrice = PsiCashAmount(nanoPsi: Int64(sbDistinguisher.hours) * 100_000_000_000)
+        return .speedBoost(.init(product: sbProduct, expectedPrice: expectedPrice))
     }
     
     let psiCashBalance = PsiCashAmount(nanoPsi: 8_700_000_000_000)
