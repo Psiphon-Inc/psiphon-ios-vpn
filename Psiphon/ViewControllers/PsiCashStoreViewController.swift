@@ -144,12 +144,9 @@ final class PsiCashStoreViewController: ReactiveViewController {
         let messageViewWithAction = PsiCashMessageViewWithButton { [unowned objCBridgeDelegate] message in
             switch message {
             case .untunneled(_):
-                // Dismisses this view controller, and starts the VPN.
-                objCBridgeDelegate.dismiss(screen: .psiCash) {
-                    // This action toggles the VPN, but it is expcected to only
-                    // be called when the VPN is disc
-                    objCBridgeDelegate.startStopVPN()
-                }
+                // This action toggles the VPN, but it is expcected to only
+                // be called when the VPN is not connected.
+                objCBridgeDelegate.startStopVPN()
             }
         }
         
