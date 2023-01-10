@@ -724,7 +724,7 @@ fileprivate extension PsiCashPurchasableType {
                 .success(.speedBoost(
                     PsiCashPurchasable(
                         product: product,
-                        price: PsiCashAmount(nanoPsi: purchasePrice.price)
+                        expectedPrice: PsiCashAmount(nanoPsi: purchasePrice.price)
                 )))
         }
     }

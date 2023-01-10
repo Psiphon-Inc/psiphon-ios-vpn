@@ -196,15 +196,20 @@ public protocol PsiCashProduct: Hashable  {
     var distinguisher: DistinguihserType { get }
 }
 
-/// Information about a PsiCash product that can be purchased, and its price.
+/// A PsiCash product that can be purchased, and its expected price.
 public struct PsiCashPurchasable<Product: PsiCashProduct>: Hashable {
-    public let product: Product
-    public let price: PsiCashAmount
     
-    public init(product: Product, price: PsiCashAmount) {
+    /// The product to purchase.
+    public let product: Product
+    
+    /// The expected price of the product (previously obtained by RefreshState).
+    public let expectedPrice: PsiCashAmount
+    
+    public init(product: Product, expectedPrice: PsiCashAmount) {
         self.product = product
-        self.price = price
+        self.expectedPrice = expectedPrice
     }
+    
 }
 
 public typealias SpeedBoostPurchasable = PsiCashPurchasable<SpeedBoostProduct>
@@ -296,7 +301,7 @@ extension PsiCashPurchasableType {
     public var price: PsiCashAmount {
         switch self {
         case .speedBoost(let purchasable):
-            return purchasable.price
+            return purchasable.expectedPrice
         }
     }
 }
