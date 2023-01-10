@@ -188,6 +188,7 @@ public enum PsiCashTransactionClass: String, Codable, CaseIterable {
             return .none
         }
     }
+    
 }
 
 public protocol PsiCashProduct: Hashable  {
@@ -259,15 +260,17 @@ public struct PurchasedExpirableProduct<Product: PsiCashProduct>: Equatable {
 }
 
 public enum PsiCashPurchasedType: Equatable {
+    
     case speedBoost(PurchasedExpirableProduct<SpeedBoostProduct>)
 
     public var speedBoost: PurchasedExpirableProduct<SpeedBoostProduct>? {
         guard case let .speedBoost(value) = self else { return nil }
         return value
     }
+    
 }
 
-/// Union of all types of PsiCash products.
+/// Represents all possible PsiCash purchasable products (i.e. all valid `PsiCashPurchasable<?>`).
 public enum PsiCashPurchasableType: Equatable {
 
     case speedBoost(PsiCashPurchasable<SpeedBoostProduct>)
@@ -320,11 +323,11 @@ extension PsiCashPurchasableType: Hashable {
 
 public struct SpeedBoostProduct: PsiCashProduct {
     
-    /// Amount of Speed Boost hours as defined by the Speed Boost distinguisher.
-    public var hours: Int { distinguisher.hours }
-    
     public let transactionClass: PsiCashTransactionClass
     public let distinguisher: SpeedBoostDistinguisher
+    
+    /// Amount of Speed Boost hours as defined by the Speed Boost distinguisher.
+    public var hours: Int { distinguisher.hours }
 
     /// Initializer fails if provided `distinguisher` is not supported.
     public init?(distinguisher: String) {
