@@ -30,6 +30,7 @@ struct PsiCashMessageViewWithButton: ViewBuilder {
                 case connectToPsiphon
             }
             
+            case speedBoostPurchaseDeferred
             case speedBoostAlreadyActive
             case speedBoostUnavailable(subtitle: SpeedBoostUnavailableMessage)
             case pendingPsiCashPurchase
@@ -90,6 +91,11 @@ struct PsiCashMessageViewWithButton: ViewBuilder {
                 case .untunneled(let untunneledMessage):
                     
                     switch untunneledMessage {
+                        
+                    case .speedBoostPurchaseDeferred:
+                        imageView.image = UIImage(named: "RedRocket")
+                        title.text = UserStrings.PsiCash_transaction_pending()
+                        subtitle.text = UserStrings.Connect_to_finish_psicash_transaction()
                         
                     case .speedBoostAlreadyActive:
                         imageView.image = UIImage(named: "SpeedBoostActive")!

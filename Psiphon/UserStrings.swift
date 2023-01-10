@@ -82,9 +82,9 @@ import Foundation
                                  comment: "Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate.")
     }
     
-    static func Purchasing_speed_boost() -> String {
-        return NSLocalizedString("PURCHASING_SPEED_BOOST", tableName: nil, bundle: Bundle.main,
-                                 value: "Purchasing Speed Boost…",
+    static func Purchasing_speed_boost_please_wait() -> String {
+        return NSLocalizedString("PURCHASING_SPEED_BOOST_PLEASE_WAIT_2", tableName: nil, bundle: Bundle.main,
+                                 value: "Purchasing Speed Boost…\n\nPlease wait for your purchase to complete.",
                                  comment: "Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed.")
     }
     
@@ -214,6 +214,12 @@ import Foundation
         return NSLocalizedString("CONNECTING_TO_PSIPHON", tableName: nil, bundle: Bundle.main,
                                  value: "Connecting to Psiphon",
                                  comment: "Label text shown to user when the VPN is connecting to a Psiphon server. Do not translate or transliterate 'Psiphon'")
+    }
+    
+    static func Please_wait_to_finish_connecting() -> String {
+        return NSLocalizedString("PLEASE_WAIT_TO_FINISH_CONNECTING", tableName: nil, bundle: Bundle.main,
+                                 value: "Please wait for Psiphon to finish connecting.",
+                                 comment: "Do not tarnslate or transliterate 'Psiphon'. Message asking user to wait for the until connection is established with Psiphon servers.")
     }
     
     static func Free() -> String {

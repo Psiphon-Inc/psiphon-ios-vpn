@@ -714,6 +714,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 // that can be retrieved. (e.g. server authorization rekey.)
                 self.store.send(.appReceipt(.readLocalReceiptFile))
                 
+                // Send purchase request for deferred PsiCash products.
+                self.store.send(.psiCash(.purchaseDeferredProducts))
+                
             }
         
         // Forwards `SubscriptionStatus` updates to ObjCBridgeDelegate.

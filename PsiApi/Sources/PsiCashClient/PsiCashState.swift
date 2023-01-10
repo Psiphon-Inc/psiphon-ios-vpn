@@ -48,7 +48,7 @@ public struct PsiCashState: Equatable {
     public typealias PendingAccountLoginLogoutEvent =
         Event<PendingValue<LoginLogoutPendingValue, AccountLoginLogoutCompleted>>
     
-    public var purchasing: PsiCashPurchasingState
+    public var purchase: PsiCashPurchaseState
     
     /// Representation of PsiCash data held by PsiCash library.
     /// If `nil`, PsiCash library is not initialized yet.
@@ -58,8 +58,13 @@ public struct PsiCashState: Equatable {
     public var pendingPsiCashRefresh: PendingRefresh
     
     
-    public init(purchasing: PsiCashPurchasingState, libData: Result<PsiCashLibData, ErrorRepr>? = nil, pendingAccountLoginLogout: PsiCashState.PendingAccountLoginLogoutEvent? = nil, pendingPsiCashRefresh: PsiCashState.PendingRefresh) {
-        self.purchasing = purchasing
+    public init(
+        purchase: PsiCashPurchaseState,
+        libData: Result<PsiCashLibData, ErrorRepr>? = nil,
+        pendingAccountLoginLogout: PsiCashState.PendingAccountLoginLogoutEvent? = nil,
+        pendingPsiCashRefresh: PsiCashState.PendingRefresh
+    ) {
+        self.purchase = purchase
         self.libData = libData
         self.pendingAccountLoginLogout = pendingAccountLoginLogout
         self.pendingPsiCashRefresh = pendingPsiCashRefresh
@@ -93,7 +98,7 @@ extension PsiCashState {
 extension PsiCashState: CustomFieldFeedbackDescription {
     public var feedbackFields: [String : CustomStringConvertible] {
         [
-            "purchasing": String(describing: purchasing),
+            "purchasing": String(describing: purchase),
             "pendingAccountLoginLogout": String(describing: pendingAccountLoginLogout),
             "pendingPsiCashRefresh": String(describing: pendingPsiCashRefresh)
         ]
@@ -103,7 +108,7 @@ extension PsiCashState: CustomFieldFeedbackDescription {
 extension PsiCashState {
     
     public init() {
-        purchasing = .none
+        purchase = .none
         libData = nil
         pendingAccountLoginLogout = nil
         pendingPsiCashRefresh = .completed(.success(.unit))
@@ -122,18 +127,35 @@ extension PsiCashState {
     }
 }
 
-public enum PsiCashPurchasingState: Equatable {
+/// Represents the purchase state of a PsiCash product e.g. Speed Boost.
+public enum PsiCashPurchaseState: Equatable {
+    
+    /// No product is being purchased.
     case none
-    case speedBoost(SpeedBoostPurchasable)
+    
+    /// Purchase is deferred until the tunnel is connected.
+    case deferred(PsiCashPurchasableType)
+    
+    /// Purchase request is made (or imminent), awaiting result.
+    case pending(PsiCashPurchasableType)
+    
+    /// Purchase ended in an error state.
     case error(NewExpiringPurchaseResult.ErrorType)
     
-    /// True if purchasing is completed (succeeded or failed)
-    public var completed: Bool {
-        switch self {
-        case .none: return true
-        case .error(_): return true
-        case .speedBoost(_): return false
+    /// `true` if PsiCash product purchase request is made (or imminenet).
+    public var pending: Bool {
+        guard case .pending(_) = self else {
+            return false
         }
+        return true
+    }
+    
+    /// `true` if there is a pending PsiCash product purchase after tunnel is connected.
+    public var deferred: Bool {
+        guard case .deferred(_) = self else {
+            return false
+        }
+        return true
     }
 }
 
