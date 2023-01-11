@@ -42,6 +42,7 @@
 		29BA6DA1268630A9001445EA /* TunnelFileDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 29BA6DA0268630A9001445EA /* TunnelFileDescriptor.m */; };
 		29BE0BE327C54828003BC17B /* PsiCashAccountExplainerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29BE0BE227C54828003BC17B /* PsiCashAccountExplainerViewController.swift */; };
 		29C3220A26B1C17D0075BB34 /* AppInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = 4E10920720F3DA190033114B /* AppInfo.m */; };
+		29D6156A296F537A00E05AB2 /* AppState+ValuePaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29D61569296F537A00E05AB2 /* AppState+ValuePaths.swift */; };
 		29DE99C628B43E2400445DED /* PurchaseRequiredPrompt.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29DE99C528B43E2400445DED /* PurchaseRequiredPrompt.swift */; };
 		29EE50B726ACDC0E00DB8A60 /* AppFiles.m in Sources */ = {isa = PBXBuildFile; fileRef = 29EE50B626ACDC0E00DB8A60 /* AppFiles.m */; };
 		29EE50B826ACDC0E00DB8A60 /* AppFiles.m in Sources */ = {isa = PBXBuildFile; fileRef = 29EE50B626ACDC0E00DB8A60 /* AppFiles.m */; };
@@ -431,6 +432,7 @@
 		29BA6D9F268630A9001445EA /* TunnelFileDescriptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TunnelFileDescriptor.h; sourceTree = "<group>"; };
 		29BA6DA0268630A9001445EA /* TunnelFileDescriptor.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TunnelFileDescriptor.m; sourceTree = "<group>"; };
 		29BE0BE227C54828003BC17B /* PsiCashAccountExplainerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiCashAccountExplainerViewController.swift; sourceTree = "<group>"; };
+		29D61569296F537A00E05AB2 /* AppState+ValuePaths.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppState+ValuePaths.swift"; sourceTree = "<group>"; };
 		29DE99C528B43E2400445DED /* PurchaseRequiredPrompt.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PurchaseRequiredPrompt.swift; sourceTree = "<group>"; };
 		29EE50B526ACDC0E00DB8A60 /* AppFiles.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppFiles.h; sourceTree = "<group>"; };
 		29EE50B626ACDC0E00DB8A60 /* AppFiles.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppFiles.m; sourceTree = "<group>"; };
@@ -1412,6 +1414,7 @@
 				295E32992718B63100C77BEA /* UITestAppState.swift */,
 				CE58B641251A31370081C73C /* AppState+Feedback.swift */,
 				52DF5E9723CE5A8300A1B067 /* AppAction+ValuePaths.swift */,
+				29D61569296F537A00E05AB2 /* AppState+ValuePaths.swift */,
 				52DF5E9923CE835100A1B067 /* UserStrings.swift */,
 				52DF5E9D23D0D01F00A1B067 /* BridgingTypes.swift */,
 				52B3C54823DF99E8003F6B12 /* AppObservables.h */,
@@ -2097,6 +2100,7 @@
 				8D7E9B9F2425E053006F3A2F /* Animations.swift in Sources */,
 				EF90D7A9204F22C900228A63 /* FileUtils.m in Sources */,
 				EF90D7A1204F22C900228A63 /* timestamp_valid.c in Sources */,
+				29D6156A296F537A00E05AB2 /* AppState+ValuePaths.swift in Sources */,
 				445F24DF20E1A5BA00D004E9 /* ANY.c in Sources */,
 				296622B525E8A554004635A1 /* LaunchScreenViewController.swift in Sources */,
 				295D767328BD409000AF6AC8 /* LocalNotificationService.m in Sources */,
