@@ -111,7 +111,9 @@ extension AppState {
             LandingPageReducerState(
                 pendingLandingPageOpening: self.pendingLandingPageOpening,
                 tunnelConnection: self.tunnelConnection,
-                applicationParameters: self.appDelegateState.applicationParameters
+                applicationParameters: self.appDelegateState.applicationParameters,
+                psiCashState: self.psiCashState,
+                subscriptionState: self.subscription
             )
         }
         set {
