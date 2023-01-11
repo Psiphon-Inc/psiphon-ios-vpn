@@ -635,9 +635,12 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         ]
         
     case let .presentPsiCashStore(initialTab, animated):
-        // If psiCashStoreViewState is not nil, it implies the PsiCashStoreViewController is presented.
+        // If psiCashStoreViewState is not nil, PsiCashStoreViewController is presented.
         guard case .none = state.mainView.psiCashStoreViewState else {
-            return []
+            // Switch to the `initialTab`.
+            return [
+                Effect(value: .psiCashViewAction(.switchTabs(initialTab)))
+            ]
         }
 
         state.mainView.psiCashStoreViewState = PsiCashStoreViewState(
