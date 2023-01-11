@@ -74,6 +74,13 @@ let landingPageReducer = Reducer<LandingPageReducerState
             ]
         }
         
+        guard !(state.psiCashState.purchase.deferred || state.psiCashState.purchase.pending) else {
+            return [
+                environment.feedbackLogger
+                    .log(.info, "skipping landing page (Pending or deferred PsiCash purchase)").mapNever()
+            ]
+        }
+        
         guard !state.pendingLandingPageOpening else {
             return [
                 environment.feedbackLogger.log(
