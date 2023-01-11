@@ -168,6 +168,7 @@ struct AppEnvironment {
     let mainViewStore: (MainViewAction) -> Effect<Never>
     let tunnelIntentStore: (TunnelStartStopIntent) -> Effect<Never>
     let serverRegionStore: (ServerRegionAction) -> Effect<Never>
+    let landingPageStore: (LandingPageAction) -> Effect<Never>
 
     /// `vpnStartCondition` returns true whenever the app is in such a state as to to allow
     /// the VPN to be started. If false is returned the VPN should not be started
@@ -392,6 +393,11 @@ func makeEnvironment(
                 store.send(.serverRegionAction(action))
             }
         },
+        landingPageStore: { [unowned store] (action: LandingPageAction) -> Effect<Never> in
+            .fireAndForget {
+                store.send(.landingPage(action))
+            }
+        },
         vpnStartCondition: { () -> Bool in
             // Retruns true if the VPN can be started given the current state of the app.
             // Legacy: It was used to disallow starting VPN if an interstitial ad is presented.
@@ -587,6 +593,7 @@ fileprivate func toPsiCashEnvironment(env: AppEnvironment) -> PsiCashEnvironment
         notifier: env.notifier,
         notifierUpdatedAuthorizationsMessage: NotifierUpdatedAuthorizations,
         vpnActionStore: env.vpnActionStore,
+        tunnelStatusSignal: env.tunnelStatusSignal,
         tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
         objcBridgeDelegate: env.objcBridgeDelegate,
         metadata: { ClientMetaData(env.appInfo()) },
@@ -605,6 +612,9 @@ fileprivate func toLandingPageEnvironment(env: AppEnvironment) -> LandingPageEnv
         urlHandler: env.urlHandler,
         psiCashEffects: env.psiCashEffects,
         psiCashAccountTypeSignal: env.psiCashAccountTypeSignal,
+        dateCompare: env.dateCompare,
+        tunnelStatusSignal: env.tunnelStatusSignal,
+        mainViewStore: env.mainViewStore,
         mainDispatcher: env.mainDispatcher
     )
 }
@@ -701,6 +711,7 @@ fileprivate func toAppDelegateReducerEnvironment(env: AppEnvironment) -> AppDele
         mainViewStore: env.mainViewStore,
         appReceiptStore: env.appReceiptStore,
         serverRegionStore: env.serverRegionStore,
+        landingPageStore: env.landingPageStore,
         paymentTransactionDelegate: env.paymentTransactionDelegate,
         mainDispatcher: env.mainDispatcher,
         getCurrentTime: env.dateCompare.getCurrentTime,

@@ -455,7 +455,7 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
                 getCurrentTime: environment.getCurrentTime
             )
             
-            // Updates purchasing state based on result of IAPPurchasing.makeGiven.
+            // Updates purchase state based on result of IAPPurchasing.makeGiven.
             switch iapPurchasingResult {
             case let .success(.unique(iapPurchasing, maybeUnfinishedConsumableTx)):
                 

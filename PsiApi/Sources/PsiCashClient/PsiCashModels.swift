@@ -188,6 +188,7 @@ public enum PsiCashTransactionClass: String, Codable, CaseIterable {
             return .none
         }
     }
+    
 }
 
 public protocol PsiCashProduct: Hashable  {
@@ -196,15 +197,20 @@ public protocol PsiCashProduct: Hashable  {
     var distinguisher: DistinguihserType { get }
 }
 
-/// Information about a PsiCash product that can be purchased, and its price.
+/// A PsiCash product that can be purchased, and its expected price.
 public struct PsiCashPurchasable<Product: PsiCashProduct>: Hashable {
-    public let product: Product
-    public let price: PsiCashAmount
     
-    public init(product: Product, price: PsiCashAmount) {
+    /// The product to purchase.
+    public let product: Product
+    
+    /// The expected price of the product (previously obtained by RefreshState).
+    public let expectedPrice: PsiCashAmount
+    
+    public init(product: Product, expectedPrice: PsiCashAmount) {
         self.product = product
-        self.price = price
+        self.expectedPrice = expectedPrice
     }
+    
 }
 
 public typealias SpeedBoostPurchasable = PsiCashPurchasable<SpeedBoostProduct>
@@ -254,15 +260,17 @@ public struct PurchasedExpirableProduct<Product: PsiCashProduct>: Equatable {
 }
 
 public enum PsiCashPurchasedType: Equatable {
+    
     case speedBoost(PurchasedExpirableProduct<SpeedBoostProduct>)
 
     public var speedBoost: PurchasedExpirableProduct<SpeedBoostProduct>? {
         guard case let .speedBoost(value) = self else { return nil }
         return value
     }
+    
 }
 
-/// Union of all types of PsiCash products.
+/// Represents all possible PsiCash purchasable products (i.e. all valid `PsiCashPurchasable<?>`).
 public enum PsiCashPurchasableType: Equatable {
 
     case speedBoost(PsiCashPurchasable<SpeedBoostProduct>)
@@ -270,6 +278,14 @@ public enum PsiCashPurchasableType: Equatable {
     public var speedBoost: PsiCashPurchasable<SpeedBoostProduct>? {
         guard case let .speedBoost(value) = self else { return .none }
         return value
+    }
+    
+    /// Convinience accessor.
+    public var expectedPrice: PsiCashAmount {
+        switch self {
+        case .speedBoost(let purchasable):
+            return purchasable.expectedPrice
+        }
     }
 
 }
@@ -296,7 +312,7 @@ extension PsiCashPurchasableType {
     public var price: PsiCashAmount {
         switch self {
         case .speedBoost(let purchasable):
-            return purchasable.price
+            return purchasable.expectedPrice
         }
     }
 }
@@ -315,11 +331,11 @@ extension PsiCashPurchasableType: Hashable {
 
 public struct SpeedBoostProduct: PsiCashProduct {
     
-    /// Amount of Speed Boost hours as defined by the Speed Boost distinguisher.
-    public var hours: Int { distinguisher.hours }
-    
     public let transactionClass: PsiCashTransactionClass
     public let distinguisher: SpeedBoostDistinguisher
+    
+    /// Amount of Speed Boost hours as defined by the Speed Boost distinguisher.
+    public var hours: Int { distinguisher.hours }
 
     /// Initializer fails if provided `distinguisher` is not supported.
     public init?(distinguisher: String) {

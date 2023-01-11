@@ -22,6 +22,7 @@ import Utilities
 import ReactiveSwift
 import PsiApi
 import PsiCashClient
+import struct AppStoreIAP.SubscriptionState
 
 fileprivate let landingPageTag = LogTag("LandingPage")
 
@@ -29,21 +30,34 @@ struct LandingPageReducerState: Equatable {
     var pendingLandingPageOpening: Bool
     let tunnelConnection: TunnelConnection?
     let applicationParameters: ApplicationParameters
+    let psiCashState: PsiCashState
+    let subscriptionState: SubscriptionState
 }
 
 enum LandingPageAction {
+    
+    /// Signal that external landing page can be opened if one is available.
     case tunnelConnectedAfterIntentSwitchedToStart
+    
+    /// External landing page.
     case _urlOpened(success: Bool)
+    
+    /// Presents purchase required prompt.
+    case presentPurchaseRequiredPrompt
+    
 }
 
-typealias LandingPageEnvironment = (
-    feedbackLogger: FeedbackLogger,
-    sharedDB: PsiphonDataSharedDB,
-    urlHandler: URLHandler,
-    psiCashEffects: PsiCashEffects,
-    psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType?, Never>,
-    mainDispatcher: MainDispatcher
-)
+struct LandingPageEnvironment {
+    let feedbackLogger: FeedbackLogger
+    let sharedDB: PsiphonDataSharedDB
+    let urlHandler: URLHandler
+    let psiCashEffects: PsiCashEffects
+    let psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType?, Never>
+    let dateCompare: DateCompare
+    let tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
+    let mainViewStore: (MainViewAction) -> Effect<Never>
+    let mainDispatcher: MainDispatcher
+}
 
 let landingPageReducer = Reducer<LandingPageReducerState
                                  , LandingPageAction
@@ -52,18 +66,21 @@ let landingPageReducer = Reducer<LandingPageReducerState
     
     switch action {
     case .tunnelConnectedAfterIntentSwitchedToStart:
+        
         guard !state.applicationParameters.showPurchaseRequiredPurchasePrompt else {
             return [
                 environment.feedbackLogger
                     .log(.info, "skipping landing page (ShowPurchaseRequiredPrompt)").mapNever()
             ]
         }
+        
         guard !state.pendingLandingPageOpening else {
             return [
                 environment.feedbackLogger.log(
                     .info, tag: landingPageTag, "pending landing page opening").mapNever()
             ]
         }
+        
         guard let tunnelConnection = state.tunnelConnection else {
             environment.feedbackLogger.fatalError("expected a valid tunnel provider")
             return []
@@ -100,6 +117,61 @@ let landingPageReducer = Reducer<LandingPageReducerState
     case ._urlOpened(success: _):
         state.pendingLandingPageOpening = false
         return []
+        
+    case .presentPurchaseRequiredPrompt:
+        
+        guard state.applicationParameters.showPurchaseRequiredPurchasePrompt else {
+            return []
+        }
+        
+        // Purchase required prompt is shown only once for each "VPN session".
+        
+        let lastHandledVPNSession = environment.sharedDB
+            .getContainerPurchaseRequiredHandledEventLatestVPNSessionNumber()
+        
+        // Updates PsiphonDataSharedDB that this event was handled.
+        environment.sharedDB
+            .setContainerPurchaseRequiredHandledEventVPNSessionNumber(
+                state.applicationParameters.vpnSessionNumber)
+        
+        if state.applicationParameters.vpnSessionNumber > lastHandledVPNSession {
+            
+            // Prompt is presented if the user is not (subscribed or speed-boosted)
+            // and is connected (or connecting).
+            if NEEvent.canPresentPurchaseRequiredPrompt(
+                dateCompare: environment.dateCompare,
+                psiCashState: state.psiCashState,
+                subscriptionStatus: state.subscriptionState.status,
+                tunnelConnectedStatus: state.tunnelConnection?.tunneled ?? .notConnected
+            ) {
+                
+                // If VPN is in connecting state, waits for the VPN to connect first.
+                return [
+                    environment.tunnelStatusSignal
+                        .filter {
+                            $0 == .connected
+                        }
+                        .take(first: 1)
+                        .then(
+                            environment.mainViewStore(.presentPurchaseRequiredPrompt)
+                                .mapNever()
+                        ),
+                    
+                    environment.feedbackLogger
+                        .log(.info, "Will present purchase required prompt once connected")
+                        .mapNever()
+                ]
+            } else {
+                return [
+                    environment.feedbackLogger .log(
+                        .info, "Purchase required prompt will not presented").mapNever()
+                ]
+            }
+            
+        }
+        
+        return []
+        
 
     }
 }

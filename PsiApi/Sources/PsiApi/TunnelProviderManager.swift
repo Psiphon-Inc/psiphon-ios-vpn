@@ -94,6 +94,7 @@ public class VPNConnectionObserver<T: TunnelProviderManager>: StoreDelegate<Tunn
     func setTunnelProviderManager(_ manager: T) {}
 }
 
+/// Wraps `NEVPNConnection`.
 public final class TunnelConnection: Equatable {
     
     public enum ConnectionResourceStatus: Equatable {
