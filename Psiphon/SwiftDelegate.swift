@@ -101,6 +101,7 @@ struct AppDelegateEnvironment {
     let mainViewStore: (MainViewAction) -> Effect<Never>
     let appReceiptStore: (ReceiptStateAction) -> Effect<Never>
     let serverRegionStore: (ServerRegionAction) -> Effect<Never>
+    let landingPageStore: (LandingPageAction) -> Effect<Never>
     let paymentTransactionDelegate: PaymentTransactionDelegate
     let mainDispatcher: MainDispatcher
     let getCurrentTime: () -> Date
@@ -219,60 +220,21 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
         
     case .checkApplicationParameters:
         
+        // Updates in-memory ApplicationParameters.
         let appParams = ApplicationParameters.create(
             PNEApplicationParameters(dict: environment.sharedDB.getApplicationParameters()))
         
-        // Updates self state
         state.appDelegateState.applicationParameters = appParams
-        
-        var effects = [Effect<AppDelegateAction>]()
         
         // Handles ShowPurchaseRequiredPrompt.
         if appParams.showPurchaseRequiredPurchasePrompt {
-            
-            let lastHandledVPNSession = environment.sharedDB
-                .getContainerPurchaseRequiredHandledEventLatestVPNSessionNumber()
-            
-            // Updates PsiphonDataSharedDB that this event was handled.
-            environment.sharedDB
-                .setContainerPurchaseRequiredHandledEventVPNSessionNumber(appParams.vpnSessionNumber)
-            
-            if appParams.vpnSessionNumber > lastHandledVPNSession {
-                
-                // Prompt is presented if the user is not (subscribed or speed-boosted)
-                // and is connected (or connecting).
-                if NEEvent.canPresentPurchaseRequiredPrompt(
-                    dateCompare: environment.dateCompare,
-                    psiCashState: state.psiCashState,
-                    subscriptionStatus: state.subscriptionState.status,
-                    tunnelConnectedStatus: state.tunnelConnectedStatus
-                ) {
-                    
-                    // If VPN is in connecting state, waits for the VPN to connect first.
-                    effects += [
-                        environment.tunnelStatusSignal
-                            .filter {
-                                $0 == .connected
-                            }
-                            .take(first: 1)
-                            .then(
-                                environment.mainViewStore(.presentPurchaseRequiredPrompt)
-                                    .mapNever()
-                            ),
-                        
-                        environment.feedbackLogger
-                            .log(.info, "Will present purchase required prompt once connected")
-                            .mapNever()
-                    ]
-                } else {
-                    effects += environment.feedbackLogger
-                        .log(.info, "Purchase required prompt will not presented").mapNever()
-                }
-                
-            }
+            return [
+                environment.landingPageStore(.presentPurchaseRequiredPrompt)
+                    .mapNever()
+            ]
         }
         
-        return effects
+        return []
         
     }
     
@@ -713,6 +675,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 // Performs a local receipt refersh in case there is a new
                 // that can be retrieved. (e.g. server authorization rekey.)
                 self.store.send(.appReceipt(.readLocalReceiptFile))
+                
+                // Send purchase request for deferred PsiCash products.
+                self.store.send(.psiCash(.purchaseDeferredProducts))
                 
             }
         

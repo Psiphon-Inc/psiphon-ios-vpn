@@ -30,6 +30,10 @@ public enum PsiCashAction: Equatable {
     
     case setLocale(Locale)
     
+    /// This action represents that the tunnel is connected and that the
+    /// deferred product purchases can be made now.
+    case purchaseDeferredProducts
+    
     case buyPsiCashProduct(PsiCashPurchasableType)
     case _psiCashProductPurchaseResult(
             purchasable: PsiCashPurchasableType,

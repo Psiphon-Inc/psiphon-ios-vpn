@@ -55,7 +55,7 @@ struct PurchasingAlertViewBuilder: ViewBuilder {
 
         case .speedBoost:
             image = UIImageView.make(image: "RedRocket")
-            title.text = UserStrings.Purchasing_speed_boost().uppercased(with: locale)
+            title.text = UserStrings.Purchasing_speed_boost_please_wait()
         }
 
         // Add subviews

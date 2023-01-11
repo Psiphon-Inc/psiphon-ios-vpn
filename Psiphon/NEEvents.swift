@@ -32,10 +32,16 @@ enum NEEvent {
         subscriptionStatus: SubscriptionStatus,
         tunnelConnectedStatus: TunnelConnectedStatus
     ) -> Bool {
+        
         let speedBoosted = psiCashState.activeSpeedBoost(dateCompare) != nil
+        
+        let purchasing = psiCashState.purchase.deferred || psiCashState.purchase.pending
+        
         return !speedBoosted &&
+               !purchasing &&
                !subscriptionStatus.subscribed &&
                (tunnelConnectedStatus == .connected || tunnelConnectedStatus == .connecting)
+        
     }
     
     /// Predicate for whether a disallowed-traffic prompt can be presented if

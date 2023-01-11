@@ -374,7 +374,7 @@ fileprivate final class SpeedBoostPurchaseCell: UICollectionViewCell {
         title.text = newValue.localizedProductTitle
 
         button.setTitle(
-            psiCashAmountFormatter.string(from: newValue.purchasable.price.inPsi),
+            psiCashAmountFormatter.string(from: newValue.purchasable.expectedPrice.inPsi),
             for: .normal)
     }
     

@@ -26,7 +26,7 @@ struct PsiCashMessageView: ViewBuilder {
         case pendingPsiCashVerification
         case speedBoostAlreadyActive
         case userSubscribed
-        case unavailableWhileConnecting
+        case psiphonIsConnecting
         case unavailableWhileDisconnecting
         case otherErrorTryAgain
         case signupOrLoginToPsiCash
@@ -108,11 +108,11 @@ struct PsiCashMessageView: ViewBuilder {
                     title.text = UserStrings.PsiCash_subscription_already_gives_premium_access_title()
                     subtitle.text = UserStrings.PsiCash_subscription_already_gives_premium_access_body()
                     subtitle.textAlignment = .natural
-
-                case .unavailableWhileConnecting:
+                    
+                case .psiphonIsConnecting:
                     imageView.image =  UIImage(named: "PsiCashCoinCloud")!
-                    title.text = UserStrings.PsiCash_unavailable()
-                    subtitle.text = UserStrings.PsiCash_is_unavailable_while_connecting_to_psiphon()
+                    title.text = UserStrings.Connecting_to_psiphon()
+                    subtitle.text = UserStrings.Please_wait_to_finish_connecting()
                     subtitle.textAlignment = .center
                     
                 case .unavailableWhileDisconnecting:
