@@ -201,6 +201,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
                 dateCompare: environment.dateCompare,
                 psiCashState: state.psiCashState,
                 subscriptionStatus: state.subscriptionState.status,
+                applicationParameters: state.appDelegateState.applicationParameters,
                 tunnelConnectedStatus: state.tunnelConnectedStatus
             ) {
                 effects += [

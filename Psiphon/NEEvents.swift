@@ -50,12 +50,22 @@ enum NEEvent {
         dateCompare: DateCompare,
         psiCashState: PsiCashState,
         subscriptionStatus: SubscriptionStatus,
+        applicationParameters: ApplicationParameters,
         tunnelConnectedStatus: TunnelConnectedStatus
     ) -> Bool {
+        
+        // Disallowed traffic alert is not shown if:
+        // - User has an active authorization (Speed Boost or subscription)
+        // - ShowPurchaseRequiredPrompt is true
+        // - Tunnel is not running.
+        
         let speedBoosted = psiCashState.activeSpeedBoost(dateCompare) != nil
+        
         return !speedBoosted &&
+               !applicationParameters.showPurchaseRequiredPurchasePrompt &&
                !subscriptionStatus.subscribed &&
                (tunnelConnectedStatus == .connected || tunnelConnectedStatus == .connecting)
+        
     }
     
 }

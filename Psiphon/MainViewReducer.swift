@@ -723,6 +723,7 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             dateCompare: environment.dateCompare,
             psiCashState: state.psiCashState,
             subscriptionStatus: state.subscriptionState.status,
+            applicationParameters: state.applicationParameters,
             tunnelConnectedStatus: state.tunnelConnectedStatus
         )  else {
             return []
