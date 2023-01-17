@@ -207,7 +207,7 @@ extension RecordedIAPPurchase {
     /// https://developer.apple.com/documentation/storekit/skpaymenttransaction/1411288-transactionidentifier
     /// - Returns: `false` if `paymentTransaction` is not completed,
     /// otherwise matches transaction date and product ID.
-    public func matches(paymentTransaction: PaymentTransaction) -> Bool {
+    public func matches(paymentTransaction: AppStorePaymentTransaction) -> Bool {
         guard
             case .completed(.success(let completedTx)) = paymentTransaction.transactionState()
         else {

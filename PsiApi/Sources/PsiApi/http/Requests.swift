@@ -400,6 +400,10 @@ public struct RetriableTunneledHttpRequest<Response: RetriableHTTPResponse>: Equ
                     return SignalProducer(error: errorValue)
                         .prefix(value:.value(.willRetry(
                             .afterTimeInterval(interval: self.retryInterval, result: result))))
+                        .map { (a: SignalTermination<RetriableTunneledHttpRequest<Response>.RequestResult>) in
+                            print("* retry \(a)")
+                            return a
+                        }
                 } else {
                     // Request is completed and does not need to be retried.
                     return SignalProducer(value: .terminate)

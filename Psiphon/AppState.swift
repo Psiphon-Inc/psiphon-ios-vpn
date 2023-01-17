@@ -150,7 +150,7 @@ struct AppEnvironment {
     let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
     let subscriptionStatusSignal: SignalProducer<AppStoreIAP.SubscriptionStatus, Never>
     let urlHandler: URLHandler
-    let paymentQueue: PaymentQueue
+    let paymentQueue: AppStorePaymentQueue
     let supportedAppStoreProducts: SupportedAppStoreProducts
     let objcBridgeDelegate: ObjCBridgeDelegate
     let receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate
@@ -245,7 +245,7 @@ func makeEnvironment(
     let urlSession = URLSession(configuration: urlSessionConfig)
     
     let paymentTransactionDelegate = PaymentTransactionDelegate(
-        store: store.projection(action: { .iap(.transactionUpdate($0)) })
+        store: store.projection(action: { .iap(.appStoreTransactionUpdate($0)) })
     )
     SKPaymentQueue.default().add(paymentTransactionDelegate)
     

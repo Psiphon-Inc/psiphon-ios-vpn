@@ -97,7 +97,7 @@ struct AppDelegateEnvironment {
     let feedbackLogger: FeedbackLogger
     let sharedDB: PsiphonDataSharedDB
     let psiCashEffects: PsiCashEffects
-    let paymentQueue: PaymentQueue
+    let paymentQueue: AppStorePaymentQueue
     let mainViewStore: (MainViewAction) -> Effect<Never>
     let appReceiptStore: (ReceiptStateAction) -> Effect<Never>
     let serverRegionStore: (ServerRegionAction) -> Effect<Never>
@@ -1061,9 +1061,9 @@ extension SwiftDelegate: SwiftBridgeDelegate {
 
         
         if Debugging.printAppState {
-
+            
             self.lifetime += self.store.$value.signalProducer
-                .map(\AppState.mainView)
+                .map(\AppState.iapState.purchasing)
                 .skipRepeats()
                 .startWithValues { value in
                     var output = ""

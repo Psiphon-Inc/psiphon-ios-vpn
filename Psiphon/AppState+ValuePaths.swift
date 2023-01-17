@@ -66,8 +66,8 @@ extension AppState {
         get {
             IAPReducerState(
                 iap: self.iapState,
-                receiptData: self.appReceipt.receiptData,
                 psiCashBalance: self.psiCashBalance,
+                receiptData: self.appReceipt.receiptData,
                 psiCashAccountType: self.psiCashState.libData?.successToOptional()?.accountType
             )
         }

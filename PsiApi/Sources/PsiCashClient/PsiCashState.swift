@@ -243,7 +243,8 @@ extension PsiCashBalance {
 extension PsiCashBalance {
     
     public mutating func waitingForExpectedIncrease(
-        withAddedReward addedReward: PsiCashAmount, reason: BalanceOutOfDateReason,
+        withAddedReward addedReward: PsiCashAmount,
+        reason: BalanceOutOfDateReason,
         persisted: PsiCashPersistedValues
     ) {
         self.balanceOutOfDateReason = reason
