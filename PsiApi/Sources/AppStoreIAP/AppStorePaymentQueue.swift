@@ -22,18 +22,20 @@ import StoreKit
 import ReactiveSwift
 import PsiApi
 
-public struct PaymentQueue {
-    public let transactions: () -> Effect<[PaymentTransaction]>
+/// Wrapper around `SKPaymentQueue`.
+public struct AppStorePaymentQueue {
+    
+    public let transactions: () -> Effect<[AppStorePaymentTransaction]>
     public let addPayment: (AppStoreProduct) -> Effect<Never>
     public let addObserver: (SKPaymentTransactionObserver) -> Effect<Never>
     public let removeObserver: (SKPaymentTransactionObserver) -> Effect<Never>
-    public let finishTransaction: (PaymentTransaction) -> Effect<Never>
+    public let finishTransaction: (AppStorePaymentTransaction) -> Effect<Never>
     
-    public init(transactions: @escaping () -> Effect<[PaymentTransaction]>,
+    public init(transactions: @escaping () -> Effect<[AppStorePaymentTransaction]>,
                 addPayment: @escaping (AppStoreProduct) -> Effect<Never>,
                 addObserver: @escaping (SKPaymentTransactionObserver) -> Effect<Never>,
                 removeObserver: @escaping (SKPaymentTransactionObserver) -> Effect<Never>,
-                finishTransaction: @escaping (PaymentTransaction) -> Effect<Never>) {
+                finishTransaction: @escaping (AppStorePaymentTransaction) -> Effect<Never>) {
         self.transactions = transactions
         self.addPayment = addPayment
         self.addObserver = addObserver

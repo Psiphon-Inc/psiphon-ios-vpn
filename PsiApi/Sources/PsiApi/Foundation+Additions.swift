@@ -225,6 +225,14 @@ extension Pending: Hashable where Completed: Hashable {}
 
 extension Pending {
     
+    /// Returns Completed associated value, otherwise `.none`.
+    public var completedToOptional: Completed? {
+        guard case let .completed(value) = self else {
+            return nil
+        }
+        return value
+    }
+    
     public func map<B>(_ f: (Completed) -> B) -> Pending<B> {
         switch self {
         case .pending:
@@ -273,14 +281,16 @@ public enum PendingValue<Pending, Completed> {
 
 extension PendingValue {
     
-    public var pending: Pending? {
+    /// Returns Pending associated value, otherwise `.none`.
+    public var pendingToOptional: Pending? {
         guard case let .pending(value) = self else {
             return nil
         }
         return value
     }
     
-    public var completed: Completed? {
+    /// Returns Completed associated value, otherwise `.none`.
+    public var completedToOptional: Completed? {
         guard case let .completed(value) = self else {
             return nil
         }

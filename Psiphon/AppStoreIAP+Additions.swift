@@ -35,12 +35,12 @@ extension SupportedAppStoreProducts {
     }
 }
 
-extension PaymentQueue {
+extension AppStorePaymentQueue {
     
-    static let `default` = PaymentQueue(
+    static let `default` = AppStorePaymentQueue(
         transactions: {
             Effect {
-                SKPaymentQueue.default().transactions.map(PaymentTransaction.make(from:))
+                SKPaymentQueue.default().transactions.map(AppStorePaymentTransaction.make(from:))
             }
         },
         addPayment: { product in
@@ -132,11 +132,11 @@ extension AppStoreProduct {
     
 }
 
-extension PaymentTransaction {
+extension AppStorePaymentTransaction {
         
     /// Created PaymentTransaction holds a strong reference to the `skPaymentTransaction` object.
-    static func make(from skPaymentTransaction: SKPaymentTransaction) -> Self {
-        PaymentTransaction(
+    static func make(from skPaymentTransaction: SKPaymentTransaction) -> AppStorePaymentTransaction {
+        AppStorePaymentTransaction(
             productID: { () -> ProductID in
                 ProductID(rawValue: skPaymentTransaction.payment.productIdentifier)!
             },
@@ -165,8 +165,8 @@ extension PaymentTransaction {
                     }
                     
                     return .completed(.success(
-                        PaymentTransaction.CompletedTransaction(
-                            completedState: .purchased,
+                        AppStorePaymentTransaction.CompletedTransaction(
+                            isRestored: false,
                             paymentTransactionID: PaymentTransactionID(rawValue: paymentTxID)!,
                             transactionDate: transactionDate)))
                     
@@ -188,8 +188,8 @@ extension PaymentTransaction {
                     }
                     
                     return .completed(.success(
-                        PaymentTransaction.CompletedTransaction(
-                            completedState: .restored,
+                        AppStorePaymentTransaction.CompletedTransaction(
+                            isRestored: true,
                             paymentTransactionID: PaymentTransactionID(rawValue: paymentTxID)!,
                             transactionDate: transactionDate)))
                     
@@ -247,13 +247,13 @@ SKPaymentTransactionObserver {
     // from the user's purchase history back to the queue.
     func paymentQueue(_ queue: SKPaymentQueue,
                       restoreCompletedTransactionsFailedWithError error: Error) {
-        storeSend(.restoredCompletedTransactions(error: SystemError<Int>.make(error as NSError)))
+        storeSend(.restoredCompletedTransactions(maybeError: SystemError<Int>.make(error as NSError)))
     }
     
     // Sent when all transactions from the user's purchase history have
     // successfully been added back to the queue.
     func paymentQueueRestoreCompletedTransactionsFinished(_ queue: SKPaymentQueue) {
-        storeSend(.restoredCompletedTransactions(error: .none))
+        storeSend(.restoredCompletedTransactions(maybeError: .none))
     }
     
     // Sent when the transaction array has changed (additions or state changes).
@@ -261,7 +261,7 @@ SKPaymentTransactionObserver {
     func paymentQueue(_ queue: SKPaymentQueue,
                       updatedTransactions transactions: [SKPaymentTransaction]) {
         storeSend(
-            .updatedTransactions(transactions.map(PaymentTransaction.make(from:)))
+            .updatedTransactions(transactions.map(AppStorePaymentTransaction.make(from:)))
         )
     }
     
