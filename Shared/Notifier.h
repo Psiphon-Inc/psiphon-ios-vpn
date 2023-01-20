@@ -41,6 +41,8 @@ extern NotifierMessage const NotifierApplicationParametersUpdated;
 // Messages sent by the container.
 extern NotifierMessage const NotifierStartVPN;
 extern NotifierMessage const NotifierAppEnteredBackground;
+extern NotifierMessage const NotifierAppDidBecomeActive;
+extern NotifierMessage const NotifierUpdatedAuthorizations;
 extern NotifierMessage const NotifierUpdatedAuthorizations;
 extern NotifierMessage const NotifierHostAppProcessRunning;
 
