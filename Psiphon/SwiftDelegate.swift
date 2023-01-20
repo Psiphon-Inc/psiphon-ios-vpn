@@ -303,6 +303,8 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
     
     func applicationDidBecomeActive() {
         
+        Notifier.sharedInstance().post(NotifierAppDidBecomeActive);
+        
         self.store.send(.appDelegateAction(.appLifecycleEvent(.didBecomeActive)))
         self.store.send(.mainViewAction(.applicationDidBecomeActive))
         
