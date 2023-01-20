@@ -28,6 +28,8 @@ import PsiphonClientCommonLibrary
 import SafariServices
 
 enum MainViewAction {
+    
+    case updatedConnectionStatus(TunnelConnectedStatus)
 
     case psiCashViewAction(PsiCashViewAction)
     
@@ -196,6 +198,22 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
     state, action, environment in
     
     switch action {
+        
+    case .updatedConnectionStatus(let vpnStatus):
+        
+        if case .notConnected = vpnStatus {
+            // Dismiss purchase required screen if VPN is disconnected
+            if case .completed(true) = state.mainView.purchaseRequiredPromptPresented {
+                return [
+                    dismissViewController(
+                        getTopActiveViewController: environment.getTopActiveViewController,
+                        type: ViewBuilderViewController<PurchaseRequiredPrompt>.self)
+                    .mapNever()
+                ]
+            }
+        }
+        
+        return []
         
     case .psiCashViewAction(let psiCashAction):
         switch state.psiCashViewReducerState {
@@ -448,22 +466,10 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             case .psiCashAccountAlert(.loginSuccessLastTrackerMergeAlert):
                 // Dismisses PsiCashAccountViewController if it is top of the stack.
                 return [
-                    .fireAndForget {
-                        let topVC = environment.getTopActiveViewController()
-                        let searchResult = topVC.traversePresentingStackFor(
-                            type: PsiCashAccountLoginViewController.self,
-                            searchChildren: true
-                        )
-
-                        switch searchResult {
-                        case .notPresent:
-                            // No-op.
-                            return
-                        case .presentInStack(let viewController),
-                             .presentTopOfStack(let viewController):
-                            viewController.dismiss(animated: true, completion: nil)
-                        }
-                    }
+                    dismissViewController(
+                        getTopActiveViewController: environment.getTopActiveViewController,
+                        type: PsiCashAccountLoginViewController.self)
+                    .mapNever()
                 ]
 
             default:
@@ -833,37 +839,23 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
         
     case .purchaseRequiredPromptButton(let buttonTapped):
         
-        let dismissEffect = Effect<Never>.fireAndForget {
-            let topVC = environment.getTopActiveViewController()
-            let searchResult = topVC.traversePresentingStackFor(
-                type: ViewBuilderViewController<PurchaseRequiredPrompt>.self,
-                searchChildren: true
-            )
-            
-            switch searchResult {
-            case .notPresent:
-                // No-op.
-                return
-            case .presentInStack(let viewController),
-                    .presentTopOfStack(let viewController):
-                viewController.dismiss(animated: true, completion: nil)
-            }
-        }
+        var effects = [Effect<MainViewAction>]()
         
         switch buttonTapped {
         case .subscribeTapped:
-            return [
-                Effect(value: .presentSubscriptionScreen)
-            ] + dismissEffect.mapNever()
+            effects += Effect(value: .presentSubscriptionScreen)
         case .speedBoostTapped:
-            return[
-                Effect(value: .presentPsiCashStore(initialTab: .speedBoost, animated: true))
-            ] + dismissEffect.mapNever()
+            effects += Effect(value: .presentPsiCashStore(initialTab: .speedBoost, animated: true))
         case .disconnectTapped:
-            return [
-                environment.vpnActionStore(.tunnelStateIntent(intent: .stop, reason: .userInitiated)).mapNever()
-            ] + dismissEffect.mapNever()
+            effects += environment.vpnActionStore(
+                .tunnelStateIntent(intent: .stop, reason: .userInitiated)).mapNever()
         }
+        
+        effects += dismissViewController(
+            getTopActiveViewController: environment.getTopActiveViewController,
+            type: ViewBuilderViewController<PurchaseRequiredPrompt>.self).mapNever()
+        
+        return effects
         
     case .presentSettingsScreen:
         
@@ -994,6 +986,33 @@ final class SettingsViewControllerDelegate: StoreDelegate<AppAction>, PsiphonSet
     
     func userPressedURL(_ URL: URL!) {
         feedbackDelegate.userPressedURL(URL)
+    }
+    
+}
+
+func dismissViewController<A: UIViewController>(
+    getTopActiveViewController: @escaping () -> UIViewController,
+    type: A.Type,
+    animated: Bool = true
+) -> Effect<Never> {
+    
+    return .fireAndForget {
+        
+        let topVC = getTopActiveViewController()
+        let searchResult = topVC.traversePresentingStackFor(
+            type: type,
+            searchChildren: true
+        )
+        
+        switch searchResult {
+        case .notPresent:
+            // No-op.
+            return
+        case .presentInStack(let viewController),
+                .presentTopOfStack(let viewController):
+            viewController.dismiss(animated: animated, completion: nil)
+        }
+        
     }
     
 }
