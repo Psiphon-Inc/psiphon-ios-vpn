@@ -50,8 +50,11 @@ public struct PsiCashValidationRequest: Encodable {
 }
 
 public struct PsiCashValidationResponse: RetriableHTTPResponse {
+    
     public enum ResponseError: HashableError {
+        /// Request utterly failed.
         case failedRequest(SystemError<Int>)
+        /// Received a non-2xx HTTP response.
         case errorStatusCode(HTTPResponseMetadata)
     }
 
