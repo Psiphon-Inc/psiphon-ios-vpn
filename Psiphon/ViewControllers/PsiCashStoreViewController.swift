@@ -222,7 +222,7 @@ final class PsiCashStoreViewController: ReactiveViewController {
         // Triplet containing IAP and PsiCash purchase states.
         let purchasingNavState = (
             observed.readerState.iap.purchasing[.psiCash],
-            observed.readerState.psiCash.purchase,
+            observed.readerState.psiCash.speedBoostPurchase,
             self.presentedDialog
         )
         
@@ -444,7 +444,7 @@ final class PsiCashStoreViewController: ReactiveViewController {
                     // The user might have a deferred Speed Boost purchase.
                     
                     // PsiCash deferred purchase
-                    switch observed.readerState.psiCash.purchase {
+                    switch observed.readerState.psiCash.speedBoostPurchase {
                         
                     case .deferred(_):
                         
