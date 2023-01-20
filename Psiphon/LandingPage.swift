@@ -22,7 +22,7 @@ import Utilities
 import ReactiveSwift
 import PsiApi
 import PsiCashClient
-import struct AppStoreIAP.SubscriptionState
+import AppStoreIAP
 
 fileprivate let landingPageTag = LogTag("LandingPage")
 
@@ -32,6 +32,7 @@ struct LandingPageReducerState: Equatable {
     let applicationParameters: ApplicationParameters
     let psiCashState: PsiCashState
     let subscriptionState: SubscriptionState
+    let iapState: IAPState
 }
 
 enum LandingPageAction {
@@ -67,14 +68,48 @@ let landingPageReducer = Reducer<LandingPageReducerState
     switch action {
     case .tunnelConnectedAfterIntentSwitchedToStart:
         
+        #if DEBUG || DEV_RELEASE
+        let ignorePurhcaseRequired = UserDefaults.standard.bool(forKey: UserDefaultsIgnorePurchaseRequiredParam)
+        guard ignorePurhcaseRequired || !state.applicationParameters.showPurchaseRequiredPurchasePrompt else {
+            return [
+                environment.feedbackLogger
+                    .log(.info, "skipping landing page (ShowPurchaseRequiredPrompt)").mapNever()
+            ]
+        }
+        #else
         guard !state.applicationParameters.showPurchaseRequiredPurchasePrompt else {
             return [
                 environment.feedbackLogger
                     .log(.info, "skipping landing page (ShowPurchaseRequiredPrompt)").mapNever()
             ]
         }
+        #endif
         
-        guard !(state.psiCashState.purchase.deferred || state.psiCashState.purchase.pending) else {
+        
+        // Guards that user is not in middle of a PsiCash purchase through App Store.
+        if let psiCashPurchaseState = state.iapState.purchasing[.psiCash] {
+            switch psiCashPurchaseState {
+            case .pending(_):
+                return []
+                
+            case .completed(.success(let unfinishedTx)):
+                // Pending verification, or verification failed.
+                switch unfinishedTx.verificationStatus {
+                case .notRequested, .pendingResponse:
+                    return []
+                    
+                case .requestError(_):
+                    // Transaction verification failed.
+                    // We're going to ignore the failure reason.
+                    break
+                }
+            case .completed(.failure(_)):
+                break
+            }
+        }
+        
+        // Guards that user is not purchasing Speed Boost.
+        guard !(state.psiCashState.speedBoostPurchase.deferred || state.psiCashState.speedBoostPurchase.pending) else {
             return [
                 environment.feedbackLogger
                     .log(.info, "skipping landing page (Pending or deferred PsiCash purchase)").mapNever()
@@ -93,22 +128,22 @@ let landingPageReducer = Reducer<LandingPageReducerState
             return []
         }
         
-        guard let landingPages = NonEmpty(array: environment.sharedDB.getHomepages()) else {
+        #if DEBUG || DEV_RELEASE
+        let randomlySelectedURL = URL(string: "https://landing.dev.psi.cash/dev-index.html")!
+        #else
+        guard
+            let landingPages = NonEmpty(array: environment.sharedDB.getHomepages()),
+            let randomlySelectedURL = landingPages.randomElement()?.url
+        else {
             return [
                 Effect(value: ._urlOpened(success: false)),
                 environment.feedbackLogger.log(
                     .warn, tag: landingPageTag, "no landing pages found").mapNever()
             ]
         }
+        #endif
         
         state.pendingLandingPageOpening = true
-        
-        #if DEV_RELEASE
-        // Hard-coded landing page for PsiCash accounts testing
-        let randomlySelectedURL = URL(string: "https://landing.dev.psi.cash/dev-index.html")!
-        #else
-        let randomlySelectedURL = landingPages.randomElement()!.url
-        #endif
         
         return [
             modifyLandingPagePendingObtainingToken(

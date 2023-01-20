@@ -113,7 +113,8 @@ extension AppState {
                 tunnelConnection: self.tunnelConnection,
                 applicationParameters: self.appDelegateState.applicationParameters,
                 psiCashState: self.psiCashState,
-                subscriptionState: self.subscription
+                subscriptionState: self.subscription,
+                iapState: self.iapState
             )
         }
         set {
