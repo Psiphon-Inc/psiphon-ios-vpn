@@ -1059,7 +1059,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 store!.send(.mainViewAction(.presentAlert(alertEvent)))
             }
 
-        
+        #if DEBUG
         if Debugging.printAppState {
             
             self.lifetime += self.store.$value.signalProducer
@@ -1072,6 +1072,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 }
             
         }
+        #endif
         
     }
     
