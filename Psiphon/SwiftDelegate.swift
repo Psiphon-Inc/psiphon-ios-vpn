@@ -97,7 +97,7 @@ struct AppDelegateEnvironment {
     let feedbackLogger: FeedbackLogger
     let sharedDB: PsiphonDataSharedDB
     let psiCashEffects: PsiCashEffects
-    let paymentQueue: PaymentQueue
+    let paymentQueue: AppStorePaymentQueue
     let mainViewStore: (MainViewAction) -> Effect<Never>
     let appReceiptStore: (ReceiptStateAction) -> Effect<Never>
     let serverRegionStore: (ServerRegionAction) -> Effect<Never>
@@ -302,6 +302,8 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
     }
     
     func applicationDidBecomeActive() {
+        
+        Notifier.sharedInstance().post(NotifierAppDidBecomeActive);
         
         self.store.send(.appDelegateAction(.appLifecycleEvent(.didBecomeActive)))
         self.store.send(.mainViewAction(.applicationDidBecomeActive))
@@ -659,27 +661,40 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             
         }
         
-        // Observes VPN connected state, and sends actions that need to be performed.
+        // Observes connection status, and sends actions that need to be performed.
+        self.lifetime += self.store.$value.signalProducer
+            .map(\.vpnState.value.loadState.connectionStatus.tunneled)
+            .skipRepeats()
+            .startWithValues { tunnelConnectedStatus in
+                
+                self.store.send(.mainViewAction(.updatedConnectionStatus(tunnelConnectedStatus)))
+                
+                if case .connected = tunnelConnectedStatus {
+                    
+                    // Check ApplicationParameters
+                    self.store.send(.appDelegateAction(.checkApplicationParameters))
+                    
+                    // PsiCash RefreshState
+                    self.store.send(.psiCash(.refreshPsiCashState()))
+                    
+                    // Validity of subscription authorization is determined by Psiphon servers
+                    // when the VPN connects.
+                    // Performs a local receipt refersh in case there is a new
+                    // that can be retrieved. (e.g. server authorization rekey.)
+                    self.store.send(.appReceipt(.readLocalReceiptFile))
+                    
+                    // Send purchase request for deferred PsiCash products.
+                    self.store.send(.psiCash(.purchaseDeferredProducts))
+                    
+                }
+                
+            }
+        
+        // Forwards VPN status changes to ObjCBridgeDelegate.
         self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
             .skipRepeats()
-            .filter { $0 == .connected }
-            .startWithValues { _ in
-                
-                // Check ApplicationParameters
-                self.store.send(.appDelegateAction(.checkApplicationParameters))
-                
-                // PsiCash RefreshState
-                self.store.send(.psiCash(.refreshPsiCashState()))
-                
-                // Validity of subscription authorization is determined by Psiphon servers
-                // when the VPN connects.
-                // Performs a local receipt refersh in case there is a new
-                // that can be retrieved. (e.g. server authorization rekey.)
-                self.store.send(.appReceipt(.readLocalReceiptFile))
-                
-                // Send purchase request for deferred PsiCash products.
-                self.store.send(.psiCash(.purchaseDeferredProducts))
-                
+            .startWithValues { [unowned objcBridge] in
+                objcBridge!.onVPNStatusDidChange($0)
             }
         
         // Forwards `SubscriptionStatus` updates to ObjCBridgeDelegate.
@@ -717,13 +732,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                     return
                 }
                 objcBridge!.onSelectedServerRegionUpdate(region)
-            }
-        
-        // Forwards VPN status changes to ObjCBridgeDelegate.
-        self.lifetime += self.store.$value.signalProducer.map(\.vpnState.value.vpnStatus)
-            .skipRepeats()
-            .startWithValues { [unowned objcBridge] in
-                objcBridge!.onVPNStatusDidChange($0)
             }
         
         // Monitors state of VPN status and tunnel intent.
@@ -1059,11 +1067,11 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 store!.send(.mainViewAction(.presentAlert(alertEvent)))
             }
 
-        
+        #if DEBUG
         if Debugging.printAppState {
-
+            
             self.lifetime += self.store.$value.signalProducer
-                .map(\AppState.mainView)
+                .map(\AppState.iapState.purchasing)
                 .skipRepeats()
                 .startWithValues { value in
                     var output = ""
@@ -1072,6 +1080,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 }
             
         }
+        #endif
         
     }
     

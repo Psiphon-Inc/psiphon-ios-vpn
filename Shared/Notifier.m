@@ -45,6 +45,7 @@ NotifierMessage const NotifierApplicationParametersUpdated = PSIPHON_VPN_GROUP @
 // Messages sent by the container.
 NotifierMessage const NotifierStartVPN               = PSIPHON_GROUP @".StartVPN";
 NotifierMessage const NotifierAppEnteredBackground   = PSIPHON_GROUP @".AppEnteredBackground";
+NotifierMessage const NotifierAppDidBecomeActive   = PSIPHON_GROUP @".AppDidBecomeActive";
 
 NotifierMessage const NotifierUpdatedAuthorizations = PSIPHON_GROUP @".UpdatedAuthorizations";
 NotifierMessage const NotifierHostAppProcessRunning  = PSIPHON_GROUP @".HostAppProcessRunning";
@@ -118,6 +119,7 @@ static inline void AddDarwinNotifyObserver(CFNotificationCenterRef center, const
     // Listens to all messages sent by the container.
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierStartVPN);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAppEnteredBackground);
+    AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierAppDidBecomeActive);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierUpdatedAuthorizations);
     AddDarwinNotifyObserver(center, (__bridge const void *)self, (__bridge CFStringRef)NotifierHostAppProcessRunning);
 

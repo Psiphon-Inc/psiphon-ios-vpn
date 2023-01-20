@@ -66,8 +66,8 @@ extension AppState {
         get {
             IAPReducerState(
                 iap: self.iapState,
-                receiptData: self.appReceipt.receiptData,
                 psiCashBalance: self.psiCashBalance,
+                receiptData: self.appReceipt.receiptData,
                 psiCashAccountType: self.psiCashState.libData?.successToOptional()?.accountType
             )
         }
@@ -113,7 +113,8 @@ extension AppState {
                 tunnelConnection: self.tunnelConnection,
                 applicationParameters: self.appDelegateState.applicationParameters,
                 psiCashState: self.psiCashState,
-                subscriptionState: self.subscription
+                subscriptionState: self.subscription,
+                iapState: self.iapState
             )
         }
         set {

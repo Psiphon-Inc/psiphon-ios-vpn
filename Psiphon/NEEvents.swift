@@ -35,7 +35,7 @@ enum NEEvent {
         
         let speedBoosted = psiCashState.activeSpeedBoost(dateCompare) != nil
         
-        let purchasing = psiCashState.purchase.deferred || psiCashState.purchase.pending
+        let purchasing = psiCashState.speedBoostPurchase.deferred || psiCashState.speedBoostPurchase.pending
         
         return !speedBoosted &&
                !purchasing &&

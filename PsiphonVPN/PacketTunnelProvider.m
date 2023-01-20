@@ -78,7 +78,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     /** @const TunnelProviderStateZombie PacketTunnelProvider has entered zombie state, all packets will be eaten. */
     TunnelProviderStateZombie,
     /** @const TunnelProviderStateKillMessageSent PacketTunnelProvider has displayed a message to the user that it will exit soon or when the message has been dismissed by the user. */
-    TunnelProviderStateKillMessageSent
+    TunnelProviderStateKillMessageSent,
+    /** @const TunnelProviderStatePausedPurchaseRequired Tunnel is paused for purchase-required enforcement. */
+    TunnelProviderStatePausedPurchaseRequired
 };
 
 @interface PacketTunnelProvider () <NotifierObserver>
@@ -375,6 +377,24 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                 [[LocalNotificationService shared] requestOpenContainerToConnectNotification];
             }
             
+        }
+        
+        // If ShowRequiredPurchasePrompt is true and the app the backgrounded,
+        // and the user does not have any authorizations, disconnect the tunnel.
+        if (
+            self.tunnelProviderState == TunnelProviderStateStarted &&
+            self->applicationParameters.showRequiredPurchasePrompt == TRUE &&
+            ![self->authorizationStore hasActiveSubscriptionOrSpeedBoost]
+        ) {
+            self.tunnelProviderState = TunnelProviderStatePausedPurchaseRequired;
+            [self.psiphonTunnel stop];
+        }
+        
+    } else if ([NotifierAppDidBecomeActive isEqualToString:message]) {
+        
+        // Restarts Psiphon tunnel if it was previously paused.
+        if (self.tunnelProviderState == TunnelProviderStatePausedPurchaseRequired) {
+            [self startPsiphonTunnel];
         }
 
     } else if ([NotifierUpdatedAuthorizations isEqualToString:message]) {

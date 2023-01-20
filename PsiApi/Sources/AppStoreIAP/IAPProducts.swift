@@ -197,16 +197,20 @@ public struct SupportedAppStoreProducts: Equatable {
 }
 
 /// Wraps a `SKPaymentTransaction` object and provides better typing of it's state.
-/// A payment transaction represents an object in the payment queue.
-public struct PaymentTransaction: Equatable {
+/// A payment transaction represents an object in the StoreKit payment queue.
+public final class AppStorePaymentTransaction: Equatable {
 
     /// Refines `SKPaymentTransaction` state.
     /// - Note: `SKPaymentTransaction.transactionDate` is only valid if state is
     /// `SKPaymentTransactionStatePurchased` or `SKPaymentTransactionStateRestored`.
     public enum TransactionState: Equatable {
         
+        /// Represents pending state of `SKPaymentTransactionState`.
+        /// https://developer.apple.com/documentation/storekit/skpaymenttransactionstate
         public enum PendingTransactionState: Equatable {
+            /// A transaction that is being processed by the App Store.
             case purchasing
+            /// A transaction that is in the queue, but its final status is pending external action such as Ask to Buy.
             case deferred
         }
         
@@ -223,24 +227,31 @@ public struct PaymentTransaction: Equatable {
         case completed(Result<CompletedTransaction, TransactionErrorState>)
     }
     
-    /// Represents a `SKPaymentTransaction` with state `.purchased` or `.completed`.
+    /// Represents a `SKPaymentTransaction` with state `.purchased` or `.restored`.
+    /// Two `CompletedTransaction` objects are equal if their payment transdaction identifier is equal.
+    /// Ref: https://developer.apple.com/documentation/storekit/skpaymenttransaction/1411288-transactionidentifier
     public struct CompletedTransaction: Equatable {
         
-        public enum State: Equatable {
-            case purchased
-            case restored
-        }
+        /// Whether or not this completed transaction was restored or not.
+        public let isRestored: Bool
         
-        public let completedState: State
+        /// Unique identifier of a successful payment transaction.
         public let paymentTransactionID: PaymentTransactionID
+        
         public let transactionDate: Date
         
-        public init(completedState: PaymentTransaction.CompletedTransaction.State,
-                    paymentTransactionID: PaymentTransactionID,
-                    transactionDate: Date) {
-            self.completedState = completedState
+        public init(
+            isRestored: Bool,
+            paymentTransactionID: PaymentTransactionID,
+            transactionDate: Date
+        ) {
+            self.isRestored = isRestored
             self.paymentTransactionID = paymentTransactionID
             self.transactionDate = transactionDate
+        }
+        
+        public static func == (lhs: CompletedTransaction, rhs: CompletedTransaction) -> Bool {
+            return lhs.paymentTransactionID == rhs.paymentTransactionID
         }
         
     }
@@ -248,15 +259,17 @@ public struct PaymentTransaction: Equatable {
     public let productID: () -> ProductID
     public let transactionState: () -> TransactionState
     public let payment: () -> Payment
-    public let isEqual: (PaymentTransaction) -> Bool
+    public let isEqual: (AppStorePaymentTransaction) -> Bool
     
     public let skPaymentTransaction: () -> SKPaymentTransaction?
     
-    public init(productID: @escaping () -> ProductID,
-                transactionState: @escaping () -> PaymentTransaction.TransactionState,
-                payment: @escaping () -> Payment,
-                isEqual: @escaping (PaymentTransaction) -> Bool,
-                skPaymentTransaction: @escaping () -> SKPaymentTransaction?) {
+    public init(
+        productID: @escaping () -> ProductID,
+        transactionState: @escaping () -> AppStorePaymentTransaction.TransactionState,
+        payment: @escaping () -> Payment,
+        isEqual: @escaping (AppStorePaymentTransaction) -> Bool,
+        skPaymentTransaction: @escaping () -> SKPaymentTransaction?
+    ) {
         self.productID = productID
         self.transactionState = transactionState
         self.payment = payment
@@ -264,15 +277,35 @@ public struct PaymentTransaction: Equatable {
         self.skPaymentTransaction = skPaymentTransaction
     }
     
-    public static func == (lhs: Self, rhs: Self) -> Bool {
+    public static func == (lhs: AppStorePaymentTransaction, rhs: AppStorePaymentTransaction) -> Bool {
         lhs.isEqual(rhs)
     }
 }
 
-extension PaymentTransaction.TransactionState {
+extension AppStorePaymentTransaction {
     
-    /// Indicates whether the app receipt has been updated.
-    var appReceiptUpdated: Bool {
+    /// Returns `CompletedTransaction` if this transaction is completed, otherwise returns `nil`.
+    var completedTransaction: CompletedTransaction? {
+        guard case .completed(.success(let completedTx)) =  self.transactionState() else {
+            return nil
+        }
+        return completedTx
+    }
+    
+}
+
+extension AppStorePaymentTransaction.TransactionState {
+    
+    /// Whether or not the App Store purchase is pending completed or is completed/failed.
+    var pending: Bool {
+        switch self {
+        case .pending(_): return true
+        case .completed(_): return false
+        }
+    }
+    
+    /// App Store app receipt is expected to be updated for a completed IAP transaction.
+    var isReceiptUpdated: Bool {
         // Each case is explicitly typed as returning true or false
         // to ensure function correctness in future updates.
         switch self {
@@ -289,51 +322,11 @@ extension PaymentTransaction.TransactionState {
         }
     }
     
-    /// Represents whether for a given App Store transaction, `finishTransaction(_:)`
-    /// should be called on the transaction.
-    public enum FinishAppStoreTransaction: Equatable {
-        /// It's an error to call `finishTransaction(_:)` on the transaction given it's current state.
-        case nop
-        /// `finishTransaction(_:)` should be called immediately.
-        case immediately
-        /// `finishTransaction(_:)` should be called after all the deliverables are delivered.
-        case afterDeliverablesDelivered
-    }
-    
-    /// `shouldFinishTransactionImmediately` determines whether or not to
-    /// call `finishTransaction(_:)` on an App Store IAP before any deliverables are delivered
-    /// based on current transaction state and the provided `productType`.
-    public func shouldFinishTransactionImmediately(
-        productType: AppStoreProductType
-    ) -> FinishAppStoreTransaction {
-        switch self {
-        case .pending(_):
-            return .nop
-            
-        case .completed(.failure(_)):
-            return .immediately
-            
-        case .completed(.success(_)):
-            switch productType {
-            case .psiCash:
-                // PsiCash purchases are consumables. The receipt may
-                // no longer contain the transaction after it is finished.
-                return .afterDeliverablesDelivered
-            case .subscription:
-                // Subscription purchases are auto-renewable subscriptions.
-                // The transaction can be finished either right after it has
-                // completed, or like the case of `PsiCash` consumable purchase
-                // can be finished after all the deliverables have been delivered.
-                return .immediately
-            }
-        }
-    }
-    
 }
 
-extension PaymentTransaction.TransactionState: FeedbackDescription {}
+extension AppStorePaymentTransaction.TransactionState: FeedbackDescription {}
 
-extension PaymentTransaction: CustomFieldFeedbackDescription {
+extension AppStorePaymentTransaction: CustomFieldFeedbackDescription {
     
     public var feedbackFields: [String: CustomStringConvertible] {
         ["productID": self.productID(),
