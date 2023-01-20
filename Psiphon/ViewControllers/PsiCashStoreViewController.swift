@@ -219,14 +219,19 @@ final class PsiCashStoreViewController: ReactiveViewController {
             return
         }
         
-        let psiCashIAPPurchase = observed.readerState.iap.purchasing[.psiCash] ?? nil
-        let purchasingNavState = (psiCashIAPPurchase?.purchasingState,
-                                  observed.readerState.psiCash.purchase,
-                                  self.presentedDialog)
-        
+        // Triplet containing IAP and PsiCash purchase states.
+        let purchasingNavState = (
+            observed.readerState.iap.purchasing[.psiCash],
+            observed.readerState.psiCash.speedBoostPurchase,
+            self.presentedDialog
+        )
         
         switch purchasingNavState {
         case (.none, .none, _):
+            self.dismissPurchasingScreens()
+            
+        case (.completed(.success(_)), .none, _):
+            // Last PsiCash IAP purchase finished successfully.
             self.dismissPurchasingScreens()
             
         case (.pending(_), _, .none):
@@ -273,8 +278,9 @@ final class PsiCashStoreViewController: ReactiveViewController {
                 self.store.send(.mainViewAction(.presentAlert(alertEvent)))
             }
 
-        case (.completed(let iapErrorEvent), _, _):
+        case (.completed(.failure(let iapErrorEvent)), _, _):
             self.dismissPurchasingScreens()
+            
             if let errorDesc = iapErrorEvent.localizedErrorEventDescription {
 
                 let alertEvent = AlertEvent(
@@ -358,13 +364,16 @@ final class PsiCashStoreViewController: ReactiveViewController {
             case (.notConnected, .addPsiCash),
                  (.connected, .addPsiCash):
                 
-                if let unverifiedPsiCashTx = observed.readerState.iap.unfinishedPsiCashTx {
+                if
+                    case .completed(.success(let unfinishedPsiCashTx)) =
+                        observed.readerState.iap.purchasing[.psiCash]
+                {
                     switch observed.tunneled {
                     case .connected:
                         
                         // Set view content based on verification state of the
                         // unverified PsiCash IAP transaction.
-                        switch unverifiedPsiCashTx.verificationState {
+                        switch unfinishedPsiCashTx.verificationStatus {
                         case .notRequested, .pendingResponse:
                             self.containerView.bind(
                                 .left(.right(.right(.right(.right(
@@ -435,7 +444,7 @@ final class PsiCashStoreViewController: ReactiveViewController {
                     // The user might have a deferred Speed Boost purchase.
                     
                     // PsiCash deferred purchase
-                    switch observed.readerState.psiCash.purchase {
+                    switch observed.readerState.psiCash.speedBoostPurchase {
                         
                     case .deferred(_):
                         
@@ -856,7 +865,7 @@ extension PsiCashStoreViewController {
     
 }
 
-extension ErrorEvent where E == IAPError {
+extension ErrorEvent where E == IAPState.IAPError {
     
     /// Returns an `ErrorEventDescription` if the error represents a user-facing error, otherwise returns `nil`.
     fileprivate var localizedErrorEventDescription: ErrorEventDescription<ErrorRepr>? {

@@ -149,7 +149,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
     case .purchaseDeferredProducts:
         
         // Checks if there is a deferred purchase.
-        guard case let .deferred(purchasableType) = state.psiCash.purchase else {
+        guard case let .deferred(purchasableType) = state.psiCash.speedBoostPurchase else {
             return []
         }
 
@@ -175,7 +175,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             case .success(let libData) = state.psiCash.libData,
             let tunnelConnection = state.tunnelConnection,
             case .notSubscribed = state.subscription.status,
-            !state.psiCash.purchase.pending
+            !state.psiCash.speedBoostPurchase.pending
         else {
             return []
         }
@@ -189,7 +189,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                 date: environment.getCurrentTime()
             )
             
-            state.psiCash.purchase = .error(errorEvent)
+            state.psiCash.speedBoostPurchase = .error(errorEvent)
             
             return [
                 environment.feedbackLogger.log(.info, """
@@ -206,7 +206,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         if deferred {
             
             // Purchase is deferred until tunnel is connected.
-            state.psiCash.purchase = .deferred(purchasableType)
+            state.psiCash.speedBoostPurchase = .deferred(purchasableType)
             return [
                 environment.vpnActionStore(.tunnelStateIntent(
                     intent: .start(transition: .none), reason: .userInitiated
@@ -215,7 +215,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             
         } else {
             
-            state.psiCash.purchase = .pending(purchasableType)
+            state.psiCash.speedBoostPurchase = .pending(purchasableType)
             
             // Purchase immediately.
             return [
@@ -235,9 +235,9 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
         
     case let ._psiCashProductPurchaseResult(purchasableType, purchaseResult):
         
-        guard case .pending(_) = state.psiCash.purchase else {
+        guard case .pending(_) = state.psiCash.speedBoostPurchase else {
             environment.feedbackLogger.fatalError("""
-                Expected '.pending' state:'\(String(describing: state.psiCash.purchase))'
+                Expected '.pending' state:'\(String(describing: state.psiCash.speedBoostPurchase))'
                 """)
             return []
         }
@@ -264,7 +264,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
                     
                 case .speedBoost(let purchasedProduct):
                     
-                    state.psiCash.purchase = .none
+                    state.psiCash.speedBoostPurchase = .none
                     
                     return [
                         
@@ -298,7 +298,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
             
         case let .failure(errorEvent):
             
-            state.psiCash.purchase = .error(errorEvent)
+            state.psiCash.speedBoostPurchase = .error(errorEvent)
             
             var effects = [Effect<PsiCashAction>]()
             
@@ -548,7 +548,7 @@ let psiCashReducer = Reducer<PsiCashReducerState, PsiCashAction, PsiCashEnvironm
     case .dismissedAlert(let dismissed):
         switch dismissed {
         case .speedBoostAlreadyActive:
-            state.psiCash.purchase = .none
+            state.psiCash.speedBoostPurchase = .none
             return []
         }
         

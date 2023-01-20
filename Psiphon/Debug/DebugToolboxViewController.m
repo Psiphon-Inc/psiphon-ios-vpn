@@ -35,6 +35,7 @@
 NSString * const UserDefaultsPsiCashUsername = @"Testing-Account-Username";
 NSString * const UserDefaultsPsiCashPassword = @"Testing-Account-Password";
 NSString * const UserDefaultsRecordHTTP = @"Testing-Record-Http";
+NSString * const UserDefaultsIgnorePurchaseRequiredParam = @"Testing-Ignore-Purchase-Required-Param";
 
 NSString * const ActionCellIdentifier = @"ActionCell";
 NSString * const SwitchCellIdentifier = @"SwitchCell";
@@ -151,35 +152,47 @@ NSString * const StateCellIdentifier = @"StateCell";
                 break;
             }
             case 1: {
+                NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+                cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                cell.textLabel.text = @"(landing page) Ignore purchase required";
+                UISwitch *switchView = [[UISwitch alloc] initWithFrame:CGRectZero];
+                [switchView setOn:[defaults boolForKey:UserDefaultsIgnorePurchaseRequiredParam]];
+                [switchView addTarget:self
+                               action:@selector(onIgnorePurchaseRequiredParamSwitch:)
+                     forControlEvents:UIControlEventValueChanged];
+                cell.accessoryView = switchView;
+                break;
+            }
+            case 2: {
                 cell.textLabel.text = @"Default PsiCash Accounts credentials";
                 action = @selector(onDefaultAccountsCredentials);
                 break;
             }
-            case 2: {
+            case 3: {
                 cell.textLabel.text = @"Reset Standard UserDefaults";
                 cell.textLabel.textColor = UIColor.radicalRed;
                 action = @selector(onResetStandardUserDefaults);
                 break;
             }
-            case 3: {
+            case 4: {
                 cell.textLabel.text = @"Reset PsiphonDataSharedDB";
                 cell.textLabel.textColor = UIColor.radicalRed;
                 action = @selector(onResetPsiphonDataSharedDB);
                 break;
             }
-            case 4: {
+            case 5: {
                 cell.textLabel.text = @"Delete Core Data persistent store";
                 cell.textLabel.textColor = UIColor.radicalRed;
                 action = @selector(onDeleteCoreDataPersistentStores);
                 break;
             }
-            case 5: {
+            case 6: {
                 cell.textLabel.text = @"Delete PsiCash store directory";
                 cell.textLabel.textColor = UIColor.radicalRed;
                 action = @selector(onDeletePsiCashStore);
                 break;
             }
-            case 6: {
+            case 7: {
                 cell.textLabel.text = @"Force crash app";
                 cell.textLabel.textColor = UIColor.radicalRed;
                 action = @selector(onForceCrashApp);
@@ -287,6 +300,10 @@ NSString * const StateCellIdentifier = @"StateCell";
 
 - (void)onRecordHttpTrafficSwitch:(UISwitch *)view {
     [[NSUserDefaults standardUserDefaults] setBool:view.isOn forKey:UserDefaultsRecordHTTP];
+}
+
+- (void)onIgnorePurchaseRequiredParamSwitch:(UISwitch *)view {
+    [[NSUserDefaults standardUserDefaults] setBool:view.isOn forKey:UserDefaultsIgnorePurchaseRequiredParam];
 }
 
 - (void)onDefaultAccountsCredentials {

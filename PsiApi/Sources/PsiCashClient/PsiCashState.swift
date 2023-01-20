@@ -48,7 +48,7 @@ public struct PsiCashState: Equatable {
     public typealias PendingAccountLoginLogoutEvent =
         Event<PendingValue<LoginLogoutPendingValue, AccountLoginLogoutCompleted>>
     
-    public var purchase: PsiCashPurchaseState
+    public var speedBoostPurchase: PsiCashPurchaseState
     
     /// Representation of PsiCash data held by PsiCash library.
     /// If `nil`, PsiCash library is not initialized yet.
@@ -59,12 +59,12 @@ public struct PsiCashState: Equatable {
     
     
     public init(
-        purchase: PsiCashPurchaseState,
+        speedBoostPurchase: PsiCashPurchaseState,
         libData: Result<PsiCashLibData, ErrorRepr>? = nil,
         pendingAccountLoginLogout: PsiCashState.PendingAccountLoginLogoutEvent? = nil,
         pendingPsiCashRefresh: PsiCashState.PendingRefresh
     ) {
-        self.purchase = purchase
+        self.speedBoostPurchase = speedBoostPurchase
         self.libData = libData
         self.pendingAccountLoginLogout = pendingAccountLoginLogout
         self.pendingPsiCashRefresh = pendingPsiCashRefresh
@@ -98,7 +98,7 @@ extension PsiCashState {
 extension PsiCashState: CustomFieldFeedbackDescription {
     public var feedbackFields: [String : CustomStringConvertible] {
         [
-            "purchasing": String(describing: purchase),
+            "purchasing": String(describing: speedBoostPurchase),
             "pendingAccountLoginLogout": String(describing: pendingAccountLoginLogout),
             "pendingPsiCashRefresh": String(describing: pendingPsiCashRefresh)
         ]
@@ -108,7 +108,7 @@ extension PsiCashState: CustomFieldFeedbackDescription {
 extension PsiCashState {
     
     public init() {
-        purchase = .none
+        speedBoostPurchase = .none
         libData = nil
         pendingAccountLoginLogout = nil
         pendingPsiCashRefresh = .completed(.success(.unit))
@@ -243,7 +243,8 @@ extension PsiCashBalance {
 extension PsiCashBalance {
     
     public mutating func waitingForExpectedIncrease(
-        withAddedReward addedReward: PsiCashAmount, reason: BalanceOutOfDateReason,
+        withAddedReward addedReward: PsiCashAmount,
+        reason: BalanceOutOfDateReason,
         persisted: PsiCashPersistedValues
     ) {
         self.balanceOutOfDateReason = reason
