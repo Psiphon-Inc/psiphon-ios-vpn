@@ -394,6 +394,10 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                     self.tunnelProviderState = TunnelProviderStatePausedPurchaseRequired;
                     [self.psiphonTunnel stop];
                     
+                    // VPN Session number is incremented.
+                    // An app background is treated like a VPN start-stop by the user.
+                    [self.sharedDB incrementVPNSessionNumber];
+                    
                     [[LocalNotificationService shared] requestPurchaseRequiredPrompt];
                 }
             
