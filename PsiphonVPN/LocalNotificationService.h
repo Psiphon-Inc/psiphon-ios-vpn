@@ -32,6 +32,7 @@ extern NSString *_Nonnull const NotificationIdPurchaseRequired;
 
 #if TARGET_IS_EXTENSION
 // NE notification service.
+// This class is not thread-safe.
 @interface LocalNotificationService : NSObject
 
 + (instancetype)shared;
