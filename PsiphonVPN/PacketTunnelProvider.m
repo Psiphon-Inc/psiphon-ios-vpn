@@ -364,6 +364,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
         LOG_DEBUG(@"container entered background");
         
+        // Clears notification token set when the app is backgrounded.
+        [[LocalNotificationService shared] clearOnlyOnceTokens];
+        
         // Only on iOS mobile devices:
         // If the container StartVPN command has not been received from the container,
         // and the container goes to the background, then alert the user to open the app.
@@ -388,6 +391,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         ) {
             self.tunnelProviderState = TunnelProviderStatePausedPurchaseRequired;
             [self.psiphonTunnel stop];
+            
+            [[LocalNotificationService shared] requestPurchaseRequiredPrompt];
         }
         
     } else if ([NotifierAppDidBecomeActive isEqualToString:message]) {

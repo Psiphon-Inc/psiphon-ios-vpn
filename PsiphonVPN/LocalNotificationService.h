@@ -36,6 +36,12 @@ extern NSString *_Nonnull const NotificationIdPurchaseRequired;
 
 + (instancetype)shared;
 
+/**
+ Some notifications can only be requested once.
+ This resets the internal list of notifications presented.
+ */
+- (void)clearOnlyOnceTokens;
+
 - (void)requestOpenContainerToConnectNotification;
 
 - (void)requestCorruptSettingsFileNotification;
