@@ -38,14 +38,14 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
 #if TARGET_IS_EXTENSION
 
 @implementation LocalNotificationService {
-    NSMutableSet<NSString *> *requesetdNotifications;
+    NSMutableSet<NSString *> *onlyOnceTokenSet;
     PsiphonDataSharedDB *sharedDB;
 }
 
 - (instancetype)init {
     self = [super init];
     if (self) {
-        requesetdNotifications = [NSMutableSet set];
+        onlyOnceTokenSet = [NSMutableSet set];
         sharedDB = [[PsiphonDataSharedDB alloc] initForAppGroupIdentifier:PsiphonAppGroupIdentifier];
     }
     return self;
@@ -58,6 +58,10 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
         sharedInstance = [[LocalNotificationService alloc] init];
     });
     return sharedInstance;
+}
+
+- (void)clearOnlyOnceTokens {
+    onlyOnceTokenSet = [NSMutableSet set];
 }
 
 - (void)requestOpenContainerToConnectNotification {
@@ -97,11 +101,11 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
 
 - (void)requestSubscriptionExpiredNotification {
     
-    if ([self->requesetdNotifications containsObject:NotificationIdSubscriptionExpired]) {
+    if ([self->onlyOnceTokenSet containsObject:NotificationIdSubscriptionExpired]) {
         return;
     }
     
-    [self->requesetdNotifications addObject:NotificationIdSubscriptionExpired];
+    [self->onlyOnceTokenSet addObject:NotificationIdSubscriptionExpired];
     
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
@@ -162,11 +166,11 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
     }
     
     // Notification should only be presented once per tunnel session.
-    if ([self->requesetdNotifications containsObject:NotificationIdDisallowedTraffic]) {
+    if ([self->onlyOnceTokenSet containsObject:NotificationIdDisallowedTraffic]) {
         return;
     }
     
-    [self->requesetdNotifications addObject:NotificationIdDisallowedTraffic];
+    [self->onlyOnceTokenSet addObject:NotificationIdDisallowedTraffic];
     
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     
@@ -208,11 +212,11 @@ NSString *_Nonnull const NotificationIdPurchaseRequired = @"PurchaseRequired";
     }
     
     // Notification should only be presented once per tunnel session.
-    if ([self->requesetdNotifications containsObject:NotificationIdPurchaseRequired]) {
+    if ([self->onlyOnceTokenSet containsObject:NotificationIdPurchaseRequired]) {
         return;
     }
     
-    [self->requesetdNotifications addObject:NotificationIdPurchaseRequired];
+    [self->onlyOnceTokenSet addObject:NotificationIdPurchaseRequired];
     
     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
     

@@ -350,92 +350,105 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 // Expected to be called on the workQueue only.
 - (void)onMessageReceived:(NotifierMessage)message {
-
-    if ([NotifierStartVPN isEqualToString:message]) {
-
-        LOG_DEBUG(@"container signaled VPN to start");
-
-        if ([self.sharedDB getAppForegroundState] == TRUE || [AppInfo isiOSAppOnMac] == TRUE) {
-            self.waitForContainerStartVPNCommand = FALSE;
-            [self tryStartVPN];
-        }
-
-    } else if ([NotifierAppEnteredBackground isEqualToString:message]) {
-
-        LOG_DEBUG(@"container entered background");
+    
+    dispatch_async(self->workQueue, ^{
         
-        // Only on iOS mobile devices:
-        // If the container StartVPN command has not been received from the container,
-        // and the container goes to the background, then alert the user to open the app.
-        
-        if (self.waitForContainerStartVPNCommand && [AppInfo isiOSAppOnMac] == FALSE) {
+        if ([NotifierStartVPN isEqualToString:message]) {
             
-            // TunnelStartStopIntent integer codes are defined in VPNState.swift.
-            NSInteger tunnelIntent = [self.sharedDB getContainerTunnelIntentStatus];
+            LOG_DEBUG(@"container signaled VPN to start");
             
-            if (tunnelIntent == TUNNEL_INTENT_START || tunnelIntent == TUNNEL_INTENT_RESTART) {
-                [[LocalNotificationService shared] requestOpenContainerToConnectNotification];
+            if ([self.sharedDB getAppForegroundState] == TRUE || [AppInfo isiOSAppOnMac] == TRUE) {
+                self.waitForContainerStartVPNCommand = FALSE;
+                [self tryStartVPN];
             }
             
+        } else if ([NotifierAppEnteredBackground isEqualToString:message]) {
+            
+            LOG_DEBUG(@"container entered background");
+            
+            // Clears notification token set when the app is backgrounded.
+            [[LocalNotificationService shared] clearOnlyOnceTokens];
+            
+            // Only on iOS mobile devices:
+            // If the container StartVPN command has not been received from the container,
+            // and the container goes to the background, then alert the user to open the app.
+            
+            if (self.waitForContainerStartVPNCommand && [AppInfo isiOSAppOnMac] == FALSE) {
+                
+                // TunnelStartStopIntent integer codes are defined in VPNState.swift.
+                NSInteger tunnelIntent = [self.sharedDB getContainerTunnelIntentStatus];
+                
+                if (tunnelIntent == TUNNEL_INTENT_START || tunnelIntent == TUNNEL_INTENT_RESTART) {
+                    [[LocalNotificationService shared] requestOpenContainerToConnectNotification];
+                }
+                
+            }
+            
+            // If ShowRequiredPurchasePrompt is true and the app the backgrounded,
+            // and the user does not have any authorizations, disconnect the tunnel.
+            if (
+                self.tunnelProviderState == TunnelProviderStateStarted &&
+                self->applicationParameters.showRequiredPurchasePrompt == TRUE &&
+                ![self->authorizationStore hasActiveSubscriptionOrSpeedBoost]
+                ) {
+                    self.tunnelProviderState = TunnelProviderStatePausedPurchaseRequired;
+                    [self.psiphonTunnel stop];
+                    
+                    // VPN Session number is incremented.
+                    // An app background is treated like a VPN start-stop by the user.
+                    [self.sharedDB incrementVPNSessionNumber];
+                    
+                    [[LocalNotificationService shared] requestPurchaseRequiredPrompt];
+                }
+            
+        } else if ([NotifierAppDidBecomeActive isEqualToString:message]) {
+            
+            // Restarts Psiphon tunnel if it was previously paused.
+            if (self.tunnelProviderState == TunnelProviderStatePausedPurchaseRequired) {
+                [self startPsiphonTunnel];
+            }
+            
+        } else if ([NotifierUpdatedAuthorizations isEqualToString:message]) {
+            
+            // Restarts the tunnel only if the persisted authorizations have changed from the
+            // last set of authorizations supplied to tunnel-core.
+            // Checks for updated subscription authorizations.
+            [self checkAuthorizationAndReconnectIfNeeded];
+            
         }
         
-        // If ShowRequiredPurchasePrompt is true and the app the backgrounded,
-        // and the user does not have any authorizations, disconnect the tunnel.
-        if (
-            self.tunnelProviderState == TunnelProviderStateStarted &&
-            self->applicationParameters.showRequiredPurchasePrompt == TRUE &&
-            ![self->authorizationStore hasActiveSubscriptionOrSpeedBoost]
-        ) {
-            self.tunnelProviderState = TunnelProviderStatePausedPurchaseRequired;
-            [self.psiphonTunnel stop];
-        }
-        
-    } else if ([NotifierAppDidBecomeActive isEqualToString:message]) {
-        
-        // Restarts Psiphon tunnel if it was previously paused.
-        if (self.tunnelProviderState == TunnelProviderStatePausedPurchaseRequired) {
-            [self startPsiphonTunnel];
-        }
-
-    } else if ([NotifierUpdatedAuthorizations isEqualToString:message]) {
-
-        // Restarts the tunnel only if the persisted authorizations have changed from the
-        // last set of authorizations supplied to tunnel-core.
-        // Checks for updated subscription authorizations.
-        [self checkAuthorizationAndReconnectIfNeeded];
-
-    }
-
 #if DEBUG || DEV_RELEASE
-
-    if ([NotifierDebugForceJetsam isEqualToString:message]) {
-        [DebugUtils jetsamWithAllocationInterval:1 withNumberOfPages:15];
-
-    } else if ([NotifierDebugGoProfile isEqualToString:message]) {
-
-        NSError *e = [FileUtils createDir:self.sharedDB.goProfileDirectory];
-        if (e != nil) {
-            [PsiFeedbackLogger errorWithType:ExtensionNotificationLogType
-                                     message:@"FailedToCreateProfileDir"
-                                      object:e];
-            return;
+        
+        if ([NotifierDebugForceJetsam isEqualToString:message]) {
+            [DebugUtils jetsamWithAllocationInterval:1 withNumberOfPages:15];
+            
+        } else if ([NotifierDebugGoProfile isEqualToString:message]) {
+            
+            NSError *e = [FileUtils createDir:self.sharedDB.goProfileDirectory];
+            if (e != nil) {
+                [PsiFeedbackLogger errorWithType:ExtensionNotificationLogType
+                                         message:@"FailedToCreateProfileDir"
+                                          object:e];
+                return;
+            }
+            
+            [self.psiphonTunnel writeRuntimeProfilesTo:self.sharedDB.goProfileDirectory.path
+                          withCPUSampleDurationSeconds:0
+                        withBlockSampleDurationSeconds:0];
+            
+            [self displayMessage:@"DEBUG: Finished writing runtime profiles."
+               completionHandler:^(BOOL success) {}];
+            
+        } else if ([NotifierDebugMemoryProfiler isEqualToString:message]) {
+            [self updateAppProfiling];
+            
+        } else if ([NotifierDebugCustomFunction isEqualToString:message]) {
+            // Custom function.
         }
-
-        [self.psiphonTunnel writeRuntimeProfilesTo:self.sharedDB.goProfileDirectory.path
-                      withCPUSampleDurationSeconds:0
-                    withBlockSampleDurationSeconds:0];
-
-        [self displayMessage:@"DEBUG: Finished writing runtime profiles."
-           completionHandler:^(BOOL success) {}];
-
-    } else if ([NotifierDebugMemoryProfiler isEqualToString:message]) {
-        [self updateAppProfiling];
-
-    } else if ([NotifierDebugCustomFunction isEqualToString:message]) {
-        // Custom function.
-    }
-
+        
 #endif
+        
+    });
 
 }
 
