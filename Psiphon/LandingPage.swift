@@ -43,8 +43,9 @@ enum LandingPageAction {
     /// External landing page.
     case _urlOpened(success: Bool)
     
-    /// Presents purchase required prompt.
-    case presentPurchaseRequiredPrompt
+    /// Requests for presents purchase required prompt.
+    /// It is only presented if required conditions are met.
+    case checkPurchaseRequiredPrompt
     
 }
 
@@ -160,7 +161,7 @@ let landingPageReducer = Reducer<LandingPageReducerState
         state.pendingLandingPageOpening = false
         return []
         
-    case .presentPurchaseRequiredPrompt:
+    case .checkPurchaseRequiredPrompt:
         
         guard state.applicationParameters.showPurchaseRequiredPurchasePrompt else {
             return []
