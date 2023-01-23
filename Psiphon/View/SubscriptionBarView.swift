@@ -326,7 +326,8 @@ extension SubscriptionBarView.SubscriptionBarState {
     
     var subscriptionButtonEnabled: Bool {
         switch self.authState {
-        case .notSubscribed, .subscribedWithAuth:return true
+        case .notSubscribed: return true
+        case .subscribedWithAuth: return false
         case .failedRetry, .pending:
             switch self.tunnelStatus {
             case .connecting, .disconnecting: return false
