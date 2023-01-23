@@ -230,7 +230,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
         // Handles ShowPurchaseRequiredPrompt.
         if appParams.showPurchaseRequiredPurchasePrompt {
             return [
-                environment.landingPageStore(.presentPurchaseRequiredPrompt)
+                environment.landingPageStore(.checkPurchaseRequiredPrompt)
                     .mapNever()
             ]
         }

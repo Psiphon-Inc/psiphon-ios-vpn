@@ -32,9 +32,16 @@ extern NSString *_Nonnull const NotificationIdPurchaseRequired;
 
 #if TARGET_IS_EXTENSION
 // NE notification service.
+// This class is not thread-safe.
 @interface LocalNotificationService : NSObject
 
 + (instancetype)shared;
+
+/**
+ Some notifications can only be requested once.
+ This resets the internal list of notifications presented.
+ */
+- (void)clearOnlyOnceTokens;
 
 - (void)requestOpenContainerToConnectNotification;
 
