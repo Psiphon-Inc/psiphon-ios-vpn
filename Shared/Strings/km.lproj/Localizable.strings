@@ -283,6 +283,9 @@
 /*[UNTRANSLATED] Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
 "PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Something went wrong, please try again later.\n\nIf this problem persists, please send a feedback.";
 
+/*[UNTRANSLATED] Do not tarnslate or transliterate 'Psiphon'. Message asking user to wait for the until connection is established with Psiphon servers. */
+"PLEASE_WAIT_TO_FINISH_CONNECTING" = "Please wait for Psiphon to finish connecting.";
+
 /* No comment provided by engineer. */
 "privacy-canadian-privacy-commission-link-text" = "ការិយាល័យស្នងការសិទ្ធិឯកជននៃប្រទេសកាណាដា";
 
@@ -652,8 +655,8 @@
 /* Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
 "PURCHASING_PSICASH" = "កំពុងទិញ PsiCash…";
 
-/* Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PURCHASING_SPEED_BOOST" = "កំពុងទិញ បង្កើនល្បឿន…";
+/*[UNTRANSLATED] Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PURCHASING_SPEED_BOOST_PLEASE_WAIT_2" = "Purchasing Speed Boost…\n\nPlease wait for your purchase to complete.";
 
 /* Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "ផ្ទុកបង្កាន់ដៃកម្មវិធីរបស់អ្នកឡើងវិញនៅពេល៖";
