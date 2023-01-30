@@ -161,23 +161,13 @@ import PsiphonClientCommonLibrary
 
 // MARK: Bridged Types
 
-@objc enum StartButtonAction: Int {
-    case startVPN
-    case stopVPN
-}
-
 // TODO: Log the fatalError calls
 @objc final class SwitchedVPNStartStopIntent: NSObject {
     
     let switchedIntent: TunnelStartStopIntent
-    @objc var startButtonAction: StartButtonAction
     
-    private init(
-        switchedIntent: TunnelStartStopIntent,
-        startButtonAction: StartButtonAction
-    ) {
+    private init(switchedIntent: TunnelStartStopIntent) {
         self.switchedIntent = switchedIntent
-        self.startButtonAction = startButtonAction
     }
     
     static func make<T: TunnelProviderManager>(
@@ -187,27 +177,15 @@ import PsiphonClientCommonLibrary
             fatalError("expected no pending sync with tunnel provider")
         }
 
-        let intendToStart: Bool
         let newIntent: TunnelStartStopIntent
         if state.vpnStatus.providerRunning {
             newIntent = .stop
-            intendToStart = false
         } else {
             newIntent = .start(transition: .none)
-            intendToStart = true
-        }
-        
-        let startButtonAction: StartButtonAction
-        if (intendToStart) {
-            startButtonAction = .startVPN
-        } else {
-            // The intent is to stop the VPN.
-            startButtonAction = .stopVPN
         }
         
         return SwitchedVPNStartStopIntent(
-            switchedIntent: newIntent,
-            startButtonAction: startButtonAction
+            switchedIntent: newIntent
         )
     }
     
