@@ -890,6 +890,17 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         
         self->applicationParameters.showRequiredPurchasePrompt =
         [parameters[@"ShowPurchaseRequiredPrompt"] boolValue];
+        
+#if DEBUG || DEV_RELEASE
+        // Modifies application parameters based on the shared debug flags.
+        OnConnectedMode onConnectedMode = [self.sharedDB getSharedDebugFlags].onConnectedMode;
+        if (onConnectedMode == OnConnectedModeLandingPage) {
+            self->applicationParameters.showRequiredPurchasePrompt = FALSE;
+        } else if (onConnectedMode == OnConnectedModePurchaseRequired) {
+            self->applicationParameters.showRequiredPurchasePrompt = TRUE;
+        }
+#endif
+        
     });
 }
 

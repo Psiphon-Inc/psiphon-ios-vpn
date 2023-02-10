@@ -45,6 +45,8 @@ UserDefaultsKey const ConstainerPurchaseRequiredVPNSessionHandledIntKey =
 
 UserDefaultsKey const ExtensionIsZombieBoolKey = @"extension_zombie";
 
+UserDefaultsKey const ContainerSharedDebugFlagsKey = @"SHARED_DEBUG_FLAGS";
+
 UserDefaultsKey const ContainerForegroundStateBoolKey = @"container_foreground_state_bool_key";
 
 UserDefaultsKey const ContainerTunnelIntentStatusIntKey = @"container_tunnel_intent_status_key";
@@ -457,6 +459,32 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
 #pragma mark - Debug Preferences
 
 #if DEBUG || DEV_RELEASE
+
+- (SharedDebugFlags *_Nonnull)getSharedDebugFlags {
+    NSData *_Nullable data = [sharedDefaults dataForKey:ContainerSharedDebugFlagsKey];
+    if (data == nil) {
+        return [[SharedDebugFlags alloc] init];
+    } else {
+        NSError *err = nil;
+        id flags = [NSKeyedUnarchiver unarchivedObjectOfClass:[SharedDebugFlags class]
+                                                     fromData:data
+                                                        error:&err];
+        if (err != nil) {
+            return [[SharedDebugFlags alloc] init];
+        } else {
+            return (SharedDebugFlags *)flags;
+        }
+    }
+}
+
+- (void)setSharedDebugFlags:(SharedDebugFlags *_Nonnull)debugFlags {
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:debugFlags
+                                         requiringSecureCoding:TRUE
+                                                         error:nil];
+    if (data != nil) {
+        [sharedDefaults setObject:data forKey:ContainerSharedDebugFlagsKey];
+    }
+}
 
 - (void)setDebugMemoryProfiler:(BOOL)enabled {
     [sharedDefaults setBool:enabled forKey:DebugMemoryProfileBoolKey];
