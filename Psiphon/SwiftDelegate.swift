@@ -222,8 +222,7 @@ let appDelegateReducer = Reducer<AppDelegateReducerState,
     case .checkApplicationParameters:
         
         // Updates in-memory ApplicationParameters.
-        let appParams = ApplicationParameters.create(
-            PNEApplicationParameters(dict: environment.sharedDB.getApplicationParameters()))
+        let appParams = ApplicationParameters.create(environment.sharedDB.getApplicationParameters())
         
         state.appDelegateState.applicationParameters = appParams
         
@@ -582,8 +581,7 @@ extension SwiftDelegate: SwiftBridgeDelegate {
             #endif
         } else {
             
-            let appParams = ApplicationParameters.create(
-                PNEApplicationParameters(dict: self.sharedDB.getApplicationParameters()))
+            let appParams = ApplicationParameters.create(self.sharedDB.getApplicationParameters())
 
             self.store = Store(
                 initialValue: AppState(

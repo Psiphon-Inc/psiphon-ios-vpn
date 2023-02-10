@@ -150,7 +150,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         
         _hostAppProtocol = [[HostAppProtocol alloc] init];
         
-        applicationParameters = [[PNEApplicationParameters alloc] initDefaults];
+        applicationParameters = [[PNEApplicationParameters alloc] init];
     }
     return self;
 }
@@ -804,7 +804,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
         }
         // If self.reasserting is true and an authorization was rejected,
-        // we will assume that tunnel reconnected due to expired authorization.
+        // the tunnel reconnected most likely due to an expired authorization.
         if ((speedBoostRejected || subscriptionRejected) && self.reasserting) {
             [self.sharedDB incrementVPNSessionNumber];
         }
@@ -833,7 +833,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         // Persists ApplicationParameters.
         [self.sharedDB setApplicationParametersChangeTimestamp:[NSDate date]];
         [self->applicationParameters setVpnSessionNumber:[self.sharedDB getVPNSessionNumber]];
-        [self.sharedDB setApplicationParameters:[self->applicationParameters asDictionary]];
+        [self.sharedDB setApplicationParameters:self->applicationParameters];
         
         // Notifies host app that persisted application parameters has been updated.
         [[Notifier sharedInstance] post:NotifierApplicationParametersUpdated];
@@ -887,7 +887,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 - (void)onApplicationParameters:(NSDictionary *_Nonnull)parameters {
     dispatch_async(self->workQueue, ^{
-        self->applicationParameters = [[PNEApplicationParameters alloc] initWithDict:parameters];
+        
+        self->applicationParameters.showRequiredPurchasePrompt =
+        [parameters[@"ShowPurchaseRequiredPrompt"] boolValue];
     });
 }
 

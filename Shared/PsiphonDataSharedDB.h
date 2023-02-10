@@ -19,6 +19,7 @@
 
 #import <Foundation/Foundation.h>
 #import "UserDefaults.h"
+#import "PNEApplicationParameters.h"
 
 #if !(TARGET_IS_EXTENSION)
 #import "PsiphonData.h"
@@ -180,11 +181,11 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 #endif
 - (NSInteger)getVPNSessionNumber;
 
+- (PNEApplicationParameters *_Nonnull)getApplicationParameters;
 #if TARGET_IS_EXTENSION
 // Overrides previously persisted application parameters.
-- (void)setApplicationParameters:(NSDictionary<NSString *, id> *_Nonnull)params;
+- (void)setApplicationParameters:(PNEApplicationParameters *_Nonnull)params;
 #endif
-- (NSDictionary<NSString *, id> *_Nonnull)getApplicationParameters;
 
 - (NSString *_Nullable)emittedClientRegion;
 
