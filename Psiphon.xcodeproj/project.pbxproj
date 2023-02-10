@@ -36,6 +36,8 @@
 		2974E99E27CE858000DA0918 /* PsiNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2974E99D27CE858000DA0918 /* PsiNavigationController.swift */; };
 		29923FDA264EFC720078E8BB /* PsiCashLib.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; };
 		29923FDB264EFC720078E8BB /* PsiCashLib.xcframework in CopyFiles */ = {isa = PBXBuildFile; fileRef = 29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		2995DB4C2981D3880006130F /* SharedDebugFlags.m in Sources */ = {isa = PBXBuildFile; fileRef = 2995DB4B2981D3880006130F /* SharedDebugFlags.m */; };
+		2995DB4D2981D79F0006130F /* SharedDebugFlags.m in Sources */ = {isa = PBXBuildFile; fileRef = 2995DB4B2981D3880006130F /* SharedDebugFlags.m */; };
 		29A7075227CE9198006DE45A /* ChildViewControllerDismissedDelegate+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A7075127CE9198006DE45A /* ChildViewControllerDismissedDelegate+Additions.swift */; };
 		29AEC21328AD85110063003C /* LocalNotificationService.m in Sources */ = {isa = PBXBuildFile; fileRef = 29AEC21228AD85110063003C /* LocalNotificationService.m */; };
 		29AEC21428B014AF0063003C /* Strings.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083974C8CF9DDFE7A341D /* Strings.m */; };
@@ -426,6 +428,8 @@
 		296A1A88267A01E70068B115 /* CopyableLabel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CopyableLabel.swift; sourceTree = "<group>"; };
 		2974E99D27CE858000DA0918 /* PsiNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PsiNavigationController.swift; sourceTree = "<group>"; };
 		29923FD9264EFC720078E8BB /* PsiCashLib.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = PsiCashLib.xcframework; path = Frameworks/PsiCashLib.xcframework; sourceTree = "<group>"; };
+		2995DB4A2981D3880006130F /* SharedDebugFlags.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SharedDebugFlags.h; sourceTree = "<group>"; };
+		2995DB4B2981D3880006130F /* SharedDebugFlags.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SharedDebugFlags.m; sourceTree = "<group>"; };
 		29A7075127CE9198006DE45A /* ChildViewControllerDismissedDelegate+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ChildViewControllerDismissedDelegate+Additions.swift"; sourceTree = "<group>"; };
 		29AEC21128AD85110063003C /* LocalNotificationService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocalNotificationService.h; sourceTree = "<group>"; };
 		29AEC21228AD85110063003C /* LocalNotificationService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LocalNotificationService.m; sourceTree = "<group>"; };
@@ -1129,6 +1133,8 @@
 				29EE50B626ACDC0E00DB8A60 /* AppFiles.m */,
 				295D765C28B8164700AF6AC8 /* PNEApplicationParameters.h */,
 				295D765D28B8164700AF6AC8 /* PNEApplicationParameters.m */,
+				2995DB4A2981D3880006130F /* SharedDebugFlags.h */,
+				2995DB4B2981D3880006130F /* SharedDebugFlags.m */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -2158,6 +2164,7 @@
 				52D363C9230DE215002C2221 /* PsiCashStoreViewController.swift in Sources */,
 				528D81332384823F00AA2D77 /* PsiCashMessageView.swift in Sources */,
 				EF90D7A8204F22C900228A63 /* DispatchUtils.m in Sources */,
+				2995DB4C2981D3880006130F /* SharedDebugFlags.m in Sources */,
 				445F24D820E1A5BA00D004E9 /* OBJECT_IDENTIFIER.c in Sources */,
 				445F24D920E1A5BA00D004E9 /* BIT_STRING.c in Sources */,
 				445F24E820E1A5BA00D004E9 /* NativeEnumerated.c in Sources */,
@@ -2333,6 +2340,7 @@
 				295D765F28B8164700AF6AC8 /* PNEApplicationParameters.m in Sources */,
 				EF90D7B2204F232100228A63 /* timestamp_format.c in Sources */,
 				CED6794724A4F95D00C4CA81 /* RunningMinMax.m in Sources */,
+				2995DB4D2981D79F0006130F /* SharedDebugFlags.m in Sources */,
 				CED6794924A4F95D00C4CA81 /* RunningBins.m in Sources */,
 				CED6795A24A4FA1200C4CA81 /* FileRegistry.m in Sources */,
 				CED6795624A4F9F100C4CA81 /* Archiver.m in Sources */,

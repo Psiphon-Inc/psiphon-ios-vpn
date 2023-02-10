@@ -60,6 +60,7 @@
 #import "PsiphonConfigReader.h"
 #import "PsiphonDataSharedDB.h"
 #import "PersistentContainerWrapper.h"
+#import "SharedDebugFlags.h"
 
 #import "SharedAuthorization+CoreDataProperties.h"
 

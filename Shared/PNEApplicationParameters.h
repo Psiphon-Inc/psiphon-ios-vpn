@@ -21,26 +21,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-// PNEApplicationParameters(s) keys
-extern NSString* ApplicationParamKeyVPNSessionNumber;
-extern NSString* ApplicationParamKeyShowRequiredPurchasePrompt;
+@interface PNEApplicationParameters : NSObject <NSSecureCoding>
 
-@interface PNEApplicationParameters : NSObject
-
-/// VPN session number is defined in the NE.
+/// VPN session number is defined in the Netwrok Extension.
 /// Value is `0` before the first connected tunnel.
 @property (nonatomic) NSInteger vpnSessionNumber;
-@property (readonly, nonatomic) BOOL showRequiredPurchasePrompt;
 
-- (instancetype)init NS_UNAVAILABLE;
-
-- (instancetype)initDefaults;
-
-- (instancetype)initWithDict:(NSDictionary<NSString *, id> *)values;
-
-/// Returns ApplicationParameters dict given by tunnel-core (or default if none provided),
-/// along with `vpnSessionNumber`.
-- (NSDictionary<NSString *, id> *_Nonnull)asDictionary;
+@property (nonatomic) BOOL showRequiredPurchasePrompt;
 
 @end
 

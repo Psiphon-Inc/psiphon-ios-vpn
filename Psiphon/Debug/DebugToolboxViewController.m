@@ -35,7 +35,6 @@
 NSString * const UserDefaultsPsiCashUsername = @"Testing-Account-Username";
 NSString * const UserDefaultsPsiCashPassword = @"Testing-Account-Password";
 NSString * const UserDefaultsRecordHTTP = @"Testing-Record-Http";
-NSString * const UserDefaultsIgnorePurchaseRequiredParam = @"Testing-Ignore-Purchase-Required-Param";
 
 NSString * const ActionCellIdentifier = @"ActionCell";
 NSString * const SwitchCellIdentifier = @"SwitchCell";
@@ -73,6 +72,7 @@ NSString * const StateCellIdentifier = @"StateCell";
     actionsTableView = [[UITableView alloc] init];
     actionsTableView.dataSource = self;
     actionsTableView.delegate = self;
+    actionsTableView.rowHeight = UITableViewAutomaticDimension;
     [actionsTableView registerClass:UITableViewCell.class forCellReuseIdentifier:ActionCellIdentifier];
     [actionsTableView registerClass:UITableViewCell.class forCellReuseIdentifier:SwitchCellIdentifier];
     [actionsTableView registerClass:UITableViewCell.class forCellReuseIdentifier:StateCellIdentifier];
@@ -107,10 +107,11 @@ NSString * const StateCellIdentifier = @"StateCell";
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     switch (section) {
-        case 0: return 7; // CONTAINER
-        case 1: return 1; // PSIPHON TUNNEL
-        case 2: return 3; // EXTENSION
-        case 3: return 2; // PPROF
+        case 0: return 1; // On Connected Mode
+        case 1: return 7; // CONTAINER
+        case 2: return 1; // PSIPHON TUNNEL
+        case 3: return 3; // EXTENSION
+        case 4: return 2; // PPROF
         default:
             PSIAssert(FALSE)
             return 0;
@@ -119,10 +120,11 @@ NSString * const StateCellIdentifier = @"StateCell";
 
 - (nullable NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section {
     switch (section) {
-        case 0: return @"CONTAINER";
-        case 1: return @"PSIPHON TUNNEL";
-        case 2: return @"EXTENSION";
-        case 3: return @"PPROF";
+        case 0: return @"On Connected Mode";
+        case 1: return @"Container";
+        case 2: return @"Psiphon Tunnel";
+        case 3: return @"Network Extension";
+        case 4: return @"Go PPROF";
         default:
             PSIAssert(FALSE);
             return @"";
@@ -134,6 +136,64 @@ NSString * const StateCellIdentifier = @"StateCell";
     SEL action = nil;
     
     if (indexPath.section == 0) {
+        switch (indexPath.row) {
+            case 0: {
+                cell = [tableView dequeueReusableCellWithIdentifier:SwitchCellIdentifier
+                                                               forIndexPath:indexPath];
+                
+                
+                
+
+                UISegmentedControl *segmentedCtrl = nil;
+                if ([cell.contentView.subviews count] == 0) {
+                    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+                    
+                    // Items indices should match OnConnectedMode enum.
+                    segmentedCtrl = [[UISegmentedControl alloc]
+                                     initWithItems:@[@"Default", @"Landing page", @"Purchase-Required"]];
+                    [segmentedCtrl setApportionsSegmentWidthsByContent:TRUE];
+                    
+                    [segmentedCtrl addTarget:self
+                                      action:@selector(onConnectedModeChanged:)
+                            forControlEvents:UIControlEventValueChanged];
+                    
+                    UILabel *label = [[UILabel alloc] init];
+                    label.adjustsFontSizeToFitWidth = TRUE;
+                    label.text = @"Changing modes will stop the VPN process.";
+                    label.font = [UIFont systemFontOfSize:11];
+                    label.textColor = UIColor.systemGrayColor;
+                    
+                    UIStackView *vstack = [[UIStackView alloc] init];
+                    vstack.axis = UILayoutConstraintAxisVertical;
+                    vstack.distribution = UIStackViewDistributionFill;
+                    vstack.spacing = 5.0;
+                    
+                    [vstack addArrangedSubview:segmentedCtrl];
+                    [vstack addArrangedSubview: label];
+                    [cell.contentView addSubview:vstack];
+                    
+                    vstack.translatesAutoresizingMaskIntoConstraints = FALSE;
+                    [NSLayoutConstraint activateConstraints:@[
+                        [vstack.leadingAnchor
+                         constraintEqualToAnchor:cell.leadingAnchor
+                         constant:10.0],
+                        [vstack.trailingAnchor
+                         constraintEqualToAnchor:cell.trailingAnchor
+                         constant:-10.0]
+                    ]];
+
+                    
+                } else {
+                    segmentedCtrl = (UISegmentedControl*) cell.contentView.subviews[0].subviews[0];
+                }
+                
+                segmentedCtrl.selectedSegmentIndex = [self.sharedDB getSharedDebugFlags].onConnectedMode;
+                
+                break;
+            }
+        }
+        
+    } else if (indexPath.section == 1) {
         // CONTAINER section
         cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier
                                                forIndexPath:indexPath];
@@ -152,47 +212,35 @@ NSString * const StateCellIdentifier = @"StateCell";
                 break;
             }
             case 1: {
-                NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-                cell.selectionStyle = UITableViewCellSelectionStyleNone;
-                cell.textLabel.text = @"(landing page) Ignore purchase required";
-                UISwitch *switchView = [[UISwitch alloc] initWithFrame:CGRectZero];
-                [switchView setOn:[defaults boolForKey:UserDefaultsIgnorePurchaseRequiredParam]];
-                [switchView addTarget:self
-                               action:@selector(onIgnorePurchaseRequiredParamSwitch:)
-                     forControlEvents:UIControlEventValueChanged];
-                cell.accessoryView = switchView;
-                break;
-            }
-            case 2: {
                 cell.textLabel.text = @"Default PsiCash Accounts credentials";
                 action = @selector(onDefaultAccountsCredentials);
                 break;
             }
-            case 3: {
+            case 2: {
                 cell.textLabel.text = @"Reset Standard UserDefaults";
                 cell.textLabel.textColor = UIColor.radicalRed;
                 action = @selector(onResetStandardUserDefaults);
                 break;
             }
-            case 4: {
+            case 3: {
                 cell.textLabel.text = @"Reset PsiphonDataSharedDB";
                 cell.textLabel.textColor = UIColor.radicalRed;
                 action = @selector(onResetPsiphonDataSharedDB);
                 break;
             }
-            case 5: {
+            case 4: {
                 cell.textLabel.text = @"Delete Core Data persistent store";
                 cell.textLabel.textColor = UIColor.radicalRed;
                 action = @selector(onDeleteCoreDataPersistentStores);
                 break;
             }
-            case 6: {
+            case 5: {
                 cell.textLabel.text = @"Delete PsiCash store directory";
                 cell.textLabel.textColor = UIColor.radicalRed;
                 action = @selector(onDeletePsiCashStore);
                 break;
             }
-            case 7: {
+            case 6: {
                 cell.textLabel.text = @"Force crash app";
                 cell.textLabel.textColor = UIColor.radicalRed;
                 action = @selector(onForceCrashApp);
@@ -200,7 +248,7 @@ NSString * const StateCellIdentifier = @"StateCell";
             }
         }
         
-    } else if (indexPath.section == 1) {
+    } else if (indexPath.section == 2) {
         // PSIPHON TUNNEL section
         cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier
                                                forIndexPath:indexPath];
@@ -216,7 +264,7 @@ NSString * const StateCellIdentifier = @"StateCell";
             }
         }
         
-    } else if (indexPath.section == 2) {
+    } else if (indexPath.section == 3) {
         // EXTENSION section
         cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier
                                                forIndexPath:indexPath];
@@ -245,7 +293,7 @@ NSString * const StateCellIdentifier = @"StateCell";
             }
         }
         
-    } else if (indexPath.section == 3) {
+    } else if (indexPath.section == 4) {
         // PPROF section
         cell = [tableView dequeueReusableCellWithIdentifier:ActionCellIdentifier forIndexPath:indexPath];
         switch (indexPath.row) {
@@ -302,8 +350,17 @@ NSString * const StateCellIdentifier = @"StateCell";
     [[NSUserDefaults standardUserDefaults] setBool:view.isOn forKey:UserDefaultsRecordHTTP];
 }
 
-- (void)onIgnorePurchaseRequiredParamSwitch:(UISwitch *)view {
-    [[NSUserDefaults standardUserDefaults] setBool:view.isOn forKey:UserDefaultsIgnorePurchaseRequiredParam];
+- (void)onConnectedModeChanged:(UISegmentedControl *)view {
+    
+    // Stops the tunnel.
+    [SwiftDelegate.bridge stopVPN];
+    
+    // Updates shared debug flags.
+    SharedDebugFlags *sharedFlags = [self.sharedDB getSharedDebugFlags];
+    
+    sharedFlags.onConnectedMode = (OnConnectedMode) view.selectedSegmentIndex;
+    [self.sharedDB setSharedDebugFlags:sharedFlags];
+    
 }
 
 - (void)onDefaultAccountsCredentials {

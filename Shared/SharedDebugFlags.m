@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022, Psiphon Inc.
+ * Copyright (c) 2023, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -17,33 +17,30 @@
  *
  */
 
-#import "PNEApplicationParameters.h"
+#import "SharedDebugFlags.h"
 
-NSString* VPNSessionNumber = @"VPNSessionNumber";
-NSString* ShowRequiredPurchasePrompt = @"ShowPurchaseRequiredPrompt";
+#if DEBUG || DEV_RELEASE
 
-@implementation PNEApplicationParameters
+NSString * const OnConnectedModeKey = @"OnConnectedMode";
+
+@implementation SharedDebugFlags
 
 - (instancetype)init {
     self = [super init];
     if (self) {
-        // Default values.
-        _vpnSessionNumber = 0;
-        _showRequiredPurchasePrompt = FALSE;
+        _onConnectedMode = OnConnectedModeDefault;
     }
     return self;
 }
 
-- (void)encodeWithCoder:(nonnull NSCoder *)coder {
-    [coder encodeInteger:self.vpnSessionNumber forKey:VPNSessionNumber];
-    [coder encodeBool:self.showRequiredPurchasePrompt forKey:ShowRequiredPurchasePrompt];
+- (void)encodeWithCoder:(NSCoder *)coder {
+    [coder encodeInteger:self.onConnectedMode forKey:OnConnectedModeKey];
 }
 
 - (nullable instancetype)initWithCoder:(nonnull NSCoder *)coder {
     self = [super init];
     if (self) {
-        _vpnSessionNumber = [coder decodeIntegerForKey:VPNSessionNumber];
-        _showRequiredPurchasePrompt = [coder decodeBoolForKey:ShowRequiredPurchasePrompt];
+        _onConnectedMode = [coder decodeIntegerForKey:OnConnectedModeKey];
     }
     return self;
 }
@@ -53,3 +50,5 @@ NSString* ShowRequiredPurchasePrompt = @"ShowPurchaseRequiredPrompt";
 }
 
 @end
+
+#endif
