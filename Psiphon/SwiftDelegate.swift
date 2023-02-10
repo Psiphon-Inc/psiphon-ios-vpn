@@ -1431,6 +1431,12 @@ extension SwiftDelegate: SwiftBridgeDelegate {
         ))
     }
     
+    @objc func stopVPN() {
+        self.store.send(vpnAction: .tunnelStateIntent(
+            intent: .stop, reason: .userInitiated
+        ))
+    }
+    
     @objc func reinstallVPNConfig() {
         self.store.send(vpnAction: .reinstallVPNConfig)
     }

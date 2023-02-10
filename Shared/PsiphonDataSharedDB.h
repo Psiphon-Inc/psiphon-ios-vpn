@@ -25,6 +25,10 @@
 #import "PsiphonData.h"
 #endif
 
+#if DEBUG || DEV_RELEASE
+#import "SharedDebugFlags.h"
+#endif
+
 #pragma mark - Keys from PsiphonClientCommonLibrary
 
 // Value re-defined from PsiphonClientCommonLibrary
@@ -275,6 +279,10 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 #pragma mark - Debug Preferences
 
 #if DEBUG || DEV_RELEASE
+
+- (SharedDebugFlags *_Nonnull)getSharedDebugFlags;
+
+- (void)setSharedDebugFlags:(SharedDebugFlags *_Nonnull)debugFlags;
 
 - (void)setDebugMemoryProfiler:(BOOL)enabled;
 

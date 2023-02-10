@@ -124,6 +124,7 @@ import PsiphonClientCommonLibrary
     @objc func sendNewVPNIntent(_ value: SwitchedVPNStartStopIntent)
     
     @objc func restartVPNIfActive()
+    @objc func stopVPN()
     @objc func reinstallVPNConfig()
     @objc func installVPNConfigWithPromise()
         -> Promise<VPNConfigInstallResultWrapper>.ObjCPromise<VPNConfigInstallResultWrapper>
