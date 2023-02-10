@@ -38,7 +38,7 @@ UserDefaultsKey const ServerTimestampStringKey = @"server_timestamp";
 
 UserDefaultsKey const ExtensionVPNSessionNumberIntKey = @"extension_vpn_session_number";
 
-UserDefaultsKey const ExtensionApplicationParametersDictKey = @"server_application_parameters";
+UserDefaultsKey const ExtensionApplicationParametersDataKey = @"server_application_parameters_data";
 
 UserDefaultsKey const ConstainerPurchaseRequiredVPNSessionHandledIntKey =
 @"container_purchase_required_handled_vpn_session_num";
@@ -289,16 +289,32 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
     return [sharedDefaults integerForKey:ExtensionVPNSessionNumberIntKey];
 }
 
-- (void)setApplicationParameters:(NSDictionary<NSString *, id> *_Nonnull)params {
-    [sharedDefaults setObject:params forKey:ExtensionApplicationParametersDictKey];
+- (PNEApplicationParameters *_Nonnull)getApplicationParameters {
+    NSData *_Nullable data = [sharedDefaults dataForKey:ExtensionApplicationParametersDataKey];
+    if (data == nil) {
+        return [[PNEApplicationParameters alloc] init];
+    }
+    
+    NSError *err = nil;
+    
+    id params = [NSKeyedUnarchiver unarchivedObjectOfClass:[PNEApplicationParameters class]
+                                                  fromData:data
+                                                     error:&err];
+    
+    if (err != nil) {
+        [PsiFeedbackLogger error:err message:@"Failed to unarchive PNEApplicationParameters"];
+        return [[PNEApplicationParameters alloc] init];
+    } else {
+        return (PNEApplicationParameters *)params;
+    }
 }
 
-- (NSDictionary<NSString *, id> *_Nonnull)getApplicationParameters {
-    NSDictionary *_Nullable dict = [sharedDefaults dictionaryForKey:ExtensionApplicationParametersDictKey];
-    if (dict == nil) {
-        return [NSDictionary dictionary];
-    } else {
-        return dict;
+- (void)setApplicationParameters:(PNEApplicationParameters *_Nonnull)params {
+    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:params
+                                         requiringSecureCoding:TRUE
+                                                         error:nil];
+    if (data != nil) {
+        [sharedDefaults setObject:data forKey:ExtensionApplicationParametersDataKey];
     }
 }
 

@@ -19,49 +19,37 @@
 
 #import "PNEApplicationParameters.h"
 
-NSString* ApplicationParamKeyVPNSessionNumber = @"VPNSessionNumber";
-NSString* ApplicationParamKeyShowRequiredPurchasePrompt = @"ShowPurchaseRequiredPrompt";
+NSString* VPNSessionNumber = @"VPNSessionNumber";
+NSString* ShowRequiredPurchasePrompt = @"ShowPurchaseRequiredPrompt";
 
-@implementation PNEApplicationParameters {
-    // Values received directly form tunnel-core.
-    NSDictionary<NSString *, id> *values;
-}
+@implementation PNEApplicationParameters
 
-+ (NSMutableDictionary *)getDefaultDictionary {
-    return [NSMutableDictionary dictionaryWithDictionary: @{
-        ApplicationParamKeyVPNSessionNumber: @0,
-        ApplicationParamKeyShowRequiredPurchasePrompt: @FALSE
-    }];
-}
-
-- (instancetype)initDefaults {
+- (instancetype)init {
     self = [super init];
     if (self) {
-        // Default values are defined here.
-        values = [PNEApplicationParameters getDefaultDictionary];
+        // Default values.
+        _vpnSessionNumber = 0;
+        _showRequiredPurchasePrompt = FALSE;
     }
     return self;
 }
 
-- (instancetype)initWithDict:(NSDictionary<NSString *, id> *)values {
+- (void)encodeWithCoder:(nonnull NSCoder *)coder {
+    [coder encodeInteger:self.vpnSessionNumber forKey:VPNSessionNumber];
+    [coder encodeBool:self.showRequiredPurchasePrompt forKey:ShowRequiredPurchasePrompt];
+}
+
+- (nullable instancetype)initWithCoder:(nonnull NSCoder *)coder {
     self = [super init];
     if (self) {
-        NSMutableDictionary *dict = [PNEApplicationParameters getDefaultDictionary];
-        [dict addEntriesFromDictionary:values];
-        self->values = dict;
-        self->_vpnSessionNumber = [(NSNumber*)dict[ApplicationParamKeyVPNSessionNumber] integerValue];
+        _vpnSessionNumber = [coder decodeIntegerForKey:VPNSessionNumber];
+        _showRequiredPurchasePrompt = [coder decodeBoolForKey:ShowRequiredPurchasePrompt];
     }
     return self;
 }
 
-- (BOOL)showRequiredPurchasePrompt {
-    return [(NSNumber*)values[ApplicationParamKeyShowRequiredPurchasePrompt] boolValue];
-}
-
-- (NSDictionary<NSString *, id> *_Nonnull)asDictionary {
-    NSMutableDictionary *dict = [NSMutableDictionary dictionaryWithDictionary:values];
-    dict[ApplicationParamKeyVPNSessionNumber] = [NSNumber numberWithInteger:self.vpnSessionNumber];
-    return  dict;
++ (BOOL)supportsSecureCoding {
+    return TRUE;
 }
 
 @end
