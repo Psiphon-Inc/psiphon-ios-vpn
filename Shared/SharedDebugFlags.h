@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018, Psiphon Inc.
+ * Copyright (c) 2023, Psiphon Inc.
  * All rights reserved.
  *
  * This program is free software: you can redistribute it and/or modify
@@ -18,15 +18,23 @@
  */
 
 #import <Foundation/Foundation.h>
-#import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-extern NSString * const UserDefaultsPsiCashUsername;
-extern NSString * const UserDefaultsPsiCashPassword;
-extern NSString * const UserDefaultsRecordHTTP;
+#if DEBUG || DEV_RELEASE
 
-@interface DebugToolboxViewController : UIViewController <UITableViewDelegate, UITableViewDataSource>
+typedef NS_ENUM(NSInteger, OnConnectedMode) {
+    OnConnectedModeDefault = 0,
+    OnConnectedModeLandingPage = 1,
+    OnConnectedModePurchaseRequired = 2
+} NS_SWIFT_NAME(OnConnectedMode);
+
+@interface SharedDebugFlags : NSObject <NSSecureCoding>
+
+@property (nonatomic) OnConnectedMode onConnectedMode;
+
 @end
+
+#endif
 
 NS_ASSUME_NONNULL_END

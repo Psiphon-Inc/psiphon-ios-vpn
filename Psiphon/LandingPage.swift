@@ -69,23 +69,12 @@ let landingPageReducer = Reducer<LandingPageReducerState
     switch action {
     case .tunnelConnectedAfterIntentSwitchedToStart:
         
-        #if DEBUG || DEV_RELEASE
-        let ignorePurhcaseRequired = UserDefaults.standard.bool(forKey: UserDefaultsIgnorePurchaseRequiredParam)
-        guard ignorePurhcaseRequired || !state.applicationParameters.showPurchaseRequiredPurchasePrompt else {
-            return [
-                environment.feedbackLogger
-                    .log(.info, "skipping landing page (ShowPurchaseRequiredPrompt)").mapNever()
-            ]
-        }
-        #else
         guard !state.applicationParameters.showPurchaseRequiredPurchasePrompt else {
             return [
                 environment.feedbackLogger
                     .log(.info, "skipping landing page (ShowPurchaseRequiredPrompt)").mapNever()
             ]
         }
-        #endif
-        
         
         // Guards that user is not in middle of a PsiCash purchase through App Store.
         if let psiCashPurchaseState = state.iapState.purchasing[.psiCash] {
@@ -129,11 +118,17 @@ let landingPageReducer = Reducer<LandingPageReducerState
             return []
         }
         
+        let landingPages = NonEmpty(array: environment.sharedDB.getHomepages())
+        
         #if DEBUG || DEV_RELEASE
+        let onConnectedMode: OnConnectedMode = environment.sharedDB.getSharedDebugFlags().onConnectedMode;
+        guard landingPages != nil && onConnectedMode != OnConnectedMode.purchaseRequired else {
+            return []
+        }
         let randomlySelectedURL = URL(string: "https://landing.dev.psi.cash/dev-index.html")!
         #else
         guard
-            let landingPages = NonEmpty(array: environment.sharedDB.getHomepages()),
+            let landingPages = landingPages,
             let randomlySelectedURL = landingPages.randomElement()?.url
         else {
             return [
