@@ -731,7 +731,7 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // Use default rotation rules for homepage and notice files.
     // Note: homepage and notice files are only used if this field is set.
     NSMutableDictionary *noticeFiles = [[NSMutableDictionary alloc] init];
-    [noticeFiles setObject:@0 forKey:@"RotatingFileSize"];
+    [noticeFiles setObject:@870000 forKey:@"RotatingFileSize"];
     [noticeFiles setObject:@0 forKey:@"RotatingSyncFrequency"];
 
     mutableConfigCopy[@"UseNoticeFiles"] = noticeFiles;
