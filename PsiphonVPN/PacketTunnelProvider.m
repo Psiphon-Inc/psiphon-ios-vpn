@@ -125,6 +125,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     // Values are stored here and committed to disk after on onConnected.
     // Access should be protected by `workQueue`.
     PNEApplicationParameters *_Nonnull applicationParameters;
+    
+    // IPv4 address of Packet Tunnel DNS resolver.
+    // Value is set only once on `getTunnelSettings`,
+    // and subsequently passed into PsiphonTunnel.
+    NSString *_Nullable packetTunnelDNSResolverIPv4Address;
+    
 }
 
 - (id)init {
@@ -544,7 +550,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     newSettings.IPv4Settings.excludedRoutes = @[];
 
     // TODO: call getPacketTunnelDNSResolverIPv6Address
-    newSettings.DNSSettings = [[NEDNSSettings alloc] initWithServers:@[[self.psiphonTunnel getPacketTunnelDNSResolverIPv4Address]]];
+    self->packetTunnelDNSResolverIPv4Address = selectedAddress[0];
+    newSettings.DNSSettings = [[NEDNSSettings alloc]
+                               initWithServers:@[self->packetTunnelDNSResolverIPv4Address]];
 
     newSettings.DNSSettings.searchDomains = @[@""];
 
@@ -672,6 +680,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     [mutableConfigCopy addEntriesFromDictionary:tunnelUserConfigs];
     
     mutableConfigCopy[@"PacketTunnelTunFileDescriptor"] = fd;
+    
+    // Setup DNS
+    mutableConfigCopy[@"PacketTunnelTransparentDNSIPv4Address"] = self->packetTunnelDNSResolverIPv4Address;
 
     mutableConfigCopy[@"ClientVersion"] = [AppInfo appVersion];
 
