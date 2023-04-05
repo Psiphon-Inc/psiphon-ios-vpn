@@ -188,7 +188,8 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 - (PNEApplicationParameters *_Nonnull)getApplicationParameters;
 #if TARGET_IS_EXTENSION
 // Overrides previously persisted application parameters.
-- (void)setApplicationParameters:(PNEApplicationParameters *_Nonnull)params;
+// Returns an non-nil error if archiving params failed.
+- (NSError *_Nullable)setApplicationParameters:(PNEApplicationParameters *_Nonnull)params;
 #endif
 
 - (NSString *_Nullable)emittedClientRegion;

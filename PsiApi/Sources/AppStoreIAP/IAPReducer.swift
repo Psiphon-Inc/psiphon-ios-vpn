@@ -224,7 +224,7 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
             return [
                 environment.feedbackLogger
                     .log(.info, """
-                        appReceiptDataUpdated but not unfinished PsiCash transactionx observed
+                        appReceiptDataUpdated but no unfinished PsiCash transactions observed
                         """).mapNever()
             ]
         }

@@ -842,12 +842,18 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
         //       as of now application parameters are overwritten.
         
         // Persists ApplicationParameters.
-        [self.sharedDB setApplicationParametersChangeTimestamp:[NSDate date]];
         [self->applicationParameters setVpnSessionNumber:[self.sharedDB getVPNSessionNumber]];
-        [self.sharedDB setApplicationParameters:self->applicationParameters];
         
-        // Notifies host app that persisted application parameters has been updated.
-        [[Notifier sharedInstance] post:NotifierApplicationParametersUpdated];
+        NSError *err = [self.sharedDB setApplicationParameters:self->applicationParameters];
+        if (err == nil) {
+            [self.sharedDB setApplicationParametersChangeTimestamp:[NSDate date]];
+            // Notifies host app that persisted application parameters has been updated.
+            [[Notifier sharedInstance] post:NotifierApplicationParametersUpdated];
+        } else {
+            [PsiFeedbackLogger errorWithType:PacketTunnelProviderLogType
+                                     message:@"setApplicationParameters failed"
+                                      object:err];
+        }
         
         // Request notification if purchase required.
         if (self->applicationParameters.showRequiredPurchasePrompt == TRUE

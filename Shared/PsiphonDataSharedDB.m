@@ -311,13 +311,20 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
     }
 }
 
-- (void)setApplicationParameters:(PNEApplicationParameters *_Nonnull)params {
-    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:params
-                                         requiringSecureCoding:TRUE
-                                                         error:nil];
+- (NSError *_Nullable)setApplicationParameters:(PNEApplicationParameters *_Nonnull)params {
+    NSError *err = nil;
+    NSData *data = nil;
+    if (@available(iOS 11.0, *)) {
+        data = [NSKeyedArchiver archivedDataWithRootObject:params
+                                             requiringSecureCoding:TRUE
+                                                             error:&err];
+    } else {
+        data = [NSKeyedArchiver archivedDataWithRootObject:params];
+    }
     if (data != nil) {
         [sharedDefaults setObject:data forKey:ExtensionApplicationParametersDataKey];
     }
+    return err;
 }
 
 // TODO: is timestamp needed? Maybe we can use this to detect staleness later
