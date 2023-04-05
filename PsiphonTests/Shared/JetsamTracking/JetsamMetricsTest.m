@@ -205,8 +205,9 @@
 
     // Decode
 
-    JetsamMetrics *decodedMetrics = [Archiver unarchiveObjectWithData:data
-                                                                error:&err];
+    JetsamMetrics *decodedMetrics = [Archiver unarchiveObjectOfClass:[JetsamMetrics class]
+                                                            fromData:data
+                                                               error:&err];
 
     // Compare
     XCTAssertNotNil(decodedMetrics);

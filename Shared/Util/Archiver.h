@@ -39,11 +39,13 @@ typedef NS_ERROR_ENUM(ArchiverErrorDomain, ArchiverFileErrorCode) {
                              error:(NSError * _Nullable *)outError;
 
 /// Unarchives the given object with a keyed archiver.
+/// @param cls The expected class of the root object.
 /// @param data Data which represents a keyed archive.
 /// @param outError If non-nil on return, then initialization failed with the provided error.
 /// @return Returns nil when `outError` is non-nil.
-+ (nullable id)unarchiveObjectWithData:(NSData*)data
-                                 error:(NSError * _Nullable *)outError;
++ (nullable id)unarchiveObjectOfClass:(Class)cls
+                             fromData:(NSData*)data
+                                error:(NSError * _Nullable *)outError;
 
 @end
 
