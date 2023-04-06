@@ -201,7 +201,9 @@
 
     // Decode
 
-    RunningStat *decodedStat = [Archiver unarchiveObjectWithData:data error:&err];
+    RunningStat *decodedStat = [Archiver unarchiveObjectOfClass:[RunningStat class]
+                                                       fromData:data
+                                                          error:&err];
     if (err != nil) {
         XCTFail(@"Unexpected error: %@", err);
     }

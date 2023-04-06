@@ -44,7 +44,9 @@
 
     // Decode
 
-    JetsamEvent *decodedJetsam = [Archiver unarchiveObjectWithData:data error:&err];
+    JetsamEvent *decodedJetsam = [Archiver unarchiveObjectOfClass:[JetsamEvent class]
+                                                         fromData:data
+                                                            error:&err];
     if (err != nil) {
         XCTFail(@"Unexpected error: %@", err);
     }

@@ -53,15 +53,18 @@ NSErrorDomain _Nonnull const ArchiverErrorDomain = @"ArchiverErrorDomain";
     return data;
 }
 
-+ (id)unarchiveObjectWithData:(NSData*)data
-                        error:(NSError * _Nullable *)outError {
++ (nullable id)unarchiveObjectOfClass:(Class)cls
+                             fromData:(NSData*)data
+                                error:(NSError * _Nullable *)outError {
     *outError = nil;
 
     id object;
     if (@available(iOS 11.0, *)) {
         NSError *err;
-        object = [NSKeyedUnarchiver unarchiveTopLevelObjectWithData:data
-                                                              error:&err];
+        
+        object = [NSKeyedUnarchiver unarchivedObjectOfClass:cls
+                                                   fromData:data
+                                                      error:&err];
         if (err) {
             *outError = [NSError errorWithDomain:ArchiverErrorDomain
                                             code:ArchiverErrorUnarchiveFailed

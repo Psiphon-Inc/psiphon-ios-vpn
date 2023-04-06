@@ -70,7 +70,9 @@ NSErrorDomain _Nonnull const ContainerReaderRotatedFileErrorDomain = @"Container
 
             if (registryData != nil) {
                 NSError *err;
-                FileRegistry *registry = [Archiver unarchiveObjectWithData:registryData error:&err];
+                FileRegistry *registry = [Archiver unarchiveObjectOfClass:[FileRegistry class]
+                                                                 fromData:registryData
+                                                                    error:&err];
                 if (err != nil) {
                    *outError = [NSError errorWithDomain:ContainerReaderRotatedFileErrorDomain
                                                    code:ContainerReaderRotatedFileErrorUnarchiveRegistryFailed
