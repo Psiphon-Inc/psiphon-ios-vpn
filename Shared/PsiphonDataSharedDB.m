@@ -22,6 +22,7 @@
 #import "NSDate+PSIDateExtension.h"
 #import "SharedConstants.h"
 #import "FileUtils.h"
+#import "Archiver.h"
 #import <PsiphonTunnel/PsiphonTunnel.h>
 
 #pragma mark - NSUserDefaults Keys
@@ -298,29 +299,21 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
     }
     
     NSError *err = nil;
-    
-    id params = [NSKeyedUnarchiver unarchivedObjectOfClass:[PNEApplicationParameters class]
-                                                  fromData:data
-                                                     error:&err];
+    PNEApplicationParameters *params = [Archiver unarchiveObjectOfClass:[PNEApplicationParameters class]
+                                                               fromData:data
+                                                                  error:&err];
     
     if (err != nil) {
         [PsiFeedbackLogger error:err message:@"Failed to unarchive PNEApplicationParameters"];
         return [[PNEApplicationParameters alloc] init];
     } else {
-        return (PNEApplicationParameters *)params;
+        return params;
     }
 }
 
 - (NSError *_Nullable)setApplicationParameters:(PNEApplicationParameters *_Nonnull)params {
     NSError *err = nil;
-    NSData *data = nil;
-    if (@available(iOS 11.0, *)) {
-        data = [NSKeyedArchiver archivedDataWithRootObject:params
-                                             requiringSecureCoding:TRUE
-                                                             error:&err];
-    } else {
-        data = [NSKeyedArchiver archivedDataWithRootObject:params];
-    }
+    NSData *data = [Archiver archiveObject:params error:&err];
     if (data != nil) {
         [sharedDefaults setObject:data forKey:ExtensionApplicationParametersDataKey];
     }
@@ -473,21 +466,21 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
         return [[SharedDebugFlags alloc] init];
     } else {
         NSError *err = nil;
-        id flags = [NSKeyedUnarchiver unarchivedObjectOfClass:[SharedDebugFlags class]
-                                                     fromData:data
-                                                        error:&err];
+        
+        SharedDebugFlags *flags = [Archiver unarchiveObjectOfClass:[SharedDebugFlags class]
+                                                          fromData:data
+                                                             error:&err];
         if (err != nil) {
             return [[SharedDebugFlags alloc] init];
         } else {
-            return (SharedDebugFlags *)flags;
+            return flags;
         }
     }
 }
 
 - (void)setSharedDebugFlags:(SharedDebugFlags *_Nonnull)debugFlags {
-    NSData *data = [NSKeyedArchiver archivedDataWithRootObject:debugFlags
-                                         requiringSecureCoding:TRUE
-                                                         error:nil];
+    NSError *err = nil;
+    NSData *data = [Archiver archiveObject:debugFlags error:&err];
     if (data != nil) {
         [sharedDefaults setObject:data forKey:ContainerSharedDebugFlagsKey];
     }

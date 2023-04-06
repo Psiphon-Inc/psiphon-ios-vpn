@@ -51,7 +51,9 @@
 
     // Decode
 
-    FileRegistry *decodedReg = [Archiver unarchiveObjectWithData:data error:&err];
+    FileRegistry *decodedReg = [Archiver unarchiveObjectOfClass:[FileRegistry class]
+                                                       fromData:data
+                                                          error:&err];
     if (err != nil) {
         XCTFail(@"Unexpected error: %@", err);
     }
