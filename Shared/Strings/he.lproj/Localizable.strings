@@ -1,7 +1,7 @@
 /* Accept button title */
 "ACCEPT_BUTTON_TITLE" = "קבל";
 
-/* After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
+/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
 "ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Activating...";
 
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
@@ -814,7 +814,7 @@
 /* Title of button that disconnects the VPN. */
 "VPN_DISCONNECT_BUTTON_TITLE" = "התנתק";
 
-/* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
+/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "שגיאה  התרחשה בעת התחלת Psiphon. אנא נסה שוב. אם הבעיה נמשכת, נסה להתקין מחדש את יישום Psiphon.";
 
 /*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to 'Best performance', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */

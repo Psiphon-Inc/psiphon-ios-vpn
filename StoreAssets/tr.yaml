@@ -2,9 +2,9 @@ tr:
   app_name: Psiphon
   subtitle: Sınırları Aşın
   description: |
-    On milyonlarca kullanıcının sevdikleri uygulama ve web sitelerine erişmelerinde yardımcı olduktan sonra, Psiphon ilk iOS uygulamasını yayınladı! Yeni uygulamamız Psiphon ağına kesintisiz erişim sağlayarak uygulama ve web sitelerine güvenle bağlanılmasını sağlar.
+    On milyonlarca kullanıcının sevdikleri uygulama ve sitelere erişmelerinde yardımcı olduktan sonra, Psiphon ilk iOS uygulamasını yayınladı! Yeni uygulamamız Psiphon ağına kesintisiz erişim sağlayarak uygulama ve sitelere güvenle bağlanılmasını sağlar.
 
-    Dünyanın neresinde olursanız olun, Psiphon uygulaması sizi sık kullandığınız uygulama ve web sitelerine bağlar. Bu uygulama herkese açık Wi-Fi hizmetlerini ya da güvenilmez olabilecek diğer ağları kullanırken de ek bir koruma katmanı sağlar.
+    Dünyanın neresinde olursanız olun, Psiphon uygulaması sizi sık kullandığınız uygulama ve sitelere bağlar. Bu uygulama herkese açık Wi-Fi hizmetlerini ya da güvenilmez olabilecek diğer ağları kullanırken de ek bir koruma katmanı sağlar.
 
     Temel özellikleri:
 
@@ -24,8 +24,8 @@ tr:
     • Satın alınan abonelikler Hesap Ayarları bölümünden yönetilebilir ve otomatik yenileme kapatılabilir.
     • Abonelik satın aldığınızda ücretsiz deneme süresinin kalanı abonelik süresine eklenir.
 
-    Gizlilik İlkesi: https://psiphon.ca/en/privacy.html
-    Kullanım Koşulları: https://psiphon.ca/en/license.html
+    Gizlilik ilkesi: https://psiphon.ca/en/privacy.html
+    Kullanım koşulları: https://psiphon.ca/en/license.html
   keywords: Psiphon, vekil sunucu
   subscriptions:
     weekly:
