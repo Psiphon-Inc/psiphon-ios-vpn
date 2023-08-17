@@ -1,10 +1,10 @@
 /*[UNTRANSLATED] Accept button title */
 "ACCEPT_BUTTON_TITLE" = "Accept";
 
-/* After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
+/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
 "ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Activating...";
 
-/* Title of the section in the subscription dialog that shows currently active subscription information. */
+/*[UNTRANSLATED] Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Current subscription";
 
 /*[UNTRANSLATED] Button title to add to user's PsiCash balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
@@ -676,7 +676,7 @@
 /*[UNTRANSLATED] Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "Restore Subscription";
 
-/* Title of button which triggers an attempt to restore the user's existing subscription */
+/*[UNTRANSLATED] Title of button which triggers an attempt to restore the user's existing subscription */
 "RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my existing subscription";
 
 /* Action button title, that when pressed retries the recently failed operation. */

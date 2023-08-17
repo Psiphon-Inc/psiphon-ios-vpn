@@ -29,7 +29,7 @@
 "BUY_REQUEST_PROGRESS_ALERT_DISMISS_BUTTON_TITLE" = "Yok say";
 
 /* Buy subscription dialog footer text explaining where the user can cancel an active subscription */
-"BUY_SUBSCRIPTIONS_FOOTER_CANCEL_INSTRUCTIONS_TEXT" = "Etkin aboneliğinizi iTunes Hesap Ayarları bölümünden iptal edebilirsiniz.";
+"BUY_SUBSCRIPTIONS_FOOTER_CANCEL_INSTRUCTIONS_TEXT" = "Etkin aboneliğinizi iTunes hesap ayarları bölümünden iptal edebilirsiniz.";
 
 /* Buy subscription dialog footer text */
 "BUY_SUBSCRIPTIONS_FOOTER_TEXT" = "Abonelikler otomatik olarak yenilenir. Yani bir abonelik bir kez satın alındığında, geçerli abonelik süresinin bitiminden 24 saat öncesinde iptal edilene kadar otomatik olarak yenilenir.\n\nAbonelik sürenizin bitimine 24 saat kala iTunes hesabınızdan abonelik yenileme ücreti çekilir.";
@@ -263,7 +263,7 @@
 "ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "Bağlantı kurabilmek için Psiphon uygulamasına VPN yapılandırması ekleme izni vermelisiniz.";
 
 /* Title of a button that open a URL on the device's web browser. */
-"OPEN_IN_BROWSER_BUTTON_TITLE" = "Web tarayıcıda aç";
+"OPEN_IN_BROWSER_BUTTON_TITLE" = "Tarayıcıda aç";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "Lütfen bağlantıyı tamamlamak için Psiphon uygulamasını açın.";
@@ -293,10 +293,10 @@
 "privacy-information-collected-client-ads-head" = "Psiphon uygulaması reklam ağları";
 
 /* No comment provided by engineer. */
-"privacy-information-collected-client-advertising-networks-para-1" = "Zaman zaman hizmetimizi desteklemek için web işaretleri ve çerezler gibi teknolojilerden yararlanan reklamları kullanıyoruz. Reklam veren iş ortaklarımız, kendilerinden ve iş ortaklarından çerezlerdeki kullanım verilerinize göre seçilmiş reklamlar sunabilir. Bu işlemler sırasında toplanan bilgiler reklam veren iş ortaklarımızın kişisel gizlilik ilkelerine uygun olarak işlenir:";
+"privacy-information-collected-client-advertising-networks-para-1" = "Zaman zaman hizmetimizi desteklemek için site işaretleri ve çerezler gibi teknolojilerden yararlanan reklamları kullanıyoruz. Reklam veren iş ortaklarımız, kendilerinden ve iş ortaklarından çerezlerdeki kullanım verilerinize göre seçilmiş reklamlar sunabilir. Bu işlemler sırasında toplanan bilgiler reklam veren iş ortaklarımızın gizlilik ilkelerine uygun olarak işlenir:";
 
 /* No comment provided by engineer. */
-"privacy-information-collected-client-advertising-networks-para-2" = "Reklamların ilgi alanınıza göre seçilmesini istemiyorsanız çerezleri şuradan devre dışı bırakabilirsiniz:";
+"privacy-information-collected-client-advertising-networks-para-2" = "Reklamların ilgi alanınıza göre seçilmesini istemiyorsanız çerezleri şuradan kapatabilirsiniz:";
 
 /* Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
 "privacy-information-collected-data-categories-header" = "Veri kategorileri";
@@ -305,16 +305,16 @@
 "privacy-information-collected-mypsicash-cookies-head" = "Çerezler";
 
 /* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-cookies-para-1" = "my.psi.cash, web sitesinin çalışması için gereken işlemleri yapabilmek amacıyla yalnızca çerezleri ve benzer izleme teknolojilerini kullanır. Web sitesinin temel işlevlerini sağlamak için temel çerezler gereklidir. Çerezler, bilgisayarınızda saklanan ve web tarayıcınız tarafından kaydedilen küçük metin dosyalarıdır ve aygıtınız için herhangi bir risk oluşturmaz. Web tarayıcınızın çerezleri işleme şeklini, tarayıcı ayarlarınızdan isteğinize göre yapılandırabilirsiniz. Temel çerezleri devre dışı bırakmak, bu web sitesinin işlevselliğini azaltır.";
+"privacy-information-collected-mypsicash-cookies-para-1" = "my.psi.cash, sitenin çalışması için gereken işlemleri yapabilmek amacıyla yalnızca çerezleri ve benzer izleme teknolojilerini kullanır. Sitenin temel işlevlerini sağlamak için temel çerezler gereklidir. Çerezler, bilgisayarınızda saklanan ve tarayıcınız tarafından kaydedilen küçük metin dosyalarıdır ve aygıtınız için herhangi bir risk oluşturmaz. Tarayıcınızın çerezleri işleme şeklini, tarayıcı ayarlarınızdan isteğinize göre yapılandırabilirsiniz. Temel çerezleri kapatmak, bu sitenin işlevselliğini azaltır.";
 
 /* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. 'PsiCash' must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-para-1" = "Kullanıcılar <a href=\"https://my.psi.cash\" target=\"_blank\" rel=\"noopener noreferrer\">my.psi.cash</a> web sitesinden PsiCash hesaplarını açar ve yönetir.";
+"privacy-information-collected-mypsicash-para-1" = "Kullanıcılar <a href=\"https://my.psi.cash\" target=\"_blank\" rel=\"noopener noreferrer\">my.psi.cash</a> sitesinden PsiCash hesaplarını açar ve yönetir.";
 
 /* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-recaptcha-para-1" = "my.psi.cash üzerinde, web sitelerini istenmeyen iletilerden ve insan olmayan kullanıcıların (botlar) kötü niyetli girişimlerinden koruyan Google reCAPTCHA v3 (bundan böyle \"reCAPTCHA\" olarak anılacaktır) uygulaması kullanılıyor. reCAPTCHA, teknolojisinin kullanılabilmesi için gerekli olan bazı kişisel verileri, kendi gizlilik ilkesi koşulları altında toplar. my.psi.cash sitesini kullanarak, Google <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">Gizlilik İlkesini</a> ve <a href=\"https://policies.google.com/terms\" target=\"_blank\" rel=\"noopener noreferrer\">Koşullarını</a> kabul etmiş olursunuz.";
+"privacy-information-collected-mypsicash-recaptcha-para-1" = "my.psi.cash üzerinde, siteleri istenmeyen iletilerden ve insan olmayan kullanıcıların (botlar) kötü niyetli girişimlerinden koruyan Google reCAPTCHA v3 (bundan böyle \"reCAPTCHA\" olarak anılacaktır) uygulaması kullanılıyor. reCAPTCHA, teknolojisinin kullanılabilmesi için gerekli olan bazı kişisel verileri, kendi gizlilik ilkesi koşulları altında toplar. my.psi.cash sitesini kullanarak, Google <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">Gizlilik ilkesini</a> ve <a href=\"https://policies.google.com/terms\" target=\"_blank\" rel=\"noopener noreferrer\">Hizmet koşullarını</a> kabul etmiş olursunuz.";
 
 /* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-recaptcha-para-2" = "reCAPTCHA uygulamasını kullanma kapsamımız kesinlikle my.psi.cash sitesinin sürekli çalışmasını sağlamakla sınırlıdır. reCAPTCHA teknolojisi, her siteye erişme isteği için kullanıcının herhangi bir ek işlem yapmasına gerek kalmadan otomatik bir inceleme yapar. Bu inceleme, kullanıcı tarafından yapılan etkileşimlere dayanır ve web sitemizdeki bot ve diğer kötü niyetli davranışları azaltmak için kullanılır. İnceleme sırasında toplanan veriler, bir insan olup olmadığınızın belirlenmesi için bu verilerin kullanılacağı Google tarafına iletilir. Bu inceleme arka planda yapılır ve bu işleme kullanıcıların katılması önerilmez.";
+"privacy-information-collected-mypsicash-recaptcha-para-2" = "reCAPTCHA uygulamasını kullanma kapsamımız kesinlikle my.psi.cash sitesinin sürekli çalışmasını sağlamakla sınırlıdır. reCAPTCHA teknolojisi, her siteye erişme isteği için kullanıcının herhangi bir ek işlem yapmasına gerek kalmadan otomatik bir inceleme yapar. Bu inceleme, kullanıcı tarafından yapılan etkileşimlere dayanır ve sitemizdeki bot ve diğer kötü niyetli davranışları azaltmak için kullanılır. İnceleme sırasında toplanan veriler, bir insan olup olmadığınızın belirlenmesi için bu verilerin kullanılacağı Google tarafına iletilir. Bu inceleme arka planda yapılır ve bu işleme kullanıcıların katılması önerilmez.";
 
 /* Paragraph text in the 'my.psi.cash' section of the Privacy page. */
 "privacy-information-collected-mypsicash-recaptcha-para-3" = "Google reCAPTCHA teknolojisi hakkında ayrıntılı bilgi almak için <a href=\"https://www.google.com/recaptcha/about/\" target=\"_blank\" rel=\"noopener noreferrer\">https://www.google.com/recaptcha/about/</a> adresine bakabilirsiniz.";
@@ -350,7 +350,7 @@
 "privacy-information-collected-psicash-para-3-item-2" = "yeniden PsiCash kazanılabilecek zaman";
 
 /* Paragraph text in the 'PsiCash' section of the Privacy page. This is preamble to a detailed bullet list. 'PsiCash' must not be translated or transliterated. */
-"privacy-information-collected-psicash-para-3-list-start" = "Kullanıcının web tarayıcısında ödül kazanma ve satın alma işlemlerini yapabilmek için bazı veriler depolanır. Bu verilerde şunlar bulunur:";
+"privacy-information-collected-psicash-para-3-list-start" = "Kullanıcının tarayıcısında ödül kazanma ve satın alma işlemlerini yapabilmek için bazı veriler depolanır. Bu verilerde şunlar bulunur:";
 
 /* Bullet list item in the 'system health and security' list. This item refers to the country from which a user was connecting when he/she performed an action. */
 "privacy-information-collected-psicash-para-4-item-1" = "kullanıcının ülkesi";
@@ -380,7 +380,7 @@
 "privacy-information-collected-s3-logging-head" = "Depolama erişimi günlük kayıtları";
 
 /* No comment provided by engineer. */
-"privacy-information-collected-s3-logging-para-1" = "Psiphon sunucu keşif listeleri, web sitesi dosyaları gibi ögeleri depolamak için Amazon S3 hizmetini kullanıyoruz. Bazen bu dosyaların indirilme durumlarını izlemek için günlük kayıtlarını etkinleştiriyoruz. Bu günlükleri inceleyerek \"Sunucu keşif listesini indirmeye başlayan ancak tamamlayamayan kaç kullanıcı var\", \"İndirilen veriler içinde, web sitesi dosyaları ile sunucu keşif listeleri oranı nedir\" ve \"web sitelerimize bir saldırgan tarafından DoS (denial-of-service) saldırısı yapılıyor mu\" gibi soruların yanıtlarını alabiliyoruz.";
+"privacy-information-collected-s3-logging-para-1" = "Psiphon sunucu keşif listeleri, site dosyaları gibi ögeleri depolamak için Amazon S3 hizmetini kullanıyoruz. Bazen bu dosyaların indirilme durumlarını izlemek için günlük kayıtlarını etkinleştiriyoruz. Bu günlükleri inceleyerek \"Sunucu keşif listesini indirmeye başlayan ancak tamamlayamayan kaç kullanıcı var\", \"İndirilen veriler içinde, site dosyaları ile sunucu keşif listeleri oranı nedir\" ve \"sitelerimize bir saldırgan tarafından DoS (denial-of-service) saldırısı yapılıyor mu\" gibi soruların yanıtlarını alabiliyoruz.";
 
 /* No comment provided by engineer. */
 "privacy-information-collected-s3-logging-para-2" = "S3 <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/LogFormat.html\" target=\"_blank\">buket erişimi günlük kayıtlarında</a>, IP adresleri, kullanıcı uygulamaları ve zaman damgaları tutulur. Bu günlükler S3 üzerinde depolandığından, Amazon bu günlüklere erişebilir (aslında Amazon tüm dosyaları da barındırdığından, bu bilgileri kendisi de oluşturabilir). Psiphon geliştiricileri günlükleri indirip derleyerek veriyi inceledikten sonra siler. Ham veriler yalnızca gerekli miktara ulaşana kadar saklanır ve üçüncü partiler ile paylaşılmaz.";
@@ -485,10 +485,10 @@
 "privacy-information-collected-vpndata-whycare-para-1" = "Bir VPN ya da vekil sunucu kullanırken, hizmet sağlayıcının verilerinizde görebilecekleri ve onlardan derlenerek yapılabilecekler hakkında endişelenmelisiniz.";
 
 /* Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. '<em>' is an 'emphasis' (like italics) HTML tag, which can be used if it makes sense in your language. */
-"privacy-information-collected-vpndata-whycare-para-2" = "VPN kullanırken aygıtınıza gelen ve giden verilerin tümü VPN üzerinden aktarılır. Şifrelenmemiş HTTP kullanan bir web sitesini ziyaret ettiğinizde web sitesi ile ilgili bilgilerin tümü VPN tarafından görülebilir. Şifrelenmiş HTTPS kullanan bir web sitesini ziyaret ettiğinizde, site içeriği şifrelenir ancak site ile ilgili bazı bilgiler VPN tarafından görülebilir. Aygıtınızdaki diğer uygulama ve hizmetler de verileri şifrelenmiş ya da şifrelenmemiş olarak aktarır (Bunun tüm VPN ağları tarafından sağlanan şifrelemeden ayrı olduğunu unutmayın. Burada yalnızca VPN tüneli <em>içindeki</em> şifrelenmiş ya da şifrelenmemiş veriler için endişeleniyoruz).";
+"privacy-information-collected-vpndata-whycare-para-2" = "VPN kullanırken aygıtınıza gelen ve giden verilerin tümü VPN üzerinden aktarılır. Şifrelenmemiş HTTP kullanan bir siteyi ziyaret ettiğinizde site ile ilgili bilgilerin tümü VPN tarafından görülebilir. Şifrelenmiş HTTPS kullanan bir siteyi ziyaret ettiğinizde, site içeriği şifrelenir ancak site ile ilgili bazı bilgiler VPN tarafından görülebilir. Aygıtınızdaki diğer uygulama ve hizmetler de verileri şifrelenmiş ya da şifrelenmemiş olarak aktarır (Bunun tüm VPN ağları tarafından sağlanan şifrelemeden ayrı olduğunu unutmayın. Burada yalnızca VPN tüneli <em>içindeki</em> şifrelenmiş ya da şifrelenmemiş veriler için endişeleniyoruz).";
 
 /* Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-whycare-para-3" = "Şifrelenmemiş hizmetler kullanılırken, VPN sağlayıcı verilerinizi görebilir, toplayabilir ve değiştirebilir (reklam eklemek gibi). Şifrelenmiş hizmetlerde ise VPN ziyaret edilen web sitelerinin üst veri bilgilerini ve yapılan işlemleri toplayabilir. Ayrıca VPN hizmeti sağlayıcının verilerinizi üçüncü taraflar ile paylaşıp paylaşmadığını bilemezsiniz.";
+"privacy-information-collected-vpndata-whycare-para-3" = "Şifrelenmemiş hizmetler kullanılırken, VPN sağlayıcı verilerinizi görebilir, toplayabilir ve değiştirebilir (reklam eklemek gibi). Şifrelenmiş hizmetlerde ise VPN ziyaret edilen sitelerin üst veri bilgilerini ve yapılan işlemleri toplayabilir. Ayrıca VPN hizmeti sağlayıcının verilerinizi üçüncü taraflar ile paylaşıp paylaşmadığını bilemezsiniz.";
 
 /* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
 "privacy-information-collected-vpndata-whycare-subhead" = "Neden dikkatli olmalısınız?";
@@ -506,16 +506,16 @@
 "privacy-information-collected-websites-google-analytics-head" = "Google Analytics";
 
 /* No comment provided by engineer. */
-"privacy-information-collected-websites-google-analytics-para-1" = "Kullanımları hakkında bilgi toplamak için web sitelerimizin bazılarında Google Analytics kullanıyoruz. Google Analytics tarafından toplanan bu bilgiler yalnızca belirli bir web sitesindeki gezinme davranışlarınızın istatistiksel sonuçlarını görmek için kullanılır. Google Analytics bilgilerinde, doğrudan ya da başka kaynaklardaki bilgiler ile birleştirilerek kim olduğunuzu ortaya çıkarabilecek veriler bulunmaz.";
+"privacy-information-collected-websites-google-analytics-para-1" = "Kullanımları hakkında bilgi toplamak için sitelerimizin bazılarında Google Analytics kullanıyoruz. Google Analytics tarafından toplanan bu bilgiler yalnızca belirli bir sitedeki gezinme davranışlarınızın istatistiksel sonuçlarını görmek için kullanılır. Google Analytics bilgilerinde, doğrudan ya da başka kaynaklardaki bilgiler ile birleştirilerek kim olduğunuzu ortaya çıkarabilecek veriler bulunmaz.";
 
 /* No comment provided by engineer. */
-"privacy-information-collected-websites-google-analytics-para-2" = "Google Analytics, bu siteyi sonraki ziyaretinizde sizi tekil kullanıcı olarak tanımlayabilmek için web tarayıcınıza kalıcı bir çerez yerleştirir. Ancak bu çerez Google dışında herhangi biri tarafından kullanılamaz ve toplanan veriler diğer sunuculardaki başka hizmetler tarafından alınamaz ya da değiştirilemez.";
+"privacy-information-collected-websites-google-analytics-para-2" = "Google Analytics, bu siteyi sonraki ziyaretinizde sizi eşsiz bir kullanıcı olarak tanımlayabilmek için tarayıcınıza kalıcı bir çerez yerleştirir. Ancak bu çerez Google dışında herhangi biri tarafından kullanılamaz ve toplanan veriler diğer sunuculardaki başka hizmetler tarafından alınamaz ya da değiştirilemez.";
 
 /* No comment provided by engineer. */
-"privacy-information-collected-websites-google-analytics-para-3" = "Bu siteye yapacağınız ziyaretler hakkında Google Analytics tarafından toplanan bilgilerin kullanım ve paylaşma hakları <a href=\"http://www.google.ca/analytics/terms/us.html\" target=\"_blank\">Google Analytics Kullanım Koşulları</a> ve <a href=\"http://www.google.com/policies/privacy/\" target=\"_blank\">Google Gizlilik İlkesi</a> metinlerinde belirlenmiştir. Web tarayıcınızdaki ayarlardan çerezleri kapatarak bu hizmetlerin kapsamı dışına çıkabilirsiniz.";
+"privacy-information-collected-websites-google-analytics-para-3" = "Bu siteye yapacağınız ziyaretler hakkında Google Analytics tarafından toplanan bilgilerin kullanım ve paylaşma hakları <a href=\"http://www.google.ca/analytics/terms/us.html\" target=\"_blank\">Google Analytics Kullanım Koşulları</a> ve <a href=\"http://www.google.com/policies/privacy/\" target=\"_blank\">Google Gizlilik İlkesi</a> metinlerinde belirlenmiştir. Tarayıcınızdaki ayarlardan çerezleri kapatarak bu hizmetlerin kapsamı dışına çıkabilirsiniz.";
 
 /* Sub-heading on the Privacy Policy page above the info about what data categories are collected by the Psiphon websites */
-"privacy-information-collected-websites-head" = "Psiphon web siteleri";
+"privacy-information-collected-websites-head" = "Psiphon siteleri";
 
 /* Alert message when the user declined privacy policy. They will not be able to use the app until the user accepts the privacy policy (Do not translate 'Psiphon') */
 "PRIVACY_POLICY_DECLINED_ALERT_BODY" = "Psiphon kullanmaya başlamadan önce Gizlilik İlkemizi kabul etmelisiniz.";
@@ -824,7 +824,7 @@
 "VPN_START_FAIL_TITLE" = "Başlatılamadı";
 
 /* ('Privacy Policy' should be the same translation as privacy policy button VPN_START_PRIVACY_POLICY_BUTTON), (Do not translate 'VPN profile'), (Do not translate 'Psiphon') */
-"VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon bağlantı kurmak için bir VPN profili kurmak amacıyla izninizi istiyor.\n\nPsiphon, kullanıcılarının kişisel gizliliğini korumayı amaçlar. Ayrıntılı bilgi almak için \"Gizlilik İlkesi\" üzerine dokunun. ";
+"VPN_START_PERMISSION_DENIED_MESSAGE" = "Psiphon bağlantı kurmak için bir VPN profili kurmak amacıyla izninizi istiyor.\n\nPsiphon, kullanıcılarının gizliliğini korumayı amaçlar. Ayrıntılı bilgi almak için \"Gizlilik ilkesi\" üzerine dokunun. ";
 
 /* Button label taking user's to our Privacy Policy page */
 "VPN_START_PRIVACY_POLICY_BUTTON" = "Gizlilik ilkesi";

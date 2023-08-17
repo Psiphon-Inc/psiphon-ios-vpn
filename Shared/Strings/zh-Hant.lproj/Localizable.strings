@@ -2,13 +2,13 @@
 "ACCEPT_BUTTON_TITLE" = "接受";
 
 /* After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
-"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Activating...";
+"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "啟動.....";
 
 /* Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "已完成訂購！";
 
-/*[UNTRANSLATED] Button title to add to user's PsiCash balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
-"ADD_PSICASH" = "Add PsiCash";
+/* Button title to add to user's PsiCash balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
+"ADD_PSICASH" = "儲值 PsiCash ";
 
 /* Alert dialog body when requested operation by the user failed. */
 "ALERT_BODY_OPERATION_FAILED" = "操作失敗，請重試";
@@ -52,17 +52,17 @@
 /* Action button title, that when pressed connects the user to Psiphon network. */
 "CONNECT_BUTTON_TITLE" = "連線";
 
-/*[UNTRANSLATED] Text shown to the user telling them to connect to 'Psiphon', to finish their unfinished transaction. Do not translate or transliterate 'Psiphon'. */
-"CONNECT_TO_FINISH_PSICASH_TRANSACTION" = "Please connect to Psiphon to finish your transaction";
+/* Text shown to the user telling them to connect to 'Psiphon', to finish their unfinished transaction. Do not translate or transliterate 'Psiphon'. */
+"CONNECT_TO_FINISH_PSICASH_TRANSACTION" = "請連線到 Psiphon 完成此交易";
 
-/*[UNTRANSLATED] Button title that lets the user to connect to the Psiphon network. Do not translate or transliterate 'Psiphon' */
-"CONNECT_TO_PSIPHON" = "Connect to Psiphon";
+/* Button title that lets the user to connect to the Psiphon network. Do not translate or transliterate 'Psiphon' */
+"CONNECT_TO_PSIPHON" = "連線 Psiphon";
 
-/*[UNTRANSLATED] User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"CONNECT_TO_USE_SPEED_BOOST" = "Connect to Psiphon to use Speed Boost";
+/* User must connect to 'Psiphon' in order to use 'Speed Boost' product. Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"CONNECT_TO_USE_SPEED_BOOST" = "連線 Psiphon 使用 Speed Boost 功能";
 
-/*[UNTRANSLATED] Label text shown to user when the VPN is connecting to a Psiphon server. Do not translate or transliterate 'Psiphon' */
-"CONNECTING_TO_PSIPHON" = "Connecting to Psiphon";
+/* Label text shown to user when the VPN is connecting to a Psiphon server. Do not translate or transliterate 'Psiphon' */
+"CONNECTING_TO_PSIPHON" = "正在連線 Psiphon";
 
 /* Alert dialog message informing the user that the settings file in the app is corrupt, and that they can potentially fix this issue by re-installing the app. */
 "CORRUPT_SETTINGS_MESSAGE" = "你的應用設置檔似乎壞掉了。請試著重新安裝應用以修復此檔案。";
@@ -70,29 +70,29 @@
 /* Button label that lets users create a new account. */
 "CREATE_ACCOUNT_BUTTON_TITLE" = "建立帳戶";
 
-/*[UNTRANSLATED] Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
-"CREATE_PSICASH_ACCOUNT_BODY_2" = "We strongly encourage you to make a PsiCash account before buying PsiCash. Having an account allows you to share your balance between devices and protect your purchases.\n\nIMPORTANT: Without an account your PsiCash will not be preserved if you uninstall Psiphon.";
+/* Body of a modal dialog that appears when the user tries to buy PsiCash with real money but doens't have an account. The word 'PsiCash' must not be translated or transliterated. */
+"CREATE_PSICASH_ACCOUNT_BODY_2" = "在購買 PsiCash 前，我們極力建議您先申請 PsiCash 帳號，它可以在不同設備上顯示您目前的餘額以保障您的訂購。\n\n重要：若沒帳號則一旦您解除 Psiphon 安裝則您的 PsiCash 將無法保留。";
 
-/*[UNTRANSLATED] Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will continue on to the PsiCash store. */
-"CREATE_PSICASH_ACCOUNT_CONTINUE_BUTTON" = "Continue without account";
+/* Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will continue on to the PsiCash store. */
+"CREATE_PSICASH_ACCOUNT_CONTINUE_BUTTON" = "繼續不登入帳號";
 
-/*[UNTRANSLATED] Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will be taken to a screen where they can create an account or log into an existing one. */
-"CREATE_PSICASH_ACCOUNT_CREATE_BUTTON" = "Create or log into account";
+/* Button in the modal dialog encouraging users to create an account when they attempt to buy PsiCash with real money without one. If they click this button, they will be taken to a screen where they can create an account or log into an existing one. */
+"CREATE_PSICASH_ACCOUNT_CREATE_BUTTON" = "創建或登入帳號";
 
 /* Decline button title */
 "DECLINE_BUTTON_TITLE" = "拒絕";
 
-/*[UNTRANSLATED] Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
-"DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "Some Internet traffic is not supported by the free version of Psiphon. Purchase a subscription or Speed Boost to unlock the full potential of your Psiphon experience.";
+/* Content of the alert dialog which is shown to the user when they click toolbar notification of unsupported Internet traffic request. */
+"DISALLOWED_TRAFFIC_ALERT_MESSAGE" = "有些網際網路流量不支援免費版的 Psiphon，請考慮訂購加速昇級以解放 Psiphon  的完整體驗。";
 
-/*[UNTRANSLATED] Appears in the notification area when Psiphon disallows some non-web internet traffic. The user needs to purchase Speed Boost or subscription in order to full app compatibilty and more speed. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"DISALLOWED_TRAFFIC_NOTIFICATION_BODY_V2" = "Apps not working? Activate Speed Boost or purchase subscription to unlock the full potential of your Psiphon experience.";
+/* Appears in the notification area when Psiphon disallows some non-web internet traffic. The user needs to purchase Speed Boost or subscription in order to full app compatibilty and more speed. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"DISALLOWED_TRAFFIC_NOTIFICATION_BODY_V2" = "應用程式無法運行？激活 Speed Boost 或是訂閱以解鎖 Psiphon 完整的潛力。";
 
-/*[UNTRANSLATED] Appears in the notification area when Psiphon disallows some non-web internet traffic. The user will be told to 'upgrade' their connection with Speed Boost (giving more speed and app compatibility). The word 'Psiphon' must not be translated or transliterated. */
-"DISALLOWED_TRAFFIC_NOTIFICATION_TITLE_V2" = "Upgrade your Psiphon connection";
+/* Appears in the notification area when Psiphon disallows some non-web internet traffic. The user will be told to 'upgrade' their connection with Speed Boost (giving more speed and app compatibility). The word 'Psiphon' must not be translated or transliterated. */
+"DISALLOWED_TRAFFIC_NOTIFICATION_TITLE_V2" = "昇級 Psiphon 連線";
 
-/*[UNTRANSLATED] Text next to the button indicating to the user that the rewarded video advertisement is only available when they are not connected to Psiphon. Do not translate or transliterate 'PsiCash'. Do not translate or transliterate 'Psiphon'. */
-"DISCONNECT_TO_WATCH_AND_EARN_PSICASH" = "You must disconnect from Psiphon to watch a video to earn PsiCash";
+/* Text next to the button indicating to the user that the rewarded video advertisement is only available when they are not connected to Psiphon. Do not translate or transliterate 'PsiCash'. Do not translate or transliterate 'Psiphon'. */
+"DISCONNECT_TO_WATCH_AND_EARN_PSICASH" = "您必須切斷 Psiphon 連線才能觀看賺取 PsiCash 的影片";
 
 /* Dismiss button title. Dismisses pop-up alert when the user clicks on the button */
 "DISMISS_BUTTON_TITLE" = "退訂";
@@ -103,11 +103,11 @@
 /* Error alert title */
 "ERROR_TITLE" = "錯誤";
 
-/*[UNTRANSLATED] No comment provided by engineer. */
-"EXTENSION_EXPIRED_SUBSCRIPTION_ALERT" = "Your Psiphon subscription has expired.\n\n Please open Psiphon app to renew your subscription.";
+/* No comment provided by engineer. */
+"EXTENSION_EXPIRED_SUBSCRIPTION_ALERT" = "您的 Psiphon 訂閱已過期。\n\n請開啟 Psiphon 應用程式更新續訂。";
 
-/*[UNTRANSLATED] Message shown when verification of a product already purchased fails. */
-"FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "Failed to verify purchase";
+/* Message shown when verification of a product already purchased fails. */
+"FAILED_TO_VERIFY_PSICASH_IAP_PURCHASE" = "儲值驗證失敗";
 
 /* No comment provided by engineer. */
 "faq-information-collected-answer-head-2" = "反饋";
@@ -121,11 +121,11 @@
 /* No comment provided by engineer. */
 "faq-information-collected-answer-para-10" = "請注意如果在應用程式商店下載賽風，譬如谷歌商店或是亞馬遜商店，這些商店有可能會收集額外的資料。以下的例子是谷歌商店會收集的資料：";
 
-/*[UNTRANSLATED] No comment provided by engineer. */
-"faq-information-collected-answer-para-11" = "When you send an email request to our email auto-responder server, we are able to see your email address. While your email is being processed it is saved to the email server's disk, and it is deleted as soon as it is processed (usually in a few seconds). Your email address may be written to the server system logs. These logs are deleted after one week.";
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-11" = "當您發送電郵到我們自動回應的伺服器時，我們會看到您的電子郵件地址，而您的郵件會被處理儲存到郵件伺服器的硬碟，通常待幾秒後完成了處理就會儘快將之刪除。您的電郵地址可能被記錄到系統活動日誌，而這些記錄一週後會刪除。";
 
-/*[UNTRANSLATED] No comment provided by engineer. */
-"faq-information-collected-answer-para-12" = "Our email auto-responder server is hosted in the Amazon EC2 cloud. This means that Amazon is able to see the email you send and our response to you.";
+/* No comment provided by engineer. */
+"faq-information-collected-answer-para-12" = "我們的自動回應伺服器是使用  Amazon EC2 雲端服務，這表示  Amazon 也能夠看到您所寄出的郵件與我們的回應。";
 
 /* No comment provided by engineer. */
 "faq-information-collected-answer-para-13" = "我們每收到一封電子郵件，都會把訊息存儲到：";
@@ -181,20 +181,20 @@
 /* Button title that lets users reset their password if they forgot their account's password. */
 "FORGOT_PASSWORD" = "忘記密碼？";
 
-/*[UNTRANSLATED] Button title that lets users reset their username or password if they forgot their account's username or password. */
-"FORGOT_USERNAME_OR_PASSWORD" = "Forgot your password or username?";
+/* Button title that lets users reset their username or password if they forgot their account's username or password. */
+"FORGOT_USERNAME_OR_PASSWORD" = "忘記帳號或密碼？";
 
 /* Button title for a product that is free. There is no cost or payment associated. */
 "FREE_PSICASH_COIN" = "免費";
 
-/*[UNTRANSLATED] Generic alert shown when purchase of a product fails. */
-"GENERIC_PURCHASE_FAILED" = "Purchase Failed";
+/* Generic alert shown when purchase of a product fails. */
+"GENERIC_PURCHASE_FAILED" = "購買失敗";
 
-/*[UNTRANSLATED] Body of an error dialog asking the user to send Psiphon a report. Do not translate or transliterate 'Psiphon' */
-"HELP_IMPROVE_PSIPHON_BY_SENDING_REPORT" = "Help improve Psiphon by sending a report of this error.";
+/* Body of an error dialog asking the user to send Psiphon a report. Do not translate or transliterate 'Psiphon' */
+"HELP_IMPROVE_PSIPHON_BY_SENDING_REPORT" = "回報此問題以協助改善 Psiphon";
 
-/*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash login fails due to bad username or password. */
-"INCORRECT_USERNAME_OR_PASSWORD" = "The username or password entered was incorrect.";
+/* Body text of a modal dialog shown when a PsiCash login fails due to bad username or password. */
+"INCORRECT_USERNAME_OR_PASSWORD" = "輸入的密碼或帳號不正確";
 
 /* User does not have sufficient 'PsiCash' balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
 "INSUFFICIENT_PSICASH_BALANCE" = "PsiCash餘額不足";
@@ -208,29 +208,29 @@
 /* Text displayed while app loads */
 "LOADING" = "載入中…";
 
-/*[UNTRANSLATED] Message shown when a resource (online or offline) fails to load. */
-"LOADING_FAILED" = "Loading failed";
+/* Message shown when a resource (online or offline) fails to load. */
+"LOADING_FAILED" = "載入失敗";
 
 /* Title on a button that lets users login to their account with the username and password they have entered. */
 "LOG_IN_BUTTON_TITLE" = "登入";
 
-/*[UNTRANSLATED] Message title informing the user that they must sign up for an account or log in to their account */
-"LOG_IN_OR_SIGN_UP" = "Log in or sign up";
+/* Message title informing the user that they must sign up for an account or log in to their account */
+"LOG_IN_OR_SIGN_UP" = "登入或新建帳號";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
-"LOG_IN_OR_SIGNUP_TO_CONTINUE" = "Log in or create account to continue using PsiCash";
+/* Do not translate or transliterate 'PsiCash'. Informs the user that they must sign up for a PsiCash account or log in to their PsiCash account in order to user PsiCash features. */
+"LOG_IN_OR_SIGNUP_TO_CONTINUE" = "登入或新建帳號以繼續使用 PsiCash";
 
-/*[UNTRANSLATED] Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed. */
-"LOG_OUT_ANY_WAY_BUTTON_TITLE_2" = "Log out anyway";
+/* Button in the modal dialog shown to users when they attempt to log out of their PsiCash account with no active Psiphon tunnel. Clicking this button will cause a local-only logout to be performed. */
+"LOG_OUT_ANY_WAY_BUTTON_TITLE_2" = "繼續登出";
 
 /* Title of the button that lets users log out of their account */
 "LOG_OUT_BUTTON_TITLE_2" = "登出";
 
-/*[UNTRANSLATED] Label indicating to the user that they are logging into their PsiCash account. Use ellipses if it makes sense. */
-"LOGGING_IN_ELLIPSES" = "Logging in ...";
+/* Label indicating to the user that they are logging into their PsiCash account. Use ellipses if it makes sense. */
+"LOGGING_IN_ELLIPSES" = "登入....";
 
-/*[UNTRANSLATED] Label indicating to the user that they are logging out of their PsiCash account. Use ellipses if it makes sense. */
-"LOGGING_OUT_ELLIPSES" = "Logging out ...";
+/* Label indicating to the user that they are logging out of their PsiCash account. Use ellipses if it makes sense. */
+"LOGGING_OUT_ELLIPSES" = "登出....";
 
 /* Button title that takes user to the next page */
 "NEXT_PAGE_BUTTON_TITLE" = "下一個";
@@ -238,11 +238,11 @@
 /* Alert title informing user there is no internet connection */
 "NO_INTERNET" = "無網路連線　";
 
-/*[UNTRANSLATED] Message shown to the user when there is no internet connect. */
-"NO_INTERNET_CONNECTION_TITLE" = "No internet connection";
+/* Message shown to the user when there is no internet connect. */
+"NO_INTERNET_CONNECTION_TITLE" = "無網路連線";
 
-/*[UNTRANSLATED] Subscriptions view text that is visible when the list of subscriptions is not available */
-"NO_PRODUCTS_TEXT_2" = "Could not retrieve subscriptions from the App Store. Please try again later.";
+/* Subscriptions view text that is visible when the list of subscriptions is not available */
+"NO_PRODUCTS_TEXT_2" = "無法從應用程式商店 App Store 取回訂購，請稍候再試。";
 
 /*[UNTRANSLATED] Alert OK Button */
 "OK_BUTTON" = "OK";
@@ -253,17 +253,17 @@
 /* Onboarding header */
 "ONBOARDING_GETTING_STARTED_HEADER" = "入門指南";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app. */
-"ONBOARDING_NOTIFICATION_PERMISSION_BODY" = "Allow Psiphon to send notifications so that you can be notified of important network events.";
+/* Do not translate or transliterate 'Psiphon'. Onboarding screen asking user to give the Psiphon app permission to send notifications about important network events while they use the app. */
+"ONBOARDING_NOTIFICATION_PERMISSION_BODY" = "授權 Psiphon 發送通知，以掌握網路重要情況訊息。";
 
-/*[UNTRANSLATED] Onboarding screen title that will be asking the user permission to send notifications about important network events while they use the app. */
-"ONBOARDING_NOTIFICATION_PERMISSION_TITLE" = "Get notified about important network events";
+/* Onboarding screen title that will be asking the user permission to send notifications about important network events while they use the app. */
+"ONBOARDING_NOTIFICATION_PERMISSION_TITLE" = "獲取網路重要情況的訊息通知";
 
 /* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
 "ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "用戶需要可讓 Psiphon 設置上增加 VPN 以進行連線。";
 
-/*[UNTRANSLATED] Title of a button that open a URL on the device's web browser. */
-"OPEN_IN_BROWSER_BUTTON_TITLE" = "Open in Browser";
+/* Title of a button that open a URL on the device's web browser. */
+"OPEN_IN_BROWSER_BUTTON_TITLE" = "打開瀏覽器";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "請打開Psiphon應用來完成連線";
@@ -277,14 +277,14 @@
 /* Alert dialog title indicating to the user that Psiphon needs their permission */
 "PERMISSION_REQUIRED_ALERT__TITLE" = "授權要求";
 
-/*[UNTRANSLATED] Subtitle shown when the current operation failed, asking the user to try again at a later time. */
-"PLEASE_TRY_AGAIN_LATER" = "Please try again later.";
+/* Subtitle shown when the current operation failed, asking the user to try again at a later time. */
+"PLEASE_TRY_AGAIN_LATER" = "請稍候再試試";
 
-/*[UNTRANSLATED] Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
-"PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "Something went wrong, please try again later.\n\nIf this problem persists, please send a feedback.";
+/* Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
+"PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "出了一點問題，請稍候再試\n\n如果問題持續沒解決，請發送反饋。";
 
-/*[UNTRANSLATED] Do not tarnslate or transliterate 'Psiphon'. Message asking user to wait for the until connection is established with Psiphon servers. */
-"PLEASE_WAIT_TO_FINISH_CONNECTING" = "Please wait for Psiphon to finish connecting.";
+/* Do not tarnslate or transliterate 'Psiphon'. Message asking user to wait for the until connection is established with Psiphon servers. */
+"PLEASE_WAIT_TO_FINISH_CONNECTING" = "請待 Psiphon 完成連線";
 
 /* No comment provided by engineer. */
 "privacy-canadian-privacy-commission-link-text" = "加拿大隱私專員辦公室";
@@ -298,26 +298,26 @@
 /* No comment provided by engineer. */
 "privacy-information-collected-client-advertising-networks-para-2" = "您可以選擇不使用 Cookie 相關的基於訪問興趣的廣告網路：";
 
-/*[UNTRANSLATED] Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
-"privacy-information-collected-data-categories-header" = "Data Categories";
+/* Heading for a section in our privacy policy. Under this heading will be sections with the different categories of data covered by the privacy policy. */
+"privacy-information-collected-data-categories-header" = "資料類別";
 
 /*[UNTRANSLATED] Header text in the 'my.psi.cash' section of the Privacy page. Refers to the cookies stored by web browsers. */
 "privacy-information-collected-mypsicash-cookies-head" = "Cookies";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-cookies-para-1" = "my.psi.cash only uses cookies and similar tracking technologies to carry out activities that are essential for the operation of the website. Essential cookies are necessary to ensure basic functions of the website. Cookies are small text files that are stored on your computer and saved by your browser, and do not represent any risk to your device. You can configure your browser settings to personalize how you would like your browser to handle cookies. Disabling essential cookies will degrade the functionality of this website.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-cookies-para-1" = "my.psi.cash 只使用網站營運必要活動中的 cookies 或其它類似追蹤技術。重要的 cookies 是為了確保網站基本功能所需，Cookies 是一些儲存在用戶端電腦上的小型文件由瀏覽器所用，不會對設備造成危險。 可透過瀏覽器設置自定調整瀏覽器如何處理 cookies。關閉必要的 cookies 可能會降低網站功能。";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. 'PsiCash' must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-para-1" = "Users create and manage their PsiCash accounts on the <a href=\"https://my.psi.cash\" target=\"_blank\" rel=\"noopener noreferrer\">my.psi.cash</a> website.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-para-1" = "在<a href=\"https://my.psi.cash\" target=\"_blank\" rel=\"noopener noreferrer\">my.psi.cash</a>網站建立與管理 PsiCash 帳號";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-recaptcha-para-1" = "my.psi.cash uses Google’s reCAPTCHA v3 (hereinafter “reCAPTCHA”), which protects websites from spam and abuse by non-human users (i.e., bots). reCAPTCHA collects personal information that is required for the functioning of the technology and is subject to its own privacy policy. Use of my.psi.cash indicates acceptance of Google’s <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">Privacy Policy</a> and <a href=\"https://policies.google.com/terms\" target=\"_blank\" rel=\"noopener noreferrer\">Terms</a>.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-recaptcha-para-1" = "my.psi.cash 使用 Google’s reCAPTCHA v3 (後稱 “reCAPTCHA”)，以保護網站免於垃圾留言與非人類的濫用 (i.e., 機器人). reCAPTCHA 因技術功能所需會收集個人資料並依照它自己的隱私政策。使用 my.psi.cash 也代表接受 Google’s <a href=\"https://policies.google.com/privacy\" target=\"_blank\" rel=\"noopener noreferrer\">隱私權政策</a> 與 <a href=\"https://policies.google.com/terms\" target=\"_blank\" rel=\"noopener noreferrer\">服務條款</a>。";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
-"privacy-information-collected-mypsicash-recaptcha-para-2" = "Our use of reCAPTCHA is strictly limited to ensuring the continued functioning of my.psi.cash. reCAPTCHA technology performs an automatic analysis for each site request without requiring the user to take any additional actions. This analysis is based on interactions made by the user, and is used to mitigate bot and other malicious behaviour on our website. The data collected during analysis is forwarded to Google, where Google will use this data to determine if you are a human user. This analysis takes place in the background, and users are not advised it is taking place.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. 'my.psi.cash' is the domain name of the website and must not be translated or transliterated. */
+"privacy-information-collected-mypsicash-recaptcha-para-2" = "我們使用 reCAPTCHA 嚴格限制在確保 my.psi.cash 持續正常運作。 reCAPTCHA 技術會自動分析各個網站的請求而未再要求用戶其它行為。它的分析是基於每位用戶的互動狀況以減少機器人或其它惡意行為破壞網站 。分析時所收集的資料會轉送到 Google, 以便判斷對方是否為真人使用者。這些分析都發生在後台，用戶不會意識這些程序正在進行。";
 
-/*[UNTRANSLATED] Paragraph text in the 'my.psi.cash' section of the Privacy page. */
-"privacy-information-collected-mypsicash-recaptcha-para-3" = "For more information about Google’s reCAPTCHA technology, please visit <a href=\"https://www.google.com/recaptcha/about/\" target=\"_blank\" rel=\"noopener noreferrer\">https://www.google.com/recaptcha/about/</a>.";
+/* Paragraph text in the 'my.psi.cash' section of the Privacy page. */
+"privacy-information-collected-mypsicash-recaptcha-para-3" = "請進一步了解 Google’s reCAPTCHA 技術，可至 <a href=\"https://www.google.com/recaptcha/about/\" target=\"_blank\" rel=\"noopener noreferrer\">https://www.google.com/recaptcha/about/</a>.";
 
 /* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
 "privacy-information-collected-psicash-para-1" = "PsiCash 系統只收集維持系統運作、監測健康與確保安全所需的必要資訊，";
@@ -331,8 +331,8 @@
 /* Bullet list item in the 'operation of the system' list. This item refers to the date and time that the user last earned or spent PsiCash. */
 "privacy-information-collected-psicash-para-2-item-3" = "最近活動時間戳圖";
 
-/*[UNTRANSLATED] Bullet list item in the 'operation of the system' list. This item refers to transaction history of the user earning PsiCash. 'PsiCash' must not be translated or transliterated. */
-"privacy-information-collected-psicash-para-2-item-4" = "PsiCash earning history, including what actions the rewards were granted for";
+/* Bullet list item in the 'operation of the system' list. This item refers to transaction history of the user earning PsiCash. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-2-item-4" = "PsiCash 獲取記錄，包括得到獎勵的行為";
 
 /* Bullet list item in the 'operation of the system' list. This item refers to transaction history of the user spending PsiCash, such as by buying Speed Boost. 'PsiCash' must not be translated or transliterated. */
 "privacy-information-collected-psicash-para-2-item-5" = "PsiCash 交易記錄，包括購買方案。";
@@ -340,8 +340,8 @@
 /* Paragraph text in the 'PsiCash' section of the Privacy page. This is preamble to a detailed bullet list. 'PsiCash' must not be translated or transliterated. */
 "privacy-information-collected-psicash-para-2-list-start" = "PsiCash 伺服器儲存個別用戶資料以便於系統進行下列營運操作：";
 
-/*[UNTRANSLATED] Paragraph text on the Privacy Policy page. Describes the user data requirements for PsiCash accounts. 'PsiCash' must not be translated or transliterated. 'Psiphon' must not be translated or transliterated. */
-"privacy-information-collected-psicash-para-2b" = "Creating a PsiCash account is optional. If an account is created, account-specific information such as username, password, and email address (if provided) are stored on the server. When logged in to a Psiphon client, the username is also stored locally.";
+/* Paragraph text on the Privacy Policy page. Describes the user data requirements for PsiCash accounts. 'PsiCash' must not be translated or transliterated. 'Psiphon' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-2b" = "建立  PsiCash 帳號並非強制，但如果有帳號則其相關的特定資訊例如: 用戶名稱、密碼與電子郵件地址(若有提供) 就會存在伺候器上。當登入 Psiphon 用戶端軟體時，用戶名也會存在本地的設備上。";
 
 /* Bullet list item in the 'data stored in web browser' list. This item refers to randomly generated values that allow a user to access and utilize the system. */
 "privacy-information-collected-psicash-para-3-item-1" = "產生用戶訪問的授權令牌";
@@ -373,8 +373,8 @@
 /* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
 "privacy-information-collected-psicash-para-5" = "絕不會與第三方分享個別用戶的資料，我們或許會分享粗略加總的統計數據，但絕不包含可辨別身份的內容。";
 
-/*[UNTRANSLATED] Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
-"privacy-information-collected-psicash-para-6" = "PsiCash server resources are stored in AWS, which means Amazon has access to the data.";
+/* Paragraph text in the 'PsiCash' section of the Privacy page. 'PsiCash' must not be translated or transliterated. */
+"privacy-information-collected-psicash-para-6" = "PsiCash 伺候器資源存放在 AWS，這意謂著 Amazon 可以讀取這些資料。";
 
 /* Sub-heading for section describing use of logging access to data storage (aka S3 bucket logging). The way to read this is 'creation of logs for user accesses to data storage'. Psiphon 'stores' websites, downloads, and upgrades (the 'data') in Amazon S3 (the 'storage'). Users 'access' the data storage. And, somtimes, we 'log' those accesses. (For example, if we suspect attackers are accessing the storage, or if it seems the storage is blocked by a country.) */
 "privacy-information-collected-s3-logging-head" = "儲存訪問日誌";
@@ -385,14 +385,14 @@
 /* No comment provided by engineer. */
 "privacy-information-collected-s3-logging-para-2" = "S3 <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/dev/LogFormat.html\" target=\"_blank\">bucket 訪問日誌</a>包含IP地址、用戶代理字符串以及時間戳記。這些日誌存儲在 S3 本身，因此亞馬遜將有權限訪問這些日誌。（不過，亞馬遜已經在提供這些文件，因此他們已經可以訪問此信息。）Psiphon 開發者將下載這些日誌，匯總並分析數據，然後刪除日誌。原始數據將保持較長時間以完成匯總，不會與第三方共享。";
 
-/*[UNTRANSLATED] Paragraph text in the 'Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-aggdata-para-1" = "Data is “aggregated” by taking a lot of sensitive user activity data and combining it together to form coarse statistical data that is no longer specific to a user. After aggregation, the user activity data is deleted.";
+/* Paragraph text in the 'Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-aggdata-para-1" = "一大群敏感使用者的活動資料被加總起來組成統計用的粗糙資料，不會突顯某一位特定的使用者，加總之後用戶的活動資料就被刪除。";
 
-/*[UNTRANSLATED] Paragraph text in the 'Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-aggdata-para-2" = "An example of aggregated data might be: On a particular day, 250 people connected from New York City using Comcast, and transferred 200GB from <code>youtube.com</code> and 500GB in total.";
+/* Paragraph text in the 'Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-aggdata-para-2" = "舉個總和資料的例子：某一天，250名用戶從紐約市 Comcast 接入，在<code>youtube.com</code>使用了 200GB 的傳輸量，而當天全部的傳輸量為 500GB。 ";
 
-/*[UNTRANSLATED] Paragraph text in the 'Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-aggdata-para-3" = "Aggregated data is much less sensitive than activity data, but we still treat it as potentially sensitive and do not share it in this form.";
+/* Paragraph text in the 'Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-aggdata-para-3" = "比起活動資料，總和資料較不敏感，但我們仍嚴正地將之視為潛在敏感性資料，也不會向別人分享。";
 
 /* Sub-heading for the definition of 'Aggregated Data' under the 'User Activity and VPN Data' section of the Privacy Policy page. */
 "privacy-information-collected-vpndata-aggdata-subhead" = "匯總數據";
@@ -400,59 +400,59 @@
 /* Sub-heading on the Privacy Policy page for the section describing handling of user traffic data and activity statistics through the Psiphon VPN */
 "privacy-information-collected-vpndata-head-v2" = "用戶活動和 VPN 數據";
 
-/*[UNTRANSLATED] Paragraph text in the 'What kinds of user data does Psiphon collect?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-kindsofdata-para-1" = "We will define some categories of data to help us talk about them in the context of Psiphon.";
+/* Paragraph text in the 'What kinds of user data does Psiphon collect?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-kindsofdata-para-1" = "我們會規範某些資料類別，以助於在使用 Psiphon  的情境下明確其含義。";
 
 /* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. */
 "privacy-information-collected-vpndata-kindsofdata-subhead" = "賽風會收集哪些用戶數據?";
 
-/*[UNTRANSLATED] Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-shareable-para-1" = "When sharing aggregated data with third parties, we make sure that the data could not be combined with other sources to reveal user identities. For example, we do not share data for countries that only have a few Psiphon users in a day. We make sure that the data is anonymized.";
+/* Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-shareable-para-1" = "當對第三者分享總和資料時，我們會確保這些資料不會與其它可揭示用戶身份的資料合併。例如我們不會分享一些國家一天只有少數 Psiphon 用戶使用的資料，也會確認資料經過匿名化處理。";
 
 /* Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
 "privacy-information-collected-vpndata-shareable-para-2" = "我們不會向第三方分享網域相關資料";
 
-/*[UNTRANSLATED] Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-shareable-para-3" = "An example of shareable aggregated data might be: On a particular day, 500 people connected from New York City and transferred 800GB in total.";
+/* Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-shareable-para-3" = "可分享的總合資料案例如：某個特定的日子，有 500人自紐約市接入其總計傳輸量為 800 GB。";
 
-/*[UNTRANSLATED] Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. '<em>' is an HTML tag that adds emphasis (like italics), which can be used if it makes sense in your language. */
-"privacy-information-collected-vpndata-shareable-para-4" = "An example of data that is <em>not shareable</em>: On a particular day, 2 people connected from Los Angeles. Those people will be included in the stats for the entire US, but that is too few people to anonymously share city data for.";
+/* Paragraph text in the 'Shareable Aggregated Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. '<em>' is an HTML tag that adds emphasis (like italics), which can be used if it makes sense in your language. */
+"privacy-information-collected-vpndata-shareable-para-4" = " <em>不可共享</em>的資料例如: 某天有 2人自洛衫磯接入，這些使用都會被計入全美國的統計資料，但要匿名共享城市資料則數量過少容易被辨識出來。";
 
 /* Sub-heading for the definition of 'Shareable Aggregated Data' under the 'User Activity and VPN Data' section of the Privacy Policy page. */
 "privacy-information-collected-vpndata-shareable-subhead" = "可分享的匯總數據";
 
-/*[UNTRANSLATED] Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-useractivity-para-1" = "While a user's device is tunneled through Psiphon, we collect some information about how they're using it. We record what protocol Psiphon used to connect, how long the device was connected, how many bytes were transferred during the session, and what city, country, and ISP the connection came from. For some domains (but very few, and only popular ones) or server IP addresses (e.g., known malware servers) that are visited, we also record how many bytes were transferred to it. (But never full URLs or anything more sensitive. And only domains of general interest, not all domains.)";
+/* Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-useractivity-para-1" = "當用戶設備道接入 Psiphon，我們會收集一些使用情況的資訊 ，包括記錄使用何種協議連入 Psiphon、連線時間長短、期間使用多少流量、來自哪個城市國家與其 ISP 供應商。用戶訪問了哪些特定網域名(僅少數常被使用的) 或伺服器 IP 位置 (e.g., 已知的惡意軟體伺服器) ，期間傳輸的流量我們也會記錄 (但不會記錄完整的 URLs 或任何更為敏感的資料，僅有一般的域名非全部網域名)。";
 
-/*[UNTRANSLATED] Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-useractivity-para-2" = "Geographical location and ISP info are derived from user IP addresses, which are then immediately discarded.";
+/* Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-useractivity-para-2" = "根據用戶 IP 地址所得知的地理位置與網路服務商 ISP 資料，會立即刪除。";
 
-/*[UNTRANSLATED] Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-useractivity-para-3" = "An example of user activity data might be: At a certain time a user connected from New York City, using Comcast, and transferred 100MB from <code>youtube.com</code> and 300MB in total.";
+/* Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-useractivity-para-3" = "用戶活動資料的例子為：某段時間一名用戶在紐約市透過 Comcast 接入，在<code>youtube.com</code> 傳輸了近100MB 流量而總用量為 300MB。";
 
-/*[UNTRANSLATED] Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-useractivity-para-4.1" = "We consider user activity data the most sensitive category of data. We never, ever share this data with third parties. We keep user activity data for at most 90 days, and then we aggregate it and delete it. Backups of that data are kept for a reasonable amount of time.";
+/* Paragraph text in the 'User Activity Data' definition subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-useractivity-para-4.1" = "我們將用戶活動資料視為最敏感的資料類別，絕不會與第三者分享。我們會保留這類活動資料 90 天，將之加總後刪除個別資料。備份的資料則會保存一段合理的時間。";
 
 /* Sub-heading for the definition of 'User Activity Data' under the 'User Activity and VPN Data' section of the Privacy Policy page. */
 "privacy-information-collected-vpndata-useractivity-subhead" = "用戶活動數據";
 
-/*[UNTRANSLATED] Paragraph text in the 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-whatdoespsiphondowith-para-1-v2" = "Activity and aggregated statistical data are vital for us to make Psiphon work best. It allows us to do things like:";
+/* Paragraph text in the 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-para-1-v2" = "活動與總和統計資料對 Psiphon 維持正常運作至關重要，它可讓我們：";
 
-/*[UNTRANSLATED] Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-whatdoespsiphondowith-para-2-item-1" = "Monitor the health and success of the Psiphon network: We need to know how many people are connecting, from where, how much data they're transferring, and if they're having any problems.";
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-para-2-item-1" = "監控 Psiphon 網路的健康與順利狀況：我們需要知道多少用戶接入，接入的地區、其傳輸的流量以及是否遇上問題。";
 
-/*[UNTRANSLATED] Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-whatdoespsiphondowith-para-2-item-2" = "Monitor threats to our users' devices: We watch for malware infections that attempt to contact command-and-control servers.";
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-para-2-item-2" = "監控對用戶設備的威脅：我們觀察試圖訪問控制與指揮伺服器的惡意傳染。";
 
-/*[UNTRANSLATED] Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-whatdoespsiphondowith-para-2-item-3" = "Ensure users stay connected while foiling censors: We try to detect that a user is behaving like a real person and then reveal new Psiphon servers to them. (This is our obfuscated server list technology.)";
+/* Bullet list text under 'What does Psiphon do with User Activity and Aggregated Data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphondowith-para-2-item-3" = "確保用戶規避網路審查時可順暢地連接：我們會偵察使用者行為是否為真人，再幫助他們連接上新的 Psiphon  伺服器 (這是我們的模糊伺服器列表技術)";
 
 /* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes what Psiphon does with the little bit of VPN data that it collects stats from. */
 "privacy-information-collected-vpndata-whatdoespsiphondowith-subhead-v2" = "Psiphon 會如何處理用戶活動和匯總數據?";
 
-/*[UNTRANSLATED] Paragraph text in the 'What does Psiphon NOT do with your data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-whatdoespsiphonnotdowith-para-1" = "We DO NOT collect or store any VPN data that is not mentioned here.";
+/* Paragraph text in the 'What does Psiphon NOT do with your data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whatdoespsiphonnotdowith-para-1" = "我們不會收集或儲存任何此處未提到的 VPN  資料。";
 
 /* Paragraph text in the 'What does Psiphon NOT do with your data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
 "privacy-information-collected-vpndata-whatdoespsiphonnotdowith-para-2" = "我們不會更改您的VPN數據";
@@ -460,35 +460,35 @@
 /* Paragraph text in the 'What does Psiphon NOT do with your data?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
 "privacy-information-collected-vpndata-whatdoespsiphonnotdowith-para-3" = "我們不會向第三方分享任何敏感或用戶特定數據";
 
-/*[UNTRANSLATED] Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes what undesirable things Psiphon DOES NOT do with user data. '<strong>' is an HTML tag that makes text bold, which can be used if it makes sense in your language. */
-"privacy-information-collected-vpndata-whatdoespsiphonnotdowith-subhead" = "What does Psiphon <strong>NOT</strong> do with your data?";
+/* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes what undesirable things Psiphon DOES NOT do with user data. '<strong>' is an HTML tag that makes text bold, which can be used if it makes sense in your language. */
+"privacy-information-collected-vpndata-whatdoespsiphonnotdowith-subhead" = "Psiphon <strong>不會</strong>拿把您的資料作何種使用？";
 
-/*[UNTRANSLATED] Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-whopsiphonshareswith-para-1-v2" = "Shareable aggregated data is shared with sponsors, organizations we collaborate with, and civil society researchers. The data can be used to show such things as:";
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-1-v2" = "可分享的總和資料會與贊助人、合作組織、公民社會的研究人員共享。這些資料可用來展示：";
 
-/*[UNTRANSLATED] Bullet list text under 'Who does Psiphon share Aggregated Data with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-whopsiphonshareswith-para-2-item-1" = "How well Psiphon is working in a particular region.";
+/* Bullet list text under 'Who does Psiphon share Aggregated Data with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-2-item-1" = "Psiphon 在特定地區的運行狀況";
 
-/*[UNTRANSLATED] Bullet list text under 'Who does Psiphon share Aggregated Data with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-whopsiphonshareswith-para-2-item-2" = "The blocking patterns in a given country, for example during political events.";
+/* Bullet list text under 'Who does Psiphon share Aggregated Data with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-2-item-2" = "某特定國家的封鎖模式，例如發生政治事件期間。";
 
-/*[UNTRANSLATED] Bullet list text under 'Who does Psiphon share Aggregated Data with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-whopsiphonshareswith-para-2-item-3" = "That the populace of a country is determined to access the open internet.";
+/* Bullet list text under 'Who does Psiphon share Aggregated Data with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-2-item-3" = "民眾堅決地想使用開放網際網路";
 
-/*[UNTRANSLATED] Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-whopsiphonshareswith-para-3-v2" = "Again, only anonymized shareable aggregated data is ever shared with third parties.";
+/* Paragraph text in the 'Who does Psiphon share these statistics with?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-para-3-v2" = "再次強調，我們只向第三方提供匿名可分享的總和資料。";
 
-/*[UNTRANSLATED] Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
-"privacy-information-collected-vpndata-whopsiphonshareswith-subhead-v2" = "Who does Psiphon share Aggregated Data with?";
+/* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes who Psiphon shares VPN data stats. The answer will be organizations and not specific people, in case that makes a difference in your language. */
+"privacy-information-collected-vpndata-whopsiphonshareswith-subhead-v2" = "Psiphon 對誰分享總和資料？";
 
-/*[UNTRANSLATED] Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-whycare-para-1" = "When using a VPN or proxy you should be concerned about what the VPN provider can see in your data, collect from it, and do to it.";
+/* Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whycare-para-1" = "當使用 VPN 代理時，您需考慮 VPN  服務商會知道、收集您的何種資料以及會如何處置使用這些資料。";
 
-/*[UNTRANSLATED] Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. '<em>' is an 'emphasis' (like italics) HTML tag, which can be used if it makes sense in your language. */
-"privacy-information-collected-vpndata-whycare-para-2" = "When you use a VPN, all data to and from your device goes through it. If you visit a website that uses unencrypted HTTP, all of that site's data is visible to the VPN. If you visit a website that uses encrypted HTTPS, the site content is encrypted, but some information about the site might be visible to the VPN. Other apps and services on your device will also transfer data that is encrypted or unencrypted. (Note that this is distinct from the encryption that all VPNs provide. Here we're only concerned with data that is or is not encrypted <em>inside</em> the VPN tunnel.)";
+/* Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. '<em>' is an 'emphasis' (like italics) HTML tag, which can be used if it makes sense in your language. */
+"privacy-information-collected-vpndata-whycare-para-2" = "當使用 VPN 時，設備上全部進出的資料都會經過它。若您訪問一個未加密的 HTTP 網站，則 VPN 可看到在該網站的活動資料；若網站有使用 HTTPS 則內容會經過加密，但 VPN 仍可看到部份資訊。您設備上的應用程式與服務也會傳輸加密或未加密的資料 ( 注意，此處的加密與所有 VPN 提供的加密有所不同，這裏我們僅關注在<em>VPN 隧道內部</em> 的資料有無加密)。";
 
-/*[UNTRANSLATED] Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
-"privacy-information-collected-vpndata-whycare-para-3" = "For unencrypted services, it is possible for a VPN provider to see, collect, and modify (e.g., injecting ads into) the contents of your data. For encrypted data, it is still possible for a VPN to collect metadata about sites visited or actions taken. You should also be concerned with your VPN provider sharing your data with third parties.";
+/* Paragraph text in the 'Why should you care?' subsection of the 'User Activity and VPN Data' section of the Privacy page. */
+"privacy-information-collected-vpndata-whycare-para-3" = "未經加密的服務， VPN 供應商可能會看到、收集與修改 (例如 插入廣告) 您的資料內容。而加密過的資料， VPN 仍可能會收集訪問網站的元數據或相關活動。您應該關心 VPN 供應商如何與第三者分享用戶的資料。 ";
 
 /* Sub-heading in the 'User Activity and VPN Data' section of the Privacy Policy page. The section describes why it's important for users to consider what a VPN does with their traffic data. */
 "privacy-information-collected-vpndata-whycare-subhead" = "為何要關心？";
@@ -508,8 +508,8 @@
 /* No comment provided by engineer. */
 "privacy-information-collected-websites-google-analytics-para-1" = "我們在一些網站上使用 Google Analytics 來收集使用量的資料。Google Analytics 所收集的資料只會用於用戶在此特定站點上瀏覽習慣的統計分析。我們從 Google Analytics 獲取的信息無關個人資料，也不會跟任何第三方資料作關連來製作個人資料。";
 
-/*[UNTRANSLATED] No comment provided by engineer. */
-"privacy-information-collected-websites-google-analytics-para-2" = "Google Analytics sets a permanent cookie in your web browser to identify you as a unique user the next time you visit the site, but this cookie cannot be used by anyone except Google, and the data collected cannot be altered or retrieved by services from other domains.";
+/* No comment provided by engineer. */
+"privacy-information-collected-websites-google-analytics-para-2" = "Google Analytics 在您的瀏覽器留置了永久的 cookies 以便在下回訪問時得以辨別出特定用戶，這些 cookies 為 Google 專用，其它域名服務無法變更或獲取這些資料。\n ";
 
 /* No comment provided by engineer. */
 "privacy-information-collected-websites-google-analytics-para-3" = "谷歌使用或分享 Google Analytics 所收集用戶瀏覽資料的行為受限於<a href=\"http://www.google.ca/analytics/terms/us.html\" target=\"_blank\"> Google Analytics 使用條款</a>和<a href=\"http://www.google.com/policies/privacy/\" target=\"_blank\">谷歌隱私政策</a>。閣下也可以選擇在瀏覽器的個人設置中關閉 cookie 以停用。";
@@ -526,137 +526,137 @@
 /* page title for the Privacy Policy page */
 "PrivacyTitle" = "隱私政策";
 
-/*[UNTRANSLATED] Message shown when products available for purchase could not be retrieved. */
-"PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "Product list could not be retrieved";
+/* Message shown when products available for purchase could not be retrieved. */
+"PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "產品列表不可取回";
 
-/*[UNTRANSLATED] Title of screen encouraging the user to create a PsiCash account so that their PsiCash balance is protected. Do not translate or transliterate 'PsiCash' */
-"PROTECT_YOUR_PSICASH" = "Protect your PsiCash";
+/* Title of screen encouraging the user to create a PsiCash account so that their PsiCash balance is protected. Do not translate or transliterate 'PsiCash' */
+"PROTECT_YOUR_PSICASH" = "保障您的 PsiCash";
 
-/*[UNTRANSLATED] Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
-"PROTECT_YOUR_PURCHASES" = "Protect Your Purchases";
+/* Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
+"PROTECT_YOUR_PURCHASES" = "保障您的訂購";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts. */
-"PSICASH_ACCOUNT" = "PsiCash Account";
+/* Do not translate or transliterate 'PsiCash'. Header of a box providing context that the actions inside the box are related to PsiCash accounts. */
+"PSICASH_ACCOUNT" = "PsiCash 帳號";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
-"PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "Are you sure you want to log out of your PsiCash account?";
+/* Do not translate or transliterate 'PsiCash'. Alert message asking user if they are sure they would like to logout of their PsiCash account */
+"PSICASH_ACCOUNT_LOGOUT_CHECK_PROMPT" = "確定要登出 PsiCash 帳號？";
 
-/*[UNTRANSLATED] An alert shown when the user logs out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_ACCOUNT_LOGOUT_COMPLETE_TITLE" = "PsiCash account logout complete.";
+/* An alert shown when the user logs out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNT_LOGOUT_COMPLETE_TITLE" = "PsiCash 帳號已完全登出。";
 
-/*[UNTRANSLATED] Body of modal dialog shown when the user attempts to log out of their PsiCash account and an unexpected error occurs. Please don't modify the link URL. */
-"PSICASH_ACCOUNT_LOGOUT_FAILED_BODY" = "You logout attempt failed unexpectedly. Please try restarting the application.";
+/* Body of modal dialog shown when the user attempts to log out of their PsiCash account and an unexpected error occurs. Please don't modify the link URL. */
+"PSICASH_ACCOUNT_LOGOUT_FAILED_BODY" = "您的登出遇上無預警的錯誤，請試著重啟此應用程式。";
 
-/*[UNTRANSLATED] Header of a modal dialog that appears when the user tries to log out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_ACCOUNT_LOGOUT_TITLE" = "PsiCash Account Logout";
+/* Header of a modal dialog that appears when the user tries to log out of their PsiCash account. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNT_LOGOUT_TITLE" = "PsiCash 帳號登出";
 
-/*[UNTRANSLATED] Button title that opens 'PsiCash' account management. */
-"PSICASH_ACCOUNT_MANAGEMENT_2" = "Manage account";
+/* Button title that opens 'PsiCash' account management. */
+"PSICASH_ACCOUNT_MANAGEMENT_2" = "管理帳號";
 
-/*[UNTRANSLATED] Explanation text that appears below 'Create account' button on the PsiCash sign in screen. Do not translate or transliterate terms PsiCash or Psiphon */
-"PSICASH_ACCOUNT_PRODUCT_DESCRIPTION" = "Creating a PsiCash account will help preserve your PsiCash if you reinstall the app or use Psiphon on another device.";
+/* Explanation text that appears below 'Create account' button on the PsiCash sign in screen. Do not translate or transliterate terms PsiCash or Psiphon */
+"PSICASH_ACCOUNT_PRODUCT_DESCRIPTION" = "建立 PsiCash 帳號可以在其它設備使用或重安裝 Psiphon 時，仍可保留 PsiCash。";
 
-/*[UNTRANSLATED] An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "Your PsiCash login has expired. Please log back in.";
+/* An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "您的 PsiCash 登入時效已過，請重新登入。";
 
-/*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash login succeeds. There is a fixed number of times that a user can merge a pre-account balance into a PsiCash account. This message indicates that the user has hit that limit and the merge that occurred is the last one allowed. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_ACCOUNTS_LAST_MERGE_WARNING_BODY" = "You are logged into your PsiCash account. The preexisting balance from this device has been transferred into your account, but this is the last time a balance merge will occur.";
+/* Body text of a modal dialog shown when a PsiCash login succeeds. There is a fixed number of times that a user can merge a pre-account balance into a PsiCash account. This message indicates that the user has hit that limit and the merge that occurred is the last one allowed. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_ACCOUNTS_LAST_MERGE_WARNING_BODY" = "當登人您的 PsiCash 帳號，這台登入設備之前的餘額會轉入您的帳號，其為最後一次餘額合併。";
 
-/*[UNTRANSLATED] PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
-"PSICASH_BALANCE" = "PsiCash Balance:";
+/* PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
+"PSICASH_BALANCE" = "PsiCash 餘額:";
 
-/*[UNTRANSLATED] Subtitle of an error message shown when the PsiCash feature is unavailable, asking the user to send us a feedback if this problem persists. */
-"PSICASH_LIB_INIT_FAILED_SEND_FEEDBACK" = "PsiCash failed to load.\n\nIf this problem persists, please send a feedback.";
+/* Subtitle of an error message shown when the PsiCash feature is unavailable, asking the user to send us a feedback if this problem persists. */
+"PSICASH_LIB_INIT_FAILED_SEND_FEEDBACK" = "PsiCash 無法載入\n\n若此情況無改善，請送發反饋";
 
-/*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash account login fails due to a 'bad request' error. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_LOGIN_BAD_REQUEST_ERROR_BODY" = "The PsiCash server indicated that the login request was invalid. Please try again later.";
+/* Body text of a modal dialog shown when a PsiCash account login fails due to a 'bad request' error. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_BAD_REQUEST_ERROR_BODY" = "PsiCash 伺服器顯示此登入請求無效，請稍候再試。";
 
-/*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash login fails without a specific reason. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_LOGIN_CATASTROPHIC_ERROR_BODY" = "Your PsiCash login attempt failed unexpectedly.";
+/* Body text of a modal dialog shown when a PsiCash login fails without a specific reason. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_CATASTROPHIC_ERROR_BODY" = "嘗試登入 PsiCash 意外失敗";
 
-/*[UNTRANSLATED] Title of modal dialog shown when the PsiCash account login attempt fails for some reason. Text within the modal will explain why. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_LOGIN_FAILED_TITLE" = "PsiCash Login Failed";
+/* Title of modal dialog shown when the PsiCash account login attempt fails for some reason. Text within the modal will explain why. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_FAILED_TITLE" = "PsiCash 登入失敗";
 
-/*[UNTRANSLATED] Body text of a modal dialog shown when a PsiCash account login fails due to a server error. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_LOGIN_SERVER_ERROR_BODY" = "The PsiCash server responded with an error while trying to log you in. Please try again later.";
+/* Body text of a modal dialog shown when a PsiCash account login fails due to a server error. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_SERVER_ERROR_BODY" = "您欲登入時  PsiCash 伺服器傳回錯誤訊息，請稍候再試。";
 
-/*[UNTRANSLATED] Title of modal dialog shown when the PsiCash account login attempt succeeds, if additional information needs to be conveyed. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_LOGIN_SUCCESS_TITLE" = "PsiCash Login Success";
+/* Title of modal dialog shown when the PsiCash account login attempt succeeds, if additional information needs to be conveyed. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGIN_SUCCESS_TITLE" = "PsiCash 登入成功";
 
-/*[UNTRANSLATED] Body of a modal dialog that appears when the user tries to log out of thier PsiCash account while not currently connected to the Psiphon network. We don't allow PsiCash network requests when not connected, so only an inferior localy-only logout is available. 'Psiphon' must not be translated/transliterated. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_LOGOUT_OFFLINE_BODY" = "Being connected to the Psiphon network enables a more secure PsiCash logout. Would you like to connect before logging out?";
+/* Body of a modal dialog that appears when the user tries to log out of thier PsiCash account while not currently connected to the Psiphon network. We don't allow PsiCash network requests when not connected, so only an inferior localy-only logout is available. 'Psiphon' must not be translated/transliterated. The word 'PsiCash' must not be translated or transliterated. */
+"PSICASH_LOGOUT_OFFLINE_BODY" = "連線至 Psiphon 網路以確保 PsiCash 安全登出，您是否在登出前先連線至 Psiphon ?";
 
-/*[UNTRANSLATED] Body text of a modal dialog shown when the user tries to use (spend, buy, etc.) PsiCash, if they not currently connected. 'Use' here means buy, spend, or otherwise interact with. 'Psiphon' must not be translated/transliterated. 'PsiCash' must not be translated/transliterated. */
-"PSICASH_MUST_BE_CONNECTED" = "In order to use PsiCash, you must be connected to the Psiphon network.";
+/* Body text of a modal dialog shown when the user tries to use (spend, buy, etc.) PsiCash, if they not currently connected. 'Use' here means buy, spend, or otherwise interact with. 'Psiphon' must not be translated/transliterated. 'PsiCash' must not be translated/transliterated. */
+"PSICASH_MUST_BE_CONNECTED" = "要使用 PsiCash, 必須先連線到 Psiphon 網路。";
 
-/*[UNTRANSLATED] PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
-"PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "IMPORTANT: Your PsiCash will not be preserved if you uninstall Psiphon, unless you have created a PsiCash account and are logged into your PsiCash account.";
+/* PsiCash in-app purchase disclaimer that appears on the bottom of the screen where users can buy different amounts of PsiCash from the PlayStore.  Do not translate or transliterate terms PsiCash */
+"PSICASH_NON_ACCOUNT_SCREEN_NOTICE" = "重要提醒：除非您建立 PsiCash 帳唬號且順利登入，否則一旦在設備上刪除 Psiphon，PsiCash 就無法保留了。";
 
-/*[UNTRANSLATED] Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_SPEED_BOOST_PRODUCT_NOT_FOUND_MESSAGE" = "Speed Boost product not found. Your app may be out of date. Please check for updates.";
+/* Alert error message informing user that their Speed Boost purchase request failed because they attempted to buy a product that is no longer available and that they should try updating or reinstalling the app. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_BOOST_PRODUCT_NOT_FOUND_MESSAGE" = "找不到 Speed Boost，您的應用程式可能太老舊，請檢查更新。";
 
-/*[UNTRANSLATED] Body of an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. The words 'PsiCash' and 'Psiphon' must not be translated or transliterated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PSICASH_SPEED_PORT_LIMITS_BODY" = "Without active Speed Boost, your speed is limited and some internet traffic is not supported. Activate Speed Boost with PsiCash to unlock the full potential of your Psiphon experience.";
+/* Body of an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. The words 'PsiCash' and 'Psiphon' must not be translated or transliterated. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PSICASH_SPEED_PORT_LIMITS_BODY" = "沒有啟用 Speed Boost，您的速度會受限且無法支援某些網路流量。透過 PsiCash 啟動加速以解效完全的 Psiphon 使用體驗。";
 
-/*[UNTRANSLATED] Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. Port here refers to port in computer networking. */
-"PSICASH_SPEED_PORT_LIMITS_HEAD" = "Speed and Port Limits";
+/* Heading for an information section explaining that there are port and speed restrictions when the user doesn't have Speed Boost active. Port here refers to port in computer networking. */
+"PSICASH_SPEED_PORT_LIMITS_HEAD" = "速度與端口限制";
 
-/*[UNTRANSLATED] A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon */
-"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY" = "Your Psiphon subscription already gives you always-on Speed Boost, so there is no reason to buy more. Your PsiCash balance will be retained should you ever decide to cancel your subscription.\n\nYou can still access your PsiCash account from the settings menu.";
+/* A description message to the premium user (a user with a subscription) when they are trying to navigate to PsiCash and Speed Boost screen. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. Do not translate or transliterate words PsiCash or Psiphon */
+"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_BODY" = "您的 Psiphon 訂閱讓您可享受加速，故無須再多買。若取消訂閱，則會補充到您的 PsiCash 餘額上。\n\n可透過設置選單來訪問您的 PsiCash 帳號";
 
-/*[UNTRANSLATED] A title message to the premium user (a user with a subscription when they are trying to navigate to PsiCash and Speed Boost screen. Do not translate or transliterate words PsiCash or Psiphon */
-"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_TITLE" = "Your Psiphon subscription gives you premium access!";
+/* A title message to the premium user (a user with a subscription when they are trying to navigate to PsiCash and Speed Boost screen. Do not translate or transliterate words PsiCash or Psiphon */
+"PSICASH_SUBSCRIPTION_PREMIUM_ACCESS_TITLE" = "Psiphon 訂閱可享有昇級的訪問權限！";
 
-/*[UNTRANSLATED] An error that signifies a state where the user has made a 'PsiCash' purchase, but extra action is needed from the user to finish the transaction. Do not translate or transliterate 'PsiCash'. */
-"PSICASH_TRANSACTION_PENDING" = "Transaction Pending";
+/* An error that signifies a state where the user has made a 'PsiCash' purchase, but extra action is needed from the user to finish the transaction. Do not translate or transliterate 'PsiCash'. */
+"PSICASH_TRANSACTION_PENDING" = "交易待處理";
 
-/*[UNTRANSLATED] PsiCash currently unavailable. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
-"PSICASH_UNAVAILABLE" = "PsiCash Unavailable";
+/* PsiCash currently unavailable. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
+"PSICASH_UNAVAILABLE" = "無 PsiCash 可用";
 
-/*[UNTRANSLATED] 'PsiCash' features are unavailable while the app the connecting to 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash' */
-"PSICASH_UNAVAILABLE_WHILE_CONNECTING" = "PsiCash is unavailable while connecting to Psiphon";
+/* 'PsiCash' features are unavailable while the app the connecting to 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash' */
+"PSICASH_UNAVAILABLE_WHILE_CONNECTING" = "在連線至 Psiphon 時，不能使用 PsiCash。";
 
-/*[UNTRANSLATED] 'PsiCash' features are unavailable while the app the is disconnecting from 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash' */
-"PSICASH_UNAVAILABLE_WHILE_DISCONNECTING" = "PsiCash is unavailable while disconnecting from Psiphon";
+/* 'PsiCash' features are unavailable while the app the is disconnecting from 'Psiphon'. PsiCash is a type of credit. Do not translate or transliterate 'Psiphon'. Do not translate or transliterate 'PsiCash' */
+"PSICASH_UNAVAILABLE_WHILE_DISCONNECTING" = "當 Psiphon 斷線時，無法使用 PsiCash。";
 
-/*[UNTRANSLATED] 'PsiCash' features are unavailable while the user has a subscription. Do not translate or transliterate 'PsiCash' */
-"PSICASH_UNAVAILABLE_WHILE_SUBSCRIBED" = "PsiCash is unavailable while subscribed";
+/* 'PsiCash' features are unavailable while the user has a subscription. Do not translate or transliterate 'PsiCash' */
+"PSICASH_UNAVAILABLE_WHILE_SUBSCRIBED" = "若為訂閱用戶則 PsiCash 無法使用。";
 
-/*[UNTRANSLATED] Text field label where users can enter their account's username */
-"PSICASH_USERNAME_TEXT_FIELD" = "PsiCash username";
+/* Text field label where users can enter their account's username */
+"PSICASH_USERNAME_TEXT_FIELD" = "PsiCash 用戶名稱";
 
-/*[UNTRANSLATED] Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
-"PSICASH_WAIT_TRANSACTION_VERIFIED" = "Please wait while your transaction is being verified";
+/* Message when the user has made a purchase, and paid successfully, however the transaction is not complete yet and is pending verification */
+"PSICASH_WAIT_TRANSACTION_VERIFIED" = "請等候交易完成驗證";
 
 /*[UNTRANSLATED] Do not translate or transliterate 'PsiCash'. PsiCash is a unit of currency here. Reorder the format specifier '%@' if in the translated language ordering of unit and amount is different from English. */
 "PSICASH_WITH_AMOUNT" = "%@ PsiCash";
 
-/*[UNTRANSLATED] Alert message informing user that a Psiphon connection is required */
-"PSIPHON_CONNECTION_REQUIRED" = "Psiphon Connection Required";
+/* Alert message informing user that a Psiphon connection is required */
+"PSIPHON_CONNECTION_REQUIRED" = "要求 Psiphon 連線";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost', conform to translation under key 'SPEED_BOOST'. Body of an alert that is shown to the user when they connect from a region where free service is no longer offered, asking the user to subscribe or purchase Speed Boost. */
-"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_BUY_SUB_OR_SPEEDBOOST_BODY" = "Help keep Psiphon free for those who need it most! Subscribe now or purchase a Speed Boost.";
+/* Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost', conform to translation under key 'SPEED_BOOST'. Body of an alert that is shown to the user when they connect from a region where free service is no longer offered, asking the user to subscribe or purchase Speed Boost. */
+"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_BUY_SUB_OR_SPEEDBOOST_BODY" = "幫助 Psiphon 維持免費提供給最需要的人，立即訂閱或購買 Speed Boost 。";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. An alert with this title is shown when the user connects from a region where free service is no longer offered, asking the user to subscribe. */
-"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_TITLE" = "Psiphon is no longer free in your region";
+/* Do not translate or transliterate 'Psiphon'. An alert with this title is shown when the user connects from a region where free service is no longer offered, asking the user to subscribe. */
+"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_TITLE" = "在您的地區 Psiphon 不再免費";
 
-/*[UNTRANSLATED] Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
-"PSIPHON_IS_NOT_CONNECTED" = "Psiphon is not connected";
+/* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
+"PSIPHON_IS_NOT_CONNECTED" = "未連接 Psiphon";
 
-/*[UNTRANSLATED] Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
-"PSIPHON_MUST_BE_CONNECTED_INFO" = "Psiphon must be connected to show this content";
+/* Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
+"PSIPHON_MUST_BE_CONNECTED_INFO" = "必須連接 Psiphon 方能看到此內容";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. Notification message shown to the user indicating that Psiphon's service is no longer free in theri region, and that should open the app to learn more. */
-"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE_3" = "Psiphon is no longer free in your region, open the app to learn more.";
+/* Do not translate or transliterate 'Psiphon'. Notification message shown to the user indicating that Psiphon's service is no longer free in theri region, and that should open the app to learn more. */
+"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE_3" = "在您的地區 Psiphon 不再免費，請開啟應用了解詳情";
 
-/*[UNTRANSLATED] Alert message that the users purchases have been restored successfully */
-"PURCHASES_RESTORED_SUCCESSFULLY" = "Purchases restored successfully";
+/* Alert message that the users purchases have been restored successfully */
+"PURCHASES_RESTORED_SUCCESSFULLY" = "購買重置成功";
 
-/*[UNTRANSLATED] Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
-"PURCHASING_PSICASH" = "Purchasing PsiCash…";
+/* Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
+"PURCHASING_PSICASH" = "購買 PsiCash...";
 
-/*[UNTRANSLATED] Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PURCHASING_SPEED_BOOST_PLEASE_WAIT_2" = "Purchasing Speed Boost…\n\nPlease wait for your purchase to complete.";
+/* Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PURCHASING_SPEED_BOOST_PLEASE_WAIT_2" = "購買流量加速...\n\n請稍等候訂購完成。";
 
 /* Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "重刷新應用收據：";
@@ -667,11 +667,11 @@
 /* Point in a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_POINT_2" = "無法在設備上看到所購買的訂閱資料";
 
-/*[UNTRANSLATED] Title of a button that enables the user to report an error that they faced to us. */
-"REPORT_BUTTON_TITLE" = "Report...";
+/* Title of a button that enables the user to report an error that they faced to us. */
+"REPORT_BUTTON_TITLE" = "回報....";
 
-/*[UNTRANSLATED] Button that restores users previous purchases */
-"RESTORE_PURCHASES" = "Restore purchases";
+/* Button that restores users previous purchases */
+"RESTORE_PURCHASES" = "重置購買";
 
 /* Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "重置訂閱";
@@ -682,8 +682,8 @@
 /* Action button title, that when pressed retries the recently failed operation. */
 "RETRY_BUTTON_TITLE" = "重試";
 
-/*[UNTRANSLATED] Shown in a pop-up alert if user's rewarded video ad failed to load. */
-"REWARDED_VIDEO_LOAD_FAILED" = "Failed to load rewarded video. Please try again later.";
+/* Shown in a pop-up alert if user's rewarded video ad failed to load. */
+"REWARDED_VIDEO_LOAD_FAILED" = "無法載入獎勵影片，請稍候再試。";
 
 /* Title for screen that allows user to select language. Use all capital letters in the translation only if it makes sense. */
 "SELECT_LANG" = "選取語言";
@@ -694,8 +694,8 @@
 /* Title for screen that allows user to select their desired server region. */
 "SELECT_SERVER_REGION" = "選擇伺服器地區";
 
-/*[UNTRANSLATED] Title of an error dialog shown to the user when a serious error occurs in the app */
-"SERIOUS_ERROR_OCCURRED" = "A serious error occurred";
+/* Title of an error dialog shown to the user when a serious error occurs in the app */
+"SERIOUS_ERROR_OCCURRED" = "發生嚴重錯誤";
 
 /* Title of cell in settings menu which, when pressed, reinstalls the user's VPN profile for Psiphon */
 "SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE" = "重新安裝 VPN  ";
@@ -703,14 +703,14 @@
 /* Subscriptions item title in the app settings when user has an active subscription. Clicking this item opens subscriptions view */
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "訂閱付費";
 
-/* Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+/*[UNTRANSLATED] Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST" = "加速版 Speed Boost";
 
 /* Label on a button. Clicking this button will buy 1 hour of Speed Boost. Translate number as well. */
 "SPEED_BOOST_1HR" = "1 小時";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 1 day (24 hr) of Speed Boost. Translate number as well. */
-"SPEED_BOOST_24HR" = "1 Day";
+/* Label on a button. Clicking this button will buy 1 day (24 hr) of Speed Boost. Translate number as well. */
+"SPEED_BOOST_24HR" = "1 天";
 
 /* Label on a button. Clicking this button will buy 2 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_2HR" = "2小時";
@@ -718,47 +718,47 @@
 /* Label on a button. Clicking this button will buy 1 month (31 days) of Speed Boost. Translate number as well. */
 "SPEED_BOOST_31DAY" = "1 個月";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 3 hours of Speed Boost. Translate number as well. */
-"SPEED_BOOST_3HR" = "3 hours";
+/* Label on a button. Clicking this button will buy 3 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_3HR" = "3 小時";
 
 /* Label on a button. Clicking this button will buy 4 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_4HR" = "4小時";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 5 hours of Speed Boost. Translate number as well. */
-"SPEED_BOOST_5HR" = "5 hours";
+/* Label on a button. Clicking this button will buy 5 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_5HR" = "5 小時";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 6 hours of Speed Boost. Translate number as well. */
-"SPEED_BOOST_6HR" = "6 hours";
+/* Label on a button. Clicking this button will buy 6 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_6HR" = "6 小時";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 1 week (7 days) of Speed Boost. Translate number as well. */
-"SPEED_BOOST_7DAY" = "1 Week";
+/* Label on a button. Clicking this button will buy 1 week (7 days) of Speed Boost. Translate number as well. */
+"SPEED_BOOST_7DAY" = "1 週";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 7 hours of Speed Boost. Translate number as well. */
-"SPEED_BOOST_7HR" = "7 hours";
+/* Label on a button. Clicking this button will buy 7 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_7HR" = "7 小時";
 
 /* Label on a button. Clicking this button will buy 8 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_8HR" = "8小時";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 9 hours of Speed Boost. Translate number as well. */
-"SPEED_BOOST_9HR" = "9 hours";
+/* Label on a button. Clicking this button will buy 9 hours of Speed Boost. Translate number as well. */
+"SPEED_BOOST_9HR" = "9 小時";
 
 /* Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
 "SPEED_BOOST_ACTIVE" = "加速版啟用中";
 
-/*[UNTRANSLATED] '%@' is going to be replace by a timer (e.g. '02:12'). Place the exact string '%@' at the appropriate place. This string is shown when the user's 'Speed Boost' is active. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"SPEED_BOOST_IS_ACTIVE" = "Speed Boost Active %@";
+/* '%@' is going to be replace by a timer (e.g. '02:12'). Place the exact string '%@' at the appropriate place. This string is shown when the user's 'Speed Boost' is active. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"SPEED_BOOST_IS_ACTIVE" = "Speed Boost 啟用中 %@";
 
-/*[UNTRANSLATED] 'Speed Boost' product is currently unavailable. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"SPEED_BOOST_UNAVAILABLE" = "Speed Boost Unavailable";
+/* 'Speed Boost' product is currently unavailable. Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"SPEED_BOOST_UNAVAILABLE" = "Speed Boost 無法使用";
 
-/*[UNTRANSLATED] Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"SPEED_BOOST_YOU_ALREADY_HAVE" = "You already have Speed Boost";
+/* Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"SPEED_BOOST_YOU_ALREADY_HAVE" = "您已有 Speed Boost";
 
-/*[UNTRANSLATED] Footer text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. Please keep this text concise as the width of the text box is restricted in size. */
-"SUBSCRIPTION_BAR_FOOTER_TEXT_NOT_SUBSCRIBED_2" = "Remove ads • Max speed";
+/* Footer text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. Please keep this text concise as the width of the text box is restricted in size. */
+"SUBSCRIPTION_BAR_FOOTER_TEXT_NOT_SUBSCRIBED_2" = "無廣告 • 最高速";
 
-/*[UNTRANSLATED] Footer text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
-"SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED_V2" = "Premium • Max Speed";
+/* Footer text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
+"SUBSCRIPTION_BAR_FOOTER_TEXT_SUBSCRIBED_V2" = "高級版 • 最高速";
 
 /* Header text beside button that opens paid subscriptions manager UI. At this point the user is not subscribed. If “Premium” doesn't easily translate, please choose a term that conveys “Pro” or “Extra” or “Better” or “Elite”. Please keep this text concise as the width of the text box is restricted in size. */
 "SUBSCRIPTION_BAR_HEADER_TEXT_NOT_SUBSCRIBED" = "訂閱 Premium ";
@@ -766,17 +766,17 @@
 /* Header text beside button that opens paid subscriptions manager UI. At this point the user is subscribed. Please keep this text concise as the width of the text box is restricted in size. */
 "SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIBED" = "訂閱";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. This title is displayed on the main screen indicating that the subscription is pending activation. */
-"SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIPTION_PENDING" = "SUBSCRIPTION PENDING";
+/* After a user successfully purchases a subscription, it needs to be activated. This title is displayed on the main screen indicating that the subscription is pending activation. */
+"SUBSCRIPTION_BAR_HEADER_TEXT_SUBSCRIPTION_PENDING" = "訂閱處理中";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. Label with this text displayed on the main screen, indicating that the user needs to connect to Psiphon in order to activate the subscription. */
-"SUBSCRIPTION_CONNECT_TO_ACTIVATE" = "Connect to activate";
+/* After a user successfully purchases a subscription, it needs to be activated. Label with this text displayed on the main screen, indicating that the user needs to connect to Psiphon in order to activate the subscription. */
+"SUBSCRIPTION_CONNECT_TO_ACTIVATE" = "連線以激活";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating that activation of user's subscription failed. */
-"SUBSCRIPTION_FAILED_TO_ACTIVATE" = "Failed to activate";
+/* After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating that activation of user's subscription failed. */
+"SUBSCRIPTION_FAILED_TO_ACTIVATE" = "無法激活";
 
-/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating to the user that the subscription is in the process of getting activated */
-"SUBSCRIPTION_PLEASE_WAIT_WHILE_ACTIVATING" = "Please wait while activating";
+/* After a user successfully purchases a subscription, it needs to be activated. Label with this text is displayed on the main screen, indicating to the user that the subscription is in the process of getting activated */
+"SUBSCRIPTION_PLEASE_WAIT_WHILE_ACTIVATING" = "激活中請稍待";
 
 /* Title of the dialog for available in-app paid subscriptions */
 "SUBSCRIPTIONS" = "訂閱付費";
@@ -784,11 +784,11 @@
 /* Label on a button which, when pressed, opens a screen where the user can manage their currently active subscription. */
 "SUBSCRIPTIONS_MANAGE_SUBSCRIPTION_BUTTON" = "管理";
 
-/*[UNTRANSLATED] Subtitle of the banner on the subscriptions page informing the user that the subscriptions require no commitment, and can be cancelled anytime */
-"SUBSCRIPTIONS_PAGE_BANNER_SUBTITLE" = "No commitment, cancel anytime.";
+/* Subtitle of the banner on the subscriptions page informing the user that the subscriptions require no commitment, and can be cancelled anytime */
+"SUBSCRIPTIONS_PAGE_BANNER_SUBTITLE" = "無綁約隨時可取消";
 
-/*[UNTRANSLATED] Title of the banner on the subscriptions page advertising that subscriptions enable no ads and maximum speed. */
-"SUBSCRIPTIONS_PAGE_BANNER_TITLE_2" = "No ads and maximum speed.";
+/* Title of the banner on the subscriptions page advertising that subscriptions enable no ads and maximum speed. */
+"SUBSCRIPTIONS_PAGE_BANNER_TITLE_2" = "無廣告最高速";
 
 /* Title of the button on the subscriptions page which, when pressed, navigates the user to the page where they can restore their existing subscription */
 "SUBSCRIPTIONS_PAGE_RESTORE_SUBSCRIPTION_BUTTON" = "無法查看訂閱狀況";
@@ -802,23 +802,23 @@
 /* Title of button on subscriptions page which opens Psiphon's terms of use webpage */
 "SUBSCRIPTIONS_TERMS_OF_USE_BUTTON_TEXT" = "使用條款";
 
-/*[UNTRANSLATED] Button title shown when something fails to load. Asks the user to tap the button to retry the operation */
-"TAP_TO_RETRY" = "Tap to Retry";
+/* Button title shown when something fails to load. Asks the user to tap the button to retry the operation */
+"TAP_TO_RETRY" = "輕觸以重試";
 
-/*[UNTRANSLATED] Alert message informing user to turn on their cellular data or wifi to connect to the internet */
-"TURN_ON_DATE" = "Please turn on cellular data or use Wi-Fi.";
+/* Alert message informing user to turn on their cellular data or wifi to connect to the internet */
+"TURN_ON_DATE" = "請打開行動流量或使用 Wi-Fi";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
-"UPGRADE_PSIPHON" = "Upgrade Psiphon";
+/* Do not translate or transliterate 'Psiphon'. This is title of an alert which is shown to the user when Psiphon server detects an unsupported Internet traffic request. */
+"UPGRADE_PSIPHON" = "昇級 Psiphon";
 
 /* Title of button that disconnects the VPN. */
 "VPN_DISCONNECT_BUTTON_TITLE" = "中斷連缐";
 
 /* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
-"VPN_START_FAIL_MESSAGE" = "啟動Psiphon時出錯，請再試一次。如此問題一直發生，請重新安裝Psiphon應用。";
+"VPN_START_FAIL_MESSAGE" = "啟動 Psiphon 時出錯，請重新試試";
 
-/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to 'Best performance', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
-"VPN_START_FAIL_REGION_INVALID_MESSAGE_3" = "The region you selected is no longer available. You have automatically been switched to \"Best performance\".\n\n You can also select a new region from the Psiphon app.";
+/* Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to 'Best performance', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
+"VPN_START_FAIL_REGION_INVALID_MESSAGE_3" = "您所選的地區已不再提供服務，您已自動被轉到其它最佳效能的地區。\n\n您也可以自Psiphon 應用程式選擇其它新的地區。";
 
 /* Alert dialog title indicating to the user that Psiphon was unable to start */
 "VPN_START_FAIL_TITLE" = "無法開始";
@@ -850,9 +850,9 @@
 /* Status when the VPN is restarting. */
 "VPN_STATUS_RESTARTING" = "正在重啟";
 
-/*[UNTRANSLATED] Error message when something was wrong with the VPN. Asks the user that if the error persists, try tapping the 'Reinstall VPN Profile' button in the settings menu. 'Reinstall VPN Profile' translation has key SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE */
-"VPN_SYNC_FAILED_REINSTALL_CONFIG" = "If this error persists, please try 'Reinstall VPN Profile'.";
+/* Error message when something was wrong with the VPN. Asks the user that if the error persists, try tapping the 'Reinstall VPN Profile' button in the settings menu. 'Reinstall VPN Profile' translation has key SETTINGS_REINSTALL_VPN_CONFIGURATION_CELL_TITLE */
+"VPN_SYNC_FAILED_REINSTALL_CONFIG" = "若此問題一再出現，請試著\"重新安裝 VPN 帳號\"";
 
-/*[UNTRANSLATED] Button subtitle informing the user that if pressed a rewarded video ad will be displayed and they will earn credit. */
-"WATCH_REWARDED_VIDEO_AND_EARN" = "Watch Video and Earn";
+/* Button subtitle informing the user that if pressed a rewarded video ad will be displayed and they will earn credit. */
+"WATCH_REWARDED_VIDEO_AND_EARN" = "觀看影片以獲得獎勵";
 
