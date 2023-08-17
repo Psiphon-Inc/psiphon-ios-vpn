@@ -283,8 +283,8 @@
 /* Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
 "PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "مشکلی رخ داد، لطفا بعدا دوباره تلاش کنید.\n\nاگر این مشکل ادامه یافت، لطفا به ما بازخورد بفرستید.";
 
-/*[UNTRANSLATED] Do not tarnslate or transliterate 'Psiphon'. Message asking user to wait for the until connection is established with Psiphon servers. */
-"PLEASE_WAIT_TO_FINISH_CONNECTING" = "Please wait for Psiphon to finish connecting.";
+/* Do not tarnslate or transliterate 'Psiphon'. Message asking user to wait for the until connection is established with Psiphon servers. */
+"PLEASE_WAIT_TO_FINISH_CONNECTING" = "لطفا منتظر بمانید تا اتصال Psiphon به پایان برسد.";
 
 /* No comment provided by engineer. */
 "privacy-canadian-privacy-commission-link-text" = "دفتر کمیساریای حفظ حریم خصوصی کانادا";

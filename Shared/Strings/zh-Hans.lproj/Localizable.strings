@@ -17,7 +17,7 @@
 "ALERT_TITLE_OPERATION_FAILED" = "操作失败";
 
 /* Text that appears above the 'Log in' button on the PsiCash sign in screen. */
-"ALREADY_HAVE_AN_ACCOUNT" = "已注册过帐户？";
+"ALREADY_HAVE_AN_ACCOUNT" = "已注册过账户？";
 
 /* Title of the button which takes the user to the previous screen. Text should be short and one word when possible. */
 "BACK_BUTTON" = "返回";
@@ -262,8 +262,8 @@
 /* Onboarding text for install VPN configuration. (Do not translate 'Psiphon'). */
 "ONBOARDING_VPN_INSTALL_GUIDE_TEXT" = "您需要允许 Psiphon 添加 VPN 配置文件才能连接。";
 
-/*[UNTRANSLATED] Title of a button that open a URL on the device's web browser. */
-"OPEN_IN_BROWSER_BUTTON_TITLE" = "Open in Browser";
+/* Title of a button that open a URL on the device's web browser. */
+"OPEN_IN_BROWSER_BUTTON_TITLE" = "在浏览器中打开";
 
 /* Alert message informing the user they should open the app to finish connecting to the VPN. DO NOT translate 'Psiphon'. */
 "OPEN_PSIPHON_APP" = "请打开 Psiphon 应用来完成连接";
@@ -283,8 +283,8 @@
 /* Subtitle of an error message shown when the current operation failed, asking the user to try again at a later time and send us a feedback if this problem persists. */
 "PLEASE_TRY_AGAIN_LATER_AND_SEND_FEEDBACK" = "有些问题，请稍后再尝试。\n\n如果这个问题还是存在，请发送一个反馈。";
 
-/*[UNTRANSLATED] Do not tarnslate or transliterate 'Psiphon'. Message asking user to wait for the until connection is established with Psiphon servers. */
-"PLEASE_WAIT_TO_FINISH_CONNECTING" = "Please wait for Psiphon to finish connecting.";
+/* Do not tarnslate or transliterate 'Psiphon'. Message asking user to wait for the until connection is established with Psiphon servers. */
+"PLEASE_WAIT_TO_FINISH_CONNECTING" = "请等待 Psiphon 完成连接。";
 
 /* No comment provided by engineer. */
 "privacy-canadian-privacy-commission-link-text" = "加拿大隐私专员办公室";
@@ -529,8 +529,8 @@
 /* Message shown when products available for purchase could not be retrieved. */
 "PRODUCT_LIST_COULD_NOT_BE_RETRIEVED" = "产品清单不可更改";
 
-/*[UNTRANSLATED] Title of screen encouraging the user to create a PsiCash account so that their PsiCash balance is protected. Do not translate or transliterate 'PsiCash' */
-"PROTECT_YOUR_PSICASH" = "Protect your PsiCash";
+/* Title of screen encouraging the user to create a PsiCash account so that their PsiCash balance is protected. Do not translate or transliterate 'PsiCash' */
+"PROTECT_YOUR_PSICASH" = "保护您的 PsiCash";
 
 /* Text for a link displayed when the user does not have a PsiCash account. It encourages them to make one. The word 'PsiCash' must not be translated or transliterated. */
 "PROTECT_YOUR_PURCHASES" = "保护您的购买";
@@ -553,14 +553,14 @@
 /* Button title that opens 'PsiCash' account management. */
 "PSICASH_ACCOUNT_MANAGEMENT_2" = "管理账号";
 
-/*[UNTRANSLATED] Explanation text that appears below 'Create account' button on the PsiCash sign in screen. Do not translate or transliterate terms PsiCash or Psiphon */
-"PSICASH_ACCOUNT_PRODUCT_DESCRIPTION" = "Creating a PsiCash account will help preserve your PsiCash if you reinstall the app or use Psiphon on another device.";
+/* Explanation text that appears below 'Create account' button on the PsiCash sign in screen. Do not translate or transliterate terms PsiCash or Psiphon */
+"PSICASH_ACCOUNT_PRODUCT_DESCRIPTION" = "如果您重新安装应用程序或在其他设备上使用 Psiphon，创建 PsiCash 账户将有助于保留您的 PsiCash。";
 
 /* An alert shown when the user's PsiCash account tokens expire. This is a normal occurrence (once per year), and the user needs to log into their PsiCash account again to continue to use it. The word 'PsiCash' must not be translated or transliterated. */
 "PSICASH_ACCOUNT_TOKENS_EXPIRED_BODY_2" = "您的PsiCash账号登录已经过期。请重新登录。";
 
 /* Body text of a modal dialog shown when a PsiCash login succeeds. There is a fixed number of times that a user can merge a pre-account balance into a PsiCash account. This message indicates that the user has hit that limit and the merge that occurred is the last one allowed. The word 'PsiCash' must not be translated or transliterated. */
-"PSICASH_ACCOUNTS_LAST_MERGE_WARNING_BODY" = "您已经登陆您的PsiCash账户。预先存在在这个设备上的余额已经转入您的帐户，但是这是最后一次余额合并。";
+"PSICASH_ACCOUNTS_LAST_MERGE_WARNING_BODY" = "您已经登陆您的PsiCash账户。预先存在在这个设备上的余额已经转入您的账户，但是这是最后一次余额合并。";
 
 /* PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Text shown next to the user's PsiCash balance (a numerical value). Keep colon if appropriate. */
 "PSICASH_BALANCE" = "PsiCash余额：";
@@ -643,11 +643,11 @@
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "未连接至Psiphon";
 
-/*[UNTRANSLATED] Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
-"PSIPHON_MUST_BE_CONNECTED_INFO" = "Psiphon must be connected to show this content";
+/* Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
+"PSIPHON_MUST_BE_CONNECTED_INFO" = "必须连接 Psiphon 才能显示此内容";
 
-/*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. Notification message shown to the user indicating that Psiphon's service is no longer free in theri region, and that should open the app to learn more. */
-"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE_3" = "Psiphon is no longer free in your region, open the app to learn more.";
+/* Do not translate or transliterate 'Psiphon'. Notification message shown to the user indicating that Psiphon's service is no longer free in theri region, and that should open the app to learn more. */
+"PURCHASE_REQUIRED_NOTIFICATION_MESSAGE_3" = "Psiphon 在您所在地区不再免费，请打开应用程序了解更多信息。";
 
 /* Alert message that the users purchases have been restored successfully */
 "PURCHASES_RESTORED_SUCCESSFULLY" = "购买成功恢复";
@@ -655,8 +655,8 @@
 /* Shown when the user is purchasing PsiCash. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. Including ellipses '…' if appropriate. */
 "PURCHASING_PSICASH" = "购买PsiCash...";
 
-/*[UNTRANSLATED] Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"PURCHASING_SPEED_BOOST_PLEASE_WAIT_2" = "Purchasing Speed Boost…\n\nPlease wait for your purchase to complete.";
+/* Purchasing 'Speed Boost' product. Including ellipses '…' if appropriate. Do not transliterate 'Speed Boost'. 'Speed Boost' is a product that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
+"PURCHASING_SPEED_BOOST_PLEASE_WAIT_2" = "购买加速…请等待购买完成。";
 
 /* Description text above a list of scenarios where the user should try refreshing their app receipt to restore an existing subscription */
 "REFRESH_APP_RECEIPT_BUTTON_DESCRIPTION_LIST_HEADER" = "何时刷新应用收据：";
@@ -709,14 +709,14 @@
 /* Label on a button. Clicking this button will buy 1 hour of Speed Boost. Translate number as well. */
 "SPEED_BOOST_1HR" = "1 小时";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 1 day (24 hr) of Speed Boost. Translate number as well. */
-"SPEED_BOOST_24HR" = "1 Day";
+/* Label on a button. Clicking this button will buy 1 day (24 hr) of Speed Boost. Translate number as well. */
+"SPEED_BOOST_24HR" = "1 天";
 
 /* Label on a button. Clicking this button will buy 2 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_2HR" = "2小时";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 1 month (31 days) of Speed Boost. Translate number as well. */
-"SPEED_BOOST_31DAY" = "1 Month";
+/* Label on a button. Clicking this button will buy 1 month (31 days) of Speed Boost. Translate number as well. */
+"SPEED_BOOST_31DAY" = "1个月";
 
 /* Label on a button. Clicking this button will buy 3 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_3HR" = "3小时";
@@ -730,8 +730,8 @@
 /* Label on a button. Clicking this button will buy 6 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_6HR" = "6小时";
 
-/*[UNTRANSLATED] Label on a button. Clicking this button will buy 1 week (7 days) of Speed Boost. Translate number as well. */
-"SPEED_BOOST_7DAY" = "1 Week";
+/* Label on a button. Clicking this button will buy 1 week (7 days) of Speed Boost. Translate number as well. */
+"SPEED_BOOST_7DAY" = "1周";
 
 /* Label on a button. Clicking this button will buy 7 hours of Speed Boost. Translate number as well. */
 "SPEED_BOOST_7HR" = "7小时";

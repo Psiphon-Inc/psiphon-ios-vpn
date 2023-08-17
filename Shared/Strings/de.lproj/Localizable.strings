@@ -4,7 +4,7 @@
 /* After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
 "ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Wird aktiviert …";
 
-/* Title of the section in the subscription dialog that shows currently active subscription information. */
+/*[UNTRANSLATED] Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Current subscription";
 
 /*[UNTRANSLATED] Button title to add to user's PsiCash balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
@@ -175,7 +175,7 @@
 /* Title of screen that lets user to send feedback about the app to Psiphon Inc. Should be kept short. */
 "FEEDBACK_TITLE" = "Rückmeldung";
 
-/* Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
+/*[UNTRANSLATED] Alert dialog message thanking the user for helping improve the Psiphon network by submitting their feedback. */
 "FEEDBACK_UPLOAD_SUCCESSFUL_TITLE" = "Rückmeldung erfolgreich hochgeladen";
 
 /* Button title that lets users reset their password if they forgot their account's password. */
