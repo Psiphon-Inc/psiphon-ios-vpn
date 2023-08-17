@@ -58,3 +58,5 @@ psiphon_config
 embedded_server_entries
 Bourbon-Oblique.otf
 transifex_conf.json
+transifex_api_token
+
