@@ -1,10 +1,10 @@
 /* Accept button title */
 "ACCEPT_BUTTON_TITLE" = "গ্রহণ";
 
-/* After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
+/*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
 "ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Activating...";
 
-/* Title of the section in the subscription dialog that shows currently active subscription information. */
+/*[UNTRANSLATED] Title of the section in the subscription dialog that shows currently active subscription information. */
 "ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "বর্তমান সদস্যতা";
 
 /*[UNTRANSLATED] Button title to add to user's PsiCash balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
@@ -37,7 +37,7 @@
 /*[UNTRANSLATED] Title for a button that cancels an action. This should be generic enough to make sense whenever a cancel button is used. */
 "CANCEL_BUTTON_TITLE" = "Cancel";
 
-/* Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
+/*[UNTRANSLATED] Alert message informing user that their subscription has expired or that they're not a subscriber, therefore Psiphon can only be started from the Psiphon app. DO NOT translate 'Psiphon'. */
 "CANNOT_START_TUNNEL_DUE_TO_SUBSCRIPTION" = "আপনার সাইফন সদস্যতার মেয়াদ শেষ হয়ে গেছে।\nযেহেতু আপনি একজন গ্রাহক নন বা আপনার সদস্যতার মেয়াদ শেষ হয়ে গেছে, সাইফন কেবল সাইফন অ্যাপ থেকে চালু হতে পারে।\n\nদয়া করে সাইফন অ্যাপ্লিকেশন খুলুন।";
 
 /* Main text in the 'Upstream Proxy Error' dialog box. This is shown when the user has directly altered these settings, and those settings are (probably) erroneous. DO NOT translate 'Psiphon'. */
@@ -676,7 +676,7 @@
 /*[UNTRANSLATED] Button which, when pressed, attempts to restore any existing subscriptions the user has purchased */
 "RESTORE_SUBSCRIPTION_BUTTON" = "Restore Subscription";
 
-/* Title of button which triggers an attempt to restore the user's existing subscription */
+/*[UNTRANSLATED] Title of button which triggers an attempt to restore the user's existing subscription */
 "RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "আমার বিদ্যমান সাবস্ক্রিপশন পুনরুদ্ধার করুন";
 
 /* Action button title, that when pressed retries the recently failed operation. */
@@ -814,7 +814,7 @@
 /* Title of button that disconnects the VPN. */
 "VPN_DISCONNECT_BUTTON_TITLE" = "সংযোগ বিচ্ছিন্ন করা";
 
-/* Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
+/*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon (Do not translate 'Psiphon'). The user should try again, and if the problem persists, they should try reinstalling the app. */
 "VPN_START_FAIL_MESSAGE" = "সাইফন শুরু করার সময় একটি ত্রুটি ঘটেছে।অনুগ্রহপূর্বক আবার চেষ্টা করুন। এই সমস্যাটি চলতে থাকলে, সাইফন অ্যাপ্লিকেশন পুনরায় ইনস্টল করার চেষ্টা করুন।";
 
 /*[UNTRANSLATED] Alert dialog message informing the user that an error occurred while starting Psiphon because they selected an egress region that is no longer available (Do not translate 'Psiphon'). The user has been automatically switched to 'Best performance', but they can also open the Psiphon app to choose another country. Note: the backslash before each quotation mark should be left as is for formatting. */
