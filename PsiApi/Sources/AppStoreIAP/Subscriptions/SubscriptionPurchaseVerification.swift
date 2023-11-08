@@ -65,7 +65,7 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
         case serverError(HTTPStatusCode)
         
         /// Received unsupported/unknown status code.
-        case unknownStatusCode(HTTPStatusCode)
+        case unknownStatusCode(Int)
         
         /// Failed to parse responsy body.
         case responseBodyParseError(SystemError<Int>)
@@ -148,7 +148,7 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
         // TODO: The mapping of types of `urlSessionResult` to `result` can be generalized.
         switch urlSessionResult.result {
         case let .success(r):
-            switch r.metadata.statusCode {
+            switch r.metadata.respStatus {
             case .ok:
                 do {
                     let decoder = JSONDecoder.makeRfc3339Decoder()
@@ -164,8 +164,8 @@ public struct SubscriptionValidationResponse: RetriableHTTPResponse {
             default:
                 // If the status code is not 200 OK or 400 Bad Request Error,
                 // it is either a 5xx server error, or an uknown/unsupported status code.
-                if case .serverError = r.metadata.statusCode.responseType {
-                    self.result = .failure(ErrorEvent(.serverError(r.metadata.statusCode),
+                if let respStatus = r.metadata.respStatus, case .serverError = respStatus.responseType {
+                    self.result = .failure(ErrorEvent(.serverError(respStatus),
                                                       date: urlSessionResult.date))
                 } else {
                     self.result = .failure(ErrorEvent(.unknownStatusCode(r.metadata.statusCode),

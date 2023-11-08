@@ -74,18 +74,23 @@ public struct HTTPResponseData: Hashable {
 public struct HTTPResponseMetadata: Hashable {
     public let url: URL
     public let headers: [String: String]
-    public let statusCode: HTTPStatusCode
+    public let statusCode: Int
+    /// respStatus is typed `statusCode`.
+    /// `nil` represents an uknown status code.
+    public let respStatus: HTTPStatusCode?
     
-    public init(url: URL, headers: [String: String], statusCode: HTTPStatusCode) {
+    public init(url: URL, headers: [String: String], statusCode: Int) {
         self.url = url
         self.headers = headers
         self.statusCode = statusCode
+        self.respStatus = HTTPStatusCode(rawValue: statusCode)
     }
     
     public init(_ httpURLResponse: HTTPURLResponse) {
         self.url = httpURLResponse.url!
         self.headers = httpURLResponse.allHeaderFields as! [String: String]
-        self.statusCode = HTTPStatusCode(rawValue: httpURLResponse.statusCode)!
+        self.statusCode = httpURLResponse.statusCode
+        self.respStatus = HTTPStatusCode(rawValue: httpURLResponse.statusCode)
     }
 }
 
