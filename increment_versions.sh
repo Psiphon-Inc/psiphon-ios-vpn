@@ -20,11 +20,11 @@ set -ue
 
 
 usage () {
-    echo " Usage: ${0} <none|patch|minor|major> [--dry-run]"
+    echo " Usage: ${0} <build-version-only|patch|minor|major> [--dry-run]"
     echo ""
     echo " Automatically increments build number and version number based on"
     echo "  the lastest git tag at 'github.com/Psiphon-Inc/psiphon-ios-vpn.git.'"
-    echo "  e.g.: '${0} none' increments build number only without changing version number."
+    echo "  e.g.: '${0} build-version-only' increments build number only without changing version number."
     echo "  e.g.: '${0} minor' increments build number and minor version number."
     echo ""
     echo " You can  also manually set versions with:"
@@ -146,8 +146,8 @@ guard_cmd_exists fastlane
 # Parses $1 (version number bump type).
 BUMP_TYPE=""
 case "${1:-}" in
-    none)
-        BUMP_TYPE="none"
+    "build-version-only")
+        BUMP_TYPE="build-version-only"
         ;;
     patch)
         BUMP_TYPE="patch"
@@ -195,9 +195,9 @@ echo ""
 INCREMENTED_BUILD_NUM=$((BUILD_NUM + 1))
 echo " Incremented build number: ${INCREMENTED_BUILD_NUM}"
 
-# Evalutates incremented version number, if $BUMP_TYPE is not "none".
+# Evalutates incremented version number, if $BUMP_TYPE is not "build-version-only".
 INCREMENTED_VERSION_NUM=$VERSION_NUM
-if [ $BUMP_TYPE != "none" ]; then
+if [ $BUMP_TYPE != "build-version-only" ]; then
     increment_version_number_into "$VERSION_NUM" "$1" INCREMENTED_VERSION_NUM
     echo " Incremented ${1} version number: ${INCREMENTED_VERSION_NUM}"
 fi
