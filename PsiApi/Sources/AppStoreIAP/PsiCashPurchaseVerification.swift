@@ -67,7 +67,7 @@ public struct PsiCashValidationResponse: RetriableHTTPResponse {
     public init(urlSessionResult: URLSessionResult) {
         switch urlSessionResult.result {
         case let .success(r):
-            switch r.metadata.statusCode {
+            switch r.metadata.respStatus {
             case .ok:
                 self.result = .success(.unit)
             default:
@@ -101,7 +101,7 @@ public struct PsiCashValidationResponse: RetriableHTTPResponse {
                 
             case .errorStatusCode(let metadata):
                 // Received a non-200 OK response from the server.
-                switch metadata.statusCode {
+                switch metadata.respStatus {
                 case .internalServerError,
                      .serviceUnavailable:
                     // Retry if the HTTP status code is 500 or 503.

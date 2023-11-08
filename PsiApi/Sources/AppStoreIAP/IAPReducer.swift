@@ -412,7 +412,7 @@ public let iapReducer = Reducer<IAPReducerState, IAPAction, IAPEnvironment> {
                 // might have been expired.
                 if
                     case .errorStatusCode(let responseMetadata) = errorEvent.error,
-                    case .clientError = responseMetadata.statusCode.responseType
+                    case .clientError = responseMetadata.respStatus?.responseType
                 {
                     
                     effects += environment.psiCashStore(.refreshPsiCashState())
