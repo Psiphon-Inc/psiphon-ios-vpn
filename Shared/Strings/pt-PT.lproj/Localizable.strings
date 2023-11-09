@@ -2,10 +2,10 @@
 "ACCEPT_BUTTON_TITLE" = "Aceitar";
 
 /*[UNTRANSLATED] After a user successfully purchases a subscription, it needs to be activated. A label with this title is presented to the user indicating the the subscription is in the process of getting activated. Include the ellipses or equivalent symbol if it makes sense in the translated language. */
-"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Activating...";
+"ACTIVATE_SUBSCRIPTION_BUTTON_TITILE" = "Activating…";
 
 /*[UNTRANSLATED] Title of the section in the subscription dialog that shows currently active subscription information. */
-"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "Current subscription";
+"ACTIVE_SUBSCRIPTION_SECTION_TITLE" = "You're subscribed!";
 
 /* Button title to add to user's PsiCash balance. PsiCash is a type of credit. Do not translate or transliterate 'PsiCash'. */
 "ADD_PSICASH" = "Adicionar PsiCash";
@@ -643,7 +643,7 @@
 /*[UNTRANSLATED] Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon is not connected";
 
-/*[UNTRANSLATED] Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
+/* Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_MUST_BE_CONNECTED_INFO" = "Psiphon must be connected to show this content";
 
 /*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. Notification message shown to the user indicating that Psiphon's service is no longer free in theri region, and that should open the app to learn more. */
@@ -677,7 +677,7 @@
 "RESTORE_SUBSCRIPTION_BUTTON" = "Restore Subscription";
 
 /*[UNTRANSLATED] Title of button which triggers an attempt to restore the user's existing subscription */
-"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my existing subscription";
+"RESTORE_SUBSCRIPTION_BUTTON_TITLE" = "Restore my subscription";
 
 /* Action button title, that when pressed retries the recently failed operation. */
 "RETRY_BUTTON_TITLE" = "Repetir";
