@@ -205,9 +205,15 @@ import Foundation
     }
     
     static func Psiphon_must_be_connected_to_show_this_content() -> String {
-        return NSLocalizedString("PSIPHON_MUST_BE_CONNECTED_INFO", tableName: nil, bundle: Bundle.main,
-                                 value: "Psiphon must be connected to show this content",
+        return NSLocalizedString("PSIPHON_MUST_BE_CONNECTED_INFO_2", tableName: nil, bundle: Bundle.main,
+                                 value: "Psiphon must be connected to show this content.",
                                  comment: "Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon'")
+    }
+    
+    static func Psiphon_must_be_connected_tap_open_in_browser_to_continue_anyways() -> String {
+        return NSLocalizedString("PSIPHON_MUST_BE_CONNECTED_TAP_OPEN_IN_BROWSER_TO_CONTINUE", tableName: nil, bundle: Bundle.main,
+                                 value: "To preserve your privacy Psiphon app does not load the requested screen when disconnected.\n\nTap \"Open in Browser\" if you would like to proceed anyway.",
+                                 comment: "Message shown if a webpage is not opened because the user is not connected to Psiphon. If the user wishes to view the webpage anyways, the could tap on the 'Open in Browser' key: OPEN_IN_BROWSER_BUTTON_TITLE and they will be taken outside the app.")
     }
     
     static func Connecting_to_psiphon() -> String {
