@@ -643,7 +643,7 @@
 /* Shown when user is not connected to Psiphon network. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_IS_NOT_CONNECTED" = "Psiphon tidak terhubung";
 
-/*[UNTRANSLATED] Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
+/* Message shown to the user informing them that they are not connected to Psiphon and in order to view this content they must connect to Psiphon. Do not translate or transliterate 'Psiphon' */
 "PSIPHON_MUST_BE_CONNECTED_INFO" = "Psiphon must be connected to show this content";
 
 /*[UNTRANSLATED] Do not translate or transliterate 'Psiphon'. Notification message shown to the user indicating that Psiphon's service is no longer free in theri region, and that should open the app to learn more. */
