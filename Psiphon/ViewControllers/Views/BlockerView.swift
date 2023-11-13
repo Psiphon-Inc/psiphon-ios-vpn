@@ -94,7 +94,9 @@ struct BlockerView: ViewBuilder {
         
         // Setup Auto Layout
         vStack.activateConstraints {
-            $0.constraintToParent(.centerX(), .centerY())
+            $0.constraintToParent(.centerX(), .centerY(),
+                                  .leading(Float(Style.default.largePadding)),
+                                  .trailing(Float(-Style.default.largePadding)))
         }
         
         return .init(viewable: background) { [vStack, label] _ in

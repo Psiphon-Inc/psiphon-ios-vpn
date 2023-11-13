@@ -1,14 +1,39 @@
 vi:
   app_name: Psiphon
   subtitle: Bên Kia Biên Giới
+  description: |+
+    Sau khi giúp hàng chục triệu người dùng truy cập vào các trang web và ứng dụng họ ưa thích, Psiphon đã ra mắt ứng dụng đầu tiên cho hệ iOS! Ứng dụng mới này hòa nhập nhuần nhuyễn vào mạng Psiphon, kết nối bạn an toàn với các ứng dụng và trang mạng.
+
+    Dầu bạn đang ở đâu trên thế giới, ứng dụng Psiphon sẽ kết nối bạn với ứng dụng và trang mạng ưa thích. Ứng dụng còn có thêm một lớp bảo vệ khi dùng dịch vụ Wi-Fi công cộng hoặc các mạng không tin cậy.
+
+    Các tính năng quan trọng gồm có:
+    • Miễn phí, không giới hạn cho cá nhân sử dụng.
+    • Tải về, cài đặt và sử dụng dễ dàng. Không cần đăng ký hay cấu hình.
+    • Tự động chọn giao thức để luôn có kết nối lẹ, bền.
+    • Nhiều ngôn ngữ giao diện và tùy chỉnh địa điểm máy chủ.
+
+    Ghi chú thuê bao:
+    • Thuê bao sẽ không có quảng cáo và cho bạn lướt mạng lẹ hơn!
+    • Thời hạn dùng thử 3-ngày miễn phí.
+    • Phí: US$2.99 cho một tuần, US$9.99 cho một tháng, hay US$99.99 cho một năm.
+    • Chi phí sẽ tính vào tài khoản iTunes của bạn khi có xác nhận đặt mua.
+    • Thuê bao sẽ gia hạn tự động trừ phi tùy chọn gia hạn-tự động được tắt ít nhất 24-tiếng trước khi giai đoạn thuê bao hiện thời hết hạn.
+    • Tài khoản của bạn sẽ được tính tiền gia hạn trong vòng 24-tiếng trước khi giai đoạn thuê bao hiện thời hết hạn, và cho biết giá thuê bao.
+    • Không được phép hủy bỏ thuê bao hiện thời trong lúc giai đoạn thuê bao còn hiệu lực.
+    • Thuê bao có thể được quản lý và gia hạn-tự động có thể được tắt trong phần Thiết đặt Tài khoản sau khi mua.
+    • Thời gian còn dư lại của giai đoạn thử miễn phí sẽ bị bỏ khi bạn mua thuê bao.
+
+    Chính sách Quyền Riêng tư: https://psiphon.ca/en/privacy.html
+    Điều khoản Sử dụng: https://psiphon.ca/en/license.html
+
   keywords: Psiphon, proxy
-  description: "Sau khi giúp cho hàng chục triệu người dùng truy cập vào các trang
-    mạng ưa thích, Psiphon đã tung ra ứng dụng chính thức đầu tiên cho hệ iOS! Ứng
-    dụng trình duyệt mới này tích hợp việc truy cập một cách liền lạc vào mạng Psiphon,
-    kết nối bạn an toàn vào mạng.\n\nBất cứ bạn ở nơi nào trên thế giới, ứng dụng
-    Trình Duyệt Psiphon sẽ kết nối bạn đến trang web muốn vào. Ứng dụng còn cung cấp
-    thêm một lớp bảo vệ an toàn khi bạn dùng wifi công cộng hoặc khi bạn dùng một
-    mạng không tin cậy.\n\nCác tính năng then chốt bao gồm:\n• Miễn phí, không giới
-    hạn khi sử dụng cho cá nhân.\n• Tải xuống, cài đặt và sử dụng dễ dàng. Không cần
-    phải đăng ký, cấu hình.\n• Tự động chọn giao thức phù hợp để có truy cập lẹ và
-    chắc chắn mọi lúc.\n• Hỗ trợ nhiều ngôn ngữ và chọn được vị trí của máy chủ.\n"
+  subscriptions:
+    weekly:
+      title: Thượng hạng 1 tuần
+      description: Thuê bao gia hạn tự động
+    monthly:
+      title: Thượng hạng 1 tháng
+      description: Thuê bao gia hạn tự động
+    yearly:
+      title: Thượng hạng 1 năm
+      description: Thuê bao gia hạn tự động
