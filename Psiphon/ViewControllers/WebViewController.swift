@@ -70,6 +70,7 @@ final class WebViewController: ReactiveViewController {
     @MainState private var mainFrameLoadState: WebViewLoadingState = .pending
     
     /// - Parameter showOpenInBrowser: Adds "Open in Browser" button to navigation's right hand-side.
+    ///     This button is present even when untunneled.
     init(
         baseURL: URL,
         showOpenInBrowser: Bool = false,
@@ -142,6 +143,13 @@ final class WebViewController: ReactiveViewController {
                 return
             }
             
+            let blockerViewMessage: String
+            if showOpenInBrowser {
+                blockerViewMessage = UserStrings.Psiphon_must_be_connected_tap_open_in_browser_to_continue_anyways()
+            } else {
+                blockerViewMessage = UserStrings.Psiphon_must_be_connected_to_show_this_content()
+            }
+            
             switch observed.tunnelStatus.tunneled {
             
             case .notConnected:
@@ -150,7 +158,7 @@ final class WebViewController: ReactiveViewController {
                     .right(
                         BlockerView.DisplayOption(
                             animateSpinner: false,
-                            viewOptions: .label(text: UserStrings.Psiphon_must_be_connected_to_show_this_content()))))
+                            viewOptions: .label(text: blockerViewMessage))))
                 
             case .connecting:
                 
@@ -158,7 +166,7 @@ final class WebViewController: ReactiveViewController {
                     .right(
                         BlockerView.DisplayOption(
                             animateSpinner: true,
-                            viewOptions: .label(text: UserStrings.Psiphon_must_be_connected_to_show_this_content()))))
+                            viewOptions: .label(text: blockerViewMessage))))
                 
             case .disconnecting:
                 
@@ -166,7 +174,7 @@ final class WebViewController: ReactiveViewController {
                     .right(
                         BlockerView.DisplayOption(
                             animateSpinner: false,
-                            viewOptions: .label(text: UserStrings.Psiphon_must_be_connected_to_show_this_content()))))
+                            viewOptions: .label(text: blockerViewMessage))))
                 
             case .connected:
                 

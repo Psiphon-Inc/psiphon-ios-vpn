@@ -704,7 +704,7 @@
 "SETTINGS_SUBSCRIPTION_ACTIVE" = "訂閱付費";
 
 /*[UNTRANSLATED] Do not transliterate 'Speed Boost'. 'Speed Boost' is a reward that can be purchased with PsiCash credit. It provides unlimited network connection speed through Psiphon. Other words that can be used to help with translation are: 'turbo' (like cars), 'accelerate', 'warp speed', 'blast off', or anything that indicates a fast or unrestricted speed. */
-"SPEED_BOOST" = "加速版 Speed Boost";
+"SPEED_BOOST" = "Speed Boost";
 
 /* Label on a button. Clicking this button will buy 1 hour of Speed Boost. Translate number as well. */
 "SPEED_BOOST_1HR" = "1 小時";
