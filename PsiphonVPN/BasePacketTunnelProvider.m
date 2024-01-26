@@ -184,6 +184,10 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
             tunnelStartedFromContainerRecently = (time < 5.0);
         }
 
+        NSInteger lastExtensionStopReason = [self.sharedDB getExtensionStopReason];
+        [self.sharedDB setExtensionStopReason:NEProviderStopReasonNone];
+        LOG_DEBUG(@"lastExtensionStopReason: %ld", (long)lastExtensionStopReason);
+
         // Determine how the extension was started.
         // ExtensionStartMethodFromCrash priority should be after _FromBoot and _FromContainer.
         //
@@ -197,7 +201,9 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
 
         } else if (previouslyJetsammed) {
             self.extensionStartMethod = ExtensionStartMethodFromCrash;
-
+        } else if (lastExtensionStopReason == NEProviderStopReasonIdleTimeout ||
+                   lastExtensionStopReason == NEProviderStopReasonConnectionFailed) {
+            self.extensionStartMethod = ExtensionStartMethodOtherAfterSystemStop;
         } else {
             self.extensionStartMethod = ExtensionStartMethodOther;
         }
@@ -365,6 +371,7 @@ PsiFeedbackLogType const JetsamMetricsLogType = @"JetsamMetrics";
         case ExtensionStartMethodFromBoot: return @"Boot";
         case ExtensionStartMethodFromCrash: return @"Crash";
         case ExtensionStartMethodOther: return @"Other";
+        case ExtensionStartMethodOtherAfterSystemStop: return @"OtherAfterSystemStop";
         default: PSIAssert(FALSE);
     }
 

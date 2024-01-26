@@ -46,6 +46,8 @@ UserDefaultsKey const ConstainerPurchaseRequiredVPNSessionHandledIntKey =
 
 UserDefaultsKey const ExtensionIsZombieBoolKey = @"extension_zombie";
 
+UserDefaultsKey const ExtensionStopReasonIntegerKey = @"extension_stop_reason";
+
 UserDefaultsKey const ContainerSharedDebugFlagsKey = @"SHARED_DEBUG_FLAGS";
 
 UserDefaultsKey const ContainerForegroundStateBoolKey = @"container_foreground_state_bool_key";
@@ -347,6 +349,14 @@ UserDefaultsKey const ContainerAppReceiptLatestSubscriptionExpiryDate_Legacy =
 
 - (BOOL)getExtensionIsZombie {
     return [sharedDefaults boolForKey:ExtensionIsZombieBoolKey];
+}
+
+- (void)setExtensionStopReason:(NSInteger)reason {
+    [sharedDefaults setInteger:reason forKey:ExtensionStopReasonIntegerKey];
+}
+
+- (NSInteger)getExtensionStopReason {
+    return [sharedDefaults integerForKey:ExtensionStopReasonIntegerKey];
 }
 
 - (void)incrementDisallowedTrafficAlertWriteSequenceNum {

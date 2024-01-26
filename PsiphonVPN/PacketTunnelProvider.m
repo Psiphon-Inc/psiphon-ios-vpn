@@ -261,16 +261,18 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     
     // Increments "VPN Session" number when the network extension is started
     // from the container or other methods.
-    // Note: This implies that network extension process start after a detected carsh
+    // Note: This implies that network extension process start after a detected crash
     //       or from boot do not increment the "VPN Session" number.
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
-        self.extensionStartMethod == ExtensionStartMethodOther) {
+        self.extensionStartMethod == ExtensionStartMethodOther ||
+        self.extensionStartMethod == ExtensionStartMethodOtherAfterSystemStop) {
         [self.sharedDB incrementVPNSessionNumber];
     }
 
     if (self.extensionStartMethod == ExtensionStartMethodFromContainer ||
         self.extensionStartMethod == ExtensionStartMethodFromBoot ||
         self.extensionStartMethod == ExtensionStartMethodFromCrash ||
+        self.extensionStartMethod == ExtensionStartMethodOtherAfterSystemStop ||
         hasSubscriptionAuth == TRUE) {
 
         [self.sharedDB setExtensionIsZombie:FALSE];
@@ -329,6 +331,8 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                                json:@{@"Event":@"Stop",
                                       @"StopReason": [PacketTunnelUtils textStopReason:reason],
                                       @"StopCode": @(reason)}];
+
+    [self.sharedDB setExtensionStopReason:reason];
 
     [self.psiphonTunnel stop];
 }
