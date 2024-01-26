@@ -64,6 +64,10 @@ typedef NS_ENUM(NSInteger, ExtensionStartMethodEnum) {
     /*! @const ExtensionStartMethodOther The Network Extension process was either started by "Connect On Demand" rules,
         or by the user from system settings. */
     ExtensionStartMethodOther,
+    /*! @const ExtensionStartMethodOtherAfterSystemStop The Network Extension process was either started by
+        "Connect On Demand" rules, or by the user from system settings, and was last stopped by the system with
+        NEProviderStopReasonIdleTimeout or NEProviderStopReasonConnectionFailed. */
+    ExtensionStartMethodOtherAfterSystemStop,
 };
 
 #pragma mark - BasePacketTunnelProvider protocol
