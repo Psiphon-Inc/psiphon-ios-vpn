@@ -180,8 +180,9 @@ NSString *_Nonnull const FileRegistryEntriesDictCoderKey = @"entries.dict";
 - (nullable instancetype)initWithCoder:(nonnull NSCoder *)coder {
     self = [super init];
     if (self) {
-        self.entries = [coder decodeObjectOfClass:[NSDictionary class]
-                                           forKey:FileRegistryEntriesDictCoderKey];
+        NSSet<Class> *classes = [NSSet setWithObjects:[NSDictionary class], [FileRegistryEntry class], nil];
+        self.entries = [coder decodeObjectOfClasses:classes
+                                             forKey:FileRegistryEntriesDictCoderKey];
     }
     return self;
 }
