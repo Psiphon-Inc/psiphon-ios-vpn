@@ -42,6 +42,7 @@ extern UserDefaultsKey const _Nonnull TunnelStartTimeStringKey;
 extern UserDefaultsKey const _Nonnull TunnelSponsorIDStringKey;
 extern UserDefaultsKey const _Nonnull ServerTimestampStringKey;
 extern UserDefaultsKey const _Nonnull ExtensionIsZombieBoolKey;
+extern UserDefaultsKey const _Nonnull ExtensionStopReasonIntegerKey;
 extern UserDefaultsKey const _Nonnull ContainerForegroundStateBoolKey;
 extern UserDefaultsKey const _Nonnull ContainerTunnelIntentStatusIntKey;
 extern UserDefaultsKey const _Nonnull ExtensionDisallowedTrafficAlertWriteSeqIntKey;
@@ -216,7 +217,7 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
 - (BOOL)setCurrentSponsorId:(NSString *_Nullable)sponsorId;
 
 /**
- * @brief Sets server timestamp in shared NSSUserDefaults dictionary.
+ * @brief Sets server timestamp in shared NSUserDefaults dictionary.
  * @param timestamp from the handshake in RFC3339 format.
  * @return TRUE if change was persisted to disk successfully, FALSE otherwise.
  */
@@ -245,6 +246,23 @@ The integer values are defined in `NEBridge.h` with prefix `TUNNEL_INTENT_`.
  * Returns last value recorded by the extension with call to `setExtensionIsZombie:`.
  */
 - (BOOL)getExtensionIsZombie;
+
+#if TARGET_IS_EXTENSION
+/**
+ * @brief Sets extension stop reason in shared NSUserDefaults. Called by the extension when
+ * stopped.
+ * @param stopReason Provider stop reason. See NEProviderStopReason.
+ */
+- (void)setExtensionStopReason:(NSInteger)stopReason;
+
+/**
+ * @return Previously persisted NEProviderStopReason in shared NSUserDefaults, which is the
+ * reason the extension was last stopped. Returns 0 if the the extension has not been stopped yet,
+ * which is the same as NEProviderStopReasonNone; i.e. first run of the extension after as fresh
+ * install or a subsequent run if the extension continues to jetsam before it is stopped.
+ */
+- (NSInteger)getExtensionStopReason;
+#endif
 
 #if TARGET_IS_EXTENSION
 - (void)incrementDisallowedTrafficAlertWriteSequenceNum;
