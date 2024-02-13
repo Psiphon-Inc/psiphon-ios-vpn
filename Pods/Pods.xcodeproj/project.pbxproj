@@ -1799,8 +1799,8 @@
 		BFDFE7DC352907FC980B868725387E98 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1240;
-				LastUpgradeCheck = 1240;
+				LastSwiftUpdateCheck = 1500;
+				LastUpgradeCheck = 1500;
 			};
 			buildConfigurationList = 4821239608C13582E20E6DA73FD5F1F9 /* Build configuration list for PBXProject "Pods" */;
 			compatibilityVersion = "Xcode 11.0";
@@ -2312,6 +2312,26 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
+		001D5D653E8BCFEC2678F62620ECE8E9 /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 36FD66C635A85AE2DE6ACE40DD65F893 /* PsiphonClientCommonLibrary.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/PsiphonClientCommonLibrary";
+				ENABLE_BITCODE = NO;
+				IBSC_MODULE = PsiphonClientCommonLibrary;
+				INFOPLIST_FILE = "Target Support Files/PsiphonClientCommonLibrary/ResourceBundle-PsiphonClientCommonLibrary-PsiphonClientCommonLibrary-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				PRODUCT_NAME = PsiphonClientCommonLibrary;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = DevRelease;
+		};
 		027674825F376418F63CC3F7AEE2E50F /* DevRelease */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 72B307DD65AC858E4AF7780265CF5CA1 /* ReactiveObjC.release.xcconfig */;
@@ -2480,24 +2500,6 @@
 			};
 			name = DevRelease;
 		};
-		124F6BA81688322E8E07C23A0C7936F4 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 36C10AC45D250BC4CDAA22547D628016 /* InAppSettingsKit.release.xcconfig */;
-			buildSettings = {
-				CODE_SIGNING_ALLOWED = NO;
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/InAppSettingsKit";
-				ENABLE_BITCODE = NO;
-				IBSC_MODULE = InAppSettingsKit;
-				INFOPLIST_FILE = "Target Support Files/InAppSettingsKit/ResourceBundle-InAppSettingsKit-InAppSettingsKit-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				PRODUCT_NAME = InAppSettingsKit;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				WRAPPER_EXTENSION = bundle;
-			};
-			name = Release;
-		};
 		135D19919B57FB076B299D0105435EAA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 08268FFA3C90E3EE24D45066DC0E753A /* PsiphonClientCommonLibrary.debug.xcconfig */;
@@ -2523,26 +2525,6 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
-		};
-		1737B7A758533DA60B7144F23FDEB487 /* DevRelease */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 36FD66C635A85AE2DE6ACE40DD65F893 /* PsiphonClientCommonLibrary.release.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/PsiphonClientCommonLibrary";
-				ENABLE_BITCODE = NO;
-				IBSC_MODULE = PsiphonClientCommonLibrary;
-				INFOPLIST_FILE = "Target Support Files/PsiphonClientCommonLibrary/ResourceBundle-PsiphonClientCommonLibrary-PsiphonClientCommonLibrary-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				PRODUCT_NAME = PsiphonClientCommonLibrary;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-				WRAPPER_EXTENSION = bundle;
-			};
-			name = DevRelease;
 		};
 		260A2927EDAB3FCA24C812C71871A859 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -2606,25 +2588,7 @@
 			};
 			name = Release;
 		};
-		35A71BB494BEBDDAF12AF609AECEEB81 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 08268FFA3C90E3EE24D45066DC0E753A /* PsiphonClientCommonLibrary.debug.xcconfig */;
-			buildSettings = {
-				CODE_SIGNING_ALLOWED = NO;
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/PsiphonClientCommonLibrary";
-				ENABLE_BITCODE = NO;
-				IBSC_MODULE = PsiphonClientCommonLibrary;
-				INFOPLIST_FILE = "Target Support Files/PsiphonClientCommonLibrary/ResourceBundle-PsiphonClientCommonLibrary-PsiphonClientCommonLibrary-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				PRODUCT_NAME = PsiphonClientCommonLibrary;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				WRAPPER_EXTENSION = bundle;
-			};
-			name = Debug;
-		};
-		4B0F8E5582C76395B4A37C20411CBFFB /* Debug */ = {
+		2A1FFEE6CFB91AFA2C6A054C25C9A97D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B2026D68A9CA65A49A506A662C83797C /* InAppSettingsKit.debug.xcconfig */;
 			buildSettings = {
@@ -2721,17 +2685,17 @@
 			};
 			name = DevRelease;
 		};
-		663DEA81BD2A15D8976360D35FB3CC1C /* Release */ = {
+		66E723E478C8888261B31D07D96940CA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 36FD66C635A85AE2DE6ACE40DD65F893 /* PsiphonClientCommonLibrary.release.xcconfig */;
+			baseConfigurationReference = 36C10AC45D250BC4CDAA22547D628016 /* InAppSettingsKit.release.xcconfig */;
 			buildSettings = {
 				CODE_SIGNING_ALLOWED = NO;
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/PsiphonClientCommonLibrary";
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/InAppSettingsKit";
 				ENABLE_BITCODE = NO;
-				IBSC_MODULE = PsiphonClientCommonLibrary;
-				INFOPLIST_FILE = "Target Support Files/PsiphonClientCommonLibrary/ResourceBundle-PsiphonClientCommonLibrary-PsiphonClientCommonLibrary-Info.plist";
+				IBSC_MODULE = InAppSettingsKit;
+				INFOPLIST_FILE = "Target Support Files/InAppSettingsKit/ResourceBundle-InAppSettingsKit-InAppSettingsKit-Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				PRODUCT_NAME = PsiphonClientCommonLibrary;
+				PRODUCT_NAME = InAppSettingsKit;
 				SDKROOT = iphoneos;
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -2763,6 +2727,26 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+			};
+			name = DevRelease;
+		};
+		69214B1E3E8166671DED02794F3034C0 /* DevRelease */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 36C10AC45D250BC4CDAA22547D628016 /* InAppSettingsKit.release.xcconfig */;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGNING_ALLOWED = NO;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/InAppSettingsKit";
+				ENABLE_BITCODE = NO;
+				IBSC_MODULE = InAppSettingsKit;
+				INFOPLIST_FILE = "Target Support Files/InAppSettingsKit/ResourceBundle-InAppSettingsKit-InAppSettingsKit-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				PRODUCT_NAME = InAppSettingsKit;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				WRAPPER_EXTENSION = bundle;
 			};
 			name = DevRelease;
 		};
@@ -2815,6 +2799,24 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		7C16D690235F5D514AA0BB1556F59B30 /* Release */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 36FD66C635A85AE2DE6ACE40DD65F893 /* PsiphonClientCommonLibrary.release.xcconfig */;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/PsiphonClientCommonLibrary";
+				ENABLE_BITCODE = NO;
+				IBSC_MODULE = PsiphonClientCommonLibrary;
+				INFOPLIST_FILE = "Target Support Files/PsiphonClientCommonLibrary/ResourceBundle-PsiphonClientCommonLibrary-PsiphonClientCommonLibrary-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				PRODUCT_NAME = PsiphonClientCommonLibrary;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = bundle;
 			};
 			name = Release;
 		};
@@ -2924,26 +2926,6 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
-		};
-		AF1EC24140FAE465DE717C40DBAF8FDB /* DevRelease */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = 36C10AC45D250BC4CDAA22547D628016 /* InAppSettingsKit.release.xcconfig */;
-			buildSettings = {
-				CLANG_ENABLE_OBJC_WEAK = NO;
-				CODE_SIGNING_ALLOWED = NO;
-				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/InAppSettingsKit";
-				ENABLE_BITCODE = NO;
-				IBSC_MODULE = InAppSettingsKit;
-				INFOPLIST_FILE = "Target Support Files/InAppSettingsKit/ResourceBundle-InAppSettingsKit-InAppSettingsKit-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
-				PRODUCT_NAME = InAppSettingsKit;
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-				WRAPPER_EXTENSION = bundle;
-			};
-			name = DevRelease;
 		};
 		BDDB92B06A9C2E28238DD99676DCA5C0 /* Release */ = {
 			isa = XCBuildConfiguration;
@@ -3144,6 +3126,24 @@
 			};
 			name = Debug;
 		};
+		FB3D481339A39C9286F946B9A68A9FD4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = 08268FFA3C90E3EE24D45066DC0E753A /* PsiphonClientCommonLibrary.debug.xcconfig */;
+			buildSettings = {
+				CODE_SIGNING_ALLOWED = NO;
+				CONFIGURATION_BUILD_DIR = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)/PsiphonClientCommonLibrary";
+				ENABLE_BITCODE = NO;
+				IBSC_MODULE = PsiphonClientCommonLibrary;
+				INFOPLIST_FILE = "Target Support Files/PsiphonClientCommonLibrary/ResourceBundle-PsiphonClientCommonLibrary-PsiphonClientCommonLibrary-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				PRODUCT_NAME = PsiphonClientCommonLibrary;
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = bundle;
+			};
+			name = Debug;
+		};
 		FC5349AFB5E670D29B2B64B8B12B630C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 2688585E97DA214448F6EB6FC3CC4719 /* Pods-Psiphon.debug.xcconfig */;
@@ -3224,9 +3224,9 @@
 		A955FC3CA0992F7EDB60EC8B853A87E5 /* Build configuration list for PBXNativeTarget "PsiphonClientCommonLibrary-PsiphonClientCommonLibrary" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				35A71BB494BEBDDAF12AF609AECEEB81 /* Debug */,
-				1737B7A758533DA60B7144F23FDEB487 /* DevRelease */,
-				663DEA81BD2A15D8976360D35FB3CC1C /* Release */,
+				FB3D481339A39C9286F946B9A68A9FD4 /* Debug */,
+				001D5D653E8BCFEC2678F62620ECE8E9 /* DevRelease */,
+				7C16D690235F5D514AA0BB1556F59B30 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
@@ -3264,9 +3264,9 @@
 		E4394E4F4953711F671A70145044E85F /* Build configuration list for PBXNativeTarget "InAppSettingsKit-InAppSettingsKit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				4B0F8E5582C76395B4A37C20411CBFFB /* Debug */,
-				AF1EC24140FAE465DE717C40DBAF8FDB /* DevRelease */,
-				124F6BA81688322E8E07C23A0C7936F4 /* Release */,
+				2A1FFEE6CFB91AFA2C6A054C25C9A97D /* Debug */,
+				69214B1E3E8166671DED02794F3034C0 /* DevRelease */,
+				66E723E478C8888261B31D07D96940CA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
