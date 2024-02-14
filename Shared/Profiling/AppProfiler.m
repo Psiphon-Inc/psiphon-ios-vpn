@@ -22,25 +22,23 @@
 #import "Asserts.h"
 #import "Logging.h"
 #import "PsiFeedbackLogger.h"
+#import <os/proc.h>
 
 PsiFeedbackLogType const ExtensionMemoryProfilingLogType = @"MemoryProfiling";
 
 @interface AppProfiler ()
 
-@property (nonatomic, assign) BOOL suspendTimerWithBackoff;
-
 @end
 
 @implementation AppProfiler {
     dispatch_source_t timerDispatch;
-    float lastRSS;
+    unsigned long long prevAvailableMemory;
 }
 
 - (void)startProfilingWithStartInterval:(NSTimeInterval)startInterval
                              forNumLogs:(int)numLogsAtStartInterval
             andThenExponentialBackoffTo:(NSTimeInterval)endInterval
-               withNumLogsAtEachBackOff:(int)numLogsAtEachBackOff
-{
+               withNumLogsAtEachBackOff:(int)numLogsAtEachBackOff API_AVAILABLE(ios(13.0)) {
     [self startProfilingWithStartInterval:startInterval
                                forNumLogs:numLogsAtStartInterval
               andThenExponentialBackoffTo:endInterval
@@ -52,13 +50,8 @@ PsiFeedbackLogType const ExtensionMemoryProfilingLogType = @"MemoryProfiling";
 - (void)startProfilingWithStartInterval:(NSTimeInterval)startInterval
                              forNumLogs:(int)numLogsAtStartInterval
             andThenExponentialBackoffTo:(NSTimeInterval)endInterval
-               withNumLogsAtEachBackOff:(int)numLogsAtEachBackOff index:(int)index
-{
+               withNumLogsAtEachBackOff:(int)numLogsAtEachBackOff index:(int)index API_AVAILABLE(ios(13.0)) {
 #define backoffExponentOffset 2
-    
-    if (self.suspendTimerWithBackoff) {
-        return;
-    }
 
     PSIAssert(startInterval < endInterval);
     
@@ -86,7 +79,7 @@ PsiFeedbackLogType const ExtensionMemoryProfilingLogType = @"MemoryProfiling";
         
         if (strongSelf != nil) {
             
-            [strongSelf logMemoryReportIfDelta];
+            [strongSelf logAvailableMemoryIfDelta];
             
             [strongSelf startProfilingWithStartInterval:startInterval
                                              forNumLogs:numLogsAtStartInterval
@@ -98,7 +91,7 @@ PsiFeedbackLogType const ExtensionMemoryProfilingLogType = @"MemoryProfiling";
 }
 
 // Starts profiling at regular interval.
-- (void)startProfilingWithInterval:(NSTimeInterval)interval {
+- (void)startProfilingWithInterval:(NSTimeInterval)interval API_AVAILABLE(ios(13.0)) {
     AppProfiler *__weak weakSelf = self;
     
     if (timerDispatch != nil) {
@@ -120,49 +113,65 @@ PsiFeedbackLogType const ExtensionMemoryProfilingLogType = @"MemoryProfiling";
     dispatch_source_set_event_handler(timerDispatch, ^{
         AppProfiler *__strong strongSelf = weakSelf;
         if (strongSelf != nil) {
-            [strongSelf logMemoryReportIfDelta];
+            [strongSelf logAvailableMemoryIfDelta];
         }
     });
     
     dispatch_resume(timerDispatch);
 }
 
-- (void)stopProfiling {
+- (void)stopProfiling API_AVAILABLE(ios(13.0)) {
     if (timerDispatch != nil) {
         dispatch_source_cancel(timerDispatch);
         timerDispatch = nil;
     }
-    self.suspendTimerWithBackoff = TRUE;
 }
 
 #pragma mark - Logging
 
-- (void)logMemoryReportIfDelta {
-    NSError *e;
-
-    float rss = (float)[AppStats privateResidentSetSize:&e] / 1000000; // in MB
-
-    if (e) {
-        [PsiFeedbackLogger errorWithType:ExtensionMemoryProfilingLogType message:@"Failed to get RSS" object:e];
-    } else if ((int)(lastRSS * 100) != (int)(rss * 100)) {
-        // Only log if RSS has delta greater than 0.01
-        lastRSS = rss;
-        NSString *msg = [NSString stringWithFormat:@"%.2fM", rss];
-        [PsiFeedbackLogger infoWithType:ExtensionMemoryProfilingLogType json:@{@"rss":msg}];
+- (void)logAvailableMemoryIfDelta API_AVAILABLE(ios(13.0)) {
+    unsigned long long availableMemory = (unsigned long long)os_proc_available_memory();
+    if (availableMemory != self->prevAvailableMemory) {
+        self->prevAvailableMemory = availableMemory;
+        [AppProfiler logAvailableMemory:availableMemory withTag:@"delta"];
     }
 }
 
-+ (void)logMemoryReportWithTag:(NSString*_Nonnull)tag {
-    NSError *e;
++ (void)logAvailableMemoryWithTag:(NSString*_Nonnull)tag {
+    [AppProfiler logAvailableMemory:os_proc_available_memory() withTag:tag];
+}
 
-    float rss = (float)[AppStats privateResidentSetSize:&e] / 1000000; // in MB
++ (void)logAvailableMemory:(unsigned long long)availableMemory withTag:(NSString*_Nonnull)tag {
 
-    if (e) {
-        [PsiFeedbackLogger errorWithType:ExtensionMemoryProfilingLogType message:@"Failed to get RSS" object:e];
+    // Calculate the current memory footprint of the application, which should be its memory limit
+    // minus the amount of additional memory it can allocate before hitting that memory limit. I.e.,
+    // memoryInUse = memoryLimit - availableMemory.
+    unsigned long long memoryInUse;
+    if (@available(iOS 15.0, *)) {
+        // iOS 15+: network extension memory limit is 50MB; may change in a future iOS version
+        memoryInUse = (50 << 20) - availableMemory;
     } else {
-        NSString *msg = [NSString stringWithFormat:@"%.2fM", rss];
-        [PsiFeedbackLogger infoWithType:ExtensionMemoryProfilingLogType json:@{@"rss":msg,@"tag":tag}];
+        // iOS 10-14: network extension memory limit is 10MB
+        memoryInUse = (10 << 20) - availableMemory;
     }
+
+    NSDictionary *json = @{
+        @"Free": [AppProfiler memoryBytesInMB:availableMemory],
+        @"FreeBytes": [NSNumber numberWithUnsignedLongLong:availableMemory],
+        @"Used": [AppProfiler memoryBytesInMB:memoryInUse],
+        @"UsedBytes": [NSNumber numberWithUnsignedLongLong:memoryInUse],
+        @"Tag": tag
+    };
+    [PsiFeedbackLogger infoWithType:ExtensionMemoryProfilingLogType json:json];
+}
+
+# pragma mark - Helpers
+
++ (NSString *)memoryBytesInMB:(unsigned long long)memoryBytes {
+    NSByteCountFormatter *bf = [[NSByteCountFormatter alloc] init];
+    bf.allowedUnits = NSByteCountFormatterUseMB;
+    bf.countStyle = NSByteCountFormatterCountStyleMemory;
+    return [bf stringFromByteCount:memoryBytes];
 }
 
 @end

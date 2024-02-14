@@ -27,7 +27,7 @@
 /**
  * Log profile every `interval` seconds.
  */
-- (void)startProfilingWithInterval:(NSTimeInterval)interval;
+- (void)startProfilingWithInterval:(NSTimeInterval)interval API_AVAILABLE(ios(13.0));
 
 /**
  * Start by logging profile every `startInterval` seconds for `numLogsAtStartInterval` logs.
@@ -35,25 +35,26 @@
  * increasing period until this period has exceeded `endInterval`. Once the logging period
  * has surpassed `endInterval` the period is set to `endInterval` and logging continues indefinitely
  * until `stopProfiling` or another `startProfiling` call is made.
- *
- * @attention Only logs if the RSS has changed by 0.01MB since the last log.
  */
-- (void)startProfilingWithStartInterval:(NSTimeInterval)startInterval forNumLogs:(int)numLogsAtStartInterval andThenExponentialBackoffTo:(NSTimeInterval)endInterval withNumLogsAtEachBackOff:(int)numLogsAtEachBackOff;
+- (void)startProfilingWithStartInterval:(NSTimeInterval)startInterval
+                             forNumLogs:(int)numLogsAtStartInterval
+            andThenExponentialBackoffTo:(NSTimeInterval)endInterval
+               withNumLogsAtEachBackOff:(int)numLogsAtEachBackOff API_AVAILABLE(ios(13.0));
 
 /**
  * Stop any active profiling. If no active profiling is ongoing this
  * is a noop.
  */
-- (void)stopProfiling;
+- (void)stopProfiling API_AVAILABLE(ios(13.0));
 
 /**
- * Log memory report if RSS has changed by 0.01MB since the last log.
+ * Log available memory if the amount has changed since the last call to logAvailableMemoryIfDelta.
  */
-- (void)logMemoryReportIfDelta;
+- (void)logAvailableMemoryIfDelta API_AVAILABLE(ios(13.0));
 
 /**
- * Log memory report with given tag for later indentification.
+ * Log available memory with given tag for later indentification.
  */
-+ (void)logMemoryReportWithTag:(NSString*_Nonnull)tag;
++ (void)logAvailableMemoryWithTag:(NSString*_Nonnull)tag API_AVAILABLE(ios(13.0));
 
 @end
