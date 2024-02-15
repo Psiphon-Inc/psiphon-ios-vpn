@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -101,11 +101,9 @@
 		5202011D2360D34000D00C8E /* EitherView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5202011C2360D34000D00C8E /* EitherView.swift */; };
 		52055D04230C823100244F9E /* GradientButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D03230C823100244F9E /* GradientButton.swift */; };
 		52055D06230C833700244F9E /* SpeedBoostButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52055D05230C833700244F9E /* SpeedBoostButton.swift */; };
-		521FD0F9219E0DDF00F748EC /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F6219E0DDF00F748EC /* AppStats.m */; };
 		521FD0FA219E0DDF00F748EC /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F8219E0DDF00F748EC /* AppProfiler.m */; };
 		521FD0FD219E0E0F00F748EC /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0FB219E0E0E00F748EC /* DebugUtils.m */; };
 		521FD0FE219E0E1900F748EC /* AppProfiler.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F8219E0DDF00F748EC /* AppProfiler.m */; };
-		521FD0FF219E0E2600F748EC /* AppStats.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0F6219E0DDF00F748EC /* AppStats.m */; };
 		521FD100219E0E3800F748EC /* DebugUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = 521FD0FB219E0E0E00F748EC /* DebugUtils.m */; };
 		5245C5C92342A6840033EE13 /* UserDefaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5245C5C82342A6840033EE13 /* UserDefaults.swift */; };
 		5246800722D51AA3009AEC6E /* PsiCashWidgetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5246800622D51AA3009AEC6E /* PsiCashWidgetView.swift */; };
@@ -232,6 +230,8 @@
 		CE26FCAC1BBDC85900B83375 /* PsiphonVPN.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE26FCA31BBDC85900B83375 /* PsiphonVPN.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CE551C6A24FBFB8E00011C51 /* PsiphonFeedback+FeedbackUploadProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE551C6924FBFB8E00011C51 /* PsiphonFeedback+FeedbackUploadProvider.swift */; };
 		CE58B642251A31370081C73C /* AppState+Feedback.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE58B641251A31370081C73C /* AppState+Feedback.swift */; };
+		CE6C33CB2B7E82CA0082BCEF /* HostInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C33C92B7E82C90082BCEF /* HostInfo.m */; };
+		CE6C33CC2B7E84190082BCEF /* HostInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C33C92B7E82C90082BCEF /* HostInfo.m */; };
 		CE6C3F6A24366AE1007A17F0 /* ClientMetadata.m in Sources */ = {isa = PBXBuildFile; fileRef = CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */; };
 		CE8420472522823D00796032 /* DebugViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE84203D2522823D00796032 /* DebugViewController.m */; };
 		CE8420482522823D00796032 /* DebugToolboxViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CE84203F2522823D00796032 /* DebugToolboxViewController.m */; };
@@ -553,8 +553,6 @@
 		52055D03230C823100244F9E /* GradientButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GradientButton.swift; sourceTree = "<group>"; };
 		52055D05230C833700244F9E /* SpeedBoostButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SpeedBoostButton.swift; sourceTree = "<group>"; };
 		521FD0F5219E0DDF00F748EC /* AppProfiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppProfiler.h; path = Shared/Profiling/AppProfiler.h; sourceTree = SOURCE_ROOT; };
-		521FD0F6219E0DDF00F748EC /* AppStats.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppStats.m; path = Shared/Profiling/AppStats.m; sourceTree = SOURCE_ROOT; };
-		521FD0F7219E0DDF00F748EC /* AppStats.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppStats.h; path = Shared/Profiling/AppStats.h; sourceTree = SOURCE_ROOT; };
 		521FD0F8219E0DDF00F748EC /* AppProfiler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppProfiler.m; path = Shared/Profiling/AppProfiler.m; sourceTree = SOURCE_ROOT; };
 		521FD0FB219E0E0E00F748EC /* DebugUtils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugUtils.m; sourceTree = "<group>"; };
 		521FD0FC219E0E0E00F748EC /* DebugUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DebugUtils.h; sourceTree = "<group>"; };
@@ -788,6 +786,8 @@
 		CE50A25724699CD80047D3FE /* it */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = it; path = Strings/it.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE551C6924FBFB8E00011C51 /* PsiphonFeedback+FeedbackUploadProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PsiphonFeedback+FeedbackUploadProvider.swift"; sourceTree = "<group>"; };
 		CE58B641251A31370081C73C /* AppState+Feedback.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "AppState+Feedback.swift"; sourceTree = "<group>"; };
+		CE6C33C92B7E82C90082BCEF /* HostInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = HostInfo.m; path = Shared/Profiling/HostInfo.m; sourceTree = SOURCE_ROOT; };
+		CE6C33CA2B7E82CA0082BCEF /* HostInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HostInfo.h; path = Shared/Profiling/HostInfo.h; sourceTree = SOURCE_ROOT; };
 		CE6C3F6824366AE1007A17F0 /* ClientMetadata.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ClientMetadata.h; sourceTree = "<group>"; };
 		CE6C3F6924366AE1007A17F0 /* ClientMetadata.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ClientMetadata.m; sourceTree = "<group>"; };
 		CE84203D2522823D00796032 /* DebugViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DebugViewController.m; sourceTree = "<group>"; };
@@ -1258,8 +1258,8 @@
 			children = (
 				521FD0F5219E0DDF00F748EC /* AppProfiler.h */,
 				521FD0F8219E0DDF00F748EC /* AppProfiler.m */,
-				521FD0F7219E0DDF00F748EC /* AppStats.h */,
-				521FD0F6219E0DDF00F748EC /* AppStats.m */,
+				CE6C33CA2B7E82CA0082BCEF /* HostInfo.h */,
+				CE6C33C92B7E82C90082BCEF /* HostInfo.m */,
 			);
 			name = Profiling;
 			path = "New Group";
@@ -2153,6 +2153,7 @@
 				445F24D720E1A5BA00D004E9 /* per_support.c in Sources */,
 				8D82F0E625420E21002D37E7 /* PsiCashViewReducer.swift in Sources */,
 				EF90D7AA204F22C900228A63 /* NSError+Convenience.m in Sources */,
+				CE6C33CB2B7E82CA0082BCEF /* HostInfo.m in Sources */,
 				296054AA265307770001E72D /* PsiCashAccountNameViewWrapper.swift in Sources */,
 				52DF5E9823CE5A8300A1B067 /* AppAction+ValuePaths.swift in Sources */,
 				CE234A7424F439CB0007709A /* FeedbackReducer.swift in Sources */,
@@ -2209,7 +2210,6 @@
 				9BFECD2FAA1FCDA88A7D432E /* UIColor+Additions.m in Sources */,
 				2911A797263F1941001A0A4D /* BlockerView.swift in Sources */,
 				8D4EEA9624F761630057E32D /* ApplicationSupportFileStore.swift in Sources */,
-				521FD0F9219E0DDF00F748EC /* AppStats.m in Sources */,
 				8D417E992411954A00FEE587 /* PsiCashReducer.swift in Sources */,
 				8D7789BD247493300038BFDA /* VPNState.swift in Sources */,
 				29F8536E26D4549000533472 /* Requests+Additions.swift in Sources */,
@@ -2328,7 +2328,6 @@
 				EF90D7B5204F234700228A63 /* NSDate+PSIDateExtension.m in Sources */,
 				29AEC21428B014AF0063003C /* Strings.m in Sources */,
 				EF652CDA1F352271002AFB48 /* PacketTunnelProvider.m in Sources */,
-				521FD0FF219E0E2600F748EC /* AppStats.m in Sources */,
 				4E0DCB1E1F2855FC00495781 /* PsiphonDataSharedDB.m in Sources */,
 				CED6795E24A4FA3200C4CA81 /* RotatingFile.m in Sources */,
 				9BFECD1880B51B0E2EAEFF1F /* Notifier.m in Sources */,
@@ -2362,6 +2361,7 @@
 				291C0BA6269CC21F0075FAB7 /* PersistentContainerWrapper.m in Sources */,
 				CED6790F24A4F82400C4CA81 /* JetsamTracking.m in Sources */,
 				521FD100219E0E3800F748EC /* DebugUtils.m in Sources */,
+				CE6C33CC2B7E84190082BCEF /* HostInfo.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

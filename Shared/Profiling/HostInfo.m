@@ -21,11 +21,11 @@
 #import "NSError+Convenience.h"
 #import <mach/mach.h>
 
-NSErrorDomain _Nonnull const AppStatsErrorDomain = @"AppStatsErrorDomain";
+NSErrorDomain _Nonnull const HostInfoErrorDomain = @"HostInfoErrorDomain";
 
-typedef NS_ERROR_ENUM(AppStatsErrorDomain, AppStatsErrorCode) {
-    AppStatsErrorCodeUnknown = -1,
-    AppStatsErrorCodeKernError = 1,
+typedef NS_ERROR_ENUM(HostInfoErrorDomain, HostInfoErrorCode) {
+    HostInfoErrorCodeUnknown = -1,
+    HostInfoErrorCodeKernError = 1,
 };
 
 @implementation HostInfo
@@ -36,7 +36,7 @@ typedef NS_ERROR_ENUM(AppStatsErrorDomain, AppStatsErrorCode) {
     kern_return_t kerr = host_page_size(mach_host_self(), &page_size);
     if (kerr != KERN_SUCCESS) {
         if (*error) {
-            *error = [NSError errorWithDomain:AppStatsErrorDomain code:AppStatsErrorCodeKernError andLocalizedDescription:[NSString stringWithFormat:@"host_page_size: %s", mach_error_string(kerr)]];
+            *error = [NSError errorWithDomain:HostInfoErrorDomain code:HostInfoErrorCodeKernError andLocalizedDescription:[NSString stringWithFormat:@"host_page_size: %s", mach_error_string(kerr)]];
         }
         return 0;
     }
