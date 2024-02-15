@@ -17,7 +17,7 @@
  *
  */
 
-#import "AppStats.h"
+#import "HostInfo.h"
 #import "NSError+Convenience.h"
 #import <mach/mach.h>
 
@@ -28,7 +28,7 @@ typedef NS_ERROR_ENUM(AppStatsErrorDomain, AppStatsErrorCode) {
     AppStatsErrorCodeKernError = 1,
 };
 
-@implementation AppStats
+@implementation HostInfo
 
 + (vm_size_t)pageSize:(NSError *_Nullable *_Nonnull)error {
     vm_size_t page_size;

@@ -20,9 +20,9 @@
 #import <Foundation/Foundation.h>
 
 /**
- * This class provides convenience methods for profiling app performance.
+ * This class provides convenience methods for determining host information.
  */
-@interface AppStats : NSObject
+@interface HostInfo : NSObject
 
 /**
  * Gets size of each memory page in bytes.
