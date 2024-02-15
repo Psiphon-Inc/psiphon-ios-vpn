@@ -136,7 +136,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 - (id)init {
     self = [super init];
     if (self) {
-        [AppProfiler logMemoryReportWithTag:@"PacketTunnelProviderInit"];
+        if (@available(iOS 13.0, *)) {
+            [AppProfiler logAvailableMemoryWithTag:@"PacketTunnelProviderInit"];
+        }
 
         workQueue = dispatch_queue_create("ca.psiphon.PsiphonVPN.workQueue", DISPATCH_QUEUE_SERIAL);
 
@@ -163,22 +165,21 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
 
 // For debug builds starts or stops app profiler based on `sharedDB` state.
 // For prod builds only starts app profiler.
-- (void)updateAppProfiling {
+- (void)updateAppProfiling API_AVAILABLE(ios(13.0)) {
 #if DEBUG
     BOOL start = self.sharedDB.getDebugMemoryProfiler;
 #else
     BOOL start = TRUE;
 #endif
-
     if (!appProfiler && start) {
         appProfiler = [[AppProfiler alloc] init];
         [appProfiler startProfilingWithStartInterval:1
                                           forNumLogs:10
                          andThenExponentialBackoffTo:60*30
                             withNumLogsAtEachBackOff:1];
-
     } else if (!start) {
         [appProfiler stopProfiling];
+        appProfiler = nil;
     }
 }
 
@@ -201,7 +202,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             // Sets VPN reasserting to TRUE before the tunnel goes down for reconnection.
             self.reasserting = TRUE;
             
-            [AppProfiler logMemoryReportWithTag:@"reconnectWithConfig"];
+            if (@available(iOS 13.0, *)) {
+                [AppProfiler logAvailableMemoryWithTag:@"reconnectWithConfig"];
+            }
             
             NSString *sponsorId = [self->authorizationStore
                                    getSponsorId:self->psiphonConfigSponsorIds
@@ -238,7 +241,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
     __weak PacketTunnelProvider *weakSelf = self;
 
     // In prod starts app profiling.
-    [self updateAppProfiling];
+    if (@available(iOS 13.0, *)) {
+        [self updateAppProfiling];
+    }
 
     [[Notifier sharedInstance] registerObserver:self callbackQueue:workQueue];
 
@@ -450,8 +455,12 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
                completionHandler:^(BOOL success) {}];
             
         } else if ([NotifierDebugMemoryProfiler isEqualToString:message]) {
-            [self updateAppProfiling];
-            
+            if (@available(iOS 13.0, *)) {
+                [self updateAppProfiling];
+            } else {
+                [PsiFeedbackLogger infoWithType:PacketTunnelProviderLogType
+                                        message:@"DEBUG: app profiling not supported on iOS < 15"];
+            }
         } else if ([NotifierDebugCustomFunction isEqualToString:message]) {
             // Custom function.
         }
@@ -866,7 +875,9 @@ typedef NS_ENUM(NSInteger, TunnelProviderState) {
             [[LocalNotificationService shared] requestPurchaseRequiredPrompt];
         }
         
-        [AppProfiler logMemoryReportWithTag:@"onConnected"];
+        if (@available(iOS 13.0, *)) {
+            [AppProfiler logAvailableMemoryWithTag:@"onConnected"];
+        }
         [[Notifier sharedInstance] post:NotifierTunnelConnected];
         [self tryStartVPN];
         

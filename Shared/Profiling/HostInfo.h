@@ -20,35 +20,14 @@
 #import <Foundation/Foundation.h>
 
 /**
- * This class provides convenience methods for profiling app performance.
+ * This class provides convenience methods for determining host information.
  */
-@interface AppStats : NSObject
-
+@interface HostInfo : NSObject
 
 /**
  * Gets size of each memory page in bytes.
  * @return Memory page size.
  */
 + (vm_size_t)pageSize:(NSError *_Nullable *_Nonnull)error;
-
-/**
- * Returns current mach tasks's resident set size.
- *
- * @param e A pointer to an error object. If an error occures, it will be set to
- * an error object describing the error. Otherwise, set to nil.
- *
- * @return Resident set size.
- */
-+ (mach_vm_size_t)residentSetSize:(NSError *_Nullable*_Nonnull)e;
-
-/**
- * Returns current mach task's private resident set size.
- *
- * @param e A pointer to an error object. If an error occures, it will be set to
- * an error object describing the error. Otherwise, set to nil.
- *
- * @return Private resident set size.
- */
-+ (size_t)privateResidentSetSize:(NSError *_Nullable*_Nonnull)e;
 
 @end

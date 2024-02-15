@@ -17,33 +17,31 @@
  *
  */
 
-#import "DebugUtils.h"
 #import "HostInfo.h"
-#import "Asserts.h"
-#import "Logging.h"
+#import "NSError+Convenience.h"
+#import <mach/mach.h>
 
+NSErrorDomain _Nonnull const AppStatsErrorDomain = @"AppStatsErrorDomain";
 
-@implementation DebugUtils
+typedef NS_ERROR_ENUM(AppStatsErrorDomain, AppStatsErrorCode) {
+    AppStatsErrorCodeUnknown = -1,
+    AppStatsErrorCodeKernError = 1,
+};
 
-+ (NSTimer *)jetsamWithAllocationInterval:(NSTimeInterval)allocationInterval withNumberOfPages:(unsigned int)pageNum {
+@implementation HostInfo
 
-    NSError *err;
-    vm_size_t pageSize = [HostInfo pageSize:&err];
-    if (err != nil) {
-        LOG_DEBUG(@"Failed to get page size: %@", err);
-        PSIAssert(FALSE);
++ (vm_size_t)pageSize:(NSError *_Nullable *_Nonnull)error {
+    vm_size_t page_size;
+
+    kern_return_t kerr = host_page_size(mach_host_self(), &page_size);
+    if (kerr != KERN_SUCCESS) {
+        if (*error) {
+            *error = [NSError errorWithDomain:AppStatsErrorDomain code:AppStatsErrorCodeKernError andLocalizedDescription:[NSString stringWithFormat:@"host_page_size: %s", mach_error_string(kerr)]];
+        }
+        return 0;
     }
 
-    NSTimer *t = [NSTimer timerWithTimeInterval:allocationInterval repeats:TRUE block:^(NSTimer *timer) {
-        char * array = (char *) malloc(sizeof(char) * pageSize * pageNum);
-        for (int i = 1; i <= pageNum; i++) {
-            array[i * pageSize - 1] = '0';
-        }
-    }];
-
-    [[NSRunLoop mainRunLoop] addTimer:t forMode:NSDefaultRunLoopMode];
-
-    return t;
+    return page_size;
 }
 
 @end
