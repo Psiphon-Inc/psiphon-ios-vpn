@@ -18,7 +18,7 @@
  */
 
 #import "DebugUtils.h"
-#import "AppStats.h"
+#import "HostInfo.h"
 #import "Asserts.h"
 #import "Logging.h"
 
@@ -28,7 +28,7 @@
 + (NSTimer *)jetsamWithAllocationInterval:(NSTimeInterval)allocationInterval withNumberOfPages:(unsigned int)pageNum {
 
     NSError *err;
-    vm_size_t pageSize = [AppStats pageSize:&err];
+    vm_size_t pageSize = [HostInfo pageSize:&err];
     if (err != nil) {
         LOG_DEBUG(@"Failed to get page size: %@", err);
         PSIAssert(FALSE);

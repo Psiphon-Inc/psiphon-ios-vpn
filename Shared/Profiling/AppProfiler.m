@@ -18,7 +18,6 @@
  */
 
 #import "AppProfiler.h"
-#import "AppStats.h"
 #import "Asserts.h"
 #import "Logging.h"
 #import "PsiFeedbackLogger.h"
