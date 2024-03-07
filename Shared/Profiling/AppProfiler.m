@@ -150,8 +150,8 @@ PsiFeedbackLogType const ExtensionMemoryProfilingLogType = @"MemoryProfiling";
         // iOS 15+: network extension memory limit is 50MB; may change in a future iOS version
         memoryInUse = (50 << 20) - availableMemory;
     } else {
-        // iOS 10-14: network extension memory limit is 10MB
-        memoryInUse = (10 << 20) - availableMemory;
+        // iOS 10-14: network extension memory limit is 15MB
+        memoryInUse = (15 << 20) - availableMemory;
     }
 
     NSDictionary *json = @{
