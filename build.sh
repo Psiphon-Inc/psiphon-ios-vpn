@@ -49,13 +49,13 @@ build () {
     pod install --repo-update
 
     # Build
-    if ! xcodebuild -workspace "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/Psiphon.xcworkspace" -scheme Psiphon -sdk iphoneos -configuration "${CONFIGURATION}" archive -archivePath "${BUILD_DIR}/Psiphon.xcarchive";
+    if ! xcodebuild -workspace "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/Psiphon.xcworkspace" -scheme Psiphon -sdk iphoneos -configuration "${CONFIGURATION}" archive -archivePath "${BUILD_DIR}/Psiphon.xcarchive" -allowProvisioningUpdates;
     then
         echo "xcodebuild failed. Failed to create Psiphon.xcarchive, aborting..."
         exit 1
     fi
     
-    if ! xcodebuild -exportArchive -archivePath "${BUILD_DIR}/Psiphon.xcarchive" -exportOptionsPlist "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/${EXPORT_OPTIONS_PLIST}" -exportPath "${BUILD_DIR}";
+    if ! xcodebuild -exportArchive -archivePath "${BUILD_DIR}/Psiphon.xcarchive" -exportOptionsPlist "${PSIPHON_IOS_VPN_XCODE_WORKSPACE}/${EXPORT_OPTIONS_PLIST}" -exportPath "${BUILD_DIR}" -allowProvisioningUpdates;
     then
         echo "xcodebuild failed. Failed to export Psiphon.xcarchive, aborting..."
         exit 1
