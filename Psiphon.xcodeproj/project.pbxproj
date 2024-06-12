@@ -2610,7 +2610,7 @@
 					"TARGET_IS_CONTAINER=1",
 				);
 				INFOPLIST_FILE = Psiphon/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2649,7 +2649,7 @@
 					"TARGET_IS_EXTENSION=1",
 				);
 				INFOPLIST_FILE = PsiphonVPN/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_NO_PIE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2869,7 +2869,7 @@
 					"TARGET_IS_CONTAINER=1",
 				);
 				INFOPLIST_FILE = Psiphon/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2918,7 +2918,7 @@
 					"TARGET_IS_CONTAINER=1",
 				);
 				INFOPLIST_FILE = Psiphon/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2958,7 +2958,7 @@
 					"TARGET_IS_EXTENSION=1",
 				);
 				INFOPLIST_FILE = PsiphonVPN/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_NO_PIE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2989,7 +2989,7 @@
 					"TARGET_IS_EXTENSION=1",
 				);
 				INFOPLIST_FILE = PsiphonVPN/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_NO_PIE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
