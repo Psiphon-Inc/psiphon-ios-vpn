@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-platform :ios, '10.2'
+platform :ios, '15.0'
 
  # Disable sending stats
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
