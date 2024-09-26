@@ -115,9 +115,10 @@ def process_plist(plist_fname, strings):
     Copy strings, keys, and comments from `plist_fname` into the
     `strings` dict, which is `key => {'key':..., 'default':..., 'description':...}`
     """
-    plist = plistlib.readPlist(plist_fname)
-    for item in plist['PreferenceSpecifiers']:
-        _process_plist_dict(item, strings)
+    with open(plist_fname, 'rb') as fp:
+        plist = plistlib.loads(fp.read())
+        for item in plist['PreferenceSpecifiers']:
+            _process_plist_dict(item, strings)
 
 
 def _process_plist_dict(plist_dict, strings):
