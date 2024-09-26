@@ -71,11 +71,11 @@ extension NonEmptySeq: Codable where T: Codable {
         case cons = "cons"
     }
 
-    private struct ConsTuple<T: Codable>: Codable {
-        let elem: T
-        let cons: NonEmptySeq<T>
+    private struct ConsTuple<U: Codable>: Codable {
+        let elem: U
+        let cons: NonEmptySeq<U>
 
-        init(elem: T, cons: NonEmptySeq<T>) {
+        init(elem: U, cons: NonEmptySeq<U>) {
             self.elem = elem
             self.cons = cons
         }
