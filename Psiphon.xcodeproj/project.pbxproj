@@ -2060,7 +2060,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/usr/bin/env python \"./genstrings.py\"\nif [ $? != 0 ] ; then\n    exit 1\nfi\n";
+			shellScript = "python3 \"./genstrings.py\"\nif [ $? != 0 ] ; then\n    exit 1\nfi\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
