@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 54;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -39,6 +39,8 @@
 		2995DB4C2981D3880006130F /* SharedDebugFlags.m in Sources */ = {isa = PBXBuildFile; fileRef = 2995DB4B2981D3880006130F /* SharedDebugFlags.m */; };
 		2995DB4D2981D79F0006130F /* SharedDebugFlags.m in Sources */ = {isa = PBXBuildFile; fileRef = 2995DB4B2981D3880006130F /* SharedDebugFlags.m */; };
 		29A7075227CE9198006DE45A /* ChildViewControllerDismissedDelegate+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29A7075127CE9198006DE45A /* ChildViewControllerDismissedDelegate+Additions.swift */; };
+		29A9C9F52CA5DD020054431A /* PsiApi in Frameworks */ = {isa = PBXBuildFile; productRef = 29A9C9F42CA5DD020054431A /* PsiApi */; };
+		29A9C9F82CA5DD1D0054431A /* Utilities in Frameworks */ = {isa = PBXBuildFile; productRef = 29A9C9F72CA5DD1D0054431A /* Utilities */; };
 		29AEC21328AD85110063003C /* LocalNotificationService.m in Sources */ = {isa = PBXBuildFile; fileRef = 29AEC21228AD85110063003C /* LocalNotificationService.m */; };
 		29AEC21428B014AF0063003C /* Strings.m in Sources */ = {isa = PBXBuildFile; fileRef = A84083974C8CF9DDFE7A341D /* Strings.m */; };
 		29BA6DA1268630A9001445EA /* TunnelFileDescriptor.m in Sources */ = {isa = PBXBuildFile; fileRef = 29BA6DA0268630A9001445EA /* TunnelFileDescriptor.m */; };
@@ -143,8 +145,6 @@
 		8D0017D924DB4B1200EC3409 /* OnboardingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0017D824DB4B1200EC3409 /* OnboardingViewController.swift */; };
 		8D0017DB24DDD99A00EC3409 /* AppUpgrade.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D0017DA24DDD99A00EC3409 /* AppUpgrade.swift */; };
 		8D13232F25310661005F83C8 /* SecretValueTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D13232E25310661005F83C8 /* SecretValueTextField.swift */; };
-		8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62B9247DBB0D0028AFAF /* Utilities */; };
-		8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */ = {isa = PBXBuildFile; productRef = 8D1F62BB247DBB130028AFAF /* PsiApi */; };
 		8D1F62BE247DC1690028AFAF /* Receipt+AppStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62BD247DC1690028AFAF /* Receipt+AppStore.swift */; };
 		8D1F62C0247DC3350028AFAF /* Authorization+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62BF247DC3350028AFAF /* Authorization+Additions.swift */; };
 		8D1F62C2247DC4840028AFAF /* PsiCashEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D1F62C1247DC4840028AFAF /* PsiCashEffects.swift */; };
@@ -921,12 +921,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				29923FDA264EFC720078E8BB /* PsiCashLib.xcframework in Frameworks */,
-				8D1F62BC247DBB130028AFAF /* PsiApi in Frameworks */,
 				668AF9C01E92CBE0008CAAAA /* NetworkExtension.framework in Frameworks */,
-				8D1F62BA247DBB0D0028AFAF /* Utilities in Frameworks */,
 				529DE74825AD039200F82936 /* PsiphonTunnel.xcframework in Frameworks */,
 				440D75BE1F59E041005C603B /* StoreKit.framework in Frameworks */,
+				29A9C9F82CA5DD1D0054431A /* Utilities in Frameworks */,
 				C825DCB5AEAFE8906B75CEAD /* libPods-Psiphon.a in Frameworks */,
+				29A9C9F52CA5DD020054431A /* PsiApi in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1804,8 +1804,8 @@
 			);
 			name = Psiphon;
 			packageProductDependencies = (
-				8D1F62B9247DBB0D0028AFAF /* Utilities */,
-				8D1F62BB247DBB130028AFAF /* PsiApi */,
+				29A9C9F42CA5DD020054431A /* PsiApi */,
+				29A9C9F72CA5DD1D0054431A /* Utilities */,
 			);
 			productName = Psiphon;
 			productReference = CE26FC8A1BBDC7B800B83375 /* Psiphon.app */;
@@ -1946,6 +1946,10 @@
 				Base,
 			);
 			mainGroup = CE26FC811BBDC7B700B83375;
+			packageReferences = (
+				29A9C9F32CA5DD020054431A /* XCLocalSwiftPackageReference "PsiApi" */,
+				29A9C9F62CA5DD1D0054431A /* XCLocalSwiftPackageReference "Utilities" */,
+			);
 			productRefGroup = CE26FC8B1BBDC7B800B83375 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -2578,7 +2582,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -2610,7 +2614,7 @@
 					"TARGET_IS_CONTAINER=1",
 				);
 				INFOPLIST_FILE = Psiphon/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2649,7 +2653,7 @@
 					"TARGET_IS_EXTENSION=1",
 				);
 				INFOPLIST_FILE = PsiphonVPN/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_NO_PIE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2778,7 +2782,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -2834,7 +2838,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 10.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -2869,7 +2873,7 @@
 					"TARGET_IS_CONTAINER=1",
 				);
 				INFOPLIST_FILE = Psiphon/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2918,7 +2922,7 @@
 					"TARGET_IS_CONTAINER=1",
 				);
 				INFOPLIST_FILE = Psiphon/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -2958,7 +2962,7 @@
 					"TARGET_IS_EXTENSION=1",
 				);
 				INFOPLIST_FILE = PsiphonVPN/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_NO_PIE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -2989,7 +2993,7 @@
 					"TARGET_IS_EXTENSION=1",
 				);
 				INFOPLIST_FILE = PsiphonVPN/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_NO_PIE = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -3128,14 +3132,25 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCSwiftPackageProductDependency section */
-		8D1F62B9247DBB0D0028AFAF /* Utilities */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = Utilities;
+/* Begin XCLocalSwiftPackageReference section */
+		29A9C9F32CA5DD020054431A /* XCLocalSwiftPackageReference "PsiApi" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = PsiApi;
 		};
-		8D1F62BB247DBB130028AFAF /* PsiApi */ = {
+		29A9C9F62CA5DD1D0054431A /* XCLocalSwiftPackageReference "Utilities" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Utilities;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		29A9C9F42CA5DD020054431A /* PsiApi */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = PsiApi;
+		};
+		29A9C9F72CA5DD1D0054431A /* Utilities */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Utilities;
 		};
 /* End XCSwiftPackageProductDependency section */
 

@@ -1,5 +1,5 @@
 # Uncomment the next line to define a global platform for your project
-platform :ios, '10.2'
+platform :ios, '15.0'
 
  # Disable sending stats
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -22,7 +22,7 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '11.0'
+      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
       config.build_settings['ENABLE_BITCODE'] = 'NO'
       config.build_settings['CODE_SIGNING_ALLOWED'] = 'NO' # https://github.com/CocoaPods/CocoaPods/issues/11402#issuecomment-1201464693
     end
