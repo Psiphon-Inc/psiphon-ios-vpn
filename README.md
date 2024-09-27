@@ -1,14 +1,24 @@
 # Psiphon iOS VPN
 
-### Prerequisites
+## Prerequisites
 - [Cocoapods](https://cocoapods.org/)
   `sudo gem install cocoapods`
 
-### Building
+- Git LFS
+
+
+## Git LFS
+   If you already have the project cloned, run the following command to pull the latest LFS-tracked files:
+   ```bash
+   git lfs pull
+   ```
+
+## Building
 - Replace `Shared/psiphon_config.stub` with your configuration file.
 - Replace `Shared/embedded_server_entries.stub` with your server entries file.
 - Replace `Psiphon/Bourbon-Oblique.otf` with the "Psiphon" font file.
 - Run `pod install` to install the third-party libraries.
+
 
 ## I18n/L10n
 
