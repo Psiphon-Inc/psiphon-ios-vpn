@@ -93,6 +93,9 @@ import PsiCashClient
                 [ $0.topAnchor.constraint(equalTo: topRowHStack.bottomAnchor,
                                           constant: Style.default.padding) ]
         }
+        
+        // Phasing out PsiCash
+        self.isHidden = true
 
     }
 
@@ -101,6 +104,13 @@ import PsiCashClient
     }
 
     func bind(_ newValue: BindingType) {
+        
+        if let minPurchasePrice = newValue.balanceViewModel.minSpeedBoostPurchasePrice,
+           newValue.balanceViewModel.balanceState.psiCashBalance.lastRefreshBalance >= minPurchasePrice {
+            self.isHidden = false
+        } else {
+            self.isHidden = true
+        }
         
         balanceViewWrapper.bind(newValue.balanceViewModel)
         speedBoostButton.bind(newValue.speedBoostButtonModel)

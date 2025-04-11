@@ -27,6 +27,7 @@ struct PsiCashBalanceViewModel: Equatable {
     /// `true` if PsiCash state has been restored from the PsiCash library.
     let psiCashLibLoaded: Bool
     let balanceState: BalanceState
+    let minSpeedBoostPurchasePrice: PsiCashAmount?
 }
 
 @objc final class PsiCashBalanceViewWrapper: NSObject, ViewWrapper, Bindable {

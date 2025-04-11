@@ -135,9 +135,17 @@ extension AppState {
     }
     
     var psiCashBalanceViewModel: PsiCashBalanceViewModel {
-        PsiCashBalanceViewModel(
+        let minPurchasePrice = self.psiCashState.libData?.successToOptional()?.purchasePrices
+            .compactMap({
+                $0.successToOptional()
+            })
+            .sorted(by: { $0.price < $1.price })
+            .first?.price
+        
+        return PsiCashBalanceViewModel(
             psiCashLibLoaded: self.psiCashState.libData != nil,
-            balanceState: self.balanceState
+            balanceState: self.balanceState,
+            minSpeedBoostPurchasePrice: minPurchasePrice
         )
     }
     
