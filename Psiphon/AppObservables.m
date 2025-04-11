@@ -6,7 +6,6 @@
 //  Copyright © 2020 Psiphon Inc. All rights reserved.
 //
 
-#import <PsiphonTunnel/Reachability.h>
 #import "AppObservables.h"
 #import <ReactiveObjC.h>
 #import "Logging.h"
@@ -26,7 +25,6 @@
 
 @property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *vpnStartStopStatus;
 
-@property (nonatomic, readwrite) RACReplaySubject<NSNumber *> *reachabilityStatus;
 
 @property (nonatomic, readwrite) RACReplaySubject<ObjcSettingsViewModel *> *settingsViewModel;
 
@@ -37,9 +35,7 @@
 
 @end
 
-@implementation AppObservables {
-    Reachability *reachability;
-}
+@implementation AppObservables
 
 + (instancetype)shared {
     static AppObservables *sharedInstance = nil;
@@ -53,14 +49,11 @@
 - (instancetype)init {
     self = [super init];
     if (self) {
-        reachability = [Reachability reachabilityForInternetConnection];
-
         _subscriptionStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _subscriptionBarStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _psiCashWidgetViewModel = [RACReplaySubject replaySubjectWithCapacity:1];
         _vpnStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _vpnStartStopStatus = [RACReplaySubject replaySubjectWithCapacity:1];
-        _reachabilityStatus = [RACReplaySubject replaySubjectWithCapacity:1];
         _settingsViewModel = [RACReplaySubject replaySubjectWithCapacity:1];
         _selectedServerRegion = [RACReplaySubject replaySubjectWithCapacity:1];
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
@@ -69,12 +62,11 @@
 }
 
 - (void)dealloc {
-    [reachability stopNotifier];
     [self.compoundDisposable dispose];
 }
 
+// TODO! who calls, this? Why was it important?
 - (void)appLaunched {
-    [reachability startNotifier];
 }
 
 @end

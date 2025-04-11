@@ -262,8 +262,8 @@ func feedbackJSON(userFeedback: UserFeedback,
                   psiphonConfig: [AnyHashable: Any],
                   appStateFeedbackEntry: DiagnosticEntry,
                   sharedDB: PsiphonDataSharedDB,
-                  getCurrentTime: () -> Date,
-                  reachabilityStatus: ReachabilityStatus) -> Result<String, Error> {
+                  getCurrentTime: () -> Date
+) -> Result<String, Error> {
     
     let result = getFeedbackLogs(
         for: Set(FeedbackLogSource.allCases),
@@ -349,7 +349,7 @@ func feedbackJSON(userFeedback: UserFeedback,
                 feedbackId: userFeedback.feedbackId,
                 psiphonConfig: psiphonConfig,
                 clientPlatform: clientPlatform,
-                connectionType: reachabilityStatus.connectionTypeForFeedback,
+                connectionType: nil,  // TODO! find a nice way to
                 isJailbroken: JailbreakCheck.isDeviceJailbroken(),
                 diagnosticEntries: diagnosticEntries,
                 statusEntries: .none)
@@ -360,18 +360,3 @@ func feedbackJSON(userFeedback: UserFeedback,
     }
 }
 
-fileprivate extension ReachabilityStatus {
-
-    /// Human readable string for use in feedback package.
-    var connectionTypeForFeedback : String {
-        switch self {
-        case .notReachable:
-            return "none"
-        case .viaWiFi:
-            return "WIFI"
-        case .viaWWAN:
-            return "mobile"
-        }
-    }
-
-}

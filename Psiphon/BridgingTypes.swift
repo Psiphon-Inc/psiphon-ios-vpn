@@ -46,8 +46,6 @@ import PsiphonClientCommonLibrary
     
     @objc func onVPNStateSyncError(_ userErrorMessage: String)
     
-    @objc func onReachabilityStatusDidChange(_ previousStats: ReachabilityStatus)
-    
     @objc func onSettingsViewModelDidChange(_ model: ObjcSettingsViewModel)
 
     @objc func dismiss(screen: DismissibleScreen, completion: (() -> Void)?)

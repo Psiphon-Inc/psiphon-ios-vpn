@@ -337,10 +337,6 @@ willFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     [AppObservables.shared.vpnStartStopStatus sendNext:@(status)];
 }
 
-- (void)onReachabilityStatusDidChange:(ReachabilityStatus)status {
-    [AppObservables.shared.reachabilityStatus sendNext:@(status)];
-}
-
 - (void)onSettingsViewModelDidChange:(ObjcSettingsViewModel *)model {
     [AppObservables.shared.settingsViewModel sendNext:model];
 }

@@ -69,7 +69,6 @@ struct FeedbackReducerState: Equatable {
 struct FeedbackReducerEnvironment {
     let feedbackLogger: FeedbackLogger
     let getFeedbackUpload: () -> FeedbackUploadProvider
-    let internetReachabilityStatusSignal: SignalProducer<ReachabilityStatus, Never>
     let tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
     let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
     let subscriptionStatusSignal: SignalProducer<AppStoreIAP.SubscriptionStatus, Never>
@@ -84,7 +83,6 @@ struct FeedbackReducerEnvironment {
     init(
         feedbackLogger: FeedbackLogger,
         getFeedbackUpload: @escaping () -> FeedbackUploadProvider,
-        internetReachabilityStatusSignal: SignalProducer<ReachabilityStatus, Never>,
         tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>,
         tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>,
         subscriptionStatusSignal: SignalProducer<AppStoreIAP.SubscriptionStatus, Never>,
@@ -98,7 +96,6 @@ struct FeedbackReducerEnvironment {
     ) {
         self.feedbackLogger = feedbackLogger
         self.getFeedbackUpload = getFeedbackUpload
-        self.internetReachabilityStatusSignal = internetReachabilityStatusSignal
         self.tunnelStatusSignal = tunnelStatusSignal
         self.tunnelConnectionRefSignal = tunnelConnectionRefSignal
         self.subscriptionStatusSignal = subscriptionStatusSignal
@@ -239,8 +236,7 @@ fileprivate func sendFeedback(userFeedback: UserFeedback,
     // following signal chain.
     let triggers =
         SignalProducer
-        .combineLatest(environment.internetReachabilityStatusSignal,
-                       environment.tunnelStatusSignal,
+        .combineLatest(environment.tunnelStatusSignal,
                        environment.tunnelConnectionRefSignal,
                        environment.subscriptionStatusSignal)
 
@@ -249,16 +245,11 @@ fileprivate func sendFeedback(userFeedback: UserFeedback,
         .skipRepeats({ (lhs, rhs) -> Bool in
              return lhs == rhs
          })
-        .flatMap(.latest) { (value: (ReachabilityStatus, TunnelProviderVPNStatus,
+        .flatMap(.latest) { (value: (TunnelProviderVPNStatus,
                                      TunnelConnection?, AppStoreIAP.SubscriptionStatus))
             -> SignalProducer<SignalTermination<FeedbackAction>, Never> in
 
-            let reachabilityStatus = value.0
-            if reachabilityStatus == .notReachable {
-                return SignalProducer(value: .value(._log("waiting for network connectivity")))
-            }
-
-            let vpnStatus = value.1
+            let vpnStatus = value.0
             guard vpnStatus == .invalid ||
                     vpnStatus == .disconnected ||
                     vpnStatus == .connected else {
@@ -278,7 +269,7 @@ fileprivate func sendFeedback(userFeedback: UserFeedback,
                 vpnStatus == .disconnecting ||
                 vpnStatus == .disconnected
 
-            let subscriptionStatus = value.3
+            let subscriptionStatus = value.2
             switch feedbackUploadPsiphonConfig(basePsiphonConfig: psiphonConfig,
                                                useUpstreamProxy: useUpstreamProxy,
                                                subscriptionStatus: subscriptionStatus,
@@ -291,14 +282,13 @@ fileprivate func sendFeedback(userFeedback: UserFeedback,
                                      psiphonConfig: psiphonConfig,
                                      appStateFeedbackEntry: appStateFeedbackEntry,
                                      sharedDB: environment.sharedDB,
-                                     getCurrentTime: environment.getCurrentTime,
-                                     reachabilityStatus: reachabilityStatus)
+                                     getCurrentTime: environment.getCurrentTime)
 
                     switch feedback {
                     case .success(let feedbackJSON):
 
                             // Last moment VPN status check.
-                            if let tunnelConnection = value.2 {
+                            if let tunnelConnection = value.1 {
                                 if case .connection(let tunnelConnectionVPNStatus) = tunnelConnection.connectionStatus() {
                                     guard tunnelConnectionVPNStatus == .invalid ||
                                             tunnelConnectionVPNStatus == .disconnected ||

@@ -828,14 +828,6 @@ extension SwiftDelegate: SwiftBridgeDelegate {
                 objcBridge!.onVPNStartStopStateDidChange(value)
             }
         
-        // Forwards AppState `internetReachability` value to ObjCBridgeDelegate.
-        self.lifetime += self.store.$value.signalProducer
-            .map(\.internetReachability)
-            .skipRepeats()
-            .startWithValues { [unowned objcBridge] reachabilityStatus in
-                objcBridge!.onReachabilityStatusDidChange(reachabilityStatus.networkStatus)
-            }
-        
         // Produces a SettingsViewModel type and passes
         // the value to the ObjCBridgeDelegte.
         self.lifetime += SignalProducer.combineLatest(

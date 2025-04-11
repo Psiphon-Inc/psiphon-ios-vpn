@@ -388,12 +388,9 @@ public enum StartTunnelError: HashableError {
 }
 
 public func startPsiphonTunnel<T: TunnelProviderManager>(
-    _ tpm: T, options: [String: String], internetReachability: InternetReachability
+    _ tpm: T, options: [String: String]
 ) -> Effect<Result<T, ErrorEvent<StartTunnelError>>> {
             Effect { () -> Result<T, ErrorEvent<StartTunnelError>> in
-                guard internetReachability.isCurrentlyReachable else {
-                    return .failure(ErrorEvent(.internetNotReachable, date: Date()))
-                }
                 do {
                     try tpm.start(options: options)
                     return .success(tpm)

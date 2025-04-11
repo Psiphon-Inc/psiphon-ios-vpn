@@ -154,7 +154,6 @@ struct VPNReducerEnvironment<T: TunnelProviderManager> {
     let sharedDB: PsiphonDataSharedDB
     let vpnStartCondition: () -> Bool
     let vpnConnectionObserver: VPNConnectionObserver<T>
-    let internetReachability: InternetReachability
 }
 
 func vpnStateReducer<T: TunnelProviderManager>(
@@ -730,9 +729,8 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
             switch saveLoadConfigResult {
             case .success(let tpm):
                 // Starts the tunnel and then saves the updated config from tunnel start.
-                return startPsiphonTunnel(tpm, options: startOptions,
-                                          internetReachability: environment.internetReachability
-                ).flatMap(.latest) { startResult -> Effect<TPMEffectResultWrapper<T>> in
+                return startPsiphonTunnel(tpm, options: startOptions)
+                    .flatMap(.latest) { startResult -> Effect<TPMEffectResultWrapper<T>> in
                         switch startResult {
                         case .success(let tpm):
                             return saveAndLoadConfig(tpm)
@@ -757,7 +755,7 @@ fileprivate func startPsiphonTunnelReducer<T: TunnelProviderManager>(
             }
         }.map {
             ._tpmEffectResultWrapper($0)
-        }
+            }
     ]
 }
 

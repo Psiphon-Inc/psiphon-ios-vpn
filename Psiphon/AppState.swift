@@ -43,7 +43,6 @@ struct AppState: Equatable {
     var iapState = IAPState()
     var products = PsiCashAppStoreProductsState()
     var pendingLandingPageOpening: Bool = false
-    var internetReachability = ReachabilityState()
     var appDelegateState = AppDelegateState()
     var queuedFeedbacks: [UserFeedback] = []
     var mainView = MainViewState()
@@ -64,7 +63,6 @@ extension AppState: CustomFieldFeedbackDescription {
             "iapState": String(describing: iapState),
             "products": String(describing: products),
             "pendingLandingPageOpening": String(describing: pendingLandingPageOpening),
-            "internetReachability": String(describing: internetReachability),
             "appDelegateState": String(describing: appDelegateState),
             "queuedFeedbacks": String(describing: queuedFeedbacks),
             "mainView": String(describing: mainView),
@@ -120,7 +118,6 @@ enum AppAction {
     case subscription(SubscriptionAction)
     case subscriptionAuthStateAction(SubscriptionAuthStateAction)
     case productRequest(ProductRequestAction)
-    case reachabilityAction(ReachabilityAction)
     case feedbackAction(FeedbackAction)
     case mainViewAction(MainViewAction)
     case serverRegionAction(ServerRegionAction)
@@ -144,7 +141,6 @@ struct AppEnvironment {
     let userConfigs: UserDefaultsConfig
     let standardUserDefaults: UserDefaults
     let notifier: PsiApi.Notifier
-    let internetReachabilityStatusSignal: SignalProducer<ReachabilityStatus, Never>
     let tunnelStatusSignal: SignalProducer<TunnelProviderVPNStatus, Never>
     let psiCashAccountTypeSignal: SignalProducer<PsiCashAccountType?, Never>
     let tunnelConnectionRefSignal: SignalProducer<TunnelConnection?, Never>
@@ -156,8 +152,6 @@ struct AppEnvironment {
     let receiptRefreshRequestDelegate: ReceiptRefreshRequestDelegate
     let paymentTransactionDelegate: PaymentTransactionDelegate
     let productRequestDelegate: ProductRequestDelegate
-    let internetReachability: InternetReachability
-    let internetReachabilityDelegate: StoreDelegate<ReachabilityAction>
     let vpnConnectionObserver: VPNConnectionObserver<PsiphonTPM>
     let vpnActionStore: (VPNPublicAction) -> Effect<Never>
     let psiCashStore: (PsiCashAction) -> Effect<Never>
@@ -263,8 +257,6 @@ func makeEnvironment(
         feedbackDelegate: feedbackViewControllerDelegate,
         shouldEnableSettingsLinks: true)
     
-    let reachabilityForInternetConnection = Reachability.forInternetConnection()!
-    
     let httpClient = HTTPClient.default(urlSession: urlSession, feedbackLogger: feedbackLogger)
     
     let tunnelStatusSignal = store.$value.signalProducer
@@ -321,7 +313,6 @@ func makeEnvironment(
         userConfigs: userDefaultsConfig,
         standardUserDefaults: standardUserDefaults,
         notifier: NotifierObjC(notifier:Notifier.sharedInstance()),
-        internetReachabilityStatusSignal: store.$value.signalProducer.map(\.internetReachability.networkStatus),
         tunnelStatusSignal: tunnelStatusSignal,
         psiCashAccountTypeSignal: store.$value.signalProducer.map {
             $0.psiCashState.libData?.successToOptional()?.accountType
@@ -338,11 +329,6 @@ func makeEnvironment(
         paymentTransactionDelegate: paymentTransactionDelegate,
         productRequestDelegate: ProductRequestDelegate(store:
             store.projection(action: { .productRequest($0) })
-        ),
-        internetReachability: reachabilityForInternetConnection,
-        internetReachabilityDelegate: InternetReachabilityDelegate(
-            reachability: reachabilityForInternetConnection,
-            store: store.projection(action: { .reachabilityAction($0) })
         ),
         vpnConnectionObserver: PsiphonTPMConnectionObserver(store:
             store.projection(action: { .vpnStateAction(.action(._vpnStatusDidChange($0))) })
@@ -725,7 +711,6 @@ fileprivate func toFeedbackReducerEnvironment(env: AppEnvironment) -> FeedbackRe
     FeedbackReducerEnvironment(
         feedbackLogger: env.feedbackLogger,
         getFeedbackUpload: env.getFeedbackUpload,
-        internetReachabilityStatusSignal: env.internetReachabilityStatusSignal,
         tunnelStatusSignal: env.tunnelStatusSignal,
         tunnelConnectionRefSignal: env.tunnelConnectionRefSignal,
         subscriptionStatusSignal: env.subscriptionStatusSignal,
@@ -744,8 +729,7 @@ fileprivate func toVPNReducerEnvironment(env: AppEnvironment) -> VPNReducerEnvir
         feedbackLogger: env.feedbackLogger,
         sharedDB: env.sharedDB,
         vpnStartCondition: env.vpnStartCondition,
-        vpnConnectionObserver: env.vpnConnectionObserver,
-        internetReachability: env.internetReachability
+    vpnConnectionObserver: env.vpnConnectionObserver
     )
 }
 
@@ -804,10 +788,6 @@ func makeAppReducer(
                  value: \.vpnReducerState,
                  action: \.vpnStateAction,
                  environment: toVPNReducerEnvironment(env:)),
-        internetReachabilityReducer.pullback(
-                 value: \.internetReachability,
-                 action: \.reachabilityAction,
-                 environment: erase),
         psiCashReducer.pullback(
                  value: \.psiCashReducerState,
                  action: \.psiCash,

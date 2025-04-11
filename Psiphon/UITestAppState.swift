@@ -91,7 +91,6 @@ func makeUITestAppState(embeddedServerEntriesFile: String) -> AppState {
         iapState: .init(),
         products: .init(),
         pendingLandingPageOpening: false,
-        internetReachability: ReachabilityState(networkStatus: .viaWiFi, codedStatus: .none),
         appDelegateState: AppDelegateState(
             appLifecycle: .didBecomeActive,
             pendingPresentingDisallowedTrafficAlert: false,

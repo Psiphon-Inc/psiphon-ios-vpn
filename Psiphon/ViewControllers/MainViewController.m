@@ -84,7 +84,6 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
     // Replaces the PsiCash UI when the user is subscribed
     UIImageView *psiphonLargeLogo;
     UIImageView *psiphonTitle;
-    NoConnectionBannerView *noConnectionBannerView;
 
     // PsiCash
     PsiCashWidgetView *psiCashWidget;
@@ -104,7 +103,7 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
 // All such initialization could be deferred to viewDidLoad callback.
 - (id)initWithStartingVPN:(BOOL)startVPN {
     self = [super init];
-    if (self) {
+if (self) {
         _compoundDisposable = [RACCompoundDisposable compoundDisposable];
         _startVPNOnFirstLoad = startVPN;
     }
@@ -131,7 +130,6 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
     [self setupVersionLabel];
     [self setupPsiphonLogoView];
     [self setupPsiphonTitle];
-    [self setupNoConnectionBannerView];
     [self setupStartAndStopButton];
     [self setupStatusLabel];
     [self setupRegionSelectionButton];
@@ -255,22 +253,6 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
         }]];
     }
 
-    // Observes reachability status.
-    {
-        [self.compoundDisposable addDisposable:
-         [AppObservables.shared.reachabilityStatus subscribeNext:^(NSNumber * _Nullable statusObj) {
-            MainViewController *__strong strongSelf = weakSelf;
-            if (strongSelf) {
-                ReachabilityStatus networkStatus = (ReachabilityStatus)[statusObj integerValue];
-                if (networkStatus == ReachabilityStatusNotReachable) {
-                    [strongSelf->noConnectionBannerView setHidden: FALSE];
-                } else {
-                    [strongSelf->noConnectionBannerView setHidden: TRUE];
-                }
-            }
-        }]];
-    }
-    
     // Observes selected server region.
     {
         [self.compoundDisposable addDisposable:
@@ -454,7 +436,6 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
     settingsButton = [[AnimatedUIButton alloc] init];
     psiphonLargeLogo = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonLogoWhite"]];
     psiphonTitle = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"PsiphonTitle"]];
-    noConnectionBannerView = [[NoConnectionBannerView alloc] init];
     psiCashWidget = [[PsiCashWidgetView alloc] initWithLocale:currentLocale];
     startAndStopButton = [VPNStartAndStopButton buttonWithType:UIButtonTypeCustom];
     statusLabel = [[UILabel alloc] init];
@@ -476,7 +457,6 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
     [self.view addSubview:regionSelectionButton];
     [self.view addSubview:bottomBarBackground];
     [self.view addSubview:subscriptionBarView];
-    [self.view addSubview:noConnectionBannerView];
     
 }
 
@@ -702,18 +682,6 @@ PsiFeedbackLogType const MainViewControllerLogType = @"MainViewController";
             constant:topPadding + 20]
         ]];
     }
-}
-
-- (void)setupNoConnectionBannerView {
-    noConnectionBannerView.translatesAutoresizingMaskIntoConstraints = NO;
-    
-    [NSLayoutConstraint activateConstraints:@[
-        [noConnectionBannerView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor],
-        [noConnectionBannerView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor],
-        [noConnectionBannerView.topAnchor constraintEqualToAnchor:self.view.topAnchor],
-        [noConnectionBannerView.bottomAnchor constraintEqualToAnchor:psiphonTitle.bottomAnchor]
-    ]];
-    
 }
 
 - (void)setupPsiCashWidgetView {
