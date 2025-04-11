@@ -354,7 +354,7 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
 #pragma mark - Callbacks
 
 - (void)presentPsiCashStore {
-    [SwiftDelegate.bridge presentPsiCashStoreViewController:PsiCashScreenTabAddPsiCash];
+    [SwiftDelegate.bridge presentPsiCashStoreViewController:PsiCashScreenTabSpeedBoost];
 }
 
 - (void)openPsiCashAccountManagement {

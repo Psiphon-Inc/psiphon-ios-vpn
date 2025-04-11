@@ -625,10 +625,6 @@ if (self) {
 
 #pragma mark - PsiCash UI
 
-- (void)addPsiCashButtonTapped {
-    [SwiftDelegate.bridge presentPsiCashStoreViewController:PsiCashScreenTabAddPsiCash];
-}
-
 - (void)psiCashAccountButtonTapped {
     [SwiftDelegate.bridge presentPsiCashAccountViewControllerWithPsiCashScreen:TRUE];
 }
@@ -695,11 +691,6 @@ if (self) {
         [psiCashWidget.trailingAnchor constraintEqualToAnchor:viewWidthGuide.trailingAnchor]
     ]];
 
-    // Sets button actions
-    [psiCashWidget.addPsiCashButton addTarget:self
-                                       action:@selector(addPsiCashButtonTapped)
-                             forControlEvents:UIControlEventTouchUpInside];
-    
     [psiCashWidget.psiCashAccountButton addTarget:self
                                            action:@selector(psiCashAccountButtonTapped)
                                  forControlEvents:UIControlEventTouchUpInside];

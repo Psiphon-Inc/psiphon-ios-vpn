@@ -476,11 +476,6 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                 return []
             }
 
-        case .addPsiCashTapped:
-            // Note that "Add PsiCash" tab is only displayed only if PsiCashStoreViewController
-            // is already presented (i.e. state.mainView.psiCashStoreViewState is not nil).
-            return [ Effect(value: .psiCashViewAction(.switchTabs(.addPsiCash))) ]
-            
         case .sendErrorInitiatedFeedback:
             return [ Effect(value: .presentModalFeedbackScreen(errorInitiated: true)) ]
             

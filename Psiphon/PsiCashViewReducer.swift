@@ -42,12 +42,10 @@ enum PsiCashViewAction: Equatable {
 }
 
 @objc enum PsiCashScreenTab: Int, TabControlViewTabType {
-    case addPsiCash
     case speedBoost
 
     var localizedUserDescription: String {
         switch self {
-        case .addPsiCash: return UserStrings.Add_psiCash()
         case .speedBoost: return UserStrings.Speed_boost()
         }
     }

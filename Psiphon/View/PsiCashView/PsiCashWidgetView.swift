@@ -33,7 +33,6 @@ import PsiCashClient
 
     @objc let balanceViewWrapper: PsiCashBalanceViewWrapper
     @objc let speedBoostButton: SpeedBoostButton
-    @objc let addPsiCashButton = DuskButton()
     @objc let psiCashAccountButton = DuskButton()
 
     // Horizonal stack containing the top row items.
@@ -58,10 +57,6 @@ import PsiCashClient
         
         super.init(frame: .zero)
         
-        addPsiCashButton.setTitle("+", for: .normal)
-        addPsiCashButton.titleLabel!.font = AvenirFont.demiBold.customFont(20.0)
-        addPsiCashButton.setTitleColor(.white, for: .normal)
-        
         let accountIcon = UIImage(named: "AccountIcon")!
         psiCashAccountButton.setImage(accountIcon, for: .normal)
         
@@ -70,7 +65,6 @@ import PsiCashClient
         // Adds permanent views to the stack view.
         topRowHStack.addArrangedSubviews(
             balanceViewWrapper.view,
-            addPsiCashButton,
             psiCashAccountButton
         )
         
@@ -87,13 +81,6 @@ import PsiCashClient
             ]
         }
 
-        addPsiCashButton.activateConstraints {
-            [
-                $0.widthAnchor.constraint(equalToConstant: Style.default.buttonHeight),
-                $0.heightAnchor.constraint(equalToConstant: Style.default.buttonHeight)
-            ]
-        }
-        
         psiCashAccountButton.activateConstraints {
             [
                 $0.widthAnchor.constraint(equalToConstant: Style.default.buttonHeight),

@@ -73,8 +73,6 @@ enum AlertAction: Equatable {
     /// "Dismissed" or "OK" button tapped.
     case dismissTapped
 
-    case addPsiCashTapped
-
     /// Opens the feedback screen for the user to send a feedback.
     /// This alert is presented when an error condition is hit.
     case sendErrorInitiatedFeedback
@@ -98,9 +96,6 @@ extension UIAlertController {
                     title: UserStrings.PsiCash(),
                     message: localizedMessage,
                     actions: [
-                        .defaultButton(title: UserStrings.Add_psiCash()) {
-                                onActionButtonTapped(alertEvent, .addPsiCashTapped)
-                        },
                         .dismissButton {
                             onActionButtonTapped(alertEvent, .dismissTapped)
                         }
