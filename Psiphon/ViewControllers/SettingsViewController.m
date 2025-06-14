@@ -66,11 +66,6 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
           SettingsSubscriptionCellSpecifierKey,
           SettingsRestorePurchases,
           SettingsReinstallVPNConfigurationKey,
-          SettingsPsiCashGroupHeaderTitleKey,
-          SettingsPsiCashCellSpecifierKey,
-          SettingsPsiCashAccountManagementSpecifierKey,
-          SettingsPsiCashAccountLogoutCellSpecifierKey,
-          SettingspsiCashAccountLoginCellSpecifierKey
         ];
            
     }
@@ -123,37 +118,7 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
         [hiddenKeys addObject:kForceReconnectFooter];
     }
     
-    // PsiCash Manage Account button:
-    // - Shown when logged in account.
-    // - Not allowed when disconnected (button disabled, not hidden).
-    // - Not allowed when logging out
-    if (self.viewModel.isPsiCashAccountLoggedIn == TRUE) {
-        [hiddenKeys removeObject:SettingsPsiCashAccountManagementSpecifierKey];
-    } else {
-        [hiddenKeys addObject:SettingsPsiCashAccountManagementSpecifierKey];
-    }
-    
-    // PsiCash Logout button:
-    // - Shown when logged in account.
-    // - Allowed when disconnected, local only, with prompt.
-    if (self.viewModel.isPsiCashAccountLoggedIn == TRUE) {
-        [hiddenKeys removeObject:SettingsPsiCashAccountLogoutCellSpecifierKey];
-    } else {
-        [hiddenKeys addObject:SettingsPsiCashAccountLogoutCellSpecifierKey];
-    }
-    
-    // PsiCash Login button:
-    // - Shown when not logged in (no tokens, trackers, logged out state),
-    //   or when PsiCash lib did not initialize successfully.
-    // - Not allowed when disconnected (button disabled, not hidden).
-    if (self.viewModel.isPsiCashInitialized == FALSE || self.viewModel.isPsiCashAccountLoggedIn == TRUE) {
-        [hiddenKeys addObject:SettingspsiCashAccountLoginCellSpecifierKey];
-    } else {
-        [hiddenKeys removeObject:SettingspsiCashAccountLoginCellSpecifierKey];
-    }
-    
     [self setHiddenKeys:hiddenKeys animated:FALSE];
-    
 }
 
 - (void)viewDidAppear:(BOOL)animated {
@@ -238,47 +203,6 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
         cell.userInteractionEnabled = enabled;
         cell.textLabel.enabled = enabled;
         cell.detailTextLabel.enabled = enabled;
-
-    } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
-        // PsiCash button.
-        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-        cell.textLabel.text = [UserStrings PsiCash];
-        
-    } else if ([specifier.key isEqualToString:SettingsPsiCashAccountManagementSpecifierKey]) {
-        // PsiCash Account Management button.
-        [cell setAccessoryType:UITableViewCellAccessoryDisclosureIndicator];
-        [cell.textLabel setText:[UserStrings PsiCash_account_management]];
-        
-        // PsiCash account management button disabled when not connected,
-        // and when logging out.
-        BOOL enabled = ([VPNStateCompat isConnected:self.viewModel.vpnStatus] && !self.viewModel.isLoggingOut);
-        cell.userInteractionEnabled = enabled;
-        cell.textLabel.enabled = enabled;
-        cell.detailTextLabel.enabled = enabled;
-        
-    } else if ([specifier.key isEqualToString:SettingsPsiCashAccountLogoutCellSpecifierKey]) {
-        // PsiCash Account Logout button.
-        cell.textLabel.textAlignment = NSTextAlignmentCenter;
-        cell.textLabel.text = [UserStrings Log_Out];
-        
-        // Logout button is enabled when VPN state in not in a transitory state,
-        // and no pending logout operation.
-        BOOL enabled = ![VPNStateCompat isInTransition:self.viewModel.vpnStatus] && !self.viewModel.isLoggingOut;
-        cell.userInteractionEnabled = enabled;
-        cell.textLabel.enabled = enabled;
-        cell.detailTextLabel.enabled = enabled;
-        
-    } else if ([specifier.key isEqualToString:SettingspsiCashAccountLoginCellSpecifierKey]) {
-        // PsiCash Account Login button.
-        cell.textLabel.textAlignment = NSTextAlignmentCenter;
-        cell.textLabel.text = [UserStrings Log_in];
-        
-        // Login button is enabled when VPN state in not in a transitory state.
-        BOOL enabled = ![VPNStateCompat isInTransition:self.viewModel.vpnStatus];
-        cell.userInteractionEnabled = enabled;
-        cell.textLabel.enabled = enabled;
-        cell.detailTextLabel.enabled = enabled;
-        
     }
 
     PSIAssert(cell != nil);
@@ -326,101 +250,10 @@ NSString * const SettingspsiCashAccountLoginCellSpecifierKey = @"settingsLoginPs
         // Reinstall VPN config button
         [SwiftDelegate.bridge reinstallVPNConfig];
         [self settingsViewControllerDidEnd:nil];
-
-    } else if ([specifier.key isEqualToString:SettingsPsiCashCellSpecifierKey]) {
-        
-        // PsiCash button
-        [self presentPsiCashStore];
-        
-    } else if ([specifier.key isEqualToString:SettingsPsiCashAccountManagementSpecifierKey]) {
-        
-        // PsiCash Account Management button
-        [self openPsiCashAccountManagement];
-        
-    } else if ([specifier.key isEqualToString:SettingsPsiCashAccountLogoutCellSpecifierKey]) {
-        
-        // PsiCash Account Logout button
-        [self onPsiCashAccountLogOutWithSourceView:cell];
-        
-    } else if ([specifier.key isEqualToString:SettingspsiCashAccountLoginCellSpecifierKey]) {
-        
-        //PsiCash Account Login button
-        [self onPsiCashAccountLoginTapped];
-        
     }
-    
 }
 
 #pragma mark - Callbacks
-
-- (void)presentPsiCashStore {
-    [SwiftDelegate.bridge presentPsiCashStoreViewController:PsiCashScreenTabSpeedBoost];
-}
-
-- (void)openPsiCashAccountManagement {
-    [SwiftDelegate.bridge presentPsiCashAccountManagement];
-}
-
-- (void)onPsiCashAccountLoginTapped {
-    [SwiftDelegate.bridge presentPsiCashAccountViewControllerWithPsiCashScreen:FALSE];
-}
-
-- (void)onPsiCashAccountLogOutWithSourceView:(UIView *_Nonnull)sourceView {
-    
-    // No-op if tunnel is not connected or disconnected.
-    if ([VPNStateCompat isInTransition:self.viewModel.vpnStatus] == TRUE) {
-        return;
-    }
-    
-    BOOL isOffline = [VPNStateCompat isDisconnected:self.viewModel.vpnStatus];
-    
-    NSString *message;
-    NSString *logoutTitle;
-    
-    if (isOffline == TRUE) {
-        
-        message = [UserStrings PsiCash_logout_offline_body];
-        logoutTitle = [UserStrings Logout_anyway];
-        
-    } else {
-        
-        message = [UserStrings Are_you_sure_psicash_account_logout];
-        logoutTitle = [UserStrings Log_Out];
-        
-    }
-    
-    UIAlertController *alert = [UIAlertController
-                                alertControllerWithTitle:[UserStrings Psicash_account_logout_title]
-                                message:message
-                                preferredStyle:UIAlertControllerStyleAlert];
-    
-    UIAlertAction *logoutAction = [UIAlertAction actionWithTitle:logoutTitle
-                                                           style:UIAlertActionStyleDestructive
-                                                         handler:^(UIAlertAction *action) {
-        [SwiftDelegate.bridge logOutPsiCashAccount];
-    }];
-    
-    // Adds a "Connect" button if tunnel is not connected,
-    // and sets it as the default action.
-    if (isOffline == TRUE) {
-        
-        UIAlertAction *connectAction = [UIAlertAction actionWithTitle:[UserStrings Connect]
-                                                               style:UIAlertActionStyleDefault
-                                                             handler:^(UIAlertAction *action) {
-            [SwiftDelegate.bridge connectButtonTappedFromSettings];
-        }];
-        
-        [alert addAction:connectAction];
-        
-        alert.preferredAction = connectAction;
-        
-    }
-    
-    [alert addAction:logoutAction];
-    [alert addCancelAction:nil];
-    
-    [alert presentFromTopController];
-}
 
 - (void)onRestorePurchases {
     
