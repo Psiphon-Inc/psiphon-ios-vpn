@@ -192,7 +192,7 @@ extension SubscriptionBarView.SubscriptionBarState {
     
     static func make(
         subscriptionAuthState: SubscriptionAuthState,
-        subscriptionStatus: SubscriptionStatus,
+        subscriptionStatus: AppStoreIAP.SubscriptionStatus,
         tunnelStatus: TunnelConnectedStatus
     ) -> Self {
         switch subscriptionStatus {

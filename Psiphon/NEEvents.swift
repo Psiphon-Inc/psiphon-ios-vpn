@@ -29,7 +29,7 @@ enum NEEvent {
     static func canPresentPurchaseRequiredPrompt(
         dateCompare: DateCompare,
         psiCashState: PsiCashState,
-        subscriptionStatus: SubscriptionStatus,
+        subscriptionStatus: AppStoreIAP.SubscriptionStatus,
         tunnelConnectedStatus: TunnelConnectedStatus
     ) -> Bool {
         
@@ -49,7 +49,7 @@ enum NEEvent {
     static func canPresentDisallowedTrafficPrompt(
         dateCompare: DateCompare,
         psiCashState: PsiCashState,
-        subscriptionStatus: SubscriptionStatus,
+        subscriptionStatus: AppStoreIAP.SubscriptionStatus,
         applicationParameters: ApplicationParameters,
         tunnelConnectedStatus: TunnelConnectedStatus
     ) -> Bool {

@@ -290,7 +290,7 @@ import PsiphonClientCommonLibrary
         self.hasBeenInIntroPeriod = subscription?.hasBeenInIntroOfferPeriod ?? false
     }
 
-    static func from(state: SubscriptionStatus) -> BridgedUserSubscription {
+    static func from(state: AppStoreIAP.SubscriptionStatus) -> BridgedUserSubscription {
         switch state {
         case .subscribed(let purchase):
             return .init(.active, purchase)

@@ -25,7 +25,7 @@ import PsiCashClient
 // Container for data used by `SettingsViewController`.
 struct SettingsViewModel: Equatable {
     let receiptRefreshState: ReceiptState.ReceiptRefreshState
-    let subscriptionState: SubscriptionStatus
+    let subscriptionState: AppStoreIAP.SubscriptionStatus
     let psiCashLib: PsiCashState.PsiCashLibState
     let isLoggingOut: Bool
     let vpnStatus: VPNStatus
