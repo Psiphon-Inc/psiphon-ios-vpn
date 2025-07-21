@@ -1,0 +1,46 @@
+name: Pull latest psiphon-tunnel-core framwork
+
+on:
+  workflow_dispatch:
+
+jobs:
+  sync-xcframework:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          # PsiphonTunnel.xcframework is in Git LFS
+          lfs: true
+
+      - name: Install Git LFS
+        run: |
+          brew install git-lfs
+          git lfs install
+
+      - name: Clone github.com/Psiphon-Labs/psiphon-tunnel-core-binaries
+        run: |
+          git clone --depth 1 https://github.com/Psiphon-Labs/psiphon-tunnel-core-binaries.git
+          ls psiphon-tunnel-core-binaries
+
+      - name: Unzip archive
+        run: unzip -o psiphon-tunnel-core-binaries/ios/build.zip -d .
+
+      # Reads the psiphon-tunnel-core commit hash inside the framework.
+      # This is used to link the commit message to the psiphon-tunnel-core commit that produces this framework.
+      - name: Read short build commit hash
+        id: short_hash
+        run: |
+          HASH=$(cat PsiphonTunnel.xcframework/ios-arm64/PsiphonTunnel.framework/build-git-commit.txt | cut -c1-8)
+          echo "hash=$HASH" >> $GITHUB_OUTPUT
+
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-author: github-actions <actions@github.com>
+          commit-message: "Use Psiphon-Labs/psiphon-tunnel-core@${{ steps.short_hash.outputs.hash }}"
+          title: "Update PsiphonTunne.xcframework to commit ${{ steps.short_hash.outputs.hash }}"
+          body: "This PR updates PsiphonTunnel.xcframework the the latest version in psiphon-tunnel-core-binaries"
+          base: master
