@@ -27,6 +27,9 @@ jobs:
       - name: Unzip archive
         run: unzip -o psiphon-tunnel-core-binaries/ios/build.zip -d .
 
+      - name: Clean up cloned repo
+        run: rm -rf psiphon-tunnel-core-binaries
+
       # Reads the psiphon-tunnel-core commit hash inside the framework.
       # This is used to link the commit message to the psiphon-tunnel-core commit that produces this framework.
       - name: Read short build commit hash
@@ -36,11 +39,12 @@ jobs:
           echo "hash=$HASH" >> $GITHUB_OUTPUT
 
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-author: github-actions <actions@github.com>
           commit-message: "Use Psiphon-Labs/psiphon-tunnel-core@${{ steps.short_hash.outputs.hash }}"
           title: "Update PsiphonTunne.xcframework to commit ${{ steps.short_hash.outputs.hash }}"
           body: "This PR updates PsiphonTunnel.xcframework the the latest version in psiphon-tunnel-core-binaries"
+          branch: "update/tunnel-core-${{ steps.short_hash.outputs.hash }}"
           base: master
