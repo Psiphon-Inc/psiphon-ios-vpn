@@ -42,7 +42,7 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-author: github-actions <actions@github.com>
+          author: github-actions <actions@github.com>
           commit-message: "Use Psiphon-Labs/psiphon-tunnel-core@${{ steps.short_hash.outputs.hash }}"
           title: "Update PsiphonTunne.xcframework to commit ${{ steps.short_hash.outputs.hash }}"
           body: "This PR updates PsiphonTunnel.xcframework the the latest version in psiphon-tunnel-core-binaries"
