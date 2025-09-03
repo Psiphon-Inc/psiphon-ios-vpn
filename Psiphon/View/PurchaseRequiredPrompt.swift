@@ -26,7 +26,6 @@ import struct PsiCashClient.PsiCashState
 struct PurchaseRequiredPrompt: ViewBuilder {
     
     let subscribeButtonHandler: () -> Void
-    let speedBoostButtonHandler: () -> Void
     let disconnectButtonHandler: () -> Void
     
     func build(_ container: UIView?) -> ImmutableBindableViewable<Utilities.Unit, UIView> {
@@ -44,7 +43,7 @@ struct PurchaseRequiredPrompt: ViewBuilder {
         )
         
         let explanation = UILabel.make(
-            text: UserStrings.Psiphon_is_no_longer_free_in_your_region_buy_sub_or_speedboost_body(),
+            text: UserStrings.Psiphon_is_no_longer_free_in_your_region_buy_sub_body(),
             fontSize: .normal,
             typeface: .medium,
             color: .white,
@@ -61,15 +60,6 @@ struct PurchaseRequiredPrompt: ViewBuilder {
             $0.setEventHandler(self.subscribeButtonHandler)
         }
         
-        let speedBoostButton = GradientButton(contentShadow: true, gradient: .blue)
-        mutate(speedBoostButton) {
-            $0.titleLabel!.apply(fontSize: .h3,
-                                 typeface: .demiBold)
-            $0.setTitleColor(.white, for: .normal)
-            $0.setTitle(UserStrings.Speed_boost(), for: .normal)
-            $0.setEventHandler(self.speedBoostButtonHandler)
-        }
-        
         let disconnectButton = GradientButton(contentShadow: false, gradient: .pureWhite)
         mutate(disconnectButton) {
             $0.setTitle(UserStrings.Vpn_disconnect_button_title(), for: .normal)
@@ -84,7 +74,6 @@ struct PurchaseRequiredPrompt: ViewBuilder {
             title,
             explanation,
             subscribeButton,
-            speedBoostButton,
             disconnectButton,
             backgroundImage
         )
@@ -117,20 +106,10 @@ struct PurchaseRequiredPrompt: ViewBuilder {
             ]
         }
         
-        speedBoostButton.activateConstraints {
-            $0.constraintToParent(.centerX()) +
-            [
-                $0.topAnchor.constraint(equalTo: subscribeButton.bottomAnchor,
-                                        constant: Style.default.largePadding),
-                $0.heightAnchor.constraint(equalToConstant: Style.default.buttonHeight),
-                $0.widthAnchor.constraint(equalTo: title.widthAnchor)
-            ]
-        }
-        
         disconnectButton.activateConstraints {
             $0.constraintToParent(.centerX()) +
             [
-                $0.topAnchor.constraint(equalTo: speedBoostButton.bottomAnchor,
+                $0.topAnchor.constraint(equalTo: subscribeButton.bottomAnchor,
                                         constant: Style.default.largePadding),
                 $0.heightAnchor.constraint(equalToConstant: Style.default.buttonHeight),
                 $0.widthAnchor.constraint(equalTo: title.widthAnchor)

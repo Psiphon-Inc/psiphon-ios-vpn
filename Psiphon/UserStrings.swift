@@ -886,12 +886,12 @@ extension UserStrings {
                                  comment: "Do not translate or transliterate 'Psiphon'. An alert with this title is shown when the user connects from a region where free service is no longer offered, asking the user to subscribe.")
     }
     
-    static func Psiphon_is_no_longer_free_in_your_region_buy_sub_or_speedboost_body() -> String {
-        return NSLocalizedString("PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_BUY_SUB_OR_SPEEDBOOST_BODY", tableName: nil, bundle: Bundle.main,
-                                 value: "Help keep Psiphon free for those who need it most! Subscribe now or purchase a Speed Boost.",
-                                 comment: "Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost', conform to translation under key 'SPEED_BOOST'. Body of an alert that is shown to the user when they connect from a region where free service is no longer offered, asking the user to subscribe or purchase Speed Boost.")
+    static func Psiphon_is_no_longer_free_in_your_region_buy_sub_body() -> String {
+        return NSLocalizedString("PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_BUY_SUB", tableName: nil, bundle: Bundle.main,
+                                 value: "Help keep Psiphon free for those who need it most! Subscribe now.",
+                                 comment: "Do not translate or transliterate 'Psiphon'. Body of an alert that is shown to the user when they connect from a region where free service is no longer offered, asking the user to subscribe.")
     }
-    
+
 }
 
 // MARK: Feedback

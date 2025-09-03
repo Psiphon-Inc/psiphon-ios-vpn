@@ -636,8 +636,8 @@
 /* Alert message informing user that a Psiphon connection is required */
 "PSIPHON_CONNECTION_REQUIRED" = "Psiphon Connection Required";
 
-/* Do not translate or transliterate 'Psiphon'. Do not transliterate 'Speed Boost', conform to translation under key 'SPEED_BOOST'. Body of an alert that is shown to the user when they connect from a region where free service is no longer offered, asking the user to subscribe or purchase Speed Boost. */
-"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_BUY_SUB_OR_SPEEDBOOST_BODY" = "Help keep Psiphon free for those who need it most! Subscribe now or purchase a Speed Boost.";
+/* Do not translate or transliterate 'Psiphon'. Body of an alert that is shown to the user when they connect from a region where free service is no longer offered, asking the user to subscribe. */
+"PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_BUY_SUB" = "Help keep Psiphon free for those who need it most! Subscribe now.";
 
 /* Do not translate or transliterate 'Psiphon'. An alert with this title is shown when the user connects from a region where free service is no longer offered, asking the user to subscribe. */
 "PSIPHON_IS_NO_LONGER_FREE_IN_YOUR_REGION_TITLE" = "Psiphon is no longer free in your region";

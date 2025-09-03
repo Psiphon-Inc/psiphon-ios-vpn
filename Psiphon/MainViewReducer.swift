@@ -807,9 +807,6 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
                         subscribeButtonHandler: { [observer] in
                             observer.send(value: .purchaseRequiredPromptButton(.subscribeTapped))
                         },
-                        speedBoostButtonHandler: { [observer] in
-                            observer.send(value: .purchaseRequiredPromptButton(.speedBoostTapped))
-                        },
                         disconnectButtonHandler: { [observer] in
                             observer.send(value: .purchaseRequiredPromptButton(.disconnectTapped))
                         }
