@@ -174,14 +174,9 @@ let landingPageReducer = Reducer<LandingPageReducerState
         
         if state.applicationParameters.vpnSessionNumber > lastHandledVPNSession {
             
-            // Prompt is presented if the user is not (subscribed or speed-boosted)
-            // and is connected (or connecting).
-            if NEEvent.canPresentPurchaseRequiredPrompt(
-                dateCompare: environment.dateCompare,
-                psiCashState: state.psiCashState,
-                subscriptionStatus: state.subscriptionState.status,
-                tunnelConnectedStatus: state.tunnelConnection?.tunneled ?? .notConnected
-            ) {
+            // Prompt is presented if the user is not subscribed.
+            if state.subscriptionState.status == .unknown ||
+                state.subscriptionState.status == .notSubscribed {
                 
                 // If VPN is in connecting state, waits for the VPN to connect first.
                 return [

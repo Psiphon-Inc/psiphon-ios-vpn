@@ -200,19 +200,6 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
     switch action {
         
     case .updatedConnectionStatus(let vpnStatus):
-        
-        if case .notConnected = vpnStatus {
-            // Dismiss purchase required screen if VPN is disconnected
-            if case .completed(true) = state.mainView.purchaseRequiredPromptPresented {
-                return [
-                    dismissViewController(
-                        getTopActiveViewController: environment.getTopActiveViewController,
-                        type: ViewBuilderViewController<PurchaseRequiredPrompt>.self)
-                    .mapNever()
-                ]
-            }
-        }
-        
         return []
         
     case .psiCashViewAction(let psiCashAction):
@@ -783,21 +770,18 @@ let mainViewReducer = Reducer<MainViewReducerState, MainViewAction, MainViewEnvi
             return []
         }
         
-        // Prompt is presented if the user is not (subscribed or speed-boosted)
-        // and is connected (or connecting).
-        guard NEEvent.canPresentPurchaseRequiredPrompt(
-            dateCompare: environment.dateCompare,
-            psiCashState: state.psiCashState,
-            subscriptionStatus: state.subscriptionState.status,
-            tunnelConnectedStatus: state.tunnelConnectedStatus
-        )  else {
+        // Prompt is presented if the user is not subscribed.
+        if case .subscribed(_) = state.subscriptionState.status {
             return []
         }
         
         state.mainView.purchaseRequiredPromptPresented = .pending
         
-        // Presents purchase required prompt.
+        // Stop the VPN and present the purchase required prompt.
         return [
+            environment.vpnActionStore(
+                .tunnelStateIntent(intent: .stop, reason: .userInitiated)).mapNever(),
+            
             Effect { observer, _ in
                 
                 let vc = ViewBuilderViewController(

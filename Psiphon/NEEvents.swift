@@ -24,26 +24,6 @@ import PsiCashClient
 
 enum NEEvent {
     
-    /// Predicate for whether a required purchase prompt can be presented if
-    /// `"ShowPurchaseRequiredPrompt": true` value was received from Psiphon server.
-    static func canPresentPurchaseRequiredPrompt(
-        dateCompare: DateCompare,
-        psiCashState: PsiCashState,
-        subscriptionStatus: AppStoreIAP.SubscriptionStatus,
-        tunnelConnectedStatus: TunnelConnectedStatus
-    ) -> Bool {
-        
-        let speedBoosted = psiCashState.activeSpeedBoost(dateCompare) != nil
-        
-        let purchasing = psiCashState.speedBoostPurchase.deferred || psiCashState.speedBoostPurchase.pending
-        
-        return !speedBoosted &&
-               !purchasing &&
-               !subscriptionStatus.subscribed &&
-               (tunnelConnectedStatus == .connected || tunnelConnectedStatus == .connecting)
-        
-    }
-    
     /// Predicate for whether a disallowed-traffic prompt can be presented if
     /// `"disallowed-traffic"` server alert was received from Psiphon server.
     static func canPresentDisallowedTrafficPrompt(
